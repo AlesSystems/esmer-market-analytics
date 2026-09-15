@@ -1,0 +1,19 @@
+{
+  "entries": 646,
+  "files": 540,
+  "outsideAllowlist": [],
+  "prohibitedPaths": [],
+  "localOrLegacyPathMatches": 0,
+  "dependencyNoticeFiles": 11,
+  "archiveSha256": "f5c113273e22b507d4bdd5890886a1628c5096e132800f937af4260185e69972",
+  "runtimeNotices": [
+    {
+      "name": "LICENSE",
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "name": "LICENSES.chromium.html",
+      "sha256": "a62dabd1c6ef1327365b2a3fdffb806222684a746dcb8f4afd1c1f690eba5535"
+    }
+  ]
+}

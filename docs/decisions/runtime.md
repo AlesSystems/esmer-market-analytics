@@ -1,0 +1,60 @@
+# Phase 1 runtime
+
+Implements [issue #4](https://github.com/AlesSystems/esmer-market-analytics/issues/4), tasks 1.1 and 1.2 of the [approved plan](../superpowers/plans/esmer-market-implementation-plan.md#phase-1--independent-foundation), and the foundation of D01, D04, D07, D08, D19, and D20.
+
+## Application boundary
+
+One Electron application owns a React renderer and a local Node worker. The renderer asks for service availability through one named preload method. The main process validates the sender and payload before it calls the worker. No HTTP service, source driver, source credentials, or business schema is needed for this phase.
+
+The worker must prove that its empty local SQLite connection works before reporting availability. Durable storage and migrations belong to Phase 4. Availability distinguishes an empty, ready service from an unavailable service.
+
+## Dependency selections
+
+The direct versions are exact pins in `package.json`; `package-lock.json` locks the complete graph. Selection used public upstream documentation and npm metadata on 2026-09-15. These are independent choices, with no legacy manifest or runtime code imported.
+
+| Dependency | Selection | Licence | Reason |
+| --- | --- | --- | --- |
+| Electron | 44.3.0 | MIT, with bundled third-party notices | Desktop runtime and Windows target |
+| React and React DOM | 19.3.0 | MIT | Approved renderer stack |
+| SQLite | 3.53.4 through Electron's bundled `node:sqlite` | SQLite is public domain; Node includes its own notices | Avoid an additional native module and Electron ABI rebuild |
+| decimal.js | 10.6.0 | MIT | Parse decimal strings without binary floating-point arithmetic |
+| read-excel-file | 9.3.10 | MIT | Read `.xlsx` with an explicit number parser |
+| write-excel-file | 4.1.1 | MIT | Write typed `.xlsx` cells, sheets, and number formats |
+| TypeScript | 6.0.3 | Apache-2.0 | Compatible with the selected TypeScript ESLint peer range |
+| esbuild | 0.28.2 | MIT | Bundle the desktop, preload, worker, and React without another application framework |
+| Vitest | 5.0.1 | MIT | Run filtered unit and integration tests once |
+| Playwright Test | 1.63.0 | Apache-2.0 | Launch the packaged Electron executable |
+| electron-builder | 26.15.3 | MIT | Produce host smoke packages and Windows outputs |
+| ESLint | 10.10.0 | MIT | Lint source, scripts, and tests |
+| typescript-eslint | 8.70.0 | MIT | TypeScript lint support |
+| Node type declarations | 24.13.4 | MIT | Compile against the Node 24 API |
+| React and React DOM type declarations | 19.3.0 | MIT | Match the renderer major version |
+
+Development uses Node 24 and npm 11. The tested Electron package embeds Node 24.20.0 and SQLite 3.53.4. TypeScript 7 was not selected because typescript-eslint 8.70.0 declares TypeScript `<6.1.0`. The Excel packages have 2026 updates in their npm metadata. Dependency audit results and tested operating systems are recorded in [the evidence index](../evidence/index.md).
+
+## Decimal and Excel limits
+
+The dependency check uses synthetic values. Financial rules, rounding policy, source semantics, and UI-to-Excel report reconciliation remain later acceptance work.
+
+`read-excel-file` supports a custom `parseNumber` function, so source numeric strings can remain strings until the decimal layer parses them. Its formula reader uses cached spreadsheet results; it does not evaluate formulas. Phase 7 must define how expense imports reject or handle formula cells and missing cached values. `write-excel-file` supports explicit cell types and number formats. Values that cannot be represented safely as Excel numbers need an explicit export policy before reports ship. No financial API accepts JavaScript floating-point values merely because a spreadsheet library can write them.
+
+## Windows and native packaging
+
+Windows is the deployment target. A local macOS package establishes that the build and bundled service work on the development host. It cannot establish Windows compatibility.
+
+Using `node:sqlite` keeps SQLite in the Electron runtime. If a later feature needs an external native module, rebuild it for the exact Electron version and target architecture, inspect its ASAR unpack rules, and repeat the packaged Windows check. An ordinary Node test does not prove that an Electron native module loads.
+
+The Windows agent must record the actual Windows edition/build, architecture, Node/npm versions, executable hash, and bundled Electron/Node/SQLite versions. The Phase 1 exit gate stays open until the packaged executable opens offline on that environment. No installation on Eralp's computer or production rollout is authorized by this PR.
+
+## Upstream references
+
+- [Electron security guidance](https://www.electronjs.org/docs/latest/tutorial/security)
+- [Electron native modules and ABI compatibility](https://www.electronjs.org/docs/latest/tutorial/using-native-node-modules)
+- [Node SQLite API](https://nodejs.org/api/sqlite.html)
+- [SQLite public-domain declaration](https://www.sqlite.org/copyright.html)
+- [decimal.js API](https://mikemcl.github.io/decimal.js/)
+- [read-excel-file documentation and licence](https://github.com/catamphetamine/read-excel-file)
+- [write-excel-file documentation and licence](https://github.com/catamphetamine/write-excel-file)
+- [Playwright Electron support](https://playwright.dev/docs/api/class-electron)
+
+Retain dependency licences and Electron's third-party notices in distributed artifacts. This selection record does not replace the Phase 10 distribution licence review.
