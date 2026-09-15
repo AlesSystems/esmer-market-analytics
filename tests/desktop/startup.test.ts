@@ -13,7 +13,7 @@ const executablePath =
       : resolve("release/linux-unpacked/esmer-market-analytics"));
 test("empty packaged app starts offline without login or renderer privileges", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-desktop-"));
-  const app = await electron.launch({
+  let app = await electron.launch({
     executablePath,
     args: [`--user-data-dir=${userData}`],
   });
@@ -52,18 +52,71 @@ test("empty packaged app starts offline without login or renderer privileges", a
     expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
       await realpath(userData),
     );
-    const runtime = await app.evaluate(async () => {
+    const runtime = await app.evaluate(async ({ app }) => {
       const { DatabaseSync } = process.getBuiltinModule("node:sqlite");
       const database = new DatabaseSync(":memory:");
       const sqlite = database
         .prepare("SELECT sqlite_version() AS version")
         .get();
       database.close();
-      return {
+      const main = {
         electron: process.versions.electron,
         node: process.versions.node,
         sqlite,
       };
+      const { Worker } = process.getBuiltinModule("node:worker_threads");
+      const { join } = process.getBuiltinModule("node:path");
+      const worker = new Worker(
+        `
+          const { parentPort, workerData, isMainThread } = require('node:worker_threads');
+          const { DatabaseSync } = require('node:sqlite');
+          const database = new DatabaseSync(':memory:');
+          const sqlite = database.prepare('SELECT sqlite_version() AS version').get();
+          database.close();
+          const postMessage = parentPort.postMessage.bind(parentPort);
+          parentPort.postMessage = (availability) => postMessage({
+            electron: process.versions.electron,
+            node: process.versions.node,
+            sqlite,
+            isMainThread,
+            availability,
+          });
+          require(workerData);
+        `,
+        {
+          eval: true,
+          workerData: join(app.getAppPath(), "dist/service/worker.cjs"),
+        },
+      );
+      try {
+        const measured = await new Promise<unknown>((resolve, reject) => {
+          const timeout = setTimeout(
+            () => reject(new Error("WORKER_RUNTIME_TIMEOUT")),
+            5_000,
+          );
+          worker.once("message", (result: unknown) => {
+            clearTimeout(timeout);
+            resolve(result);
+          });
+          worker.once("error", () => {
+            clearTimeout(timeout);
+            reject(new Error("WORKER_RUNTIME_FAILED"));
+          });
+          worker.postMessage(null);
+        });
+        return { main, worker: measured };
+      } finally {
+        await worker.terminate();
+      }
+    });
+    expect(runtime.worker).toEqual({
+      ...runtime.main,
+      isMainThread: false,
+      availability: {
+        status: "ready",
+        store: "empty",
+        liveConnection: "disabled",
+      },
     });
     await writeFile(
       "test-results/runtime.json",
@@ -148,6 +201,25 @@ test("empty packaged app starts offline without login or renderer privileges", a
       ),
     ).toBe(1);
     await page.screenshot({ path: "test-results/offline-startup.png" });
+    await app.close();
+    app = await electron.launch({
+      executablePath,
+      args: [`--user-data-dir=${userData}`],
+    });
+    const reopened = await app.firstWindow();
+    await expect(
+      reopened.getByRole("heading", { name: "Henüz veri içe aktarılmadı" }),
+    ).toBeVisible();
+    await expect(reopened.getByText("Canlı bağlantı kapalı")).toBeVisible();
+    await expect(reopened.locator("input[type=password]")).toHaveCount(0);
+    expect(await reopened.evaluate(() => window.esmer.getAvailability())).toEqual({
+      status: "ready",
+      store: "empty",
+      liveConnection: "disabled",
+    });
+    expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
+      await realpath(userData),
+    );
   } finally {
     await app.close();
     await rm(userData, { recursive: true, force: true });
