@@ -1,24 +1,112 @@
-import { test, expect, _electron as electron } from '@playwright/test';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-
-const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === 'darwin'
-  ? resolve(`release/mac${process.arch === 'arm64' ? '-arm64' : ''}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`)
-  : process.platform === 'win32' ? resolve('release/win-unpacked/Esmer Market Analytics.exe') : resolve('release/linux-unpacked/esmer-market-analytics'));
-
-test('empty packaged app starts offline without login or renderer privileges', async () => {
-  const userData = await mkdtemp(join(tmpdir(), 'esmer-desktop-'));
-  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+import { test, expect, _electron as electron } from "@playwright/test";
+import { mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+const executablePath =
+  process.env.ESMER_EXECUTABLE ??
+  (process.platform === "darwin"
+    ? resolve(
+        `release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`,
+      )
+    : process.platform === "win32"
+      ? resolve("release/win-unpacked/Esmer Market Analytics.exe")
+      : resolve("release/linux-unpacked/esmer-market-analytics"));
+test("empty packaged app starts offline without login or renderer privileges", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-desktop-"));
+  const app = await electron.launch({
+    executablePath,
+    args: [`--user-data-dir=${userData}`],
+  });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: 'Henüz veri içe aktarılmadı' })).toBeVisible();
-    await expect(page.getByText('Canlı bağlantı kapalı')).toBeVisible();
-    await expect(page.locator('input[type=password]')).toHaveCount(0);
-    expect(await page.evaluate(() => ({ api: Object.keys(window.esmer), node: typeof window.require, process: typeof window.process }))).toEqual({ api: ['getAvailability'], node: 'undefined', process: 'undefined' });
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ status: 'ready', store: 'empty', liveConnection: 'disabled' });
+    await expect(
+      page.getByRole("heading", { name: "Henüz veri içe aktarılmadı" }),
+    ).toBeVisible();
+    await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
+    await expect(page.locator("input[type=password]")).toHaveCount(0);
+    expect(
+      await page.evaluate(() => ({
+        api: Object.keys(window.esmer),
+        node: typeof window.require,
+        process: typeof window.process,
+      })),
+    ).toEqual({
+      api: ["getAvailability"],
+      node: "undefined",
+      process: "undefined",
+    });
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({
+      status: "ready",
+      store: "empty",
+      liveConnection: "disabled",
+    });
     expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
-    await page.screenshot({ path: 'test-results/offline-startup.png' });
+    expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
+      await realpath(userData),
+    );
+    const runtime = await app.evaluate(async () => {
+      const { DatabaseSync } = process.getBuiltinModule("node:sqlite");
+      const database = new DatabaseSync(":memory:");
+      const sqlite = database
+        .prepare("SELECT sqlite_version() AS version")
+        .get();
+      database.close();
+      return {
+        electron: process.versions.electron,
+        node: process.versions.node,
+        sqlite,
+      };
+    });
+    await writeFile(
+      "test-results/runtime.json",
+      JSON.stringify(runtime, null, 2),
+    );
+    const preferences = await app.evaluate(({ BrowserWindow }) =>
+      (
+        BrowserWindow.getAllWindows()[0].webContents as unknown as {
+          getLastWebPreferences(): Record<string, unknown>;
+        }
+      ).getLastWebPreferences(),
+    );
+    expect(preferences).toMatchObject({
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false,
+      webviewTag: false,
+    });
+    expect(
+      await page.evaluate(async () => {
+        try {
+          await fetch("https://example.invalid/source");
+          return "allowed";
+        } catch {
+          return "blocked";
+        }
+      }),
+    ).toBe("blocked");
+    expect(
+      await page.evaluate(
+        async () =>
+          (await navigator.permissions.query({ name: "geolocation" })).state,
+      ),
+    ).toBe("denied");
+    expect(
+      await page.evaluate(() => window.open("https://example.invalid/")),
+    ).toBeNull();
+    await page.evaluate(() => {
+      location.href = "https://example.invalid/";
+    });
+    expect(
+      await app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows()[0].webContents.getURL(),
+      ),
+    ).toBe("esmer://app/index.html");
+    expect(
+      await app.evaluate(
+        ({ BrowserWindow }) => BrowserWindow.getAllWindows().length,
+      ),
+    ).toBe(1);
+    await page.screenshot({ path: "test-results/offline-startup.png" });
   } finally {
     await app.close();
     await rm(userData, { recursive: true, force: true });
