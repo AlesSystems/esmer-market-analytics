@@ -50,7 +50,7 @@ Using `node:sqlite` keeps SQLite in the Electron runtime. If a later feature nee
 
 The [Windows evidence](../evidence/windows-phase-1.md) records the user-approved HP development host, its Windows edition/build and hardware, development and packaged runtime versions, artifact hashes, packaged startup, same-profile restart, portable launch, and NSIS lifecycle observations. The runtime check loads the packaged service module in an additional instrumented worker instance and verifies its actual availability response. It does not add a production diagnostic API.
 
-Windows build, packaging, and the full available suite passed. The Phase 1 exit gate stays open pending the physical network-disconnection smoke and final evidence review. No installation on Eralp's computer or production rollout is authorized by this PR.
+Windows build, packaging, and the full available suite passed. The Phase 1 exit gate is complete using the recorded Windows checks and the user-reported manual offline startup. The offline report is not an automated-run result. No installation on Eralp's computer or production rollout is authorized by this PR.
 
 ## Upstream references
 

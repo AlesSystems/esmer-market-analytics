@@ -110,10 +110,10 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Interface:** The desktop starts the local service and displays its typed availability result. The service has no source connection at startup. An empty local store is a valid application state.
 
-- [ ] Before application work begins, confirm implementation authorization, inspect this repository's instructions and check release inputs for private material. Use the existing independent repository and approved planning artifacts. Preserve the legacy checkout and its unrelated untracked files.
-- [ ] Select and lock compatible maintained dependencies after validating licence terms, Windows support, Electron native-module packaging and decimal/Excel requirements. Record exact selections in `runtime.md`; do not copy legacy dependency choices by default.
-- [ ] Establish the verification scripts above and a desktop test that opens an empty application, finds `Henüz veri içe aktarılmadı`, observes no source connection and confirms no login screen appears.
-- [ ] Build the smallest window/service/React slice that passes that test. Open a packaged smoke build on a documented Windows test environment; do not install on Eralp's computer as a development shortcut.
+- [x] Before application work begins, confirm implementation authorization, inspect this repository's instructions and check release inputs for private material. Use the existing independent repository and approved planning artifacts. Preserve the legacy checkout and its unrelated untracked files.
+- [x] Select and lock compatible maintained dependencies after validating licence terms, Windows support, Electron native-module packaging and decimal/Excel requirements. Record exact selections in `runtime.md`; do not copy legacy dependency choices by default.
+- [x] Establish the verification scripts above and a desktop test that opens an empty application, finds `Henüz veri içe aktarılmadı`, observes no source connection and confirms no login screen appears.
+- [x] Build the smallest window/service/React slice that passes that test. Open a packaged smoke build on a documented Windows test environment; do not install on Eralp's computer as a development shortcut.
 
 **Verify:** `npm run test:desktop -- tests/desktop/startup.test.ts`, `npm run typecheck`, `npm run lint`, `npm run build`.
 
@@ -125,11 +125,13 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Interface:** Expose named operations for report reads, import preview/confirmation, export and recovery as those features arrive. Each request has a validated payload and trusted sender. File selection returns a service-owned handle; the renderer cannot send arbitrary SQL, credentials or unchecked filesystem paths.
 
-- [ ] Add cases for an unknown operation, invalid payload, untrusted sender and SQL text embedded in an import request. Every case must fail before privileged work begins.
-- [ ] Enable renderer context isolation and sandboxing, disable renderer Node integration, restrict navigation/permissions and use a restrictive content policy. Expose individual operations through preload, never raw IPC or database handles. [Electron security guidance](https://www.electronjs.org/docs/latest/tutorial/security)
-- [ ] Assert that source credentials and native modules are absent from renderer-visible state. Return useful Turkish errors while logging only safe diagnostic metadata.
+- [x] Add cases for an unknown operation, invalid payload, untrusted sender and SQL text embedded in an import request. Every case must fail before privileged work begins.
+- [x] Enable renderer context isolation and sandboxing, disable renderer Node integration, restrict navigation/permissions and use a restrictive content policy. Expose individual operations through preload, never raw IPC or database handles. [Electron security guidance](https://www.electronjs.org/docs/latest/tutorial/security)
+- [x] Assert that source credentials and native modules are absent from renderer-visible state. Return useful Turkish errors while logging only safe diagnostic metadata.
 
 **Verify:** `npm run test:integration -- tests/integration/desktop-boundary.test.ts` and the startup test.
+
+**Evidence status (2026-09-15): Complete.** [Windows verification](../../evidence/windows-phase-1.md) records packaged checks, dependency notices, runtime versions, screenshots, installer removal, and user-performed offline startup. A01, A05, and A07 remain broader release gates. Stop after Phase 1.
 
 **Exit gate:** Offline startup and privilege-boundary checks pass. Dependency choices and Windows smoke evidence are recorded. Covers the foundation of A01, A05 and A07.
 
