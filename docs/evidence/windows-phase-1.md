@@ -2,9 +2,9 @@
 
 ## Gate status
 
-The Phase 1 exit gate remains **open**. Windows build and package creation passed. Packaged startup, disconnected networking, restart, portable launch, and NSIS install/launch/uninstall have not run. This record does not complete A01, A05, or A07.
+The Phase 1 exit gate remains **open** pending the physical network-disconnection smoke. Windows packaging, packaged startup, fresh-profile restart, worker runtime checks, the full available test suite, portable launch, and an NSIS install/launch/uninstall cycle passed. This record does not complete A01, A05, or A07.
 
-The session requested confirmation that the available Windows host is the isolated development/test machine, as required by the [Windows handoff](../operations/windows-phase-1-handoff.md). That confirmation is pending. Windows Sandbox is unavailable on this host. Application launches and installer execution remain pending rather than assuming this is an approved installation target.
+The user confirmed that the HP is a second development computer and authorized its use for these checks. This is the approved test target for the [Windows handoff](../operations/windows-phase-1-handoff.md). Windows Sandbox is unavailable. Testing used the host directly, not a clean guest VM or Eralp's computer.
 
 ## Build and environment
 
@@ -13,7 +13,9 @@ The session requested confirmation that the available Windows host is the isolat
 - Existing PR: [#15](https://github.com/AlesSystems/esmer-market-analytics/pull/15).
 - Branch: `codex/phase-1-independent-foundation`.
 - Fetched baseline: `51255786a47cffc3b4a274e0db4d72ac1d1024fe`. Recorded before any file changes.
-- Final code and packaging commit: `709c75f1e64e4f34fcc0042aa24e269b18141e5e`. Final checks and artifacts used these unchanged file contents. The evidence commit adds documentation only.
+- Resumed remote and local baseline after host authorization: `b7308fc16d319d1bd84671dfa904a21571ab432a`. Both matched after fetching; the working tree was clean.
+- Application and packaging commit: `709c75f1e64e4f34fcc0042aa24e269b18141e5e`.
+- Tested commit: `cc83aa0fab81580216273a597f52ced882b8f99c`. This adds worker-runtime and same-profile restart coverage. Application and packaging contents remain unchanged from `709c75f`.
 - Initial working tree: clean, on `main` at `7c0dfee0abda9793fafa7e1145d6603d050fa69b`. The session fetched and switched to the existing remote Phase 1 branch.
 - App version: `0.1.0`.
 - Fixture: `synthetic-empty-v1`. No business records, source database, backups, credentials, or network services were used.
@@ -22,7 +24,7 @@ The session requested confirmation that the available Windows host is the isolat
 - Command host: PowerShell 7.6.6.
 - Initial development runtime: Node 22.19.0 and npm 10.9.3. These were not used for the verification commands below.
 - Verification development runtime: Node 24.15.0 and npm 11.12.1, from the official Windows x64 Node archive, checked against its published SHA-256 list and extracted under ignored `work/`.
-- Packaged runtime measurement: **pending**. Electron `44.3.0` is the selected package version. Bundled Node and SQLite versions have not been measured on Windows. The macOS runtime record is separate.
+- Measured packaged runtime: Electron `44.3.0`, bundled Node `24.20.0`, and SQLite `3.53.4` in both the Windows main process and the instrumented packaged worker instance. These are separate from development Node `24.15.0`.
 
 Machine names, serial numbers, account identifiers, private paths, and raw logs are excluded from this record.
 
@@ -42,15 +44,15 @@ Commands ran from the repository root in PowerShell. The local Node 24 directory
 | `npm run lint` | Passed |
 | `npm run test:unit` | Passed, 2 tests |
 | `npm run test:integration -- tests/integration/desktop-boundary.test.ts` | Passed, 7 tests |
-| `npm run test:desktop -- tests/desktop/startup.test.ts` | Not run, pending confirmation of the isolated test host |
+| `npm run test:desktop -- tests/desktop/startup.test.ts` | Baseline passed after host confirmation; enhanced worker-runtime and same-profile restart test passed, 1 test |
 | `npm run build` | Initial host-shell parse failure; passed with the session shell setting above |
 | `npm run package:win` | Passed with the session shell setting; produced x64 NSIS and portable executables; final check printed `PACKAGE_NOTICES_OK 6 dependencies` |
-| `npm test` | Not run because its packaged desktop step requires the pending host confirmation |
+| `npm test` | Passed on the tested commit, 2 unit tests, 7 integration tests, and 1 packaged desktop test |
 | `git diff --check` | Passed for the final changes |
 
-After the packaging fix, `npm ci`, typecheck, lint, both unit tests, all seven integration tests, build, and Windows packaging passed again. Neither the full suite nor packaged runtime/manual smoke ran. No application source, IPC contract, sandbox preference, or desktop test-driver setting changed.
+After the packaging fix and test enhancement, typecheck, lint, the full available suite, build, and Windows packaging passed again. The enhanced desktop check measures the worker runtime and restarts the same fresh profile. No application source, IPC contract, or sandbox preference changed.
 
-The installer uses electron-builder's default per-user, one-click NSIS configuration. Successful packaging does not prove installation or startup.
+The installer uses electron-builder's default per-user, one-click NSIS configuration. The observed installation and removal cycle is recorded below, separately from packaging success.
 
 ## Artifact hashes
 
@@ -58,16 +60,22 @@ SHA-256 values were measured with `Get-FileHash -Algorithm SHA256` after packagi
 
 | Artifact under `release/` | SHA-256 |
 | --- | --- |
-| `Esmer Market Analytics Setup 0.1.0.exe` | `82780b97360b761829b8ae3e9e8cafa2e81d942eff10cdba09dfdbf24950576a` |
-| `Esmer Market Analytics 0.1.0.exe` | `9ccd3e96827be04844d92d9b24e0c179e87b3075845e55bd96eee97025eae93c` |
+| `Esmer Market Analytics Setup 0.1.0.exe` | `d9c39da63b1bbf91d054b0067d79dd5f910d97d115585b815ccf4ab037c7bb5d` |
+| `Esmer Market Analytics 0.1.0.exe` | `76b3ead33356cea2bcc280027f663432690cf839b57b843f725b370b28920fe7` |
 | `win-unpacked/Esmer Market Analytics.exe` | `06fbf01c3bc9f00bd668bf67c8b306a355499f069d4de180ae27195e6f1b673d` |
 | `win-unpacked/resources/app.asar` | `3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460` |
 
-`Get-AuthenticodeSignature` reports `NotSigned` for all three application executables. The builder's log says it runs a signing step, but these outputs have no Authenticode signature. No SmartScreen or publisher dialog has been observed because the artifacts have not been launched. No absence of warnings is claimed.
+`Get-AuthenticodeSignature` reports `NotSigned` for all three application executables. The builder's log says it runs a signing step, but these outputs have no Authenticode signature. Neither local NSIS installation nor the native portable launch displayed a SmartScreen, publisher, or UAC warning during observation. These were locally generated artifacts. This observation does not establish warning behavior for a downloaded copy or another Windows configuration.
 
 ## Boundary and release-content evidence
 
-The seven integration cases passed. Unknown operations, malformed availability payloads, untrusted senders, path/credential-bearing payloads, and SQL-bearing import or availability requests return safe failures without calling the service. The valid service-failure case preserves its typed Turkish response. These are integration results; Windows renderer/runtime enforcement still needs the packaged desktop test.
+The seven integration cases passed. Unknown operations, malformed availability payloads, untrusted senders, path/credential-bearing payloads, and SQL-bearing import or availability requests return safe failures without calling the service. The valid service-failure case preserves its typed Turkish response.
+
+The Windows desktop test opens the actual packaged executable and verifies `app.isPackaged`. Its renderer exposes only `getAvailability`, with neither `require` nor `process`. Context isolation and sandboxing remain enabled; Node integration and webviews remain disabled. The test observes denied geolocation and popup creation, prevented navigation, and a `connect-src` policy violation for an external fetch. The availability reply is exactly `{"status":"ready","store":"empty","liveConnection":"disabled"}`. These policy assertions do not establish that the machine's network was physically disconnected.
+
+The enhanced test closes the application and reopens the same executable with the same temporary profile. The Turkish empty-state heading and `Canlı bağlantı kapalı` appear again. No password input appears. The test checks the canonical profile path and the ready availability response after reopening.
+
+The committed [runtime measurements](windows-phase-1-runtime.json), copied from `test-results/runtime.json`, record separate `main` and `worker` measurements. The test creates an additional Electron worker instance that loads the exact packaged `dist/service/worker.cjs`. Test-only instrumentation attaches runtime versions and `isMainThread: false` to that module's actual availability response, then terminates the instance. It does not inspect the application's already-running private worker object or expose a production diagnostic method. Both contexts measured Electron `44.3.0`, Node `24.20.0`, and SQLite `3.53.4`; the worker returned ready empty-store availability.
 
 Inspection used the installed `@electron/asar` library's `listPackage`, `statFile`, and `extractFile` functions. Windows inspection requires native path separators for the archive API. The final archive contains 349 entries and 301 files. Its top-level contents are `dist`, production `node_modules`, and `package.json`. Searches found no prohibited private input paths, `.env` files, source backups, databases, source maps, credential files, repository fixtures, or local checkout/user-home paths. Public dependency documentation is retained, including `write-excel-file/docs/IMAGES.md`.
 
@@ -94,14 +102,32 @@ The fix keeps `read-excel-file` pinned as a development dependency for the synth
 PACKAGE_NOTICES_OK 6 dependencies
 ```
 
-## Screenshots and remaining checks
+## Windows lifecycle and screenshots
 
-No Windows application or installer screenshot exists for this run. The [macOS screenshot](phase-1-offline-startup.png) is prior evidence and must not be presented as Windows evidence.
+The first NSIS cycle installed the app and launched it automatically. Visual inspection confirmed the Turkish empty state and disabled live connection. After closing the app, the uninstaller confirmation was accepted. The installed executable was absent afterward, and the matching current-user uninstall registry entry count was zero.
 
-On the confirmed isolated Windows test target, the remaining work is to run the packaged desktop check and full suite, open the unpacked and portable artifacts with networking disconnected, close and reopen the same fresh profile, and exercise NSIS install/launch/uninstall. Record worker SQLite loading, actual bundled versions, renderer restrictions, safe Turkish failures, publisher dialogs, screenshots, and final artifact hashes. Repeat these checks after any application or test-driver fixes.
+The final installer with the hash above was then installed and launched automatically. Its screenshot shows the expected application state. Removal of this final installation remains pending while the disconnected-network runner waits for the user to disconnect networking.
 
-Independent read-only review at the fetched baseline found no confirmed Windows application defect and no code comments or lint/TypeScript suppressions. It identified the unperformed restart, worker-version measurement, disconnected-network, portable, and installer evidence above. A separate reviewer examined final commit `709c75f` and the Windows evidence and found no actionable code or evidence inconsistency. All 81 recorded release-file hashes matched the local artifacts. Reviews used separate agents from the same model family. Windows runtime and manual smoke checks remain unperformed.
+![Installed Windows application](windows-phase-1-installed.png)
 
-Poteto's Prove It Works principle kept the gate open without Windows runtime evidence. Test Behavior, Not Implementation required the failing and passing check against real archives. Sequence Work into Verifiable Units put the failing check before the fix. Laziness Protocol limited the fix to dependency classification. Model the Domain represented each shipped package with its name, version, directory, and notice files.
+The portable executable also launched natively with a Windows-only `PATH`, without a development Node executable on that path. Visual inspection confirmed the same Turkish empty state. This screenshot is from the earlier portable artifact, whose `app.asar` hash matches the final artifact.
+
+![Portable Windows application](windows-phase-1-portable.png)
+
+The final portable artifact passed two additional launches using a local test driver. The driver spawns the portable executable, connects to a unique loopback Chrome DevTools Protocol port, verifies process ownership, and checks the running window. These checks do not require a production network service. The driver preserves the application sandbox and context isolation.
+
+A direct Playwright `_electron.launch` attempt against the portable wrapper timed out after 30 seconds. Local dependency inspection found that Playwright waits for Electron's inspector output from the launched process in `playwright-core/lib/coreBundle.js`. Electron-builder's `templates/nsis/portable.nsi` instead uses `ExecWait` to launch the extracted application as a child. The wrapper does not provide the direct Electron inspector stream expected by that launcher. Native launch and the separate spawn-and-connect check passed without relaxing security flags. The packaged desktop command tests the unpacked executable; the portable wrapper uses the separate local smoke procedure.
+
+![NSIS uninstall confirmation](windows-phase-1-uninstall.png)
+
+The default NSIS uninstall confirmation uses English text, as shown above. The application UI remains Turkish. Installer localization remains a recorded limitation.
+
+## Remaining checks and review
+
+The physical network-disconnection smoke is still waiting. No disconnected-network result is claimed in this record. The remaining run must open the required packaged variants with networking disconnected, capture its actual outcomes, and finish the final installation's removal check.
+
+Independent read-only review at the fetched baseline found no confirmed Windows application defect and no code comments or lint/TypeScript suppressions. It identified the then-missing restart, worker-version measurement, disconnected-network, portable, and installer evidence. A separate reviewer examined commit `709c75f` and its evidence and found no actionable code or evidence inconsistency. All 81 release-file hashes recorded at that review matched its local artifacts. Reviews used separate agents from the same model family. Final independent review of the enhanced test and evidence found no remaining actionable defect. The reviewer verified all 81 current release-file hashes and checked the screenshots for private identifiers. The review identified a stale-process risk in the scratch portable smoke driver; unique debug ports, process ancestry verification, and exit checks resolved it before the final driver run. The final physical-disconnection run remains pending.
+
+Poteto's Prove It Works principle keeps the gate open until the disconnected-network result is observed. Test Behavior, Not Implementation required the failing and passing check against real archives. Sequence Work into Verifiable Units put the failing check before the fix. Laziness Protocol limited the fix to dependency classification. Model the Domain represented each shipped package with its name, version, directory, and notice files.
 
 Phase 10 retains upgrade, recovery, performance, and full-dataset acceptance. Persistent business storage and Phase 2 remain outside this work.

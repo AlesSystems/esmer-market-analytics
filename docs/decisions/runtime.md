@@ -30,7 +30,7 @@ The direct versions are exact pins in `package.json`; `package-lock.json` locks 
 | Node type declarations | 24.13.4 | MIT | Compile against the Node 24 API |
 | React and React DOM type declarations | 19.3.0 | MIT | Match the renderer major version |
 
-Development uses Node 24 and npm 11. The tested macOS Electron package embeds Node 24.20.0 and SQLite 3.53.4. These are not measured Windows runtime versions. TypeScript 7 was not selected because typescript-eslint 8.70.0 declares TypeScript `<6.1.0`. The Excel packages have 2026 updates in their npm metadata. Dependency audit results and tested operating systems are recorded in [the evidence index](../evidence/index.md).
+Development uses Node 24 and npm 11. The Windows tests used development Node 24.15.0 and npm 11.12.1. The packaged Windows main process and instrumented packaged worker instance both measured Electron 44.3.0, bundled Node 24.20.0, and SQLite 3.53.4. The macOS package measured the same bundled versions in its separate record. TypeScript 7 was not selected because typescript-eslint 8.70.0 declares TypeScript `<6.1.0`. The Excel packages have 2026 updates in their npm metadata. Dependency audit results and tested operating systems are recorded in [the evidence index](../evidence/index.md).
 
 ## Decimal and Excel limits
 
@@ -48,7 +48,9 @@ Windows is the deployment target. A local macOS package establishes that the bui
 
 Using `node:sqlite` keeps SQLite in the Electron runtime. If a later feature needs an external native module, rebuild it for the exact Electron version and target architecture, inspect its ASAR unpack rules, and repeat the packaged Windows check. An ordinary Node test does not prove that an Electron native module loads.
 
-The Windows agent must record the actual Windows edition/build, architecture, Node/npm versions, executable hash, and bundled Electron/Node/SQLite versions. The Phase 1 exit gate stays open until the packaged executable opens offline on that environment. No installation on Eralp's computer or production rollout is authorized by this PR.
+The [Windows evidence](../evidence/windows-phase-1.md) records the user-approved HP development host, its Windows edition/build and hardware, development and packaged runtime versions, artifact hashes, packaged startup, same-profile restart, portable launch, and NSIS lifecycle observations. The runtime check loads the packaged service module in an additional instrumented worker instance and verifies its actual availability response. It does not add a production diagnostic API.
+
+Windows build, packaging, and the full available suite passed. The Phase 1 exit gate stays open pending the physical network-disconnection smoke and final evidence review. No installation on Eralp's computer or production rollout is authorized by this PR.
 
 ## Upstream references
 

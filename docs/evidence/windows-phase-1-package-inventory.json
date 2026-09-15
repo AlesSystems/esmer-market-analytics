@@ -61,27 +61,27 @@
     {
       "path": "builder-debug.yml",
       "bytes": 6284,
-      "sha256": "d013ad17e25409f0af9630c989c532e315c8ac1a23d5fae769874f34dac41b03"
+      "sha256": "9eb4ede3c2af2770b6a7b629866c63f7fb600643cf469c7cfb39de8a9ff53fd2"
     },
     {
       "path": "Esmer Market Analytics 0.1.0.exe",
-      "bytes": 112603550,
-      "sha256": "9ccd3e96827be04844d92d9b24e0c179e87b3075845e55bd96eee97025eae93c"
+      "bytes": 112603544,
+      "sha256": "76b3ead33356cea2bcc280027f663432690cf839b57b843f725b370b28920fe7"
     },
     {
       "path": "Esmer Market Analytics Setup 0.1.0.exe",
-      "bytes": 112770852,
-      "sha256": "82780b97360b761829b8ae3e9e8cafa2e81d942eff10cdba09dfdbf24950576a"
+      "bytes": 112770851,
+      "sha256": "d9c39da63b1bbf91d054b0067d79dd5f910d97d115585b815ccf4ab037c7bb5d"
     },
     {
       "path": "Esmer Market Analytics Setup 0.1.0.exe.blockmap",
-      "bytes": 118274,
-      "sha256": "8cda3ed84b757091e643e9fa4659381da01e5406c21ba4c6956be388f43d1e44"
+      "bytes": 118276,
+      "sha256": "2d78a50a09c47335fe7ef8abccd12998331347761d002e954e5b92af2344a625"
     },
     {
       "path": "latest.yml",
       "bytes": 373,
-      "sha256": "dbe8745134f97baa996f4c36a469dbb5d4e36e1d3b57aed270b3358b008f282d"
+      "sha256": "067b943d113325c09a0e09ba131ec56ac7cd49ecf11785762ffe52835a468e7b"
     },
     {
       "path": "win-unpacked/chrome_100_percent.pak",
