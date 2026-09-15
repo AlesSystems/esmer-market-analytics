@@ -27,3 +27,11 @@ await build({
 });
 await copyFile("src/ui/index.html", "dist/ui/index.html");
 await copyFile("src/ui/style.css", "dist/ui/style.css");
+
+await mkdir("dist/licences", { recursive: true });
+for (const notice of ["LICENSE", "LICENSES.chromium.html"]) {
+  await copyFile(
+    `node_modules/electron/dist/${notice}`,
+    `dist/licences/${notice}`,
+  );
+}

@@ -2,7 +2,7 @@
   "name": "esmer-market-analytics",
   "version": "0.1.0",
   "private": true,
-  "description": "Esmer Market \u00e7evrimd\u0131\u015f\u0131 analiz uygulamas\u0131",
+  "description": "Esmer Market çevrimdışı analiz uygulaması",
   "author": "Ales Systems",
   "license": "UNLICENSED",
   "main": "dist/desktop/main.cjs",
@@ -10,7 +10,7 @@
     "node": ">=24.15.0 <25"
   },
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "install-electron && node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test:unit": "vitest run --dir tests/unit",
@@ -50,7 +50,8 @@
       "dist/**/*",
       "package.json",
       "!**/*.map",
-      "!**/*.test.*"
+      "!**/*.test.*",
+      "!dist/licences/**/*"
     ],
     "asar": true,
     "npmRebuild": false,
@@ -72,7 +73,13 @@
           ]
         }
       ]
-    }
+    },
+    "extraResources": [
+      {
+        "from": "dist/licences",
+        "to": "licences"
+      }
+    ]
   },
   "type": "module"
 }

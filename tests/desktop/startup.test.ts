@@ -1,5 +1,5 @@
 import { test, expect, _electron as electron } from "@playwright/test";
-import { mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 const executablePath =
@@ -41,6 +41,14 @@ test("empty packaged app starts offline without login or renderer privileges", a
       liveConnection: "disabled",
     });
     expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
+    const resourcesPath = await app.evaluate(() => process.resourcesPath);
+    for (const notice of ["LICENSE", "LICENSES.chromium.html"]) {
+      expect(
+        await readFile(join(resourcesPath, "licences", notice), "utf8"),
+      ).toBe(
+        await readFile(join("node_modules/electron/dist", notice), "utf8"),
+      );
+    }
     expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
       await realpath(userData),
     );
