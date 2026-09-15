@@ -18,7 +18,7 @@ The direct versions are exact pins in `package.json`; `package-lock.json` locks 
 | React and React DOM | 19.3.0 | MIT | Approved renderer stack |
 | SQLite | 3.53.4 through Electron's bundled `node:sqlite` | SQLite is public domain; Node includes its own notices | Avoid an additional native module and Electron ABI rebuild |
 | decimal.js | 10.6.0 | MIT | Parse decimal strings without binary floating-point arithmetic |
-| read-excel-file | 9.3.10 | MIT | Read `.xlsx` with an explicit number parser |
+| read-excel-file | 9.3.10, development only | MIT declaration; transitive notice unresolved | Check `.xlsx` compatibility with an explicit number parser; not distributed in Phase 1 |
 | write-excel-file | 4.1.1 | MIT | Write typed `.xlsx` cells, sheets, and number formats |
 | TypeScript | 6.0.3 | Apache-2.0 | Compatible with the selected TypeScript ESLint peer range |
 | esbuild | 0.28.2 | MIT | Bundle the desktop, preload, worker, and React without another application framework |
@@ -30,13 +30,17 @@ The direct versions are exact pins in `package.json`; `package-lock.json` locks 
 | Node type declarations | 24.13.4 | MIT | Compile against the Node 24 API |
 | React and React DOM type declarations | 19.3.0 | MIT | Match the renderer major version |
 
-Development uses Node 24 and npm 11. The tested Electron package embeds Node 24.20.0 and SQLite 3.53.4. TypeScript 7 was not selected because typescript-eslint 8.70.0 declares TypeScript `<6.1.0`. The Excel packages have 2026 updates in their npm metadata. Dependency audit results and tested operating systems are recorded in [the evidence index](../evidence/index.md).
+Development uses Node 24 and npm 11. The tested macOS Electron package embeds Node 24.20.0 and SQLite 3.53.4. These are not measured Windows runtime versions. TypeScript 7 was not selected because typescript-eslint 8.70.0 declares TypeScript `<6.1.0`. The Excel packages have 2026 updates in their npm metadata. Dependency audit results and tested operating systems are recorded in [the evidence index](../evidence/index.md).
 
 ## Decimal and Excel limits
 
 The dependency check uses synthetic values. Financial rules, rounding policy, source semantics, and UI-to-Excel report reconciliation remain later acceptance work.
 
 `read-excel-file` supports a custom `parseNumber` function, so source numeric strings can remain strings until the decimal layer parses them. Its formula reader uses cached spreadsheet results; it does not evaluate formulas. Phase 7 must define how expense imports reject or handle formula cells and missing cached values. `write-excel-file` supports explicit cell types and number formats. Values that cannot be represented safely as Excel numbers need an explicit export policy before reports ship. No financial API accepts JavaScript floating-point values merely because a spreadsheet library can write them.
+
+Windows package inspection found that the reader's transitive dependency `worker-f` 0.1.20 declares MIT but supplies no licence notice. Its [npm metadata](https://registry.npmjs.org/worker-f/0.1.20) identifies upstream commit `32742a0f8a57f19968c73539a09ecb3606efa3f9`. The [exact upstream tree](https://gitlab.com/catamphetamine/worker-f/-/tree/32742a0f8a57f19968c73539a09ecb3606efa3f9) also lacks a licence file. The reader remains pinned as a development dependency for the synthetic compatibility test. No application source imports it, so this excludes the unused reader and its transitive dependencies from the Phase 1 distribution without changing application behavior. Before shipping Excel import, resolve its distribution notices or select and validate a replacement. A manifest licence identifier is not a substitute for a missing notice.
+
+`npm run package:win` checks that every shipped dependency in `app.asar` includes a nonempty licence notice. This checks the current distribution contents; it does not certify future dependencies or replace the Phase 10 licence review.
 
 ## Windows and native packaging
 
