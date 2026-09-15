@@ -22,6 +22,6 @@ The fixture is `synthetic-empty-v1`. It contains no imported transactions, busin
 
 The development host is macOS 26.4.1, build 25E253, ARM64. Development Node is 24.15.0 and npm is 11.12.1. The [local verification record](phase-1-local.md) contains the tested commit, packaged runtime versions, commands, outcomes, archive hash, screenshot, independent review, and remaining limitations.
 
-## Pending Windows evidence
+## Windows evidence
 
-The Windows agent must add `windows-phase-1.md` with the tested commit, environment, artifact hashes, commands, observed offline startup, privilege-boundary results, screenshot, and remaining limitations. No Windows package or smoke result is claimed by the macOS record. The [approved plan](../superpowers/plans/esmer-market-implementation-plan.md#execution-and-evidence-rules) defines the evidence fields.
+The [Windows verification record](windows-phase-1.md) contains the fetched commit, host characteristics, Node/npm versions, passing build and integration results, unsigned artifact hashes, package inventory, and remaining checks. Windows packaging and shipped dependency notices passed after excluding the unused Excel reader with an unresolved transitive notice. Packaged launches and installer smoke remain pending confirmation of the isolated test host. No Windows runtime screenshot or smoke pass is claimed. The [approved plan](../superpowers/plans/esmer-market-implementation-plan.md#execution-and-evidence-rules) defines the evidence fields.
