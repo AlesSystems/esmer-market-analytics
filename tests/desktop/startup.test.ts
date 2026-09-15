@@ -75,15 +75,36 @@ test("empty packaged app starts offline without login or renderer privileges", a
       webviewTag: false,
     });
     expect(
-      await page.evaluate(async () => {
-        try {
-          await fetch("https://example.invalid/source");
-          return "allowed";
-        } catch {
-          return "blocked";
-        }
-      }),
-    ).toBe("blocked");
+      await page.evaluate(
+        () =>
+          new Promise((resolve) => {
+            const timeout = setTimeout(() => {
+              document.removeEventListener(
+                "securitypolicyviolation",
+                onViolation,
+              );
+              resolve(null);
+            }, 5_000);
+            function onViolation(event: SecurityPolicyViolationEvent) {
+              if (event.effectiveDirective !== "connect-src") return;
+              clearTimeout(timeout);
+              document.removeEventListener(
+                "securitypolicyviolation",
+                onViolation,
+              );
+              resolve({
+                directive: event.effectiveDirective,
+                blockedURI: event.blockedURI,
+              });
+            }
+            document.addEventListener("securitypolicyviolation", onViolation);
+            void fetch("https://example.invalid/source").catch(() => undefined);
+          }),
+      ),
+    ).toEqual({
+      directive: "connect-src",
+      blockedURI: "https://example.invalid/source",
+    });
     expect(
       await page.evaluate(
         async () =>
@@ -93,14 +114,26 @@ test("empty packaged app starts offline without login or renderer privileges", a
     expect(
       await page.evaluate(() => window.open("https://example.invalid/")),
     ).toBeNull();
-    await page.evaluate(() => {
-      location.href = "https://example.invalid/";
-    });
     expect(
-      await app.evaluate(({ BrowserWindow }) =>
-        BrowserWindow.getAllWindows()[0].webContents.getURL(),
+      await app.evaluate(
+        ({ BrowserWindow }) =>
+          new Promise((resolve) => {
+            const contents = BrowserWindow.getAllWindows()[0].webContents;
+            const timeout = setTimeout(() => {
+              contents.removeListener("will-navigate", onNavigate);
+              resolve(null);
+            }, 5_000);
+            function onNavigate(event: Electron.Event, url: string) {
+              clearTimeout(timeout);
+              resolve({ prevented: event.defaultPrevented, url });
+            }
+            contents.once("will-navigate", onNavigate);
+            void contents.executeJavaScript(
+              'location.href = "esmer://app/style.css"',
+            );
+          }),
       ),
-    ).toBe("esmer://app/index.html");
+    ).toEqual({ prevented: true, url: "esmer://app/style.css" });
     expect(
       await app.evaluate(
         ({ BrowserWindow }) => BrowserWindow.getAllWindows().length,
