@@ -1,0 +1,45 @@
+# Privacy and field allowlists
+
+## Scope and review status
+
+This is the Phase 2 privacy contract for [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5), D10 and A05. It applies to fixtures now and constrains later extraction. No source query, extractor, analytics-package writer or real reduced fixture is implemented or exercised here.
+
+The declarative [source registry](../../src/source/contract.ts) lists allowed synthetic fields and historically evidenced source-column candidates. These are different schemas. A synthetic `businessDate` or `quantity` field does not prove a raw SQL column name. A future extractor must resolve every required raw mapping on an authorized clean restore and receive a reviewed contract revision before use.
+
+## Default-deny rules
+
+Only explicitly declared fields may appear in a permitted record. Unknown columns and unknown nested objects are rejected. Approval applies to a field in its named record type and use case, not globally to any column with the same name. An unknown field must not be preserved for convenience or hidden only at display time.
+
+The following populations are excluded:
+
+- Customer identities and references that identify a customer, names, contact details, addresses, tax/identity numbers and loyalty/card identifiers.
+- Personnel identifiers, names, individual salaries, payroll records and payslips. Only monthly aggregate labour is eligible later.
+- Identifying/free-form source text, source credentials, raw change-log SQL, legacy authentication tables and original backup contents.
+- Wholesale `CARI`, `FIS_POS`, archive, cancellation or change-log replication.
+
+Known historical sensitive names include `MUSTERI_AD`, `VERGI_NUMARASI`, `EMAIL`, `VERGI_DAIRESI` and `ADRES`. A denylist of those names is not sufficient; the allowlist must also reject unknown private columns. Raw change-log SQL can contain sensitive values and is excluded even when its table/operation metadata would otherwise be useful.
+
+## Minimal record populations
+
+| Record | Permitted purpose | Boundary |
+| --- | --- | --- |
+| Source identity / snapshot | Lineage, snapshot, schema/mapping version, synthetic provenance, explicit cutoff and coverage | No backup path, connection string or credential. Private evidence uses opaque references outside Git. |
+| Document / line | Stable IDs, document kind, date, product/unit/decimal facts needed by a declared oracle | Explicit fixture keys only. Source raw mappings remain subject to revalidation. |
+| Conversion / return link | IDs and validated event relationship | No raw SQL, free text or unsupported settlement assertion. |
+| Product / category | Minimal identifiers and approved non-identifying product/category data | Product-level `STOK.CARI` is not accepted as supplier mapping. Display fields need separate raw-schema review. |
+| Supplier | Counterparty ID proven to occur on a purchasing document | Shared counterparty-table membership alone is insufficient. No customer rows, contact/address/tax fields or unreviewed display names. |
+| App-owned fixture records | Synthetic expenses, adjustments, settings, audit entries and accepted report references | These represent preservation expectations, not extracted POS data. No employee-level fields. |
+
+The historical audit evidences names such as `FIS.ID`, `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI` and `FATRALANDIRILMIS_IRSALIYEMI`. Other required field names cannot be invented from familiarity with another schema. The machine-readable candidate list is not an executable SELECT list and does not resolve the missing mappings.
+
+## Synthetic privacy tests
+
+The fixture suite uses conspicuously fake private sentinels only as hostile input. Permitted outputs and snapshots must exclude both prohibited keys and sentinel values. Mutation tests add unknown/private fields at record boundaries and must fail with safe diagnostics rather than printing submitted values. Attack inputs are separate from valid analytics-shaped fixtures.
+
+These tests verify the declared fixture boundary. They do not prove the future extractor avoids broad SELECTs, filters every log path or publishes private-data-free packages. Phase 3 must exercise the actual extraction and publication workflow against its approved allowlist, with purchasing-only supplier membership and synthetic sentinels. A field projection simulated inside a test cannot pass A05 extraction acceptance.
+
+## Required release evidence
+
+Before real reduced data enters Git, review every generated field and its purpose, confirm authorized source provenance, inspect the generated content and record reviewer/evidence identity. Keep original backup, credential and identifiable records outside Git. Review release archives and logs as separate artefacts. Phase 2 fixtures remain excluded from the desktop build under existing packaging rules.
+
+See [source revalidation obligations](source.md#revalidation-gate) and [local evidence](../evidence/phase-2-local.md) for performed checks and open gates.

@@ -1,0 +1,775 @@
+[
+  {
+    "id": "fractional",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Synthetic prices are per kg and share tax basis."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "weight"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "weight",
+        "kind": "sale",
+        "documentId": "weight-doc",
+        "quantity": "0.375",
+        "unit": "kg",
+        "unitNet": "80",
+        "net": "30",
+        "cost": "40"
+      }
+    ],
+    "expected": {
+      "net": "30",
+      "estimatedCost": "15",
+      "estimatedGrossProfit": "15"
+    }
+  },
+  {
+    "id": "unknown-cost-unit",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Zero and negative source snapshots are unsupported absent independent evidence."
+    ],
+    "coverage": {
+      "coveredIds": [],
+      "excludedIds": [
+        "unknown-unit",
+        "zero-cost",
+        "negative-cost",
+        "missing-cost"
+      ]
+    },
+    "records": [
+      {
+        "id": "unknown-unit",
+        "kind": "sale",
+        "documentId": "unknown",
+        "quantity": "2",
+        "unit": "unknown",
+        "net": "20",
+        "cost": "5"
+      },
+      {
+        "id": "zero-cost",
+        "kind": "sale",
+        "documentId": "zero",
+        "quantity": "1",
+        "unit": "piece",
+        "net": "10",
+        "cost": "0"
+      },
+      {
+        "id": "negative-cost",
+        "kind": "sale",
+        "documentId": "negative",
+        "quantity": "1",
+        "unit": "piece",
+        "net": "10",
+        "cost": "-1"
+      },
+      {
+        "id": "missing-cost",
+        "kind": "sale",
+        "documentId": "missing",
+        "quantity": "1",
+        "unit": "piece",
+        "net": "10",
+        "cost": null
+      }
+    ],
+    "expected": {
+      "eligibleCost": null,
+      "excludedIds": [
+        "unknown-unit",
+        "zero-cost",
+        "negative-cost",
+        "missing-cost"
+      ],
+      "warning": "unsupported-cost-or-unit"
+    }
+  },
+  {
+    "id": "denominators",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Zero and negative comparison/margin bases are unsuitable; zero sale count has no basket."
+    ],
+    "coverage": {
+      "coveredIds": [],
+      "excludedIds": [
+        "zero",
+        "negative"
+      ]
+    },
+    "records": [
+      {
+        "id": "zero",
+        "kind": "context",
+        "net": "0"
+      },
+      {
+        "id": "negative",
+        "kind": "context",
+        "net": "-10"
+      }
+    ],
+    "expected": {
+      "zeroComparisonPercent": null,
+      "negativeComparisonPercent": null,
+      "zeroMarginPercent": null,
+      "negativeMarginPercent": null,
+      "zeroBasket": null,
+      "zeroCostCoveragePercent": null
+    }
+  },
+  {
+    "id": "absolute-coverage",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Return cost 30 is the total reversal magnitude on the matching basis."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "sale-covered",
+        "return-covered"
+      ],
+      "excludedIds": [
+        "return-missing"
+      ]
+    },
+    "records": [
+      {
+        "id": "sale-covered",
+        "kind": "sale",
+        "documentId": "sale",
+        "net": "100",
+        "cost": "60"
+      },
+      {
+        "id": "return-covered",
+        "kind": "return",
+        "documentId": "return",
+        "quantity": "-1",
+        "unit": "piece",
+        "net": "-50",
+        "cost": "30",
+        "linkedId": "sale-covered"
+      },
+      {
+        "id": "return-missing",
+        "kind": "return",
+        "documentId": "missing",
+        "quantity": "-1",
+        "unit": "piece",
+        "net": "-50",
+        "cost": null,
+        "linkedId": null
+      }
+    ],
+    "expected": {
+      "coveredSaleNet": "100",
+      "coveredReturnNet": "-50",
+      "excludedSaleNet": "0",
+      "excludedReturnNet": "-50",
+      "coveredAbsoluteNet": "150",
+      "totalAbsoluteNet": "200",
+      "coveragePercent": "75",
+      "coveredEstimatedCost": "30",
+      "coveredEstimatedGrossProfit": "20"
+    }
+  },
+  {
+    "id": "basket-margin",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Costs here are line totals, return cost is reversal magnitude; margin denominator is net sales 250.",
+      "Separately issued return does not change completed-sale count or basket numerator."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "sale-a",
+        "sale-b",
+        "return-a"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "sale-a",
+        "kind": "sale",
+        "documentId": "a",
+        "net": "180",
+        "cost": "140",
+        "status": "complete"
+      },
+      {
+        "id": "sale-b",
+        "kind": "sale",
+        "documentId": "b",
+        "net": "120",
+        "cost": "85",
+        "status": "complete"
+      },
+      {
+        "id": "return-a",
+        "kind": "return",
+        "documentId": "r",
+        "net": "-50",
+        "cost": "30",
+        "linkedId": "sale-a"
+      }
+    ],
+    "expected": {
+      "completedSaleDocuments": "2",
+      "basketNumerator": "300",
+      "averageBasket": "150",
+      "customerReturns": "-50",
+      "netSales": "250",
+      "estimatedCost": "195",
+      "estimatedGrossProfit": "55",
+      "estimatedMarginPercent": "22"
+    }
+  },
+  {
+    "id": "comparison-partial",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Arithmetic comparison is qualified partial-period evidence, never a completed-month claim."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "previous",
+        "current"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "previous",
+        "kind": "context",
+        "net": "100",
+        "status": "complete",
+        "date": "2025-09-30"
+      },
+      {
+        "id": "current",
+        "kind": "context",
+        "net": "120",
+        "status": "partial",
+        "date": "2025-10-12"
+      }
+    ],
+    "expected": {
+      "difference": "20",
+      "comparisonPercent": "20",
+      "periodState": "partial",
+      "fullMonthComparable": false,
+      "cutoff": "2025-10-12"
+    }
+  },
+  {
+    "id": "expense-classification",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "150 only applies to complete classified operating expense 50 with owner confirmation and eligible gross 200; unknown row is a separate blocked variant."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "operating",
+        "owner",
+        "gross"
+      ],
+      "excludedIds": [
+        "unknown-tax"
+      ]
+    },
+    "records": [
+      {
+        "id": "operating",
+        "kind": "expense",
+        "net": "50",
+        "date": "2025-01-15",
+        "paidDate": null,
+        "classification": "operating",
+        "kdvTreatment": "same-basis",
+        "revision": "1"
+      },
+      {
+        "id": "owner",
+        "kind": "expense",
+        "net": "500",
+        "date": "2025-01-15",
+        "paidDate": null,
+        "classification": "owner-contribution",
+        "kdvTreatment": "not-applicable",
+        "revision": "1"
+      },
+      {
+        "id": "unknown-tax",
+        "kind": "expense",
+        "net": "10",
+        "date": "2025-01-15",
+        "paidDate": null,
+        "classification": "unclassified",
+        "kdvTreatment": "unknown",
+        "revision": "1"
+      },
+      {
+        "id": "gross",
+        "kind": "context",
+        "net": "200",
+        "status": "estimated"
+      }
+    ],
+    "expected": {
+      "eligibleOperatingResult": "150",
+      "ownerContributionEffect": "0",
+      "withUnknownTaxOperatingResult": null,
+      "withoutConfirmationOperatingResult": null,
+      "method": "estimated-management-result"
+    }
+  },
+  {
+    "id": "rounding-discounts",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Synthetic decimal half-up to 2 places for display only; retain input precision.",
+      "Second record applies 10% line discount then 5% header discount and recorded 5% KDV."
+    ],
+    "coverage": {
+      "coveredIds": [],
+      "excludedIds": [
+        "precision",
+        "discounts"
+      ]
+    },
+    "records": [
+      {
+        "id": "precision",
+        "kind": "sale",
+        "documentId": "p",
+        "quantity": "3",
+        "unit": "piece",
+        "unitNet": "0.335",
+        "discountPercent": "0",
+        "net": "1.005",
+        "kdv": "0.05025",
+        "gross": "1.05525",
+        "cost": null
+      },
+      {
+        "id": "discounts",
+        "kind": "sale",
+        "documentId": "d",
+        "quantity": "2",
+        "unit": "piece",
+        "unitNet": "100",
+        "discountPercent": "10",
+        "net": "171",
+        "kdv": "8.55",
+        "gross": "179.55",
+        "cost": null
+      }
+    ],
+    "expected": {
+      "unroundedNet": "1.005",
+      "displayNetHalfUp": "1.01",
+      "unroundedKdv": "0.05025",
+      "lineDiscountNet": "180",
+      "headerDiscountNet": "171",
+      "headerDiscountKdv": "8.55",
+      "sourceRounding": "unresolved"
+    }
+  },
+  {
+    "id": "unsupported-documents",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Voids were never completed sales; archived documents are already absent from current source.",
+      "Unknown type and inconsistent link/flag cannot acquire financial inclusion."
+    ],
+    "coverage": {
+      "coveredIds": [],
+      "excludedIds": [
+        "rare",
+        "void",
+        "archive",
+        "conflict",
+        "kdv-anomaly"
+      ]
+    },
+    "records": [
+      {
+        "id": "rare",
+        "kind": "context",
+        "documentType": "999",
+        "status": "unknown"
+      },
+      {
+        "id": "void",
+        "kind": "context",
+        "status": "pre-completion-void"
+      },
+      {
+        "id": "archive",
+        "kind": "context",
+        "status": "archived-deletion"
+      },
+      {
+        "id": "conflict",
+        "kind": "conversion",
+        "documentId": "conflict",
+        "documentType": "5",
+        "linkedId": null,
+        "eventId": "unproven",
+        "net": "80",
+        "status": "invoiced"
+      },
+      {
+        "id": "kdv-anomaly",
+        "kind": "sale",
+        "documentId": "anomaly",
+        "net": "100",
+        "kdv": "999",
+        "gross": "1099",
+        "cost": null
+      }
+    ],
+    "expected": {
+      "rareType": "unsupported",
+      "voidSaleCountEffect": "0",
+      "archiveSubtraction": "0",
+      "conversionMetric": null,
+      "recordedKdv": "999",
+      "kdvWarning": "anomaly-not-rewritten"
+    }
+  },
+  {
+    "id": "lineage-reset",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-reset",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "A source reset uses another lineage even when source IDs are reused."
+    ],
+    "coverage": {
+      "coveredIds": [],
+      "excludedIds": [
+        "line-edit"
+      ]
+    },
+    "records": [
+      {
+        "id": "line-edit",
+        "kind": "sale",
+        "documentId": "doc-edit",
+        "net": "999",
+        "cost": null
+      }
+    ],
+    "expected": {
+      "collidesWithSourceA": false,
+      "identity": [
+        "synthetic-market-reset",
+        "line-edit"
+      ]
+    }
+  },
+  {
+    "id": "interrupted-publication",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Interruption before atomic activation retains A; these are future importer expectations, not importer execution."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "active",
+        "expense-during-stage",
+        "adjustment-during-stage"
+      ],
+      "excludedIds": [
+        "candidate"
+      ]
+    },
+    "records": [
+      {
+        "id": "active",
+        "kind": "context",
+        "value": "source-a"
+      },
+      {
+        "id": "candidate",
+        "kind": "context",
+        "value": "source-b",
+        "status": "interrupted"
+      },
+      {
+        "id": "expense-during-stage",
+        "kind": "expense",
+        "net": "7",
+        "date": "2025-02-02",
+        "paidDate": null,
+        "classification": "operating",
+        "kdvTreatment": "same-basis",
+        "revision": "2"
+      },
+      {
+        "id": "adjustment-during-stage",
+        "kind": "adjustment",
+        "targetId": "line-edit",
+        "net": "2",
+        "revision": "2"
+      }
+    ],
+    "expected": {
+      "activeDataset": "source-a",
+      "candidateActivated": false,
+      "acceptedDataset": "source-a",
+      "preservedConcurrentIds": [
+        "expense-during-stage",
+        "adjustment-during-stage"
+      ]
+    }
+  },
+  {
+    "id": "positive-comparisons",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Periods are complete, comparable and denominators positive.",
+      "Quantity compares kg with kg; prices share purchasing supplier, unit and KDV basis."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "prior",
+        "current",
+        "supplier-comparison",
+        "purchase-comparison"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "prior",
+        "kind": "context",
+        "net": "100",
+        "quantity": "4",
+        "unit": "kg",
+        "value": "2",
+        "cost": "10"
+      },
+      {
+        "id": "current",
+        "kind": "context",
+        "net": "120",
+        "quantity": "5",
+        "unit": "kg",
+        "value": "3",
+        "cost": "15"
+      },
+      {
+        "id": "supplier-comparison",
+        "kind": "supplier",
+        "name": "SENTETİK TEDARİKÇİ",
+        "purchaseDocumentId": "purchase-comparison"
+      },
+      {
+        "id": "purchase-comparison",
+        "kind": "conversion",
+        "documentId": "purchase-comparison",
+        "documentType": "1",
+        "linkedId": null,
+        "eventId": "comparison-purchase",
+        "net": "15",
+        "status": "complete"
+      }
+    ],
+    "expected": {
+      "nominalNetGrowthPercent": "20",
+      "transactionGrowthPercent": "50",
+      "unitVolumeGrowthPercent": "25",
+      "purchasePriceGrowthPercent": "50",
+      "supplierId": "supplier-comparison"
+    }
+  },
+  {
+    "id": "documented-zero-cost",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Synthetic explicit evidence establishes a free item acquisition on matching unit and tax basis; undocumented source zero remains unsupported."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "gift"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "gift",
+        "kind": "sale",
+        "documentId": "gift-doc",
+        "quantity": "1",
+        "unit": "piece",
+        "net": "10",
+        "cost": "0",
+        "status": "synthetic-zero-cost-evidence"
+      }
+    ],
+    "expected": {
+      "eligibleCost": "0",
+      "estimatedGrossProfit": "10",
+      "sourceZeroCostRule": "unsupported"
+    }
+  },
+  {
+    "id": "unit-conversion",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Synthetic validated conversion is 12 pieces per carton; historical unit cost is TRY3 per piece on the same tax basis."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "carton",
+        "multiplier"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "carton",
+        "kind": "sale",
+        "documentId": "carton-doc",
+        "quantity": "0.5",
+        "unit": "carton",
+        "net": "30",
+        "cost": "3"
+      },
+      {
+        "id": "multiplier",
+        "kind": "context",
+        "quantity": "12",
+        "unit": "pieces-per-carton"
+      }
+    ],
+    "expected": {
+      "pieces": "6",
+      "estimatedCost": "18",
+      "estimatedGrossProfit": "12"
+    }
+  }
+]
