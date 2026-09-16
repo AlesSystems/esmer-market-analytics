@@ -70,6 +70,7 @@ function keys(value: object, names: readonly string[]) {
 
 function validateFixture(fixture: Fixture, contract = sourceContract): string {
   try {
+    assert.ok(!JSON.stringify(fixture).includes("SYNTHETIC_PRIVATE_"));
     keys(fixture, ["id", "version", "mappingVersion", "provenance", "lineage", "semantics", "assumptions", "coverage", "records", "expected"]);
     assert.equal(fixture.version, 1);
     assert.equal(fixture.mappingVersion, contract.version);
@@ -97,7 +98,6 @@ function validateFixture(fixture: Fixture, contract = sourceContract): string {
       assert.ok(Object.keys(row).every((key) => allowed.includes(key)));
       assert.ok(Object.values(row).every((value) => value === null || typeof value === "string"));
       assert.ok(row.id.trim().length > 0);
-      assert.ok(Object.values(row).every((value) => value === null || !value.includes("SYNTHETIC_PRIVATE_")));
       if (["sale", "return", "conversion"].includes(row.kind)) assert.ok(row.documentId?.trim());
       if (row.kind === "supplier") {
         assert.ok(row.purchaseDocumentId && row.name);
