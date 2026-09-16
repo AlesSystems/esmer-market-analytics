@@ -145,13 +145,13 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Interface:** A versioned mapping declares document inclusion, unit conversion, money/KDV basis, return/conversion attribution, stable IDs and field allowlists. Each rule identifies its evidence and whether it is supported, unsupported or excluded with a warning.
 
-- [ ] Start with the existing audit. If renewed source inspection is needed, obtain authorization for that isolated audit before starting any container, restoring a backup or reconnecting. Planning approval alone does not grant this access.
+- [x] Start with the existing audit. If renewed source inspection is needed, obtain authorization for that isolated audit before starting any container, restoring a backup or reconnecting. Planning approval alone does not grant this access.
 - [ ] Revalidate the source contract on an authorized clean restore or newer backup, as required by the audit. Record lineage, backup identity/hash where available, schema differences, legacy-app additions and coverage. Use read-only queries and scoped permission checks; keep credentials and full source records out of documentation. If suitable input is unavailable, leave the affected source evidence gates open.
 - [ ] Validate historical last-purchase cost units and KDV basis, zero/negative costs, fractional quantities, return-cost links, header/line discounts and rounding. Adopt explicit decimal precision rules only after representative source examples support them.
 - [ ] Resolve financial inclusion for every relevant dictionary type. Specifically investigate sale type 11 versus type 35, invoice/dispatch links and inconsistent conversion flags; reused receipt keys and absent exact matches do not settle economic identity.
 - [ ] Define sale-document counting and the basket convention above; classify voids, archived deletions, customer returns and supplier returns separately. Verify the market-local business-date convention independently of machine timezone.
 - [ ] Produce a reviewed column allowlist. Use purchasing counterparties for suppliers; exclude customer identifiers, contact/address/tax/loyalty data, personnel fields and raw change-log SQL.
-- [ ] Record unresolved cases with their affected population and the exact consequence: block the dependent metric, show an identified covered subset, or reject an essential import. Do not weaken a gate to make the source fit.
+- [x] Record unresolved cases with their affected population and the exact consequence: block the dependent metric, show an identified covered subset, or reject an essential import. Do not weaken a gate to make the source fit.
 
 **Gate:** A reviewed source-to-domain contract exists before implementing any affected formula. Synthetic development can continue for unsupported cases, but no source-reconciled label is granted without evidence. Covers A02, A03 and A05.
 
@@ -161,15 +161,17 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Interface:** Each fixture includes input records, independent expected outputs, mapping version, coverage and provenance. Paired snapshots explicitly identify the same source lineage and stable document identities.
 
-- [ ] Encode G01–G08 from the acceptance checklist without changing their assumptions. Independently check their arithmetic; label all generated data synthetic.
-- [ ] Add fractional units, unknown units, unsuitable denominators, rare document types, inconsistent conversion links, KDV anomalies, backdated corrections, deleted lines, source-ID reuse after reset and interrupted publication cases.
-- [ ] Add source A/B fixtures with insert, edit and deletion changes. Include app-owned expenses/adjustments that must survive and a referenced source line that disappears.
+- [x] Encode G01–G08 from the acceptance checklist without changing their assumptions. Independently check their arithmetic; label all generated data synthetic.
+- [x] Add fractional units, unknown units, unsuitable denominators, rare document types, inconsistent conversion links, KDV anomalies, backdated corrections, deleted lines, source-ID reuse after reset and interrupted publication cases.
+- [x] Add source A/B fixtures with insert, edit and deletion changes. Include app-owned expenses/adjustments that must survive and a referenced source line that disappears.
 - [ ] When source access is authorized, create a reduced fixture using the approved allowlist. Review generated contents before committing; use synthetic sentinels to test privacy filtering.
-- [ ] Write a fixture contract test that fails on missing expected outputs, undeclared source lineage, unsupported semantics presented as supported, and unreviewed private fields.
+- [x] Write a fixture contract test that fails on missing expected outputs, undeclared source lineage, unsupported semantics presented as supported, and unreviewed private fields.
 
 **Verify:** `npm run test:integration -- tests/integration/fixture-contract.test.ts`.
 
 **Exit gate:** Every initially released formula has an independent oracle, and source-supported versus synthetic-only evidence is distinguishable. Financial implementation remains blocked for unresolved rules.
+
+**Evidence status (2026-09-16): Synthetic contract and fixture checks complete for #5; source and Windows gates open.** The [source contract](../../contracts/source.md), [oracle record](../../evidence/golden-oracles.md) and [local evidence](../../evidence/phase-2-local.md) distinguish synthetic checks from source validation. Source-dependent checkboxes remain open. Windows checks continue on the same branch using the [Phase 2 handoff](../../operations/windows-phase-2-handoff.md). No Phase 3 work is authorized by this status note.
 
 ## Phase 3 — Read-only extraction and analytics packages
 

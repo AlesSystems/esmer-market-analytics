@@ -1,0 +1,21 @@
+{
+  "phase": 2,
+  "commit": "8bd7439e6b5cd5222ee8ac75df850a8b06fcee28",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "archive": "release/mac-arm64/Esmer Market Analytics.app/Contents/Resources/app.asar",
+  "sha256": "2baa8a49c0d19739c867fe1ce0f85735b71013453f47a3357b07ce72edc36d06",
+  "entries": 349,
+  "files": 301,
+  "roots": [
+    "dist",
+    "node_modules",
+    "package.json"
+  ],
+  "forbiddenPaths": [],
+  "fixtureMarkersInApplicationBundles": 0,
+  "allowedVendorDocumentation": [
+    "node_modules/write-excel-file/docs/IMAGES.md"
+  ],
+  "limitations": "Static archive inspection; no actual source or Windows privacy acceptance."
+}

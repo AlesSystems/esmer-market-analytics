@@ -25,3 +25,11 @@ The development host is macOS 26.4.1, build 25E253, ARM64. Development Node is 2
 ## Windows evidence
 
 The [Windows verification record](windows-phase-1.md) contains the fetched commit, host characteristics, Node/npm versions, passing build and integration results, unsigned artifact hashes, package inventory, and remaining checks. Windows packaging and shipped dependency notices passed after excluding the unused Excel reader with an unresolved transitive notice. The user confirmed the HP development test host. The packaged desktop and full suite passed, including worker SQLite and same-profile restart checks. Native portable launch and an NSIS install/launch/uninstall cycle passed. Windows screenshots and bundled runtime measurements are recorded. The user reported the expected empty/offline state with networking disconnected and no failures or warnings. That manual report is separate from the automated results. Final test-installation removal passed. The unattended offline runner timed out and supplies no offline evidence. The [approved plan](../superpowers/plans/esmer-market-implementation-plan.md#execution-and-evidence-rules) defines the evidence fields.
+
+## Phase 2 status
+
+The user authorized [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5) implementation and a PR, with a stop before Windows execution. Work continues on `codex/phase-2-source-contract`. Phase 1 is complete and issue #4 is closed.
+
+The Phase 2 contribution is a declarative source contract, synthetic golden/edge fixtures and paired snapshots with independent expected outputs. See [source](../contracts/source.md), [calculations](../contracts/calculations.md), [privacy](../contracts/privacy.md), [golden oracles](golden-oracles.md), and [local verification](phase-2-local.md). No source was accessed and no source-backed financial mapping was validated.
+
+The Phase 2 exit gate remains **open** for source-dependent evidence. Synthetic checks do not pass extraction, financial-runtime, import-activation or Windows release acceptance. The [Windows handoff](../operations/windows-phase-2-handoff.md) gives the exact remaining checks on the same branch. Windows execution for this change is intentionally unperformed on this macOS host.
