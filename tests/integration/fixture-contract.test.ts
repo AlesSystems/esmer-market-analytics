@@ -131,6 +131,7 @@ test.each([
   ["foreign covered population", (f: Fixture) => { f.coverage.coveredIds = ["absent-line"]; }],
   ["overlapping coverage", (f: Fixture) => { f.coverage.excludedIds = [...f.coverage.coveredIds]; }],
   ["incompatible record kind", (f: Fixture) => { f.records[0].kind = "expense"; }],
+  ["private assumption", (f: Fixture) => { f.assumptions.push("SYNTHETIC_PRIVATE_SENTINEL"); }],
   ["nested private field", (f: Fixture) => { Object.assign(f.records[0], { private: { EMAIL: "SYNTHETIC_PRIVATE_SENTINEL" } }); }],
 ] as const)("rejects %s", (_name, mutate) => {
   const changed = structuredClone(golden[0]);
@@ -357,4 +358,46 @@ test("documents synthetic zero-cost evidence and explicit fractional unit conver
   checkInteger("unit-conversion", "pieces", pieces);
   checkInteger("unit-conversion", "estimatedCost", pieces * integer(carton, "cost"));
   checkInteger("unit-conversion", "estimatedGrossProfit", integer(carton, "net") - pieces * integer(carton, "cost"));
+});
+
+
+test("retains every required edge oracle exactly once", () => {
+  expect(edges.map(({ id }) => id).sort()).toEqual([
+    "fractional", "unknown-cost-unit", "denominators", "absolute-coverage",
+    "basket-margin", "comparison-partial", "expense-classification",
+    "rounding-discounts", "unsupported-documents", "lineage-reset",
+    "interrupted-publication", "positive-comparisons", "documented-zero-cost",
+    "unit-conversion",
+  ].sort());
+});
+
+test("unavailable and warning oracles retain the inputs that justify them", () => {
+  expect(record("denominators", "zero").net).toBe("0");
+  expect(record("denominators", "negative").net).toBe("-10");
+  expect(Object.values(scenario("denominators").expected as object)).toEqual(
+    [null, null, null, null, null, null],
+  );
+  expect(record("unknown-cost-unit", "unknown-unit").unit).toBe("unknown");
+  expect(record("unknown-cost-unit", "zero-cost").cost).toBe("0");
+  expect(record("unknown-cost-unit", "negative-cost").cost).toBe("-1");
+  expect(record("unknown-cost-unit", "missing-cost").cost).toBeNull();
+  expect(scenario("unknown-cost-unit").coverage.excludedIds).toEqual(
+    output("unknown-cost-unit", "excludedIds"),
+  );
+  const previous = record("comparison-partial", "previous");
+  const current = record("comparison-partial", "current");
+  expect([previous.status, current.status]).toEqual(["complete", "partial"]);
+  expect(previous.date).toBe("2025-09-30");
+  expect(current.date).toBe(output("comparison-partial", "cutoff"));
+  const difference = integer(current, "net") - integer(previous, "net");
+  checkInteger("comparison-partial", "difference", difference);
+  checkInteger("comparison-partial", "comparisonPercent", difference * 100n / integer(previous, "net"));
+  expect(record("unsupported-documents", "rare").documentType).toBe("999");
+  expect(record("unsupported-documents", "void").status).toBe("pre-completion-void");
+  expect(record("unsupported-documents", "archive").status).toBe("archived-deletion");
+  const conflict = record("unsupported-documents", "conflict");
+  expect([conflict.documentType, conflict.status, conflict.linkedId]).toEqual(["5", "invoiced", null]);
+  const anomaly = record("unsupported-documents", "kdv-anomaly");
+  expect(anomaly.kdv).toBe(output("unsupported-documents", "recordedKdv"));
+  expect(integer(anomaly, "net") + integer(anomaly, "kdv")).toBe(integer(anomaly, "gross"));
 });
