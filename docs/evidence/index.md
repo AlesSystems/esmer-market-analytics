@@ -28,8 +28,10 @@ The [Windows verification record](windows-phase-1.md) contains the fetched commi
 
 ## Phase 2 status
 
-The user authorized [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5) implementation and a PR, with a stop before Windows execution. Work continues on `codex/phase-2-source-contract`. Phase 1 is complete and issue #4 is closed.
+The user authorized [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5) implementation and a PR, then authorized Windows continuation on the same branch, `codex/phase-2-source-contract`. Phase 1 is complete and issue #4 is closed. The existing PR is [#16](https://github.com/AlesSystems/esmer-market-analytics/pull/16).
 
 The Phase 2 contribution is a declarative source contract, synthetic golden/edge fixtures and paired snapshots with independent expected outputs. See [source](../contracts/source.md), [calculations](../contracts/calculations.md), [privacy](../contracts/privacy.md), [golden oracles](golden-oracles.md), and [local verification](phase-2-local.md). No source was accessed and no source-backed financial mapping was validated.
 
-The Phase 2 exit gate remains **open** for source-dependent evidence. Synthetic checks do not pass extraction, financial-runtime, import-activation or Windows release acceptance. The [Windows handoff](../operations/windows-phase-2-handoff.md) gives the exact remaining checks on the same branch. Windows execution for this change is intentionally unperformed on this macOS host.
+The [Phase 2 Windows record](windows-phase-2.md) contains passing fixture, timezone, typecheck, lint, build, packaging and full-suite checks, packaged runtime measurements, archive/distribution inventory, hashes, native screenshots and successful portable/NSIS lifecycle checks. The user chose to leave the physical-disconnect check open. No new human offline observation is claimed.
+
+The Phase 2 exit gate remains **open** for source-dependent evidence. Synthetic checks do not pass extraction, financial-runtime, import-activation or full Windows release acceptance. No source rules were promoted, no Phase 3 work began, and issue #5 remains open. The original [Windows handoff](../operations/windows-phase-2-handoff.md) is retained as the procedure; the Windows record above governs actual outcomes and remaining checks.
