@@ -1,0 +1,137 @@
+{
+  "reproducedAt": "301884b07373899a6c085531561045343988563a",
+  "fixedAt": "3e20828dfa41162ee4a4939b7e032a63f7da68d1",
+  "failure": "Two existing package tests exceeded unchanged 5000 ms timeout during fixture setup",
+  "fix": "One transaction for each bulk fixture insertion loop",
+  "measurements": [
+    {
+      "transaction": false,
+      "kind": "pagination",
+      "index": 0,
+      "schemaMs": 151.3,
+      "insertsMs": 2299.1,
+      "behaviorMs": 45.2,
+      "totalMs": 2495.7
+    },
+    {
+      "transaction": false,
+      "kind": "pagination",
+      "index": 1,
+      "schemaMs": 165.7,
+      "insertsMs": 2434.8,
+      "behaviorMs": 43.4,
+      "totalMs": 2643.9
+    },
+    {
+      "transaction": false,
+      "kind": "pagination",
+      "index": 2,
+      "schemaMs": 158.7,
+      "insertsMs": 2233.1,
+      "behaviorMs": 40.8,
+      "totalMs": 2432.7
+    },
+    {
+      "transaction": false,
+      "kind": "shadowed",
+      "index": 0,
+      "schemaMs": 132,
+      "insertsMs": 2708.7,
+      "behaviorMs": 40.6,
+      "totalMs": 2881.3
+    },
+    {
+      "transaction": false,
+      "kind": "shadowed",
+      "index": 1,
+      "schemaMs": 121.9,
+      "insertsMs": 2683.2,
+      "behaviorMs": 37,
+      "totalMs": 2842.2
+    },
+    {
+      "transaction": false,
+      "kind": "shadowed",
+      "index": 2,
+      "schemaMs": 126.1,
+      "insertsMs": 3005.4,
+      "behaviorMs": 39,
+      "totalMs": 3170.5
+    },
+    {
+      "transaction": false,
+      "kind": "shadowed",
+      "index": 3,
+      "schemaMs": 132.8,
+      "insertsMs": 2754.1,
+      "behaviorMs": 39.8,
+      "totalMs": 2926.7
+    },
+    {
+      "transaction": true,
+      "kind": "pagination",
+      "index": 0,
+      "schemaMs": 126.3,
+      "insertsMs": 17,
+      "behaviorMs": 42.2,
+      "totalMs": 185.6
+    },
+    {
+      "transaction": true,
+      "kind": "pagination",
+      "index": 1,
+      "schemaMs": 122.5,
+      "insertsMs": 15.1,
+      "behaviorMs": 41.4,
+      "totalMs": 179
+    },
+    {
+      "transaction": true,
+      "kind": "pagination",
+      "index": 2,
+      "schemaMs": 152.2,
+      "insertsMs": 14.9,
+      "behaviorMs": 49.2,
+      "totalMs": 216.3
+    },
+    {
+      "transaction": true,
+      "kind": "shadowed",
+      "index": 0,
+      "schemaMs": 128.5,
+      "insertsMs": 12.9,
+      "behaviorMs": 41.3,
+      "totalMs": 182.6
+    },
+    {
+      "transaction": true,
+      "kind": "shadowed",
+      "index": 1,
+      "schemaMs": 119,
+      "insertsMs": 12,
+      "behaviorMs": 55.7,
+      "totalMs": 186.7
+    },
+    {
+      "transaction": true,
+      "kind": "shadowed",
+      "index": 2,
+      "schemaMs": 116.3,
+      "insertsMs": 16.4,
+      "behaviorMs": 48.5,
+      "totalMs": 181.1
+    },
+    {
+      "transaction": true,
+      "kind": "shadowed",
+      "index": 3,
+      "schemaMs": 167.4,
+      "insertsMs": 21.6,
+      "behaviorMs": 37.3,
+      "totalMs": 226.2
+    }
+  ],
+  "focusedAfter": "2 passed; 5 skipped; 2.08 seconds",
+  "fullFileAfter": "7 passed; 3.26 seconds",
+  "limitation": "Synthetic fixture setup timings only; no source or application performance claim"
+}
