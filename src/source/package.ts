@@ -43,7 +43,7 @@ function validate(value: unknown, verifyHashes = true): asserts value is { manif
       keys(row, stream === "documents" ? ["id", "kind", "date", "supplierId"] : stream === "lines" ? ["id", "documentId", "quantity", "net", "cost"] : ["id"]);
       id(row.id); requireThat(!ids[stream].has(String(row.id))); ids[stream].add(String(row.id));
       if (stream === "documents") {
-        requireThat(["sale", "purchase", "customer-return", "supplier-return"].includes(String(row.kind))); date(row.date);
+        requireThat(typeof row.kind === "string" && ["sale", "purchase", "customer-return", "supplier-return"].includes(row.kind)); date(row.date);
         requireThat(String(row.date) >= String(m.coverage.from) && String(row.date) <= String(m.coverage.to));
         if (row.supplierId !== null) { id(row.supplierId); requireThat(row.kind === "purchase" || row.kind === "supplier-return"); }
       }
