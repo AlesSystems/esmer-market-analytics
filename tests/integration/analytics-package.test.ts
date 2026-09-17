@@ -91,8 +91,9 @@ test("pagination retains all source IDs and rejects empty, null and duplicate ID
     const { path } = await fixture(); const db = new DatabaseSync(path);
     db.exec("ALTER TABLE lines RENAME TO old_lines; CREATE TABLE lines (id TEXT, documentId TEXT, quantity TEXT, net TEXT, cost TEXT); INSERT INTO lines SELECT * FROM old_lines");
     const insert = db.prepare("INSERT INTO lines VALUES (?, '9007199254740993', '1', '1', NULL)");
+    db.exec("BEGIN");
     for (let i = 0; i < 260; i++) insert.run(`valid-${i}`);
-    insert.run(invalid); db.close();
+    insert.run(invalid); db.exec("COMMIT"); db.close();
     const batches = await collect(extract({ path, mappingVersion: "synthetic-relational-v1" }));
     expect(batches.filter(batch => batch.stream === "lines").reduce((sum, batch) => sum + batch.records.length, 0)).toBe(262);
     expect(() => writePackage(batches, metadata)).toThrow();
@@ -105,8 +106,9 @@ test("preparation rejects shadowed SQLite row identifiers without publishing tru
     const { path, dir } = await fixture(); const db = new DatabaseSync(path);
     db.exec(`ALTER TABLE lines ADD COLUMN ${alias}`);
     const insert = db.prepare("INSERT INTO lines (id, documentId, quantity, net, cost) VALUES (?, '9007199254740993', '1', '1', NULL)");
+    db.exec("BEGIN");
     for (let i = 0; i < 300; i++) insert.run(`shadow-${i}`);
-    db.close();
+    db.exec("COMMIT"); db.close();
     const before = await readFile(path); const destination = join(dir, "shadow.json");
     expect(await preparePackage({ path, destination, mappingVersion: "synthetic-relational-v1", metadata })).toEqual({ ok: false, code: "PREPARATION_FAILED" });
     await expect(readFile(destination)).rejects.toMatchObject({ code: "ENOENT" });
