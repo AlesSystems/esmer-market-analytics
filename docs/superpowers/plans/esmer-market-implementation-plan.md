@@ -184,9 +184,11 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 **Interface:** The extractor consumes the reviewed mapping plus a protected read-only connection and streams only approved records. The preparation tool orchestrates extraction from an already isolated restore; database administration is separate from both extractor and desktop.
 
 - [ ] Write an isolated permission test for the full extraction lifecycle, including connection initialization, retry, cancellation and failure. Approved reads succeed; forbidden writes/administration are denied by the test account.
-- [ ] Test a source-shaped fixture containing prohibited synthetic sentinel values; assert they never appear in extracted records, logs or diagnostic output. Do not broadly select customer-bearing tables and redact after persistence.
-- [ ] Implement explicit parameterized SELECT queries with bounded batches, query limits and cancellation/resource cleanup. Review dependency initialization for hidden source writes; do not execute unchecked source procedures.
-- [ ] Keep tests that attempt forbidden writes exclusively on the isolated test instance. Capture permission/workflow evidence without sensitive parameter values.
+- [x] Test a source-shaped fixture containing prohibited synthetic sentinel values; assert they never appear in extracted records, logs or diagnostic output. Do not broadly select customer-bearing tables and redact after persistence.
+- [x] Implement explicit parameterized SELECT queries with bounded batches, query limits and cancellation/resource cleanup. Review dependency initialization for hidden source writes; do not execute unchecked source procedures.
+- [x] Keep tests that attempt forbidden writes exclusively on the isolated test instance. Capture permission/workflow evidence without sensitive parameter values.
+
+These completed steps apply to `synthetic-relational-v1` and generated SQLite databases only. The restricted SQL Server account test above and the reviewed real-source mapping remain open. The preparation tool rejects unsupported mappings before opening a source.
 
 **Verify:** `npm run test:integration -- tests/integration/source-readonly.test.ts` and `npm run test:integration -- tests/integration/source-privacy.test.ts`.
 
@@ -196,11 +198,13 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Interface:** The package writer consumes approved streams and emits a versioned manifest plus payload. The reader returns validated records and metadata or a structured rejection; it does not activate a dataset.
 
-- [ ] Define the exact stream/schema encoding and size limits in `analytics-package.md`; record lineage, mapping version, coverage, record counts and content hashes. Preserve decimal strings and stable source IDs without numeric precision loss.
-- [ ] Test round-trip identity, a changed payload/hash, unsupported schema, undeclared stream, invalid required references and truncated input. Reject malformed input before activation; show permitted incompleteness as warnings.
-- [ ] Keep full POS backups, source credentials and operational restoration tooling out of the desktop distribution. Document preparation without promising an ongoing manual import service.
+- [x] Define the exact stream/schema encoding and size limits in `analytics-package.md`; record lineage, mapping version, coverage, record counts and content hashes. Preserve decimal strings and stable source IDs without numeric precision loss.
+- [x] Test round-trip identity, a changed payload/hash, unsupported schema, undeclared stream, invalid required references and truncated input. Reject malformed input before activation; show permitted incompleteness as warnings.
+- [x] Keep full POS backups, source credentials and operational restoration tooling out of the desktop distribution. Document preparation without promising an ongoing manual import service.
 
 **Verify:** `npm run test:integration -- tests/integration/analytics-package.test.ts`.
+
+**Evidence status (2026-09-17): Synthetic implementation verified locally; Windows handoff pending.** The [package contract](../../contracts/analytics-package.md), [preparation procedure](../../operations/prepare-package.md) and [local evidence](../../evidence/phase-3-local.md) record bounded synthetic scope. The package reader does not activate a dataset. Real-source extraction, source privacy and SQL Server permissions remain unvalidated, so the source-dependent exit gate remains open. Follow the [Windows prompt](../../operations/windows-phase-3-handoff.md) on the same branch and stop after Phase 3.
 
 **Exit gate:** A prepared package is reproducible, minimal and validated. Read-only and privacy evidence satisfies the extraction portions of A01/A05; package validation contributes to A04.
 

@@ -35,3 +35,11 @@ The Phase 2 contribution is a declarative source contract, synthetic golden/edge
 The [Phase 2 Windows record](windows-phase-2.md) contains passing fixture, timezone, typecheck, lint, build, packaging and full-suite checks, packaged runtime measurements, archive/distribution inventory, hashes, native screenshots and successful portable/NSIS lifecycle checks. On 2026-09-17, the user reported successful physical-disconnect testing. That manual report is separate from the connected-host automated checks.
 
 The Phase 2 exit gate remains **open** for source-dependent evidence. Synthetic checks do not pass extraction, financial-runtime, import-activation or full Windows release acceptance. No source rules were promoted, no Phase 3 work began, and issue #5 remains open. The original [Windows handoff](../operations/windows-phase-2-handoff.md) is retained as the procedure; the Windows record above governs actual outcomes and remaining checks.
+
+## Phase 3 status
+
+The user authorized [issue #6](https://github.com/AlesSystems/esmer-market-analytics/issues/6), a PR and a stop before Windows testing. Issue #5 was closed when this work began; its source-dependent evidence remains open. This supersedes the older issue-status sentence above without changing its evidence limitations.
+
+Phase 3 implements synthetic SQLite extraction, a bounded validated analytics package and developer-side preparation. See the [package contract](../contracts/analytics-package.md), [preparation procedure](../operations/prepare-package.md), [local evidence](phase-3-local.md), and [archive inventory](phase-3-package-inventory.json). Real raw-column mapping and SQL Server permissions remain unvalidated. The desktop retains its empty/offline behavior.
+
+The source-dependent Phase 3 exit gate remains **open**. Windows checks are deliberately unperformed here. Continue on `codex/phase-3-analytics-packages` with the [Windows agent prompt](../operations/windows-phase-3-handoff.md). Package validation does not establish Phase 4 activation or app-owned preservation.

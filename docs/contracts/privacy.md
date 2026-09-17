@@ -2,7 +2,7 @@
 
 ## Scope and review status
 
-This is the Phase 2 privacy contract for [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5), D10 and A05. It applies to fixtures now and constrains later extraction. No source query, extractor, analytics-package writer or real reduced fixture is implemented or exercised here.
+This privacy contract began in [Phase 2](https://github.com/AlesSystems/esmer-market-analytics/issues/5) for D10 and A05. Phase 2 established fixture boundaries. [Phase 3](analytics-package.md) adds an explicitly synthetic extraction and package contract. No actual market-source mapping or real reduced fixture is approved.
 
 The declarative [source registry](../../src/source/contract.ts) lists allowed synthetic fields and historically evidenced source-column candidates. These are different schemas. A synthetic `businessDate` or `quantity` field does not prove a raw SQL column name. A future extractor must resolve every required raw mapping on an authorized clean restore and receive a reviewed contract revision before use.
 
