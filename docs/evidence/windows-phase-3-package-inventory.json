@@ -1,0 +1,852 @@
+{
+  "entries": 349,
+  "files": 301,
+  "paths": [
+    "node_modules",
+    "node_modules/decimal.js",
+    "node_modules/decimal.js/LICENCE.md",
+    "node_modules/decimal.js/decimal.js",
+    "node_modules/decimal.js/decimal.mjs",
+    "node_modules/decimal.js/package.json",
+    "node_modules/fflate",
+    "node_modules/fflate/LICENSE",
+    "node_modules/fflate/esm",
+    "node_modules/fflate/esm/browser.js",
+    "node_modules/fflate/esm/index.d.mts",
+    "node_modules/fflate/esm/index.mjs",
+    "node_modules/fflate/lib",
+    "node_modules/fflate/lib/browser.cjs",
+    "node_modules/fflate/lib/browser.d.cts",
+    "node_modules/fflate/lib/index.cjs",
+    "node_modules/fflate/lib/node-worker.cjs",
+    "node_modules/fflate/lib/node.cjs",
+    "node_modules/fflate/lib/node.d.cts",
+    "node_modules/fflate/lib/worker.cjs",
+    "node_modules/fflate/package.json",
+    "node_modules/fflate/umd",
+    "node_modules/fflate/umd/index.js",
+    "node_modules/react",
+    "node_modules/react/LICENSE",
+    "node_modules/react/cjs",
+    "node_modules/react/cjs/react-compiler-runtime.development.js",
+    "node_modules/react/cjs/react-compiler-runtime.production.js",
+    "node_modules/react/cjs/react-compiler-runtime.profiling.js",
+    "node_modules/react/cjs/react-jsx-dev-runtime.development.js",
+    "node_modules/react/cjs/react-jsx-dev-runtime.production.js",
+    "node_modules/react/cjs/react-jsx-dev-runtime.profiling.js",
+    "node_modules/react/cjs/react-jsx-dev-runtime.react-server.development.js",
+    "node_modules/react/cjs/react-jsx-dev-runtime.react-server.production.js",
+    "node_modules/react/cjs/react-jsx-runtime.development.js",
+    "node_modules/react/cjs/react-jsx-runtime.production.js",
+    "node_modules/react/cjs/react-jsx-runtime.profiling.js",
+    "node_modules/react/cjs/react-jsx-runtime.react-server.development.js",
+    "node_modules/react/cjs/react-jsx-runtime.react-server.production.js",
+    "node_modules/react/cjs/react.development.js",
+    "node_modules/react/cjs/react.production.js",
+    "node_modules/react/cjs/react.react-server.development.js",
+    "node_modules/react/cjs/react.react-server.production.js",
+    "node_modules/react/compiler-runtime.js",
+    "node_modules/react/index.js",
+    "node_modules/react/jsx-dev-runtime.js",
+    "node_modules/react/jsx-dev-runtime.react-server.js",
+    "node_modules/react/jsx-runtime.js",
+    "node_modules/react/jsx-runtime.react-server.js",
+    "node_modules/react/package.json",
+    "node_modules/react/react.react-server.js",
+    "node_modules/react-dom",
+    "node_modules/react-dom/LICENSE",
+    "node_modules/react-dom/cjs",
+    "node_modules/react-dom/cjs/react-dom-client.development.js",
+    "node_modules/react-dom/cjs/react-dom-client.production.js",
+    "node_modules/react-dom/cjs/react-dom-profiling.development.js",
+    "node_modules/react-dom/cjs/react-dom-profiling.profiling.js",
+    "node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js",
+    "node_modules/react-dom/cjs/react-dom-server-legacy.browser.production.js",
+    "node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js",
+    "node_modules/react-dom/cjs/react-dom-server-legacy.node.production.js",
+    "node_modules/react-dom/cjs/react-dom-server.browser.development.js",
+    "node_modules/react-dom/cjs/react-dom-server.browser.production.js",
+    "node_modules/react-dom/cjs/react-dom-server.bun.development.js",
+    "node_modules/react-dom/cjs/react-dom-server.bun.production.js",
+    "node_modules/react-dom/cjs/react-dom-server.edge.development.js",
+    "node_modules/react-dom/cjs/react-dom-server.edge.production.js",
+    "node_modules/react-dom/cjs/react-dom-server.node.development.js",
+    "node_modules/react-dom/cjs/react-dom-server.node.production.js",
+    "node_modules/react-dom/cjs/react-dom-test-utils.development.js",
+    "node_modules/react-dom/cjs/react-dom-test-utils.production.js",
+    "node_modules/react-dom/cjs/react-dom.development.js",
+    "node_modules/react-dom/cjs/react-dom.production.js",
+    "node_modules/react-dom/cjs/react-dom.react-server.development.js",
+    "node_modules/react-dom/cjs/react-dom.react-server.production.js",
+    "node_modules/react-dom/client.js",
+    "node_modules/react-dom/client.react-server.js",
+    "node_modules/react-dom/index.js",
+    "node_modules/react-dom/package.json",
+    "node_modules/react-dom/profiling.js",
+    "node_modules/react-dom/profiling.react-server.js",
+    "node_modules/react-dom/react-dom.react-server.js",
+    "node_modules/react-dom/server.browser.js",
+    "node_modules/react-dom/server.bun.js",
+    "node_modules/react-dom/server.edge.js",
+    "node_modules/react-dom/server.js",
+    "node_modules/react-dom/server.node.js",
+    "node_modules/react-dom/server.react-server.js",
+    "node_modules/react-dom/static.browser.js",
+    "node_modules/react-dom/static.edge.js",
+    "node_modules/react-dom/static.js",
+    "node_modules/react-dom/static.node.js",
+    "node_modules/react-dom/static.react-server.js",
+    "node_modules/react-dom/test-utils.js",
+    "node_modules/scheduler",
+    "node_modules/scheduler/LICENSE",
+    "node_modules/scheduler/cjs",
+    "node_modules/scheduler/cjs/scheduler-unstable_mock.development.js",
+    "node_modules/scheduler/cjs/scheduler-unstable_mock.production.js",
+    "node_modules/scheduler/cjs/scheduler-unstable_post_task.development.js",
+    "node_modules/scheduler/cjs/scheduler-unstable_post_task.production.js",
+    "node_modules/scheduler/cjs/scheduler.development.js",
+    "node_modules/scheduler/cjs/scheduler.native.development.js",
+    "node_modules/scheduler/cjs/scheduler.native.production.js",
+    "node_modules/scheduler/cjs/scheduler.production.js",
+    "node_modules/scheduler/index.js",
+    "node_modules/scheduler/index.native.js",
+    "node_modules/scheduler/package.json",
+    "node_modules/scheduler/unstable_mock.js",
+    "node_modules/scheduler/unstable_post_task.js",
+    "node_modules/write-excel-file",
+    "node_modules/write-excel-file/.gitlab-ci.yml",
+    "node_modules/write-excel-file/CODE_OF_CONDUCT.md",
+    "node_modules/write-excel-file/LICENSE",
+    "node_modules/write-excel-file/README_FEATURE_SENSITIVITY_LABEL.md",
+    "node_modules/write-excel-file/browser",
+    "node_modules/write-excel-file/browser/index.cjs",
+    "node_modules/write-excel-file/browser/index.js",
+    "node_modules/write-excel-file/browser/package.json",
+    "node_modules/write-excel-file/bundle",
+    "node_modules/write-excel-file/bundle/getSheetData.min.js",
+    "node_modules/write-excel-file/bundle/test-cases.html",
+    "node_modules/write-excel-file/bundle/test-cases.js",
+    "node_modules/write-excel-file/bundle/write-excel-file.min.js",
+    "node_modules/write-excel-file/commonjs",
+    "node_modules/write-excel-file/commonjs/export",
+    "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayBrowser.js",
+    "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayNode.js",
+    "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayUniversal.js",
+    "node_modules/write-excel-file/commonjs/export/convertFilesContentToUint8Arrays.js",
+    "node_modules/write-excel-file/commonjs/export/downloadBlob.js",
+    "node_modules/write-excel-file/commonjs/export/writeXlsxFileBrowser.js",
+    "node_modules/write-excel-file/commonjs/export/writeXlsxFileNode.js",
+    "node_modules/write-excel-file/commonjs/export/writeXlsxFileUniversal.js",
+    "node_modules/write-excel-file/commonjs/getSheetData",
+    "node_modules/write-excel-file/commonjs/getSheetData/getSheetData.js",
+    "node_modules/write-excel-file/commonjs/package.json",
+    "node_modules/write-excel-file/commonjs/xlsx",
+    "node_modules/write-excel-file/commonjs/xlsx/features",
+    "node_modules/write-excel-file/commonjs/xlsx/features/conditionalFormatting.js",
+    "node_modules/write-excel-file/commonjs/xlsx/features/images.js",
+    "node_modules/write-excel-file/commonjs/xlsx/features/stickyRowsOrColumns.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files",
+    "node_modules/write-excel-file/commonjs/xlsx/files/[Content_Types].xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/drawing.xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/drawing.xml.rels.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/rels.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sharedStrings.xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml.rels.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/cell.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/column.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/columns.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/drawingReference.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/helpers",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/helpers/floatToInteger.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/helpers/getCellStyleProperties.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/mergedCellsDescription.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/pageMargins.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/pageSetup.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/processMergedCells.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/row.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheet.xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheetData.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheetViews.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/styles.xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/workbook.xml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/files/workbook.xml.rels.js",
+    "node_modules/write-excel-file/commonjs/xlsx/generateXlsxFileContents.js",
+    "node_modules/write-excel-file/commonjs/xlsx/getFeatures.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/convertDateToSerialNumber.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/features",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getAdditionalContent.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getElementXml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getWrittenFiles.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/features/transformContent.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getAlignmentXml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getBorderXml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getCellAddress.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getFileExtensionForContentType.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getFillXml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getFontXml.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getOrderOfSiblings.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/getXlsxColorForHexColor.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/hasAlignment.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/hasBorder.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/hasFill.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/hasFont.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/isCellObject.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/isObject.js",
+    "node_modules/write-excel-file/commonjs/xlsx/helpers/orderOfSiblings.js",
+    "node_modules/write-excel-file/commonjs/xlsx/initializeSharedStrings.js",
+    "node_modules/write-excel-file/commonjs/xlsx/initializeSheets.js",
+    "node_modules/write-excel-file/commonjs/xlsx/initializeStyles.js",
+    "node_modules/write-excel-file/commonjs/xlsx/validateSheetData.js",
+    "node_modules/write-excel-file/commonjs/xlsx/validateSheetName.js",
+    "node_modules/write-excel-file/commonjs/xml",
+    "node_modules/write-excel-file/commonjs/xml/appendMarkupInsideElement.js",
+    "node_modules/write-excel-file/commonjs/xml/applyEnclosingElementOffset.js",
+    "node_modules/write-excel-file/commonjs/xml/escapeXmlSpecialCharacters.js",
+    "node_modules/write-excel-file/commonjs/xml/findElement.js",
+    "node_modules/write-excel-file/commonjs/xml/findElementInsideElement.js",
+    "node_modules/write-excel-file/commonjs/xml/findElementsNonRecursive_.js",
+    "node_modules/write-excel-file/commonjs/xml/getAttributesString.js",
+    "node_modules/write-excel-file/commonjs/xml/getChildElements.js",
+    "node_modules/write-excel-file/commonjs/xml/getClosingTagMarkup.js",
+    "node_modules/write-excel-file/commonjs/xml/getMarkupInsideElement.js",
+    "node_modules/write-excel-file/commonjs/xml/getOpeningTagMarkup.js",
+    "node_modules/write-excel-file/commonjs/xml/getSelfClosingTagMarkup.js",
+    "node_modules/write-excel-file/commonjs/xml/insertElementMarkupAccordingToOrderOfSiblings.js",
+    "node_modules/write-excel-file/commonjs/xml/prependMarkupInsideElement.js",
+    "node_modules/write-excel-file/commonjs/xml/removeInvalidXmlCharacters.js",
+    "node_modules/write-excel-file/commonjs/xml/replaceElement.js",
+    "node_modules/write-excel-file/commonjs/xml/sanitizeAttributeName.js",
+    "node_modules/write-excel-file/commonjs/xml/sanitizeAttributeValue.js",
+    "node_modules/write-excel-file/commonjs/xml/sanitizeTextContent.js",
+    "node_modules/write-excel-file/commonjs/xml/setMarkupInsideElement.js",
+    "node_modules/write-excel-file/commonjs/zip",
+    "node_modules/write-excel-file/commonjs/zip/zipToArrayBuffer.js",
+    "node_modules/write-excel-file/commonjs/zip/zipToArrayBufferSync.js",
+    "node_modules/write-excel-file/commonjs/zip/zipToStream.js",
+    "node_modules/write-excel-file/docs",
+    "node_modules/write-excel-file/docs/IMAGES.md",
+    "node_modules/write-excel-file/modules",
+    "node_modules/write-excel-file/modules/export",
+    "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayBrowser.js",
+    "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayNode.js",
+    "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayUniversal.js",
+    "node_modules/write-excel-file/modules/export/convertFilesContentToUint8Arrays.js",
+    "node_modules/write-excel-file/modules/export/downloadBlob.js",
+    "node_modules/write-excel-file/modules/export/writeXlsxFileBrowser.js",
+    "node_modules/write-excel-file/modules/export/writeXlsxFileNode.js",
+    "node_modules/write-excel-file/modules/export/writeXlsxFileUniversal.js",
+    "node_modules/write-excel-file/modules/getSheetData",
+    "node_modules/write-excel-file/modules/getSheetData/getSheetData.js",
+    "node_modules/write-excel-file/modules/xlsx",
+    "node_modules/write-excel-file/modules/xlsx/features",
+    "node_modules/write-excel-file/modules/xlsx/features/conditionalFormatting.js",
+    "node_modules/write-excel-file/modules/xlsx/features/images.js",
+    "node_modules/write-excel-file/modules/xlsx/features/stickyRowsOrColumns.js",
+    "node_modules/write-excel-file/modules/xlsx/files",
+    "node_modules/write-excel-file/modules/xlsx/files/[Content_Types].xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/drawing.xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/drawing.xml.rels.js",
+    "node_modules/write-excel-file/modules/xlsx/files/rels.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sharedStrings.xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml.rels.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/cell.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/column.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/columns.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/drawingReference.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/helpers",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/helpers/floatToInteger.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/helpers/getCellStyleProperties.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/mergedCellsDescription.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/pageMargins.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/pageSetup.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/processMergedCells.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/row.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheet.xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheetData.js",
+    "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheetViews.js",
+    "node_modules/write-excel-file/modules/xlsx/files/styles.xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/workbook.xml.js",
+    "node_modules/write-excel-file/modules/xlsx/files/workbook.xml.rels.js",
+    "node_modules/write-excel-file/modules/xlsx/generateXlsxFileContents.js",
+    "node_modules/write-excel-file/modules/xlsx/getFeatures.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers",
+    "node_modules/write-excel-file/modules/xlsx/helpers/convertDateToSerialNumber.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/features",
+    "node_modules/write-excel-file/modules/xlsx/helpers/features/getAdditionalContent.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/features/getElementXml.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/features/getWrittenFiles.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/features/transformContent.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getAlignmentXml.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getBorderXml.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getCellAddress.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getFileExtensionForContentType.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getFillXml.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getFontXml.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getOrderOfSiblings.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/getXlsxColorForHexColor.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/hasAlignment.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/hasBorder.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/hasFill.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/hasFont.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/isCellObject.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/isObject.js",
+    "node_modules/write-excel-file/modules/xlsx/helpers/orderOfSiblings.js",
+    "node_modules/write-excel-file/modules/xlsx/initializeSharedStrings.js",
+    "node_modules/write-excel-file/modules/xlsx/initializeSheets.js",
+    "node_modules/write-excel-file/modules/xlsx/initializeStyles.js",
+    "node_modules/write-excel-file/modules/xlsx/validateSheetData.js",
+    "node_modules/write-excel-file/modules/xlsx/validateSheetName.js",
+    "node_modules/write-excel-file/modules/xml",
+    "node_modules/write-excel-file/modules/xml/appendMarkupInsideElement.js",
+    "node_modules/write-excel-file/modules/xml/applyEnclosingElementOffset.js",
+    "node_modules/write-excel-file/modules/xml/escapeXmlSpecialCharacters.js",
+    "node_modules/write-excel-file/modules/xml/findElement.js",
+    "node_modules/write-excel-file/modules/xml/findElementInsideElement.js",
+    "node_modules/write-excel-file/modules/xml/findElementsNonRecursive_.js",
+    "node_modules/write-excel-file/modules/xml/getAttributesString.js",
+    "node_modules/write-excel-file/modules/xml/getChildElements.js",
+    "node_modules/write-excel-file/modules/xml/getClosingTagMarkup.js",
+    "node_modules/write-excel-file/modules/xml/getMarkupInsideElement.js",
+    "node_modules/write-excel-file/modules/xml/getOpeningTagMarkup.js",
+    "node_modules/write-excel-file/modules/xml/getSelfClosingTagMarkup.js",
+    "node_modules/write-excel-file/modules/xml/insertElementMarkupAccordingToOrderOfSiblings.js",
+    "node_modules/write-excel-file/modules/xml/prependMarkupInsideElement.js",
+    "node_modules/write-excel-file/modules/xml/removeInvalidXmlCharacters.js",
+    "node_modules/write-excel-file/modules/xml/replaceElement.js",
+    "node_modules/write-excel-file/modules/xml/sanitizeAttributeName.js",
+    "node_modules/write-excel-file/modules/xml/sanitizeAttributeValue.js",
+    "node_modules/write-excel-file/modules/xml/sanitizeTextContent.js",
+    "node_modules/write-excel-file/modules/xml/setMarkupInsideElement.js",
+    "node_modules/write-excel-file/modules/zip",
+    "node_modules/write-excel-file/modules/zip/zipToArrayBuffer.js",
+    "node_modules/write-excel-file/modules/zip/zipToArrayBufferSync.js",
+    "node_modules/write-excel-file/modules/zip/zipToStream.js",
+    "node_modules/write-excel-file/node",
+    "node_modules/write-excel-file/node/index.cjs",
+    "node_modules/write-excel-file/node/index.js",
+    "node_modules/write-excel-file/node/package.json",
+    "node_modules/write-excel-file/package.json",
+    "node_modules/write-excel-file/rollup.config.mjs",
+    "node_modules/write-excel-file/types",
+    "node_modules/write-excel-file/types/SheetOptionsForObjects.ts",
+    "node_modules/write-excel-file/universal",
+    "node_modules/write-excel-file/universal/index.cjs",
+    "node_modules/write-excel-file/universal/index.js",
+    "node_modules/write-excel-file/universal/package.json",
+    "node_modules/write-excel-file/utility",
+    "node_modules/write-excel-file/utility/index.cjs",
+    "node_modules/write-excel-file/utility/index.js",
+    "node_modules/write-excel-file/utility/package.json",
+    "dist",
+    "dist/desktop",
+    "dist/desktop/main.cjs",
+    "dist/desktop/preload.cjs",
+    "dist/service",
+    "dist/service/worker.cjs",
+    "dist/ui",
+    "dist/ui/app.js",
+    "dist/ui/index.html",
+    "dist/ui/style.css",
+    "package.json"
+  ],
+  "outsideAllowlist": [],
+  "prohibitedPaths": [],
+  "machinePathMatches": [],
+  "sentinelMatches": [],
+  "dependencies": [
+    {
+      "name": "decimal.js",
+      "version": "10.6.0",
+      "licence": "MIT"
+    },
+    {
+      "name": "fflate",
+      "version": "0.8.3",
+      "licence": "MIT"
+    },
+    {
+      "name": "react",
+      "version": "19.3.0",
+      "licence": "MIT"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.3.0",
+      "licence": "MIT"
+    },
+    {
+      "name": "scheduler",
+      "version": "0.28.0",
+      "licence": "MIT"
+    },
+    {
+      "name": "write-excel-file",
+      "version": "4.1.1",
+      "licence": "MIT"
+    }
+  ],
+  "dependencyNoticeFiles": [
+    "node_modules/decimal.js/LICENCE.md",
+    "node_modules/fflate/LICENSE",
+    "node_modules/react/LICENSE",
+    "node_modules/react-dom/LICENSE",
+    "node_modules/scheduler/LICENSE",
+    "node_modules/write-excel-file/LICENSE"
+  ],
+  "archiveSha256": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460",
+  "runtimeNotices": [
+    {
+      "name": "LICENSE",
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "matchesRuntime": true
+    },
+    {
+      "name": "LICENSES.chromium.html",
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70",
+      "matchesRuntime": true
+    }
+  ],
+  "releaseFiles": [
+    {
+      "path": "builder-debug.yml",
+      "bytes": 980,
+      "sha256": "e7f021f17829a11dff22e3ec3781b97d349165a4e76fdb69530f0ebe7ec8f091"
+    },
+    {
+      "path": "Esmer Market Analytics 0.1.0.exe",
+      "bytes": 112603548,
+      "sha256": "30229b393a131aed7b3f8330cfdf1bf7fb68fbabc29e3f4d8cd1e250e58841c1"
+    },
+    {
+      "path": "Esmer Market Analytics Setup 0.1.0.exe",
+      "bytes": 112770856,
+      "sha256": "b2e9ee9a7a7665defa36d7fa5df4a59309a4edccc6b5fb7da391422dcb18b6cd"
+    },
+    {
+      "path": "Esmer Market Analytics Setup 0.1.0.exe.blockmap",
+      "bytes": 118252,
+      "sha256": "c7e3504e72bff63d0e3814eaeb7f8cfcb680f5e14e1638895cc1f87c1cd5fee5"
+    },
+    {
+      "path": "latest.yml",
+      "bytes": 373,
+      "sha256": "8a862f258d943203481dd828ebab2145b1d90ffa1c060abdead94dc692beeca9"
+    },
+    {
+      "path": "win-unpacked/chrome_100_percent.pak",
+      "bytes": 719654,
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe"
+    },
+    {
+      "path": "win-unpacked/chrome_200_percent.pak",
+      "bytes": 1269017,
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d"
+    },
+    {
+      "path": "win-unpacked/d3dcompiler_47.dll",
+      "bytes": 4741488,
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb"
+    },
+    {
+      "path": "win-unpacked/dxcompiler.dll",
+      "bytes": 25744896,
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac"
+    },
+    {
+      "path": "win-unpacked/dxil.dll",
+      "bytes": 1509760,
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a"
+    },
+    {
+      "path": "win-unpacked/Esmer Market Analytics.exe",
+      "bytes": 246070272,
+      "sha256": "06fbf01c3bc9f00bd668bf67c8b306a355499f069d4de180ae27195e6f1b673d"
+    },
+    {
+      "path": "win-unpacked/ffmpeg.dll",
+      "bytes": 3113472,
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0"
+    },
+    {
+      "path": "win-unpacked/icudtl.dat",
+      "bytes": 10876560,
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe"
+    },
+    {
+      "path": "win-unpacked/LICENSE.electron.txt",
+      "bytes": 1096,
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "path": "win-unpacked/LICENSES.chromium.html",
+      "bytes": 20472830,
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70"
+    },
+    {
+      "path": "win-unpacked/locales/af.pak",
+      "bytes": 636155,
+      "sha256": "3017b141bd16e24190d810f0748612f0fd4352ca8553002b9a63a7f77f7154f8"
+    },
+    {
+      "path": "win-unpacked/locales/am.pak",
+      "bytes": 1029450,
+      "sha256": "67b938d162bc75db067120bb8366b5bafd9a75fa99a0ca9ad4f46b47d1d37634"
+    },
+    {
+      "path": "win-unpacked/locales/ar.pak",
+      "bytes": 1130933,
+      "sha256": "a6eb037da4ac7930a8661c8bf602deee090fc4409bf4db24db8aab65c89b1d06"
+    },
+    {
+      "path": "win-unpacked/locales/bg.pak",
+      "bytes": 1178203,
+      "sha256": "2eb9c74c67e4b13b45a73061fa978738e335bc245da71bab0ea9b205fe91074e"
+    },
+    {
+      "path": "win-unpacked/locales/bn.pak",
+      "bytes": 1513545,
+      "sha256": "415621a5c0b1546e6e447d43b76414425a8703cc7681d637ec1f283ad0c787e7"
+    },
+    {
+      "path": "win-unpacked/locales/ca.pak",
+      "bytes": 716908,
+      "sha256": "6f28297c1ccb628f534d65dade167ae559f83eace359acf47e48ff890b9409d5"
+    },
+    {
+      "path": "win-unpacked/locales/cs.pak",
+      "bytes": 743351,
+      "sha256": "799a789ce531991cb975425730db310f9a8fe74091eee568f3e65fcc7ef0cd57"
+    },
+    {
+      "path": "win-unpacked/locales/da.pak",
+      "bytes": 666465,
+      "sha256": "9a2cd25537a4818897481ba944981e8aee3d89c7ad37588d02f1deebff3f62d0"
+    },
+    {
+      "path": "win-unpacked/locales/de.pak",
+      "bytes": 717834,
+      "sha256": "fcf63fd89e613a7ef69f16054b97b3493948e5c665aad180a91d3635256fb7d7"
+    },
+    {
+      "path": "win-unpacked/locales/el.pak",
+      "bytes": 1295538,
+      "sha256": "37d2e1ef69fea9bdb1e0902cbc61a458baa9009fc3761029bd1c1882a7a0c9b2"
+    },
+    {
+      "path": "win-unpacked/locales/en-GB.pak",
+      "bytes": 580030,
+      "sha256": "01d9200a5daee1770f7147b166d25baa6a8dd72c138c3c526421e656dec789f5"
+    },
+    {
+      "path": "win-unpacked/locales/en-US.pak",
+      "bytes": 586582,
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1"
+    },
+    {
+      "path": "win-unpacked/locales/es-419.pak",
+      "bytes": 707635,
+      "sha256": "6ff6ea0a14da50cacc4b72ab8c8c7b49c8423abb64f6a3a7f1643d8c3c74e6e9"
+    },
+    {
+      "path": "win-unpacked/locales/es.pak",
+      "bytes": 703926,
+      "sha256": "4578e08033967a5062bfd3b1937e711df84571d444e4940b8ffe5366bce4e778"
+    },
+    {
+      "path": "win-unpacked/locales/et.pak",
+      "bytes": 642216,
+      "sha256": "dd1205eae606f12510e24ce39f301439c98b3293d766ca5839dc292a14d7973c"
+    },
+    {
+      "path": "win-unpacked/locales/fa.pak",
+      "bytes": 1063054,
+      "sha256": "f3675255feb8b054717be9e92e93289262f35e82f25f2f8de0d3ebf3865715af"
+    },
+    {
+      "path": "win-unpacked/locales/fi.pak",
+      "bytes": 655113,
+      "sha256": "1f3123d7fb5c22a95b5250ea17450b665c3c6cd6a6dfd28bbdde15e1bf684a0e"
+    },
+    {
+      "path": "win-unpacked/locales/fil.pak",
+      "bytes": 741385,
+      "sha256": "02e2c70d3d85b0deb677a9ae576ae3cf89e80774532cb3315c14f1e8ce64b310"
+    },
+    {
+      "path": "win-unpacked/locales/fr.pak",
+      "bytes": 763453,
+      "sha256": "4db43f1cfba1ed1d7dd347d58fbab0b8d6d89dd008a3b9d2436d8744e3363453"
+    },
+    {
+      "path": "win-unpacked/locales/gu.pak",
+      "bytes": 1495625,
+      "sha256": "e86e8c240d4b6283abb03c49df9e8899607ef9def6d4933c7a541d63b5835271"
+    },
+    {
+      "path": "win-unpacked/locales/he.pak",
+      "bytes": 928748,
+      "sha256": "ddc1f304ab1f4489d19ae2b31e7f8e3ffb47dae439520159e8975422c65e4115"
+    },
+    {
+      "path": "win-unpacked/locales/hi.pak",
+      "bytes": 1586592,
+      "sha256": "10a6f19c1982590e33476427dee8d4293b0707e25dc536d6394b5782ecc3b642"
+    },
+    {
+      "path": "win-unpacked/locales/hr.pak",
+      "bytes": 715279,
+      "sha256": "d46c64ae8af3562e37eb80438aa2bee228fafda251d58ba4d0991291f1c72aab"
+    },
+    {
+      "path": "win-unpacked/locales/hu.pak",
+      "bytes": 765640,
+      "sha256": "0a46fc8d50f74effd1cfe1979e677df3de6fc47e6b551267303d93d57bd83f50"
+    },
+    {
+      "path": "win-unpacked/locales/id.pak",
+      "bytes": 635080,
+      "sha256": "f567569c42a25bb2dfc5c33e13aac558c0e2a1d5d4b969592bbd0841b36438db"
+    },
+    {
+      "path": "win-unpacked/locales/it.pak",
+      "bytes": 693990,
+      "sha256": "899be10e8f46f53d9bbe7cab827fc17b7c2bd7184e31791688016e2ca4df6622"
+    },
+    {
+      "path": "win-unpacked/locales/ja.pak",
+      "bytes": 842132,
+      "sha256": "9370c20a0612f5874dff2b015f31482e167eccf1b3c1d1a2efc1c2e38cefa88e"
+    },
+    {
+      "path": "win-unpacked/locales/kn.pak",
+      "bytes": 1720240,
+      "sha256": "af5fed2130102ecc0c878059c88faed9d6db2e8b147fb5ae9e15e3fe69706c8a"
+    },
+    {
+      "path": "win-unpacked/locales/ko.pak",
+      "bytes": 718709,
+      "sha256": "0f5bc49c4d35bfea1563db6eb77a074c65b39b49a916cb35a022ef96340338f2"
+    },
+    {
+      "path": "win-unpacked/locales/lt.pak",
+      "bytes": 777281,
+      "sha256": "af969f4407c190dd01a426fa1244cb1ec7cdf2909d1c3ba5b87ff662ba567303"
+    },
+    {
+      "path": "win-unpacked/locales/lv.pak",
+      "bytes": 774751,
+      "sha256": "27e20dfa5585161ef8b641f628aefe6c88d9f9590ffedb647e0c9da1cacf219d"
+    },
+    {
+      "path": "win-unpacked/locales/ml.pak",
+      "bytes": 1767850,
+      "sha256": "b5606265910e45098a88e989202a550531f6d00333c6b112ed4c5cbc07b2ff6a"
+    },
+    {
+      "path": "win-unpacked/locales/mr.pak",
+      "bytes": 1467313,
+      "sha256": "8465d4077ed5414cbcb7d9bdb00d85e515a1a069703cdc1d4d67c9d6e5623fb0"
+    },
+    {
+      "path": "win-unpacked/locales/ms.pak",
+      "bytes": 668356,
+      "sha256": "af7021a00befa586aa067ae3ccb339079e6f13ee0cab1621836f6abb608b6f2a"
+    },
+    {
+      "path": "win-unpacked/locales/nb.pak",
+      "bytes": 638121,
+      "sha256": "d97a2b0cbe6adc99add2ed3ce0d15d0bb124b778086c466c126634d60ea72608"
+    },
+    {
+      "path": "win-unpacked/locales/nl.pak",
+      "bytes": 664767,
+      "sha256": "9d82c384fbb6480c7a6e721c6bcd1f2cd19665d848b056b5a2911504308ba037"
+    },
+    {
+      "path": "win-unpacked/locales/pl.pak",
+      "bytes": 742064,
+      "sha256": "8a0969fc743d3e2f5111387d53c0d79e8c1d9f68256ad6553b87fca2bcaa7e6e"
+    },
+    {
+      "path": "win-unpacked/locales/pt-BR.pak",
+      "bytes": 697044,
+      "sha256": "8272a84e2e6658dc4da17c6bd21995011fbaa6c328efafd24c4ebd4fe2e64916"
+    },
+    {
+      "path": "win-unpacked/locales/pt-PT.pak",
+      "bytes": 701056,
+      "sha256": "bdfa7264dddf70f936f1785737969559a577b51d1952c820a468c611d18b17ca"
+    },
+    {
+      "path": "win-unpacked/locales/ro.pak",
+      "bytes": 728144,
+      "sha256": "1e6b5b0dac63a9e951daf523de310f6bd9e5c53e281f37706d41bd35d2a08bb5"
+    },
+    {
+      "path": "win-unpacked/locales/ru.pak",
+      "bytes": 1200996,
+      "sha256": "52a31a7ca057b8c76208620932120927a089502ddfb66c30de4324959f9e0075"
+    },
+    {
+      "path": "win-unpacked/locales/sk.pak",
+      "bytes": 755475,
+      "sha256": "a53551e8d251fa01305afe1d0d187144c56bfdffd5d1aa9f96a9350b96c0a252"
+    },
+    {
+      "path": "win-unpacked/locales/sl.pak",
+      "bytes": 722720,
+      "sha256": "e1371c8df577b979e3a515af34b0aaa3d07153c7a5c55d39a9b49a7ffe62d3d2"
+    },
+    {
+      "path": "win-unpacked/locales/sr.pak",
+      "bytes": 1112919,
+      "sha256": "be4ce17afac24dffc1eb36609cb51e766e77097d6656b1008a2a825e59609cc1"
+    },
+    {
+      "path": "win-unpacked/locales/sv.pak",
+      "bytes": 646537,
+      "sha256": "8bdff8855d23c739ece357f653c0a17bb36fe97577a5761912080d057ed341a5"
+    },
+    {
+      "path": "win-unpacked/locales/sw.pak",
+      "bytes": 685130,
+      "sha256": "312b225a81cc3cc15f13f80c45dd0e0bb3655d31873d2956861207e70c33c1dc"
+    },
+    {
+      "path": "win-unpacked/locales/ta.pak",
+      "bytes": 1758067,
+      "sha256": "91fb1460711df108d8d435a378c8be1d1e80b0886c0158d8c6ae92f35812681b"
+    },
+    {
+      "path": "win-unpacked/locales/te.pak",
+      "bytes": 1629379,
+      "sha256": "fc8c2706c5dfd36e7af8e380a240e0f697cc5fe969b512092a2185896512c4af"
+    },
+    {
+      "path": "win-unpacked/locales/th.pak",
+      "bytes": 1368866,
+      "sha256": "c1f4235c31bc05153230b0e55b7aabc9020d7460d5b0a025c386885e1e4bda3c"
+    },
+    {
+      "path": "win-unpacked/locales/tr.pak",
+      "bytes": 697368,
+      "sha256": "ae87bbd88ce0adfc2dc3c460736a7d0513472af62fc856caccc638dedfec9b4a"
+    },
+    {
+      "path": "win-unpacked/locales/uk.pak",
+      "bytes": 1211565,
+      "sha256": "a6230520dac708a6235588f5d9e894fcc9b1391e18a70e3220e06ddf80f76688"
+    },
+    {
+      "path": "win-unpacked/locales/ur.pak",
+      "bytes": 1047994,
+      "sha256": "c218e21744df2ff0669a87d497d65d76333073577360d4c662c592de146bf82a"
+    },
+    {
+      "path": "win-unpacked/locales/vi.pak",
+      "bytes": 830059,
+      "sha256": "42f3f0c4f645aedc66c12c74aee7256336a929798d736c56853daec91d44511a"
+    },
+    {
+      "path": "win-unpacked/locales/zh-CN.pak",
+      "bytes": 592116,
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15"
+    },
+    {
+      "path": "win-unpacked/locales/zh-TW.pak",
+      "bytes": 583860,
+      "sha256": "82739378d17ea73e57c8efae31994e0c8818ab2d0d12cb1f6b20d2f340b3229d"
+    },
+    {
+      "path": "win-unpacked/resources/app.asar",
+      "bytes": 10168832,
+      "sha256": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460"
+    },
+    {
+      "path": "win-unpacked/resources/licences/LICENSE",
+      "bytes": 1096,
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "path": "win-unpacked/resources/licences/LICENSES.chromium.html",
+      "bytes": 20472830,
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70"
+    },
+    {
+      "path": "win-unpacked/resources.pak",
+      "bytes": 12435445,
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6"
+    },
+    {
+      "path": "win-unpacked/snapshot_blob.bin",
+      "bytes": 368776,
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458"
+    },
+    {
+      "path": "win-unpacked/v8_context_snapshot.bin",
+      "bytes": 742208,
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b"
+    },
+    {
+      "path": "win-unpacked/vk_swiftshader.dll",
+      "bytes": 5520384,
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8"
+    },
+    {
+      "path": "win-unpacked/vk_swiftshader_icd.json",
+      "bytes": 106,
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9"
+    },
+    {
+      "path": "win-unpacked/vulkan-1.dll",
+      "bytes": 939008,
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f"
+    }
+  ],
+  "distributionComparisons": [
+    {
+      "artifact": "portable",
+      "files": 76,
+      "baselineFiles": 74,
+      "mismatches": 0,
+      "extraFiles": [
+        {
+          "path": "resources/app-update.yml",
+          "bytes": 117,
+          "sha256": "dd2116bc58ed0a9cba7c0e19939a56879c3d5c7c0c11d43efb1de283519788eb"
+        },
+        {
+          "path": "resources/elevate.exe",
+          "bytes": 107520,
+          "sha256": "9b1fbf0c11c520ae714af8aa9af12cfd48503eedecd7398d8992ee94d1b4dc37"
+        }
+      ]
+    },
+    {
+      "artifact": "installed",
+      "files": 77,
+      "baselineFiles": 74,
+      "mismatches": 0,
+      "extraFiles": [
+        {
+          "path": "resources/app-update.yml",
+          "bytes": 117,
+          "sha256": "dd2116bc58ed0a9cba7c0e19939a56879c3d5c7c0c11d43efb1de283519788eb"
+        },
+        {
+          "path": "resources/elevate.exe",
+          "bytes": 107520,
+          "sha256": "9b1fbf0c11c520ae714af8aa9af12cfd48503eedecd7398d8992ee94d1b4dc37"
+        },
+        {
+          "path": "Uninstall Esmer Market Analytics.exe",
+          "bytes": 140067,
+          "sha256": "6265129a1a50ba38fa9fd6dce1ba48995de66576ba824aef9b9fc58ead63b971"
+        }
+      ]
+    }
+  ]
+}

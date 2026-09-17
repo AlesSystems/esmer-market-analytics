@@ -1,0 +1,17 @@
+{
+  "archive": "app.asar",
+  "sha256": "2baa8a49c0d19739c867fe1ce0f85735b71013453f47a3357b07ce72edc36d06",
+  "entryCount": 349,
+  "applicationBundles": [
+    "dist/desktop/main.cjs",
+    "dist/desktop/preload.cjs",
+    "dist/service/worker.cjs",
+    "dist/ui/app.js",
+    "dist/ui/index.html",
+    "dist/ui/style.css"
+  ],
+  "excludedRepositoryInputs": true,
+  "absentPreparationMarkers": true,
+  "dependencyNoticeCheck": "separate scripts/verify-package.mjs check",
+  "limitation": "Local macOS archive; Windows distribution untested"
+}

@@ -1,0 +1,61 @@
+{
+  "fixture": "createSyntheticSource",
+  "mapping": "synthetic-relational-v1",
+  "metadata": {
+    "lineage": "synthetic-test",
+    "extractionId": "synthetic-batch-1",
+    "extractedAt": "2026-01-03T00:00:00.000Z",
+    "cutoff": "2026-01-02",
+    "coverage": {
+      "from": "2026-01-01",
+      "to": "2026-01-02",
+      "complete": false
+    }
+  },
+  "sourceSha256Before": "39496f404b2ee38ac3a791aa35ea0f4525ad11146248cd77ab6a148ac8c7db0d",
+  "sourceSha256After": "39496f404b2ee38ac3a791aa35ea0f4525ad11146248cd77ab6a148ac8c7db0d",
+  "packageBytes": 1029,
+  "packageSha256": "387c1055231c9e331b11a8cd2873cc27e37e052ace8e7fda023c2ded9f063a41",
+  "deterministic": true,
+  "warnings": [
+    "SYNTHETIC_ONLY",
+    "PARTIAL_COVERAGE",
+    "MISSING_COST"
+  ],
+  "exactDecimalsPreserved": true,
+  "sourceReconciled": false,
+  "independentlyRehashedUnknownFieldRejected": true,
+  "truncationRejected": true,
+  "existingDestinationPreserved": true,
+  "noPartialOrFailedPublication": true,
+  "timeoutAndAbortPreserveDestination": true,
+  "pausedConsumerTimeoutReleasedLockBeforeResuming": true,
+  "sourceRenameAfterTermination": true,
+  "privateSentinelMatches": 0,
+  "outputs": [
+    {
+      "scenario": "first.json:synthetic-relational-v1",
+      "exitCode": 0,
+      "stdout": "PACKAGE_PREPARED\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "second.json:synthetic-relational-v1",
+      "exitCode": 0,
+      "stdout": "PACKAGE_PREPARED\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "first.json:synthetic-relational-v1",
+      "exitCode": 1,
+      "stdout": "PREPARATION_FAILED\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "unsupported.json:source-contract-v1",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "PREPARATION_ARGUMENTS_INVALID\n"
+    }
+  ]
+}

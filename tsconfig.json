@@ -6,8 +6,9 @@
     "jsx": "react-jsx",
     "strict": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "types": ["node"]
   },
-  "include": ["src", "tests", "*.config.ts"]
+  "include": ["src", "tests", "tools", "*.config.ts"]
 }
