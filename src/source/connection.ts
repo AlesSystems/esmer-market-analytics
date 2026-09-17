@@ -9,6 +9,7 @@ export function openSyntheticReadOnly(path: string): DatabaseSync {
   const db = new DatabaseSync(path, { readOnly: true, enableDoubleQuotedStringLiterals: false, allowExtension: false, timeout: 50 });
   try {
     db.setAuthorizer((action, table, column) => {
+      if (action === constants.SQLITE_PRAGMA && table === "table_xinfo" && column && ["documents", "lines", "suppliers"].includes(column)) return constants.SQLITE_OK;
       if (action === constants.SQLITE_SELECT || action === constants.SQLITE_TRANSACTION) return constants.SQLITE_OK;
       if (action === constants.SQLITE_READ && table && column && columns[table]?.includes(column)) return constants.SQLITE_OK;
       return constants.SQLITE_DENY;
@@ -16,6 +17,10 @@ export function openSyntheticReadOnly(path: string): DatabaseSync {
     db.exec("BEGIN");
     const tables = db.prepare("SELECT name, type FROM sqlite_master WHERE name IN ('synthetic_marker', 'documents', 'lines', 'suppliers')").all();
     if (tables.length !== 4 || tables.some(table => table.type !== "table")) throw new Error("INVALID_SOURCE");
+    for (const table of ["documents", "lines", "suppliers"]) {
+      const schema = db.prepare(`PRAGMA table_xinfo(${table})`).all();
+      if (schema.some(column => ["rowid", "_rowid_", "oid"].includes(String(column.name).toLowerCase()))) throw new Error("INVALID_SOURCE");
+    }
     const marker = db.prepare("SELECT version FROM synthetic_marker LIMIT 2").all();
     if (marker.length !== 1 || marker[0].version !== "synthetic-relational-v1") throw new Error("INVALID_SOURCE");
     return db;

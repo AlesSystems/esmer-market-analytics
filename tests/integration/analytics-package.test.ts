@@ -100,9 +100,9 @@ test("pagination retains all source IDs and rejects empty, null and duplicate ID
 
 test("preparation rejects shadowed SQLite row identifiers without publishing truncated rows", async () => {
   const { DatabaseSync } = await import("node:sqlite");
-  for (const alias of ["ROWID", "_rowid_", "oid"]) {
+  for (const alias of ["ROWID INTEGER DEFAULT 1", "_rowid_ INTEGER DEFAULT 1", "oid INTEGER DEFAULT 1", "RoWiD INTEGER GENERATED ALWAYS AS (1) VIRTUAL"]) {
     const { path, dir } = await fixture(); const db = new DatabaseSync(path);
-    db.exec(`ALTER TABLE lines ADD COLUMN ${alias} INTEGER DEFAULT 1`);
+    db.exec(`ALTER TABLE lines ADD COLUMN ${alias}`);
     const insert = db.prepare("INSERT INTO lines (id, documentId, quantity, net, cost) VALUES (?, '9007199254740993', '1', '1', NULL)");
     for (let i = 0; i < 300; i++) insert.run(`shadow-${i}`);
     db.close();
