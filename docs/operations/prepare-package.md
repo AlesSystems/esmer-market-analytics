@@ -12,7 +12,7 @@ node tools/prepare-backup.ts synthetic-relational-v1 /path/to/generated.sqlite /
 
 The final argument is `partial` or `complete`. The two dates declare coverage, and the second date is the cutoff. Use opaque synthetic lineage and extraction IDs. The successful command prints `PACKAGE_PREPARED` and exits with zero. Failure prints a fixed code and exits with one. Paths, SQL parameters, and driver errors are not printed.
 
-The tool opens the synthetic database read-only, checks its marker and physical tables, and permits only fixed column reads. It excludes customer-bearing columns before extraction. Queries use bound keyset cursors and batch sizes. A SQLite authorizer denies other columns, functions, writes, extensions, and administration. A read transaction holds a coherent extraction snapshot.
+The tool opens the synthetic database read-only, checks its marker and physical tables, and permits only fixed column reads. Fixed `table_xinfo` metadata reads reject declared `rowid`, `_rowid_`, or `oid` columns, including generated columns, before pagination. It excludes customer-bearing columns before extraction. Queries use bound keyset cursors and batch sizes. A SQLite authorizer denies other columns, functions, writes, extensions, and administration. A read transaction holds a coherent extraction snapshot.
 
 One transient SQLite busy failure permits a retry from the beginning. The tool discards earlier batches before retry. Other failures stop preparation. Ctrl+C or termination requests abort extraction and remove the temporary package.
 
