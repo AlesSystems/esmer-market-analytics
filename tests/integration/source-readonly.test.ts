@@ -3,9 +3,10 @@ import { mkdtemp, readFile, rm, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { createSyntheticSource, collect } from "../helpers/synthetic-source";
+import { createSyntheticSource, collect, metadata } from "../helpers/synthetic-source";
 import { openSyntheticReadOnly } from "../../src/source/connection";
 import { extract } from "../../src/source/extract";
+import { preparePackage } from "../../tools/prepare-backup";
 const dirs: string[] = [];
 afterEach(async () => { await Promise.all(dirs.splice(0).map(path => rm(path, { recursive: true, force: true }))); });
 async function fixture() { const dir = await mkdtemp(join(tmpdir(), "source-readonly-")); dirs.push(dir); const path = join(dir, "synthetic.sqlite"); createSyntheticSource(path); return { dir, path }; }
@@ -35,7 +36,7 @@ test("unsupported mapping fails before opening a path and abort/early exit relea
   expect(await readFile(path)).toEqual(before);
 });
 
-test("invalid initialization and query failure close connections without raw diagnostics", async () => {
+test("invalid initialization closes connections without raw diagnostics", async () => {
   const { path } = await fixture(); const db = new DatabaseSync(path); db.exec("DROP TABLE lines"); db.close();
   await expect(collect(extract({ path, mappingVersion: "synthetic-relational-v1" }))).rejects.toThrow("EXTRACTION_FAILED");
   const writable = new DatabaseSync(path); writable.exec("BEGIN EXCLUSIVE; ROLLBACK"); writable.close();
@@ -56,4 +57,20 @@ test("abort closes a worker even while its consumer is paused after a batch", as
   await iterator.next(); controller.abort();
   const db = new DatabaseSync(path, { timeout: 1000 });
   try { db.exec("BEGIN EXCLUSIVE; ROLLBACK"); } finally { db.close(); await iterator.return(undefined); }
+});
+
+
+test("a query failure after an emitted batch closes the source and publishes no package", async () => {
+  const { path, dir } = await fixture(); const db = new DatabaseSync(path);
+  db.exec("ALTER TABLE lines DROP COLUMN cost"); db.close();
+  const before = await readFile(path);
+  const iterator = extract({ path, mappingVersion: "synthetic-relational-v1" });
+  const first = await iterator.next();
+  expect(first.done).toBe(false); expect(first.value?.stream).toBe("documents");
+  await expect(iterator.next()).rejects.toThrow("EXTRACTION_FAILED");
+  const writable = new DatabaseSync(path); writable.exec("BEGIN EXCLUSIVE; ROLLBACK"); writable.close();
+  const destination = join(dir, "failed.json");
+  expect(await preparePackage({ path, destination, mappingVersion: "synthetic-relational-v1", metadata })).toEqual({ ok: false, code: "PREPARATION_FAILED" });
+  expect(await readdir(dir)).toEqual(["synthetic.sqlite"]);
+  expect(await readFile(path)).toEqual(before);
 });
