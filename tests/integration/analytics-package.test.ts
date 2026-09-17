@@ -59,12 +59,13 @@ test("schema and references reject independently rehashed malformed payloads", a
   const { canonical } = await import("../../src/source/package");
   const { path } = await fixture();
   const bytes = writePackage(await collect(extract({ path, mappingVersion: "synthetic-relational-v1" })), metadata);
-  for (const change of ["reference", "duplicate", "private", "supplier", "numeric"]) {
+  for (const change of ["reference", "duplicate", "private", "supplier", "numeric", "kind-array"]) {
     const value = JSON.parse(bytes.toString());
     if (change === "reference") value.payload.lines[0].documentId = "missing";
     if (change === "duplicate") value.payload.lines.push(value.payload.lines[0]);
     if (change === "private") value.payload.documents[0].customerName = "PRIVATE_SENTINEL";
     if (change === "supplier") value.payload.suppliers.push({ id: "unreferenced" });
+    if (change === "kind-array") value.payload.documents[0].kind = ["sale"];
     if (change === "numeric") value.payload.lines[0].net = 123;
     for (const stream of ["documents", "lines", "suppliers"]) value.manifest.streams[stream] = { count: value.payload[stream].length, sha256: createHash("sha256").update(canonical(value.payload[stream])).digest("hex") };
     expect(readPackage(Buffer.from(canonical(value)))).toEqual({ ok: false, code: "INVALID_PACKAGE" });
