@@ -103,7 +103,9 @@ The final test installation was removed with its NSIS uninstaller using `/S`. Th
 
 ## Manual offline status
 
-The host has an active Ethernet adapter and the agent session lacks administrator access. The user explicitly chose to leave the physical-disconnect check open. No networking-disconnected launch or new human observation is claimed for Phase 2. The prior Phase 1 human report is historical evidence, not a substitute for this build's missing check.
+On 2026-09-17, the user reported that the Phase 2 physical-disconnect test was successful. This completes the previously deferred manual check as human-reported evidence. The requested procedure was to disconnect Ethernet, launch the final portable artifact and check the empty/offline screen before reconnecting. Expected behavior was startup with `Henüz veri içe aktarılmadı` and `Canlı bağlantı kapalı`; actual outcome was reported as successful. The artifact and tested code/build identity are recorded above. No separate screenshot, detailed warning report or runtime measurement accompanied this confirmation.
+
+This human report is separate from the connected-host automated lifecycle records, which remain unchanged. Physical disconnection checks the offline startup requirement against an unavailable network, including dependencies outside renderer network restrictions. It does not establish full-dataset operation, recovery, performance or source correctness.
 
 ## Independent review and remaining gates
 
@@ -117,7 +119,7 @@ Both workers also reviewed this Windows evidence against the logs, JSON records 
 | 2.2 / A02 | G01 through G08, edge oracles and exact synthetic arithmetic checks | Actual financial engine correctness and source reconciliation |
 | 2.2 / A04 | Concrete paired snapshots and preservation expectations | Persistent import activation, concurrency, recovery and failure injection |
 | 2.1 and 2.2 / A05 | Synthetic allowlist and private-sentinel rejection | Reviewed real raw mappings, reduced real fixtures and actual extractor/log/publication privacy |
-| A07 | Windows regression evidence recorded here | Physical-disconnect launch, full dataset, upgrades, recovery, performance and later reporting acceptance |
+| A07 | Windows regression evidence and user-reported successful physical-disconnect launch | Full dataset, upgrades, recovery, performance and later reporting acceptance |
 | L01 | Live connection remains disabled | All production permission and rollout gates |
 
 Synthetic success does not promote source financial rules, estimated profit or any full A02/A03/A04/A05/A07 release gate. The Phase 2 source-dependent exit gate stays open. No Phase 3 work, merge or automatic issue closure is authorized by this record.

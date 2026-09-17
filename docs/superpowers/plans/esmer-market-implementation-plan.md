@@ -171,7 +171,7 @@ For every completed gate, record: task/gate ID, build and commit, fixture/source
 
 **Exit gate:** Every initially released formula has an independent oracle, and source-supported versus synthetic-only evidence is distinguishable. Financial implementation remains blocked for unresolved rules.
 
-**Evidence status (2026-09-16): Synthetic contract and fixture checks complete for #5; source gates open.** The [source contract](../../contracts/source.md), [oracle record](../../evidence/golden-oracles.md) and [local evidence](../../evidence/phase-2-local.md) distinguish synthetic checks from source validation. The subsequent [Windows evidence](../../evidence/windows-phase-2.md) records passing packaged regression, inventory and portable/NSIS lifecycle checks on the same branch. The user left the physical-disconnect check open. Source-dependent checkboxes and broader release gates remain open. No Phase 3 work is authorized by this status note.
+**Evidence status (2026-09-17): Synthetic contract and fixture checks complete for #5; source gates open.** The [source contract](../../contracts/source.md), [oracle record](../../evidence/golden-oracles.md) and [local evidence](../../evidence/phase-2-local.md) distinguish synthetic checks from source validation. The subsequent [Windows evidence](../../evidence/windows-phase-2.md) records passing packaged regression, inventory and portable/NSIS lifecycle checks on the same branch. The user reported successful physical-disconnect testing on 2026-09-17. Source-dependent checkboxes and broader release gates remain open. No Phase 3 work is authorized by this status note.
 
 ## Phase 3 — Read-only extraction and analytics packages
 
