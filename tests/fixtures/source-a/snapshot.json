@@ -1,0 +1,98 @@
+{
+  "id": "source-a",
+  "version": 1,
+  "mappingVersion": "source-contract-v1",
+  "provenance": {
+    "kind": "synthetic",
+    "oracle": "independent-hand-arithmetic",
+    "sourceReconciled": false
+  },
+  "lineage": "synthetic-market-1",
+  "semantics": "synthetic-assumptions-only",
+  "assumptions": [
+    "Complete synthetic snapshot A; app revision 1."
+  ],
+  "coverage": {
+    "coveredIds": [
+      "line-edit",
+      "line-delete"
+    ],
+    "excludedIds": []
+  },
+  "records": [
+    {
+      "id": "line-edit",
+      "kind": "sale",
+      "documentId": "doc-edit",
+      "quantity": "1",
+      "unit": "piece",
+      "net": "100",
+      "cost": "60",
+      "date": "2025-02-01"
+    },
+    {
+      "id": "line-delete",
+      "kind": "sale",
+      "documentId": "doc-delete",
+      "quantity": "1",
+      "unit": "piece",
+      "net": "50",
+      "cost": "30",
+      "date": "2025-02-01"
+    },
+    {
+      "id": "expense-1",
+      "kind": "expense",
+      "net": "50",
+      "date": "2025-01-15",
+      "paidDate": "2025-02-10",
+      "classification": "operating",
+      "kdvTreatment": "same-basis",
+      "revision": "1"
+    },
+    {
+      "id": "adjustment-1",
+      "kind": "adjustment",
+      "targetId": "line-delete",
+      "net": "5",
+      "revision": "1"
+    },
+    {
+      "id": "setting-1",
+      "kind": "setting",
+      "value": "TRY",
+      "revision": "1"
+    },
+    {
+      "id": "audit-1",
+      "kind": "audit",
+      "targetId": "adjustment-1",
+      "revision": "1"
+    },
+    {
+      "id": "report-1",
+      "kind": "report",
+      "datasetId": "source-a",
+      "mappingVersion": "source-contract-v1",
+      "calculationVersion": "synthetic-calculation-v1",
+      "appRevision": "1",
+      "net": "150"
+    }
+  ],
+  "expected": {
+    "sourceIds": [
+      "line-edit",
+      "line-delete"
+    ],
+    "sourceNet": "150",
+    "appOwnedIds": [
+      "expense-1",
+      "adjustment-1",
+      "setting-1",
+      "audit-1",
+      "report-1"
+    ],
+    "acceptedReportNet": "150",
+    "acceptedDataset": "source-a"
+  }
+}

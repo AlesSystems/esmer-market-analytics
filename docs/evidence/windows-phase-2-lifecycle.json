@@ -1,0 +1,118 @@
+[
+  {
+    "artifact": "portable",
+    "launch": 1,
+    "archiveHash": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460",
+    "physicalDisconnectRequired": false,
+    "physicalAdaptersBefore": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "physicalAdaptersAfter": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "availability": {
+      "status": "ready",
+      "store": "empty",
+      "liveConnection": "disabled"
+    },
+    "developerRuntimeInPath": false,
+    "launchedProcessOwnershipVerified": true
+  },
+  {
+    "artifact": "portable",
+    "launch": 2,
+    "archiveHash": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460",
+    "physicalDisconnectRequired": false,
+    "physicalAdaptersBefore": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "physicalAdaptersAfter": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "availability": {
+      "status": "ready",
+      "store": "empty",
+      "liveConnection": "disabled"
+    },
+    "developerRuntimeInPath": false,
+    "launchedProcessOwnershipVerified": true
+  },
+  {
+    "artifact": "installed",
+    "launch": 1,
+    "archiveHash": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460",
+    "physicalDisconnectRequired": false,
+    "physicalAdaptersBefore": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "physicalAdaptersAfter": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "availability": {
+      "status": "ready",
+      "store": "empty",
+      "liveConnection": "disabled"
+    },
+    "developerRuntimeInPath": false,
+    "launchedProcessOwnershipVerified": true
+  },
+  {
+    "artifact": "installed",
+    "launch": 2,
+    "archiveHash": "3ea55989fa43f7cd974b46376f1dda1479d765ec0c6df78fb0f5c82f1f757460",
+    "physicalDisconnectRequired": false,
+    "physicalAdaptersBefore": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "physicalAdaptersAfter": [
+      {
+        "Status": "Disconnected"
+      },
+      {
+        "Status": "Up"
+      }
+    ],
+    "availability": {
+      "status": "ready",
+      "store": "empty",
+      "liveConnection": "disabled"
+    },
+    "developerRuntimeInPath": false,
+    "launchedProcessOwnershipVerified": true
+  }
+]

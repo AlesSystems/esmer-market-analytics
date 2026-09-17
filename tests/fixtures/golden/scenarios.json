@@ -1,0 +1,413 @@
+[
+  {
+    "id": "G01",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Unit and tax basis match; recorded KDV is 5%, not a legal-rate assertion.",
+      "One line discount; no additional header discount or charge."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "sale-1"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "sale-1",
+        "kind": "sale",
+        "documentId": "doc-1",
+        "quantity": "2",
+        "unit": "piece",
+        "unitNet": "100",
+        "discountPercent": "10",
+        "net": "180",
+        "kdv": "9",
+        "gross": "189",
+        "cost": "70"
+      }
+    ],
+    "expected": {
+      "netSales": "180",
+      "kdv": "9",
+      "grossReceipt": "189",
+      "estimatedCost": "140",
+      "estimatedGrossProfit": "40",
+      "method": "historical-last-purchase-estimate"
+    }
+  },
+  {
+    "id": "G02",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Missing cost is unknown, never zero.",
+      "Coverage uses absolute net line amounts."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "costed"
+      ],
+      "excludedIds": [
+        "missing"
+      ]
+    },
+    "records": [
+      {
+        "id": "costed",
+        "kind": "sale",
+        "documentId": "doc-1",
+        "net": "100",
+        "cost": "60"
+      },
+      {
+        "id": "missing",
+        "kind": "sale",
+        "documentId": "doc-2",
+        "net": "100",
+        "cost": null
+      }
+    ],
+    "expected": {
+      "coveredSales": "100",
+      "coveredCost": "60",
+      "coveredEstimatedGrossProfit": "40",
+      "costCoveragePercent": "50",
+      "fullPopulationGrossProfit": null
+    }
+  },
+  {
+    "id": "G03",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "All prices share the same unit and tax basis; current prices never rewrite history."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "historical"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "historical",
+        "kind": "sale",
+        "documentId": "doc-1",
+        "quantity": "3",
+        "unit": "piece",
+        "cost": "10"
+      },
+      {
+        "id": "current-a",
+        "kind": "replacement",
+        "cost": "25",
+        "revision": "a"
+      },
+      {
+        "id": "current-b",
+        "kind": "replacement",
+        "cost": "50",
+        "revision": "b"
+      }
+    ],
+    "expected": {
+      "historicalEstimatedCost": "30",
+      "replacementA": "75",
+      "replacementB": "150"
+    }
+  },
+  {
+    "id": "G04",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Validated original-sale link and matching unit/tax basis are synthetic assumptions."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "original",
+        "linked-return"
+      ],
+      "excludedIds": [
+        "unlinked-return"
+      ]
+    },
+    "records": [
+      {
+        "id": "original",
+        "kind": "sale",
+        "documentId": "doc-1",
+        "quantity": "2",
+        "unit": "piece",
+        "net": "200",
+        "cost": "60"
+      },
+      {
+        "id": "linked-return",
+        "kind": "return",
+        "documentId": "return-1",
+        "quantity": "-1",
+        "unit": "piece",
+        "net": "-100",
+        "cost": "60",
+        "linkedId": "original"
+      },
+      {
+        "id": "unlinked-return",
+        "kind": "return",
+        "documentId": "return-2",
+        "quantity": "-1",
+        "unit": "piece",
+        "net": "-100",
+        "cost": null,
+        "linkedId": null
+      }
+    ],
+    "expected": {
+      "linkedReturnNet": "-100",
+      "linkedReturnCost": "-60",
+      "unlinkedReturnCost": null,
+      "warning": "unsupported-return-cost"
+    }
+  },
+  {
+    "id": "G05",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "Incurred date attributes operating expense; payment date is a separate view."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "expense-1"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "expense-1",
+        "kind": "expense",
+        "net": "50",
+        "date": "2025-01-15",
+        "paidDate": "2025-02-10",
+        "classification": "operating",
+        "kdvTreatment": "same-basis",
+        "revision": "1"
+      }
+    ],
+    "expected": {
+      "januaryExpense": "50",
+      "februaryExpense": "0",
+      "februaryPayment": "50",
+      "totalExpense": "50"
+    }
+  },
+  {
+    "id": "G06",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "No expense import and no owner completeness confirmation."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "costed"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "costed",
+        "kind": "sale",
+        "documentId": "doc-1",
+        "net": "100",
+        "cost": "60"
+      },
+      {
+        "id": "expenses",
+        "kind": "context",
+        "status": "absent"
+      }
+    ],
+    "expected": {
+      "netSales": "100",
+      "estimatedGrossProfit": "40",
+      "operatingProfit": null,
+      "message": "Faaliyet kârı hesaplanamıyor — gider verileri eksik."
+    }
+  },
+  {
+    "id": "G07",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "For this fixture only, each linked pair is one validated economic event; invoice carries value at agreed event timing."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "purchase-dispatch",
+        "purchase-invoice",
+        "supplier-dispatch",
+        "supplier-invoice"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "purchase-dispatch",
+        "kind": "conversion",
+        "documentId": "dispatch-1",
+        "documentType": "5",
+        "linkedId": "purchase-invoice",
+        "eventId": "purchase-event",
+        "net": "80",
+        "status": "invoiced"
+      },
+      {
+        "id": "purchase-invoice",
+        "kind": "conversion",
+        "documentId": "invoice-1",
+        "documentType": "1",
+        "linkedId": "purchase-dispatch",
+        "eventId": "purchase-event",
+        "net": "80",
+        "status": "complete"
+      },
+      {
+        "id": "supplier-dispatch",
+        "kind": "conversion",
+        "documentId": "dispatch-2",
+        "documentType": "7",
+        "linkedId": "supplier-invoice",
+        "eventId": "supplier-event",
+        "net": "-20",
+        "status": "invoiced"
+      },
+      {
+        "id": "supplier-invoice",
+        "kind": "conversion",
+        "documentId": "invoice-2",
+        "documentType": "3",
+        "linkedId": "supplier-dispatch",
+        "eventId": "supplier-event",
+        "net": "-20",
+        "status": "complete"
+      }
+    ],
+    "expected": {
+      "purchaseEvents": "1",
+      "purchaseNet": "80",
+      "supplierReturnEvents": "1",
+      "supplierReturnNet": "-20",
+      "retainedDocumentIds": [
+        "dispatch-1",
+        "invoice-1",
+        "dispatch-2",
+        "invoice-2"
+      ]
+    }
+  },
+  {
+    "id": "G08",
+    "version": 1,
+    "mappingVersion": "source-contract-v1",
+    "provenance": {
+      "kind": "synthetic",
+      "oracle": "independent-hand-arithmetic",
+      "sourceReconciled": false
+    },
+    "lineage": "synthetic-market-1",
+    "semantics": "synthetic-assumptions-only",
+    "assumptions": [
+      "A and B are complete snapshots of the same declared lineage.",
+      "Candidate expectations do not execute import/publication."
+    ],
+    "coverage": {
+      "coveredIds": [
+        "snapshot-a",
+        "snapshot-b"
+      ],
+      "excludedIds": []
+    },
+    "records": [
+      {
+        "id": "snapshot-a",
+        "kind": "context",
+        "value": "source-a"
+      },
+      {
+        "id": "snapshot-b",
+        "kind": "context",
+        "value": "source-b"
+      }
+    ],
+    "expected": {
+      "candidateDataset": "source-b",
+      "acceptedDataset": "source-a",
+      "changedIds": [
+        "line-edit"
+      ],
+      "insertedIds": [
+        "line-insert"
+      ],
+      "deletedIds": [
+        "line-delete"
+      ],
+      "reviewAdjustmentIds": [
+        "adjustment-1",
+        "adjustment-during-stage"
+      ]
+    }
+  }
+]

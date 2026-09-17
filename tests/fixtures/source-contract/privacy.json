@@ -1,0 +1,56 @@
+{
+  "id": "privacy",
+  "version": 1,
+  "mappingVersion": "source-contract-v1",
+  "provenance": {
+    "kind": "synthetic",
+    "oracle": "independent-hand-arithmetic",
+    "sourceReconciled": false
+  },
+  "lineage": "synthetic-market-1",
+  "semantics": "synthetic-assumptions-only",
+  "assumptions": [
+    "All attack values added by tests are synthetic sentinels, never private records.",
+    "Supplier is linked to a synthetic purchasing document; actual CARI projection remains unvalidated."
+  ],
+  "coverage": {
+    "coveredIds": [
+      "supplier-1",
+      "purchase-1"
+    ],
+    "excludedIds": []
+  },
+  "records": [
+    {
+      "id": "supplier-1",
+      "kind": "supplier",
+      "name": "SENTETİK TEDARİKÇİ",
+      "purchaseDocumentId": "purchase-1"
+    },
+    {
+      "id": "purchase-1",
+      "kind": "conversion",
+      "documentId": "purchase-1",
+      "documentType": "1",
+      "linkedId": null,
+      "eventId": "supplier-purchase",
+      "net": "80",
+      "status": "complete"
+    }
+  ],
+  "expected": {
+    "approvedSupplierIds": [
+      "supplier-1"
+    ],
+    "rejectedFields": [
+      "MUSTERI_AD",
+      "EMAIL",
+      "ADRES",
+      "VERGI_NUMARASI",
+      "LOYALTY_CARD",
+      "PERSONNEL_NAME",
+      "RAW_SQL",
+      "credentials"
+    ]
+  }
+}

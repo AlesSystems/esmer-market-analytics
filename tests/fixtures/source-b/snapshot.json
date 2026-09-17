@@ -1,0 +1,135 @@
+{
+  "id": "source-b",
+  "version": 1,
+  "mappingVersion": "source-contract-v1",
+  "provenance": {
+    "kind": "synthetic",
+    "oracle": "independent-hand-arithmetic",
+    "sourceReconciled": false
+  },
+  "lineage": "synthetic-market-1",
+  "semantics": "synthetic-assumptions-only",
+  "assumptions": [
+    "Complete B replaces source A exactly once; app revision 2 includes concurrent additions."
+  ],
+  "coverage": {
+    "coveredIds": [
+      "line-edit",
+      "line-insert"
+    ],
+    "excludedIds": []
+  },
+  "records": [
+    {
+      "id": "line-edit",
+      "kind": "sale",
+      "documentId": "doc-edit",
+      "quantity": "1",
+      "unit": "piece",
+      "net": "90",
+      "cost": "60",
+      "date": "2025-01-31"
+    },
+    {
+      "id": "line-insert",
+      "kind": "sale",
+      "documentId": "doc-insert",
+      "quantity": "1",
+      "unit": "piece",
+      "net": "20",
+      "cost": "10",
+      "date": "2025-02-02"
+    },
+    {
+      "id": "expense-1",
+      "kind": "expense",
+      "net": "50",
+      "date": "2025-01-15",
+      "paidDate": "2025-02-10",
+      "classification": "operating",
+      "kdvTreatment": "same-basis",
+      "revision": "1"
+    },
+    {
+      "id": "adjustment-1",
+      "kind": "adjustment",
+      "targetId": "line-delete",
+      "net": "5",
+      "revision": "1"
+    },
+    {
+      "id": "setting-1",
+      "kind": "setting",
+      "value": "TRY",
+      "revision": "1"
+    },
+    {
+      "id": "audit-1",
+      "kind": "audit",
+      "targetId": "adjustment-1",
+      "revision": "1"
+    },
+    {
+      "id": "report-1",
+      "kind": "report",
+      "datasetId": "source-a",
+      "mappingVersion": "source-contract-v1",
+      "calculationVersion": "synthetic-calculation-v1",
+      "appRevision": "1",
+      "net": "150"
+    },
+    {
+      "id": "expense-during-stage",
+      "kind": "expense",
+      "net": "7",
+      "date": "2025-02-02",
+      "paidDate": null,
+      "classification": "operating",
+      "kdvTreatment": "same-basis",
+      "revision": "2"
+    },
+    {
+      "id": "adjustment-during-stage",
+      "kind": "adjustment",
+      "targetId": "line-edit",
+      "net": "2",
+      "revision": "2"
+    }
+  ],
+  "expected": {
+    "sourceIds": [
+      "line-edit",
+      "line-insert"
+    ],
+    "sourceNet": "110",
+    "insertedIds": [
+      "line-insert"
+    ],
+    "editedIds": [
+      "line-edit"
+    ],
+    "deletedIds": [
+      "line-delete"
+    ],
+    "backdatedIds": [
+      "line-edit"
+    ],
+    "preservedAppOwnedIds": [
+      "expense-1",
+      "adjustment-1",
+      "setting-1",
+      "audit-1",
+      "report-1"
+    ],
+    "concurrentAppOwnedIds": [
+      "expense-during-stage",
+      "adjustment-during-stage"
+    ],
+    "reviewAdjustmentIds": [
+      "adjustment-1",
+      "adjustment-during-stage"
+    ],
+    "acceptedReportNet": "150",
+    "acceptedDataset": "source-a"
+  }
+}
