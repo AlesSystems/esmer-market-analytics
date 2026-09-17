@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createSyntheticSource, metadata } from "../helpers/synthetic-source";
+import { collect } from "../helpers/synthetic-source";
 import { extract } from "../../src/source/extract";
 import { readPackage, writePackage } from "../../src/source/package";
 import { preparePackage } from "../../tools/prepare-backup";
@@ -13,7 +14,7 @@ async function fixture() { const dir = await mkdtemp(join(tmpdir(), "analytics-p
 
 test("real extraction round-trips precise strings with deterministic bytes and warnings", async () => {
   const { path } = await fixture();
-  const records = await Array.fromAsync(extract({ path, mappingVersion: "synthetic-relational-v1" }));
+  const records = await collect(extract({ path, mappingVersion: "synthetic-relational-v1" }));
   const bytes = writePackage(records, metadata);
   expect(writePackage([...records].reverse(), metadata)).toEqual(bytes);
   const result = readPackage(bytes);
@@ -27,7 +28,7 @@ test("real extraction round-trips precise strings with deterministic bytes and w
 
 test("reader rejects tampering, schema drift, unknown fields, references, invalid UTF8 and truncation", async () => {
   const { path } = await fixture();
-  const bytes = writePackage(await Array.fromAsync(extract({ path, mappingVersion: "synthetic-relational-v1" })), metadata);
+  const bytes = writePackage(await collect(extract({ path, mappingVersion: "synthetic-relational-v1" })), metadata);
   for (const mutate of [
     (x: { manifest: { schemaVersion: string; streams: { lines: { count: number } } }; payload: Record<string, Record<string, unknown>[]> }) => { x.payload.lines[0].net = "1"; },
     (x: { manifest: { schemaVersion: string; streams: { lines: { count: number } } }; payload: Record<string, Record<string, unknown>[]> }) => { x.manifest.schemaVersion = "unknown"; },
@@ -39,6 +40,7 @@ test("reader rejects tampering, schema drift, unknown fields, references, invali
     const value = JSON.parse(bytes.toString()); mutate(value);
     expect(readPackage(Buffer.from(JSON.stringify(value))).ok).toBe(false);
   }
+  expect(readPackage(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), bytes])).ok).toBe(false);
   expect(readPackage(bytes.subarray(0, -1)).ok).toBe(false);
   expect(readPackage(Buffer.from([0xff])).ok).toBe(false);
   expect(readPackage(Buffer.alloc(32 * 1024 * 1024 + 1)).ok).toBe(false);
@@ -50,4 +52,48 @@ test("preparation publishes once, preserves existing target and leaves no partia
   const first = await readFile(destination);
   expect(await preparePackage({ path, destination, mappingVersion: "synthetic-relational-v1", metadata })).toEqual({ ok: false, code: "PREPARATION_FAILED" });
   expect(await readFile(destination)).toEqual(first);
+});
+
+test("schema and references reject independently rehashed malformed payloads", async () => {
+  const { createHash } = await import("node:crypto");
+  const { canonical } = await import("../../src/source/package");
+  const { path } = await fixture();
+  const bytes = writePackage(await collect(extract({ path, mappingVersion: "synthetic-relational-v1" })), metadata);
+  for (const change of ["reference", "duplicate", "private", "supplier", "numeric"]) {
+    const value = JSON.parse(bytes.toString());
+    if (change === "reference") value.payload.lines[0].documentId = "missing";
+    if (change === "duplicate") value.payload.lines.push(value.payload.lines[0]);
+    if (change === "private") value.payload.documents[0].customerName = "PRIVATE_SENTINEL";
+    if (change === "supplier") value.payload.suppliers.push({ id: "unreferenced" });
+    if (change === "numeric") value.payload.lines[0].net = 123;
+    for (const stream of ["documents", "lines", "suppliers"]) value.manifest.streams[stream] = { count: value.payload[stream].length, sha256: createHash("sha256").update(canonical(value.payload[stream])).digest("hex") };
+    expect(readPackage(Buffer.from(canonical(value)))).toEqual({ ok: false, code: "INVALID_PACKAGE" });
+  }
+});
+
+test("preparation retries a transient initialization lock once without duplicated batches", async () => {
+  const { DatabaseSync } = await import("node:sqlite");
+  const { path, dir } = await fixture(); const lock = new DatabaseSync(path); lock.exec("BEGIN EXCLUSIVE");
+  let retries = 0;
+  try {
+    const destination = join(dir, "retry.json");
+    expect(await preparePackage({ path, destination, mappingVersion: "synthetic-relational-v1", metadata, onRetry: () => { retries++; lock.exec("ROLLBACK"); lock.close(); } })).toEqual({ ok: true });
+    expect(retries).toBe(1);
+    const result = readPackage(await readFile(destination));
+    expect(result.ok && result.records.documents.length).toBe(2);
+  } finally { if (lock.isOpen) { lock.exec("ROLLBACK"); lock.close(); } }
+});
+
+test("pagination retains all source IDs and rejects empty, null and duplicate IDs", async () => {
+  const { DatabaseSync } = await import("node:sqlite");
+  for (const invalid of [null, "", "line-1"]) {
+    const { path } = await fixture(); const db = new DatabaseSync(path);
+    db.exec("ALTER TABLE lines RENAME TO old_lines; CREATE TABLE lines (id TEXT, documentId TEXT, quantity TEXT, net TEXT, cost TEXT); INSERT INTO lines SELECT * FROM old_lines");
+    const insert = db.prepare("INSERT INTO lines VALUES (?, '9007199254740993', '1', '1', NULL)");
+    for (let i = 0; i < 260; i++) insert.run(`valid-${i}`);
+    insert.run(invalid); db.close();
+    const batches = await collect(extract({ path, mappingVersion: "synthetic-relational-v1" }));
+    expect(batches.filter(batch => batch.stream === "lines").reduce((sum, batch) => sum + batch.records.length, 0)).toBe(262);
+    expect(() => writePackage(batches, metadata)).toThrow();
+  }
 });

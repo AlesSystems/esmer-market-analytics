@@ -22,3 +22,5 @@ export const metadata = {
   lineage: "synthetic-test", extractionId: "synthetic-batch-1", extractedAt: "2026-01-03T00:00:00.000Z",
   cutoff: "2026-01-02", coverage: { from: "2026-01-01", to: "2026-01-02", complete: false },
 };
+
+export async function collect<T>(values: AsyncIterable<T>): Promise<T[]> { const result: T[] = []; for await (const value of values) result.push(value); return result; }
