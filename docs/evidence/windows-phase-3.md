@@ -107,13 +107,15 @@ The agent inspected both installed and portable native windows through Windows C
 
 `Get-AuthenticodeSignature` reported `NotSigned` for both distribution executables. No publisher, SmartScreen or UAC prompt was observed during local installation and launches. The one-click installer progressed before its window could be captured; the resulting installed application was inspected. Local builds do not establish warning behavior for downloaded copies or other Windows configurations.
 
-Physical-disconnect startup is pending a human report. The agent opened the final portable artifact and asked the user to close it, disconnect Ethernet/Wi-Fi, reopen it twice, verify the expected empty/offline text, reconnect and report any warning. This non-administrative session cannot physically unplug the connection. Phase 2's human report is not reused as Phase 3 evidence.
+On 2026-09-17, the user reported successful physical-disconnect testing of the final Phase 3 portable artifact. This completes the previously pending manual check as human-reported evidence. The requested procedure was to close the app, disconnect Ethernet/Wi-Fi, reopen it twice, verify `Henüz veri içe aktarılmadı` and `Canlı bağlantı kapalı`, then reconnect and report the result. The user reported success without supplying a separate screenshot, timing measurement or detailed warning report. The tested artifact and code/build identities are recorded above.
+
+This human report is separate from the connected-host automated lifecycle records, which remain unchanged. It establishes the reported empty-app offline startup result, not full-dataset operation, upgrades, recovery, performance or source correctness. Phase 2's report is not reused as Phase 3 evidence.
 
 ## Review and remaining gates
 
 Independent same-model Standards and Spec reviewers found no actionable findings in the fetched Phase 3 code. Comment review found no changed TypeScript comments or suppressions to remove. A separate Spec review of the Windows fixture fix found no contract change and checked the measured root cause and CLI proof.
 
-Both reviewers also checked the final Windows evidence against logs, scripts, JSON and all three screenshots, with no actionable findings. The Standards reviewer independently rehashed all 79 release files and matched the exact 349-entry archive inventory. The parent verifier checked 43 local Markdown targets, all release hashes, runtime measurements, four lifecycle runs and uninstall results. Final logs contained no known synthetic private sentinels. `git diff --check` passed. These reviews are independent same-model checks, not human or cross-model certification. The physical-disconnect report remains pending and is not implied by review success.
+Both reviewers also checked the final Windows evidence against logs, scripts, JSON and all three screenshots, with no actionable findings. The Standards reviewer independently rehashed all 79 release files and matched the exact 349-entry archive inventory. The parent verifier checked 43 local Markdown targets, all release hashes, runtime measurements, four lifecycle runs and uninstall results. Final logs contained no known synthetic private sentinels. `git diff --check` passed. These reviews are independent same-model checks, not human or cross-model certification. The subsequent physical-disconnect result comes from the user's report above, not from those reviews.
 
 | Task/gate | Evidence contributed here | Still open |
 | --- | --- | --- |
@@ -121,7 +123,7 @@ Both reviewers also checked the final Windows evidence against logs, scripts, JS
 | 3.1 / A05 | Synthetic allowlist, purchasing-only supplier IDs, payload and diagnostic sentinel checks | Reviewed real raw-column mapping, approved reduced real fixtures and real-data privacy |
 | 3.2 / A04 | Deterministic package, strict validation and no-overwrite preparation | Phase 4 activation, app-owned preservation, recovery and accepted-report reproducibility |
 | A02 / A03 | Exact transport strings and explicit synthetic-only status | Source semantics, financial calculations and source reconciliation |
-| A07 | Windows verification recorded above | Full-dataset operation, upgrades, recovery, reporting and full-volume performance |
+| A07 | Windows verification and human-reported successful physical-disconnect startup | Full-dataset operation, upgrades, recovery, reporting and full-volume performance |
 | L01 | Live connection remains disabled | Owner acceptance, production permission and separate rollout direction |
 
 The source-dependent Phase 3 exit gate remains open. SQLite denial is not SQL Server account permission proof. A valid synthetic package is never source-reconciled data. No complete A01–A07 or L01 release gate is claimed.
