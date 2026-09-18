@@ -46,3 +46,11 @@ test("unknown and future databases are rejected without changing their bytes", (
     const check = new DatabaseSync(path); expect(check.prepare("PRAGMA user_version").get()?.user_version).toBe(sql.includes("999") ? 999 : 0); check.close();
   }
 });
+
+test("damaged recognized v1 schema is rejected before migration without modifying bytes", () => {
+  const path = databasePath(); const db = new DatabaseSync(path); migrate(db, 1); db.exec("DROP TABLE source_lines"); db.close();
+  const before = readFileSync(path);
+  expect(() => openStore(path)).toThrow("UNSUPPORTED_STORE");
+  expect(readFileSync(path)).toEqual(before);
+  const check = new DatabaseSync(path); expect(check.prepare("PRAGMA user_version").get()?.user_version).toBe(1); check.close();
+});

@@ -97,3 +97,16 @@ test("runtime validation rejects malformed revisions and preserves all original 
   expect(db.prepare("SELECT COUNT(*) AS count FROM app_revisions").get()?.count).toBe(3);
   expect(() => db.exec("DELETE FROM app_revisions")).toThrow("IMMUTABLE_REVISION"); db.close();
 });
+
+test("accepted unsorted package arrays retain their canonical order through staging and restart", async () => {
+  const { createHash } = await import("node:crypto"); const { canonical } = await import("../../src/source/package");
+  const { store, path } = fixture(); const value = JSON.parse(sourcePackage("a").toString());
+  for (const stream of ["documents", "lines", "suppliers"]) {
+    value.payload[stream].reverse();
+    value.manifest.streams[stream].sha256 = createHash("sha256").update(canonical(value.payload[stream])).digest("hex");
+  }
+  const bytes = Buffer.from(canonical(value)); expect(readPackage(bytes).ok).toBe(true);
+  expect(store.importPackage(bytes).status).toBe("active");
+  expect(store.readSnapshot().records).toEqual(value.payload); store.close();
+  const reopened = openStore(path); expect(reopened.readSnapshot().records).toEqual(value.payload); reopened.close();
+});
