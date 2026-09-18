@@ -2,6 +2,7 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { sourcePackage } from "../helpers/store-fixtures";
 const executablePath =
   process.env.ESMER_EXECUTABLE ??
   (process.platform === "darwin"
@@ -26,12 +27,12 @@ test("empty packaged app starts offline without login or renderer privileges", a
     await expect(page.locator("input[type=password]")).toHaveCount(0);
     expect(
       await page.evaluate(() => ({
-        api: Object.keys(window.esmer),
+        api: Object.keys(window.esmer).sort(),
         node: typeof window.require,
         process: typeof window.process,
       })),
     ).toEqual({
-      api: ["getAvailability"],
+      api: ["getAvailability", "importPackage"],
       node: "undefined",
       process: "undefined",
     });
@@ -74,18 +75,18 @@ test("empty packaged app starts offline without login or renderer privileges", a
           const sqlite = database.prepare('SELECT sqlite_version() AS version').get();
           database.close();
           const postMessage = parentPort.postMessage.bind(parentPort);
-          parentPort.postMessage = (availability) => postMessage({
+          parentPort.postMessage = ({ result: availability }) => postMessage({
             electron: process.versions.electron,
             node: process.versions.node,
             sqlite,
             isMainThread,
             availability,
           });
-          require(workerData);
+          require(workerData.modulePath);
         `,
         {
           eval: true,
-          workerData: join(app.getAppPath(), "dist/service/worker.cjs"),
+          workerData: { modulePath: join(app.getAppPath(), "dist/service/worker.cjs"), databasePath: join(app.getPath("userData"), "runtime-probe.sqlite") },
         },
       );
       try {
@@ -102,7 +103,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
             clearTimeout(timeout);
             reject(new Error("WORKER_RUNTIME_FAILED"));
           });
-          worker.postMessage(null);
+          worker.postMessage({ id: 1, operation: "getAvailability" });
         });
         return { main, worker: measured };
       } finally {
@@ -224,4 +225,38 @@ test("empty packaged app starts offline without login or renderer privileges", a
     await app.close();
     await rm(userData, { recursive: true, force: true });
   }
+});
+
+test("packaged app imports through native selection, preserves data after failed import and restarts offline", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-import-"));
+  const packagePath = join(userData, "synthetic.json"); await writeFile(packagePath, sourcePackage("b"));
+  let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    let page = await app.firstWindow();
+    await expect(page.getByRole("heading", { name: "Henüz veri içe aktarılmadı" })).toBeVisible();
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
+    await expect(page.getByText("Sentetik gösterim verisi — gerçek market verisi değildir.")).toBeVisible();
+    await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
+    const availability = await page.evaluate(() => window.esmer.getAvailability());
+    expect(availability).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled", dataset: { cutoff: "2025-02-02", counts: { documents: 2, lines: 2, suppliers: 0 }, warnings: ["SYNTHETIC_ONLY"] } });
+    await page.screenshot({ path: "test-results/phase-4-imported.png" });
+    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await expect(page.getByText("Bu veri paketi zaten etkin. Veriler değiştirilmedi.")).toBeVisible();
+    await writeFile(packagePath, "invalid package");
+    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await expect(page.getByRole("alert")).toHaveText("Veri paketi geçersiz. Son geçerli veriler korundu.");
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    await page.screenshot({ path: "test-results/phase-4-import-failed.png" });
+    await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
+    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    await app.close();
+    app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
+    await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["getAvailability", "importPackage"] });
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
