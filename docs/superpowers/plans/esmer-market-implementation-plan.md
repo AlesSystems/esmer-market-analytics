@@ -218,10 +218,10 @@ These completed steps apply to `synthetic-relational-v1` and generated SQLite da
 
 **Interface:** Dataset IDs namespace immutable source facts. An app revision identifies expense, adjustment, confirmation and settings changes. Report reads explicitly bind both; migrations target only the app database.
 
-- [ ] Define tables for import batches, source versions/facts/links, active dataset, app-owned revisions, report versions and evidence references. Use exact decimal text or documented scaled storage; never SQLite floating-point money as an accidental default.
-- [ ] Write a test that creates a source version, an expense revision and an accepted report, applies an app schema migration, and verifies all values and references remain readable.
-- [ ] Serialize app writes through the owning service. Keep expensive parsing/calculation work outside the renderer; use read transactions or pinned versions for coherent reports.
-- [ ] Document retention: preserve active data and everything required by accepted reports and unresolved adjustments; prune redundant unreferenced candidate data/caches. Expose storage pressure instead of silently deleting required evidence.
+- [x] Define tables for import batches, source versions/facts/links, active dataset, app-owned revisions, report versions and evidence references. Use exact decimal text or documented scaled storage; never SQLite floating-point money as an accidental default.
+- [x] Write a test that creates a source version, an expense revision and an accepted report, applies an app schema migration, and verifies all values and references remain readable.
+- [x] Serialize app writes through the owning service. Keep expensive parsing/calculation work outside the renderer; use read transactions or pinned versions for coherent reports.
+- [x] Document retention: preserve active data and everything required by accepted reports and unresolved adjustments; prune redundant unreferenced candidate data/caches. Expose storage pressure instead of silently deleting required evidence.
 
 **Verify:** `npm run test:integration -- tests/integration/store-ownership.test.ts`.
 
@@ -231,13 +231,15 @@ These completed steps apply to `synthetic-relational-v1` and generated SQLite da
 
 **Interface:** Import state advances through staged → validated → active, with explicit failed/cancelled outcomes. Activation changes only the selected source dataset and source-related metadata; it does not replace the database file.
 
-- [ ] Test identical-package idempotency and overlapping source A/B snapshots. Edits/deletions replace the current source view exactly once; changed source lineage cannot collide on reused IDs.
-- [ ] Test an expense and adjustment created after staging but before activation. Both survive activation; changed or missing adjustment targets become review-required without reassignment.
-- [ ] Inject failures during package reading, batch persistence, validation, summary generation and activation. Restart after interruption and verify the prior complete dataset remains usable.
-- [ ] Test disk exhaustion, corrupt input, essential reference failures and a failed first import. Preserve the working state; show an empty/error view on first-use failure.
-- [ ] Activate only a coherent candidate. Do not publish source-only summaries together with operating results computed from an obsolete app revision. Retain rollback and difference evidence.
+- [x] Test identical-package idempotency and overlapping source A/B snapshots. Edits/deletions replace the current source view exactly once; changed source lineage cannot collide on reused IDs.
+- [x] Test an expense and adjustment created after staging but before activation. Both survive activation; changed or missing adjustment targets become review-required without reassignment.
+- [x] Inject failures during package reading, batch persistence, validation, summary generation and activation. Restart after interruption and verify the prior complete dataset remains usable.
+- [x] Test disk exhaustion, corrupt input, essential reference failures and a failed first import. Preserve the working state; show an empty/error view on first-use failure.
+- [x] Activate only a coherent candidate. Do not publish source-only summaries together with operating results computed from an obsolete app revision. Retain rollback and difference evidence.
 
 **Verify:** `npm run test:integration -- tests/integration/import-activation.test.ts` and `npm run test:integration -- tests/integration/import-failures.test.ts`.
+
+**Evidence status (2026-09-18): Synthetic implementation verified locally; Windows boundary reached.** The [persistence contract](../../contracts/persistence.md) and [local evidence](../../evidence/phase-4-local.md) record file-backed migration, pinned revisions, A/B overlap, retention, failure injection, process termination, SQLite page exhaustion and actual packaged macOS import/restart checks. These completed checkboxes describe the bounded synthetic local implementation. The Phase 4 exit gate remains open until the [Windows handoff](../../operations/windows-phase-4-handoff.md) is executed on the same branch. Broader A04 and source-dependent gates remain open. Stop before Windows-specific work on this host and do not begin Phase 5.
 
 **Exit gate:** A04 import, ownership, interruption and overlap scenarios pass. The source package is now usable without source connectivity.
 

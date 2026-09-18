@@ -1,0 +1,22 @@
+{
+  "main": {
+    "electron": "44.3.0",
+    "node": "24.20.0",
+    "sqlite": {
+      "version": "3.53.4"
+    }
+  },
+  "worker": {
+    "electron": "44.3.0",
+    "node": "24.20.0",
+    "sqlite": {
+      "version": "3.53.4"
+    },
+    "isMainThread": false,
+    "availability": {
+      "status": "ready",
+      "store": "empty",
+      "liveConnection": "disabled"
+    }
+  }
+}

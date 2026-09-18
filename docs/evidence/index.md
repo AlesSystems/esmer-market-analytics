@@ -45,3 +45,13 @@ Phase 3 implements synthetic SQLite extraction, a bounded validated analytics pa
 The [Phase 3 Windows record](windows-phase-3.md) contains passing synthetic extraction/privacy/package tests, typecheck, lint, build, Windows packaging and the full suite against the actual packaged executable. It records a fixture-only transaction fix for Windows setup timeouts, deterministic CLI output, worker/file cleanup, archive/distribution inventories, runtime versions, native screenshots and portable/NSIS lifecycle checks. On 2026-09-17, the user reported successful physical-disconnect testing. That manual report is separate from the connected-host automated checks.
 
 The source-dependent Phase 3 exit gate remains **open**. Real-source mapping, SQL Server permissions, reconciliation, real-data privacy and full-volume performance are unvalidated. The original [Windows prompt](../operations/windows-phase-3-handoff.md) remains as the procedure; the Windows record governs actual results. Package validation does not establish Phase 4 activation or app-owned preservation. No merge, issue closure or Phase 4 work follows from this evidence.
+
+## Phase 4 status
+
+The user authorized [issue #7](https://github.com/AlesSystems/esmer-market-analytics/issues/7), PR creation and a stop before Windows-specific implementation/testing. Issues #4, #5 and #6 were closed at entry; their unresolved source gates remain open.
+
+Phase 4 adds one durable app-owned SQLite store, immutable source datasets, append-only app revisions, accepted-report pins, atomic package activation, retention and a minimal Turkish native-file import flow. The [persistence contract](../contracts/persistence.md), [desktop boundary](../contracts/desktop.md), [local verification](phase-4-local.md), [runtime record](phase-4-runtime.json) and [archive inventory](phase-4-package-inventory.json) describe the implementation and proof.
+
+Local verification passed 2 unit, 110 integration and 4 actual packaged macOS desktop tests, plus typecheck and lint. Build and macOS directory packaging passed within the desktop run. Review exposed and corrected package-order, damaged-schema and missing restart-warning regressions. Final independent Standards and Spec follow-ups have no remaining findings. No dependency changed.
+
+The Phase 4 exit gate remains **open pending Windows verification**. The [Windows-agent prompt](../operations/windows-phase-4-handoff.md) continues on `codex/phase-4-durable-imports`. No Windows packaging or lifecycle check was run here. Broader A04 expense-import/recovery obligations and the real-source, financial, recovery, full-volume and live-integration gates remain open. No merge, issue closure or Phase 5 work is authorized by this evidence.

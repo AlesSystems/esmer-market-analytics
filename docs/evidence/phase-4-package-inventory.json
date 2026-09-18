@@ -1,0 +1,31 @@
+{
+  "platform": "darwin",
+  "arch": "arm64",
+  "archive": "release/mac-arm64/Esmer Market Analytics.app/Contents/Resources/app.asar",
+  "sha256": "300c1f458ec9ea1f5390fdaf1b740000240422cea271eb2411e93a8fb5bb5c28",
+  "entries": 349,
+  "applicationBundles": [
+    {
+      "path": "dist/desktop/main.cjs",
+      "bytes": 7115,
+      "sha256": "91cc1db207f58d68f2923b080aef75b20836846d1a4754ee2ff6fb398612bfef"
+    },
+    {
+      "path": "dist/desktop/preload.cjs",
+      "bytes": 363,
+      "sha256": "a29b27b0d246cf85f9eb6adaa86c0c130de10107e41e606d4c998c5ca3db1d66"
+    },
+    {
+      "path": "dist/service/worker.cjs",
+      "bytes": 30866,
+      "sha256": "b786bcfa41b111647dbe8352a09efe2b52be26e42f7c52654b3dad03e3933b38"
+    },
+    {
+      "path": "dist/ui/app.js",
+      "bytes": 227595,
+      "sha256": "f234ea3f0730c2f026ae7261cf18ed28ead313850088db2c186faf36c8cf312b"
+    }
+  ],
+  "excludedFiles": [],
+  "limitations": "macOS package only; package reader and store are expected service code; no Windows or real-source privacy acceptance"
+}
