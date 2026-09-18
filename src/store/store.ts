@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
 import { migrate } from "./migrations";
+import type { Availability } from "../domain/contracts";
 import { type AcceptedReport, type AppChange, type AppRecord, type Pin, type Target, requireValid, validId, validateChange } from "./revisions";
 
 export type ImportCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
@@ -29,6 +30,13 @@ class AnalyticsStore {
     db.prepare("UPDATE import_batches SET state='failed',error_code='INTERRUPTED' WHERE state IN ('staged','validated')").run();
   }
   close() { this.db.close(); }
+  availability(): Availability {
+    const row = this.db.prepare("SELECT d.id,d.manifest_json,d.warnings_json,d.summary_json FROM active_dataset a JOIN datasets d ON d.id=a.dataset_id").get();
+    if (!row) return { status: "ready", store: "empty", liveConnection: "disabled" };
+    const manifest = decode<Manifest>(row.manifest_json);
+    const summary = decode<{ documents: number; lines: number; suppliers: number }>(row.summary_json);
+    return { status: "ready", store: "loaded", liveConnection: "disabled", dataset: { datasetId: String(row.id), cutoff: manifest.cutoff, extractedAt: manifest.extractedAt, counts: { documents: summary.documents, lines: summary.lines, suppliers: summary.suppliers }, warnings: decode<string[]>(row.warnings_json) } };
+  }
   private transaction<T>(work: () => T, read = false): T {
     this.db.exec(read ? "BEGIN" : "BEGIN IMMEDIATE");
     try { const result = work(); this.db.exec("COMMIT"); return result; }
