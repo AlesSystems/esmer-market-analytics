@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "vitest";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -40,7 +40,9 @@ test("file-backed migration preserves precise facts, app revisions, pins and acc
 test("unknown and future databases are rejected without changing their bytes", () => {
   for (const sql of ["CREATE TABLE foreign_source (id TEXT)", "PRAGMA application_id=1163087186; PRAGMA user_version=999"]) {
     const path = databasePath(); const db = new DatabaseSync(path); db.exec(sql); db.close();
+    const before = readFileSync(path);
     expect(() => openStore(path)).toThrow("UNSUPPORTED_STORE");
+    expect(readFileSync(path)).toEqual(before);
     const check = new DatabaseSync(path); expect(check.prepare("PRAGMA user_version").get()?.user_version).toBe(sql.includes("999") ? 999 : 0); check.close();
   }
 });
