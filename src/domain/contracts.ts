@@ -1,7 +1,8 @@
+export type ImportErrorCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
 export type DatasetMetadata = { datasetId: string; cutoff: string; extractedAt: string; counts: { documents: number; lines: number; suppliers: number }; warnings: string[] };
 export type Availability =
-  | { status: "ready"; store: "empty"; liveConnection: "disabled" }
-  | { status: "ready"; store: "loaded"; liveConnection: "disabled"; dataset: DatasetMetadata }
+  | { status: "ready"; store: "empty"; liveConnection: "disabled"; lastImportError?: ImportErrorCode }
+  | { status: "ready"; store: "loaded"; liveConnection: "disabled"; dataset: DatasetMetadata; lastImportError?: ImportErrorCode }
   | { status: "unavailable"; code: "SERVICE_UNAVAILABLE"; message: string };
 export type RequestError = {
   status: "rejected";
@@ -11,7 +12,7 @@ export type RequestError = {
 export type ImportOutcome =
   | { status: "active" | "unchanged" | "historical"; datasetId: string }
   | { status: "cancelled" }
-  | { status: "failed"; code: "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE" | "SERVICE_UNAVAILABLE"; message: string };
+  | { status: "failed"; code: ImportErrorCode | "SERVICE_UNAVAILABLE"; message: string };
 export interface DesktopApi {
   getAvailability(): Promise<Availability | RequestError>;
   importPackage(): Promise<ImportOutcome | RequestError>;

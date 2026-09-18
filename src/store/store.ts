@@ -2,10 +2,10 @@ import { createHash, randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
 import { migrate } from "./migrations";
-import type { Availability } from "../domain/contracts";
+import type { Availability, ImportErrorCode } from "../domain/contracts";
 import { type AcceptedReport, type AppChange, type AppRecord, type Pin, type Target, requireValid, validId, validateChange } from "./revisions";
 
-export type ImportCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
+export type ImportCode = ImportErrorCode;
 export type ImportResult = { status: "active" | "unchanged" | "historical"; datasetId: string } | { status: "failed"; code: ImportCode } | { status: "cancelled" };
 export type StageResult = { status: "validated"; id: string; datasetId: string } | ImportResult;
 export type FaultBoundary = "reading" | "persistence" | "validation" | "summary" | "activation";
@@ -30,12 +30,18 @@ class AnalyticsStore {
     db.prepare("UPDATE import_batches SET state='failed',error_code='INTERRUPTED' WHERE state IN ('staged','validated')").run();
   }
   close() { this.db.close(); }
+  private lastImportError(): ImportCode | undefined {
+    const batch = this.db.prepare("SELECT state,error_code FROM import_batches WHERE state IN ('failed','active') ORDER BY rowid DESC LIMIT 1").get();
+    return batch?.state === "failed" ? batch.error_code as ImportCode : undefined;
+  }
   availability(): Availability {
+    const lastImportError = this.lastImportError();
+    const error = lastImportError ? { lastImportError } : {};
     const row = this.db.prepare("SELECT d.id,d.manifest_json,d.warnings_json,d.summary_json FROM active_dataset a JOIN datasets d ON d.id=a.dataset_id").get();
-    if (!row) return { status: "ready", store: "empty", liveConnection: "disabled" };
+    if (!row) return { status: "ready", store: "empty", liveConnection: "disabled", ...error };
     const manifest = decode<Manifest>(row.manifest_json);
     const summary = decode<{ documents: number; lines: number; suppliers: number }>(row.summary_json);
-    return { status: "ready", store: "loaded", liveConnection: "disabled", dataset: { datasetId: String(row.id), cutoff: manifest.cutoff, extractedAt: manifest.extractedAt, counts: { documents: summary.documents, lines: summary.lines, suppliers: summary.suppliers }, warnings: decode<string[]>(row.warnings_json) } };
+    return { status: "ready", store: "loaded", liveConnection: "disabled", ...error, dataset: { datasetId: String(row.id), cutoff: manifest.cutoff, extractedAt: manifest.extractedAt, counts: { documents: summary.documents, lines: summary.lines, suppliers: summary.suppliers }, warnings: decode<string[]>(row.warnings_json) } };
   }
   private transaction<T>(work: () => T, read = false): T {
     this.db.exec(read ? "BEGIN" : "BEGIN IMMEDIATE");
@@ -123,7 +129,10 @@ class AnalyticsStore {
       const parsed = readPackage(bytes);
       if (!parsed.ok) return this.failure(id, null, parsed.code);
       datasetId = createHash("sha256").update(bytes).digest("hex");
-      if (this.currentPin().datasetId === datasetId) return { status: "unchanged", datasetId };
+      if (this.currentPin().datasetId === datasetId) {
+        if (this.lastImportError()) this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,created_at) VALUES(?,?,'active',?)").run(id, datasetId, new Date().toISOString());
+        return { status: "unchanged", datasetId };
+      }
       if (this.db.prepare("SELECT hash FROM package_history WHERE hash=? AND activated=1").get(datasetId)) return { status: "historical", datasetId };
       const candidateId = datasetId;
       this.transaction(() => {

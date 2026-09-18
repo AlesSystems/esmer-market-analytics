@@ -14,6 +14,12 @@ function importMessage(result: ImportOutcome | RequestError): string {
     default: return result.message;
   }
 }
+function previousImportMessage(availability: Extract<Availability, { status: "ready" }>): string {
+  const preserved = availability.store === "loaded" ? "Son geçerli veriler korundu." : "Henüz etkin veri yok.";
+  if (availability.lastImportError === "INTERRUPTED") return `Önceki içe aktarma yarıda kaldı. ${preserved} Paketi yeniden içe aktarın.`;
+  if (availability.lastImportError === "STORAGE_FULL") return `Önceki içe aktarma için disk alanı yetersizdi. ${preserved} Yer açıp yeniden deneyin.`;
+  return `Önceki içe aktarma tamamlanamadı. ${preserved} Geçerli bir paketle yeniden deneyin.`;
+}
 function App() {
   const [availability, setAvailability] = useState<Availability | RequestError>();
   const [importing, setImporting] = useState(false);
@@ -43,6 +49,7 @@ function App() {
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
         </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p></>}
+        {!result && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
         {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
       </section>
       <footer>Esmer Market · Çevrimdışı analiz</footer>
