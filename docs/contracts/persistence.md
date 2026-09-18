@@ -22,7 +22,7 @@ An adjustment retains its original dataset, lineage, target ID and target conten
 
 ## Import lifecycle
 
-The service validates bounded package bytes through the existing package reader before they can become active. Staging persists candidate facts separately from the selected source view. Candidate validation checks completeness and references, and saves source counts and warning evidence. Only a validated coherent candidate can activate.
+The service records a durable import attempt before reading and validating bounded package bytes through the existing package reader. Candidate facts remain inside a separate transaction, so rollback cannot erase the attempt needed for a restart warning. Staging persists candidate facts separately from the selected source view. Candidate validation checks completeness and references, and saves source counts and warning evidence. Only a validated coherent candidate can activate.
 
 Activation uses one SQLite transaction. It retains the previous dataset and difference evidence, then changes the active pointer. It never writes back an app snapshot captured during staging. An expense or adjustment created between staging and activation therefore survives.
 
@@ -40,6 +40,6 @@ Storage pressure produces a visible error. It never relaxes retention or silentl
 
 ## Scope and evidence
 
-The [local evidence record](../evidence/phase-4-local.md) records implementation and verification. The [Windows handoff](../operations/windows-phase-4-handoff.md) defines the remaining platform work. Migration, interruption, locking, packaging and lifecycle claims apply only to the environment actually tested.
+The [local evidence record](../evidence/phase-4-local.md) records initial implementation and verification. The [Windows evidence](../evidence/windows-phase-4.md) records subsequent fixes, packaged verification, native import and lifecycle results. The [Windows handoff](../operations/windows-phase-4-handoff.md) remains the procedure. Migration, interruption, locking, packaging and lifecycle claims apply only to the environment actually tested.
 
 Expense spreadsheet import, duplicate classification, financial calculations, exports and encrypted backup/recovery retain their later-phase gates. No real-source mapping, source reconciliation, SQL Server permission or full-volume performance claim follows from synthetic persistence tests.

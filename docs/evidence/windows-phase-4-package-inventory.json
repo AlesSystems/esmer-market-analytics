@@ -1,0 +1,1976 @@
+{
+  "inspectedAt": "2026-09-18T08:39:23.114Z",
+  "platform": "win32",
+  "arch": "x64",
+  "developmentNode": "v24.15.0",
+  "observedHead": "3a3f3272745482fe76e427001cbb0d01daaa6420",
+  "archive": "release/win-unpacked/resources/app.asar",
+  "archiveSha256": "ced2a5d0e57cb1ed1c0d2739a0a8654db13246a6296abc62c9eedae6879d4e14",
+  "archiveBytes": 10204515,
+  "archiveEntries": 349,
+  "archiveFileCount": 301,
+  "applicationBundles": [
+    {
+      "path": "dist/desktop/main.cjs",
+      "bytes": 7115,
+      "sha256": "91cc1db207f58d68f2923b080aef75b20836846d1a4754ee2ff6fb398612bfef"
+    },
+    {
+      "path": "dist/desktop/preload.cjs",
+      "bytes": 363,
+      "sha256": "a29b27b0d246cf85f9eb6adaa86c0c130de10107e41e606d4c998c5ca3db1d66"
+    },
+    {
+      "path": "dist/service/worker.cjs",
+      "bytes": 30962,
+      "sha256": "44b1d58e1b98077b87591bfeffd7e13ca34bf8dd9509e032e59dd74ec7f2fe02"
+    },
+    {
+      "path": "dist/ui/app.js",
+      "bytes": 227646,
+      "sha256": "15ae724751e567d8927a8b4e9d0aa71effadb8e3be7e460fad9fd6c673c13d87"
+    },
+    {
+      "path": "dist/ui/index.html",
+      "bytes": 336,
+      "sha256": "9e38948168e2d5718ccfa6b0fb992d2d3ddbb4ff4cf7467c5a1b504c6726bf76"
+    },
+    {
+      "path": "dist/ui/style.css",
+      "bytes": 1845,
+      "sha256": "d795fa71a379c71e696fcda006e87789b0596e3dc05c4b84c881b3ac2cb32e2d"
+    },
+    {
+      "path": "package.json",
+      "bytes": 439,
+      "sha256": "e297c794a6ce9c947a892f8533a2fa69734a52dff71d48ea8fe5d3ab1583a6e2"
+    }
+  ],
+  "bundleSources": {
+    "dist/desktop/main.cjs": [
+      "src/desktop/main.ts",
+      "src/desktop/requests.ts",
+      "src/desktop/package-file.ts",
+      "src/source/package.ts"
+    ],
+    "dist/desktop/preload.cjs": [
+      "src/desktop/preload.ts"
+    ],
+    "dist/service/worker.cjs": [
+      "src/service/worker.ts",
+      "src/store/store.ts",
+      "src/source/package.ts",
+      "src/store/migrations.ts",
+      "src/store/schema.ts",
+      "src/store/revisions.ts",
+      "src/service/operations.ts"
+    ]
+  },
+  "releaseFileCount": 79,
+  "archiveFiles": [
+    {
+      "path": "node_modules/decimal.js/LICENCE.md",
+      "bytes": 1104,
+      "sha256": "3108b546bcff5d346923a82f48b2d252ca722f9088076db6d145f6b67757ad6c"
+    },
+    {
+      "path": "node_modules/decimal.js/decimal.js",
+      "bytes": 136673,
+      "sha256": "6e99821f8204c5f611b56077e3fce056a1562d22bc341a1f4af01afe7e527d83"
+    },
+    {
+      "path": "node_modules/decimal.js/decimal.mjs",
+      "bytes": 127787,
+      "sha256": "45e6ecc0a500fee6439acdf67ee2e9322aab57e6ea0409ef52993dedbba8cf19"
+    },
+    {
+      "path": "node_modules/decimal.js/package.json",
+      "bytes": 873,
+      "sha256": "9d2b628f67a1b8e92e59dd8b5e5c3b81cbbf027da7d76743892a4264dabb82f1"
+    },
+    {
+      "path": "node_modules/fflate/LICENSE",
+      "bytes": 1069,
+      "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551"
+    },
+    {
+      "path": "node_modules/fflate/esm/browser.js",
+      "bytes": 90922,
+      "sha256": "b7ca4450b19559a1d50eb381adcee94b82449674be4cd17789d9beba7e6122a1"
+    },
+    {
+      "path": "node_modules/fflate/esm/index.d.mts",
+      "bytes": 53488,
+      "sha256": "985db2599e33d85a70a6da5f2b7b6f1b0bf9b9119781b684573a1a9b463e0cc4"
+    },
+    {
+      "path": "node_modules/fflate/esm/index.mjs",
+      "bytes": 91765,
+      "sha256": "8d75534a30a0580608e1271c13d70943ed4cd3589fddff7b1197748036a5116e"
+    },
+    {
+      "path": "node_modules/fflate/lib/browser.cjs",
+      "bytes": 91611,
+      "sha256": "cbe7f75f83e0ca95ec7f3854fcdc8f854f488485d0ecf03c3a0a7ff29765c690"
+    },
+    {
+      "path": "node_modules/fflate/lib/browser.d.cts",
+      "bytes": 53488,
+      "sha256": "985db2599e33d85a70a6da5f2b7b6f1b0bf9b9119781b684573a1a9b463e0cc4"
+    },
+    {
+      "path": "node_modules/fflate/lib/index.cjs",
+      "bytes": 91005,
+      "sha256": "36967d6a4576f414f5a3611cfc866fa4245c05582048332ac139a174c63d56e0"
+    },
+    {
+      "path": "node_modules/fflate/lib/node-worker.cjs",
+      "bytes": 1405,
+      "sha256": "69fe824fc1ecdcbd3f4ea0c8718b57bd91c84e202944034a2f0a5cb71be850f7"
+    },
+    {
+      "path": "node_modules/fflate/lib/node.cjs",
+      "bytes": 92380,
+      "sha256": "befa44cd80a1da830179db9e57930050a2e460ca3df13f0b05f83f52b1491818"
+    },
+    {
+      "path": "node_modules/fflate/lib/node.d.cts",
+      "bytes": 53488,
+      "sha256": "985db2599e33d85a70a6da5f2b7b6f1b0bf9b9119781b684573a1a9b463e0cc4"
+    },
+    {
+      "path": "node_modules/fflate/lib/worker.cjs",
+      "bytes": 636,
+      "sha256": "7e04279c47bfcfb60cee1d86b250f6cffce89e922a0bdf959258713a30e0e46a"
+    },
+    {
+      "path": "node_modules/fflate/package.json",
+      "bytes": 2328,
+      "sha256": "d897556903c401fbc7dbb0d973ae93c27778488f290baface1e303dd6e681fd7"
+    },
+    {
+      "path": "node_modules/fflate/umd/index.js",
+      "bytes": 33044,
+      "sha256": "462ef8041fc970e3615a20a9dd2b2e3047a073b2da729ef4f02b634bba8b7b83"
+    },
+    {
+      "path": "node_modules/react/LICENSE",
+      "bytes": 1088,
+      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "path": "node_modules/react/cjs/react-compiler-runtime.development.js",
+      "bytes": 1090,
+      "sha256": "7ae8fa77a54c404572cba7065e14fe599a3d8cc0b68d34d649d8acc776e4e096"
+    },
+    {
+      "path": "node_modules/react/cjs/react-compiler-runtime.production.js",
+      "bytes": 463,
+      "sha256": "f7d518f5c043cd008514b4fd8c665a9d2fa5686bd36c6e7d44d78187c0438700"
+    },
+    {
+      "path": "node_modules/react/cjs/react-compiler-runtime.profiling.js",
+      "bytes": 462,
+      "sha256": "821fc2969277b5bc7814965e0ac07f815aafb3880d8bca31bcb53ce5d875edd3"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-dev-runtime.development.js",
+      "bytes": 12420,
+      "sha256": "e2a2cafea5a317645d75aaad7ca10ac2ed07c178a162a7a675f17b38c6915dd8"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-dev-runtime.production.js",
+      "bytes": 387,
+      "sha256": "ba9b367119971ed746925a600256d342eb4cc3f2389de013f61e36ff1f3594a5"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-dev-runtime.profiling.js",
+      "bytes": 386,
+      "sha256": "c89fe850b7e66b6e1a10496321ea9d778a64512960d01dccf49ff0fd5d256b20"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-dev-runtime.react-server.development.js",
+      "bytes": 14009,
+      "sha256": "cb9e0b05ed482d79a1389e562cef51cc3470cc1646cdee1d200a1414769fd0df"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-dev-runtime.react-server.production.js",
+      "bytes": 1316,
+      "sha256": "c56f744270c8cd4d733575757eaf48de91edfa04d0f5e01ef5043bf9848263b3"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-runtime.development.js",
+      "bytes": 13032,
+      "sha256": "706e324b21fcd94fb728da71b374694d0727d0baee4126011cea583f54e09106"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-runtime.production.js",
+      "bytes": 976,
+      "sha256": "1e46f15002696985e80c61d47aaa30dabb03c954270a690f5f7dfbbacfa9002b"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-runtime.profiling.js",
+      "bytes": 975,
+      "sha256": "27b2fb3d04f9878687ab58717172592650e256de727e910366340be87e0f8352"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-runtime.react-server.development.js",
+      "bytes": 14005,
+      "sha256": "cde93bd719461c3a4c4bd5f68ed5a854525a79930f70071c893c6455deff54a7"
+    },
+    {
+      "path": "node_modules/react/cjs/react-jsx-runtime.react-server.production.js",
+      "bytes": 1312,
+      "sha256": "44bdd0dbbf51d5d49ac46ece12e919151c7f27b7f5b174790c4ca6aef0b6a1eb"
+    },
+    {
+      "path": "node_modules/react/cjs/react.development.js",
+      "bytes": 49165,
+      "sha256": "97bef56f30daa05320514ea220d7d03eb765635519ff2d5650c4887772aa5767"
+    },
+    {
+      "path": "node_modules/react/cjs/react.production.js",
+      "bytes": 18040,
+      "sha256": "6b28feb9dbe9781ab1e1b64dea7b29a7c70f03d2dc10eaa966363053d8a9b4e5"
+    },
+    {
+      "path": "node_modules/react/cjs/react.react-server.development.js",
+      "bytes": 31610,
+      "sha256": "fa524524548e8843f983aa83c561d85eae324bdcde54402b425f342242a75fa3"
+    },
+    {
+      "path": "node_modules/react/cjs/react.react-server.production.js",
+      "bytes": 13809,
+      "sha256": "e4a5f60506155dae5b5b6d781a6d81c0b8c0cee4aa1e3206afb5058791e915c0"
+    },
+    {
+      "path": "node_modules/react/compiler-runtime.js",
+      "bytes": 412,
+      "sha256": "5c00456a0180b7b6b2366348f7218b0ea2c3a85c7fefe24c18533ed54126f601"
+    },
+    {
+      "path": "node_modules/react/index.js",
+      "bytes": 186,
+      "sha256": "60caffdecbdc5db3bc4ec4e83df9488345ccb271d07533b9210bf5750918d97e"
+    },
+    {
+      "path": "node_modules/react/jsx-dev-runtime.js",
+      "bytes": 218,
+      "sha256": "486589120a962721c8281b5acec2f6d49e60ce5f9d908cc814ddfe71c6163ace"
+    },
+    {
+      "path": "node_modules/react/jsx-dev-runtime.react-server.js",
+      "bytes": 244,
+      "sha256": "29cbe21640848ed3e8aebfdc47af7ff24eddcaea57b29f98958dc2c3e8fd279d"
+    },
+    {
+      "path": "node_modules/react/jsx-runtime.js",
+      "bytes": 210,
+      "sha256": "b392951a77d0a2e6a6bd017e49d768481ae5b63c4109c6c31f622cf7b2433edc"
+    },
+    {
+      "path": "node_modules/react/jsx-runtime.react-server.js",
+      "bytes": 236,
+      "sha256": "47346212fa0ec5c7f3a9ab36c658cdce7bb02d4f66f00aa5e11cadc0ee258853"
+    },
+    {
+      "path": "node_modules/react/package.json",
+      "bytes": 1158,
+      "sha256": "23f9165347c421c2a0d0f4a9d930504c18062a5fc04301eb1431d381beb9ba10"
+    },
+    {
+      "path": "node_modules/react/react.react-server.js",
+      "bytes": 212,
+      "sha256": "ced6f228807a193b8a0ec436304b96ca44492bae8899c3e84c2a88162843dc14"
+    },
+    {
+      "path": "node_modules/react-dom/LICENSE",
+      "bytes": 1088,
+      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-client.development.js",
+      "bytes": 1182785,
+      "sha256": "c10b5e5ad37ca22c88b58bf4ada9a3b655ab79934c0b5cc6bad26f42c774584f"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-client.production.js",
+      "bytes": 625168,
+      "sha256": "8a8147c1cebdb19d82fd11bdb76391be9b20d00edf67cc8e8b30f44e850ce693"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-profiling.development.js",
+      "bytes": 1199917,
+      "sha256": "98cd96a073ddff85aaa7d900d26be6d908a885bca90d8652ed457c729097c046"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-profiling.profiling.js",
+      "bytes": 699916,
+      "sha256": "8a7db04afbb35f04c8eb05e352397409ae8878b96b2619cda49b7ebcbec63528"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js",
+      "bytes": 421786,
+      "sha256": "dbb08ceb2375abe0d46ed0579ff2541da49937b0097a3057fbcaaa1fbf19badf"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server-legacy.browser.production.js",
+      "bytes": 258822,
+      "sha256": "5528f58d28f5e035dccbf0ebec7e593ed0b97cebae830b838756c27c100a8caa"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js",
+      "bytes": 421783,
+      "sha256": "14b43d302d520ad3ee2c8199a285e3858e7b7f34be9020beb315e7d8030bcb84"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server-legacy.node.production.js",
+      "bytes": 264184,
+      "sha256": "bb015a96ed358f4054869f91ba8741b00e28b720cda5a40ec8d4a8bbc36ab50c"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.browser.development.js",
+      "bytes": 451470,
+      "sha256": "7fcd669e6094719222ad340aca3c0266c54598af92e983a1e0dc2c9725a7bf90"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.browser.production.js",
+      "bytes": 286554,
+      "sha256": "3e201e0287f8b51028ce52684551b32ef8fa970766a51095e6a46bdbdb55a605"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.bun.development.js",
+      "bytes": 399427,
+      "sha256": "ea265c53e966d645d69614405730fd15643a6a3ba16f157839ef4798126181f5"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.bun.production.js",
+      "bytes": 287481,
+      "sha256": "7788965c961f704b5a33be0360ecd5c90f72fca254e6caa4b9a44ba11a2b8ba2"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.edge.development.js",
+      "bytes": 452252,
+      "sha256": "ebc6faffef703916a2d78a9230177983f5d5b255621525d7aead57d069233e8f"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.edge.production.js",
+      "bytes": 292617,
+      "sha256": "44700ca18ec5fc8a3594d291fef11041f19f48a9ec643bc7f5749fd9189ec80d"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.node.development.js",
+      "bytes": 458095,
+      "sha256": "d680cbb2844e9cf2465f108dcfdad717ce370be57d37a8039db6181431f13697"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-server.node.production.js",
+      "bytes": 300544,
+      "sha256": "26b08a8d2fea78cec643ec611b55eaa5d32bfb73e82b8a4d4a9888fc51ace46d"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-test-utils.development.js",
+      "bytes": 793,
+      "sha256": "a691b913756753dd769c1559b8efbd3d8157feb4c9368d2cb4b79eba67441841"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom-test-utils.production.js",
+      "bytes": 686,
+      "sha256": "d41ce0bee80299c8330fc080936da31afa5f307dfe4912bc8a6c68f9f566d344"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom.development.js",
+      "bytes": 18481,
+      "sha256": "e4ca31557a0d93a3750438e2f78905d0ce39eff1391a6ff6df12de3a2c332f11"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom.production.js",
+      "bytes": 7326,
+      "sha256": "fd016e2c887f97b82f466ca435ae259d08cf7d4e7fef37e087963336d4770c01"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom.react-server.development.js",
+      "bytes": 14614,
+      "sha256": "c6d4d2d243ca23f890f0bd5f23e679fd7d7ac88361a1eb975458942d3fa73480"
+    },
+    {
+      "path": "node_modules/react-dom/cjs/react-dom.react-server.production.js",
+      "bytes": 5227,
+      "sha256": "1c5935e317543d9b58874e4be12a6a73093f5215d35f99abea64948b6d147ddc"
+    },
+    {
+      "path": "node_modules/react-dom/client.js",
+      "bytes": 1373,
+      "sha256": "00e348ab3d6bc2eef908345d0bc4e008c95bcfecec060dfda5c4967953761396"
+    },
+    {
+      "path": "node_modules/react-dom/client.react-server.js",
+      "bytes": 101,
+      "sha256": "93fc36199826bbc50a5c79944653a6685bd3acfb9f80b587110804e92c1c964b"
+    },
+    {
+      "path": "node_modules/react-dom/index.js",
+      "bytes": 1359,
+      "sha256": "ba1a3e33489f868371561777607e3ee5091df0f7ea3f1a10f789d6b86e4c1505"
+    },
+    {
+      "path": "node_modules/react-dom/package.json",
+      "bytes": 2953,
+      "sha256": "9a762b68b4c6070ce143eaccdc1b6b4ac974f0e18a5411c0daa199e466829d5a"
+    },
+    {
+      "path": "node_modules/react-dom/profiling.js",
+      "bytes": 1378,
+      "sha256": "8ce82daa2079581a9127bdcf2947ec4c2c87a0f12aa5db04f80a0de650e12eea"
+    },
+    {
+      "path": "node_modules/react-dom/profiling.react-server.js",
+      "bytes": 104,
+      "sha256": "aec5671628a9cd521026187569e2bd33e60783ab5b4b4fe6bb05ee1dbbd921a5"
+    },
+    {
+      "path": "node_modules/react-dom/react-dom.react-server.js",
+      "bytes": 220,
+      "sha256": "cdd8a1f284daf7eff271da65863c2e504bda04fd33c3cb89ad17ed952488d811"
+    },
+    {
+      "path": "node_modules/react-dom/server.browser.js",
+      "bytes": 563,
+      "sha256": "f759460eb3571d5bf1e1a9e5ef7cb033ec5c67f25d64a6bbf5a9ac43bd25831a"
+    },
+    {
+      "path": "node_modules/react-dom/server.bun.js",
+      "bytes": 677,
+      "sha256": "05b36175a0a2a46ffe70e9fda56a6481f10ffd42172ad2d795b82f6b0b167fbe"
+    },
+    {
+      "path": "node_modules/react-dom/server.edge.js",
+      "bytes": 561,
+      "sha256": "a631527404b0a7bbe10aa79db04852196fd7fd88a056c1bb84cf1a1885e1e934"
+    },
+    {
+      "path": "node_modules/react-dom/server.js",
+      "bytes": 58,
+      "sha256": "8a05db291adfdedb4e9509e524e4f499adec95f6ffb6b8d2e04ea73aa2950684"
+    },
+    {
+      "path": "node_modules/react-dom/server.node.js",
+      "bytes": 669,
+      "sha256": "f2dd93f6f91f983cd91232098d4ac55578596d33d680d7cb9438ea3b0a611b4b"
+    },
+    {
+      "path": "node_modules/react-dom/server.react-server.js",
+      "bytes": 101,
+      "sha256": "0b18f1c65dae3eed74e6341930d31cc68f946afb75427b1fdc65fce26b5177f3"
+    },
+    {
+      "path": "node_modules/react-dom/static.browser.js",
+      "bytes": 319,
+      "sha256": "34433b7ad1306a49a8c34995f505586fe0752acc0d7c94d2f8f53a1654e7cae0"
+    },
+    {
+      "path": "node_modules/react-dom/static.edge.js",
+      "bytes": 313,
+      "sha256": "82f7d5be1d84db14a79291edef511d1a008ddbf62822d5969865f203a4fb79dc"
+    },
+    {
+      "path": "node_modules/react-dom/static.js",
+      "bytes": 58,
+      "sha256": "2ed52da7c38592c3e0677b6a87ac08c3e74a365597ae7165b79231d446f11c31"
+    },
+    {
+      "path": "node_modules/react-dom/static.node.js",
+      "bytes": 445,
+      "sha256": "39e134ed6dc903d8972b3ae5e2aa21a8772c6a53fed34457f4dc07f6b315727b"
+    },
+    {
+      "path": "node_modules/react-dom/static.react-server.js",
+      "bytes": 101,
+      "sha256": "53220a11ec9a9212e3372912f4f704c6c6e12dea2ee008ea01f4f4690936892a"
+    },
+    {
+      "path": "node_modules/react-dom/test-utils.js",
+      "bytes": 216,
+      "sha256": "9fe1733413e1437d8602ed78ee14e932bebc8b4193657d2430f42ff0fc529cc1"
+    },
+    {
+      "path": "node_modules/scheduler/LICENSE",
+      "bytes": 1088,
+      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler-unstable_mock.development.js",
+      "bytes": 13687,
+      "sha256": "de31e2407f585fd6ba00efd420485bff8b84aa6ea3ebcb870289214d27ca34b8"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler-unstable_mock.production.js",
+      "bytes": 11990,
+      "sha256": "d49069c9cfea586989b09fe16fa2b7ebdf064fd60fb7c932e9a3799f7e95cabf"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler-unstable_post_task.development.js",
+      "bytes": 4639,
+      "sha256": "34171513f5d7662f42d42c479445c2536cc02161c245b0f5083ef595f88f0e20"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler-unstable_post_task.production.js",
+      "bytes": 3974,
+      "sha256": "88e667020933b71752478d18e3f94271e9e8eb44d6dfff95ba014b06b47329be"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler.development.js",
+      "bytes": 12144,
+      "sha256": "646eb671c8585382baff16daf92fe16a4cdd10dcf1a363c58b2ae1f6bf3a2b8d"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler.native.development.js",
+      "bytes": 12327,
+      "sha256": "26401a9da7b51e0db1f506c5d1e8579081302460212d007593acdd8c5968570b"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler.native.production.js",
+      "bytes": 10869,
+      "sha256": "f6e15b1a0f7912a8dbae536f037b9c059026742f3dfe740b37bd03fc7d816d65"
+    },
+    {
+      "path": "node_modules/scheduler/cjs/scheduler.production.js",
+      "bytes": 10181,
+      "sha256": "679adff761d31e9426604f80c0e99be44a3e6f4c6834b0218ecf0312a67c171f"
+    },
+    {
+      "path": "node_modules/scheduler/index.js",
+      "bytes": 194,
+      "sha256": "145965504d60007bc25486ab930b0367867dcd5d579ccd343c148d69349a7cfb"
+    },
+    {
+      "path": "node_modules/scheduler/index.native.js",
+      "bytes": 208,
+      "sha256": "f1c2fea33a9252ccba1f7c7a9310ea7c0e82f3cff1bc7c693ff153bd54175b25"
+    },
+    {
+      "path": "node_modules/scheduler/package.json",
+      "bytes": 457,
+      "sha256": "b5351ab57d9fae60ccc67926df165d78121593141415e5ed929e7b9b8e176976"
+    },
+    {
+      "path": "node_modules/scheduler/unstable_mock.js",
+      "bytes": 222,
+      "sha256": "152be57d0705d6043d06bda4a5b35e7c03e4cbb2b4caf3d4ae6592db3f4c5bf8"
+    },
+    {
+      "path": "node_modules/scheduler/unstable_post_task.js",
+      "bytes": 232,
+      "sha256": "2aa725364b0efa1772c01cd978ac888b655711645768bdcf5e885a0c4e435ef2"
+    },
+    {
+      "path": "node_modules/write-excel-file/.gitlab-ci.yml",
+      "bytes": 204,
+      "sha256": "cd31f1372b7fe4471410b32a09555ee3a62357a9f5cf46408ef997a233598a49"
+    },
+    {
+      "path": "node_modules/write-excel-file/CODE_OF_CONDUCT.md",
+      "bytes": 3774,
+      "sha256": "68c5cae36aa874af3e01c29a08016b1869e983eed9ac869b3d6e31a31072df61"
+    },
+    {
+      "path": "node_modules/write-excel-file/LICENSE",
+      "bytes": 1103,
+      "sha256": "8cf9b31947daf7adb4a7a00a037459e58241af050cd0a603bfcf1756e533f75e"
+    },
+    {
+      "path": "node_modules/write-excel-file/README_FEATURE_SENSITIVITY_LABEL.md",
+      "bytes": 8614,
+      "sha256": "218db9d9e3fbebb2963562a03af113a7d0ee7c662f706615d57dd2e2649e2c09"
+    },
+    {
+      "path": "node_modules/write-excel-file/browser/index.cjs",
+      "bytes": 256,
+      "sha256": "3982a15f8f7afb5d4194575e248001bf1c8865c4ccc357a01f1b092be39d0ca3"
+    },
+    {
+      "path": "node_modules/write-excel-file/browser/index.js",
+      "bytes": 161,
+      "sha256": "9cff352efa8a20f9a5baf201e945286b98ef03d065ca30fea13aa15a8f64618b"
+    },
+    {
+      "path": "node_modules/write-excel-file/browser/package.json",
+      "bytes": 318,
+      "sha256": "e2e8fd604d9133f5fec32ea6bc414ee045d802e7df855b7947bcdd5d67a03b17"
+    },
+    {
+      "path": "node_modules/write-excel-file/bundle/getSheetData.min.js",
+      "bytes": 432,
+      "sha256": "148fffcbbad3fc6786d3abbc9ff90eb5471d86b92df19ec6f689236b6fbbfac1"
+    },
+    {
+      "path": "node_modules/write-excel-file/bundle/test-cases.html",
+      "bytes": 4252,
+      "sha256": "bdaf967bd6353fdd720804a5ae15076c6a4601c59c94cd42debe8112d80194c8"
+    },
+    {
+      "path": "node_modules/write-excel-file/bundle/test-cases.js",
+      "bytes": 81496,
+      "sha256": "e15360d117c87db72cf60210067e1f8eded62bf31d65bb48916e8d405db147f4"
+    },
+    {
+      "path": "node_modules/write-excel-file/bundle/write-excel-file.min.js",
+      "bytes": 70844,
+      "sha256": "d57b59731b19d443f6b7333c5af0aa7250c87146a106f8a746f63429e7694c8e"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayBrowser.js",
+      "bytes": 1086,
+      "sha256": "4ceef874bd261b4a5065d0aec48174ff1d889f8804a5d1c29447a31deeb4472b"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayNode.js",
+      "bytes": 1699,
+      "sha256": "e71fca506be8622a18b72aea66877700e501c817db3a1891f934ed751cdfa6ea"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/convertFileContentToUint8ArrayUniversal.js",
+      "bytes": 844,
+      "sha256": "246996c94eb8074313ac5b98e16de50d4e5d1ccacb645ab0c5341f0a98e34c1e"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/convertFilesContentToUint8Arrays.js",
+      "bytes": 1097,
+      "sha256": "7e1ecc4481f64153078bd7946455e0dd461ae7373a362507eb584c209371caf2"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/downloadBlob.js",
+      "bytes": 815,
+      "sha256": "0d9e9fbc4953869a8212e133e9d0ab29dabd860a92120c80a2e5ce79d0d0dfa7"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/writeXlsxFileBrowser.js",
+      "bytes": 1903,
+      "sha256": "23a9113ca70ca6c08c9d1d0720de890ac26cb25aabe8931f019e41cb2d1c6c74"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/writeXlsxFileNode.js",
+      "bytes": 5615,
+      "sha256": "96b02d584d22d742e63aa8e9db87f516f14240d442be6a8c0b67713d0078dfa0"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/export/writeXlsxFileUniversal.js",
+      "bytes": 3462,
+      "sha256": "ad27b32a8300dfc26ef3991e84855d47190e5d29f8ff2b4da924b968a725dbd0"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/getSheetData/getSheetData.js",
+      "bytes": 777,
+      "sha256": "d85fa11ef33c6fd73802b2c98664d41fd2b8d489cfccc8fda55db9a699f99d57"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/package.json",
+      "bytes": 82,
+      "sha256": "fe39004adcf1501f55be7b209b27cee6e944cb1206fc50131d4cfaadd0952b60"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/features/conditionalFormatting.js",
+      "bytes": 12096,
+      "sha256": "a19189cf08f887d45d0133f19e654f0c1c2c459bbf85cebec435743ffe16523d"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/features/images.js",
+      "bytes": 11810,
+      "sha256": "2d6ca786aefd6652e8431965fa14c9a62c414095a6b7c10e7d7945d9a1a90d08"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/features/stickyRowsOrColumns.js",
+      "bytes": 7584,
+      "sha256": "b7ea81e77be70ff34a24799d8049ede13c16b44afbf4d306c14a1a2019c9dec5"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/[Content_Types].xml.js",
+      "bytes": 2244,
+      "sha256": "c28447b8e7d53cbabb7b139172c1b29f454e07594763527415302edeaaf0c275"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/drawing.xml.js",
+      "bytes": 1593,
+      "sha256": "654d8ad24f645c9fd5296c3caa330b4f4a20509c3b5d3b89c7da749487844820"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/drawing.xml.rels.js",
+      "bytes": 1284,
+      "sha256": "f794c0557286a75b14fa15d04ca2d0e5d008a909ddca752733332123724a0d84"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/rels.js",
+      "bytes": 1189,
+      "sha256": "4275c43c15116da576fda933e526f56619129400c6e4ec5c7fdb264de6d11afe"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sharedStrings.xml.js",
+      "bytes": 2008,
+      "sha256": "3ded73602a75a37512aa3987859b4e3c0d072db6c8b9b26e4e5c504ef592a6c1"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml.rels.js",
+      "bytes": 1723,
+      "sha256": "95a27796c151e19c867c9c1913198e2ecbc12d5ce5dc636a2c9a97e43ec66709"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/cell.js",
+      "bytes": 6966,
+      "sha256": "88318d366cf9431e9949682983fe264a1d7df23573c546291894d842857b2d77"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/column.js",
+      "bytes": 2718,
+      "sha256": "2a98420fa99bf297e3a07a31cd5130c3219e1ef9652e8cbe9056e7a76f45d752"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/columns.js",
+      "bytes": 1256,
+      "sha256": "3e955df584339bd8a81d1ba0c6b8d9e8e3407e474d7d44931b04b8e274e32683"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/drawingReference.js",
+      "bytes": 746,
+      "sha256": "05d3d5fc513d0733781e1720b512186c342291087814d25fe6701df97f45e137"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/helpers/floatToInteger.js",
+      "bytes": 561,
+      "sha256": "63fc83124b5490369b897ef218218cf6de282cf5771b61f56d20fa11d2e25137"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/helpers/getCellStyleProperties.js",
+      "bytes": 3646,
+      "sha256": "758d1596dedd460ac85b053b7463f43e5c6fea95a90e513d6237ad424facbb0f"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/mergedCellsDescription.js",
+      "bytes": 2814,
+      "sha256": "c110088de223db7bdedd5f4891951b2ffcfbff861c4247f8522c3b7b027203ea"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/pageMargins.js",
+      "bytes": 1301,
+      "sha256": "ba0a377af2cb1fbde8fada55437b1c3049bbab78ef7ddb05bff1d91f65ac9e00"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/pageSetup.js",
+      "bytes": 1147,
+      "sha256": "d8385a7d37ab9c0c6688f6b0d938d824f0c35c72e72fc0a0b2f949ea6bd4e58c"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/processMergedCells.js",
+      "bytes": 4564,
+      "sha256": "581773508fab01860b85249dcc7aa601a630017ac6349310412d3feae181bb51"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/row.js",
+      "bytes": 6373,
+      "sha256": "2f93e5cfcf1377b7afe22ff0152e4805bd04470511367927f4b3e03c0aee23ac"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheet.xml.js",
+      "bytes": 4595,
+      "sha256": "8a51a34ca3993dbe62f5c0d602b086941a4887ad2bf55dbfabb4350bc839bb9a"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheetData.js",
+      "bytes": 543,
+      "sha256": "16672109b0453b2f4d7fe3eb61756ca87d752a7bb082e18c302d1fefde46ea09"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/sheet.xml/sheetViews.js",
+      "bytes": 1559,
+      "sha256": "c604ece693e004d415c942a7147909a7da4f7726133248e07cb8e1646e79c93d"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/styles.xml.js",
+      "bytes": 8261,
+      "sha256": "f83e4503bdf60424d8529017324cf4d0f68b8a2f337dba39ee81e724c2418e55"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/workbook.xml.js",
+      "bytes": 2737,
+      "sha256": "774783099a8b6fa9a3ea53dcdbae9e9013c6a0a1e145b07f8350c8183413610c"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/files/workbook.xml.rels.js",
+      "bytes": 1677,
+      "sha256": "1d1f91cab3abbb3a05fd4717268d92642cdf4f032111858d635606b819f57658"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/generateXlsxFileContents.js",
+      "bytes": 16169,
+      "sha256": "3526de743dfac7bd8cb314f1bf1376d50fc3fe4f375220da9d3458857930e14d"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/getFeatures.js",
+      "bytes": 1790,
+      "sha256": "e22fa5cf4637790ab3ccfe80ce47ac566bf8b18b0a8f0962a93c118e27ad9965"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/convertDateToSerialNumber.js",
+      "bytes": 859,
+      "sha256": "ab82595be4b3f0bdeb667d10d329e78d13b9aa8a2cc75b33b3e083e878708a18"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getAdditionalContent.js",
+      "bytes": 1909,
+      "sha256": "618002fc3b69f48683b5c3a21e8275acc05525838f3bb76f18d32c6a62af5e3e"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getElementXml.js",
+      "bytes": 2560,
+      "sha256": "64c65c424b4c1cbf1b9208a25c7f8d8a2527b332d8329370239d0e4a28ab3231"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/features/getWrittenFiles.js",
+      "bytes": 3447,
+      "sha256": "f140b4ed3af85a80b90d33818cce2350737c4c24835c64d851cc596fe2f22fd0"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/features/transformContent.js",
+      "bytes": 1795,
+      "sha256": "1529b8bc4bfc6f1123210587a24b992e19ed2dee3235cd3f1b1bc8c9d4b70b5b"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getAlignmentXml.js",
+      "bytes": 3214,
+      "sha256": "ef9ee4ddf36552df74274ea4340f022470977f0b97afda98d2cc13581f8b35e2"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getBorderXml.js",
+      "bytes": 2095,
+      "sha256": "d6dcb051148bed8df9a4cdc98813268f3d5884dc252e5123f4e574d360e829a4"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getCellAddress.js",
+      "bytes": 902,
+      "sha256": "fe97a665a59ab03da0a841512d1f96c98fd6df3c3ee40a956b19848a9b437391"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getFileExtensionForContentType.js",
+      "bytes": 600,
+      "sha256": "92a0356e250e2807432063dfca222a2d5fa5abbb065ed9616c1c2dd39ed6e26c"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getFillXml.js",
+      "bytes": 2550,
+      "sha256": "99e6c15809dbb6347068fe8f73c3faf70fb571caa9f87eb1e40b7d7341cf9139"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getFontXml.js",
+      "bytes": 3823,
+      "sha256": "b076d001dec92d80e0012e8f107a96707b98beecb80f95e2d940fc07d874d168"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getOrderOfSiblings.js",
+      "bytes": 2222,
+      "sha256": "410cdf074d6cb29d460e17f122eaeba3d2a88477a80ae17db4cbc4d9d5040516"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/getXlsxColorForHexColor.js",
+      "bytes": 389,
+      "sha256": "95be16a1f1000ba5b1368abf3d0617a367bb7a0c90e18cd6fdab32d87c30ca17"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/hasAlignment.js",
+      "bytes": 435,
+      "sha256": "37aa35ac48c19b329d849794fa43141ad016b0ea6cb85e41871c8fd80860d1d1"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/hasBorder.js",
+      "bytes": 814,
+      "sha256": "267da37249a2f6b06f27bf94c7ba09eb48315dfb666f8b7830927e50ec260c64"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/hasFill.js",
+      "bytes": 385,
+      "sha256": "9bb2f2a8dd1b26a324a844cada5f0562913a926e16187b23c18ad994ece74df1"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/hasFont.js",
+      "bytes": 540,
+      "sha256": "f563fe1dc20a297a65015397192de917489eea8525af1198929d3bb0694e665d"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/isCellObject.js",
+      "bytes": 678,
+      "sha256": "b3ecb093c7886f03d4d53454aa78b428dc48e42d8380a2517d2108b1a4f954ec"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/isObject.js",
+      "bytes": 311,
+      "sha256": "bcb712d963bc6a146e346f90a36233289b2ff0844f4bee57261f6f2c9c4a0fdd"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/helpers/orderOfSiblings.js",
+      "bytes": 6235,
+      "sha256": "a4adc5353dffb256b48057b026e1b34da407918388bc0847e6b8a8527f13b8ff"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/initializeSharedStrings.js",
+      "bytes": 678,
+      "sha256": "4af8397925d21b7f0173c822728ea2cd0bd027d4c0f64752af6c718621781897"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/initializeSheets.js",
+      "bytes": 4137,
+      "sha256": "196307a09c6e23cd677afd4e1be4a93444b718bfb8d7d44ea069f216b3a99bd8"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/initializeStyles.js",
+      "bytes": 9279,
+      "sha256": "6e77bdba099725016c9c4ea54dc18f1e4c77e8f6ceec346b0471d75fc01ab1dd"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/validateSheetData.js",
+      "bytes": 1655,
+      "sha256": "973c110287500ce15e4d00cebd4d809884ca94959b6a93cffb1043103f98d52e"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xlsx/validateSheetName.js",
+      "bytes": 868,
+      "sha256": "7a40d0e3becc450eeedaad21478525ade63a7e0aa711cb93ec51623dcb6a6e69"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/appendMarkupInsideElement.js",
+      "bytes": 854,
+      "sha256": "eeb3a652ad0d5088343ba59c12ffe2a5378a66df3e36bfbda4da9140c714ac67"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/applyEnclosingElementOffset.js",
+      "bytes": 594,
+      "sha256": "c3b38d5e58c2d64acb423ede026a468e6a6b50899536a30cf01157f9e641c2b4"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/escapeXmlSpecialCharacters.js",
+      "bytes": 2618,
+      "sha256": "9ab7edcb0bfd83eeba918c6ee88b15c01887f323202b0e7bae2570f2640dfe64"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/findElement.js",
+      "bytes": 961,
+      "sha256": "4dace211a5a14616a26255e8250f6d45cb7fc85a4e0c64e2f913703f6f97e665"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/findElementInsideElement.js",
+      "bytes": 1488,
+      "sha256": "aaf088a30f810f78eb8fadc5eb35595af0faf34ab176188b072db42561b3aa52"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/findElementsNonRecursive_.js",
+      "bytes": 3983,
+      "sha256": "d397c34a3e0a14b9526c68e8c841a14d51db35759f40f941ea200acfeb4327d9"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getAttributesString.js",
+      "bytes": 976,
+      "sha256": "2f07d08965b529179fd57d8792fe68efa6bcfd8949fc59951c6477ed0b4bcc43"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getChildElements.js",
+      "bytes": 2499,
+      "sha256": "eff4d6464e39406399ac725989a62542ec4e939d6ab5c23b556c1db401fc4161"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getClosingTagMarkup.js",
+      "bytes": 361,
+      "sha256": "da0e579125abcf5196970e7aaa299835468290642ee1b825959fa9e0b83d8b28"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getMarkupInsideElement.js",
+      "bytes": 547,
+      "sha256": "607c0f0686860b60fe585399167f2f9db663a79569c4ed2549f12f8f5e128135"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getOpeningTagMarkup.js",
+      "bytes": 679,
+      "sha256": "d53e2661fc76097e0f197c64cdc4d0b724830d3fc65bb920ac4863b6262eb52c"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/getSelfClosingTagMarkup.js",
+      "bytes": 691,
+      "sha256": "dec906c30e948779cfc1f91419ebc0b93e4b9d62fd053fab49f7328ba34712cb"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/insertElementMarkupAccordingToOrderOfSiblings.js",
+      "bytes": 6074,
+      "sha256": "ea35de45c324987f65f586350a09d2caeb9cca9e53e5c3e26956061120e47e22"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/prependMarkupInsideElement.js",
+      "bytes": 862,
+      "sha256": "5327bcb0fb3d07add7be0eb574a4d61a6ebb6cffa5f05e44ed60c358948ca33b"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/removeInvalidXmlCharacters.js",
+      "bytes": 2079,
+      "sha256": "182603b9da8cb29f6584fe09a1e07cd82aa145b62e945a36f5aee7aa649f6437"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/replaceElement.js",
+      "bytes": 726,
+      "sha256": "cbe6005fd35573b1440294ce527f66b5cb5853e17a0689e4dfc9f4f5a7d4959f"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/sanitizeAttributeName.js",
+      "bytes": 946,
+      "sha256": "9304f0c8111fc79334ea4b60a754f6364883b2c5cec10bb20d0d77b5d5fb4052"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/sanitizeAttributeValue.js",
+      "bytes": 1045,
+      "sha256": "0f20b0efa82edf7acd5193f33eae6259ac7317bf630ecb81b9a9865a3802d9c5"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/sanitizeTextContent.js",
+      "bytes": 1024,
+      "sha256": "6157df1d1a7f59f5920d01b38d600b6a69b7c13b3c95dcc6abc718fcc3f005a9"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/xml/setMarkupInsideElement.js",
+      "bytes": 987,
+      "sha256": "d198b46f6fbb9b0554a3c93b5726f0fed4ae106d50c015915dc125c0516a30b1"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/zip/zipToArrayBuffer.js",
+      "bytes": 1793,
+      "sha256": "f9008076d7e1ebc8b7ff6c42fc634de624f8a210760809cb57d0094d15bf8ebc"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/zip/zipToArrayBufferSync.js",
+      "bytes": 1398,
+      "sha256": "3b7022ef12a7e84825abd11db0fabefdae2561247c182c56e01d778037f5f3bf"
+    },
+    {
+      "path": "node_modules/write-excel-file/commonjs/zip/zipToStream.js",
+      "bytes": 4737,
+      "sha256": "ec6532a6c40a3fb5d050b0d0af47751f33ea0c1dcdfe143a06c65ea87c5879e3"
+    },
+    {
+      "path": "node_modules/write-excel-file/docs/IMAGES.md",
+      "bytes": 14455,
+      "sha256": "278e3c7ab49c5f44921b83d53690862fc10c13bc559b95fca8e0291077693561"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayBrowser.js",
+      "bytes": 968,
+      "sha256": "12eb785b801c70121ba14268152dbf327feb1879b3f4ee9d16f356c69f43b7ed"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayNode.js",
+      "bytes": 1412,
+      "sha256": "b724cd32f0c06bd7a979166cc7142e7fcc82d5dbcc1fa38cf178af58daaff508"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/convertFileContentToUint8ArrayUniversal.js",
+      "bytes": 726,
+      "sha256": "68e272d2c1420b897f593c66f080b8b7bc7432f39f310c59c6e2c08740755025"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/convertFilesContentToUint8Arrays.js",
+      "bytes": 966,
+      "sha256": "1ba5e9bcc57c91c6253630b182d3d78c116139262beb3fc1bbfa9eecd59cf701"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/downloadBlob.js",
+      "bytes": 715,
+      "sha256": "4e3f960b702dad3405e5a49f3717385da2d945ee56cb75363623417762da92eb"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/writeXlsxFileBrowser.js",
+      "bytes": 1585,
+      "sha256": "875bf76df5d6f565c22cb4aa8476bdf9e80b10e2160fe05fb66edc52dab6747b"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/writeXlsxFileNode.js",
+      "bytes": 5164,
+      "sha256": "4add1aa31d447af49fc9b3f82225a4eadaec6211b195d0c8c91d793d4c87f3f7"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/export/writeXlsxFileUniversal.js",
+      "bytes": 2952,
+      "sha256": "60630df0cc3d616755fb1da24a3b96f95460728ef23d1ae75c8e75032ed4c4e4"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/getSheetData/getSheetData.js",
+      "bytes": 677,
+      "sha256": "8e5d366a4010e0c5b2d72461616378d22e8ad2ecca10fa51ec085b2b29eb21b6"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/features/conditionalFormatting.js",
+      "bytes": 11377,
+      "sha256": "52d8dfd1b9c7c160f7a1406d59593721a9ad0d481a67697c92f8468b438e4602"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/features/images.js",
+      "bytes": 11468,
+      "sha256": "9b934d9ff3d6aa59c041c0605ec4444c6e492afa4976296b7f1cef7715afe19e"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/features/stickyRowsOrColumns.js",
+      "bytes": 6752,
+      "sha256": "1677d79ca93c5bbd3dcd57f406996316cd5296f9db84f48e70f555c46e1b37ed"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/[Content_Types].xml.js",
+      "bytes": 1901,
+      "sha256": "e3ff040b42fc117bf3c0be3f197422519c85ee36a1aec73059dd8eff63153013"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/drawing.xml.js",
+      "bytes": 1208,
+      "sha256": "99f3cdd703ab1acb95885a57463f2951740cf937fc6f58b0f7e7b9c7646c7853"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/drawing.xml.rels.js",
+      "bytes": 996,
+      "sha256": "ecc00c47ef15eee089c08ca7bf16afec7b6b12fdef607b87b37a190fbb643126"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/rels.js",
+      "bytes": 908,
+      "sha256": "77b30c3686e5b074d1a5c3b60d820567e95dfbd40af82dbf96efc79cdc3e0558"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sharedStrings.xml.js",
+      "bytes": 1763,
+      "sha256": "8144c3ad3585e1ff4f93e651f3ec48d18a9bad24e32e7a416bd2688e37355ca3"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml.rels.js",
+      "bytes": 1381,
+      "sha256": "c2b785870489b65ad4cc94a5647517a3e6f93584ccb5baa8ccf5c0901e60f301"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/cell.js",
+      "bytes": 6643,
+      "sha256": "f58a992dc30aee4caca920584fdf1d2895b5c8a1f3a5c5f2f52a1bb3546acb66"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/column.js",
+      "bytes": 2605,
+      "sha256": "a50bc091686eb862fe0a6f46625cf6c239ea488489f13b176c375c512da6ad84"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/columns.js",
+      "bytes": 1047,
+      "sha256": "d950656d10c61d66348d12397cf2692f978c44131aae958af7e72b7b500d9448"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/drawingReference.js",
+      "bytes": 555,
+      "sha256": "99597c4538792b89ad1ce0867f54d66d6725f8b84d6eef3e6a1b7071416fd234"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/helpers/floatToInteger.js",
+      "bytes": 459,
+      "sha256": "9186af5a0849e0444ab47892ff07d5880ad1c683e978904d60ab05d703639f8a"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/helpers/getCellStyleProperties.js",
+      "bytes": 3268,
+      "sha256": "b27aae56010b65875f37082cf4d65b69b61e4925b2b5b44992ed2bafe8f41983"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/mergedCellsDescription.js",
+      "bytes": 2547,
+      "sha256": "9307714f54909db26f6cfb500fda3b4604cfeef0191909d5e7f274a3f4e8373d"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/pageMargins.js",
+      "bytes": 1078,
+      "sha256": "90ab4b6d44a73d6fe18d08e3b99914c7746b02abf7aafff72eaf18d0d7a20f01"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/pageSetup.js",
+      "bytes": 909,
+      "sha256": "c3e63d62aebfbbbbaa8baaae8f71451fb55fb627eb1ac9fe0d3f0e5229fa0fd4"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/processMergedCells.js",
+      "bytes": 4326,
+      "sha256": "2928796dd8f0682eafbd8593bafcb922001fa7cca0dc3d412e27f6093a2e6c48"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/row.js",
+      "bytes": 6050,
+      "sha256": "aeca316175c71162263d6b94895163f211151d2d5a1ea15ff1c26c82173a1195"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheet.xml.js",
+      "bytes": 4040,
+      "sha256": "8931f80e1b61fa98996e5685cf5149503c9c20f794854097a3d756ec0fc37dc0"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheetData.js",
+      "bytes": 321,
+      "sha256": "f86ef68bcb4c896be4f1c5840280ccd968b49b0d1c09b8688ae070d40bcc7ed3"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/sheet.xml/sheetViews.js",
+      "bytes": 1337,
+      "sha256": "8ca4c8a6d8fffb38018054334accd3f84f438412b027fafd62ef563b4ee126ea"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/styles.xml.js",
+      "bytes": 7678,
+      "sha256": "ae29e620db47e12282bc851e5fc6ef3cb59ed8549d49eb64033612ff717a19e1"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/workbook.xml.js",
+      "bytes": 2379,
+      "sha256": "70ae52e412e451673cc227e74b62122dc9764f1d1c0fb7ba856b6313005e0f5a"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/files/workbook.xml.rels.js",
+      "bytes": 1388,
+      "sha256": "a4ad8738a72f8b9e96128f9870f00cfaff036409933700e43afacbdc8ca7f781"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/generateXlsxFileContents.js",
+      "bytes": 14683,
+      "sha256": "d3682fa24a169f5003b92e30393429d9792ae85a1fb44263536ba7de2c6a03ee"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/getFeatures.js",
+      "bytes": 1483,
+      "sha256": "4d04c2a5851b7dbb5e9d87e83766da98ab9fd21b10ee2da18165ca8f00a01794"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/convertDateToSerialNumber.js",
+      "bytes": 746,
+      "sha256": "19d8fc418854ff64c52a51b9a433deaeb46fc3dbf855df709566187782e27a34"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/features/getAdditionalContent.js",
+      "bytes": 1801,
+      "sha256": "4340fed509e8451fc23599c9ab4181565c6b9abd022177e21c559c7a4d064850"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/features/getElementXml.js",
+      "bytes": 2236,
+      "sha256": "049346391d0a4fdd7cb3815fad3893ec35d592d02182a52aed3229604b8c4741"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/features/getWrittenFiles.js",
+      "bytes": 3344,
+      "sha256": "07db5f95a35698f6b2222895b56c0f1c574aebe312872f8356547a1dbba96f01"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/features/transformContent.js",
+      "bytes": 1691,
+      "sha256": "26e5a33ac613a6fa7371dc4e67468046e88518bdc0fcbea8df2b5d3625b2f60e"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getAlignmentXml.js",
+      "bytes": 2944,
+      "sha256": "85ef34041be01e9540897035c50e7a03f873a1c53242fd5079e5477907d82c6e"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getBorderXml.js",
+      "bytes": 1800,
+      "sha256": "9f8f6c55dbe66ba572b5f34feaa3d8e26bb039ef66f5741df46f933367952b9a"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getCellAddress.js",
+      "bytes": 800,
+      "sha256": "07a7ce097810243c284e2bdf3d8632d7c3ac364069e86609793ef58205058a7f"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getFileExtensionForContentType.js",
+      "bytes": 482,
+      "sha256": "d5684322278bc601116d76d06c429a443ab28a8ec656d072e37ddf3a10bf660f"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getFillXml.js",
+      "bytes": 2195,
+      "sha256": "396a3f9d1fabc84882c024b4d9a1e361a69fa5c51fc4016ca3a76bee6918e33f"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getFontXml.js",
+      "bytes": 3530,
+      "sha256": "d31e2fddf4add22ef7c8e1869a4570d4eea9878fa8f081ca8621644de337d3a6"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getOrderOfSiblings.js",
+      "bytes": 1993,
+      "sha256": "e35826c72e0b8fa0d87d263981fa275b4ce5d09b3032e14608016c879393097d"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/getXlsxColorForHexColor.js",
+      "bytes": 278,
+      "sha256": "60adfad765ace16a78fb7c766d43d347317f4a5e32f5ea898223c4f1406362bd"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/hasAlignment.js",
+      "bytes": 335,
+      "sha256": "47b2428dc6f5ac5592e0927b02be9561fd91d48abad2c588d3430f73e59ad5ff"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/hasBorder.js",
+      "bytes": 717,
+      "sha256": "37c56060c6a062a5b1631e4dddf269b03aabf6f7afad8d7f7659828c34d6c73a"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/hasFill.js",
+      "bytes": 290,
+      "sha256": "eaf51f33658625841bffdb6b150aab96f649a0b3d71f217b0363f044629b4e48"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/hasFont.js",
+      "bytes": 445,
+      "sha256": "a18ed20647e77595fee9c938af3ad277d2e035e79e5ac20c35036b9c6168483c"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/isCellObject.js",
+      "bytes": 446,
+      "sha256": "8a07fac3d57c82ca90eef4055e2e17f92c8657891baa154a15fb9b54b7d8afea"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/isObject.js",
+      "bytes": 215,
+      "sha256": "fcb2729049e29d0ab0c23eeafe914933a7692d5d368732fc3400f28f68f405d4"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/helpers/orderOfSiblings.js",
+      "bytes": 6108,
+      "sha256": "de99f28e5e7b98a41c085bac28eea7a4c852504020bd40c96bef1a3696eaf5d1"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/initializeSharedStrings.js",
+      "bytes": 567,
+      "sha256": "031ab01caa80c979ffa6d0f769c5ae22e614f2bfeee6728ce702a7a2c1a78cc1"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/initializeSheets.js",
+      "bytes": 3808,
+      "sha256": "0452f7eb159beaf0bf1ff222d7be95ae6646a41c58b9856d774fffeb8aa2bed0"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/initializeStyles.js",
+      "bytes": 8888,
+      "sha256": "d4c4265e7f317bc2f61b8536745bdb335a7ec235edd8d98e415bc4cd7c7145e8"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/validateSheetData.js",
+      "bytes": 1550,
+      "sha256": "b8273b343f16b0a9ba0bf740a415a1b20bee10396e91d3ace14610a994e96ee3"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xlsx/validateSheetName.js",
+      "bytes": 763,
+      "sha256": "b97fa975e949cda5eb221aab604ae64dd26ed58ac89582920249e87d44bf6d46"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/appendMarkupInsideElement.js",
+      "bytes": 609,
+      "sha256": "f283ea5221ca3b90ebdb1ffc70de74b0fb43b02c57586c73872601ff4ba76f0c"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/applyEnclosingElementOffset.js",
+      "bytes": 479,
+      "sha256": "5e52df57203eceecbe890015f02ebc2090295b5c6b19a98517fb7691b813927d"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/escapeXmlSpecialCharacters.js",
+      "bytes": 2504,
+      "sha256": "cb445445708ebf836edff3d6013e9ea49fbfb98fcd6356f50065bf476d70d0f5"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/findElement.js",
+      "bytes": 730,
+      "sha256": "5cadbf8657ec93c156477d5e6e9faff1876db7a579700d32c15c08735b303f7a"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/findElementInsideElement.js",
+      "bytes": 1154,
+      "sha256": "efc31c39f4e4edf602e2e0e787fc9c679a54f31e38f8fcd1c116186ca669cbb6"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/findElementsNonRecursive_.js",
+      "bytes": 3812,
+      "sha256": "9ba1882750022bc6fe964071f28e5e8f9b736649fd80386c2d3ee962d334709c"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getAttributesString.js",
+      "bytes": 692,
+      "sha256": "894d266a54d9bcc73a9dcc13db4bca824b9e6539c690ca965642db4255cd6573"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getChildElements.js",
+      "bytes": 2173,
+      "sha256": "60acac98ed4ecf09240be698f1c61085a4f5f22351cfd793481f958dd27fb0d8"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getClosingTagMarkup.js",
+      "bytes": 254,
+      "sha256": "d2188efed5e392ad466ca0505f68028eb0f54b444510e96c42661cafc0e3bfbf"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getMarkupInsideElement.js",
+      "bytes": 437,
+      "sha256": "2585d7521d2925ce1ae7ce661e7c2f6a1166d645b0fa5fcf536c4eca89aeab31"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getOpeningTagMarkup.js",
+      "bytes": 440,
+      "sha256": "3945c247a28cdee6a9894a6cd77da173eea08ca5b216992c1cef05ef54b470b1"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/getSelfClosingTagMarkup.js",
+      "bytes": 448,
+      "sha256": "0b5d96a390086c87dd180cb597bf2b114d9f4f298620b438904def78eb09d91d"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/insertElementMarkupAccordingToOrderOfSiblings.js",
+      "bytes": 5591,
+      "sha256": "638f3a5589a8e338ad58cf54bc0331b1bde6a407efc866588323a350d5947536"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/prependMarkupInsideElement.js",
+      "bytes": 616,
+      "sha256": "81ba7972ca7f01fc2e48476707b69bd5480f6172dac336ed2dd848cd71a8ef0c"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/removeInvalidXmlCharacters.js",
+      "bytes": 1965,
+      "sha256": "354600e4fca23fd417302fa3c924d8f99fc07b31ce24a8a85f934b04101bc5db"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/replaceElement.js",
+      "bytes": 624,
+      "sha256": "a79d611d694bec0bb1614ef8b1ecdcb4651d5378d2827bb7085c5840dde75584"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/sanitizeAttributeName.js",
+      "bytes": 705,
+      "sha256": "55418a1a607a25d618ed4741a2d29fdf6a6a47207749d863e72a99b682acd915"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/sanitizeAttributeValue.js",
+      "bytes": 758,
+      "sha256": "bd01d53c4ef8e0ae4c2d42ad3ac62f1c5904921c3cf55bd0c202b1b7a997c5e9"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/sanitizeTextContent.js",
+      "bytes": 740,
+      "sha256": "cfeafd77eee4d9e37177e71b32d838a58ef9b6d551094bbeef7f3d1c6cabf42e"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/xml/setMarkupInsideElement.js",
+      "bytes": 877,
+      "sha256": "1d545e89dd4ae55de7fa12066f0adca234090c1305ab4820b05545d107321cdf"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/zip/zipToArrayBuffer.js",
+      "bytes": 1673,
+      "sha256": "c7dfd7c2221e82257213699b485136cae943b51a6a1d5a07db97e0e470c3ca57"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/zip/zipToArrayBufferSync.js",
+      "bytes": 1278,
+      "sha256": "c88c940cebe93dbc10a3b8a98d0210b9cc625b43f8262d1e2c36da5ffc9dbb8f"
+    },
+    {
+      "path": "node_modules/write-excel-file/modules/zip/zipToStream.js",
+      "bytes": 4609,
+      "sha256": "b12c27e956c46d2fecda0caa734b944c493f4b21cc41048fac0324e0e599f83f"
+    },
+    {
+      "path": "node_modules/write-excel-file/node/index.cjs",
+      "bytes": 250,
+      "sha256": "7fa468c225e6291f4ed9183ab0e71b634252976f733df1128debbfa0f0732d8b"
+    },
+    {
+      "path": "node_modules/write-excel-file/node/index.js",
+      "bytes": 160,
+      "sha256": "4f251784e14c63a6ade4c92a7a017ca3e2d0834c7765887c1bc179abef08a16e"
+    },
+    {
+      "path": "node_modules/write-excel-file/node/package.json",
+      "bytes": 315,
+      "sha256": "d19a3f93780032dc3c2de07fd42f31ae6a693c729773a2dfc74d9c7c28e13e77"
+    },
+    {
+      "path": "node_modules/write-excel-file/package.json",
+      "bytes": 1775,
+      "sha256": "27ab9d54186cde4e7f6ab3af71b781eaf05ce9527153ba99668d0a39372104a8"
+    },
+    {
+      "path": "node_modules/write-excel-file/rollup.config.mjs",
+      "bytes": 1025,
+      "sha256": "89933bab8d8e3f85458c9c20d4df17c5a161353238fb4bc64e0e5df70bd75af8"
+    },
+    {
+      "path": "node_modules/write-excel-file/types/SheetOptionsForObjects.ts",
+      "bytes": 238,
+      "sha256": "12249647227a18576b6ac128657aed201e0518a9ffdbb22b07059ed88e120ebc"
+    },
+    {
+      "path": "node_modules/write-excel-file/universal/index.cjs",
+      "bytes": 260,
+      "sha256": "3d7712b200777efe2962ae7fc2944e548024258ac94df2e80de81c5073cbf1b1"
+    },
+    {
+      "path": "node_modules/write-excel-file/universal/index.js",
+      "bytes": 163,
+      "sha256": "577900820644fe7a7b40ecffd97d03cd17d7349f353cd005d870b55ecff0a1f4"
+    },
+    {
+      "path": "node_modules/write-excel-file/universal/package.json",
+      "bytes": 320,
+      "sha256": "2e6d8aa0052a0519845d355c5a980b4dd7336b237fcf43b8b2b77b5365a5b61b"
+    },
+    {
+      "path": "node_modules/write-excel-file/utility/index.cjs",
+      "bytes": 2010,
+      "sha256": "6c987651659ff07fec782a76341ad117b5a40c964df994f2d5529feb7518d221"
+    },
+    {
+      "path": "node_modules/write-excel-file/utility/index.js",
+      "bytes": 1987,
+      "sha256": "88f96f1ecef5046224c6cff9b81d9a02b4390419b3683d07e84d734c2013b340"
+    },
+    {
+      "path": "node_modules/write-excel-file/utility/package.json",
+      "bytes": 318,
+      "sha256": "84d053c34d87f73927541709cf74c028ff20f0fc9c5ad987c95c868db9d692f7"
+    },
+    {
+      "path": "dist/desktop/main.cjs",
+      "bytes": 7115,
+      "sha256": "91cc1db207f58d68f2923b080aef75b20836846d1a4754ee2ff6fb398612bfef"
+    },
+    {
+      "path": "dist/desktop/preload.cjs",
+      "bytes": 363,
+      "sha256": "a29b27b0d246cf85f9eb6adaa86c0c130de10107e41e606d4c998c5ca3db1d66"
+    },
+    {
+      "path": "dist/service/worker.cjs",
+      "bytes": 30962,
+      "sha256": "44b1d58e1b98077b87591bfeffd7e13ca34bf8dd9509e032e59dd74ec7f2fe02"
+    },
+    {
+      "path": "dist/ui/app.js",
+      "bytes": 227646,
+      "sha256": "15ae724751e567d8927a8b4e9d0aa71effadb8e3be7e460fad9fd6c673c13d87"
+    },
+    {
+      "path": "dist/ui/index.html",
+      "bytes": 336,
+      "sha256": "9e38948168e2d5718ccfa6b0fb992d2d3ddbb4ff4cf7467c5a1b504c6726bf76"
+    },
+    {
+      "path": "dist/ui/style.css",
+      "bytes": 1845,
+      "sha256": "d795fa71a379c71e696fcda006e87789b0596e3dc05c4b84c881b3ac2cb32e2d"
+    },
+    {
+      "path": "package.json",
+      "bytes": 439,
+      "sha256": "e297c794a6ce9c947a892f8533a2fa69734a52dff71d48ea8fe5d3ab1583a6e2"
+    }
+  ],
+  "releaseFiles": [
+    {
+      "path": "builder-debug.yml",
+      "bytes": 980,
+      "sha256": "e7f021f17829a11dff22e3ec3781b97d349165a4e76fdb69530f0ebe7ec8f091"
+    },
+    {
+      "path": "Esmer Market Analytics 0.1.0.exe",
+      "bytes": 112611315,
+      "sha256": "4acfaa7bebf34a7d180a99de7c25032bb6158f3cf7f68e9330f021d84c135dfa"
+    },
+    {
+      "path": "Esmer Market Analytics Setup 0.1.0.exe",
+      "bytes": 112778617,
+      "sha256": "fb99997aecd2e91d334d7db5fe19eccd1bfa73be6556ee3eca62b9c175943d9c"
+    },
+    {
+      "path": "Esmer Market Analytics Setup 0.1.0.exe.blockmap",
+      "bytes": 118333,
+      "sha256": "fb7836906be2b3c2a951a389f6dff4834d854622079c00933e10e613c515d4a2"
+    },
+    {
+      "path": "latest.yml",
+      "bytes": 373,
+      "sha256": "246d12e62b8a4ceb46f03c86ee6e0af937be9f3e1a37b3689016821b121527f2"
+    },
+    {
+      "path": "win-unpacked/chrome_100_percent.pak",
+      "bytes": 719654,
+      "sha256": "ab7c4b7b6cb8832a31d44b95ec50ce52294f49422a3bdde4e21968eca2930cbe"
+    },
+    {
+      "path": "win-unpacked/chrome_200_percent.pak",
+      "bytes": 1269017,
+      "sha256": "30fa4a6e27c9ff2fb0f939f01158477e621a67d86e9ecb84cf11b3947db8eb9d"
+    },
+    {
+      "path": "win-unpacked/d3dcompiler_47.dll",
+      "bytes": 4741488,
+      "sha256": "a05f99734f7c4822fefc12b367af21fd0976ed6608752fb1e1e80b6ece7ecbbb"
+    },
+    {
+      "path": "win-unpacked/dxcompiler.dll",
+      "bytes": 25744896,
+      "sha256": "b2b5c67bc4a9c92a0ea87000415e7970488d1ca25767518d4cc27b88f18fb6ac"
+    },
+    {
+      "path": "win-unpacked/dxil.dll",
+      "bytes": 1509760,
+      "sha256": "77e039c905030a641e53658a008b74e90635a5ea9b6b79eabd0f2003bdfca59a"
+    },
+    {
+      "path": "win-unpacked/Esmer Market Analytics.exe",
+      "bytes": 246070272,
+      "sha256": "666df479dd05d3eecec8442086b7170ce2d0debb67efbaf91f496206724ee8de"
+    },
+    {
+      "path": "win-unpacked/ffmpeg.dll",
+      "bytes": 3113472,
+      "sha256": "336587847c4ed3ef1a195d1aaea3d3951c9749a035ffa7951df4c0e02971e4e0"
+    },
+    {
+      "path": "win-unpacked/icudtl.dat",
+      "bytes": 10876560,
+      "sha256": "9f48c7f9c7c94d516a14870707e910ab94d75ae640ff6842c4af53276cd26ebe"
+    },
+    {
+      "path": "win-unpacked/LICENSE.electron.txt",
+      "bytes": 1096,
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "path": "win-unpacked/LICENSES.chromium.html",
+      "bytes": 20472830,
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70"
+    },
+    {
+      "path": "win-unpacked/locales/af.pak",
+      "bytes": 636155,
+      "sha256": "3017b141bd16e24190d810f0748612f0fd4352ca8553002b9a63a7f77f7154f8"
+    },
+    {
+      "path": "win-unpacked/locales/am.pak",
+      "bytes": 1029450,
+      "sha256": "67b938d162bc75db067120bb8366b5bafd9a75fa99a0ca9ad4f46b47d1d37634"
+    },
+    {
+      "path": "win-unpacked/locales/ar.pak",
+      "bytes": 1130933,
+      "sha256": "a6eb037da4ac7930a8661c8bf602deee090fc4409bf4db24db8aab65c89b1d06"
+    },
+    {
+      "path": "win-unpacked/locales/bg.pak",
+      "bytes": 1178203,
+      "sha256": "2eb9c74c67e4b13b45a73061fa978738e335bc245da71bab0ea9b205fe91074e"
+    },
+    {
+      "path": "win-unpacked/locales/bn.pak",
+      "bytes": 1513545,
+      "sha256": "415621a5c0b1546e6e447d43b76414425a8703cc7681d637ec1f283ad0c787e7"
+    },
+    {
+      "path": "win-unpacked/locales/ca.pak",
+      "bytes": 716908,
+      "sha256": "6f28297c1ccb628f534d65dade167ae559f83eace359acf47e48ff890b9409d5"
+    },
+    {
+      "path": "win-unpacked/locales/cs.pak",
+      "bytes": 743351,
+      "sha256": "799a789ce531991cb975425730db310f9a8fe74091eee568f3e65fcc7ef0cd57"
+    },
+    {
+      "path": "win-unpacked/locales/da.pak",
+      "bytes": 666465,
+      "sha256": "9a2cd25537a4818897481ba944981e8aee3d89c7ad37588d02f1deebff3f62d0"
+    },
+    {
+      "path": "win-unpacked/locales/de.pak",
+      "bytes": 717834,
+      "sha256": "fcf63fd89e613a7ef69f16054b97b3493948e5c665aad180a91d3635256fb7d7"
+    },
+    {
+      "path": "win-unpacked/locales/el.pak",
+      "bytes": 1295538,
+      "sha256": "37d2e1ef69fea9bdb1e0902cbc61a458baa9009fc3761029bd1c1882a7a0c9b2"
+    },
+    {
+      "path": "win-unpacked/locales/en-GB.pak",
+      "bytes": 580030,
+      "sha256": "01d9200a5daee1770f7147b166d25baa6a8dd72c138c3c526421e656dec789f5"
+    },
+    {
+      "path": "win-unpacked/locales/en-US.pak",
+      "bytes": 586582,
+      "sha256": "23b271e8009bfa14783700cd0712b4ecaa5b8f2ea28a4d81ae1d7e05bc0c96b1"
+    },
+    {
+      "path": "win-unpacked/locales/es-419.pak",
+      "bytes": 707635,
+      "sha256": "6ff6ea0a14da50cacc4b72ab8c8c7b49c8423abb64f6a3a7f1643d8c3c74e6e9"
+    },
+    {
+      "path": "win-unpacked/locales/es.pak",
+      "bytes": 703926,
+      "sha256": "4578e08033967a5062bfd3b1937e711df84571d444e4940b8ffe5366bce4e778"
+    },
+    {
+      "path": "win-unpacked/locales/et.pak",
+      "bytes": 642216,
+      "sha256": "dd1205eae606f12510e24ce39f301439c98b3293d766ca5839dc292a14d7973c"
+    },
+    {
+      "path": "win-unpacked/locales/fa.pak",
+      "bytes": 1063054,
+      "sha256": "f3675255feb8b054717be9e92e93289262f35e82f25f2f8de0d3ebf3865715af"
+    },
+    {
+      "path": "win-unpacked/locales/fi.pak",
+      "bytes": 655113,
+      "sha256": "1f3123d7fb5c22a95b5250ea17450b665c3c6cd6a6dfd28bbdde15e1bf684a0e"
+    },
+    {
+      "path": "win-unpacked/locales/fil.pak",
+      "bytes": 741385,
+      "sha256": "02e2c70d3d85b0deb677a9ae576ae3cf89e80774532cb3315c14f1e8ce64b310"
+    },
+    {
+      "path": "win-unpacked/locales/fr.pak",
+      "bytes": 763453,
+      "sha256": "4db43f1cfba1ed1d7dd347d58fbab0b8d6d89dd008a3b9d2436d8744e3363453"
+    },
+    {
+      "path": "win-unpacked/locales/gu.pak",
+      "bytes": 1495625,
+      "sha256": "e86e8c240d4b6283abb03c49df9e8899607ef9def6d4933c7a541d63b5835271"
+    },
+    {
+      "path": "win-unpacked/locales/he.pak",
+      "bytes": 928748,
+      "sha256": "ddc1f304ab1f4489d19ae2b31e7f8e3ffb47dae439520159e8975422c65e4115"
+    },
+    {
+      "path": "win-unpacked/locales/hi.pak",
+      "bytes": 1586592,
+      "sha256": "10a6f19c1982590e33476427dee8d4293b0707e25dc536d6394b5782ecc3b642"
+    },
+    {
+      "path": "win-unpacked/locales/hr.pak",
+      "bytes": 715279,
+      "sha256": "d46c64ae8af3562e37eb80438aa2bee228fafda251d58ba4d0991291f1c72aab"
+    },
+    {
+      "path": "win-unpacked/locales/hu.pak",
+      "bytes": 765640,
+      "sha256": "0a46fc8d50f74effd1cfe1979e677df3de6fc47e6b551267303d93d57bd83f50"
+    },
+    {
+      "path": "win-unpacked/locales/id.pak",
+      "bytes": 635080,
+      "sha256": "f567569c42a25bb2dfc5c33e13aac558c0e2a1d5d4b969592bbd0841b36438db"
+    },
+    {
+      "path": "win-unpacked/locales/it.pak",
+      "bytes": 693990,
+      "sha256": "899be10e8f46f53d9bbe7cab827fc17b7c2bd7184e31791688016e2ca4df6622"
+    },
+    {
+      "path": "win-unpacked/locales/ja.pak",
+      "bytes": 842132,
+      "sha256": "9370c20a0612f5874dff2b015f31482e167eccf1b3c1d1a2efc1c2e38cefa88e"
+    },
+    {
+      "path": "win-unpacked/locales/kn.pak",
+      "bytes": 1720240,
+      "sha256": "af5fed2130102ecc0c878059c88faed9d6db2e8b147fb5ae9e15e3fe69706c8a"
+    },
+    {
+      "path": "win-unpacked/locales/ko.pak",
+      "bytes": 718709,
+      "sha256": "0f5bc49c4d35bfea1563db6eb77a074c65b39b49a916cb35a022ef96340338f2"
+    },
+    {
+      "path": "win-unpacked/locales/lt.pak",
+      "bytes": 777281,
+      "sha256": "af969f4407c190dd01a426fa1244cb1ec7cdf2909d1c3ba5b87ff662ba567303"
+    },
+    {
+      "path": "win-unpacked/locales/lv.pak",
+      "bytes": 774751,
+      "sha256": "27e20dfa5585161ef8b641f628aefe6c88d9f9590ffedb647e0c9da1cacf219d"
+    },
+    {
+      "path": "win-unpacked/locales/ml.pak",
+      "bytes": 1767850,
+      "sha256": "b5606265910e45098a88e989202a550531f6d00333c6b112ed4c5cbc07b2ff6a"
+    },
+    {
+      "path": "win-unpacked/locales/mr.pak",
+      "bytes": 1467313,
+      "sha256": "8465d4077ed5414cbcb7d9bdb00d85e515a1a069703cdc1d4d67c9d6e5623fb0"
+    },
+    {
+      "path": "win-unpacked/locales/ms.pak",
+      "bytes": 668356,
+      "sha256": "af7021a00befa586aa067ae3ccb339079e6f13ee0cab1621836f6abb608b6f2a"
+    },
+    {
+      "path": "win-unpacked/locales/nb.pak",
+      "bytes": 638121,
+      "sha256": "d97a2b0cbe6adc99add2ed3ce0d15d0bb124b778086c466c126634d60ea72608"
+    },
+    {
+      "path": "win-unpacked/locales/nl.pak",
+      "bytes": 664767,
+      "sha256": "9d82c384fbb6480c7a6e721c6bcd1f2cd19665d848b056b5a2911504308ba037"
+    },
+    {
+      "path": "win-unpacked/locales/pl.pak",
+      "bytes": 742064,
+      "sha256": "8a0969fc743d3e2f5111387d53c0d79e8c1d9f68256ad6553b87fca2bcaa7e6e"
+    },
+    {
+      "path": "win-unpacked/locales/pt-BR.pak",
+      "bytes": 697044,
+      "sha256": "8272a84e2e6658dc4da17c6bd21995011fbaa6c328efafd24c4ebd4fe2e64916"
+    },
+    {
+      "path": "win-unpacked/locales/pt-PT.pak",
+      "bytes": 701056,
+      "sha256": "bdfa7264dddf70f936f1785737969559a577b51d1952c820a468c611d18b17ca"
+    },
+    {
+      "path": "win-unpacked/locales/ro.pak",
+      "bytes": 728144,
+      "sha256": "1e6b5b0dac63a9e951daf523de310f6bd9e5c53e281f37706d41bd35d2a08bb5"
+    },
+    {
+      "path": "win-unpacked/locales/ru.pak",
+      "bytes": 1200996,
+      "sha256": "52a31a7ca057b8c76208620932120927a089502ddfb66c30de4324959f9e0075"
+    },
+    {
+      "path": "win-unpacked/locales/sk.pak",
+      "bytes": 755475,
+      "sha256": "a53551e8d251fa01305afe1d0d187144c56bfdffd5d1aa9f96a9350b96c0a252"
+    },
+    {
+      "path": "win-unpacked/locales/sl.pak",
+      "bytes": 722720,
+      "sha256": "e1371c8df577b979e3a515af34b0aaa3d07153c7a5c55d39a9b49a7ffe62d3d2"
+    },
+    {
+      "path": "win-unpacked/locales/sr.pak",
+      "bytes": 1112919,
+      "sha256": "be4ce17afac24dffc1eb36609cb51e766e77097d6656b1008a2a825e59609cc1"
+    },
+    {
+      "path": "win-unpacked/locales/sv.pak",
+      "bytes": 646537,
+      "sha256": "8bdff8855d23c739ece357f653c0a17bb36fe97577a5761912080d057ed341a5"
+    },
+    {
+      "path": "win-unpacked/locales/sw.pak",
+      "bytes": 685130,
+      "sha256": "312b225a81cc3cc15f13f80c45dd0e0bb3655d31873d2956861207e70c33c1dc"
+    },
+    {
+      "path": "win-unpacked/locales/ta.pak",
+      "bytes": 1758067,
+      "sha256": "91fb1460711df108d8d435a378c8be1d1e80b0886c0158d8c6ae92f35812681b"
+    },
+    {
+      "path": "win-unpacked/locales/te.pak",
+      "bytes": 1629379,
+      "sha256": "fc8c2706c5dfd36e7af8e380a240e0f697cc5fe969b512092a2185896512c4af"
+    },
+    {
+      "path": "win-unpacked/locales/th.pak",
+      "bytes": 1368866,
+      "sha256": "c1f4235c31bc05153230b0e55b7aabc9020d7460d5b0a025c386885e1e4bda3c"
+    },
+    {
+      "path": "win-unpacked/locales/tr.pak",
+      "bytes": 697368,
+      "sha256": "ae87bbd88ce0adfc2dc3c460736a7d0513472af62fc856caccc638dedfec9b4a"
+    },
+    {
+      "path": "win-unpacked/locales/uk.pak",
+      "bytes": 1211565,
+      "sha256": "a6230520dac708a6235588f5d9e894fcc9b1391e18a70e3220e06ddf80f76688"
+    },
+    {
+      "path": "win-unpacked/locales/ur.pak",
+      "bytes": 1047994,
+      "sha256": "c218e21744df2ff0669a87d497d65d76333073577360d4c662c592de146bf82a"
+    },
+    {
+      "path": "win-unpacked/locales/vi.pak",
+      "bytes": 830059,
+      "sha256": "42f3f0c4f645aedc66c12c74aee7256336a929798d736c56853daec91d44511a"
+    },
+    {
+      "path": "win-unpacked/locales/zh-CN.pak",
+      "bytes": 592116,
+      "sha256": "ba8ac4bf82b50728d907215d1993948457835bf2942a4d7266a3f8af5f51de15"
+    },
+    {
+      "path": "win-unpacked/locales/zh-TW.pak",
+      "bytes": 583860,
+      "sha256": "82739378d17ea73e57c8efae31994e0c8818ab2d0d12cb1f6b20d2f340b3229d"
+    },
+    {
+      "path": "win-unpacked/resources/app.asar",
+      "bytes": 10204515,
+      "sha256": "ced2a5d0e57cb1ed1c0d2739a0a8654db13246a6296abc62c9eedae6879d4e14"
+    },
+    {
+      "path": "win-unpacked/resources/licences/LICENSE",
+      "bytes": 1096,
+      "sha256": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d"
+    },
+    {
+      "path": "win-unpacked/resources/licences/LICENSES.chromium.html",
+      "bytes": 20472830,
+      "sha256": "7b328b8c7463ac9bfc7dc648c751533517c8441a0b5b21047d6c0b2620e60d70"
+    },
+    {
+      "path": "win-unpacked/resources.pak",
+      "bytes": 12435445,
+      "sha256": "3d8c36b2ec7099a27fe00763e5af28319643ba65c1b48b85eb6a7caaae034ba6"
+    },
+    {
+      "path": "win-unpacked/snapshot_blob.bin",
+      "bytes": 368776,
+      "sha256": "1176cfa83f9ef458e7ed5b5b255c9289691dbef3ff1e4a073a5c90f9a16e8458"
+    },
+    {
+      "path": "win-unpacked/v8_context_snapshot.bin",
+      "bytes": 742208,
+      "sha256": "d9d3ec18e937ed2fddd02d92e4f0726919769e16f2ea17f962d23e40d5962b7b"
+    },
+    {
+      "path": "win-unpacked/vk_swiftshader.dll",
+      "bytes": 5520384,
+      "sha256": "cfb8a533c5da1ade3fd4e66ebd0acf7186bd17fb3cc09d48809a7909c4aaf0f8"
+    },
+    {
+      "path": "win-unpacked/vk_swiftshader_icd.json",
+      "bytes": 106,
+      "sha256": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9"
+    },
+    {
+      "path": "win-unpacked/vulkan-1.dll",
+      "bytes": 939008,
+      "sha256": "c1b383f18c0949f233e949ae197c2ad4c416abe7790894d7e395d73116403b4f"
+    }
+  ],
+  "issues": [],
+  "limitations": "Current local artifacts only. Builder debug metadata is a local build file, not an installed application file. Inventory uses package paths, file types, allowlisted application entries and known synthetic/source markers; it does not certify unknown private content or real-source privacy. Rerun after final packaging. Dependency notices are checked separately by scripts/verify-package.mjs. Physical offline behavior and lifecycle require separate evidence."
+}
