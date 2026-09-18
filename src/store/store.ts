@@ -118,26 +118,30 @@ class AnalyticsStore {
   }
   private failure(id: string, datasetId: string | null, code: ImportCode) {
     try {
-      this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,error_code,created_at) VALUES(?,?,'failed',?,?) ON CONFLICT(id) DO UPDATE SET state='failed',error_code=excluded.error_code").run(id, datasetId, code, new Date().toISOString());
+      this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,error_code,created_at) VALUES(?,?,'failed',?,?) ON CONFLICT(id) DO UPDATE SET dataset_id=excluded.dataset_id,state='failed',error_code=excluded.error_code").run(id, datasetId, code, new Date().toISOString());
     } catch { /* A full disk can also prevent recording the failure. Never mask the original error. */ }
     return { status: "failed", code } as const;
   }
   stage(bytes: Uint8Array): StageResult {
     const id = randomUUID(); let datasetId: string | null = null;
     try {
+      this.db.prepare("INSERT INTO import_batches(id,state,created_at) VALUES(?,'staged',?)").run(id, new Date().toISOString());
       this.options.fault?.("reading");
       const parsed = readPackage(bytes);
       if (!parsed.ok) return this.failure(id, null, parsed.code);
       datasetId = createHash("sha256").update(bytes).digest("hex");
+      this.db.prepare("UPDATE import_batches SET dataset_id=? WHERE id=?").run(datasetId, id);
       if (this.currentPin().datasetId === datasetId) {
-        if (this.lastImportError()) this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,created_at) VALUES(?,?,'active',?)").run(id, datasetId, new Date().toISOString());
+        this.db.prepare("UPDATE import_batches SET state='active' WHERE id=?").run(id);
         return { status: "unchanged", datasetId };
       }
-      if (this.db.prepare("SELECT hash FROM package_history WHERE hash=? AND activated=1").get(datasetId)) return { status: "historical", datasetId };
+      if (this.db.prepare("SELECT hash FROM package_history WHERE hash=? AND activated=1").get(datasetId)) {
+        this.db.prepare("UPDATE import_batches SET state='cancelled' WHERE id=?").run(id);
+        return { status: "historical", datasetId };
+      }
       const candidateId = datasetId;
       this.transaction(() => {
         this.db.prepare("INSERT INTO package_history VALUES(?,0) ON CONFLICT DO NOTHING").run(candidateId);
-        this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,created_at) VALUES(?,?,'staged',?)").run(id, candidateId, new Date().toISOString());
         if (!this.db.prepare("SELECT id FROM datasets WHERE id=?").get(candidateId)) {
           this.db.prepare("INSERT INTO datasets VALUES(?,?,?,?,?)").run(candidateId, parsed.metadata.lineage, canonical(parsed.metadata), canonical(parsed.warnings), "{}");
           const supplier = this.db.prepare("INSERT INTO source_suppliers VALUES(?,?,?)");

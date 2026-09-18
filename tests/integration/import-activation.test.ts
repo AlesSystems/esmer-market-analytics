@@ -42,7 +42,8 @@ test("A/B overlap preserves concurrent app writes, exact report pins and origina
   expect(store.importPackage(b)).toEqual({ status: "unchanged", datasetId: current.pin.datasetId });
   expect(store.importPackage(a)).toEqual({ status: "historical", datasetId: aId });
   expect(store.readSnapshot()).toEqual(current);
-  expect(store.history().at(-1)?.difference).toMatchObject({ from: aId, to: current.pin.datasetId, appRevision: 6, streams: { lines: { inserted: ["line-insert"], deleted: ["line-delete"], changed: ["line-edit"] }, documents: { changed: ["doc-edit"] } } });
+  expect(store.history().find(batch => batch.id === staged.id)?.difference).toMatchObject({ from: aId, to: current.pin.datasetId, appRevision: 6, streams: { lines: { inserted: ["line-insert"], deleted: ["line-delete"], changed: ["line-edit"] }, documents: { changed: ["doc-edit"] } } });
+  expect(store.history().slice(-2).map(batch => batch.state)).toEqual(["active", "cancelled"]);
   store.close();
   const reopened = openStore(path); expect(reopened.readSnapshot()).toEqual(current); expect(reopened.readPinned(accepted.pin)).toEqual(accepted); reopened.close();
 });
