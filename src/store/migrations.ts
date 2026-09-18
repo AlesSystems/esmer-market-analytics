@@ -13,5 +13,5 @@ export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
     if (version === 0) db.exec(schema);
     if (version < 2 && target >= 2) db.exec("CREATE INDEX app_entity_revision ON app_revisions(kind,entity_id,revision); CREATE INDEX batch_dataset ON import_batches(dataset_id)");
     db.exec(`PRAGMA application_id=${APPLICATION_ID}; PRAGMA user_version=${target}; COMMIT`);
-  } catch (error) { db.exec("ROLLBACK"); throw error; }
+  } catch (error) { if (db.isTransaction) db.exec("ROLLBACK"); throw error; }
 }

@@ -159,10 +159,12 @@ class AnalyticsStore {
         const manifest = decode<Manifest>(dataset.manifest_json);
         for (const stream of ["documents", "lines", "suppliers"] as const) requireValid(records[stream].length === manifest.streams[stream].count && hash(records[stream]) === manifest.streams[stream].sha256);
         const old = before.datasetId ? this.facts(before.datasetId) : { documents: [], lines: [], suppliers: [] };
-        const difference = { from: before.datasetId, to: datasetId, appRevision: before.appRevision, streams: Object.fromEntries((["documents", "lines", "suppliers"] as const).map(stream => {
+        const previousLineage = before.datasetId ? String(this.db.prepare("SELECT lineage FROM datasets WHERE id=?").get(before.datasetId)!.lineage) : null;
+        const lineageChanged = previousLineage !== null && previousLineage !== manifest.lineage;
+        const difference = { from: before.datasetId, to: datasetId, previousLineage, lineage: manifest.lineage, lineageChanged, appRevision: before.appRevision, streams: Object.fromEntries((["documents", "lines", "suppliers"] as const).map(stream => {
           const previous = new Map(old[stream].map(row => [row.id, canonical(row)]));
           const next = new Map(records[stream].map(row => [row.id, canonical(row)]));
-          return [stream, { inserted: [...next.keys()].filter(key => !previous.has(key)), deleted: [...previous.keys()].filter(key => !next.has(key)), changed: [...next.keys()].filter(key => previous.has(key) && previous.get(key) !== next.get(key)) }];
+          return [stream, { inserted: [...next.keys()].filter(key => lineageChanged || !previous.has(key)), deleted: [...previous.keys()].filter(key => lineageChanged || !next.has(key)), changed: [...next.keys()].filter(key => !lineageChanged && previous.has(key) && previous.get(key) !== next.get(key)) }];
         })) };
         if (before.datasetId) this.db.prepare("INSERT INTO rollback_dataset VALUES(1,?) ON CONFLICT(singleton) DO UPDATE SET dataset_id=excluded.dataset_id").run(before.datasetId);
         this.db.prepare("INSERT INTO active_dataset VALUES(1,?) ON CONFLICT(singleton) DO UPDATE SET dataset_id=excluded.dataset_id").run(datasetId);
@@ -180,7 +182,7 @@ class AnalyticsStore {
     return result.changes ? { status: "cancelled" } : { status: "failed", code: "INVALID_CANDIDATE" };
   }
   history() {
-    return this.db.prepare("SELECT id,dataset_id AS datasetId,state,error_code AS errorCode,difference_json FROM import_batches ORDER BY rowid").all().map(({ difference_json, ...row }) => ({ ...row, difference: difference_json === null ? null : decode(difference_json) }));
+    return this.db.prepare("SELECT id,dataset_id AS datasetId,state,error_code AS errorCode,difference_json FROM import_batches ORDER BY rowid").all().map(({ difference_json, ...row }) => ({ id: String(row.id), datasetId: row.datasetId === null ? null : String(row.datasetId), state: String(row.state), errorCode: row.errorCode === null ? null : String(row.errorCode), difference: difference_json === null ? null : decode(difference_json) }));
   }
   prune(): number {
     return this.transaction(() => Number(this.db.prepare(`DELETE FROM datasets WHERE id NOT IN (SELECT dataset_id FROM active_dataset)
