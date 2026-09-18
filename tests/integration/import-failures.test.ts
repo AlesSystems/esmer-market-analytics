@@ -56,8 +56,9 @@ test("real SQLite page exhaustion returns storage pressure and rolls back candid
   const check = new DatabaseSync(path); expect(check.prepare("PRAGMA integrity_check").get()?.integrity_check).toBe("ok"); check.close();
 });
 
-test.each(["reading", "persistence", "validation", "summary", "activation"] as const)("process killed during %s reports interruption and recovers prior source and app writes", async boundary => {
-  const { dir, path } = fixture(); let store = openStore(path); store.importPackage(sourcePackage("a"));
+test.each((["reading", "persistence", "validation", "summary", "activation"] as const).flatMap(boundary => [false, true].map(loaded => ({ boundary, loaded }))))("process killed during $boundary reports interruption with loaded=$loaded", async ({ boundary, loaded }) => {
+  const { dir, path } = fixture(); let store = openStore(path);
+  if (loaded) store.importPackage(sourcePackage("a"));
   store.appendRevision({ kind: "expense", entityId: "expense", value: { net: "7", date: "2025-01-01", reason: "Synthetic", evidence: "fixture:expense" } });
   const before = store.readSnapshot(); store.close();
   const packagePath = join(dir, "b.json"); writeFileSync(packagePath, sourcePackage("b"));

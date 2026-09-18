@@ -1,9 +1,10 @@
 import { test, expect, _electron as electron } from "@playwright/test";
-import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { sourcePackage } from "../helpers/store-fixtures";
 import { openStore } from "../../src/store/store";
+import { DatabaseSync } from "node:sqlite";
 const executablePath =
   process.env.ESMER_EXECUTABLE ??
   (process.platform === "darwin"
@@ -266,7 +267,10 @@ for (const loaded of [false, true]) {
   test(`packaged restart shows interrupted import and preserves ${loaded ? "loaded" : "empty"} state`, async () => {
     const userData = await mkdtemp(join(tmpdir(), "esmer-interrupted-"));
     const store = openStore(join(userData, "analytics.sqlite"));
-    if (loaded) store.importPackage(sourcePackage("a"));
+    if (loaded) {
+      store.importPackage(sourcePackage("a", "earlier-lineage"));
+      store.importPackage(sourcePackage("a"));
+    }
     const before = store.availability();
     expect(store.stage(sourcePackage("b")).status).toBe("validated"); store.close();
     const packagePath = join(userData, "synthetic.json"); await writeFile(packagePath, sourcePackage("b"));
@@ -280,6 +284,15 @@ for (const loaded of [false, true]) {
       await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
       await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
       await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
+      if (loaded) {
+        await writeFile(packagePath, sourcePackage("a", "earlier-lineage"));
+        await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+        await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+        await expect(page.getByText("Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.")).toBeVisible();
+        await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
+        expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
+        await writeFile(packagePath, sourcePackage("b"));
+      }
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
       await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
       await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
@@ -288,3 +301,46 @@ for (const loaded of [false, true]) {
     } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
   });
 }
+
+test("packaged owning worker migrates and reopens durable revisions and report pins offline", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-durable-"));
+  const databasePath = join(userData, "analytics.sqlite");
+  const store = openStore(databasePath, { schemaVersion: 1 });
+  expect(store.importPackage(sourcePackage("a")).status).toBe("active");
+  store.appendRevision({ kind: "expense", entityId: "expense", value: { net: "50.000000000000001", date: "2025-01-15", reason: "Synthetic original", evidence: "fixture:expense" } });
+  const accepted = store.readSnapshot();
+  const report = { id: "accepted", pin: accepted.pin, calculationVersion: "synthetic-v1", evidence: ["fixture:accepted"], output: { label: "synthetic only" } };
+  store.acceptReport(report);
+  const staged = store.stage(sourcePackage("b"));
+  if (staged.status !== "validated") throw new Error("STAGE_FAILED");
+  store.appendRevision({ kind: "expense", entityId: "expense", value: { net: "60.000000000000001", date: "2025-01-15", reason: "Synthetic correction", evidence: "fixture:correction" } });
+  store.appendRevision({ kind: "adjustment", entityId: "adjustment", value: { net: "5", reason: "Synthetic adjustment", evidence: "fixture:adjustment", target: { datasetId: accepted.pin.datasetId!, kind: "line", sourceId: "line-delete" }, reversed: false } });
+  expect(store.activate(staged.id).status).toBe("active");
+  const before = store.readSnapshot();
+  expect(before.app.map(row => row.kind === "adjustment" ? row.applicability : row.kind === "expense" ? row.value.net : null)).toEqual(["60.000000000000001", "review-required"]);
+  store.close();
+  try {
+    for (let launch = 0; launch < 2; launch++) {
+      const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+      try {
+        expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
+        const page = await app.firstWindow();
+        await page.context().setOffline(true);
+        await page.reload();
+        await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
+        expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", dataset: { datasetId: before.pin.datasetId, counts: { documents: 2, lines: 2, suppliers: 0 } } });
+      } finally { await app.close(); }
+      const check = new DatabaseSync(databasePath, { readOnly: true });
+      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 2 }); }
+      finally { check.close(); }
+      const reopened = openStore(databasePath);
+      try {
+        expect(reopened.readSnapshot()).toEqual(before);
+        expect(reopened.readPinned(accepted.pin)).toEqual(accepted);
+        expect(reopened.readReport("accepted")).toEqual(report);
+      } finally { reopened.close(); }
+      await rename(databasePath, `${databasePath}.released`);
+      await rename(`${databasePath}.released`, databasePath);
+    }
+  } finally { await rm(userData, { recursive: true, force: true }); }
+});
