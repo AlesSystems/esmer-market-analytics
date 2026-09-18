@@ -50,9 +50,9 @@ class AnalyticsStore {
   }
   private facts(datasetId: string): Records {
     return {
-      documents: this.db.prepare("SELECT id,kind,date,supplier_id AS supplierId FROM source_documents WHERE dataset_id=? ORDER BY id").all(datasetId) as Records["documents"],
-      lines: this.db.prepare("SELECT id,document_id AS documentId,quantity,net,cost FROM source_lines WHERE dataset_id=? ORDER BY id").all(datasetId) as Records["lines"],
-      suppliers: this.db.prepare("SELECT id FROM source_suppliers WHERE dataset_id=? ORDER BY id").all(datasetId) as Records["suppliers"],
+      documents: this.db.prepare("SELECT id,kind,date,supplier_id AS supplierId FROM source_documents WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["documents"],
+      lines: this.db.prepare("SELECT id,document_id AS documentId,quantity,net,cost FROM source_lines WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["lines"],
+      suppliers: this.db.prepare("SELECT id FROM source_suppliers WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["suppliers"],
     };
   }
   private fingerprint(target: Target, datasetId = target.datasetId): string | null {
@@ -131,12 +131,12 @@ class AnalyticsStore {
         this.db.prepare("INSERT INTO import_batches(id,dataset_id,state,created_at) VALUES(?,?,'staged',?)").run(id, candidateId, new Date().toISOString());
         if (!this.db.prepare("SELECT id FROM datasets WHERE id=?").get(candidateId)) {
           this.db.prepare("INSERT INTO datasets VALUES(?,?,?,?,?)").run(candidateId, parsed.metadata.lineage, canonical(parsed.metadata), canonical(parsed.warnings), "{}");
-          const supplier = this.db.prepare("INSERT INTO source_suppliers VALUES(?,?)");
-          for (const row of parsed.records.suppliers) supplier.run(candidateId, row.id);
-          const document = this.db.prepare("INSERT INTO source_documents VALUES(?,?,?,?,?)");
-          for (const row of parsed.records.documents) document.run(candidateId, row.id, row.kind, row.date, row.supplierId);
-          const line = this.db.prepare("INSERT INTO source_lines VALUES(?,?,?,?,?,?)");
-          for (const row of parsed.records.lines) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost);
+          const supplier = this.db.prepare("INSERT INTO source_suppliers VALUES(?,?,?)");
+          for (const [ordinal, row] of parsed.records.suppliers.entries()) supplier.run(candidateId, row.id, ordinal);
+          const document = this.db.prepare("INSERT INTO source_documents VALUES(?,?,?,?,?,?)");
+          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal);
+          const line = this.db.prepare("INSERT INTO source_lines VALUES(?,?,?,?,?,?,?)");
+          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal);
         }
         this.options.fault?.("persistence");
         const facts = this.facts(candidateId);

@@ -10,15 +10,15 @@ CREATE TABLE import_batches (
   id TEXT PRIMARY KEY, dataset_id TEXT, state TEXT NOT NULL CHECK(state IN ('staged','validated','active','failed','cancelled')),
   error_code TEXT, created_at TEXT NOT NULL, difference_json TEXT CHECK(difference_json IS NULL OR json_valid(difference_json))
 ) STRICT;
-CREATE TABLE source_suppliers (dataset_id TEXT NOT NULL REFERENCES datasets(id) ON DELETE CASCADE, id TEXT NOT NULL, PRIMARY KEY(dataset_id,id)) STRICT;
+CREATE TABLE source_suppliers (dataset_id TEXT NOT NULL REFERENCES datasets(id) ON DELETE CASCADE, id TEXT NOT NULL, ordinal INTEGER NOT NULL, PRIMARY KEY(dataset_id,id)) STRICT;
 CREATE TABLE source_documents (
   dataset_id TEXT NOT NULL REFERENCES datasets(id) ON DELETE CASCADE, id TEXT NOT NULL,
-  kind TEXT NOT NULL CHECK(kind IN ('sale','purchase','customer-return','supplier-return')), date TEXT NOT NULL, supplier_id TEXT,
+  kind TEXT NOT NULL CHECK(kind IN ('sale','purchase','customer-return','supplier-return')), date TEXT NOT NULL, supplier_id TEXT, ordinal INTEGER NOT NULL,
   PRIMARY KEY(dataset_id,id), FOREIGN KEY(dataset_id,supplier_id) REFERENCES source_suppliers(dataset_id,id)
 ) STRICT;
 CREATE TABLE source_lines (
   dataset_id TEXT NOT NULL REFERENCES datasets(id) ON DELETE CASCADE, id TEXT NOT NULL, document_id TEXT NOT NULL,
-  quantity TEXT NOT NULL, net TEXT NOT NULL, cost TEXT, PRIMARY KEY(dataset_id,id),
+  quantity TEXT NOT NULL, net TEXT NOT NULL, cost TEXT, ordinal INTEGER NOT NULL, PRIMARY KEY(dataset_id,id),
   FOREIGN KEY(dataset_id,document_id) REFERENCES source_documents(dataset_id,id)
 ) STRICT;
 CREATE TABLE active_dataset (singleton INTEGER PRIMARY KEY CHECK(singleton=1), dataset_id TEXT NOT NULL REFERENCES datasets(id)) STRICT;

@@ -1,4 +1,4 @@
-import type { DatabaseSync } from "node:sqlite";
+import { DatabaseSync } from "node:sqlite";
 import { APPLICATION_ID, SCHEMA_VERSION, schema } from "./schema";
 
 export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
@@ -6,6 +6,22 @@ export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
   const applicationId = Number(db.prepare("PRAGMA application_id").get()!.application_id);
   const empty = !db.prepare("SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' LIMIT 1").get();
   if (![1, 2].includes(target) || version > target || (version === 0 ? !empty || applicationId !== 0 : applicationId !== APPLICATION_ID)) throw new Error("UNSUPPORTED_STORE");
+  if (version !== 0) {
+    const expected = new DatabaseSync(":memory:");
+    try {
+      expected.exec(schema);
+      const tables = expected.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
+      for (const { name } of tables) {
+        const actual = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(String(name));
+        const definition = expected.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(String(name));
+        if (actual?.sql !== definition?.sql) throw new Error("UNSUPPORTED_STORE");
+      }
+      for (const { name, sql } of expected.prepare("SELECT name,sql FROM sqlite_master WHERE type='trigger'").all()) {
+        if (db.prepare("SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?").get(String(name))?.sql !== sql) throw new Error("UNSUPPORTED_STORE");
+      }
+      if (db.prepare("PRAGMA quick_check").get()?.quick_check !== "ok" || db.prepare("PRAGMA foreign_key_check").all().length) throw new Error("UNSUPPORTED_STORE");
+    } finally { expected.close(); }
+  }
   db.exec("PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000");
   if (version === target) return;
   db.exec("BEGIN IMMEDIATE");
