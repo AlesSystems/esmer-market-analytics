@@ -73,8 +73,22 @@ test("process killed inside uncommitted activation recovers prior source and app
     });
     const exited = once(child, "exit"); child.kill("SIGKILL"); await exited;
     store = openStore(path); expect(store.readSnapshot()).toEqual(before);
+    expect(store.availability()).toMatchObject({ lastImportError: "INTERRUPTED" });
     expect(store.history().at(-1)).toMatchObject({ state: "failed", errorCode: "INTERRUPTED" });
     expect(store.prune()).toBe(1); store.close();
     expect(readFileSync(path).length).toBeGreaterThan(0);
   } finally { if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL"); }
+});
+
+test.each([false, true])("restart exposes interrupted import while retaining the %s prior dataset", loaded => {
+  const { path } = fixture(); let store = openStore(path);
+  if (loaded) store.importPackage(sourcePackage("a"));
+  const before = store.readSnapshot();
+  expect(store.stage(sourcePackage("b")).status).toBe("validated"); store.close();
+  store = openStore(path);
+  expect(store.availability()).toMatchObject({ status: "ready", store: loaded ? "loaded" : "empty", lastImportError: "INTERRUPTED" });
+  expect(store.readSnapshot()).toEqual(before);
+  expect(store.importPackage(sourcePackage(loaded ? "a" : "b")).status).toBe(loaded ? "unchanged" : "active");
+  expect(store.availability()).not.toHaveProperty("lastImportError"); store.close();
+  store = openStore(path); expect(store.availability()).not.toHaveProperty("lastImportError"); store.close();
 });

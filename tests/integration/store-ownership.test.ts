@@ -21,6 +21,7 @@ test("file-backed migration preserves precise facts, app revisions, pins and acc
   const initial = new DatabaseSync(path); migrate(initial, 1); initial.close();
   let store = openStore(path, { schemaVersion: 1 });
   expect(store.importPackage(bytes).status).toBe("active");
+  expect(store.availability()).toMatchObject({ status: "ready", store: "loaded", dataset: { warnings: ["SYNTHETIC_ONLY", "PARTIAL_COVERAGE", "MISSING_COST"] } });
   store.appendRevision({ kind: "expense", entityId: "expense-1", value: { net: "50.000000000000001", date: "2026-01-01", reason: "Original", evidence: "fixture:expense-1" } });
   const before = store.readSnapshot();
   const report = { id: "report-1", pin: before.pin, calculationVersion: "fixture-v1", evidence: ["fixture:report-1"], output: { net: "12345678901234567890.123456789" } };

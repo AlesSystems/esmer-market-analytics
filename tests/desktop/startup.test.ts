@@ -3,6 +3,7 @@ import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { sourcePackage } from "../helpers/store-fixtures";
+import { openStore } from "../../src/store/store";
 const executablePath =
   process.env.ESMER_EXECUTABLE ??
   (process.platform === "darwin"
@@ -247,16 +248,39 @@ test("packaged app imports through native selection, preserves data after failed
     await writeFile(packagePath, "invalid package");
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
     await expect(page.getByRole("alert")).toHaveText("Veri paketi geçersiz. Son geçerli veriler korundu.");
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
     await page.screenshot({ path: "test-results/phase-4-import-failed.png" });
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
     await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
     await app.close();
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual(availability);
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
     expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["getAvailability", "importPackage"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+for (const loaded of [false, true]) {
+  test(`packaged restart shows interrupted import and preserves ${loaded ? "loaded" : "empty"} state`, async () => {
+    const userData = await mkdtemp(join(tmpdir(), "esmer-interrupted-"));
+    const store = openStore(join(userData, "analytics.sqlite"));
+    if (loaded) store.importPackage(sourcePackage("a"));
+    const before = store.availability();
+    expect(store.stage(sourcePackage("b")).status).toBe("validated"); store.close();
+    const packagePath = join(userData, "synthetic.json"); await writeFile(packagePath, sourcePackage("b"));
+    const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+    try {
+      const page = await app.firstWindow();
+      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri içe aktarılmadı" })).toBeVisible();
+      await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
+      expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
+      await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+      await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+      await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
+      await expect(page.getByRole("alert")).toHaveCount(0);
+      expect(await page.evaluate(() => window.esmer.getAvailability())).not.toHaveProperty("lastImportError");
+    } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+  });
+}
