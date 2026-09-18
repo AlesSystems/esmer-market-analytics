@@ -49,7 +49,7 @@ function App() {
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
         </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p></>}
-        {!result && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
+        {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
         {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
       </section>
       <footer>Esmer Market · Çevrimdışı analiz</footer>
