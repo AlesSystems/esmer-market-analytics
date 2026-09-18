@@ -276,6 +276,10 @@ for (const loaded of [false, true]) {
       await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri içe aktarılmadı" })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
       expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
+      await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
+      await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+      await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
+      await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
       await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
       await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
