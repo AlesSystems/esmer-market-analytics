@@ -1,9 +1,10 @@
-import { app, BrowserWindow, ipcMain, protocol, session } from "electron";
+import { app, BrowserWindow, ipcMain, protocol, session, dialog } from "electron";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { APP_URL, handleRequest } from "./requests";
-import type { Availability } from "../domain/contracts";
+import type { Availability, ImportOutcome, ServiceRequest, ServiceResponse } from "../domain/contracts";
+import { readPackageFile } from "./package-file";
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -11,13 +12,32 @@ protocol.registerSchemesAsPrivileged([
     privileges: { standard: true, secure: true, supportFetchAPI: true },
   },
 ]);
-const unavailable: Availability = {
+const unavailable = {
   status: "unavailable",
   code: "SERVICE_UNAVAILABLE",
   message: "Yerel hizmet başlatılamadı. Uygulamayı yeniden açın.",
-};
+} satisfies Availability;
 let worker: Worker | undefined;
-let availability: Availability = unavailable;
+let requestId = 0;
+const pending = new Map<number, (result: ServiceResponse["result"]) => void>();
+function serviceUnavailable() {
+  for (const resolve of pending.values()) resolve(unavailable);
+  pending.clear(); worker = undefined;
+}
+function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
+function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
+function requestService(request: Omit<ServiceRequest, "id">): Promise<ServiceResponse["result"]> {
+  if (!worker) return Promise.resolve(request.operation === "getAvailability" ? unavailable : { status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message });
+  const id = ++requestId;
+  return new Promise(resolve => {
+    pending.set(id, result => resolve(result.status === "unavailable" && request.operation === "importPackage" ? { status: "failed", code: "SERVICE_UNAVAILABLE", message: result.message } : result));
+    try { worker!.postMessage({ ...request, id }); }
+    catch { serviceUnavailable(); }
+  });
+}
+
+if (!app.requestSingleInstanceLock()) app.quit();
+else
 
 app.whenReady().then(async () => {
   const localSession = session.fromPartition("esmer");
@@ -55,25 +75,10 @@ app.whenReady().then(async () => {
       },
     });
   });
-  worker = new Worker(join(__dirname, "../service/worker.cjs"));
-  worker.on("exit", () => {
-    availability = unavailable;
-  });
-  const ready = new Promise<Availability>((resolve) => {
-    const timeout = setTimeout(() => resolve(unavailable), 10_000);
-    worker!.once("message", (result: Availability) => {
-      clearTimeout(timeout);
-      availability = result;
-      resolve(result);
-    });
-    worker!.once("error", () => {
-      clearTimeout(timeout);
-      console.error("SERVICE_UNAVAILABLE");
-      availability = unavailable;
-      resolve(unavailable);
-    });
-  });
-  worker.postMessage(null);
+  worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite") } });
+  worker.on("message", ({ id, result }: ServiceResponse) => { const resolve = pending.get(id); pending.delete(id); resolve?.(result); });
+  worker.on("exit", serviceUnavailable);
+  worker.on("error", serviceUnavailable);
   const window = new BrowserWindow({
     width: 1120,
     height: 760,
@@ -105,9 +110,16 @@ app.whenReady().then(async () => {
           event.senderFrame?.url === APP_URL,
         operation,
         payload,
+        () => requestService({ operation: "getAvailability" }),
         async () => {
-          await ready;
-          return availability;
+          try {
+            const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Analiz veri paketi", extensions: ["json"] }] });
+            if (selected.canceled || selected.filePaths.length !== 1) return { status: "cancelled" };
+            const bytes = await readPackageFile(selected.filePaths[0]);
+            return await requestService({ operation: "importPackage", bytes });
+          } catch {
+            return { status: "failed", code: "INVALID_PACKAGE", message: "Veri paketi okunamadı veya boyutu sınırı aşıyor. Son geçerli veriler korundu." };
+          }
         },
       ),
   );

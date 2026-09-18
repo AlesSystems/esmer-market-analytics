@@ -34,3 +34,18 @@ test("valid request returns service availability, including failure", async () =
   );
   expect(service).toHaveBeenCalledOnce();
 });
+
+test.each([
+  [false, "importPackage", null, "UNTRUSTED_SENDER"],
+  [true, "importPackage", { path: "/private/file" }, "INVALID_PAYLOAD"],
+  [true, "importPackage", undefined, "INVALID_PAYLOAD"],
+] as const)("rejects import before opening native dialog (%s)", async (trusted, operation, payload, code) => {
+  const availability = vi.fn(); const selectAndImport = vi.fn();
+  expect(await handleRequest(trusted, operation, payload, availability, selectAndImport)).toMatchObject({ status: "rejected", code });
+  expect(availability).not.toHaveBeenCalled(); expect(selectAndImport).not.toHaveBeenCalled();
+});
+test("named no-argument import invokes only the privileged import callback", async () => {
+  const availability = vi.fn(); const selectAndImport = vi.fn().mockResolvedValue({ status: "cancelled" });
+  expect(await handleRequest(true, "importPackage", null, availability, selectAndImport)).toEqual({ status: "cancelled" });
+  expect(selectAndImport).toHaveBeenCalledOnce(); expect(availability).not.toHaveBeenCalled();
+});
