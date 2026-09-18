@@ -13,7 +13,7 @@ export type Snapshot = { pin: Pin; metadata: Manifest | null; warnings: string[]
 type Options = { schemaVersion?: number; fault?: (boundary: FaultBoundary) => void; maxPages?: number };
 const hash = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
 const decode = <T>(value: unknown): T => JSON.parse(String(value)) as T;
-function errorCode(error: unknown): ImportCode { return error && typeof error === "object" && "errcode" in error && error.errcode === 13 ? "STORAGE_FULL" : "IMPORT_FAILED"; }
+export function importErrorCode(error: unknown): ImportCode { return error && typeof error === "object" && "errcode" in error && error.errcode === 13 ? "STORAGE_FULL" : "IMPORT_FAILED"; }
 
 export function openStore(path: string, options: Options = {}) {
   const db = new DatabaseSync(path);
@@ -149,7 +149,7 @@ class AnalyticsStore {
         this.db.prepare("UPDATE import_batches SET state='validated' WHERE id=?").run(id);
       });
       return { status: "validated", id, datasetId };
-    } catch (error) { return this.failure(id, datasetId, errorCode(error)); }
+    } catch (error) { return this.failure(id, datasetId, importErrorCode(error)); }
   }
   activate(id: string): ImportResult {
     let datasetId: string | null = null;
@@ -182,7 +182,7 @@ class AnalyticsStore {
         this.options.fault?.("activation");
         return { status: "active", datasetId };
       });
-    } catch (error) { return this.failure(id, datasetId, errorCode(error)); }
+    } catch (error) { return this.failure(id, datasetId, importErrorCode(error)); }
   }
   importPackage(bytes: Uint8Array): ImportResult { const staged = this.stage(bytes); return staged.status === "validated" ? this.activate(staged.id) : staged; }
   cancel(id: string): ImportResult {
