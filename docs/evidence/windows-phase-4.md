@@ -127,7 +127,9 @@ With ordinary launch settings, Electron places `analytics.sqlite` under `app.get
 
 All six lifecycle launches loaded a previously imported package, then reloaded with the browser context set offline. The packaged migration test also checks this behavior. Live connection stayed disabled, the stored dataset remained readable, and no developer runtime was on the lifecycle application's `PATH`.
 
-The host's physical networking was not disconnected for these checks. Browser-emulated offline reload does not establish a cold launch with physical adapters disconnected or inspect all possible main-process networking. No Phase 4 human physical-disconnect observation was supplied. Earlier phases' human reports are not reused here. That manual check remains open.
+The host's physical networking was not disconnected for the automated checks. Browser-emulated offline reload does not establish a cold launch with physical adapters disconnected or inspect all possible main-process networking.
+
+On 2026-09-18, after the Windows handoff, the user reported, "I have verified physical tests and all pass." This is human-reported completion of the pending Phase 4 physical-disconnect cold-launch and same-profile restart procedure below. The expected result was a readable imported synthetic dataset with its historical cutoff, missing-cost and partial-coverage warnings, and disabled live connection. The user reported a pass without separate measurements or screenshots. This closes that manual check for the bounded Phase 4 handoff; it is separate from the agent's automated results. The report does not supply evidence of physical volume exhaustion, power loss, version-increasing or failed upgrades, or a clean Windows VM.
 
 `Get-AuthenticodeSignature` reported `NotSigned` for both final executables. No publisher, SmartScreen or UAC prompt was observed during these local silent installations or launches. Silent local execution does not prove that a downloaded copy will show no warnings. No paid signing service was introduced.
 
@@ -161,9 +163,15 @@ The Prove It Works principle changed verification to actual process termination 
 | A01 / A05 | Validated IPC, renderer restrictions, synthetic-only inputs and inspected Windows distribution | Real mapping, restricted SQL Server permissions, reconciliation and real-data privacy |
 | A02 / A03 | Exact transport precision and explicit missing/synthetic coverage | Financial formulas, source semantics, confidence and report/export behavior |
 | A06 | No claim | Encrypted backup and independent recovery remain Phase 9 |
-| A07 | Windows packaged tests, real picker, portable/NSIS restart, same-version code upgrade and uninstall preservation | Human physical-disconnect cold launch, versioned/failed upgrades, clean VM, full-volume performance and complete usability/export acceptance |
+| A07 | Windows packaged tests, real picker, portable/NSIS restart, same-version code upgrade, uninstall preservation and user-reported physical-disconnect cold launch/restart | Versioned/failed upgrades, clean VM, full-volume performance and complete usability/export acceptance |
 | L01 | Live access remains disabled | Owner acceptance, source permission and separate rollout direction |
 
-The bounded synthetic Phase 4 Windows checks passed. Full A04 and first-release acceptance remain open. No merge, issue closure or Phase 5 work follows from this record. Continue any remaining Phase 4 acceptance on the same branch and existing PR.
+The authorized synthetic Phase 4 exit gate is complete. Tasks 4.1 and 4.2 have passing automated Windows evidence, and the user reported the remaining physical-disconnect check passed. Full A04 and first-release acceptance remain open under the limitations above. No merge, issue closure or Phase 5 work follows from this record. The branch remains `codex/phase-4-durable-imports` and the existing PR remains #18.
 
-For the remaining human physical-disconnect check, close the app, disconnect Ethernet/Wi-Fi, and launch the hashed final portable executable with `--user-data-dir=<repository>/work/windows-phase-4/portable-profile`. Verify the loaded synthetic record, historical cutoff, missing-cost/partial-coverage warnings and disabled live connection. Close and reopen it with the same profile, then reconnect and record the actual result. Do not substitute an earlier phase's observation or use a personal profile.
+The supplied human physical-disconnect procedure was to close the app, disconnect Ethernet/Wi-Fi, and launch the hashed final portable executable with `--user-data-dir=<repository>/work/windows-phase-4/portable-profile`. It required checking the loaded synthetic record, historical cutoff, missing-cost/partial-coverage warnings and disabled live connection, then closing and reopening the same profile before reconnecting. The report above is attributed to that requested procedure; it does not independently remeasure the user's artifact, profile or environment.
+
+## PR completion follow-up
+
+The physical-test follow-up fetched `1c4178738da600750e7b7b3c5b69dfd796f3d7e2` and changed documentation only. The tested application code and artifact identities above remain unchanged. Documentation diff and local-link checks apply to this follow-up; the application suite was not rerun for prose changes.
+
+GitHub reported PR #18 as `CLEAN`, `MERGEABLE`, open and not a draft, with no review comments or unresolved review threads. No CI checks are reported for this branch. The PR watcher timed out with `checks-unavailable` because the check rollup was empty; it did not issue a `READY` verdict. Readiness rests on the documented Windows verification, independent review, user-reported physical test and GitHub mergeability, not a claimed green CI run. The PR remains unmerged and issue #7 remains open.
