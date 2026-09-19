@@ -8,7 +8,7 @@ Question: Can the owner follow a monthly sales figure through category/product, 
 
 THESIS: Make one sales investigation visible from summary to source. Preserve the agreed journey; compare information density rather than redesigning the product.
 
-OWN-WORLD: Low-fidelity wireframes inherit the existing shell's system sans and restrained green accent. White content, pale neutral workspace, charcoal text, thin borders, native controls, tabular figures. No artwork or new brand system. The owner reads financial tables on a desktop; a light document surface supports that task (ambient-light preference remains unverified).
+OWN-WORLD: Wireframes retain the shell's system sans and use the user-requested brighter blue/green/red palette. White elevated content, pale cool workspace, navy text, blue actions, green gains and red decreases/returns keep meaning explicit. Native controls and tabular figures remain. No artwork or new brand system. The owner reads financial tables on a desktop; a light document surface supports that task (ambient-light preference remains unverified).
 
 STORY: Read the summary, choose a category or search a product, inspect matching transactions, open a document and explain a line. Back navigation retains context.
 

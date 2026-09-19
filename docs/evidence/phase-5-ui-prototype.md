@@ -42,3 +42,14 @@ Screenshots are under `.impeccable/review/` in the prototype worktree. They are 
 ## Design outcome
 
 The complete synthetic journey is available to evaluate. No A/B/C preference or new production visual identity is approved. The user should judge navigation and information density before production implementation. Main retains the prior validated design decisions; prototype files live only on the throwaway branch.
+
+
+## Palette refinement — 2026-09-19
+
+The user requested a slightly shinier palette with more red and blue alongside green. The prototype now uses blue navigation/information, green positive comparisons, red decreases/returns and labelled category accents, with brighter white surfaces and soft elevation. No calculations or navigation logic changed.
+
+- Typecheck, lint and the existing browser journey/geometry check passed.
+- Computed text/background checks for 14 representative roles ranged from 4.95:1 to 11.74:1. Signed values and written return labels remain; color is supplementary.
+- Chart highlight and control borders were darkened slightly to meet 3:1 against white (final contrast checked separately).
+- The design detector reported color/type documentation advisories. Newly introduced color roles were documented; inherited typography was not redesigned.
+- Updated captures use the `palette-` prefix in `.impeccable/review/`; initial wireframe captures remain historical evidence. This is still browser-only prototype verification, not Windows acceptance.

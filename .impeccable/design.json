@@ -6,13 +6,18 @@
     "shadows": [
       {
         "name": "development-switcher",
-        "value": "0 6px 22px #1a342b33",
+        "value": "0 6px 22px #173e692b",
         "purpose": "Development-only fixed controls."
       },
       {
         "name": "detail-overlay",
-        "value": "-8px 12px 30px #253c3422",
+        "value": "-8px 12px 30px #224b7624",
         "purpose": "Temporary detail overlay at 1200px and below."
+      },
+      {
+        "name": "content-surface",
+        "value": "0 5px 18px #234b7010",
+        "purpose": "Subtle brightness and separation on white prototype content."
       }
     ],
     "breakpoints": [
@@ -41,7 +46,7 @@
       "refersTo": "button",
       "description": "Native action control in the throwaway wireframe.",
       "html": "<button class=\"ds-button\">Kapat</button>",
-      "css": ".ds-button{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;color:#243a32;background:#fff;border:1px solid #9caea2;padding:9px 12px;border-radius:5px;cursor:pointer}.ds-button:hover{background:#eaf1ec}.ds-button:active{background:#dbe7df}.ds-button:focus-visible{outline:3px solid #397553;outline-offset:3px}"
+      "css": ".ds-button{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;color:#172b43;background:#fff;border:1px solid #7f94af;padding:9px 12px;border-radius:5px;cursor:pointer}.ds-button:hover{background:#eaf3ff}.ds-button:active{background:#d8e9ff}.ds-button:focus-visible{outline:3px solid #1d5fcd;outline-offset:3px}"
     },
     {
       "name": "Product search",
@@ -49,22 +54,22 @@
       "refersTo": "input",
       "description": "Visible label above a native search field.",
       "html": "<label class=\"ds-search\">Ürün ara<input type=\"search\" placeholder=\"Ürün adı, ör. su\"></label>",
-      "css": ".ds-search{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;display:grid;gap:5px;color:#243a32}.ds-search input{font:inherit;color:#243a32;background:#fff;border:1px solid #9caea2;border-radius:5px;padding:8px 10px;min-height:38px;caret-color:#285847}.ds-search input::placeholder{color:#626e67}.ds-search input:focus-visible{outline:3px solid #397553;outline-offset:3px}"
+      "css": ".ds-search{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;display:grid;gap:5px;color:#172b43}.ds-search input{font:inherit;color:#172b43;background:#fff;border:1px solid #7f94af;border-radius:5px;padding:8px 10px;min-height:38px;caret-color:#1d5fcd}.ds-search input::placeholder{color:#596c85}.ds-search input:focus-visible{outline:3px solid #1d5fcd;outline-offset:3px}"
     },
     {
       "name": "Breadcrumb navigation",
       "kind": "nav",
       "description": "Underlined back navigation through the sales journey.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Gezinti\"><button>Satış özeti</button><span>/ Fırın</span></nav>",
-      "css": ".ds-nav{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;display:flex;gap:10px;align-items:center;color:#59665f}.ds-nav button{font:inherit;color:#243a32;border:0;padding:4px 0;background:transparent;text-decoration:underline;text-underline-offset:4px;cursor:pointer}.ds-nav button:hover{background:#eaf1ec}.ds-nav button:focus-visible{outline:3px solid #397553;outline-offset:3px}"
+      "css": ".ds-nav{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;display:flex;gap:10px;align-items:center;color:#51627a}.ds-nav button{font:inherit;color:#1d5fcd;border:0;padding:4px 0;background:transparent;text-decoration:underline;text-underline-offset:4px;cursor:pointer}.ds-nav button:hover{background:#eaf3ff}.ds-nav button:focus-visible{outline:3px solid #1d5fcd;outline-offset:3px}"
     },
     {
       "name": "Content block",
       "kind": "card",
       "refersTo": "container",
-      "description": "Flat bordered container for tables or trend.",
+      "description": "Lightly elevated white container for tables or trend.",
       "html": "<section class=\"ds-block\"><h2>Kategoriler</h2><p>Bir kategori seçerek ürünlere ilerleyin.</p></section>",
-      "css": ".ds-block{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;color:#243a32;background:#fff;border:1px solid #d5dcd6;border-radius:7px;padding:20px}.ds-block h2{font-size:1.1rem;font-weight:650;margin:0}.ds-block p{color:#59665f;font-size:.8rem;line-height:1.6;margin:6px 0 0}"
+      "css": ".ds-block{font-family:system-ui,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;color:#172b43;background:#fff;border:1px solid transparent;box-shadow:0 5px 18px #234b7010;border-radius:7px;padding:20px}.ds-block h2{font-size:1.1rem;font-weight:650;margin:0}.ds-block p{color:#51627a;font-size:.8rem;line-height:1.6;margin:6px 0 0}"
     },
     {
       "name": "Discrepancy notice",
@@ -75,6 +80,6 @@
     }
   ],
   "narrative": {
-    "overview": "Prototype scope only. This is an extracted record of the throwaway clickable wireframe in this worktree, not an approved production identity. No A/B/C variant has been chosen. It inherits the existing system-sans/green shell in Operate mode; its denser controls and tables do not replace the production shell's styles."
+    "overview": "Prototype scope only. A/B/C remain unselected. User-requested brighter palette combines blue navigation/information, green gains and red decreases/returns; white surfaces and subtle elevation keep the financial workspace readable."
   }
 }
