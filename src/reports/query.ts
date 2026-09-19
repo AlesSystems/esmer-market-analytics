@@ -1,0 +1,89 @@
+import { randomUUID } from "node:crypto";
+import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent } from "../analytics/sales";
+import { Exact, percentageChange, sum } from "../domain/money";
+import { SALES_MAPPING_VERSION } from "../source/package";
+import type { openStore, Snapshot } from "../store/store";
+import { emptySalesFilters, type Breakdown, type Comparison, type InspectSalesRequest, type OpenSalesRequest, type QuerySalesRequest, type ReportContext, type SalesDetailResult, type SalesFailure, type SalesFilters, type SalesReportResult } from "./contracts";
+
+const failure = (code: SalesFailure["code"], message: string): SalesFailure => ({ status: "unavailable", code, message });
+const endOfMonth = (period: string) => { const [year, month] = period.split("-").map(Number); return new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10); };
+function shifted(period: string, months: number): string { const [year, month] = period.split("-").map(Number); return new Date(Date.UTC(year, month - 1 + months, 1)).toISOString().slice(0, 7); }
+function matches(line: SalesComponent, filters: SalesFilters) {
+  return (!filters.categoryId || line.categoryId === filters.categoryId) && (!filters.productId || line.productId === filters.productId) && (filters.kind === "all" || line.kind === filters.kind) && (!filters.search || line.productName.toLocaleLowerCase("tr-TR").includes(filters.search.trim().toLocaleLowerCase("tr-TR")));
+}
+function range(snapshot: Snapshot, period: string) {
+  const from = `${period}-01`, end = endOfMonth(period);
+  const coverage = snapshot.metadata!.coverage;
+  const to = coverage.to < end ? coverage.to : end;
+  return { from, to: to < from ? end : to, covered: coverage.complete && coverage.from <= from && coverage.to >= (to < from ? end : to), partial: to < end || coverage.from > from || !coverage.complete };
+}
+export class SalesReports {
+  private session: { snapshot: Snapshot; context: ReportContext } | null = null;
+  constructor(private readonly store: ReturnType<typeof openStore>) {}
+  open(request: OpenSalesRequest): SalesReportResult {
+    this.session = null;
+    const snapshot = this.store.readSnapshot();
+    if (!snapshot.metadata || !snapshot.pin.datasetId) return failure("EMPTY_STORE", "Henüz veri içe aktarılmadı.");
+    if (snapshot.metadata.mappingVersion !== SALES_MAPPING_VERSION) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
+    if (snapshot.app.some(row => row.kind === "adjustment" && row.applicability !== "reversed")) return failure("UNSUPPORTED_ADJUSTMENTS", "Satış düzeltmelerinin etkisi henüz desteklenmiyor. Düzeltilmiş toplam gösterilemiyor.");
+    const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
+    this.session = { snapshot, context };
+    return this.query({ context, filters: { ...emptySalesFilters } });
+  }
+  private resolve(context: ReportContext) {
+    const current = this.session?.context;
+    return current && current.sessionId === context.sessionId && current.datasetId === context.datasetId && current.appRevision === context.appRevision && current.calculationVersion === context.calculationVersion && current.period === context.period ? this.session! : null;
+  }
+  query({ context, filters }: QuerySalesRequest): SalesReportResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const { snapshot } = session, metadata = snapshot.metadata!;
+    const period = range(snapshot, context.period);
+    const current = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to });
+    const lines = current.lines.filter(line => matches(line, filters));
+    const metrics = totals(lines);
+    const compare = (months: number): { comparison: Comparison; lines: SalesComponent[] } => {
+      const comparisonPeriod = shifted(context.period, months);
+      const from = `${comparisonPeriod}-01`;
+      const to = `${comparisonPeriod}-${period.to.slice(8)}` < endOfMonth(comparisonPeriod) ? `${comparisonPeriod}-${period.to.slice(8)}` : endOfMonth(comparisonPeriod);
+      const result = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from, to });
+      const available = period.covered && metadata.coverage.complete && metadata.coverage.from <= from && metadata.coverage.to >= to && current.complete && result.complete;
+      const filtered = result.lines.filter(line => matches(line, filters)), previous = totals(filtered);
+      return { lines: filtered, comparison: { from, to, available, netSales: available ? previous.netSales : null, netChange: available ? percentageChange(metrics.netSales, previous.netSales) : null, transactionChange: available ? percentageChange(String(metrics.saleDocumentCount), String(previous.saleDocumentCount)) : null, basketChange: available && metrics.averageBasket !== null && previous.averageBasket !== null ? percentageChange(new Exact(metrics.basketNumerator).div(metrics.saleDocumentCount).toFixed(), new Exact(previous.basketNumerator).div(previous.saleDocumentCount).toFixed()) : null, quantityChange: { piece: available ? percentageChange(metrics.quantities.piece, previous.quantities.piece) : null, kg: available ? percentageChange(metrics.quantities.kg, previous.quantities.kg) : null } } };
+    };
+    const month = compare(-1), year = compare(-12);
+    const breakdown = (kind: "category" | "product"): Breakdown[] => {
+      const grouped = new Map<string, SalesComponent[]>();
+      const previousGroups = new Map<string, string[]>();
+      for (const line of month.lines) { const id = kind === "category" ? line.categoryId : line.productId; const values = previousGroups.get(id) ?? []; values.push(line.net); previousGroups.set(id, values); }
+      for (const line of lines) { const id = kind === "category" ? line.categoryId : line.productId; const group = grouped.get(id) ?? []; group.push(line); grouped.set(id, group); }
+      return [...grouped].map(([id, group]) => {
+        const total = totals(group);
+        const previousNet = sum(previousGroups.get(id) ?? []);
+        return { id, name: kind === "category" ? group[0].categoryName : group[0].productName, ...(kind === "product" ? { categoryId: group[0].categoryId } : {}), netSales: total.netSales, quantities: total.quantities, share: new Exact(metrics.netSales).gt(0) ? new Exact(total.netSales).div(metrics.netSales).times(100).toDecimalPlaces(2).toFixed() : null, previousMonthChange: month.comparison.available ? percentageChange(total.netSales, previousNet) : null };
+      }).sort((a, b) => new Exact(b.netSales).cmp(a.netSales) || a.id.localeCompare(b.id, "en"));
+    };
+    const dailyGroups = new Map<string, string[]>();
+    for (const line of lines) { const values = dailyGroups.get(line.date) ?? []; values.push(line.net); dailyGroups.set(line.date, values); }
+    const dailyTotals = [...dailyGroups].sort(([a], [b]) => a.localeCompare(b)).map(([date, values]) => ({ date, netSales: sum(values) }));
+    const maximum = dailyTotals.reduce((max, row) => Exact.max(max, new Exact(row.netSales).abs()), new Exact(0));
+    const ids = new Set(lines.map(line => line.documentId));
+    const transactionScopes = new Map<string, string[]>();
+    for (const line of lines) { const values = transactionScopes.get(line.documentId) ?? []; values.push(line.net); transactionScopes.set(line.documentId, values); }
+    const active = this.store.availability();
+    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.covered ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
+  }
+  inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const { snapshot } = session, metadata = snapshot.metadata!;
+    const period = range(snapshot, context.period);
+    const doc = snapshot.records.documents.find(row => row.id === documentId && row.date >= period.from && row.date <= period.to);
+    if (!doc) return failure("NOT_FOUND", "Belge bu raporda bulunamadı.");
+    const result = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to });
+    const total = result.documents.find(row => row.documentId === documentId);
+    const lines = result.lines.filter(line => line.documentId === documentId).map(line => ({ ...line, matchesScope: matches(line, filters) }));
+    const exclusion = result.exclusions.find(row => row.documentId === documentId)?.reason ?? null;
+    return { status: "detail", detail: { context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, importedAt: snapshot.importedAt, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, documentId, date: doc.date, kind: doc.kind, state: doc.sales?.state ?? "unknown", scopeNet: sum(lines.filter(line => line.matchesScope).map(line => line.net)), totals: { net: total?.net ?? "0", tax: total?.tax ?? "0", gross: total?.gross ?? "0" }, recorded: doc.sales ? { net: doc.sales.net, tax: doc.sales.tax, gross: doc.sales.gross } : null, reconciled: total?.reconciled ?? false, exclusion, lines, excludedLines: exclusion ? snapshot.records.lines.filter(line => line.documentId === documentId).map(line => ({ lineId: line.id, quantity: line.quantity, net: line.net, productName: line.sales?.productName ?? "Bilinmeyen ürün", reason: exclusion })) : [] } };
+  }
+}

@@ -9,7 +9,7 @@ export type ImportCode = ImportErrorCode;
 export type ImportResult = { status: "active" | "unchanged" | "historical"; datasetId: string } | { status: "failed"; code: ImportCode } | { status: "cancelled" };
 export type StageResult = { status: "validated"; id: string; datasetId: string } | ImportResult;
 export type FaultBoundary = "reading" | "persistence" | "validation" | "summary" | "activation";
-export type Snapshot = { pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[] };
+export type Snapshot = { importedAt: string | null; pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[] };
 type Options = { schemaVersion?: number; fault?: (boundary: FaultBoundary) => void; maxPages?: number };
 const hash = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
 const decode = <T>(value: unknown): T => JSON.parse(String(value)) as T;
@@ -95,7 +95,7 @@ class AnalyticsStore {
       if (record.kind === "adjustment") record.applicability = record.value.reversed ? "reversed" : pin.datasetId !== null && this.fingerprint(record.value.target, pin.datasetId) === row.fingerprint ? "applicable" : "review-required";
       return record;
     });
-    return { pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app };
+    return { importedAt: pin.datasetId ? (this.db.prepare("SELECT created_at FROM import_batches WHERE dataset_id=? AND state='active' ORDER BY rowid LIMIT 1").get(pin.datasetId)?.created_at as string | undefined ?? null) : null, pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app };
   }
   readSnapshot(): Snapshot { return this.transaction(() => this.snapshot(this.currentPin()), true); }
   readPinned(pin: Pin): Snapshot { return this.transaction(() => this.snapshot(pin), true); }
