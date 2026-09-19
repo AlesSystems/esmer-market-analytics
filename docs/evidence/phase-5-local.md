@@ -5,6 +5,7 @@
 This record covers issue #8 tasks 5.1 and 5.2 with the selected Option A design. The user requested a stop before Windows validation, followed by a PR and continuation prompt. A02/A03 sales and A07 UI evidence is limited to synthetic fixtures and the local macOS packaged application. No real-source or Windows acceptance follows from it.
 
 - Branch: `codex/phase-5-sales-analytics`.
+- Pull request: [#19](https://github.com/AlesSystems/esmer-market-analytics/pull/19), open for Windows continuation.
 - Starting revision: `4452fd9`, merged Phase 4.
 - Host: macOS arm64. macOS 26.4.1 build 25E253, Node 24.15.0 and npm 11.12.1.
 - Data: generated synthetic packages only. No source connection, private backup, credentials or customer/employee records.

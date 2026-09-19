@@ -60,7 +60,7 @@ The authorized synthetic Phase 4 exit gate is **complete**. On 2026-09-18, the u
 
 ## Phase 5 status
 
-Phase 4 is merged in `4452fd9` and issue #7 is closed. The user authorized [issue #8](https://github.com/AlesSystems/esmer-market-analytics/issues/8) with the selected Option A and requested a stop before Windows validation. Work continues on `codex/phase-5-sales-analytics`.
+Phase 4 is merged in `4452fd9` and issue #7 is closed. The user authorized [issue #8](https://github.com/AlesSystems/esmer-market-analytics/issues/8) with the selected Option A and requested a stop before Windows validation. Work continues on `codex/phase-5-sales-analytics` in [PR #19](https://github.com/AlesSystems/esmer-market-analytics/pull/19).
 
 Phase 5 implements synthetic-supported decimal sales, immutable browsing sessions and the monthly overview → category/product → transaction → source-evidence journey. See the [design decision](../decisions/phase-5-sales.md), [local evidence](phase-5-local.md), [decision trail](phase-5-decisions.tsv) and [Windows continuation prompt](../operations/windows-phase-5-handoff.md). Legacy sparse packages remain importable and show unavailable analytics.
 

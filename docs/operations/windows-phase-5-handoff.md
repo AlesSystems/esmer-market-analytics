@@ -6,8 +6,8 @@ Copy the prompt below into a Windows agent session. The local evidence record id
 Continue Phase 5, issue #8, in AlesSystems/esmer-market-analytics.
 https://github.com/AlesSystems/esmer-market-analytics/issues/8
 
-The user authorized Phase 5 with Option A and requested a handoff before Windows validation. Continue on the SAME branch, codex/phase-5-sales-analytics. Find and update its existing PR:
-  gh pr list --head codex/phase-5-sales-analytics --state open
+The user authorized Phase 5 with Option A and requested a handoff before Windows validation. Continue on the SAME branch, codex/phase-5-sales-analytics. Update existing PR #19: https://github.com/AlesSystems/esmer-market-analytics/pull/19
+  gh pr view 19 --comments
 Do not create a replacement PR, merge, close issue #8, start Phase 6 or deploy to Eralp.
 
 Read AGENTS.md. Inspect branch, worktrees and existing changes. Fetch origin and safely check out the branch. Record the fetched SHA and preserve unrelated work. Read issue #8 with comments, labels and dependencies #5 and #7. Read the foundation specification, audit, acceptance checklist, and the global/shared/evidence and Phase 5 sections of docs/superpowers/plans/esmer-market-implementation-plan.md.
