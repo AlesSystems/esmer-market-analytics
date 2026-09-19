@@ -53,8 +53,10 @@ function validate(value: unknown, verifyHashes = true): asserts value is { manif
   keys(m, ["schemaVersion", "mappingVersion", "provenance", "currency", "sourceReconciled", "lineage", "extractionId", "extractedAt", "cutoff", "coverage", "streams"]);
   requireThat(m.schemaVersion === "analytics-package-v1" && (m.mappingVersion === MAPPING_VERSION || m.mappingVersion === SALES_MAPPING_VERSION) && m.provenance === "synthetic" && m.currency === "TRY" && m.sourceReconciled === false);
   id(m.lineage); id(m.extractionId); date(m.cutoff);
+  if (m.mappingVersion === SALES_MAPPING_VERSION) requireThat(String(m.cutoff) >= "1900-01-01" && String(m.cutoff) <= "9998-12-31");
   requireThat(typeof m.extractedAt === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(m.extractedAt) && new Date(m.extractedAt).toISOString() === m.extractedAt);
   keys(m.coverage, ["from", "to", "complete"]); date(m.coverage.from); date(m.coverage.to);
+  if (m.mappingVersion === SALES_MAPPING_VERSION) requireThat(String(m.coverage.from) >= "1900-01-01");
   requireThat(typeof m.coverage.complete === "boolean" && String(m.coverage.from) <= String(m.coverage.to) && String(m.coverage.to) <= String(m.cutoff));
   keys(p, [...streams]); keys(m.streams, [...streams]);
   const ids = { documents: new Set<string>(), lines: new Set<string>(), suppliers: new Set<string>() };
