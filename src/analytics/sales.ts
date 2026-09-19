@@ -20,12 +20,24 @@ export function calculateSales(records: Records, context: SalesContext): SalesRe
   for (const line of records.lines) { const group = grouped.get(line.documentId) ?? []; group.push(line); grouped.set(line.documentId, group); }
   const owners = new Map<string, number>();
   for (const doc of records.documents) if (doc.sales?.convertedTo) owners.set(doc.sales.convertedTo, (owners.get(doc.sales.convertedTo) ?? 0) + 1);
+  const byId = new Map(records.documents.map(doc => [doc.id, doc]));
+  const conflicts = new Set<string>();
+  const signature = (documentId: string) => (grouped.get(documentId) ?? []).map(line => {
+    const s = line.sales;
+    return JSON.stringify(s ? [s.productId, s.categoryId, s.unit, s.meaning, ...[line.quantity, line.net, s.unitNet, s.discountRate, s.taxRate, s.tax, s.gross].map(value => new Exact(value).toFixed())] : ["unknown"]);
+  }).sort().join(";");
+  for (const doc of records.documents) if (doc.sales?.convertedTo) {
+    const target = byId.get(doc.sales.convertedTo);
+    if (!target?.sales || (owners.get(target.id) ?? 0) > 1 || target.kind !== doc.kind || signature(doc.id) !== signature(target.id) || !["net", "tax", "gross"].every(key => new Exact(doc.sales![key as "net" | "tax" | "gross"]).eq(target.sales![key as "net" | "tax" | "gross"]))) {
+      conflicts.add(doc.id); conflicts.add(doc.sales.convertedTo);
+    }
+  }
   for (const doc of [...records.documents].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)) {
     if (doc.date < context.from || doc.date > context.to) continue;
     const input = grouped.get(doc.id) ?? [];
     let reason: SalesExclusion["reason"] | null = null;
     if (doc.kind !== "sale" && doc.kind !== "customer-return") reason = "NOT_SALES";
-    else if ((owners.get(doc.id) ?? 0) > 1 || (doc.sales?.convertedTo && (owners.get(doc.sales.convertedTo) ?? 0) > 1)) reason = "CONVERSION_CONFLICT";
+    else if (conflicts.has(doc.id)) reason = "CONVERSION_CONFLICT";
     else if (doc.sales?.state === "void") reason = "VOID";
     else if (doc.sales?.state === "converted") reason = "CONVERTED";
     else if (!doc.sales || doc.sales.state !== "completed" || input.some(line => !line.sales || line.sales.meaning !== "known" || line.sales.unit === "unknown")) reason = "UNKNOWN_MEANING";
