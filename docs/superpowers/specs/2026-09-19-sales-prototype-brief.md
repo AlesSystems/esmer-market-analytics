@@ -1,6 +1,6 @@
 # Sales journey wireframe prototype
 
-Mode: Operate. Throwaway exploration, based on the confirmed [sales UI brief](2026-09-18-phase-5-sales-ui-design.md). No production integration or selected visual identity is implied.
+Mode: Operate. Throwaway exploration, based on the confirmed [sales UI brief](2026-09-18-phase-5-sales-ui-design.md). The user selected Option A on 2026-09-19, with the current brighter palette carried forward. No production integration is implied.
 
 Question: Can the owner follow a monthly sales figure through category/product, transactions, document details and source evidence without losing period, filters or meaning?
 
@@ -26,4 +26,4 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - Variant A/B/C in the URL; arrow switcher and keyboard shortcut. Period, search, returns filtering, details, source evidence and back navigation work.
 - Controls for representative empty, loading, failure, discrepancy and refresh states are prototype controls, not promised production UI.
 - Inspect the full journey and narrow/wide layouts; record screenshots and one runnable smoke check. No production acceptance claims, benchmark or Windows verification.
-- Capture the prototype on codex/phase-5-ui-prototype. User preference among variants remains pending.
+- Capture the prototype on codex/phase-5-ui-prototype. Option A is selected; B/C remain historical alternatives. See the selected-design section of the confirmed sales UI brief.

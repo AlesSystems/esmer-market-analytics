@@ -2,7 +2,7 @@
 
 Question: Can the owner follow monthly sales through categories/products, transactions, receipt lines and source evidence without losing context?
 
-This is a development-only exploration on `codex/phase-5-ui-prototype`. It is not the Phase 5 implementation, a real report, or a chosen visual identity. No production entry imports it. All values are synthetic, precomputed examples; no source, database, storage or external service is accessed. Refreshing the browser resets the journey; the variant remains in the URL.
+This is a development-only exploration on `codex/phase-5-ui-prototype`. Option A is the selected design baseline. This is not the Phase 5 implementation or a real report. No production entry imports it. All values are synthetic, precomputed examples; no source, database, storage or external service is accessed. Refreshing the browser resets the journey; the variant remains in the URL.
 
 ## Run
 
@@ -14,7 +14,7 @@ npm run prototype:sales
 
 Open [the wireframe](http://127.0.0.1:4175/?variant=A). The preview binds only to 127.0.0.1. Stop its terminal with Ctrl+C. Restart after editing (no watch server).
 
-- A — Dengeli özet: metric strip with trend/category split.
+- A — Dengeli özet (selected): metric strip with trend/category split.
 - B — Yoğun tablo: compact metric rows, broad category ledger and smaller trend.
 - C — Rehberli okuma: summary rail next to the trend/category reading area.
 
@@ -58,4 +58,4 @@ The same exported check was executed against all three variants through the Code
 
 ## Outcome
 
-The journey is runnable for review. A preferred variant has not been selected; no prototype code should be promoted directly into production. Keep the decision and rewrite the implementation against real report contracts after the design choice.
+The user selected Option A on 2026-09-19. Carry forward its horizontal metric strip, trend/category split, shared detail/evidence panel and current brighter blue/green/red palette. B/C remain historical alternatives. No prototype code should be promoted directly into production; implement the selected design against real report contracts. See the [recorded design decision](../../docs/superpowers/specs/2026-09-18-phase-5-sales-ui-design.md#selected-design--2026-09-19).

@@ -1,6 +1,6 @@
 ---
 name: Esmer Market sales journey prototype
-description: Temporary visual record of the unselected A/B/C wireframes
+description: Design reference for selected Option A and historical B/C wireframes
 colors:
   accent: "#1d5fcd"
   positive: "#137b52"
@@ -71,9 +71,9 @@ components:
 
 ## Overview
 
-**Prototype scope only.** This is an extracted record of the throwaway clickable wireframe in this worktree, not an approved production identity. No A/B/C variant has been chosen. It preserves the system-sans shell in Operate mode and applies the user-requested brighter blue, green and red palette; its denser controls and tables do not replace the production shell's styles.
+**Prototype scope only.** This is an extracted record of the throwaway clickable wireframe in this worktree, with Option A selected by the user on 2026-09-19 as the Phase 5 layout baseline. Production implementation and Windows acceptance remain outstanding. It preserves the system-sans shell in Operate mode and applies the user-requested brighter blue, green and red palette; its denser controls and tables do not replace the production shell's styles.
 
-The [direction contract](docs/superpowers/specs/2026-09-19-sales-prototype-brief.md) and [confirmed journey](docs/superpowers/specs/2026-09-18-phase-5-sales-ui-design.md) govern this experiment. The implementation references are [prototype CSS](src/ui/sales-prototype.css), [prototype UI](src/ui/sales-prototype.tsx) and [existing shell](src/ui/style.css). The frontmatter records current prototype values only. The user requested a slightly shinier palette with more red and blue alongside green. This color direction applies to the prototype; a final production identity and layout remain unselected.
+The [direction contract](docs/superpowers/specs/2026-09-19-sales-prototype-brief.md) and [confirmed journey](docs/superpowers/specs/2026-09-18-phase-5-sales-ui-design.md) govern this experiment. The implementation references are [prototype CSS](src/ui/sales-prototype.css), [prototype UI](src/ui/sales-prototype.tsx) and [existing shell](src/ui/style.css). The frontmatter records current prototype values only. The user requested a slightly shinier palette with more red and blue alongside green. Carry this palette forward with the selected Option A composition; exact production styling remains subject to implementation refinement.
 
 ## Colors
 
@@ -87,9 +87,9 @@ One installed system-sans stack serves headings, controls and tables. The headli
 
 The workspace is centered at a maximum width of 1600px, with 36px horizontal padding on wide windows. Period, breadcrumbs and source cutoff remain above the investigation. Tables may scroll horizontally.
 
-- **A:** horizontal three-metric strip, then trend and category table in a 1:1.2 split.
-- **B:** compact metric rows, then category table and trend in a 1.65:1 split.
-- **C:** 270px summary rail beside vertically ordered trend and categories.
+- **A (selected):** horizontal three-metric strip, then trend and category table in a 1:1.2 split.
+- **B (historical alternative):** compact metric rows, then category table and trend in a 1.65:1 split.
+- **C (historical alternative):** 270px summary rail beside vertically ordered trend and categories.
 
 The receipt/source panel is 420px wide beside the content on wide windows. At 1200px and below it becomes a fixed overlay. At 850px, A/B content stacks and C's rail narrows; at 600px, all compositions become one column. These are prototype observations, not accepted Windows display requirements.
 
@@ -114,5 +114,5 @@ Controls and notices use modest corners; content blocks and the detail panel use
 
 - **Do** preserve the Turkish labels, keyboard focus, units and visible synthetic-data warning when modifying this prototype.
 - **Do** compare compositions using the same fixture and journey state.
-- **Don't** treat these extracted values or an unselected variant as a durable production decision.
+- **Do** use Option A as the implementation design baseline; keep B/C as historical alternatives and refine exact tokens as needed.
 - **Don't** infer verified financial behavior, production acceptance or Windows validation from a clickable wireframe.

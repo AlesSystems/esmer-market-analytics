@@ -1,6 +1,6 @@
 # Phase 5 sales UI design
 
-Status: High-level design interview completed on 2026-09-19. The user confirmed the workspace and each of the five view designs below. Visual styling and implementation remain future work; this document does not authorize implementation.
+Status: High-level design interview completed on 2026-09-19. The user confirmed the workspace and each of the five view designs below. On 2026-09-19, the user selected Option A from the clickable prototype. The selected layout and current palette are recorded below; this document does not authorize production implementation.
 
 Scope: A brief design for each Phase 5 sales view, supporting [issue #8](https://github.com/AlesSystems/esmer-market-analytics/issues/8) and [Phase 5 of the implementation plan](../plans/esmer-market-implementation-plan.md#phase-5--sales-analytics-and-traceability). [Product context](../../../PRODUCT.md) summarizes the governing foundation requirements.
 
@@ -68,8 +68,18 @@ These requirements carry forward the foundation specification and acceptance che
 
 Use Turkish text and formatting, TRY amounts, explicit unit labels and keyboard-accessible controls. Evidence status must not rely on color alone. Financial definitions remain governed by the foundation requirements; the interface consumes report results rather than calculating its own totals.
 
-## Boundary and next design step
+## Selected design — 2026-09-19
 
-The interview defines information hierarchy and navigation at the requested shallow depth. It does not settle typography, palette, spacing, exact table widths, chart styling or narrow-window behavior. Verify the layout against the intended Windows display and scaling when producing wireframes or a prototype.
+The user chose **Option A — Dengeli özet**, saying “Option A is best.” Use this composition as the Phase 5 implementation design baseline:
 
-The next design artifact should demonstrate one complete journey from the overview to source evidence, using clearly labelled synthetic data and representative warning states. Purchasing, cost/profit estimates, expenses, report-revision review and Excel export remain in their planned later phases.
+- A horizontal strip of three summary metrics above a daily-sales trend and category table, arranged side by side on wide windows.
+- The confirmed overview → category/product → transactions → receipt → source-evidence journey, with receipt and evidence sharing the detail panel and preserving report context.
+- The current brighter palette: blue actions/navigation and trend, green net-sales emphasis and gains, restrained red for decreases/returns and brand/category accents. White surfaces, a pale cool canvas and subtle shadows provide the requested shine. Signed values and labels carry meaning independently of color; discrepancies remain amber.
+
+Reference: prototype commit `227ea94` on `codex/phase-5-ui-prototype`, [Option A capture](../../../.impeccable/review/palette-desktop-a.png), and [design tokens and component notes](../../../DESIGN.md). Options B and C remain historical alternatives, not implementation targets.
+
+## Implementation boundary
+
+The selected design settles the overall composition and carries forward the requested palette. Exact typography, spacing, table widths and responsive behavior can be refined during implementation; verify the intended Windows display and scaling. The prototype remains a synthetic, throwaway reference: implement against real report contracts rather than promoting its fixture logic or development controls.
+
+Production implementation and Windows acceptance remain outstanding. Purchasing, cost/profit estimates, expenses, report-revision review and Excel export remain in their planned later phases.

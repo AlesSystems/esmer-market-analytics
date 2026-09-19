@@ -24,7 +24,7 @@ Screenshots are under `.impeccable/review/` in the prototype worktree. They are 
 
 ## Limitations
 
-- Layout preference and owner display/scaling remain open.
+- Option A is selected; owner display/scaling verification remains open.
 - Four documents and fixed comparison summaries do not demonstrate real-data coverage, performance or financial correctness of a production engine.
 - Browser verification is not Windows packaging, keyboard acceptance or assistive-technology certification.
 - Prototype scenario controls simulate data states and perform no imports or persistence.
@@ -41,7 +41,7 @@ Screenshots are under `.impeccable/review/` in the prototype worktree. They are 
 
 ## Design outcome
 
-The complete synthetic journey is available to evaluate. No A/B/C preference or new production visual identity is approved. The user should judge navigation and information density before production implementation. Main retains the prior validated design decisions; prototype files live only on the throwaway branch.
+On 2026-09-19, the user selected Option A after the palette refinement, stating “Option A is best.” The design baseline is the horizontal summary strip and trend/category split, with the existing detail/evidence journey and brighter blue/green/red palette. Reference prototype commit: `227ea94`; capture: [Option A](../../.impeccable/review/palette-desktop-a.png). B/C remain historical alternatives. This preference does not constitute production or Windows acceptance. Prototype files and the updated design decision live on the throwaway branch.
 
 
 ## Palette refinement — 2026-09-19
