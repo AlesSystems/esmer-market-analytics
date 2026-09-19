@@ -49,3 +49,25 @@ test("named no-argument import invokes only the privileged import callback", asy
   expect(await handleRequest(true, "importPackage", null, availability, selectAndImport)).toEqual({ status: "cancelled" });
   expect(selectAndImport).toHaveBeenCalledOnce(); expect(availability).not.toHaveBeenCalled();
 });
+
+test("sales operations validate exact contexts and filters before touching report service", async () => {
+  const { openStore } = await import("../../src/store/store");
+  const { SalesReports } = await import("../../src/reports/query");
+  const { salesPackage } = await import("../helpers/sales-fixtures");
+  const { emptySalesFilters } = await import("../../src/reports/contracts");
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage());
+    const reports = new SalesReports(store);
+    const service = { open: async (request: Parameters<typeof reports.open>[0]) => reports.open(request), query: async (request: Parameters<typeof reports.query>[0]) => reports.query(request), inspect: async (request: Parameters<typeof reports.inspect>[0]) => reports.inspect(request) };
+    const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, async () => store.availability(), undefined, service);
+    const result = await invoke(true, "openSales", { period: "2025-09" });
+    expect(result).toMatchObject({ status: "report", view: { metrics: { netSales: "180" } } });
+    if (result.status !== "report") throw new Error("NO_REPORT");
+    const valid = { context: result.view.context, filters: emptySalesFilters };
+    expect(await invoke(false, "querySales", valid)).toMatchObject({ code: "UNTRUSTED_SENDER" });
+    for (const payload of [null, {}, { ...valid, sql: "SELECT *" }, { ...valid, filters: { ...emptySalesFilters, search: "a".repeat(161) } }, { ...valid, context: { ...valid.context, period: "2025-99" } }, { ...valid, context: { ...valid.context, appRevision: -1 } }]) expect(await invoke(true, "querySales", payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
+    expect(await invoke(true, "querySales", valid)).toMatchObject({ status: "report" });
+    expect(await invoke(true, "querySales", { ...valid, context: { ...valid.context, sessionId: "wrong" } })).toMatchObject({ code: "STALE_CONTEXT" });
+  } finally { store.close(); }
+});
