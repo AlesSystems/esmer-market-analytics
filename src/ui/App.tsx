@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { SalesWorkspace } from "./SalesWorkspace";
+import type { SalesView } from "../reports/contracts";
 import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
 
 const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." } satisfies Availability;
@@ -22,9 +24,21 @@ function previousImportMessage(availability: Extract<Availability, { status: "re
 }
 function App() {
   const [availability, setAvailability] = useState<Availability | RequestError>();
+  const [sales, setSales] = useState<SalesView>();
+  const [salesError, setSalesError] = useState("");
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<ImportOutcome | RequestError>();
   useEffect(() => { window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); }, []);
+  useEffect(() => {
+    if (availability?.status !== "ready" || availability.store !== "loaded" || sales) return;
+    let current = true;
+    window.esmer.openSales({ period: null }).then(value => {
+      if (!current) return;
+      if (value.status === "report") { setSales(value.view); setSalesError(""); }
+      else setSalesError(value.message);
+    }).catch(() => { if (current) setSalesError(unavailable.message); });
+    return () => { current = false; };
+  }, [availability, sales]);
   async function importPackage() {
     setImporting(true); setResult(undefined);
     try {
@@ -33,8 +47,13 @@ function App() {
     } catch { setResult({ status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message }); }
     finally { setImporting(false); }
   }
+  const messages = <>
+    {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
+    {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
+  </>;
+  if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
   return (
-    <main>
+    <main className="legacy">
       <header><span className="brand">ESMER MARKET</span><span>Yerel analiz</span></header>
       <section aria-live="polite" aria-busy={importing}>
         <p className="eyebrow">MARKETİNİZİN GENEL GÖRÜNÜMÜ</p>
@@ -49,8 +68,8 @@ function App() {
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
         </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p></>}
-        {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
-        {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
+        {salesError && <p role="status">Satış raporu kullanılamıyor. {salesError}</p>}
+        {messages}
       </section>
       <footer>Esmer Market · Çevrimdışı analiz</footer>
     </main>

@@ -7,6 +7,7 @@ import type { Availability, ImportOutcome, ServiceRequest, ServiceResponse } fro
 import type { OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { readPackageFile } from "./package-file";
 
+app.commandLine.appendSwitch("lang", "tr");
 protocol.registerSchemesAsPrivileged([
   {
     scheme: "esmer",
