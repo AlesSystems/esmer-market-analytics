@@ -108,3 +108,18 @@ test("excluded lines retain original source fields for pinned evidence without c
     expect(reports.inspect({ context: opened.view.context, filters: emptySalesFilters, documentId: "R001" })).toMatchObject({ status: "detail", detail: { context: opened.view.context, extractionId: "sales-1", lineage: "sales-fixture", mappingVersion: "synthetic-sales-v1", exclusion: "UNKNOWN_MEANING", lines: [], excludedLines: [{ lineId: "L007", quantity: "1", net: "-35", reason: "UNKNOWN_MEANING", input: { productId: "soda", categoryId: "drinks", unit: "unknown", tax: "-1.75", gross: "-36.75", unitNet: "35", discountRate: "0", taxRate: "5" } }] } });
   } finally { store.close(); }
 });
+
+test.each(["sale", "customer-return"] as const)("%s evidence retains recorded fractional quantity after import and pruning", kind => {
+  const records = journeyRecords();
+  records.documents = [{ id: "D", kind, date: "2025-09-01", supplierId: null, sales: { state: "completed", convertedTo: null, net: kind === "sale" ? "24.6000" : "-24.6000", tax: "0.0000", gross: kind === "sale" ? "24.6000" : "-24.6000" } }];
+  records.lines = [{ ...records.lines[0], id: "L", documentId: "D", quantity: "1.2300", net: records.documents[0].sales!.net, sales: { ...records.lines[0].sales!, unit: "kg", unitNet: "20.00", discountRate: "0", taxRate: "0", tax: "0.0000", gross: records.documents[0].sales!.gross } }];
+  const store = openStore(":memory:");
+  try {
+    expect(store.importPackage(salesPackage(records)).status).toBe("active");
+    const reports = new SalesReports(store), opened = reports.open({ period: "2025-09" });
+    if (opened.status !== "report") throw new Error(opened.code);
+    for (const extractionId of ["second", "third"]) expect(store.importPackage(salesPackage(journeyRecords(), { extractionId })).status).toBe("active");
+    expect(store.prune()).toBe(1);
+    expect(reports.inspect({ context: opened.view.context, filters: emptySalesFilters, documentId: "D" })).toMatchObject({ status: "detail", detail: { extractionId: "sales-1", reconciled: true, lines: [{ quantity: kind === "sale" ? "1.23" : "-1.23", net: kind === "sale" ? "24.6" : "-24.6", recorded: { quantity: "1.2300", tax: "0.0000" }, input: { unit: "kg", unitNet: "20.00" } }] } });
+  } finally { store.close(); }
+});
