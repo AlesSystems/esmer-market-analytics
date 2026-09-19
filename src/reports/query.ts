@@ -12,10 +12,12 @@ function matches(line: SalesComponent, filters: SalesFilters) {
   return (!filters.categoryId || line.categoryId === filters.categoryId) && (!filters.productId || line.productId === filters.productId) && (filters.kind === "all" || line.kind === filters.kind) && (!filters.search || line.productName.toLocaleLowerCase("tr-TR").includes(filters.search.trim().toLocaleLowerCase("tr-TR")));
 }
 function range(snapshot: Snapshot, period: string) {
-  const from = `${period}-01`, end = endOfMonth(period);
+  const start = `${period}-01`, end = endOfMonth(period);
   const coverage = snapshot.metadata!.coverage;
-  const to = coverage.to < end ? coverage.to : end;
-  return { from, to: to < from ? end : to, covered: coverage.complete && coverage.from <= from && coverage.to >= (to < from ? end : to), partial: to < end || coverage.from > from || !coverage.complete };
+  const overlap = coverage.from <= end && coverage.to >= start;
+  const from = overlap && coverage.from > start ? coverage.from : start;
+  const to = overlap && coverage.to < end ? coverage.to : end;
+  return { from, to, overlap, covered: overlap && coverage.complete, partial: from !== start || to !== end || !coverage.complete };
 }
 export class SalesReports {
   private session: { snapshot: Snapshot; context: ReportContext } | null = null;
@@ -42,25 +44,33 @@ export class SalesReports {
     const current = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to });
     const lines = current.lines.filter(line => matches(line, filters));
     const metrics = totals(lines);
-    const compare = (months: number): { comparison: Comparison; lines: SalesComponent[] } => {
+    const compare = (months: number): { comparison: Comparison; lines: SalesComponent[]; currentLines: SalesComponent[] } => {
       const comparisonPeriod = shifted(context.period, months);
-      const from = `${comparisonPeriod}-01`;
-      const to = `${comparisonPeriod}-${period.to.slice(8)}` < endOfMonth(comparisonPeriod) ? `${comparisonPeriod}-${period.to.slice(8)}` : endOfMonth(comparisonPeriod);
+      const candidateFrom = `${comparisonPeriod}-${period.from.slice(8)}`;
+      const hasMatchingDays = candidateFrom <= endOfMonth(comparisonPeriod);
+      const from = hasMatchingDays ? candidateFrom : endOfMonth(comparisonPeriod);
+      const to = period.partial && `${comparisonPeriod}-${period.to.slice(8)}` < endOfMonth(comparisonPeriod) ? `${comparisonPeriod}-${period.to.slice(8)}` : endOfMonth(comparisonPeriod);
+      const currentFrom = period.from;
+      const currentTo = hasMatchingDays && period.partial && to.slice(8) < period.to.slice(8) ? `${context.period}-${to.slice(8)}` : period.to;
       const result = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from, to });
-      const available = period.covered && metadata.coverage.complete && metadata.coverage.from <= from && metadata.coverage.to >= to && current.complete && result.complete;
+      const currentLines = lines.filter(line => line.date >= currentFrom && line.date <= currentTo);
+      const currentMetrics = totals(currentLines);
+      const available = hasMatchingDays && period.covered && metadata.coverage.complete && metadata.coverage.from <= from && metadata.coverage.to >= to && from <= to && currentFrom <= currentTo && current.complete && result.complete;
       const filtered = result.lines.filter(line => matches(line, filters)), previous = totals(filtered);
-      return { lines: filtered, comparison: { from, to, available, netSales: available ? previous.netSales : null, netChange: available ? percentageChange(metrics.netSales, previous.netSales) : null, transactionChange: available ? percentageChange(String(metrics.saleDocumentCount), String(previous.saleDocumentCount)) : null, basketChange: available && metrics.averageBasket !== null && previous.averageBasket !== null ? percentageChange(new Exact(metrics.basketNumerator).div(metrics.saleDocumentCount).toFixed(), new Exact(previous.basketNumerator).div(previous.saleDocumentCount).toFixed()) : null, quantityChange: { piece: available ? percentageChange(metrics.quantities.piece, previous.quantities.piece) : null, kg: available ? percentageChange(metrics.quantities.kg, previous.quantities.kg) : null } } };
+      return { lines: filtered, currentLines, comparison: { currentFrom, currentTo, from, to, available, netSales: available ? previous.netSales : null, netChange: available ? percentageChange(currentMetrics.netSales, previous.netSales) : null, transactionChange: available ? percentageChange(String(currentMetrics.saleDocumentCount), String(previous.saleDocumentCount)) : null, basketChange: available && currentMetrics.averageBasket !== null && previous.averageBasket !== null ? percentageChange(new Exact(currentMetrics.basketNumerator).div(currentMetrics.saleDocumentCount).toFixed(), new Exact(previous.basketNumerator).div(previous.saleDocumentCount).toFixed()) : null, quantityChange: { piece: available ? percentageChange(currentMetrics.quantities.piece, previous.quantities.piece) : null, kg: available ? percentageChange(currentMetrics.quantities.kg, previous.quantities.kg) : null } } };
     };
     const month = compare(-1), year = compare(-12);
     const breakdown = (kind: "category" | "product"): Breakdown[] => {
       const grouped = new Map<string, SalesComponent[]>();
+      const currentGroups = new Map<string, string[]>();
+      for (const line of month.currentLines) { const id = kind === "category" ? line.categoryId : line.productId; const values = currentGroups.get(id) ?? []; values.push(line.net); currentGroups.set(id, values); }
       const previousGroups = new Map<string, string[]>();
       for (const line of month.lines) { const id = kind === "category" ? line.categoryId : line.productId; const values = previousGroups.get(id) ?? []; values.push(line.net); previousGroups.set(id, values); }
       for (const line of lines) { const id = kind === "category" ? line.categoryId : line.productId; const group = grouped.get(id) ?? []; group.push(line); grouped.set(id, group); }
       return [...grouped].map(([id, group]) => {
         const total = totals(group);
         const previousNet = sum(previousGroups.get(id) ?? []);
-        return { id, name: kind === "category" ? group[0].categoryName : group[0].productName, ...(kind === "product" ? { categoryId: group[0].categoryId } : {}), netSales: total.netSales, quantities: total.quantities, share: new Exact(metrics.netSales).gt(0) ? new Exact(total.netSales).div(metrics.netSales).times(100).toDecimalPlaces(2).toFixed() : null, previousMonthChange: month.comparison.available ? percentageChange(total.netSales, previousNet) : null };
+        return { id, name: kind === "category" ? group[0].categoryName : group[0].productName, ...(kind === "product" ? { categoryId: group[0].categoryId } : {}), netSales: total.netSales, quantities: total.quantities, share: new Exact(metrics.netSales).gt(0) ? new Exact(total.netSales).div(metrics.netSales).times(100).toDecimalPlaces(2).toFixed() : null, previousMonthChange: month.comparison.available ? percentageChange(sum(currentGroups.get(id) ?? []), previousNet) : null };
       }).sort((a, b) => new Exact(b.netSales).cmp(a.netSales) || a.id.localeCompare(b.id, "en"));
     };
     const dailyGroups = new Map<string, string[]>();
@@ -71,7 +81,7 @@ export class SalesReports {
     const transactionScopes = new Map<string, string[]>();
     for (const line of lines) { const values = transactionScopes.get(line.documentId) ?? []; values.push(line.net); transactionScopes.set(line.documentId, values); }
     const active = this.store.availability();
-    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.covered ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
+    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
   }
   inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
     const session = this.resolve(context);

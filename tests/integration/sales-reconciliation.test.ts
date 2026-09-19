@@ -28,3 +28,72 @@ test("month to product to receipt retains one snapshot after two imports and pru
     expect(reports.query({ context, filters })).toMatchObject({ status: "unavailable", code: "STALE_CONTEXT" });
   } finally { store.close(); }
 });
+
+test("partial periods compare matched calendar days, missing coverage differs from valid zero", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage(journeyRecords(), { coverage: { from: "2024-01-01", to: "2025-09-03", complete: true } }));
+    const reports = new SalesReports(store);
+    const result = reports.open({ period: "2025-09" });
+    expect(result).toMatchObject({ status: "report", view: { coverage: "partial", comparisons: { month: { from: "2025-08-01", to: "2025-08-03", available: true, netSales: "0", netChange: null }, year: { from: "2024-09-01", to: "2024-09-03", available: true } } } });
+    expect(reports.open({ period: "2025-10" })).toMatchObject({ status: "report", view: { coverage: "unavailable", complete: false, comparisons: { month: { available: false, netSales: null } } } });
+    expect(reports.open({ period: "2024-03" })).toMatchObject({ status: "report", view: { comparisons: { month: { to: "2024-02-29" }, year: { to: "2023-03-31", available: false } } } });
+    expect(reports.open({ period: "2025-03" })).toMatchObject({ status: "report", view: { comparisons: { month: { to: "2025-02-28" } } } });
+  } finally { store.close(); }
+});
+
+test("basket comparisons use unrounded numerators, not rounded display averages", () => {
+  const records = journeyRecords(); records.documents = []; records.lines = [];
+  for (const [month, amount] of [["08", "1"], ["09", "2"]]) for (let index = 0; index < 3; index++) {
+    const id = `${month}-${index}`, net = index ? "0" : amount;
+    records.documents.push({ id, date: `2025-${month}-01`, kind: "sale", supplierId: null, sales: { state: "completed", convertedTo: null, net, tax: "0", gross: net } });
+    records.lines.push({ id: `${id}-line`, documentId: id, quantity: "1", net, cost: null, sales: { productId: "p", productName: "Ürün", categoryId: "c", categoryName: "Kategori", unit: "piece", unitNet: net, discountRate: "0", taxRate: "0", tax: "0", gross: net, meaning: "known" } });
+  }
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage(records, { coverage: { from: "2025-08-01", to: "2025-09-03", complete: true } }));
+    expect(new SalesReports(store).open({ period: "2025-09" })).toMatchObject({ status: "report", view: { metrics: { averageBasket: "0.67" }, comparisons: { month: { basketChange: "100", transactionChange: "0" } } } });
+  } finally { store.close(); }
+});
+
+test("header differences retain line totals and all recorded source amounts in evidence", () => {
+  const records = journeyRecords(); records.documents[1].sales!.net = "132";
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage(records));
+    const reports = new SalesReports(store), result = reports.open({ period: "2025-09" });
+    expect(result).toMatchObject({ status: "report", view: { complete: false, metrics: { netSales: "365" } } });
+    if (result.status !== "report") throw new Error(result.code);
+    expect(reports.inspect({ context: result.view.context, filters: emptySalesFilters, documentId: "S002" })).toMatchObject({ status: "detail", detail: { reconciled: false, totals: { net: "130" }, recorded: { net: "132" }, lines: [{ recorded: { net: "60" } }, { recorded: { net: "70" } }] } });
+    expect(reports.query({ context: result.view.context, filters: { ...emptySalesFilters, search: "İÇME" } })).toMatchObject({ status: "report", view: { metrics: { netSales: "100" }, products: [{ name: "İçme suyu" }] } });
+  } finally { store.close(); }
+});
+
+test("overlapping incomplete coverage retains known contributions and partial-month comparisons match days", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage(journeyRecords(), { coverage: { from: "2025-09-01", to: "2025-09-03", complete: false } }));
+    expect(new SalesReports(store).open({ period: "2025-09" })).toMatchObject({ status: "report", view: { coverage: "partial", complete: false, metrics: { netSales: "365" } } });
+    const records = journeyRecords();
+    for (const document of records.documents) document.date = "2025-03-30";
+    store.importPackage(salesPackage(records, { extractionId: "march", cutoff: "2025-03-30", coverage: { from: "2025-02-01", to: "2025-03-30", complete: true } }));
+    expect(new SalesReports(store).open({ period: "2025-03" })).toMatchObject({ status: "report", view: { metrics: { netSales: "365" }, comparisons: { month: { currentFrom: "2025-03-01", currentTo: "2025-03-28", from: "2025-02-01", to: "2025-02-28", available: true, netChange: null } } } });
+  } finally { store.close(); }
+});
+
+test("late-month coverage never returns impossible dates for a shorter comparison month", () => {
+  const store = openStore(":memory:");
+  const records = journeyRecords(); for (const doc of records.documents) doc.date = "2025-03-30";
+  try {
+    store.importPackage(salesPackage(records, { cutoff: "2025-03-30", coverage: { from: "2025-03-30", to: "2025-03-30", complete: true } }));
+    expect(new SalesReports(store).open({ period: "2025-03" })).toMatchObject({ status: "report", view: { from: "2025-03-30", to: "2025-03-30", comparisons: { month: { currentFrom: "2025-03-30", currentTo: "2025-03-30", from: "2025-02-28", to: "2025-02-28", available: false } } } });
+  } finally { store.close(); }
+});
+
+test("a complete short month compares the entire previous calendar month", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(salesPackage(journeyRecords(), { coverage: { from: "2025-01-01", to: "2025-09-03", complete: true } }));
+    expect(new SalesReports(store).open({ period: "2025-02" })).toMatchObject({ status: "report", view: { comparisons: { month: { currentFrom: "2025-02-01", currentTo: "2025-02-28", from: "2025-01-01", to: "2025-01-31", available: true } } } });
+  } finally { store.close(); }
+});
