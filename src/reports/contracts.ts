@@ -1,0 +1,16 @@
+import type { SalesComponent, SalesDocumentResult, SalesExclusion } from "../analytics/sales";
+export type ReportContext = { sessionId: string; datasetId: string; appRevision: number; calculationVersion: string; period: string };
+export type SalesFilters = { categoryId: string | null; productId: string | null; search: string; kind: "all" | "sale" | "customer-return" };
+export type ReportMetrics = { netSales: string; tax: string; gross: string; saleDocumentCount: number; basketNumerator: string; averageBasket: string | null; quantities: { piece: string; kg: string } };
+export type Comparison = { from: string; to: string; available: boolean; netSales: string | null; netChange: string | null; transactionChange: string | null; basketChange: string | null; quantityChange: { piece: string | null; kg: string | null } };
+export type Breakdown = { id: string; name: string; categoryId?: string; netSales: string; share: string | null; previousMonthChange: string | null; quantities: { piece: string; kg: string } };
+export type Transaction = SalesDocumentResult & { scopeNet: string };
+export type SalesView = { context: ReportContext; cutoff: string; extractedAt: string; mappingVersion: string; from: string; to: string; coverage: "complete" | "partial" | "unavailable"; stale: boolean; complete: boolean; filters: SalesFilters; metrics: ReportMetrics; comparisons: { month: Comparison; year: Comparison }; categories: Breakdown[]; products: Breakdown[]; daily: { date: string; netSales: string; height: string; negative: boolean }[]; transactions: Transaction[]; exclusions: SalesExclusion[]; warnings: string[] };
+export type SalesDetail = { context: ReportContext; cutoff: string; extractionId: string; mappingVersion: string; documentId: string; date: string; kind: string; state: string; scopeNet: string; totals: { net: string; tax: string; gross: string }; recorded: { net: string; tax: string; gross: string } | null; reconciled: boolean; exclusion: string | null; lines: (SalesComponent & { matchesScope: boolean })[]; excludedLines: { lineId: string; quantity: string; net: string; productName: string; reason: string }[] };
+export type SalesFailure = { status: "unavailable"; code: "EMPTY_STORE" | "UNSUPPORTED_MAPPING" | "STALE_CONTEXT" | "NOT_FOUND" | "UNSUPPORTED_ADJUSTMENTS" | "SERVICE_UNAVAILABLE"; message: string };
+export type SalesReportResult = { status: "report"; view: SalesView } | SalesFailure;
+export type SalesDetailResult = { status: "detail"; detail: SalesDetail } | SalesFailure;
+export type OpenSalesRequest = { period: string | null };
+export type QuerySalesRequest = { context: ReportContext; filters: SalesFilters };
+export type InspectSalesRequest = QuerySalesRequest & { documentId: string };
+export const emptySalesFilters: SalesFilters = { categoryId: null, productId: null, search: "", kind: "all" };
