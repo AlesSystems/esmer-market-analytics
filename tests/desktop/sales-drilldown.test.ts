@@ -92,6 +92,16 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     const panel = page.getByRole("complementary");
     await expect(panel.getByText("Net satış katkısı bilinmiyor; sıfır sayılmaz.", { exact: false }).first()).toBeVisible();
     await expect(panel.locator(".selected-total")).toContainText("Hesaplama dışında");
+    await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().click();
+    await expect(panel.getByRole("heading", { name: "Kaynak Detayı" })).toBeVisible();
+    await expect(panel.getByText("S003 / L005", { exact: true })).toBeVisible();
+    await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
+    await expect(panel.getByText("synthetic-sales-v1", { exact: true })).toBeVisible();
+    await expect(panel.getByText("Hesaplanmadı; bu satır net satış katkısı olarak kullanılmadı.", { exact: true })).toBeVisible();
+    await expect(panel.getByText("120,00 ₺ / 6,00 ₺ / 126,00 ₺", { exact: true })).toBeVisible();
+    await page.screenshot({ path: "test-results/phase-5-sales-excluded-source.png" });
+    await panel.getByRole("button", { name: "İşleme dön" }).click();
+    await expect(panel.locator(".selected-total")).toContainText("Hesaplama dışında");
     await panel.getByRole("button", { name: "Kapat" }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster" }).click();
     await page.getByRole("button", { name: "S002", exact: true }).click();
