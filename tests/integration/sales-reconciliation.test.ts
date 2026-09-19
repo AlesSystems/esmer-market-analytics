@@ -97,3 +97,14 @@ test("a complete short month compares the entire previous calendar month", () =>
     expect(new SalesReports(store).open({ period: "2025-02" })).toMatchObject({ status: "report", view: { comparisons: { month: { currentFrom: "2025-02-01", currentTo: "2025-02-28", from: "2025-01-01", to: "2025-01-31", available: true } } } });
   } finally { store.close(); }
 });
+
+test("excluded lines retain original source fields for pinned evidence without computed contributions", () => {
+  const store = openStore(":memory:");
+  const records = journeyRecords(); records.lines[6].sales!.unit = "unknown";
+  try {
+    store.importPackage(salesPackage(records));
+    const reports = new SalesReports(store), opened = reports.open({ period: "2025-09" });
+    if (opened.status !== "report") throw new Error(opened.code);
+    expect(reports.inspect({ context: opened.view.context, filters: emptySalesFilters, documentId: "R001" })).toMatchObject({ status: "detail", detail: { context: opened.view.context, extractionId: "sales-1", lineage: "sales-fixture", mappingVersion: "synthetic-sales-v1", exclusion: "UNKNOWN_MEANING", lines: [], excludedLines: [{ lineId: "L007", quantity: "1", net: "-35", reason: "UNKNOWN_MEANING", input: { productId: "soda", categoryId: "drinks", unit: "unknown", tax: "-1.75", gross: "-36.75", unitNet: "35", discountRate: "0", taxRate: "5" } }] } });
+  } finally { store.close(); }
+});
