@@ -3,7 +3,7 @@ import { SALES_MAPPING_VERSION, type Records, type SalesLine } from "../source/p
 
 export const SALES_CALCULATION_VERSION = "synthetic-sales-calc-v1";
 export type SalesContext = { mappingVersion: string; from: string; to: string };
-export type SalesComponent = { documentId: string; lineId: string; date: string; kind: "sale" | "customer-return"; productId: string; productName: string; categoryId: string; categoryName: string; unit: "piece" | "kg"; quantity: string; net: string; tax: string; gross: string; recorded: { net: string; tax: string; gross: string }; input: SalesLine; expectedTax: string; reconciled: boolean };
+export type SalesComponent = { documentId: string; lineId: string; date: string; kind: "sale" | "customer-return"; productId: string; productName: string; categoryId: string; categoryName: string; unit: "piece" | "kg"; quantity: string; net: string; tax: string; gross: string; recorded: { quantity: string; net: string; tax: string; gross: string }; input: SalesLine; expectedTax: string; reconciled: boolean };
 export type SalesExclusion = { documentId: string; reason: "VOID" | "CONVERTED" | "CONVERSION_CONFLICT" | "UNKNOWN_MEANING" | "NO_LINES" | "NOT_SALES" };
 export type SalesDocumentResult = { documentId: string; date: string; kind: "sale" | "customer-return"; net: string; tax: string; gross: string; recorded: { net: string; tax: string; gross: string }; reconciled: boolean };
 export type SalesResult = { status: "ready" | "unavailable"; netSales: string; tax: string; gross: string; saleDocumentCount: number; basketNumerator: string; averageBasket: string | null; quantities: { piece: string; kg: string }; lines: SalesComponent[]; documents: SalesDocumentResult[]; exclusions: SalesExclusion[]; complete: boolean };
@@ -51,7 +51,7 @@ export function calculateSales(records: Records, context: SalesContext): SalesRe
       const expectedTax = rounded(new Exact(net).times(s.taxRate).div(100).toFixed());
       const tax = new Exact(s.tax).toFixed();
       const gross = new Exact(net).plus(tax).toFixed();
-      const recorded = { net: line.net, tax: s.tax, gross: s.gross };
+      const recorded = { quantity: line.quantity, net: line.net, tax: s.tax, gross: s.gross };
       const reconciled = new Exact(net).eq(recorded.net) && new Exact(expectedTax).eq(recorded.tax) && new Exact(gross).eq(recorded.gross);
       return { documentId: doc.id, lineId: line.id, date: doc.date, kind, productId: s.productId, productName: s.productName, categoryId: s.categoryId, categoryName: s.categoryName, unit: s.unit as "piece" | "kg", quantity: new Exact(line.quantity).times(sign).toFixed(), net, tax, gross, recorded, input: { ...s }, expectedTax, reconciled };
     });
