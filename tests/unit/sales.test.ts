@@ -41,3 +41,27 @@ test("unknown units and meanings exclude documents instead of claiming known zer
   expect(calculateSales(records, context)).toMatchObject({ complete: false, exclusions: [{ documentId: "S1", reason: "UNKNOWN_MEANING" }], averageBasket: null });
   expect(calculateSales(salesRecords, { ...context, mappingVersion: "synthetic-relational-v1" }).status).toBe("unavailable");
 });
+
+test("duplicate conversion owners are excluded and cannot inflate a completed target", () => {
+  const records = structuredClone(salesRecords);
+  for (const id of ["A", "B"]) {
+    records.documents.push({ ...structuredClone(records.documents[0]), id, sales: { ...records.documents[0].sales!, state: "converted", convertedTo: "S1" } });
+    records.lines.push({ ...structuredClone(records.lines[0]), id: `${id}-line`, documentId: id });
+  }
+  expect(calculateSales(records, context)).toMatchObject({ netSales: "0", complete: false, exclusions: [{ documentId: "A", reason: "CONVERSION_CONFLICT" }, { documentId: "B", reason: "CONVERSION_CONFLICT" }, { documentId: "S1", reason: "CONVERSION_CONFLICT" }] });
+});
+
+test("two completed sales totaling 200 and a 50 return produce net 150 and basket 100", () => {
+  const records = structuredClone(salesRecords); records.documents = []; records.lines = [];
+  for (const [id, amount, kind] of [["S1", "100", "sale"], ["S2", "100", "sale"], ["R1", "-50", "customer-return"]] as const) {
+    records.documents.push({ id, date: "2025-09-01", kind, supplierId: null, sales: { state: "completed", convertedTo: null, net: amount, tax: "0", gross: amount } });
+    records.lines.push({ id: `${id}-line`, documentId: id, quantity: "1", net: amount, cost: null, sales: { ...salesRecords.lines[0].sales!, unitNet: kind === "sale" ? "100" : "50", discountRate: "0", taxRate: "0", tax: "0", gross: amount } });
+  }
+  const expected = calculateSales(records, context);
+  expect(expected).toMatchObject({ netSales: "150", saleDocumentCount: 2, basketNumerator: "200", averageBasket: "100" });
+  const original = process.env.TZ;
+  try {
+    for (const timezone of ["Pacific/Honolulu", "Europe/Istanbul", "Pacific/Kiritimati"]) { process.env.TZ = timezone; expect(calculateSales(records, context)).toEqual(expected); }
+  } finally { if (original === undefined) delete process.env.TZ; else process.env.TZ = original; }
+  expect(calculateSales({ documents: [], lines: [], suppliers: [] }, context)).toMatchObject({ status: "ready", complete: true, netSales: "0", saleDocumentCount: 0, averageBasket: null });
+});
