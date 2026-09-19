@@ -29,6 +29,7 @@ test("packaged sales workspace follows a number through product, document and so
     await page.getByRole("button", { name: "İçecekler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Kategori / Ürün Detayı", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Gazoz", exact: true })).toBeVisible();
+    await expect(page.locator(".comparison-boundaries")).toContainText("01.08.2025 – 03.08.2025");
     await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
     await page.getByLabel("Ürün ara").fill("İÇME");
     await page.getByRole("button", { name: "İçme suyu", exact: true }).press("Enter");
