@@ -9,7 +9,9 @@ const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "da
 test("packaged sales workspace follows a number through product, document and source with keyboard", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-sales-"));
   const packagePath = join(userData, "synthetic-sales.json");
-  await writeFile(packagePath, salesPackage(journeyRecords()));
+  const records = journeyRecords();
+  records.lines.find(line => line.id === "L003")!.quantity = "3.000";
+  await writeFile(packagePath, salesPackage(records));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
@@ -45,6 +47,9 @@ test("packaged sales workspace follows a number through product, document and so
     await expect(panel.getByRole("heading", { name: "Kaynak Detayı" })).toBeFocused();
     await expect(panel.getByText("S002 / L003", { exact: true })).toBeVisible();
     await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
+    await panel.getByText("Teknik ayrıntılar", { exact: true }).click();
+    await expect(panel.getByText("3,000 / adet", { exact: true })).toBeVisible();
+    await expect(panel.getByText("water / drinks", { exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/phase-5-sales-source.png" });
     await panel.getByRole("button", { name: "İşleme dön" }).press("Enter");
     await page.keyboard.press("Escape");
