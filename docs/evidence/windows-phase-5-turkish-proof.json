@@ -1,0 +1,39 @@
+{
+  "search": [
+    {
+      "search": "ISLAK",
+      "matches": true
+    },
+    {
+      "search": "ıslak",
+      "matches": true
+    },
+    {
+      "search": "İSLAK",
+      "matches": false
+    }
+  ],
+  "renderedJourneyMs": [
+    {
+      "repetition": 0,
+      "category": 56.10169999999971,
+      "product": 24.297100000000228,
+      "receipt": 33.483900000000176,
+      "source": 23.174200000000383
+    },
+    {
+      "repetition": 1,
+      "category": 26.647299999999632,
+      "product": 23.596199999999953,
+      "receipt": 24.648200000000088,
+      "source": 22.883400000000165
+    },
+    {
+      "repetition": 2,
+      "category": 48.87260000000015,
+      "product": 22.839000000000397,
+      "receipt": 24.977700000000368,
+      "source": 22.454400000000078
+    }
+  ]
+}

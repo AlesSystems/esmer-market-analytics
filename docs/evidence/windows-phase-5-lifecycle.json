@@ -1,0 +1,309 @@
+{
+  "portable": [
+    {
+      "stage": "portable",
+      "launch": 1,
+      "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 3,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    },
+    {
+      "stage": "portable",
+      "launch": 2,
+      "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 3,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    }
+  ],
+  "signatures": [
+    {
+      "File": "Esmer Market Analytics Setup 0.1.0.exe",
+      "Status": "NotSigned"
+    },
+    {
+      "File": "Esmer Market Analytics 0.1.0.exe",
+      "Status": "NotSigned"
+    }
+  ],
+  "uninstall": {
+    "profilesUnchanged": true,
+    "before": [
+      {
+        "hash": "F30DCD4A05452F141A5093C199F1268D698D37132AC1FFAC2B7CC95A910EC2B1",
+        "profile": "installed-profile"
+      },
+      {
+        "hash": "D9654ECA10D53FF55F2DD3C2D6771CD72138405BD0CE29E914D38F8F3D01BD01",
+        "profile": "portable-profile"
+      },
+      {
+        "hash": "430AC061768F6F1FADD3A55A538AE22B576BABE7C952B8C2E2A1A840E12CC366",
+        "profile": "native-profile"
+      }
+    ],
+    "exitCode": 0,
+    "executableRemoved": true,
+    "after": [
+      {
+        "hash": "F30DCD4A05452F141A5093C199F1268D698D37132AC1FFAC2B7CC95A910EC2B1",
+        "profile": "installed-profile"
+      },
+      {
+        "hash": "D9654ECA10D53FF55F2DD3C2D6771CD72138405BD0CE29E914D38F8F3D01BD01",
+        "profile": "portable-profile"
+      },
+      {
+        "hash": "430AC061768F6F1FADD3A55A538AE22B576BABE7C952B8C2E2A1A840E12CC366",
+        "profile": "native-profile"
+      }
+    ]
+  },
+  "baseline": [
+    {
+      "stage": "baseline",
+      "launch": 1,
+      "archiveHash": "ced2a5d0e57cb1ed1c0d2739a0a8654db13246a6296abc62c9eedae6879d4e14",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 2,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    },
+    {
+      "stage": "baseline",
+      "launch": 2,
+      "archiveHash": "ced2a5d0e57cb1ed1c0d2739a0a8654db13246a6296abc62c9eedae6879d4e14",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 2,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    }
+  ],
+  "nativeRestarts": [
+    {
+      "launch": 0,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "lastImportError": "INVALID_PACKAGE",
+        "dataset": {
+          "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "cutoff": "2025-09-03",
+          "extractedAt": "2025-09-04T00:00:00Z",
+          "counts": {
+            "documents": 4,
+            "lines": 7,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "alert": "Önceki içe aktarma tamamlanamadı. Son geçerli veriler korundu. Geçerli bir paketle yeniden deneyin."
+    },
+    {
+      "launch": 1,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "lastImportError": "INVALID_PACKAGE",
+        "dataset": {
+          "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "cutoff": "2025-09-03",
+          "extractedAt": "2025-09-04T00:00:00Z",
+          "counts": {
+            "documents": 4,
+            "lines": 7,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "alert": "Önceki içe aktarma tamamlanamadı. Son geçerli veriler korundu. Geçerli bir paketle yeniden deneyin."
+    }
+  ],
+  "upgraded": [
+    {
+      "stage": "upgraded",
+      "launch": 1,
+      "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 3,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    },
+    {
+      "stage": "upgraded",
+      "launch": 2,
+      "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+      "exitCode": 0,
+      "availability": {
+        "status": "ready",
+        "store": "loaded",
+        "liveConnection": "disabled",
+        "dataset": {
+          "datasetId": "734685b1f419470d68882e6ae58b286e151bb99b1dfa4529a9aa89cd2aa10289",
+          "cutoff": "2025-02-02",
+          "extractedAt": "2025-02-03T00:00:00Z",
+          "counts": {
+            "documents": 1,
+            "lines": 1,
+            "suppliers": 0
+          },
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "PARTIAL_COVERAGE",
+            "MISSING_COST"
+          ]
+        }
+      },
+      "developerRuntimeInPath": false,
+      "processOwnershipVerified": true,
+      "browserOfflineReload": true,
+      "physicalDisconnect": false,
+      "schemaVersion": 3,
+      "integrity": "ok",
+      "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+      "databaseRenameAfterShutdown": true
+    }
+  ]
+}

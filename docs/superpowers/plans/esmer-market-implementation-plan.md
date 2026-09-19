@@ -282,7 +282,7 @@ expect(result.averageBasket).toBe('100');
 
 **Verify:** `npm run test:integration -- tests/integration/sales-reconciliation.test.ts` and `npm run test:desktop -- tests/desktop/sales-drilldown.test.ts`.
 
-**Local implementation status (2026-09-19):** The checked tasks describe the bounded synthetic implementation and local macOS evidence only. See [local verification](../../evidence/phase-5-local.md). Source semantics and the Phase 5 Windows exit gate remain open; continue on `codex/phase-5-sales-analytics` using the [Windows prompt](../../operations/windows-phase-5-handoff.md). No later-phase work is included.
+**Evidence status (2026-09-19):** The checked tasks describe the bounded synthetic implementation. See [local verification](../../evidence/phase-5-local.md) and the subsequent [Windows verification](../../evidence/windows-phase-5.md): 12 unit, 133 integration and 7 packaged desktop tests passed, with native picker, isolated lifecycle, schema2 preservation, pinned report/pruning, inventory and timing evidence. Windows continuation preserves original quantity precision in source details. Source semantics, full-volume performance, physical-disconnect testing and actual Windows scaling/warning review remain open. No additional checkbox or broader A02/A03/A07 gate is completed by these synthetic checks. Continue on `codex/phase-5-sales-analytics` and PR19 using the [Windows prompt](../../operations/windows-phase-5-handoff.md). No later-phase work is included.
 
 **Exit gate (open):** Sales metrics reconcile and are explainable. The sales portions of A02/A03 and relevant UI portions of A07 pass.
 
