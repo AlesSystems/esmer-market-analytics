@@ -2,7 +2,7 @@
   "name": "esmer-market-analytics",
   "version": "0.1.0",
   "private": true,
-  "description": "Esmer Market çevrimdışı analiz uygulaması",
+  "description": "Esmer Market \u00e7evrimd\u0131\u015f\u0131 analiz uygulamas\u0131",
   "author": "Ales Systems",
   "license": "UNLICENSED",
   "main": "dist/desktop/main.cjs",
@@ -18,7 +18,9 @@
     "test:desktop": "node scripts/test-desktop.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:desktop",
     "package:local": "npm run build && electron-builder --dir",
-    "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar"
+    "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar",
+    "prototype:sales": "node scripts/prototype-sales.mjs",
+    "prototype:check": "node scripts/check-sales-prototype.mjs"
   },
   "dependencies": {
     "decimal.js": "10.6.0",
