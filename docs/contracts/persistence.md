@@ -43,3 +43,9 @@ Storage pressure produces a visible error. It never relaxes retention or silentl
 The [local evidence record](../evidence/phase-4-local.md) records initial implementation and verification. The [Windows evidence](../evidence/windows-phase-4.md) records subsequent fixes, packaged verification, native import and lifecycle results. The [Windows handoff](../operations/windows-phase-4-handoff.md) remains the procedure. Migration, interruption, locking, packaging and lifecycle claims apply only to the environment actually tested.
 
 Expense spreadsheet import, duplicate classification, financial calculations, exports and encrypted backup/recovery retain their later-phase gates. No real-source mapping, source reconciliation, SQL Server permission or full-volume performance claim follows from synthetic persistence tests.
+
+## Phase 5 sales fields and browsing sessions
+
+Store schema 3 adds nullable JSON sales fields to existing source document/line tables. Migrations preserve prior rows, app-owned revisions and accepted reports. Legacy rows reconstruct without an added `sales` property, preserving their canonical hashes and adjustment fingerprints. New sales fields participate in round-trip validation, activation hashes, source differences and adjustment fingerprints.
+
+The sales worker retains one immutable snapshot for the open browsing session. Importing and pruning other datasets cannot change that snapshot. Explicit report refresh replaces the session, and stale contexts fail. This is temporary browsing state, not owner report acceptance. It writes no accepted report and is not restored after application restart. Existing accepted-report persistence remains governed by its prior contract.

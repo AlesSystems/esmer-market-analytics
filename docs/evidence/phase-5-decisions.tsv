@@ -1,3 +1,10 @@
 ts	phase	decision	why	evidence	result
 2026-09-19T08:06:36.106791+00:00	ground	Use latest merged Phase4 base and separate Phase5 worktree	Preserve main and throwaway prototype; reuse validated import/store	4452fd9	Baseline 2 unit and 119 integration tests pass; build passes
 2026-09-19T08:09:29.526336+00:00	design	Extend existing records and retain one worker report snapshot	Avoid duplicate evidence stream and automatic accepted-report writes	docs/decisions/phase-5-sales.md	Independent comparison complete; same model family
+2026-09-19T08:15:45.552426+00:00	package	Preserve optional sales fields through additive schema 3	Keep legacy hashes and app-owned records unchanged	6555197	Focused package/store checks and lint pass
+2026-09-19T08:15:45.552585+00:00	calculation	Derive discounted net but preserve recorded tax	Recorded amounts must not be rewritten to match rate expectations	b20576b	G01 and tax discrepancy tests pass; typecheck and lint pass
+2026-09-19T08:40:00.627905+00:00	reports	Keep matched calendar ranges explicit	Short months must not compare unequal partial windows	d95e833	Short/leap/full/late-month and unrounded basket tests pass
+2026-09-19T08:40:00.627905+00:00	ui	Implement Option A through named report operations	Keep financial computation and snapshot ownership in service	fa3cd01	Packaged navigation and keyboard checks pass
+2026-09-19T08:40:00.627905+00:00	review	Resolve product dates and excluded source route	Every figure and exclusion needs disclosed context and evidence	84d550d;7ea6e64	Independent Standards and Spec follow-ups have no remaining findings; same model family
+2026-09-19T08:40:00.627905+00:00	verify	Stop after local verification	User requested Windows handoff boundary	7ea6e64ec2abdc6511cfce21299a57bd077822aa	12 unit;131 integration;7 packaged macOS desktop;typecheck;lint;package inventory pass
+2026-09-19T08:40:00.627905+00:00	forge	Use gh for PR operations	Origin repository resolution failed; repository workflow also specifies gh	docs/agents/issue-tracker.md	No change to forge after resolution

@@ -13,7 +13,7 @@ The manifest has these exact fields:
 | Field | Value |
 | --- | --- |
 | `schemaVersion` | `analytics-package-v1` |
-| `mappingVersion` | `synthetic-relational-v1` |
+| `mappingVersion` | `synthetic-relational-v1` or the Phase 5 `synthetic-sales-v1` extension below |
 | `provenance` | `synthetic` |
 | `currency` | `TRY` |
 | `sourceReconciled` | `false` |
@@ -52,3 +52,19 @@ Extraction has a 10-second total deadline, including worker startup and consumer
 Preparation buffers batches under the byte and row caps, then validates and serializes the envelope. This bounded in-memory format has no demonstrated scalability for real datasets. A future real-source implementation needs separately reviewed mapping, permissions, sizes, and performance evidence.
 
 The reader returns either validated metadata, records, and warning codes, or `{ ok: false, code: "INVALID_PACKAGE" }`. Warnings are ordered `SYNTHETIC_ONLY`, optional `PARTIAL_COVERAGE`, and optional `MISSING_COST`. Missing cost stays null. Missing expenses are not represented as zero or imported as source records. Broken references, duplicate IDs, unsupported versions, hash/count mismatches, malformed dates/decimals, and private fields reject the package.
+
+## Phase 5 synthetic sales mapping
+
+The same `analytics-package-v1` envelope also accepts `mappingVersion: synthetic-sales-v1`. It keeps the three existing streams, byte/row limits, canonical hashes, synthetic provenance and `sourceReconciled: false`. The original relational mapping remains unchanged and cannot supply sales metrics.
+
+Sales coverage starts no earlier than `1900-01-01`, and cutoff is no later than `9998-12-31`, matching the supported report period range. Legacy date validation remains unchanged.
+
+The sales mapping requires a `sales` object on every document and line. It rejects unknown fields, inconsistent product/category labels, invalid conversion references, malformed decimals and unbounded display labels. Product and category names are synthetic display text, limited to 160 characters without control characters. They are not a real-source name allowlist.
+
+Document sales fields are `state`, `convertedTo`, `net`, `tax`, and `gross`. State is `completed`, `void`, `converted`, or `unknown`. A converted document must point to a different completed document of the same kind. Other states have a null conversion target. Recorded header amounts remain separate from calculated line totals.
+
+Line sales fields are `productId`, `productName`, `categoryId`, `categoryName`, `unit`, `unitNet`, `discountRate`, `taxRate`, `tax`, `gross`, and `meaning`. Unit is `piece`, `kg`, or `unknown`. Meaning is `known` or `unknown`. Quantity and unit price are nonnegative magnitudes, each bounded to 20 integer and 15 fractional digits. Document kind determines the financial sign. Recorded return amounts are signed. Discount and tax rates are 0 through 100 with up to six fractional digits. These bounds and meanings apply only to this synthetic mapping.
+
+No unit conversion is inferred. A quantity is already expressed in its declared unit; an unknown unit remains unsupported. Supplier/purchase data does not acquire sales meaning. The application retains unsupported and excluded populations explicitly.
+
+The package parser checks representation and references. The calculator checks inclusion, conversion ambiguity, amounts and reconciliation. A package can therefore be structurally valid while its sales result remains incomplete. The [Phase 5 calculation policy](calculations.md#phase-5-synthetic-sales-policy) describes that distinction.
