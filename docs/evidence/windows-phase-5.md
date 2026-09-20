@@ -1,6 +1,6 @@
 # Phase 5 Windows verification
 
-Date: 2026-09-19. Issue [#8](https://github.com/AlesSystems/esmer-market-analytics/issues/8), existing PR [#19](https://github.com/AlesSystems/esmer-market-analytics/pull/19), branch `codex/phase-5-sales-analytics`. The user authorized this Windows continuation of Option A. The automated synthetic checks below passed. Physical-disconnect testing, actual Windows scaling changes and source-dependent acceptance remain open. This record does not complete A02, A03 or A07.
+Date: 2026-09-19; follow-up 2026-09-20. Issue [#8](https://github.com/AlesSystems/esmer-market-analytics/issues/8), existing PR [#19](https://github.com/AlesSystems/esmer-market-analytics/pull/19), branch `codex/phase-5-sales-analytics`. The user authorized this Windows continuation of Option A. The automated synthetic checks below passed. On September 20, the user reported that physical-offline testing passed and authorized merging the PR when ready. Actual Windows scaling changes and source-dependent acceptance remain open. This record does not complete A02, A03 or A07.
 
 ## Revision and scope
 
@@ -8,7 +8,7 @@ Date: 2026-09-19. Issue [#8](https://github.com/AlesSystems/esmer-market-analyti
 - Fetched Phase 5 tip: `d145a1135050a9485418e1cd27a602c73d6875ac`. The earlier locally verified application revision was `7ea6e64ec2abdc6511cfce21299a57bd077822aa`; the latest fetched handoff was used.
 - Final application/test revision: `5b21538813672e935bb9d7e8b27546ff408b55bd`. Subsequent evidence commits do not change application code or these builds.
 - Read issue #8 and its comments/labels, PR #19 and comments, and dependencies #5/#7. Both dependencies were closed; #8 was open with `enhancement`. Read repository instructions, foundation specification/audit/acceptance, shared and Phase 5 plan, PRODUCT, Option A design, decisions, contracts and prior evidence before changing code.
-- No source inspection, private backup, credential, real customer/payroll record, source container, Eralp contact or production installation was used. Fixtures/profiles were disposable and synthetic. No dependency or lockfile changed. No Phase 6 work, merge, issue closure or deployment is included.
+- No source inspection, private backup, credential, real customer/payroll record, source container, Eralp contact or production installation was used. Fixtures/profiles were disposable and synthetic. No dependency or lockfile changed. The September 20 instruction authorizes merging the verified implementation; issue #8 remains open, and Phase 6 and deployment remain outside scope.
 
 ## Environment and build
 
@@ -136,13 +136,24 @@ Same final archive/hardware, September2025, fixture above (3,292 bytes), no sear
 
 The [rendered journey observations](windows-phase-5-turkish-proof.json) repeat three UI journeys on the same fixture with only the water name changed to `Islak mendil`: category click→visible heading 26.6–56.1ms; product22.8–24.3ms; receipt24.6–33.5ms; source22.5–23.2ms. These include automation scheduling and visibility assertions, not a paint-level benchmark. Service timing excludes rendering. Fresh process does not mean disk-cache-cold; no OS cache flush or reboot was used. **This tiny synthetic sample cannot pass the full imported-data two-second target.** Real/full-volume performance remains open.
 
-## Remaining handoff
+## September 20 follow-up and merge readiness
 
-Continue on the same branch and PR. All automated evidence is bounded to synthetic data. The Phase5 exit gate remains open for source semantics/reconciliation and the remaining Windows human checks. No broader A02/A03/A07 gate is marked complete.
+The user reported, "Physical-offline testing passed, continue to other gates and merge PR when ready." This closes the pending physical-offline check as **human-reported evidence** for the preceding Phase 5 handoff. The agent did not observe the physical disconnect. The report supplies no separate timings, screenshots, scaling observations or publisher-warning result; none are inferred from it.
 
-1. Human physical-disconnect cold launch and same-profile restart for this final Phase5 build remain unperformed. Browser-context offline emulation passed, but networking on the host was not physically disconnected. Prior-phase human reports do not establish this build's result.
-2. Actual Windows Settings scale changes (125%/150%, minimum/default window), interactive unsigned-publisher/SmartScreen behavior and subjective usability need a human report. Native100% and forced Chromium100/125/150/200% passed automated probes; forced scale does not verify Windows DPI transitions.
-3. On this checkout, disconnect networking and launch the portable with `--user-data-dir="<repo>\work\windows-phase-5\native-profile"`. Expect365/3/133.33 and the retained import-failure warning, then close/reopen. Check category/product→receipt/source and resizing. Reconnect and attribute the result to the person/procedure/build hash above. Do not use a personal profile. The real-picker fixture remains at the TEMP path above and can be selected to clear the warning.
-4. Clean-machine/versioned/failed-upgrade, physical power/disk-failure and full release acceptance remain later evidence. Real-source mapping, source-reconciled market figures and full-volume performance require separate authorization/evidence. Costs/profit, expenses UI, Excel, accepted-report review UI, backup/recovery and live integration remain later phases.
+The resumed checkout was clean at `598107dc31dc06ebd564396c47f8aa6af63a028f`. Fetch confirmed that same branch tip and unchanged main at `4452fd9c6e0d8f76fdcdefaea667abc3e7ad17da`. The three distribution/archive hashes above were rechecked and matched. Both executables remain `NotSigned`; neither locally built file has a `Zone.Identifier` stream. This does not establish SmartScreen behavior for a downloaded distribution.
 
-The existing [Windows continuation prompt](../operations/windows-phase-5-handoff.md) remains the requested procedure. This record governs what was actually performed. Stop without merging or starting Phase6.
+A Windows Settings automation attempt did not obtain a stable display-settings window. Its target disappeared, and recovery produced no usable Settings controls. No scaling setting was changed and no new DPI result is claimed. Actual Windows 125%/150% scaling and interactive warning observations were requested from the user. The earlier forced Chromium probes remain the available scaling evidence.
+
+An independent reviewer returned **PASS+NOTES** for base `4452fd9`, head `598107dc`, stable patch ID `b6f412f46353d74b628fca6655ae61ece0b16d21`. A fresh smoke test used the existing packaged executable and an isolated synthetic profile without rebuilding. Import, 365/3/133.33 metrics, selected60 versus whole130, original quantity `3.000`, restricted renderer capabilities and restart passed. There were no outstanding code findings. Local review details are in `work/windows-phase-5/merge-review.md`.
+
+The bounded synthetic implementation is suitable for the authorized merge. This is not full Phase 5 or release acceptance. GitHub reported the PR mergeable with no review threads and no configured status checks; the recorded local suite and independent packaged smoke provide the test evidence. The follow-up changes only documentation, so verification is the documentation diff and local links. The application revision and build hashes remain unchanged.
+
+## Remaining gates
+
+All automated evidence is bounded to synthetic data. The Phase 5 exit gate remains open for source semantics/reconciliation and the remaining Windows checks. No broader A02/A03/A07 gate is marked complete, and issue #8 remains open after the authorized implementation merge.
+
+1. Actual Windows Settings scaling at 125%/150%, minimum/default window sizes, and interactive unsigned-publisher/SmartScreen behavior remain unverified. Native100% and forced Chromium100/125/150/200% passed automated probes; forced scale does not verify Windows DPI transitions.
+2. Clean-machine/versioned/failed-upgrade, physical power/disk-failure and full release acceptance remain later evidence. Real-source mapping, source-reconciled market figures and full-volume performance require separate authorization/evidence.
+3. Costs/profit, expenses UI, Excel, accepted-report review UI, backup/recovery and live integration remain later phases. No Phase 6 work or deployment follows from merging this PR.
+
+The existing [Windows continuation prompt](../operations/windows-phase-5-handoff.md) remains the historical procedure. This record and the September 20 user instruction supersede its stop-before-merge boundary.
