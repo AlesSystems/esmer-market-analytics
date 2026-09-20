@@ -5,6 +5,7 @@
 This record covers issue [#9](https://github.com/AlesSystems/esmer-market-analytics/issues/9), tasks 6.1 and 6.2. The user requested implementation through a PR and a stop before Windows implementation/testing. This evidence uses generated synthetic records and the packaged macOS application. It does not complete Windows, real-source, or full-volume acceptance.
 
 - Branch `codex/phase-6-costs-purchasing`, based on merged Phase 5 at `56d0d35`.
+- Pull request [#20](https://github.com/AlesSystems/esmer-market-analytics/pull/20), open for Windows continuation.
 - Environment macOS 27.0 build 26A428, arm64, Node 24.15.0, npm 11.12.1.
 - No new dependency. `npm ci` reported zero vulnerabilities.
 - [Local design and delivery plan](../superpowers/plans/2026-09-20-phase-6-local-plan.md).

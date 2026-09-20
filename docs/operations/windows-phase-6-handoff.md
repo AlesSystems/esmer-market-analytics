@@ -6,8 +6,8 @@ Copy this prompt into a Windows agent session. Continue on the existing branch a
 Continue Phase 6, issue #9, in AlesSystems/esmer-market-analytics.
 https://github.com/AlesSystems/esmer-market-analytics/issues/9
 
-The user authorized Phase 6 implementation and requested a stop before Windows implementation and testing. Continue on the SAME branch, codex/phase-6-costs-purchasing. Resolve its existing PR with:
-  gh pr list --head codex/phase-6-costs-purchasing
+The user authorized Phase 6 implementation and requested a stop before Windows implementation and testing. Continue on the SAME branch, codex/phase-6-costs-purchasing. Continue existing PR #20: https://github.com/AlesSystems/esmer-market-analytics/pull/20
+  gh pr view 20 --comments
 Read that PR and comments. Update it rather than creating a replacement. Do not merge, close issue #9, start Phase 7, deploy, or install on Eralp's computer.
 
 Read AGENTS.md. Inspect branch, worktrees, and existing changes. Fetch origin and safely check out the branch while preserving unrelated work. Record the fetched SHA. The locally verified application revision is 7fe3d69687bc6d48c642adf4cd70141579b7dfd9; fetch the latest branch tip because later commits add the handoff evidence and fixture generator. Read issue #9 with comments and its dependencies #5, #7, and #8. Read the foundation specification, historical audit, acceptance checklist, and global/shared/evidence and Phase 6 sections of docs/superpowers/plans/esmer-market-implementation-plan.md.
