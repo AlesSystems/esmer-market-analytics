@@ -4,7 +4,7 @@ import { estimateGrossResult } from "./costs";
 export const PURCHASING_CALCULATION_VERSION = "synthetic-purchasing-calc-v1";
 export type PurchaseRow = { documentId: string; lineId: string; date: string; productId: string; productName: string; supplierId: string; supplierName: string; unit: "piece" | "kg"; quantity: string; net: string; unitCost: string; representation: "invoice" | "dispatch"; sourceDocumentIds: string[]; evidence: string };
 export type SupplierReturnRow = PurchaseRow & { physicalReturn: boolean; requestedRecovery: string | null; recognizedCredit: string | null; replacementSettlement: "unknown" | "confirmed"; settlementEvidence: string | null; settlementEvidenceReferences: string[] };
-export type ReplacementRow = { productId: string; productName: string; unit: "piece" | "kg"; historicalUnitCost: string | null; latestUnitCost: string; nominalChangePercent: string | null; quantity: string; historicalCost: string | null; replacementCost: string; documentId: string; date: string };
+export type ReplacementRow = { productId: string; productName: string; unit: "piece" | "kg"; historicalUnitCost: string | null; latestUnitCost: string; nominalChangePercent: string | null; quantity: string; historicalCost: string | null; replacementCost: string; documentId: string; sourceDocumentIds: string[]; date: string };
 export type InventoryRow = { lineId: string; productId: string; productName: string; unit: "piece" | "kg"; date: string; stock: string | null; recordedWaste: string | null; evidence: string; complete: boolean };
 export type PurchasingResult = { status: "ready" | "unavailable"; history: PurchaseRow[]; supplierReturns: SupplierReturnRow[]; replacements: ReplacementRow[]; inventory: InventoryRow[]; warnings: string[]; exclusions: { documentId: string; reason: string }[] };
 export function calculatePurchasing(records: Records, context: { mappingVersion: string; from: string; to: string; cutoff?: string }): PurchasingResult {
@@ -66,7 +66,7 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
     const complete = lines.every(row => row.cost !== null);
     const historicalCost = complete ? sum(lines.map(row => row.cost!)) : null;
     const historicalUnitCost = historicalCost !== null && new Exact(quantity).gt(0) ? new Exact(historicalCost).div(quantity).toFixed() : null;
-    result.replacements.push({ productId: purchase.productId, productName: purchase.productName, unit: purchase.unit, historicalUnitCost, latestUnitCost: purchase.unitCost, nominalChangePercent: historicalUnitCost === null ? null : percentageChange(purchase.unitCost, historicalUnitCost), quantity, historicalCost, replacementCost: new Exact(quantity).times(purchase.unitCost).toFixed(), documentId: purchase.documentId, date: purchase.date });
+    result.replacements.push({ productId: purchase.productId, productName: purchase.productName, unit: purchase.unit, historicalUnitCost, latestUnitCost: purchase.unitCost, nominalChangePercent: historicalUnitCost === null ? null : percentageChange(purchase.unitCost, historicalUnitCost), quantity, historicalCost, replacementCost: new Exact(quantity).times(purchase.unitCost).toFixed(), documentId: purchase.documentId, sourceDocumentIds: purchase.sourceDocumentIds, date: purchase.date });
   }
   result.warnings = [...new Set([...result.warnings, ...result.exclusions.map(row => row.reason), ...(result.inventory.length ? [] : ["INVENTORY_UNAVAILABLE", "SPARSE_WASTE_RECORDING"])])];
   return result;

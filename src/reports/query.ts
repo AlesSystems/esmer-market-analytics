@@ -94,8 +94,8 @@ export class SalesReports {
     const active = this.store.availability();
     const gross = estimateGrossResult(snapshot.records, scope), purchasing = calculatePurchasing(snapshot.records, scope);
     const ids = new Set([...gross.covered, ...gross.excluded].map(row => row.documentId));
-    for (const row of [...purchasing.history, ...purchasing.supplierReturns]) row.sourceDocumentIds.forEach(id => ids.add(id));
-    for (const row of [...purchasing.replacements, ...purchasing.exclusions]) ids.add(row.documentId);
+    for (const row of [...purchasing.history, ...purchasing.supplierReturns, ...purchasing.replacements]) row.sourceDocumentIds.forEach(id => ids.add(id));
+    for (const row of purchasing.exclusions) ids.add(row.documentId);
     const lineIds = new Set(purchasing.inventory.map(row => row.lineId));
     for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
     for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
