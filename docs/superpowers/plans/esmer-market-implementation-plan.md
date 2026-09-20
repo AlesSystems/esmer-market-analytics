@@ -328,7 +328,9 @@ expect(result.confidence).toBe('estimated');
 
 **Verify:** The three named purchasing test files; inspect Turkish labels for customer versus supplier returns.
 
-**Exit gate:** A02/A03 cost, returns, purchasing and uncertainty scenarios pass. Historical estimates and replacement analysis remain distinct.
+**Local evidence (2026-09-20):** Tasks 6.1 and 6.2 have synthetic implementation and local packaged verification. [Local evidence](../../evidence/phase-6-local.md) records 22 unit, 147 integration and 10 packaged macOS desktop tests, independent review fixes, screenshots, and limitations. [Continue on Windows](../../operations/windows-phase-6-handoff.md) on the same branch and PR. Source-backed semantics and Windows acceptance remain open; Phase 6 checkboxes remain open pending the remaining acceptance evidence.
+
+**Exit gate (open):** A02/A03 cost, returns, purchasing and uncertainty scenarios pass. Historical estimates and replacement analysis remain distinct.
 
 ## Phase 7 — Expenses, adjustments and operating results
 
