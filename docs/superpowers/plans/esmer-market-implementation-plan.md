@@ -253,10 +253,10 @@ These completed steps apply to `synthetic-relational-v1` and generated SQLite da
 
 **Interface:** `calculateSales` consumes normalized, supported sale/return events and an explicit calculation context. It returns net sales, sale-document count, basket numerator/denominator, quantities by unit, exclusions and provenance. No UI code supplies financial formulas.
 
-- [ ] Write G01 as an independent test: two units at 100, line discount 10%, recorded KDV 5% produce net 180, recorded KDV 9 and gross 189. These synthetic values assert source assumptions, not jurisdictional tax rates.
-- [ ] Test sale total 200 across two completed sale documents and a separate return of 50: net sales 150, sale-document count 2 and basket 100 under the declared convention. Pre-completion voids do not create another deduction.
-- [ ] Implement the approved discounts, tax basis, conversion and inclusion rules. Exclude/flag unknown meanings; do not silently treat unresolved type-11/type-35 relationships as independent or duplicate.
-- [ ] Test fractional quantity precision, explicit rounding, zero counts, negative/zero comparison bases and separate kilogram/piece totals. Run the same fixture in different input orders and machine date/timezone settings; results must agree.
+- [x] Write G01 as an independent test: two units at 100, line discount 10%, recorded KDV 5% produce net 180, recorded KDV 9 and gross 189. These synthetic values assert source assumptions, not jurisdictional tax rates.
+- [x] Test sale total 200 across two completed sale documents and a separate return of 50: net sales 150, sale-document count 2 and basket 100 under the declared convention. Pre-completion voids do not create another deduction.
+- [x] Implement the approved discounts, tax basis, conversion and inclusion rules. Exclude/flag unknown meanings; do not silently treat unresolved type-11/type-35 relationships as independent or duplicate.
+- [x] Test fractional quantity precision, explicit rounding, zero counts, negative/zero comparison bases and separate kilogram/piece totals. Run the same fixture in different input orders and machine date/timezone settings; results must agree.
 
 **Example assertion to add to `sales.test.ts`:**
 
@@ -275,14 +275,16 @@ expect(result.averageBasket).toBe('100');
 
 **Interface:** A report query consumes period, filters and a pinned dataset/app/calculation version. It returns metrics plus their component/source evidence. Drill-down requests carry that same version context.
 
-- [ ] Test month → category/product → transaction → source line navigation with stable IDs, batch and method visible. Refreshing the source during navigation must not mix versions.
-- [ ] Compare header and line totals under the approved reconciliation rules. Mark unexplained discrepancies incomplete; do not give a matching headline and inconsistent breakdown the same reconciled status.
-- [ ] Implement previous-period/year comparisons with accurate coverage. Label partial periods and actual matched boundaries; distinguish monetary changes from transaction or unit growth.
-- [ ] Expose cutoff, import state, exclusions and warnings in the first usable sales view. An older dataset must never appear as current live activity.
+- [x] Test month → category/product → transaction → source line navigation with stable IDs, batch and method visible. Refreshing the source during navigation must not mix versions.
+- [x] Compare header and line totals under the approved reconciliation rules. Mark unexplained discrepancies incomplete; do not give a matching headline and inconsistent breakdown the same reconciled status.
+- [x] Implement previous-period/year comparisons with accurate coverage. Label partial periods and actual matched boundaries; distinguish monetary changes from transaction or unit growth.
+- [x] Expose cutoff, import state, exclusions and warnings in the first usable sales view. An older dataset must never appear as current live activity.
 
 **Verify:** `npm run test:integration -- tests/integration/sales-reconciliation.test.ts` and `npm run test:desktop -- tests/desktop/sales-drilldown.test.ts`.
 
-**Exit gate:** Sales metrics reconcile and are explainable. The sales portions of A02/A03 and relevant UI portions of A07 pass.
+**Evidence status (2026-09-20):** The checked tasks describe the bounded synthetic implementation. See [local verification](../../evidence/phase-5-local.md) and the subsequent [Windows verification](../../evidence/windows-phase-5.md): 12 unit, 133 integration and 7 packaged desktop tests passed, with native picker, isolated lifecycle, schema2 preservation, pinned report/pruning, inventory and timing evidence. Windows continuation preserves original quantity precision in source details. The user reported successful physical-offline testing and authorized merging the verified implementation in PR19. A fresh independent packaged smoke test passed. Source semantics, full-volume performance and actual Windows scaling/warning review remain open. No additional checkbox or broader A02/A03/A07 gate is completed by these synthetic checks. The [Windows prompt](../../operations/windows-phase-5-handoff.md) is the historical procedure; the evidence record and September 20 authorization govern current status. Issue #8 remains open, and no later-phase work or deployment is included.
+
+**Exit gate (open):** Sales metrics reconcile and are explainable. The sales portions of A02/A03 and relevant UI portions of A07 pass.
 
 ## Phase 6 — Historical estimates, purchasing and supplier returns
 

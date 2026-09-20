@@ -9,7 +9,7 @@ export type ImportCode = ImportErrorCode;
 export type ImportResult = { status: "active" | "unchanged" | "historical"; datasetId: string } | { status: "failed"; code: ImportCode } | { status: "cancelled" };
 export type StageResult = { status: "validated"; id: string; datasetId: string } | ImportResult;
 export type FaultBoundary = "reading" | "persistence" | "validation" | "summary" | "activation";
-export type Snapshot = { pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[] };
+export type Snapshot = { importedAt: string | null; pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[] };
 type Options = { schemaVersion?: number; fault?: (boundary: FaultBoundary) => void; maxPages?: number };
 const hash = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
 const decode = <T>(value: unknown): T => JSON.parse(String(value)) as T;
@@ -22,7 +22,9 @@ export function openStore(path: string, options: Options = {}) {
 }
 
 class AnalyticsStore {
+  private readonly salesEnabled: boolean;
   constructor(private readonly db: DatabaseSync, private readonly options: Options) {
+    this.salesEnabled = Number(db.prepare("PRAGMA user_version").get()!.user_version) >= 3;
     if (options.maxPages !== undefined) {
       requireValid(Number.isSafeInteger(options.maxPages) && options.maxPages > 0);
       db.exec(`PRAGMA max_page_count=${options.maxPages}`);
@@ -54,10 +56,13 @@ class AnalyticsStore {
       appRevision: Number(this.db.prepare("SELECT COALESCE(MAX(revision),0) AS revision FROM app_revisions").get()!.revision),
     };
   }
+  private withSales<T>(rows: Record<string, unknown>[]): T[] {
+    return rows.map(({ sales_json, ...row }) => ({ ...row, ...(sales_json ? { sales: decode(sales_json) } : {}) })) as T[];
+  }
   private facts(datasetId: string): Records {
     return {
-      documents: this.db.prepare("SELECT id,kind,date,supplier_id AS supplierId FROM source_documents WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["documents"],
-      lines: this.db.prepare("SELECT id,document_id AS documentId,quantity,net,cost FROM source_lines WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["lines"],
+      documents: this.withSales<Records["documents"][number]>(this.db.prepare(`SELECT id,kind,date,supplier_id AS supplierId${this.salesEnabled ? ",sales_json" : ""} FROM source_documents WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
+      lines: this.withSales<Records["lines"][number]>(this.db.prepare(`SELECT id,document_id AS documentId,quantity,net,cost${this.salesEnabled ? ",sales_json" : ""} FROM source_lines WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
       suppliers: this.db.prepare("SELECT id FROM source_suppliers WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["suppliers"],
     };
   }
@@ -67,6 +72,14 @@ class AnalyticsStore {
     const line = target.kind === "line" ? this.db.prepare("SELECT id,document_id,quantity,net,cost FROM source_lines WHERE dataset_id=? AND id=?").get(datasetId, target.sourceId) : null;
     if (target.kind === "line" && !line) return null;
     const document = this.db.prepare("SELECT id,kind,date,supplier_id FROM source_documents WHERE dataset_id=? AND id=?").get(datasetId, line ? String(line.document_id) : target.sourceId);
+    if (this.salesEnabled && document) {
+      const docSales = this.db.prepare("SELECT sales_json FROM source_documents WHERE dataset_id=? AND id=?").get(datasetId, String(document.id));
+      if (docSales?.sales_json) document.sales = String(docSales.sales_json);
+      if (line) {
+        const lineSales = this.db.prepare("SELECT sales_json FROM source_lines WHERE dataset_id=? AND id=?").get(datasetId, String(line.id));
+        if (lineSales?.sales_json) line.sales = String(lineSales.sales_json);
+      }
+    }
     return document ? hash({ lineage: dataset.lineage, kind: target.kind, document, line }) : null;
   }
   private snapshot(pin: Pin): Snapshot {
@@ -82,7 +95,7 @@ class AnalyticsStore {
       if (record.kind === "adjustment") record.applicability = record.value.reversed ? "reversed" : pin.datasetId !== null && this.fingerprint(record.value.target, pin.datasetId) === row.fingerprint ? "applicable" : "review-required";
       return record;
     });
-    return { pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app };
+    return { importedAt: pin.datasetId ? (this.db.prepare("SELECT created_at FROM import_batches WHERE dataset_id=? AND state='active' ORDER BY rowid LIMIT 1").get(pin.datasetId)?.created_at as string | undefined ?? null) : null, pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app };
   }
   readSnapshot(): Snapshot { return this.transaction(() => this.snapshot(this.currentPin()), true); }
   readPinned(pin: Pin): Snapshot { return this.transaction(() => this.snapshot(pin), true); }
@@ -146,10 +159,10 @@ class AnalyticsStore {
           this.db.prepare("INSERT INTO datasets VALUES(?,?,?,?,?)").run(candidateId, parsed.metadata.lineage, canonical(parsed.metadata), canonical(parsed.warnings), "{}");
           const supplier = this.db.prepare("INSERT INTO source_suppliers VALUES(?,?,?)");
           for (const [ordinal, row] of parsed.records.suppliers.entries()) supplier.run(candidateId, row.id, ordinal);
-          const document = this.db.prepare("INSERT INTO source_documents VALUES(?,?,?,?,?,?)");
-          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal);
-          const line = this.db.prepare("INSERT INTO source_lines VALUES(?,?,?,?,?,?,?)");
-          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal);
+          const document = this.db.prepare(`INSERT INTO source_documents VALUES(?,?,?,?,?,?${this.salesEnabled ? ",?" : ""})`);
+          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []));
+          const line = this.db.prepare(`INSERT INTO source_lines VALUES(?,?,?,?,?,?,?${this.salesEnabled ? ",?" : ""})`);
+          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []));
         }
         this.options.fault?.("persistence");
         const facts = this.facts(candidateId);

@@ -50,3 +50,15 @@ Historical estimates remain estimated after acceptance. Monthly `Açık / Geçic
 ## Formula release gate
 
 No formula is newly released by this phase. Each later formula must have a named oracle, supported source rules for its population, and tests against its actual implementation. The [oracle inventory](../evidence/golden-oracles.md) distinguishes covered synthetic assumptions from unimplemented or unsupported calculations. Supplier settlement, complete real-source discount/rounding behavior, inventory valuation, statutory tax calculations and weighted-average cost remain blocked or outside the approved release scope.
+
+## Phase 5 synthetic sales policy
+
+Phase 5 implements the sales engine for `synthetic-sales-v1` only. The unresolved real-source rules above remain unchanged. Earlier statements that no engine exists describe Phase 2, not this implementation. A legacy relational package has insufficient meaning and returns unavailable sales, rather than fabricated zero metrics.
+
+Synthetic line net is signed quantity magnitude multiplied by KDV-exclusive unit price and by `(1 - discountRate / 100)`. A separately issued customer return supplies the negative sign. Voids do not deduct again. Explicit converted representations are excluded from recognition while retaining their evidence. Unknown meanings or ambiguous ownership remain excluded and make coverage incomplete. The contract does not infer a type-11/type-35 relationship.
+
+Use an isolated decimal.js configuration with precision 100. The synthetic quantity/price bounds and rate bounds permit exact intermediate net arithmetic and bounded summation without binary floating-point conversion. Preserve original serialized decimal strings in evidence. Round only the explicitly declared tax expectation, final averages and percentages. The UI preserves supplied decimal digits and pads money to at least two places; it does not round aggregation inputs. Tax expectation and final ratios use two decimal places with half-away-from-zero rounding. Recorded KDV is retained, and discrepancies must remain visible rather than being silently rewritten.
+
+Header and line amounts reconcile exactly under this synthetic policy. The historical audit's 0.01 observation is not a universal tolerance. A discrepancy leaves the line-based report incomplete, with original header amounts and differences visible. Separate returns reduce net sales but neither the basket numerator nor completed-sale document count. Zero sale count yields unavailable average basket. Quantities remain separated by unit.
+
+Reports carry an explicit business-date period, dataset/app revision and calculation version. Month/year comparisons disclose matched boundaries and coverage. Complete months compare complete calendar months. Partial months compare matching available day ranges, clamping both sides for shorter months. Basket percentage changes use unrounded numerator/count ratios. Missing coverage or a nonpositive comparison base yields unavailable percentages. Synthetic reconciliation is not source reconciliation or proof of actual market completeness.

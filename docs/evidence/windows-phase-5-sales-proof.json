@@ -1,0 +1,384 @@
+{
+  "archiveSha256": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+  "fixture": {
+    "identity": "sales-fixture/sales-1",
+    "mapping": "synthetic-sales-v1",
+    "bytes": 3292,
+    "sha256": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+    "documents": 4,
+    "lines": 7,
+    "expected": {
+      "net": "365",
+      "count": 3,
+      "basket": "133.33"
+    }
+  },
+  "timing": [
+    {
+      "launch": 0,
+      "coldStartupToReportMs": 1443.0394000000001,
+      "warmServiceRequests": [
+        {
+          "repetition": 0,
+          "openMs": 2,
+          "categoryMs": 1.4000000357627869,
+          "productMs": 1.0999999642372131,
+          "detailMs": 1.199999988079071,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 1,
+          "openMs": 1.699999988079071,
+          "categoryMs": 1,
+          "productMs": 1.0999999642372131,
+          "detailMs": 0.5,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.9000000357627869,
+          "categoryMs": 1.399999976158142,
+          "productMs": 0.699999988079071,
+          "detailMs": 0.40000003576278687,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.399999976158142,
+          "categoryMs": 1.300000011920929,
+          "productMs": 1.300000011920929,
+          "detailMs": 0.3999999761581421,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1.199999988079071,
+          "categoryMs": 0.800000011920929,
+          "productMs": 0.800000011920929,
+          "detailMs": 0.3999999761581421,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        }
+      ]
+    },
+    {
+      "launch": 1,
+      "coldStartupToReportMs": 1384.2129,
+      "warmServiceRequests": [
+        {
+          "repetition": 0,
+          "openMs": 3.199999988079071,
+          "categoryMs": 2.699999988079071,
+          "productMs": 1.5,
+          "detailMs": 0.9000000357627869,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 1,
+          "openMs": 1.5,
+          "categoryMs": 2,
+          "productMs": 1.699999988079071,
+          "detailMs": 0.6000000238418579,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.899999976158142,
+          "categoryMs": 1.199999988079071,
+          "productMs": 1.100000023841858,
+          "detailMs": 0.5,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.399999976158142,
+          "categoryMs": 0.9000000357627869,
+          "productMs": 0.8999999761581421,
+          "detailMs": 0.3999999761581421,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1.300000011920929,
+          "categoryMs": 1.100000023841858,
+          "productMs": 0.8999999761581421,
+          "detailMs": 0.40000003576278687,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        }
+      ]
+    },
+    {
+      "launch": 2,
+      "coldStartupToReportMs": 1417.3091,
+      "warmServiceRequests": [
+        {
+          "repetition": 0,
+          "openMs": 3.700000047683716,
+          "categoryMs": 1.699999988079071,
+          "productMs": 1.0999999642372131,
+          "detailMs": 0.9000000357627869,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 1,
+          "openMs": 1.800000011920929,
+          "categoryMs": 1.5,
+          "productMs": 1.5999999642372131,
+          "detailMs": 0.800000011920929,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.600000023841858,
+          "categoryMs": 1.0999999642372131,
+          "productMs": 1.100000023841858,
+          "detailMs": 0.699999988079071,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.300000011920929,
+          "categoryMs": 1.0999999642372131,
+          "productMs": 1.2000000476837158,
+          "detailMs": 0.7999999523162842,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1.800000011920929,
+          "categoryMs": 1.100000023841858,
+          "productMs": 0.800000011920929,
+          "detailMs": 0.699999988079071,
+          "reportNet": "365",
+          "productNet": "100",
+          "scopeNet": "60",
+          "documentNet": "130"
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "mode": "native host scaling and actual minimum BrowserWindow",
+      "width": 664,
+      "height": 481,
+      "documentWidth": 649,
+      "devicePixelRatio": 1,
+      "sourceScrollingAndKeyboard": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1,
+      "size": [
+        1120,
+        760
+      ],
+      "width": 1104,
+      "height": 721,
+      "documentWidth": 1089,
+      "devicePixelRatio": 1,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1,
+      "size": [
+        680,
+        520
+      ],
+      "width": 664,
+      "height": 481,
+      "documentWidth": 649,
+      "devicePixelRatio": 1,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1.25,
+      "size": [
+        1120,
+        760
+      ],
+      "width": 1108,
+      "height": 730,
+      "documentWidth": 1093,
+      "devicePixelRatio": 1.25,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1.25,
+      "size": [
+        680,
+        520
+      ],
+      "width": 668,
+      "height": 491,
+      "documentWidth": 653,
+      "devicePixelRatio": 1.25,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1.5,
+      "size": [
+        1120,
+        760
+      ],
+      "width": 1110,
+      "height": 734,
+      "documentWidth": 1095,
+      "devicePixelRatio": 1.5,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 1.5,
+      "size": [
+        680,
+        520
+      ],
+      "width": 670,
+      "height": 494,
+      "documentWidth": 655,
+      "devicePixelRatio": 1.5,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 2,
+      "size": [
+        1120,
+        760
+      ],
+      "width": 1112,
+      "height": 741,
+      "documentWidth": 1097,
+      "devicePixelRatio": 2,
+      "receiptAndSourceScroll": true
+    },
+    {
+      "mode": "Chromium forced scale, OS setting unchanged",
+      "scale": 2,
+      "size": [
+        680,
+        520
+      ],
+      "width": 672,
+      "height": 502,
+      "documentWidth": 657,
+      "devicePixelRatio": 2,
+      "receiptAndSourceScroll": true
+    }
+  ],
+  "checks": {
+    "pinnedContextAfterThreeReplacements": true,
+    "oldDataset": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+    "noAcceptedReportsCreated": true,
+    "oldFactsActuallyPruned": true,
+    "restartActiveSales": "395"
+  },
+  "runtime": {
+    "versions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "packaged": true,
+    "locale": "tr",
+    "displays": [
+      {
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1440
+        },
+        "workArea": {
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1392
+        },
+        "scaleFactor": 1
+      }
+    ],
+    "size": [
+      1120,
+      760
+    ],
+    "minimum": [
+      680,
+      520
+    ]
+  }
+}

@@ -58,3 +58,7 @@ Privacy attack records contain only clearly labelled synthetic sentinel values. 
 Independent design review selected the static registry and test-local validation. It required strict nested fields, explicit policy/source separation, actual snapshot correspondence and this formula inventory. Implementation review and final test results are recorded in [local evidence](phase-2-local.md).
 
 Task 2.2's synthetic evidence can be reviewed independently. Source revalidation portions of task 2.1, real reduced-fixture work and affected A02/A03/A05 gates remain open. The subsequent [Windows record](windows-phase-2.md) lists passed synthetic/regression checks and the user-reported successful physical-disconnect check. No source-reconciled label, completed A04 importer gate or full A07 Windows gate follows from these oracles.
+
+## Phase 5 implementation evidence
+
+The sales subset now runs against the actual decimal calculator and retained report queries. G01, separate-return basket semantics, conversion exclusions, fractional precision, nonpositive comparison bases and calendar coverage are covered by `tests/unit/sales.test.ts`, `tests/unit/decimal-boundaries.test.ts` and `tests/integration/sales-reconciliation.test.ts`. See [Phase 5 local evidence](phase-5-local.md) for literal results, code revisions and packaged navigation. This implements only `synthetic-sales-v1`; the source-dependent prerequisites and later cost/expense/purchasing gates above remain open.
