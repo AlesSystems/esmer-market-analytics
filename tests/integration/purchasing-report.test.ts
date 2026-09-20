@@ -2,6 +2,28 @@ import { expect, test } from "vitest";
 import { openStore } from "../../src/store/store";
 import { SalesReports } from "../../src/reports/query";
 import { salesPackage } from "../helpers/sales-fixtures";
+import { addPurchase, businessPackage, businessRecords } from "../helpers/business-fixtures";
+
+test("replacement evidence retains both purchase documents outside the report month", () => {
+  const records = businessRecords();
+  records.documents.forEach(row => { row.date = "2025-08-15"; });
+  addPurchase(records, "P1");
+  addPurchase(records, "D1");
+  const dispatch = records.documents.find(row => row.id === "D1")!;
+  dispatch.purchasing = { ...dispatch.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true };
+  const store = openStore(":memory:");
+  try {
+    expect(store.importPackage(businessPackage(records, { coverage: { from: "2025-08-01", to: "2025-09-30", complete: true } }))).toMatchObject({ status: "active" });
+    const reports = new SalesReports(store), sales = reports.open({ period: "2025-08" });
+    if (sales.status !== "report") throw new Error("Expected report");
+    const result = reports.purchasing({ context: sales.view.context });
+    if (result.status !== "purchasing") throw new Error("Expected purchasing");
+    expect(result.view.purchasing.history).toEqual([]);
+    expect(result.view.purchasing.replacements).toMatchObject([{ documentId: "P1", replacementCost: "50" }]);
+    expect(result.view.evidence.documents.map(row => row.id)).toEqual(expect.arrayContaining(["P1", "D1"]));
+    expect(result.view.evidence.lines.map(row => row.id)).toEqual(expect.arrayContaining(["P1-line", "D1-line"]));
+  } finally { store.close(); }
+});
 
 test("purchasing shares the sales snapshot and rejects stale contexts without inventing legacy cost", () => {
   const store = openStore(":memory:");

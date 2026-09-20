@@ -50,6 +50,8 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await page.screenshot({ path: "test-results/phase-6-purchasing-source.png", fullPage: true });
     await panel.getByRole("button", { name: "R1", exact: true }).click();
     await expect(panel.getByText("Fatura", { exact: true })).toBeVisible();
+    await panel.getByRole("button", { name: "D1", exact: true }).click();
+    await expect(panel.getByText("İrsaliye", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: "D1", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "D1", exact: true }).click();
@@ -68,6 +70,33 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
     await page.getByRole("button", { name: "D1", exact: true }).click();
     await expect(panel.getByText("business-2", { exact: true })).toBeVisible();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("customer return evidence opens its original sale from the prior month and restores focus", async () => {
+  const { businessRecords, businessPackage } = await import("../helpers/business-fixtures");
+  const records = businessRecords();
+  records.documents[0].date = "2025-08-15";
+  records.documents[1] = { ...structuredClone(records.documents[0]), id: "C1", kind: "customer-return", date: "2025-09-15", sales: { ...records.documents[0].sales!, net: "-100", tax: "-5", gross: "-105" } };
+  records.lines[1] = { ...structuredClone(records.lines[0]), id: "C1-line", documentId: "C1", net: "-100", sales: { ...records.lines[0].sales!, tax: "-5", gross: "-105" }, business: { historicalCost: { ...records.lines[0].business!.historicalCost!, originalSaleLineId: records.lines[0].id }, inventory: null } };
+  const userData = await mkdtemp(join(tmpdir(), "esmer-return-evidence-")), packagePath = join(userData, "synthetic.json");
+  await writeFile(packagePath, businessPackage(records, { coverage: { from: "2025-08-01", to: "2025-09-30", complete: true } }));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await page.getByText("Satır maliyet kanıtları", { exact: true }).click();
+    const opener = page.getByRole("button", { name: "C1", exact: true });
+    await opener.press("Enter");
+    const panel = page.getByRole("complementary");
+    await panel.getByRole("button", { name: "S1", exact: true }).press("Enter");
+    await expect(panel.getByText("15.08.2025", { exact: true })).toBeVisible();
+    await expect(panel.getByText("Satır: L1", { exact: true })).toBeVisible();
+    await expect(panel.getByRole("heading", { name: "Maliyet ve alış kaynak detayı" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(opener).toBeFocused();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
