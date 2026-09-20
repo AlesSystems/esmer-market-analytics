@@ -52,6 +52,10 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await expect(panel.getByText("Fatura", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: "D1", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "D1", exact: true }).click();
+    await panel.getByRole("button", { name: "R1", exact: true }).click();
+    await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+    await expect(page.getByRole("button", { name: "D1", exact: true })).toBeFocused();
     await page.setViewportSize({ width: 680, height: 720 });
     await page.screenshot({ path: "test-results/phase-6-purchasing-small.png", fullPage: true });
     await page.setViewportSize({ width: 1120, height: 850 });

@@ -100,7 +100,7 @@ export class SalesReports {
     for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
     for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
     const evidence = { documents: snapshot.records.documents.filter(row => ids.has(row.id)), lines: snapshot.records.lines.filter(row => ids.has(row.documentId)) };
-    return { status: "purchasing", view: { costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, evidence, gross, purchasing } };
+    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, evidence, gross, purchasing } };
   }
   inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
     const session = this.resolve(context);
