@@ -1,0 +1,893 @@
+{
+  "current": {
+    "importedAt": "2026-09-20T09:35:41.798Z",
+    "pin": {
+      "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+      "appRevision": 3
+    },
+    "metadata": {
+      "coverage": {
+        "complete": true,
+        "from": "2025-09-01",
+        "to": "2025-09-03"
+      },
+      "currency": "TRY",
+      "cutoff": "2025-09-03",
+      "extractedAt": "2025-09-04T00:00:00.000Z",
+      "extractionId": "sales-1",
+      "lineage": "sales-fixture",
+      "mappingVersion": "synthetic-sales-v1",
+      "provenance": "synthetic",
+      "schemaVersion": "analytics-package-v1",
+      "sourceReconciled": false,
+      "streams": {
+        "documents": {
+          "count": 4,
+          "sha256": "84956db85512cfe654c2e3f8bae9774b2461ddc8a94c3abc06fbb6bc25928246"
+        },
+        "lines": {
+          "count": 7,
+          "sha256": "12394a68e8e56d3c19d5464a0caeec09d72ac190d24ab2027deae2926150115c"
+        },
+        "suppliers": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    },
+    "warnings": [
+      "SYNTHETIC_ONLY",
+      "MISSING_COST"
+    ],
+    "records": {
+      "documents": [
+        {
+          "id": "R001",
+          "kind": "customer-return",
+          "date": "2025-09-02",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "-36.75",
+            "net": "-35",
+            "state": "completed",
+            "tax": "-1.75"
+          }
+        },
+        {
+          "id": "S001",
+          "kind": "sale",
+          "date": "2025-09-01",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "73.5",
+            "net": "70",
+            "state": "completed",
+            "tax": "3.5"
+          }
+        },
+        {
+          "id": "S002",
+          "kind": "sale",
+          "date": "2025-09-02",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "136.5",
+            "net": "130",
+            "state": "completed",
+            "tax": "6.5"
+          }
+        },
+        {
+          "id": "S003",
+          "kind": "sale",
+          "date": "2025-09-03",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "210",
+            "net": "200",
+            "state": "completed",
+            "tax": "10"
+          }
+        }
+      ],
+      "lines": [
+        {
+          "id": "L001",
+          "documentId": "S001",
+          "quantity": "2",
+          "net": "40",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "42",
+            "meaning": "known",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "tax": "2",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "20"
+          }
+        },
+        {
+          "id": "L002",
+          "documentId": "S001",
+          "quantity": "1",
+          "net": "30",
+          "cost": null,
+          "sales": {
+            "categoryId": "bakery",
+            "categoryName": "Fırın",
+            "discountRate": "0",
+            "gross": "31.5",
+            "meaning": "known",
+            "productId": "bread",
+            "productName": "Ekmek",
+            "tax": "1.5",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "30"
+          }
+        },
+        {
+          "id": "L003",
+          "documentId": "S002",
+          "quantity": "3",
+          "net": "60",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "63",
+            "meaning": "known",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "tax": "3",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "20"
+          }
+        },
+        {
+          "id": "L004",
+          "documentId": "S002",
+          "quantity": "2",
+          "net": "70",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "73.5",
+            "meaning": "known",
+            "productId": "soda",
+            "productName": "Gazoz",
+            "tax": "3.5",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "35"
+          }
+        },
+        {
+          "id": "L005",
+          "documentId": "S003",
+          "quantity": "4",
+          "net": "120",
+          "cost": null,
+          "sales": {
+            "categoryId": "bakery",
+            "categoryName": "Fırın",
+            "discountRate": "0",
+            "gross": "126",
+            "meaning": "known",
+            "productId": "bread",
+            "productName": "Ekmek",
+            "tax": "6",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "30"
+          }
+        },
+        {
+          "id": "L006",
+          "documentId": "S003",
+          "quantity": "2",
+          "net": "80",
+          "cost": null,
+          "sales": {
+            "categoryId": "produce",
+            "categoryName": "Manav",
+            "discountRate": "0",
+            "gross": "84",
+            "meaning": "known",
+            "productId": "apple",
+            "productName": "Elma",
+            "tax": "4",
+            "taxRate": "5",
+            "unit": "kg",
+            "unitNet": "40"
+          }
+        },
+        {
+          "id": "L007",
+          "documentId": "R001",
+          "quantity": "1",
+          "net": "-35",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "-36.75",
+            "meaning": "known",
+            "productId": "soda",
+            "productName": "Gazoz",
+            "tax": "-1.75",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "35"
+          }
+        }
+      ],
+      "suppliers": []
+    },
+    "app": [
+      {
+        "revision": 2,
+        "kind": "adjustment",
+        "entityId": "adjustment",
+        "value": {
+          "evidence": "fixture:adjustment",
+          "net": "0.125000000000000001",
+          "reason": "Synthetic lifecycle adjustment",
+          "reversed": false,
+          "target": {
+            "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+            "kind": "line",
+            "sourceId": "L001"
+          }
+        },
+        "applicability": "applicable"
+      },
+      {
+        "revision": 3,
+        "kind": "setting",
+        "entityId": "currency",
+        "value": {
+          "currency": "TRY",
+          "evidence": "fixture:setting-2",
+          "reason": "Synthetic lifecycle later setting"
+        }
+      }
+    ]
+  },
+  "accepted": {
+    "importedAt": "2026-09-20T09:35:41.798Z",
+    "pin": {
+      "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+      "appRevision": 2
+    },
+    "metadata": {
+      "coverage": {
+        "complete": true,
+        "from": "2025-09-01",
+        "to": "2025-09-03"
+      },
+      "currency": "TRY",
+      "cutoff": "2025-09-03",
+      "extractedAt": "2025-09-04T00:00:00.000Z",
+      "extractionId": "sales-1",
+      "lineage": "sales-fixture",
+      "mappingVersion": "synthetic-sales-v1",
+      "provenance": "synthetic",
+      "schemaVersion": "analytics-package-v1",
+      "sourceReconciled": false,
+      "streams": {
+        "documents": {
+          "count": 4,
+          "sha256": "84956db85512cfe654c2e3f8bae9774b2461ddc8a94c3abc06fbb6bc25928246"
+        },
+        "lines": {
+          "count": 7,
+          "sha256": "12394a68e8e56d3c19d5464a0caeec09d72ac190d24ab2027deae2926150115c"
+        },
+        "suppliers": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    },
+    "warnings": [
+      "SYNTHETIC_ONLY",
+      "MISSING_COST"
+    ],
+    "records": {
+      "documents": [
+        {
+          "id": "R001",
+          "kind": "customer-return",
+          "date": "2025-09-02",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "-36.75",
+            "net": "-35",
+            "state": "completed",
+            "tax": "-1.75"
+          }
+        },
+        {
+          "id": "S001",
+          "kind": "sale",
+          "date": "2025-09-01",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "73.5",
+            "net": "70",
+            "state": "completed",
+            "tax": "3.5"
+          }
+        },
+        {
+          "id": "S002",
+          "kind": "sale",
+          "date": "2025-09-02",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "136.5",
+            "net": "130",
+            "state": "completed",
+            "tax": "6.5"
+          }
+        },
+        {
+          "id": "S003",
+          "kind": "sale",
+          "date": "2025-09-03",
+          "supplierId": null,
+          "sales": {
+            "convertedTo": null,
+            "gross": "210",
+            "net": "200",
+            "state": "completed",
+            "tax": "10"
+          }
+        }
+      ],
+      "lines": [
+        {
+          "id": "L001",
+          "documentId": "S001",
+          "quantity": "2",
+          "net": "40",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "42",
+            "meaning": "known",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "tax": "2",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "20"
+          }
+        },
+        {
+          "id": "L002",
+          "documentId": "S001",
+          "quantity": "1",
+          "net": "30",
+          "cost": null,
+          "sales": {
+            "categoryId": "bakery",
+            "categoryName": "Fırın",
+            "discountRate": "0",
+            "gross": "31.5",
+            "meaning": "known",
+            "productId": "bread",
+            "productName": "Ekmek",
+            "tax": "1.5",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "30"
+          }
+        },
+        {
+          "id": "L003",
+          "documentId": "S002",
+          "quantity": "3",
+          "net": "60",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "63",
+            "meaning": "known",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "tax": "3",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "20"
+          }
+        },
+        {
+          "id": "L004",
+          "documentId": "S002",
+          "quantity": "2",
+          "net": "70",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "73.5",
+            "meaning": "known",
+            "productId": "soda",
+            "productName": "Gazoz",
+            "tax": "3.5",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "35"
+          }
+        },
+        {
+          "id": "L005",
+          "documentId": "S003",
+          "quantity": "4",
+          "net": "120",
+          "cost": null,
+          "sales": {
+            "categoryId": "bakery",
+            "categoryName": "Fırın",
+            "discountRate": "0",
+            "gross": "126",
+            "meaning": "known",
+            "productId": "bread",
+            "productName": "Ekmek",
+            "tax": "6",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "30"
+          }
+        },
+        {
+          "id": "L006",
+          "documentId": "S003",
+          "quantity": "2",
+          "net": "80",
+          "cost": null,
+          "sales": {
+            "categoryId": "produce",
+            "categoryName": "Manav",
+            "discountRate": "0",
+            "gross": "84",
+            "meaning": "known",
+            "productId": "apple",
+            "productName": "Elma",
+            "tax": "4",
+            "taxRate": "5",
+            "unit": "kg",
+            "unitNet": "40"
+          }
+        },
+        {
+          "id": "L007",
+          "documentId": "R001",
+          "quantity": "1",
+          "net": "-35",
+          "cost": null,
+          "sales": {
+            "categoryId": "drinks",
+            "categoryName": "İçecekler",
+            "discountRate": "0",
+            "gross": "-36.75",
+            "meaning": "known",
+            "productId": "soda",
+            "productName": "Gazoz",
+            "tax": "-1.75",
+            "taxRate": "5",
+            "unit": "piece",
+            "unitNet": "35"
+          }
+        }
+      ],
+      "suppliers": []
+    },
+    "app": [
+      {
+        "revision": 1,
+        "kind": "setting",
+        "entityId": "currency",
+        "value": {
+          "currency": "TRY",
+          "evidence": "fixture:setting-1",
+          "reason": "Synthetic lifecycle initial setting"
+        }
+      },
+      {
+        "revision": 2,
+        "kind": "adjustment",
+        "entityId": "adjustment",
+        "value": {
+          "evidence": "fixture:adjustment",
+          "net": "0.125000000000000001",
+          "reason": "Synthetic lifecycle adjustment",
+          "reversed": false,
+          "target": {
+            "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+            "kind": "line",
+            "sourceId": "L001"
+          }
+        },
+        "applicability": "applicable"
+      }
+    ]
+  },
+  "report": {
+    "id": "accepted",
+    "pin": {
+      "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+      "appRevision": 2
+    },
+    "calculationVersion": "synthetic-preservation-v1",
+    "evidence": [
+      "fixture:synthetic-report"
+    ],
+    "output": {
+      "label": "Synthetic migration sentinel only; not owner acceptance",
+      "net": "0.125000000000000001"
+    }
+  },
+  "availability": {
+    "status": "ready",
+    "store": "loaded",
+    "liveConnection": "disabled",
+    "dataset": {
+      "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+      "cutoff": "2025-09-03",
+      "extractedAt": "2025-09-04T00:00:00.000Z",
+      "counts": {
+        "documents": 4,
+        "lines": 7,
+        "suppliers": 0
+      },
+      "warnings": [
+        "SYNTHETIC_ONLY",
+        "MISSING_COST"
+      ]
+    }
+  },
+  "tables": {
+    "active_dataset": {
+      "columns": [
+        "singleton",
+        "dataset_id"
+      ],
+      "rows": [
+        {
+          "singleton": 1,
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2"
+        }
+      ],
+      "sha256": "985d65efd3cb90cb0b0679bfa0bbbe65b6b4ce804d711f904edb7325dee3bbdf"
+    },
+    "adjustment_targets": {
+      "columns": [
+        "revision",
+        "dataset_id",
+        "source_kind",
+        "source_id",
+        "fingerprint"
+      ],
+      "rows": [
+        {
+          "revision": 2,
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "source_kind": "line",
+          "source_id": "L001",
+          "fingerprint": "189b59475385fefcd6ee35ec5760d15a45e299ea60fe7fb045b70857af4120a0"
+        }
+      ],
+      "sha256": "8be6405d64a12ca357d6dd4f8742bb8d7f8c75c9faf397629515cb623f3a8a2b"
+    },
+    "app_revisions": {
+      "columns": [
+        "revision",
+        "kind",
+        "entity_id",
+        "value_json",
+        "created_at"
+      ],
+      "rows": [
+        {
+          "revision": 1,
+          "kind": "setting",
+          "entity_id": "currency",
+          "value_json": "{\"currency\":\"TRY\",\"evidence\":\"fixture:setting-1\",\"reason\":\"Synthetic lifecycle initial setting\"}",
+          "created_at": "2026-09-20T09:35:41.851Z"
+        },
+        {
+          "revision": 2,
+          "kind": "adjustment",
+          "entity_id": "adjustment",
+          "value_json": "{\"evidence\":\"fixture:adjustment\",\"net\":\"0.125000000000000001\",\"reason\":\"Synthetic lifecycle adjustment\",\"reversed\":false,\"target\":{\"datasetId\":\"bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2\",\"kind\":\"line\",\"sourceId\":\"L001\"}}",
+          "created_at": "2026-09-20T09:35:41.862Z"
+        },
+        {
+          "revision": 3,
+          "kind": "setting",
+          "entity_id": "currency",
+          "value_json": "{\"currency\":\"TRY\",\"evidence\":\"fixture:setting-2\",\"reason\":\"Synthetic lifecycle later setting\"}",
+          "created_at": "2026-09-20T09:35:41.887Z"
+        }
+      ],
+      "sha256": "26383db47cf22672c19b5934b68431349996e9e33f05ae55d166dbe9f2efbf17"
+    },
+    "datasets": {
+      "columns": [
+        "id",
+        "lineage",
+        "manifest_json",
+        "warnings_json",
+        "summary_json"
+      ],
+      "rows": [
+        {
+          "id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "lineage": "sales-fixture",
+          "manifest_json": "{\"coverage\":{\"complete\":true,\"from\":\"2025-09-01\",\"to\":\"2025-09-03\"},\"currency\":\"TRY\",\"cutoff\":\"2025-09-03\",\"extractedAt\":\"2025-09-04T00:00:00.000Z\",\"extractionId\":\"sales-1\",\"lineage\":\"sales-fixture\",\"mappingVersion\":\"synthetic-sales-v1\",\"provenance\":\"synthetic\",\"schemaVersion\":\"analytics-package-v1\",\"sourceReconciled\":false,\"streams\":{\"documents\":{\"count\":4,\"sha256\":\"84956db85512cfe654c2e3f8bae9774b2461ddc8a94c3abc06fbb6bc25928246\"},\"lines\":{\"count\":7,\"sha256\":\"12394a68e8e56d3c19d5464a0caeec09d72ac190d24ab2027deae2926150115c\"},\"suppliers\":{\"count\":0,\"sha256\":\"4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945\"}}}",
+          "warnings_json": "[\"SYNTHETIC_ONLY\",\"MISSING_COST\"]",
+          "summary_json": "{\"documents\":4,\"lines\":7,\"suppliers\":0,\"warnings\":[\"SYNTHETIC_ONLY\",\"MISSING_COST\"]}"
+        }
+      ],
+      "sha256": "fceb3b3fa2fe76b63f227aefd8b133a7232ffb26c58e205dd8580d49b55ae493"
+    },
+    "evidence_references": {
+      "columns": [
+        "id",
+        "report_id",
+        "batch_id",
+        "identity"
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "report_id": null,
+          "batch_id": "2839d043-b765-4c48-b6ee-b9797fd5e4aa",
+          "identity": "package:bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2"
+        },
+        {
+          "id": 2,
+          "report_id": "accepted",
+          "batch_id": null,
+          "identity": "fixture:synthetic-report"
+        }
+      ],
+      "sha256": "eaf35d7444c96cf16907953e1ec8dba5b9755ed2b137e1d4434aa28eb52b366b"
+    },
+    "import_batches": {
+      "columns": [
+        "id",
+        "dataset_id",
+        "state",
+        "error_code",
+        "created_at",
+        "difference_json"
+      ],
+      "rows": [
+        {
+          "id": "2839d043-b765-4c48-b6ee-b9797fd5e4aa",
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "state": "active",
+          "error_code": null,
+          "created_at": "2026-09-20T09:35:41.798Z",
+          "difference_json": "{\"appRevision\":0,\"from\":null,\"lineage\":\"sales-fixture\",\"lineageChanged\":false,\"previousLineage\":null,\"streams\":{\"documents\":{\"changed\":[],\"deleted\":[],\"inserted\":[\"R001\",\"S001\",\"S002\",\"S003\"]},\"lines\":{\"changed\":[],\"deleted\":[],\"inserted\":[\"L001\",\"L002\",\"L003\",\"L004\",\"L005\",\"L006\",\"L007\"]},\"suppliers\":{\"changed\":[],\"deleted\":[],\"inserted\":[]}},\"to\":\"bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2\"}"
+        }
+      ],
+      "sha256": "f4601fe1f9cc0bb1732a649e9712907da6ce0d8d3e0736f8438320aaff9f5749"
+    },
+    "package_history": {
+      "columns": [
+        "hash",
+        "activated"
+      ],
+      "rows": [
+        {
+          "hash": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "activated": 1
+        }
+      ],
+      "sha256": "c21e5413d401c43801d7fe244b29d87bf8248e0d349395d30fd21fb8f35d30c8"
+    },
+    "report_versions": {
+      "columns": [
+        "id",
+        "dataset_id",
+        "app_revision",
+        "calculation_version",
+        "content_json"
+      ],
+      "rows": [
+        {
+          "id": "accepted",
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "app_revision": 2,
+          "calculation_version": "synthetic-preservation-v1",
+          "content_json": "{\"calculationVersion\":\"synthetic-preservation-v1\",\"evidence\":[\"fixture:synthetic-report\"],\"id\":\"accepted\",\"output\":{\"label\":\"Synthetic migration sentinel only; not owner acceptance\",\"net\":\"0.125000000000000001\"},\"pin\":{\"appRevision\":2,\"datasetId\":\"bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2\"}}"
+        }
+      ],
+      "sha256": "2a1ea45b7f3a1e663ed710254f41cfe1c097765e17b5e6ed35c826b45683eb7b"
+    },
+    "rollback_dataset": {
+      "columns": [
+        "singleton",
+        "dataset_id"
+      ],
+      "rows": [],
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_documents": {
+      "columns": [
+        "dataset_id",
+        "id",
+        "kind",
+        "date",
+        "supplier_id",
+        "ordinal",
+        "sales_json"
+      ],
+      "rows": [
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "R001",
+          "kind": "customer-return",
+          "date": "2025-09-02",
+          "supplier_id": null,
+          "ordinal": 0,
+          "sales_json": "{\"convertedTo\":null,\"gross\":\"-36.75\",\"net\":\"-35\",\"state\":\"completed\",\"tax\":\"-1.75\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "S001",
+          "kind": "sale",
+          "date": "2025-09-01",
+          "supplier_id": null,
+          "ordinal": 1,
+          "sales_json": "{\"convertedTo\":null,\"gross\":\"73.5\",\"net\":\"70\",\"state\":\"completed\",\"tax\":\"3.5\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "S002",
+          "kind": "sale",
+          "date": "2025-09-02",
+          "supplier_id": null,
+          "ordinal": 2,
+          "sales_json": "{\"convertedTo\":null,\"gross\":\"136.5\",\"net\":\"130\",\"state\":\"completed\",\"tax\":\"6.5\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "S003",
+          "kind": "sale",
+          "date": "2025-09-03",
+          "supplier_id": null,
+          "ordinal": 3,
+          "sales_json": "{\"convertedTo\":null,\"gross\":\"210\",\"net\":\"200\",\"state\":\"completed\",\"tax\":\"10\"}"
+        }
+      ],
+      "sha256": "4f6fd98d7446cc4610c83def6ef7237f990b88384c8eccb26a3ae2851497d10b"
+    },
+    "source_lines": {
+      "columns": [
+        "dataset_id",
+        "id",
+        "document_id",
+        "quantity",
+        "net",
+        "cost",
+        "ordinal",
+        "sales_json"
+      ],
+      "rows": [
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L001",
+          "document_id": "S001",
+          "quantity": "2",
+          "net": "40",
+          "cost": null,
+          "ordinal": 0,
+          "sales_json": "{\"categoryId\":\"drinks\",\"categoryName\":\"İçecekler\",\"discountRate\":\"0\",\"gross\":\"42\",\"meaning\":\"known\",\"productId\":\"water\",\"productName\":\"İçme suyu\",\"tax\":\"2\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"20\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L002",
+          "document_id": "S001",
+          "quantity": "1",
+          "net": "30",
+          "cost": null,
+          "ordinal": 1,
+          "sales_json": "{\"categoryId\":\"bakery\",\"categoryName\":\"Fırın\",\"discountRate\":\"0\",\"gross\":\"31.5\",\"meaning\":\"known\",\"productId\":\"bread\",\"productName\":\"Ekmek\",\"tax\":\"1.5\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"30\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L003",
+          "document_id": "S002",
+          "quantity": "3",
+          "net": "60",
+          "cost": null,
+          "ordinal": 2,
+          "sales_json": "{\"categoryId\":\"drinks\",\"categoryName\":\"İçecekler\",\"discountRate\":\"0\",\"gross\":\"63\",\"meaning\":\"known\",\"productId\":\"water\",\"productName\":\"İçme suyu\",\"tax\":\"3\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"20\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L004",
+          "document_id": "S002",
+          "quantity": "2",
+          "net": "70",
+          "cost": null,
+          "ordinal": 3,
+          "sales_json": "{\"categoryId\":\"drinks\",\"categoryName\":\"İçecekler\",\"discountRate\":\"0\",\"gross\":\"73.5\",\"meaning\":\"known\",\"productId\":\"soda\",\"productName\":\"Gazoz\",\"tax\":\"3.5\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"35\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L005",
+          "document_id": "S003",
+          "quantity": "4",
+          "net": "120",
+          "cost": null,
+          "ordinal": 4,
+          "sales_json": "{\"categoryId\":\"bakery\",\"categoryName\":\"Fırın\",\"discountRate\":\"0\",\"gross\":\"126\",\"meaning\":\"known\",\"productId\":\"bread\",\"productName\":\"Ekmek\",\"tax\":\"6\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"30\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L006",
+          "document_id": "S003",
+          "quantity": "2",
+          "net": "80",
+          "cost": null,
+          "ordinal": 5,
+          "sales_json": "{\"categoryId\":\"produce\",\"categoryName\":\"Manav\",\"discountRate\":\"0\",\"gross\":\"84\",\"meaning\":\"known\",\"productId\":\"apple\",\"productName\":\"Elma\",\"tax\":\"4\",\"taxRate\":\"5\",\"unit\":\"kg\",\"unitNet\":\"40\"}"
+        },
+        {
+          "dataset_id": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+          "id": "L007",
+          "document_id": "R001",
+          "quantity": "1",
+          "net": "-35",
+          "cost": null,
+          "ordinal": 6,
+          "sales_json": "{\"categoryId\":\"drinks\",\"categoryName\":\"İçecekler\",\"discountRate\":\"0\",\"gross\":\"-36.75\",\"meaning\":\"known\",\"productId\":\"soda\",\"productName\":\"Gazoz\",\"tax\":\"-1.75\",\"taxRate\":\"5\",\"unit\":\"piece\",\"unitNet\":\"35\"}"
+        }
+      ],
+      "sha256": "43623f2f90f7ca33b738554c8934347954aff8ab34622cbab979018016c5051f"
+    },
+    "source_suppliers": {
+      "columns": [
+        "dataset_id",
+        "id",
+        "ordinal"
+      ],
+      "rows": [],
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "hashes": {
+    "current": "cd8eb4d2fbf8c12288865b7c163b131d30db1ef83dcddc2a1ddae79447956676",
+    "accepted": "2a3b6672b8a485d08ba904e49556aa2577f6759568be16a4df0fccfe5334beb3",
+    "report": "61d484374d08df25e4c7848081716cc23a107c49434b421b7367e558793e02d1"
+  }
+}

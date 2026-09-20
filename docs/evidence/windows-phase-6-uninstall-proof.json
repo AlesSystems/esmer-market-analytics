@@ -1,0 +1,35 @@
+{
+  "exitCode": 0,
+  "installation": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\nsis-app",
+  "installedExecutableRemoved": true,
+  "before": [
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\installed-profile\\analytics.sqlite",
+      "Hash": "ED1B4E325E95838FC3785BA25C33DF4C2A96919984440D099398E56400268D32"
+    },
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\portable-profile\\analytics.sqlite",
+      "Hash": "EC0F4E5BEF6ED71CF67CC805218C15A59CC7D840BE5CE7E90E96E5BC03D27415"
+    },
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-native-VssATn\\analytics.sqlite",
+      "Hash": "594123DFB35840C9732EB199E427DC5EB520EE002EA0BF6A82EE2811F93C48BD"
+    }
+  ],
+  "after": [
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\installed-profile\\analytics.sqlite",
+      "Hash": "ED1B4E325E95838FC3785BA25C33DF4C2A96919984440D099398E56400268D32"
+    },
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\portable-profile\\analytics.sqlite",
+      "Hash": "EC0F4E5BEF6ED71CF67CC805218C15A59CC7D840BE5CE7E90E96E5BC03D27415"
+    },
+    {
+      "Path": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-native-VssATn\\analytics.sqlite",
+      "Hash": "594123DFB35840C9732EB199E427DC5EB520EE002EA0BF6A82EE2811F93C48BD"
+    }
+  ],
+  "profilesRetained": true,
+  "personalDataRemoved": false
+}

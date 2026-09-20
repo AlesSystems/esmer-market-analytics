@@ -1,0 +1,24 @@
+{
+  "os": {
+    "Caption": "Microsoft Windows 11 Pro",
+    "Version": "10.0.26200",
+    "BuildNumber": "26200",
+    "OSArchitecture": "64-bit"
+  },
+  "cpu": {
+    "Name": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "NumberOfCores": 14,
+    "NumberOfLogicalProcessors": 20
+  },
+  "build": {
+    "DisplayVersion": "25H2",
+    "CurrentBuild": "26200",
+    "UBR": 9457
+  },
+  "powershell": "7.6.6",
+  "computer": {
+    "Manufacturer": "HP",
+    "Model": "HP ZBook Studio 16 inch G9 Mobile Workstation PC",
+    "TotalPhysicalMemory": 33974288384
+  }
+}

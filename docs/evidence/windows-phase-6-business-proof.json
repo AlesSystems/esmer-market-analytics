@@ -1,0 +1,1380 @@
+{
+  "temporaryRoot": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-business-proof-5H3lSI",
+  "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-business-proof-5H3lSI\\ui-profile",
+  "apiProfile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-business-proof-5H3lSI\\api-profile",
+  "executablePath": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+  "archiveSha256": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+  "host": {
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "logicalCpus": 20,
+    "memoryBytes": 33974288384,
+    "release": "10.0.26200",
+    "arch": "x64"
+  },
+  "fixture": {
+    "identity": "business-fixture/business-1",
+    "mapping": "synthetic-business-v1",
+    "bytes": 4194,
+    "sha256": "3499516f34f9ff87b22454bf4412a5b306df01ad04cc27a33135ddd6e360b99b",
+    "documents": 5,
+    "lines": 5,
+    "suppliers": 1
+  },
+  "replacement": {
+    "identity": "business-fixture/business-2",
+    "bytes": 4202,
+    "sha256": "3d5caf93d0a23f18e110c8733f6a851ca9429897f864421ec9d928875317cc6d"
+  },
+  "filters": {
+    "categoryId": null,
+    "productId": null,
+    "search": "",
+    "kind": "all"
+  },
+  "period": "2025-09",
+  "timing": [
+    {
+      "run": 0,
+      "coldStartupToReportMs": 1346.9418,
+      "warm": [
+        {
+          "repetition": 0,
+          "openMs": 1.800000011920929,
+          "salesMs": 1.199999988079071,
+          "purchasingMs": 3.100000023841858,
+          "evidenceMs": 1.0999999642372131,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 1,
+          "openMs": 7.100000023841858,
+          "salesMs": 1.5,
+          "purchasingMs": 2.099999964237213,
+          "evidenceMs": 6.600000023841858,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.5,
+          "salesMs": 1.199999988079071,
+          "purchasingMs": 1.300000011920929,
+          "evidenceMs": 0.5,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.300000011920929,
+          "salesMs": 1.199999988079071,
+          "purchasingMs": 1.600000023841858,
+          "evidenceMs": 0.5,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1.199999988079071,
+          "salesMs": 0.699999988079071,
+          "purchasingMs": 1,
+          "evidenceMs": 0.30000001192092896,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "coldStartupToReportMs": 1307.3591000000001,
+      "warm": [
+        {
+          "repetition": 0,
+          "openMs": 1.9000000357627869,
+          "salesMs": 1.0999999642372131,
+          "purchasingMs": 2.900000035762787,
+          "evidenceMs": 1,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 1,
+          "openMs": 1.300000011920929,
+          "salesMs": 0.699999988079071,
+          "purchasingMs": 1.5,
+          "evidenceMs": 0.3999999761581421,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.199999988079071,
+          "salesMs": 1,
+          "purchasingMs": 1.100000023841858,
+          "evidenceMs": 0.30000001192092896,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.0999999642372131,
+          "salesMs": 1.7000000476837158,
+          "purchasingMs": 2.399999976158142,
+          "evidenceMs": 0.3999999761581421,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1,
+          "salesMs": 0.7000000476837158,
+          "purchasingMs": 0.699999988079071,
+          "evidenceMs": 0.3999999761581421,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "coldStartupToReportMs": 1298.0088999999998,
+      "warm": [
+        {
+          "repetition": 0,
+          "openMs": 1.699999988079071,
+          "salesMs": 1.199999988079071,
+          "purchasingMs": 2.899999976158142,
+          "evidenceMs": 1.100000023841858,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 1,
+          "openMs": 1.399999976158142,
+          "salesMs": 0.9000000357627869,
+          "purchasingMs": 1.399999976158142,
+          "evidenceMs": 0.6000000238418579,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 2,
+          "openMs": 1.300000011920929,
+          "salesMs": 1,
+          "purchasingMs": 1.2999999523162842,
+          "evidenceMs": 0.40000003576278687,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 3,
+          "openMs": 1.0999999642372131,
+          "salesMs": 0.800000011920929,
+          "purchasingMs": 1.100000023841858,
+          "evidenceMs": 0.30000001192092896,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        },
+        {
+          "repetition": 4,
+          "openMs": 1.199999988079071,
+          "salesMs": 0.699999988079071,
+          "purchasingMs": 1,
+          "evidenceMs": 0.30000001192092896,
+          "sales": "200",
+          "estimatedGross": "40",
+          "evidenceNet": "100"
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "mode": "Chromium forced scaling; Windows OS setting unchanged",
+      "scale": 1,
+      "requestedBrowserWindow": [
+        680,
+        520
+      ],
+      "browserWindow": [
+        680,
+        520
+      ],
+      "contentSize": [
+        664,
+        481
+      ],
+      "width": 664,
+      "height": 481,
+      "documentWidth": 649,
+      "devicePixelRatio": 1,
+      "tableScroll": [
+        {
+          "index": 0,
+          "section": "Maliyet kapsamı",
+          "width": 569,
+          "scrollWidth": 569,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 1,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 569,
+          "scrollWidth": 569,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 2,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 569,
+          "scrollWidth": 569,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 3,
+          "section": "Güncel ikame maliyeti karşılaştırması",
+          "width": 569,
+          "scrollWidth": 569,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 4,
+          "section": "Kaydedilen stok ve fire",
+          "width": 569,
+          "scrollWidth": 569,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        }
+      ],
+      "horizontalScrollExercised": false,
+      "keyboardEnterEscapeFocus": true
+    },
+    {
+      "mode": "Chromium forced scaling; Windows OS setting unchanged",
+      "scale": 1.25,
+      "requestedBrowserWindow": [
+        680,
+        520
+      ],
+      "browserWindow": [
+        680,
+        523
+      ],
+      "contentSize": [
+        668,
+        491
+      ],
+      "width": 668,
+      "height": 491,
+      "documentWidth": 653,
+      "devicePixelRatio": 1.25,
+      "tableScroll": [
+        {
+          "index": 0,
+          "section": "Maliyet kapsamı",
+          "width": 573,
+          "scrollWidth": 573,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 1,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 573,
+          "scrollWidth": 573,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 2,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 573,
+          "scrollWidth": 573,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 3,
+          "section": "Güncel ikame maliyeti karşılaştırması",
+          "width": 573,
+          "scrollWidth": 573,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 4,
+          "section": "Kaydedilen stok ve fire",
+          "width": 573,
+          "scrollWidth": 573,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        }
+      ],
+      "horizontalScrollExercised": false,
+      "keyboardEnterEscapeFocus": true
+    },
+    {
+      "mode": "Chromium forced scaling; Windows OS setting unchanged",
+      "scale": 1.5,
+      "requestedBrowserWindow": [
+        680,
+        520
+      ],
+      "browserWindow": [
+        681,
+        520
+      ],
+      "contentSize": [
+        670,
+        494
+      ],
+      "width": 670,
+      "height": 494,
+      "documentWidth": 655,
+      "devicePixelRatio": 1.5,
+      "tableScroll": [
+        {
+          "index": 0,
+          "section": "Maliyet kapsamı",
+          "width": 575,
+          "scrollWidth": 575,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 1,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 575,
+          "scrollWidth": 575,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 2,
+          "section": "Alış geçmişi ve tedarikçi iadeleri",
+          "width": 575,
+          "scrollWidth": 575,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 3,
+          "section": "Güncel ikame maliyeti karşılaştırması",
+          "width": 575,
+          "scrollWidth": 575,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        },
+        {
+          "index": 4,
+          "section": "Kaydedilen stok ve fire",
+          "width": 575,
+          "scrollWidth": 575,
+          "maximum": 0,
+          "reached": 0,
+          "restored": 0,
+          "overflowX": "auto",
+          "horizontalScrollExercised": false
+        }
+      ],
+      "horizontalScrollExercised": false,
+      "keyboardEnterEscapeFocus": true
+    }
+  ],
+  "checks": {
+    "uiTabsAndSourcePinnedUntilRefresh": true,
+    "apiPinnedVersions": {
+      "old": {
+        "sessionId": "87cac849-06ee-4795-a383-db0d5d3a0776",
+        "datasetId": "3499516f34f9ff87b22454bf4412a5b306df01ad04cc27a33135ddd6e360b99b",
+        "appRevision": 0,
+        "calculationVersion": "synthetic-sales-calc-v1",
+        "period": "2025-09"
+      },
+      "new": {
+        "sessionId": "6ae9a190-76bf-424a-95e7-a2684aa79c46",
+        "datasetId": "3d5caf93d0a23f18e110c8733f6a851ca9429897f864421ec9d928875317cc6d",
+        "appRevision": 0,
+        "calculationVersion": "synthetic-sales-calc-v1",
+        "period": "2025-09"
+      },
+      "oldPurchasing": {
+        "coverage": "complete",
+        "costCalculationVersion": "synthetic-cost-calc-v1",
+        "purchasingCalculationVersion": "synthetic-purchasing-calc-v1",
+        "context": {
+          "sessionId": "87cac849-06ee-4795-a383-db0d5d3a0776",
+          "datasetId": "3499516f34f9ff87b22454bf4412a5b306df01ad04cc27a33135ddd6e360b99b",
+          "appRevision": 0,
+          "calculationVersion": "synthetic-sales-calc-v1",
+          "period": "2025-09"
+        },
+        "cutoff": "2025-09-30",
+        "lineage": "business-fixture",
+        "extractionId": "business-1",
+        "mappingVersion": "synthetic-business-v1",
+        "from": "2025-09-01",
+        "to": "2025-09-30",
+        "stale": true,
+        "evidence": {
+          "documents": [
+            {
+              "id": "D1",
+              "kind": "supplier-return",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "-25",
+                "net": "-25",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": "R1",
+                "evidence": "evidence-D1",
+                "invoiced": true,
+                "physicalReturn": true,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "dispatch",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "P1",
+              "kind": "purchase",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "25",
+                "net": "25",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": null,
+                "evidence": "evidence-P1",
+                "invoiced": false,
+                "physicalReturn": false,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "invoice",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "R1",
+              "kind": "supplier-return",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "-25",
+                "net": "-25",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": null,
+                "evidence": "evidence-R1",
+                "invoiced": false,
+                "physicalReturn": true,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "invoice",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "S1",
+              "kind": "sale",
+              "date": "2025-09-01",
+              "supplierId": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "purchasing": null
+            },
+            {
+              "id": "S2",
+              "kind": "sale",
+              "date": "2025-09-01",
+              "supplierId": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "purchasing": null
+            }
+          ],
+          "lines": [
+            {
+              "id": "D1-line",
+              "documentId": "D1",
+              "quantity": "1",
+              "net": "-25",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "-25",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "25"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "L1",
+              "documentId": "S1",
+              "quantity": "1",
+              "net": "100",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "business": {
+                "historicalCost": {
+                  "documentedZero": false,
+                  "evidence": "historical-evidence",
+                  "originalSaleLineId": null,
+                  "taxBasis": "net",
+                  "unit": "piece",
+                  "unitCost": "60"
+                },
+                "inventory": {
+                  "complete": false,
+                  "date": "2025-09-03",
+                  "evidence": "inventory-1",
+                  "recordedWaste": "0",
+                  "stock": "-2"
+                }
+              }
+            },
+            {
+              "id": "L2",
+              "documentId": "S2",
+              "quantity": "1",
+              "net": "100",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "P1-line",
+              "documentId": "P1",
+              "quantity": "1",
+              "net": "25",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "25",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "25"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "R1-line",
+              "documentId": "R1",
+              "quantity": "1",
+              "net": "-25",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "-25",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "25"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            }
+          ]
+        },
+        "gross": {
+          "status": "ready",
+          "confidence": "estimated",
+          "method": "historical-last-purchase-estimate",
+          "coveredSales": "100",
+          "coveredCost": "60",
+          "coveredGrossProfit": "40",
+          "coveredMarginPercent": "40",
+          "costCoveragePercent": "50",
+          "covered": [
+            {
+              "lineId": "L1",
+              "documentId": "S1",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "100",
+              "cost": "60",
+              "reason": null,
+              "evidence": "historical-evidence"
+            }
+          ],
+          "excluded": [
+            {
+              "lineId": "L2",
+              "documentId": "S2",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "100",
+              "cost": null,
+              "reason": "MISSING_COST",
+              "evidence": null
+            }
+          ],
+          "exposures": {
+            "coveredSales": "100",
+            "coveredReturns": "0",
+            "excludedSales": "100",
+            "excludedReturns": "0"
+          },
+          "warnings": [
+            "MISSING_COST"
+          ]
+        },
+        "purchasing": {
+          "status": "ready",
+          "history": [
+            {
+              "documentId": "P1",
+              "lineId": "P1-line",
+              "date": "2025-09-03",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "supplierId": "supplier-1",
+              "supplierName": "Örnek Tedarikçi",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "25",
+              "unitCost": "25",
+              "representation": "invoice",
+              "sourceDocumentIds": [
+                "P1"
+              ],
+              "evidence": "evidence-P1"
+            }
+          ],
+          "supplierReturns": [
+            {
+              "documentId": "R1",
+              "lineId": "R1-line",
+              "date": "2025-09-03",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "supplierId": "supplier-1",
+              "supplierName": "Örnek Tedarikçi",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "-25",
+              "unitCost": "25",
+              "representation": "invoice",
+              "sourceDocumentIds": [
+                "D1",
+                "R1"
+              ],
+              "evidence": "evidence-R1",
+              "physicalReturn": true,
+              "requestedRecovery": null,
+              "recognizedCredit": null,
+              "replacementSettlement": "unknown",
+              "settlementEvidence": null,
+              "settlementEvidenceReferences": []
+            }
+          ],
+          "replacements": [
+            {
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "historicalUnitCost": null,
+              "latestUnitCost": "25",
+              "nominalChangePercent": null,
+              "quantity": "2",
+              "historicalCost": null,
+              "replacementCost": "50",
+              "documentId": "P1",
+              "sourceDocumentIds": [
+                "P1"
+              ],
+              "date": "2025-09-03"
+            }
+          ],
+          "inventory": [
+            {
+              "complete": false,
+              "date": "2025-09-03",
+              "evidence": "inventory-1",
+              "recordedWaste": "0",
+              "stock": "-2",
+              "lineId": "L1",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece"
+            }
+          ],
+          "warnings": [
+            "NEGATIVE_STOCK",
+            "SPARSE_WASTE_RECORDING"
+          ],
+          "exclusions": []
+        }
+      },
+      "newPurchasing": {
+        "coverage": "complete",
+        "costCalculationVersion": "synthetic-cost-calc-v1",
+        "purchasingCalculationVersion": "synthetic-purchasing-calc-v1",
+        "context": {
+          "sessionId": "6ae9a190-76bf-424a-95e7-a2684aa79c46",
+          "datasetId": "3d5caf93d0a23f18e110c8733f6a851ca9429897f864421ec9d928875317cc6d",
+          "appRevision": 0,
+          "calculationVersion": "synthetic-sales-calc-v1",
+          "period": "2025-09"
+        },
+        "cutoff": "2025-09-30",
+        "lineage": "business-fixture",
+        "extractionId": "business-2",
+        "mappingVersion": "synthetic-business-v1",
+        "from": "2025-09-01",
+        "to": "2025-09-30",
+        "stale": false,
+        "evidence": {
+          "documents": [
+            {
+              "id": "D1",
+              "kind": "supplier-return",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "-25",
+                "net": "-25",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": "R1",
+                "evidence": "evidence-D1",
+                "invoiced": true,
+                "physicalReturn": true,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "dispatch",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "P1",
+              "kind": "purchase",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "50",
+                "net": "50",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": null,
+                "evidence": "evidence-P1",
+                "invoiced": false,
+                "physicalReturn": false,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "invoice",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "R1",
+              "kind": "supplier-return",
+              "date": "2025-09-03",
+              "supplierId": "supplier-1",
+              "sales": {
+                "convertedTo": null,
+                "gross": "-25",
+                "net": "-25",
+                "state": "completed",
+                "tax": "0"
+              },
+              "purchasing": {
+                "convertedTo": null,
+                "evidence": "evidence-R1",
+                "invoiced": false,
+                "physicalReturn": true,
+                "recognizedCredit": null,
+                "replacementSettlement": "unknown",
+                "representation": "invoice",
+                "requestedRecovery": null,
+                "settlementEvidence": null
+              }
+            },
+            {
+              "id": "S1",
+              "kind": "sale",
+              "date": "2025-09-01",
+              "supplierId": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "115.5",
+                "net": "110",
+                "state": "completed",
+                "tax": "5.5"
+              },
+              "purchasing": null
+            },
+            {
+              "id": "S2",
+              "kind": "sale",
+              "date": "2025-09-01",
+              "supplierId": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "purchasing": null
+            }
+          ],
+          "lines": [
+            {
+              "id": "D1-line",
+              "documentId": "D1",
+              "quantity": "1",
+              "net": "-25",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "-25",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "25"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "L1",
+              "documentId": "S1",
+              "quantity": "1",
+              "net": "110",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "115.5",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5.5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "110"
+              },
+              "business": {
+                "historicalCost": {
+                  "documentedZero": false,
+                  "evidence": "historical-evidence",
+                  "originalSaleLineId": null,
+                  "taxBasis": "net",
+                  "unit": "piece",
+                  "unitCost": "60"
+                },
+                "inventory": {
+                  "complete": false,
+                  "date": "2025-09-03",
+                  "evidence": "inventory-1",
+                  "recordedWaste": "0",
+                  "stock": "-2"
+                }
+              }
+            },
+            {
+              "id": "L2",
+              "documentId": "S2",
+              "quantity": "1",
+              "net": "100",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "P1-line",
+              "documentId": "P1",
+              "quantity": "1",
+              "net": "50",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "50",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "50"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            },
+            {
+              "id": "R1-line",
+              "documentId": "R1",
+              "quantity": "1",
+              "net": "-25",
+              "cost": null,
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "-25",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "0",
+                "taxRate": "0",
+                "unit": "piece",
+                "unitNet": "25"
+              },
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              }
+            }
+          ]
+        },
+        "gross": {
+          "status": "ready",
+          "confidence": "estimated",
+          "method": "historical-last-purchase-estimate",
+          "coveredSales": "110",
+          "coveredCost": "60",
+          "coveredGrossProfit": "50",
+          "coveredMarginPercent": "45.45",
+          "costCoveragePercent": "52.38",
+          "covered": [
+            {
+              "lineId": "L1",
+              "documentId": "S1",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "110",
+              "cost": "60",
+              "reason": null,
+              "evidence": "historical-evidence"
+            }
+          ],
+          "excluded": [
+            {
+              "lineId": "L2",
+              "documentId": "S2",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "100",
+              "cost": null,
+              "reason": "MISSING_COST",
+              "evidence": null
+            }
+          ],
+          "exposures": {
+            "coveredSales": "110",
+            "coveredReturns": "0",
+            "excludedSales": "100",
+            "excludedReturns": "0"
+          },
+          "warnings": [
+            "MISSING_COST"
+          ]
+        },
+        "purchasing": {
+          "status": "ready",
+          "history": [
+            {
+              "documentId": "P1",
+              "lineId": "P1-line",
+              "date": "2025-09-03",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "supplierId": "supplier-1",
+              "supplierName": "Örnek Tedarikçi",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "50",
+              "unitCost": "50",
+              "representation": "invoice",
+              "sourceDocumentIds": [
+                "P1"
+              ],
+              "evidence": "evidence-P1"
+            }
+          ],
+          "supplierReturns": [
+            {
+              "documentId": "R1",
+              "lineId": "R1-line",
+              "date": "2025-09-03",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "supplierId": "supplier-1",
+              "supplierName": "Örnek Tedarikçi",
+              "unit": "piece",
+              "quantity": "1",
+              "net": "-25",
+              "unitCost": "25",
+              "representation": "invoice",
+              "sourceDocumentIds": [
+                "D1",
+                "R1"
+              ],
+              "evidence": "evidence-R1",
+              "physicalReturn": true,
+              "requestedRecovery": null,
+              "recognizedCredit": null,
+              "replacementSettlement": "unknown",
+              "settlementEvidence": null,
+              "settlementEvidenceReferences": []
+            }
+          ],
+          "replacements": [
+            {
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "historicalUnitCost": null,
+              "latestUnitCost": "50",
+              "nominalChangePercent": null,
+              "quantity": "2",
+              "historicalCost": null,
+              "replacementCost": "100",
+              "documentId": "P1",
+              "sourceDocumentIds": [
+                "P1"
+              ],
+              "date": "2025-09-03"
+            }
+          ],
+          "inventory": [
+            {
+              "complete": false,
+              "date": "2025-09-03",
+              "evidence": "inventory-1",
+              "recordedWaste": "0",
+              "stock": "-2",
+              "lineId": "L1",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece"
+            }
+          ],
+          "warnings": [
+            "NEGATIVE_STOCK",
+            "SPARSE_WASTE_RECORDING"
+          ],
+          "exclusions": []
+        }
+      },
+      "stale": [
+        {
+          "status": "unavailable",
+          "code": "STALE_CONTEXT",
+          "message": "Rapor sürümü geçerli değil. Raporu yeniden açın."
+        },
+        {
+          "status": "unavailable",
+          "code": "STALE_CONTEXT",
+          "message": "Rapor sürümü geçerli değil. Raporu yeniden açın."
+        },
+        {
+          "status": "unavailable",
+          "code": "STALE_CONTEXT",
+          "message": "Rapor sürümü geçerli değil. Raporu yeniden açın."
+        }
+      ]
+    },
+    "noAcceptedReportsCreated": true,
+    "restartActiveSales": "210",
+    "browserOfflineReload": true,
+    "physicalDisconnect": false,
+    "developerRuntimeInChildPath": false
+  },
+  "g02": {
+    "status": "ready",
+    "confidence": "estimated",
+    "method": "historical-last-purchase-estimate",
+    "coveredSales": "100",
+    "coveredCost": "60",
+    "coveredGrossProfit": "40",
+    "coveredMarginPercent": "40",
+    "costCoveragePercent": "50",
+    "covered": [
+      {
+        "lineId": "L1",
+        "documentId": "S1",
+        "productId": "water",
+        "productName": "İçme suyu",
+        "unit": "piece",
+        "quantity": "1",
+        "net": "100",
+        "cost": "60",
+        "reason": null,
+        "evidence": "historical-evidence"
+      }
+    ],
+    "excluded": [
+      {
+        "lineId": "L2",
+        "documentId": "S2",
+        "productId": "water",
+        "productName": "İçme suyu",
+        "unit": "piece",
+        "quantity": "1",
+        "net": "100",
+        "cost": null,
+        "reason": "MISSING_COST",
+        "evidence": null
+      }
+    ],
+    "exposures": {
+      "coveredSales": "100",
+      "coveredReturns": "0",
+      "excludedSales": "100",
+      "excludedReturns": "0"
+    },
+    "warnings": [
+      "MISSING_COST"
+    ]
+  },
+  "runtime": {
+    "versions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "packaged": true,
+    "locale": "tr",
+    "displays": [
+      {
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1440
+        },
+        "workArea": {
+          "x": 0,
+          "y": 0,
+          "width": 2560,
+          "height": 1392
+        },
+        "scaleFactor": 1
+      }
+    ],
+    "size": [
+      1120,
+      760
+    ],
+    "minimum": [
+      680,
+      520
+    ]
+  },
+  "proofToolHistory": [
+    "An earlier run stopped on a harness assertion requiring at least one overflowing table. Responsive tables may fit at the supported minimum width. This was a proof-tool assumption failure, not an established application defect. The corrected proof waits for renderer resize and records fit versus exercised scrolling separately."
+  ],
+  "performanceLimitation": "Small five-document synthetic fixture. Does not satisfy full imported-dataset two-second gate. Cold timings include process start and warm observations repeat service reads."
+}

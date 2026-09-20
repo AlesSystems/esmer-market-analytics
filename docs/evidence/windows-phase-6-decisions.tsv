@@ -1,0 +1,11 @@
+decision	choice	evidence	limitation
+resume	Preserve requested branch and PR20; continue from fetched 014281c11d07752e5dcfedb88bb7945a3b4968e0	Clean checkout and origin fetch	No merge or Phase7
+authorization	Complete Windows continuation after explicit user clarification	User selected Windows work then stop before merge/Phase7	No source or owner authorization inferred
+runtime	Use existing Node24.19.0 and process-local cmd script shell	Default Node22 outside manifest; PowerShell5 rejected build syntax	No global configuration or dependency change
+provenance	Carry both linked source IDs into replacement evidence and navigate original-sale/reverse links	Focused integration and packaged desktop failures before df8aeea/bb74a3f	Financial methods unchanged
+verification	Use actual Windows unpacked/installed/portable executables	Shared archive bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d	No macOS acceptance substituted
+synthetic	Use generated records and synthetic accepted-report sentinel	100 golden assertions; schema3 migration and immutable hashes	No owner acceptance or real-market mapping
+layout	Correct harness assumptions about table overflow and fractional window rounding	Final forced-scale geometry and keyboard observations	No actual OS125/150 or horizontal-overflow evidence
+offline	Separate browser offline stub and runtime-free child PATH from physical disconnection	Business/lifecycle/native observations	Physical-disconnect gate open
+review	Independent contexts reviewed Spec, Standards and evidence	No remaining actionable code/evidence findings	Same available model, not cross-model
+handoff	Commit bounded evidence and update existing PR20	Full suite22unit148integration11Windowsdesktop	Source/full-volume and remaining manual Windows gates open
