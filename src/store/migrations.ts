@@ -1,16 +1,17 @@
 import { DatabaseSync } from "node:sqlite";
-import { APPLICATION_ID, SCHEMA_VERSION, schema, salesMigration } from "./schema";
+import { APPLICATION_ID, SCHEMA_VERSION, schema, salesMigration, businessMigration } from "./schema";
 
 export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
   const version = Number(db.prepare("PRAGMA user_version").get()!.user_version);
   const applicationId = Number(db.prepare("PRAGMA application_id").get()!.application_id);
   const empty = !db.prepare("SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' LIMIT 1").get();
-  if (![1, 2, 3].includes(target) || version > target || (version === 0 ? !empty || applicationId !== 0 : applicationId !== APPLICATION_ID)) throw new Error("UNSUPPORTED_STORE");
+  if (![1, 2, 3, 4].includes(target) || version > target || (version === 0 ? !empty || applicationId !== 0 : applicationId !== APPLICATION_ID)) throw new Error("UNSUPPORTED_STORE");
   if (version !== 0) {
     const expected = new DatabaseSync(":memory:");
     try {
       expected.exec(schema);
       if (version >= 3) expected.exec(salesMigration);
+      if (version >= 4) expected.exec(businessMigration);
       const tables = expected.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
       for (const { name } of tables) {
         const actual = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(String(name));
@@ -30,6 +31,7 @@ export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
     if (version === 0) db.exec(schema);
     if (version < 2 && target >= 2) db.exec("CREATE INDEX app_entity_revision ON app_revisions(kind,entity_id,revision); CREATE INDEX batch_dataset ON import_batches(dataset_id)");
     if (version < 3 && target >= 3) db.exec(salesMigration);
+    if (version < 4 && target >= 4) db.exec(businessMigration);
     db.exec(`PRAGMA application_id=${APPLICATION_ID}; PRAGMA user_version=${target}; COMMIT`);
   } catch (error) { if (db.isTransaction) db.exec("ROLLBACK"); throw error; }
 }

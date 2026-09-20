@@ -23,7 +23,9 @@ export function openStore(path: string, options: Options = {}) {
 
 class AnalyticsStore {
   private readonly salesEnabled: boolean;
+  private readonly businessEnabled: boolean;
   constructor(private readonly db: DatabaseSync, private readonly options: Options) {
+    this.businessEnabled = Number(db.prepare("PRAGMA user_version").get()!.user_version) >= 4;
     this.salesEnabled = Number(db.prepare("PRAGMA user_version").get()!.user_version) >= 3;
     if (options.maxPages !== undefined) {
       requireValid(Number.isSafeInteger(options.maxPages) && options.maxPages > 0);
@@ -56,14 +58,14 @@ class AnalyticsStore {
       appRevision: Number(this.db.prepare("SELECT COALESCE(MAX(revision),0) AS revision FROM app_revisions").get()!.revision),
     };
   }
-  private withSales<T>(rows: Record<string, unknown>[]): T[] {
-    return rows.map(({ sales_json, ...row }) => ({ ...row, ...(sales_json ? { sales: decode(sales_json) } : {}) })) as T[];
+  private withEvidence<T>(rows: Record<string, unknown>[]): T[] {
+    return rows.map(({ sales_json, purchasing_json, business_json, ...row }) => ({ ...row, ...(sales_json ? { sales: decode(sales_json) } : {}), ...(purchasing_json ? { purchasing: decode(purchasing_json) } : {}), ...(business_json ? { business: decode(business_json) } : {}) })) as T[];
   }
   private facts(datasetId: string): Records {
     return {
-      documents: this.withSales<Records["documents"][number]>(this.db.prepare(`SELECT id,kind,date,supplier_id AS supplierId${this.salesEnabled ? ",sales_json" : ""} FROM source_documents WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
-      lines: this.withSales<Records["lines"][number]>(this.db.prepare(`SELECT id,document_id AS documentId,quantity,net,cost${this.salesEnabled ? ",sales_json" : ""} FROM source_lines WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
-      suppliers: this.db.prepare("SELECT id FROM source_suppliers WHERE dataset_id=? ORDER BY ordinal").all(datasetId) as Records["suppliers"],
+      documents: this.withEvidence<Records["documents"][number]>(this.db.prepare(`SELECT id,kind,date,supplier_id AS supplierId${this.salesEnabled ? ",sales_json" : ""}${this.businessEnabled ? ",purchasing_json" : ""} FROM source_documents WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
+      lines: this.withEvidence<Records["lines"][number]>(this.db.prepare(`SELECT id,document_id AS documentId,quantity,net,cost${this.salesEnabled ? ",sales_json" : ""}${this.businessEnabled ? ",business_json" : ""} FROM source_lines WHERE dataset_id=? ORDER BY ordinal`).all(datasetId)),
+      suppliers: this.db.prepare(`SELECT id${this.businessEnabled ? ",name" : ""} FROM source_suppliers WHERE dataset_id=? ORDER BY ordinal`).all(datasetId).map(({ name, ...row }) => ({ ...row, ...(name !== null && name !== undefined ? { name } : {}) })) as Records["suppliers"],
     };
   }
   private fingerprint(target: Target, datasetId = target.datasetId): string | null {
@@ -79,6 +81,11 @@ class AnalyticsStore {
         const lineSales = this.db.prepare("SELECT sales_json FROM source_lines WHERE dataset_id=? AND id=?").get(datasetId, String(line.id));
         if (lineSales?.sales_json) line.sales = String(lineSales.sales_json);
       }
+    }
+    if (this.businessEnabled && document) {
+      const p = this.db.prepare("SELECT purchasing_json FROM source_documents WHERE dataset_id=? AND id=?").get(datasetId, String(document.id));
+      if (p?.purchasing_json) document.purchasing = String(p.purchasing_json);
+      if (line) { const b = this.db.prepare("SELECT business_json FROM source_lines WHERE dataset_id=? AND id=?").get(datasetId, String(line.id)); if (b?.business_json) line.business = String(b.business_json); }
     }
     return document ? hash({ lineage: dataset.lineage, kind: target.kind, document, line }) : null;
   }
@@ -157,12 +164,12 @@ class AnalyticsStore {
         this.db.prepare("INSERT INTO package_history VALUES(?,0) ON CONFLICT DO NOTHING").run(candidateId);
         if (!this.db.prepare("SELECT id FROM datasets WHERE id=?").get(candidateId)) {
           this.db.prepare("INSERT INTO datasets VALUES(?,?,?,?,?)").run(candidateId, parsed.metadata.lineage, canonical(parsed.metadata), canonical(parsed.warnings), "{}");
-          const supplier = this.db.prepare("INSERT INTO source_suppliers VALUES(?,?,?)");
-          for (const [ordinal, row] of parsed.records.suppliers.entries()) supplier.run(candidateId, row.id, ordinal);
-          const document = this.db.prepare(`INSERT INTO source_documents VALUES(?,?,?,?,?,?${this.salesEnabled ? ",?" : ""})`);
-          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []));
-          const line = this.db.prepare(`INSERT INTO source_lines VALUES(?,?,?,?,?,?,?${this.salesEnabled ? ",?" : ""})`);
-          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []));
+          const supplier = this.db.prepare(`INSERT INTO source_suppliers VALUES(?,?,?${this.businessEnabled ? ",?" : ""})`);
+          for (const [ordinal, row] of parsed.records.suppliers.entries()) supplier.run(candidateId, row.id, ordinal, ...(this.businessEnabled ? [row.name ?? null] : []));
+          const document = this.db.prepare(`INSERT INTO source_documents VALUES(?,?,?,?,?,?${this.salesEnabled ? ",?" : ""}${this.businessEnabled ? ",?" : ""})`);
+          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.purchasing === undefined ? null : canonical(row.purchasing)] : []));
+          const line = this.db.prepare(`INSERT INTO source_lines VALUES(?,?,?,?,?,?,?${this.salesEnabled ? ",?" : ""}${this.businessEnabled ? ",?" : ""})`);
+          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.business ? canonical(row.business) : null] : []));
         }
         this.options.fault?.("persistence");
         const facts = this.facts(candidateId);
