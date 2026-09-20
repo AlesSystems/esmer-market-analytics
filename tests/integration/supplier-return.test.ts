@@ -24,3 +24,8 @@ test("multi-owner conversion conflicts block every member regardless of order", 
   for (const id of ["D1", "D2"]) { records.documents.push({ ...structuredClone(invoice), id, purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true } }); records.lines.push({ ...structuredClone(line), id: `${id}-line`, documentId: id }); }
   records.lines.at(-1)!.net = "99"; for (const docs of [records.documents, [...records.documents].reverse()]) expect(calculatePurchasing({ ...records, documents: docs }, context).history).toHaveLength(0);
 });
+test("converted source reconciliation conflict also blocks the invoice", () => {
+  const records = businessRecords(); addPurchase(records); const invoice = records.documents.at(-1)!, line = records.lines.at(-1)!;
+  records.documents.push({ ...structuredClone(invoice), id: "D1", sales: { ...invoice.sales!, tax: "1" }, purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true } }); records.lines.push({ ...structuredClone(line), id: "D1-line", documentId: "D1" });
+  expect(calculatePurchasing(records, context).history).toHaveLength(0);
+});

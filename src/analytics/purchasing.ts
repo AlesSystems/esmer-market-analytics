@@ -17,10 +17,10 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
   for (const line of records.lines) { const group = grouped.get(line.documentId) ?? []; group.push(line); grouped.set(line.documentId, group); }
   const conflicts = new Set<string>();
   const owners = new Map<string, string[]>();
-  const signature = (id: string) => (grouped.get(id) ?? []).map(line => JSON.stringify([line.sales?.productId, line.sales?.unit, ...[line.quantity, line.net, line.sales?.unitNet ?? "0"].map(value => new Exact(value).toFixed())])).sort().join(";");
+  const signature = (id: string) => (grouped.get(id) ?? []).map(line => JSON.stringify([line.sales?.productId, line.sales?.unit, ...[line.quantity, line.net, line.sales?.unitNet ?? "0", line.sales?.taxRate ?? "0", line.sales?.tax ?? "0", line.sales?.gross ?? "0"].map(value => new Exact(value).toFixed())])).sort().join(";");
   for (const doc of records.documents) if (doc.purchasing?.convertedTo) {
     const p = doc.purchasing, target = documents.get(p.convertedTo!); const ids = owners.get(p.convertedTo!) ?? []; ids.push(doc.id); owners.set(p.convertedTo!, ids);
-    if (p.representation !== "dispatch" || !p.invoiced || !target?.purchasing || target.purchasing.representation !== "invoice" || target.purchasing.convertedTo !== null || target.kind !== doc.kind || target.supplierId !== doc.supplierId || signature(doc.id) !== signature(target.id)) { conflicts.add(doc.id); conflicts.add(p.convertedTo!); }
+    if (doc.sales?.state !== "completed" || target?.sales?.state !== "completed" || !["net", "tax", "gross"].every(key => doc.sales && target?.sales && new Exact(doc.sales[key as "net" | "tax" | "gross"]).eq(target.sales[key as "net" | "tax" | "gross"])) || p.representation !== "dispatch" || !p.invoiced || !target?.purchasing || target.purchasing.representation !== "invoice" || target.purchasing.convertedTo !== null || target.kind !== doc.kind || target.supplierId !== doc.supplierId || signature(doc.id) !== signature(target.id)) { conflicts.add(doc.id); conflicts.add(p.convertedTo!); }
   }
   for (const [id, sources] of owners) if (sources.length > 1) { conflicts.add(id); sources.forEach(source => conflicts.add(source)); }
   for (const [id, sources] of owners) if (conflicts.has(id) || sources.some(source => conflicts.has(source))) { conflicts.add(id); sources.forEach(source => conflicts.add(source)); }
@@ -31,7 +31,7 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
     let reason: string | null = conflicts.has(doc.id) ? "CONVERSION_CONFLICT" : !p || !doc.supplierId || !suppliers.get(doc.supplierId) ? "UNSUPPORTED_PURCHASING_EVIDENCE" : null;
     if (!reason && p && ((p.invoiced && p.representation === "dispatch" && !p.convertedTo) || (p.representation === "invoice" && p.convertedTo))) reason = "CONVERSION_CONFLICT";
     if (!reason && doc.sales?.state !== "completed") reason = "UNSUPPORTED_PURCHASING_STATE";
-    if (!reason && (!lines.length || lines.some(line => !line.sales || line.sales.meaning !== "known" || line.sales.unit === "unknown" || !new Exact(line.quantity).gt(0) || new Exact(line.sales.unitNet).lt(0) || !new Exact(line.quantity).times(line.sales.unitNet).times(doc.kind === "purchase" ? 1 : -1).eq(line.net)))) reason = "UNSUPPORTED_PURCHASE_BASIS";
+    if (!reason && (!lines.length || lines.some(line => !line.sales || line.sales.meaning !== "known" || !new Exact(line.sales.discountRate).isZero() || line.sales.unit === "unknown" || !new Exact(line.quantity).gt(0) || new Exact(line.sales.unitNet).lt(0) || !new Exact(line.quantity).times(line.sales.unitNet).times(doc.kind === "purchase" ? 1 : -1).eq(line.net)))) reason = "UNSUPPORTED_PURCHASE_BASIS";
     if (!reason && doc.sales && (lines.some(line => !new Exact(line.net).times(line.sales!.taxRate).div(100).toDecimalPlaces(2).eq(line.sales!.tax) || !new Exact(line.net).plus(line.sales!.tax).eq(line.sales!.gross)) || !new Exact(sum(lines.map(line => line.net))).eq(doc.sales.net) || !new Exact(sum(lines.map(line => line.sales!.tax))).eq(doc.sales.tax) || !new Exact(sum(lines.map(line => line.sales!.gross))).eq(doc.sales.gross))) reason = "PURCHASE_RECONCILIATION";
     if (reason) { result.exclusions.push({ documentId: doc.id, reason }); continue; }
     if (p!.convertedTo) continue;
@@ -49,11 +49,15 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
   }
   const gross = estimateGrossResult(records, context);
   const latest = new Map<string, PurchaseRow>();
+  const purchaseGroups = new Map<string, PurchaseRow[]>();
+  for (const row of allPurchases) { const key = `${row.productId}:${row.unit}`, group = purchaseGroups.get(key) ?? []; group.push(row); purchaseGroups.set(key, group); }
+  const costGroups = new Map<string, typeof gross.covered>();
+  for (const row of [...gross.covered, ...gross.excluded]) { const key = `${row.productId}:${row.unit}`, group = costGroups.get(key) ?? []; group.push(row); costGroups.set(key, group); }
   for (const row of allPurchases.sort((a, b) => a.date.localeCompare(b.date) || a.documentId.localeCompare(b.documentId))) latest.set(`${row.productId}:${row.unit}`, row);
   for (const [key, purchase] of latest) {
-    const peers = allPurchases.filter(row => `${row.productId}:${row.unit}` === key && row.date === purchase.date);
+    const peers = purchaseGroups.get(key)!.filter(row => row.date === purchase.date);
     if (peers.some(row => !new Exact(row.unitCost).eq(purchase.unitCost))) { result.warnings.push("AMBIGUOUS_REPLACEMENT_PRICE"); continue; }
-    const lines = [...gross.covered, ...gross.excluded].filter(row => `${row.productId}:${row.unit}` === key);
+    const lines = costGroups.get(key) ?? [];
     if (!lines.length) continue;
     const quantity = sum(lines.map(row => row.quantity));
     const complete = lines.every(row => row.cost !== null);
