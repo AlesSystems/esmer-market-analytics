@@ -52,3 +52,18 @@ test("cost and purchasing evidence stay pinned across import and include both co
     expect(reports.purchasing({ context: sales.view.context })).toMatchObject({ status: "purchasing", view: { extractionId: "business-1", stale: true, gross: before.view.gross } });
   } finally { store.close(); }
 });
+
+test("purchasing preserves partial and unavailable source-period coverage separately from cost coverage", async () => {
+  const { businessPackage } = await import("../helpers/business-fixtures");
+  const { purchasingJourney } = await import("../helpers/purchasing-journey");
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage(purchasingJourney(), { coverage: { from: "2025-09-01", to: "2025-09-30", complete: false } }));
+    const reports = new SalesReports(store);
+    for (const [period, coverage] of [["2025-09", "partial"], ["2025-10", "unavailable"]] as const) {
+      const sales = reports.open({ period });
+      if (sales.status !== "report") throw new Error("Expected sales report");
+      expect(reports.purchasing({ context: sales.view.context })).toMatchObject({ status: "purchasing", view: { coverage } });
+    }
+  } finally { store.close(); }
+});
