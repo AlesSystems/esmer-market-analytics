@@ -29,3 +29,32 @@ test("converted source reconciliation conflict also blocks the invoice", () => {
   records.documents.push({ ...structuredClone(invoice), id: "D1", sales: { ...invoice.sales!, tax: "1" }, purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true } }); records.lines.push({ ...structuredClone(line), id: "D1-line", documentId: "D1" });
   expect(calculatePurchasing(records, context).history).toHaveLength(0);
 });
+
+test("converted unknown meanings and discounts block the whole event", () => {
+  for (const patch of [{ discountRate: "10" }, { meaning: "unknown" as const }]) {
+    const records = businessRecords(); addPurchase(records);
+    const invoice = records.documents.at(-1)!, line = records.lines.at(-1)!;
+    records.documents.push({ ...structuredClone(invoice), id: "D1", purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true } });
+    records.lines.push({ ...structuredClone(line), id: "D1-line", documentId: "D1", sales: { ...line.sales!, ...patch } });
+    const parsed = readPackage(businessPackage(records));
+    if (!parsed.ok) throw new Error("Expected structurally valid evidence");
+    const result = calculatePurchasing(parsed.records, context);
+    expect(result.history).toEqual([]);
+    expect(result.replacements).toEqual([]);
+    expect(result.exclusions).toEqual(expect.arrayContaining([{ documentId: "D1", reason: "CONVERSION_CONFLICT" }, { documentId: "P1", reason: "CONVERSION_CONFLICT" }]));
+  }
+});
+
+test("linked settlement evidence survives conversion and conflicting amounts block the event", () => {
+  const records = businessRecords(); addPurchase(records, "R1", "25", "supplier-return");
+  const invoice = records.documents.at(-1)!, line = records.lines.at(-1)!;
+  records.documents.push({ ...structuredClone(invoice), id: "D1", purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "R1", invoiced: true, requestedRecovery: "25", recognizedCredit: "25", replacementSettlement: "confirmed", settlementEvidence: "credit-D1" } });
+  records.lines.push({ ...structuredClone(line), id: "D1-line", documentId: "D1" });
+  const result = calculatePurchasing(records, context);
+  expect(result.supplierReturns).toHaveLength(1);
+  expect(result.supplierReturns[0]).toMatchObject({ requestedRecovery: "25", recognizedCredit: "25", replacementSettlement: "confirmed", settlementEvidence: "credit-D1" });
+  invoice.purchasing!.recognizedCredit = "20"; invoice.purchasing!.settlementEvidence = "credit-R1";
+  const conflict = calculatePurchasing(records, context);
+  expect(conflict.supplierReturns).toEqual([]);
+  expect(conflict.exclusions).toEqual(expect.arrayContaining([{ documentId: "D1", reason: "CONVERSION_CONFLICT" }, { documentId: "R1", reason: "CONVERSION_CONFLICT" }]));
+});
