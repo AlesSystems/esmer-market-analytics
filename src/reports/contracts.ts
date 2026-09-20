@@ -15,3 +15,7 @@ export type OpenSalesRequest = { period: string | null };
 export type QuerySalesRequest = { context: ReportContext; filters: SalesFilters };
 export type InspectSalesRequest = QuerySalesRequest & { documentId: string };
 export const emptySalesFilters: SalesFilters = { categoryId: null, productId: null, search: "", kind: "all" };
+
+export type QueryPurchasingRequest = { context: ReportContext };
+export type PurchasingView = { costCalculationVersion: string; purchasingCalculationVersion: string; context: ReportContext; cutoff: string; lineage: string; extractionId: string; mappingVersion: string; from: string; to: string; stale: boolean; evidence: { documents: import("../source/package").DocumentRecord[]; lines: import("../source/package").LineRecord[] }; gross: import("../analytics/costs").GrossResult; purchasing: import("../analytics/purchasing").PurchasingResult };
+export type PurchasingReportResult = { status: "purchasing"; view: PurchasingView } | SalesFailure;

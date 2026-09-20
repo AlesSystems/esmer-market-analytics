@@ -1,0 +1,10 @@
+export function decimal(value: string, minimum = 0) {
+  const [integer, fraction = ""] = value.split(".");
+  const digits = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const tail = fraction.padEnd(minimum, "0");
+  return tail ? `${digits},${tail}` : digits;
+}
+export const money = (value: string) => `${decimal(value, 2)} ₺`;
+export const date = (value: string) => new Intl.DateTimeFormat("tr-TR", { timeZone: "UTC" }).format(new Date(value));
+export const quantity = (value: { piece: string; kg: string }) => `${decimal(value.piece)} adet · ${decimal(value.kg)} kg`;
+export const percent = (value: string | null) => value === null ? "Karşılaştırılamıyor" : `%${decimal(value)}`;

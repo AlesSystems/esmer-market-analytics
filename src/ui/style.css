@@ -689,3 +689,5 @@ button:focus-visible { outline: 3px solid #759447; outline-offset: 4px; }
     margin-left:8px;
   }
 }
+.purchase-filters { display: flex; flex-wrap: wrap; gap: 16px; }
+.purchase-filters label { display: grid; gap: 6px; }
