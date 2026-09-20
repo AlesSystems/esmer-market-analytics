@@ -68,7 +68,7 @@ function validateBusiness(row: Record<string, unknown>, stream: string) {
   if (c !== null) {
     keys(c, ["unitCost", "unit", "taxBasis", "evidence", "documentedZero", "originalSaleLineId"]);
     if (c.unitCost !== null) { decimal(c.unitCost); requireThat(/^-?(?:0|[1-9][0-9]{0,19})(?:\.[0-9]{1,15})?$/.test(String(c.unitCost))); }
-    requireThat(["piece", "kg", "unknown"].includes(String(c.unit)) && (c.taxBasis === "net" || c.taxBasis === "unknown") && typeof c.documentedZero === "boolean");
+    requireThat(typeof c.unit === "string" && ["piece", "kg", "unknown"].includes(c.unit) && (c.taxBasis === "net" || c.taxBasis === "unknown") && typeof c.documentedZero === "boolean");
     if (c.evidence !== null) id(c.evidence); if (c.originalSaleLineId !== null) id(c.originalSaleLineId);
   }
   const i = row.business.inventory;

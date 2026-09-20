@@ -19,3 +19,9 @@ test("schema3 upgrade preserves snapshots and evidence-only corrections invalida
     expect(store.readSnapshot().app[0].applicability).toBe("review-required"); expect(store.readReport("cost-report").output).toEqual(output); expect(store.readPinned(snapshot.pin).records).toEqual(snapshot.records);
   } finally { store.close(); rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("business evidence rejects an array masquerading as a cost unit", () => {
+  const records = businessRecords();
+  Reflect.set(records.lines[0].business!.historicalCost!, "unit", ["piece"]);
+  expect(() => businessPackage(records)).toThrow("INVALID_PACKAGE");
+});
