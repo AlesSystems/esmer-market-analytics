@@ -3,7 +3,7 @@ import { BUSINESS_MAPPING_VERSION, type Records, type PurchaseEvidence } from ".
 import { estimateGrossResult } from "./costs";
 export const PURCHASING_CALCULATION_VERSION = "synthetic-purchasing-calc-v1";
 export type PurchaseRow = { documentId: string; lineId: string; date: string; productId: string; productName: string; supplierId: string; supplierName: string; unit: "piece" | "kg"; quantity: string; net: string; unitCost: string; representation: "invoice" | "dispatch"; sourceDocumentIds: string[]; evidence: string };
-export type SupplierReturnRow = PurchaseRow & { physicalReturn: boolean; requestedRecovery: string | null; recognizedCredit: string | null; replacementSettlement: "unknown" | "confirmed"; settlementEvidence: string | null };
+export type SupplierReturnRow = PurchaseRow & { physicalReturn: boolean; requestedRecovery: string | null; recognizedCredit: string | null; replacementSettlement: "unknown" | "confirmed"; settlementEvidence: string | null; settlementEvidenceReferences: string[] };
 export type ReplacementRow = { productId: string; productName: string; unit: "piece" | "kg"; historicalUnitCost: string | null; latestUnitCost: string; nominalChangePercent: string | null; quantity: string; historicalCost: string | null; replacementCost: string; documentId: string; date: string };
 export type InventoryRow = { lineId: string; productId: string; productName: string; unit: "piece" | "kg"; date: string; stock: string | null; recordedWaste: string | null; evidence: string; complete: boolean };
 export type PurchasingResult = { status: "ready" | "unavailable"; history: PurchaseRow[]; supplierReturns: SupplierReturnRow[]; replacements: ReplacementRow[]; inventory: InventoryRow[]; warnings: string[]; exclusions: { documentId: string; reason: string }[] };
@@ -17,10 +17,11 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
   for (const line of records.lines) { const group = grouped.get(line.documentId) ?? []; group.push(line); grouped.set(line.documentId, group); }
   const conflicts = new Set<string>();
   const owners = new Map<string, string[]>();
-  const signature = (id: string) => (grouped.get(id) ?? []).map(line => JSON.stringify([line.sales?.productId, line.sales?.unit, ...[line.quantity, line.net, line.sales?.unitNet ?? "0", line.sales?.taxRate ?? "0", line.sales?.tax ?? "0", line.sales?.gross ?? "0"].map(value => new Exact(value).toFixed())])).sort().join(";");
+  const signature = (id: string) => (grouped.get(id) ?? []).map(line => JSON.stringify([line.sales?.productId, line.sales?.unit, line.sales?.meaning, ...[line.quantity, line.net, line.sales?.unitNet ?? "0", line.sales?.discountRate ?? "0", line.sales?.taxRate ?? "0", line.sales?.tax ?? "0", line.sales?.gross ?? "0"].map(value => new Exact(value).toFixed())])).sort().join(";");
   for (const doc of records.documents) if (doc.purchasing?.convertedTo) {
     const p = doc.purchasing, target = documents.get(p.convertedTo!); const ids = owners.get(p.convertedTo!) ?? []; ids.push(doc.id); owners.set(p.convertedTo!, ids);
-    if (doc.sales?.state !== "completed" || target?.sales?.state !== "completed" || !["net", "tax", "gross"].every(key => doc.sales && target?.sales && new Exact(doc.sales[key as "net" | "tax" | "gross"]).eq(target.sales[key as "net" | "tax" | "gross"])) || p.representation !== "dispatch" || !p.invoiced || !target?.purchasing || target.purchasing.representation !== "invoice" || target.purchasing.convertedTo !== null || target.kind !== doc.kind || target.supplierId !== doc.supplierId || signature(doc.id) !== signature(target.id)) { conflicts.add(doc.id); conflicts.add(p.convertedTo!); }
+    const settlementConflict = target?.purchasing && (["requestedRecovery", "recognizedCredit"] as const).some(key => p[key] !== null && target.purchasing![key] !== null && !new Exact(p[key]!).eq(target.purchasing![key]!));
+    if (settlementConflict || doc.sales?.state !== "completed" || target?.sales?.state !== "completed" || !["net", "tax", "gross"].every(key => doc.sales && target?.sales && new Exact(doc.sales[key as "net" | "tax" | "gross"]).eq(target.sales[key as "net" | "tax" | "gross"])) || p.representation !== "dispatch" || !p.invoiced || !target?.purchasing || target.purchasing.representation !== "invoice" || target.purchasing.convertedTo !== null || target.kind !== doc.kind || target.supplierId !== doc.supplierId || signature(doc.id) !== signature(target.id)) { conflicts.add(doc.id); conflicts.add(p.convertedTo!); }
   }
   for (const [id, sources] of owners) if (sources.length > 1) { conflicts.add(id); sources.forEach(source => conflicts.add(source)); }
   for (const [id, sources] of owners) if (conflicts.has(id) || sources.some(source => conflicts.has(source))) { conflicts.add(id); sources.forEach(source => conflicts.add(source)); }
@@ -36,11 +37,13 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
     if (reason) { result.exclusions.push({ documentId: doc.id, reason }); continue; }
     if (p!.convertedTo) continue;
     const evidence = p as PurchaseEvidence;
+    const relatedEvidence = [evidence, ...(owners.get(doc.id) ?? []).map(id => documents.get(id)!.purchasing!)];
+    const settlementEvidenceReferences = [...new Set(relatedEvidence.flatMap(item => item.settlementEvidence ? [item.settlementEvidence] : []))];
     for (const line of lines) {
       const s = line.sales!;
       const row: PurchaseRow = { documentId: doc.id, lineId: line.id, date: doc.date, productId: s.productId, productName: s.productName, supplierId: doc.supplierId!, supplierName: suppliers.get(doc.supplierId!)!, unit: s.unit as "piece" | "kg", quantity: line.quantity, net: line.net, unitCost: s.unitNet, representation: evidence.representation, sourceDocumentIds: [...(owners.get(doc.id) ?? []), doc.id], evidence: evidence.evidence };
       if (doc.kind === "purchase") { allPurchases.push(row); if (doc.date >= context.from && doc.date <= context.to) result.history.push(row); }
-      else if (doc.date >= context.from && doc.date <= context.to) result.supplierReturns.push({ ...row, physicalReturn: evidence.physicalReturn || (owners.get(doc.id) ?? []).some(id => documents.get(id)?.purchasing?.physicalReturn), requestedRecovery: evidence.requestedRecovery, recognizedCredit: evidence.recognizedCredit, replacementSettlement: evidence.replacementSettlement, settlementEvidence: evidence.settlementEvidence });
+      else if (doc.date >= context.from && doc.date <= context.to) result.supplierReturns.push({ ...row, physicalReturn: relatedEvidence.some(item => item.physicalReturn), requestedRecovery: relatedEvidence.find(item => item.requestedRecovery !== null)?.requestedRecovery ?? null, recognizedCredit: relatedEvidence.find(item => item.recognizedCredit !== null)?.recognizedCredit ?? null, replacementSettlement: relatedEvidence.some(item => item.replacementSettlement === "confirmed") ? "confirmed" : "unknown", settlementEvidence: settlementEvidenceReferences[0] ?? null, settlementEvidenceReferences });
     }
   }
   for (const line of records.lines) {

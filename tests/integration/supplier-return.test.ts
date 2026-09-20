@@ -58,3 +58,13 @@ test("linked settlement evidence survives conversion and conflicting amounts blo
   expect(conflict.supplierReturns).toEqual([]);
   expect(conflict.exclusions).toEqual(expect.arrayContaining([{ documentId: "D1", reason: "CONVERSION_CONFLICT" }, { documentId: "R1", reason: "CONVERSION_CONFLICT" }]));
 });
+test("equivalent linked settlement amounts retain both references and unknown states do not contradict", () => {
+  const records = businessRecords(); addPurchase(records, "R1", "25", "supplier-return");
+  const invoice = records.documents.at(-1)!, line = records.lines.at(-1)!;
+  Object.assign(invoice.purchasing!, { recognizedCredit: "25.00", settlementEvidence: "credit-I" });
+  records.documents.push({ ...structuredClone(invoice), id: "D1", purchasing: { ...invoice.purchasing!, representation: "dispatch", convertedTo: "R1", invoiced: true, recognizedCredit: "25", requestedRecovery: "30", replacementSettlement: "confirmed", settlementEvidence: "credit-D" } });
+  records.lines.push({ ...structuredClone(line), id: "D1-line", documentId: "D1" });
+  const result = calculatePurchasing(records, context);
+  expect(result.supplierReturns[0]).toMatchObject({ requestedRecovery: "30", recognizedCredit: "25.00", replacementSettlement: "confirmed", settlementEvidenceReferences: ["credit-I", "credit-D"] });
+  invoice.purchasing!.requestedRecovery = "31"; expect(calculatePurchasing(records, context).supplierReturns).toEqual([]);
+});
