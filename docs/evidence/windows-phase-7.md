@@ -77,6 +77,8 @@ Several local proof attempts failed because of the probe rather than application
 
 The comment audit found zero unnecessary comments or suppressions. It did identify a restart claim that initially compared only post-restart snapshots. The final proof now compares the pre-close January view too, and the strengthened 125% run passed. The continuation uses Poteto's Prove It Works principle to check actual Windows archives, Excel and OS scaling. Model the Domain keeps fixtures and expected evidence explicit in the proof records.
 
+The Windows procedures are committed in `d949b82` and their evidence in `327e3f9`. Independent Standards and Spec reviewers inspected `0c55462...327e3f9`; each reported zero actionable findings. Both verified the three release hashes and twelve command-log receipts against local files, including the final 29/159/16 test counts. Standards checked repository rules and profile/uninstaller isolation; Spec checked the authorized Windows prompt, synthetic calculation, Excel, scaling, lifecycle claims and declared open gates. These were read-only reviews, not additional application runs.
+
 ## Remaining checks and boundary
 
 - Physical network-disconnect operation has not been performed on this Phase 7 build. Earlier-phase user reports do not establish this build's result.
