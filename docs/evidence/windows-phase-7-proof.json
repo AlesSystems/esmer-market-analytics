@@ -1,0 +1,514 @@
+{
+  "date": "2026-09-21",
+  "testedCommit": "0c5546294fe23d13c202d179b466f90694cd9648",
+  "applicationCommit": "c54b3116969e2609c14b177c678b7b626a88fedb",
+  "environment": {
+    "os": "Windows 11 Pro 25H2 26200.9457 x64",
+    "cpu": "Intel Core i9-12900H",
+    "ramBytes": 33974288384,
+    "displayPixels": [
+      1920,
+      1200
+    ],
+    "originalAndRestoredScale": 1.25,
+    "developmentNode": "24.19.0",
+    "npm": "10.9.3",
+    "powershell": "7.6.6",
+    "excel": "16.0.15128.20246",
+    "packagedRuntime": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    }
+  },
+  "releases": [
+    {
+      "path": "release/Esmer Market Analytics 0.1.0.exe",
+      "bytes": 112686710,
+      "sha256": "8e5bbee08593c65988b9f744cab2b98d5e9ff4e070b979f0c55484f544472389"
+    },
+    {
+      "path": "release/Esmer Market Analytics Setup 0.1.0.exe",
+      "bytes": 112854016,
+      "sha256": "4f0e812ed64f10f7262079c9c362cd6c172224e4d03da97cd5d8cbfcb44a43b9"
+    },
+    {
+      "path": "release/win-unpacked/resources/app.asar",
+      "bytes": 10751192,
+      "sha256": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973"
+    }
+  ],
+  "commands": [
+    {
+      "command": "npm run test:unit -- tests/unit/expense-validation.test.ts",
+      "name": "expense-validation",
+      "exit": 0,
+      "ended": "2026-09-21T10:04:41.3794468+02:00"
+    },
+    {
+      "command": "npm run test:unit -- tests/unit/operating-profit.test.ts",
+      "name": "operating-profit",
+      "exit": 0,
+      "ended": "2026-09-21T10:04:42.5972650+02:00"
+    },
+    {
+      "command": "npm run test:unit -- tests/unit/expense-workbook-boundary.test.ts",
+      "name": "workbook-boundary",
+      "exit": 0,
+      "ended": "2026-09-21T10:04:43.7994218+02:00"
+    },
+    {
+      "command": "npm run test:integration -- tests/integration/expense-import.test.ts",
+      "name": "expense-import",
+      "exit": 0,
+      "ended": "2026-09-21T10:04:46.4426523+02:00"
+    },
+    {
+      "command": "npm run test:integration -- tests/integration/adjustment-history.test.ts",
+      "name": "adjustment-history",
+      "exit": 0,
+      "ended": "2026-09-21T10:04:48.6360557+02:00"
+    },
+    {
+      "command": "npm run typecheck",
+      "name": "typecheck",
+      "exit": 0,
+      "ended": "2026-09-21T10:05:02.4550128+02:00"
+    },
+    {
+      "command": "npm run lint",
+      "name": "lint",
+      "exit": 0,
+      "ended": "2026-09-21T10:05:35.4026764+02:00"
+    },
+    {
+      "command": "npm run build",
+      "name": "build",
+      "exit": 0,
+      "ended": "2026-09-21T10:05:39.0084215+02:00"
+    },
+    {
+      "command": "npm run test:desktop",
+      "name": "desktop",
+      "exit": 0,
+      "ended": "2026-09-21T10:07:47.3703105+02:00"
+    },
+    {
+      "command": "npm run package:win",
+      "name": "package-win",
+      "exit": 0,
+      "ended": "2026-09-21T10:08:41.4228766+02:00"
+    },
+    {
+      "ended": "2026-09-21T10:28:08.2603101+02:00",
+      "command": "npm test",
+      "exit": 0
+    }
+  ],
+  "fixtures": [
+    {
+      "name": "excel-girdi.xlsx",
+      "bytes": 3385,
+      "sha256": "3b724748fbc6723794dd3d6a85504ddac35b409ac5a887837b3e5e37c3675818"
+    },
+    {
+      "name": "bos-sablon.xlsx",
+      "bytes": 3137,
+      "sha256": "bf60e675f40926c734e4797a61d9be25b7aad475f44a5874830b63fc6b1e566e"
+    },
+    {
+      "name": "sentetik-satis.json",
+      "bytes": 1356,
+      "sha256": "b84ec5867445654d0a648fe0b11c57fd64d69b7e99aa00c59f8e8704b2223378"
+    }
+  ],
+  "native": {
+    "dialogSubstitution": false,
+    "saveAndOpenCancelledWithoutWrites": true,
+    "templateBytes": 3137,
+    "previewRevision": 0,
+    "previewBatches": 0,
+    "january": {
+      "incurred": "550",
+      "payments": "0",
+      "complete": false
+    },
+    "february": {
+      "incurred": "0",
+      "payments": "50"
+    }
+  },
+  "excel": {
+    "version": "16.0.15128.20246",
+    "bytes": 9115,
+    "sha256": "c0af805c9d620c09983b858021b23f690dc63fd290dcb85976d0d54ae8c1fdd9",
+    "rows": [
+      {
+        "row": 2,
+        "date": "2026-01-15",
+        "net": "50",
+        "category": "Sentetik kira"
+      },
+      {
+        "row": 3,
+        "date": "2026-01-15",
+        "net": "500",
+        "category": "Sentetik katkı"
+      },
+      {
+        "row": 4,
+        "date": "2026-03-15",
+        "net": "1234.5678",
+        "category": "Sentetik İşçilik Çığ Şü Ö"
+      },
+      {
+        "row": 5,
+        "date": "2026-03-16",
+        "net": "12.345599999999999",
+        "category": "Sentetik sayısal"
+      }
+    ],
+    "errors": []
+  },
+  "scales": [
+    {
+      "scale": 1,
+      "display": [
+        {
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1200
+          },
+          "scale": 1
+        }
+      ],
+      "table": {
+        "client": 569,
+        "content": 1053
+      },
+      "assertions": [
+        "wide preview table scrolls with horizontal wheel at actual Windows scale",
+        "keyboard opens correction with heading focus; reason is reachable at minimum window",
+        "gross 200 minus expense 50 gives estimated 150; owner contribution 500 excluded",
+        "revocation preserves pinned 150 until reopening, then withholds result",
+        "restart retains history and revoked review; identical bytes do not append revisions or batches"
+      ],
+      "january": {
+        "incurred": "550",
+        "payments": "0",
+        "complete": false
+      },
+      "february": {
+        "incurred": "0",
+        "payments": "50"
+      },
+      "retainedLog": "work/windows-phase-7/packaged-proof-1.log"
+    },
+    {
+      "scale": 1.25,
+      "display": [
+        {
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1536,
+            "height": 960
+          },
+          "scale": 1.25
+        }
+      ],
+      "table": {
+        "client": 573,
+        "content": 1053
+      },
+      "assertions": [
+        "wide preview table scrolls with horizontal wheel at actual Windows scale",
+        "keyboard opens correction with heading focus; reason is reachable at minimum window",
+        "gross 200 minus expense 50 gives estimated 150; owner contribution 500 excluded",
+        "revocation preserves pinned 150 until reopening, then withholds result",
+        "restart retains history and revoked review; identical bytes do not append revisions or batches"
+      ],
+      "january": {
+        "incurred": "550",
+        "payments": "0",
+        "complete": false
+      },
+      "february": {
+        "incurred": "0",
+        "payments": "50"
+      },
+      "retainedLog": "work/windows-phase-7/packaged-proof-1.25.log"
+    },
+    {
+      "scale": 1.5,
+      "display": [
+        {
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "scale": 1.5
+        }
+      ],
+      "table": {
+        "client": 571,
+        "content": 1053
+      },
+      "assertions": [
+        "wide preview table scrolls with horizontal wheel at actual Windows scale",
+        "keyboard opens correction with heading focus; reason is reachable at minimum window",
+        "gross 200 minus expense 50 gives estimated 150; owner contribution 500 excluded",
+        "revocation preserves pinned 150 until reopening, then withholds result",
+        "restart retains history and revoked review; identical bytes do not append revisions or batches"
+      ],
+      "january": {
+        "incurred": "550",
+        "payments": "0",
+        "complete": false
+      },
+      "february": {
+        "incurred": "0",
+        "payments": "50"
+      },
+      "retainedLog": "work/windows-phase-7/packaged-proof-1.5.log"
+    }
+  ],
+  "lifecycle": [
+    {
+      "stage": "baseline",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 4,
+          "archive": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 4,
+          "archive": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    {
+      "stage": "upgraded",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    {
+      "stage": "installed",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    {
+      "stage": "portable",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    {
+      "stage": "reinstalled",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    }
+  ],
+  "uninstall": {
+    "exit": 0,
+    "executableRemoved": true,
+    "before": [
+      "9A4A363B200EA06217A8AA16177313372E753A70ABCE7A6B104982B1BA0DFB05",
+      "5509E5024790327529A923DC575767CA052FB87B2A7533153C3211AB74A7FB77"
+    ],
+    "after": [
+      "9A4A363B200EA06217A8AA16177313372E753A70ABCE7A6B104982B1BA0DFB05",
+      "5509E5024790327529A923DC575767CA052FB87B2A7533153C3211AB74A7FB77"
+    ]
+  },
+  "packageInspection": {
+    "archiveFiles": 305,
+    "archiveEntries": 355,
+    "issues": [],
+    "notices": "PACKAGE_NOTICES_OK 7 dependencies",
+    "signature": "NotSigned"
+  },
+  "logReceipts": [
+    {
+      "path": "work/windows-phase-7/npm-ci.log",
+      "bytes": 888,
+      "sha256": "66552a941a78d9f4c794fa29c62a2e34e3297369d673831f1f536bd179338ba1"
+    },
+    {
+      "path": "work/windows-phase-7/expense-validation.log",
+      "bytes": 323,
+      "sha256": "31f541d0ac86b5356be2e65c3836ef86ca87ee5ad4efb69ed0df40229fc3bfb4"
+    },
+    {
+      "path": "work/windows-phase-7/operating-profit.log",
+      "bytes": 332,
+      "sha256": "8cdc39f3b5857d48719c377dbbd3f84c1e5247b3040054643a64e062b661fed3"
+    },
+    {
+      "path": "work/windows-phase-7/workbook-boundary.log",
+      "bytes": 342,
+      "sha256": "f7441ca0950997e35805d9b616a9bfd5e6693cb2c4a0db789ab8ac6617f50a95"
+    },
+    {
+      "path": "work/windows-phase-7/expense-import.log",
+      "bytes": 341,
+      "sha256": "bb0dee62da9ffc91db2de4c9e02ca1b80320e3d61903277d61616e047d9268a1"
+    },
+    {
+      "path": "work/windows-phase-7/adjustment-history.log",
+      "bytes": 345,
+      "sha256": "8e507a634213ef1d4dedf54367a3a3e85fbcdd4d9f69c4bf184abbd5a929bdb8"
+    },
+    {
+      "path": "work/windows-phase-7/typecheck.log",
+      "bytes": 62,
+      "sha256": "fa4ceb5440c180b6faf52d62085b9fd01aee3a790522de97a103f589387ded41"
+    },
+    {
+      "path": "work/windows-phase-7/lint.log",
+      "bytes": 53,
+      "sha256": "92b86458c03021b9b85c62bcec7e0c17dbc94321ad46147ffa0cf8f6f3d427b2"
+    },
+    {
+      "path": "work/windows-phase-7/build.log",
+      "bytes": 88,
+      "sha256": "9d2643c3e0dcf881cdbea36e949ade860dd231c4551303030c066e64aa2f7841"
+    },
+    {
+      "path": "work/windows-phase-7/desktop.log",
+      "bytes": 3864,
+      "sha256": "7e6e15e47c75cfcaedd2dbba3d4a1dc0dc2d10a3edbe2b147fb9c55cda403650"
+    },
+    {
+      "path": "work/windows-phase-7/package-win.log",
+      "bytes": 1823,
+      "sha256": "a7c47d039c72fb66adbaf651aaf6bceed6654394dad40fd58ce9bf9d65d4686d"
+    },
+    {
+      "path": "work/windows-phase-7/final-test.log",
+      "bytes": 4593,
+      "sha256": "a5170eff73ddbc334f3276f505302203284ee01be38d4975e48d8afef2faaf17"
+    }
+  ],
+  "limitations": [
+    "Synthetic inputs only; no real source or owner acceptance",
+    "Physical network disconnection not performed on this build",
+    "Downloaded-installer publisher warning and failed upgrade not exercised",
+    "Lifecycle uses explicit disposable user-data-dir; no claim about default-profile uninstall policy",
+    "No full-volume performance measurement",
+    "Native Excel numeric cells preserve Excel stored precision, which can differ from the displayed value"
+  ]
+}
