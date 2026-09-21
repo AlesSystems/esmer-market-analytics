@@ -38,28 +38,39 @@ export class Expenses {
     const snapshot = this.store.readSnapshot(), batchId = hash(bytes);
     const preview: ExpensePreview = { status: "preview", previewId: randomUUID(), batchId, baseRevision: snapshot.pin.appRevision, rows: [], errors: [], alreadyImported: this.store.expenseBatches().some(b => b.batchId === batchId) };
     try {
-      const cells = readExpenseWorkbook(bytes), known = snapshot.app.filter(row => row.kind === "expense");
+      const cells = readExpenseWorkbook(bytes), known = new Map(snapshot.app.filter(row => row.kind === "expense").map(row => [row.entityId, row]));
+      const seen = new Set<string>(), candidates = new Map<string, string>(), losses = new Set<string>();
+      const duplicateKey = (v: ExpenseValue) => `${v.date}:${new Exact(v.gross).toFixed()}`;
+      for (const record of known.values()) if (isExpense(record.value) && !record.value.voided) {
+        const key = duplicateKey(record.value);
+        if (!candidates.has(key)) candidates.set(key, record.entityId);
+        if (record.value.loss) losses.add(record.value.loss.evidence);
+      }
       for (const [index, c] of cells.entries()) {
         if (!c.some(cell => cell?.value)) continue;
         const row: ExpensePreviewRow = { row: index + 2, entityId: "", value: null, errors: [], duplicates: [], alreadyPresent: false };
         try {
           row.value = value(c, batchId, row.row);
           row.entityId = row.value.sourceReference ? `expense-ref:${hash(row.value.sourceReference)}` : `expense:${batchId}:${row.row}`;
-          const existing = known.find(record => record.entityId === row.entityId);
-          const earlier = preview.rows.find(record => record.entityId === row.entityId);
-          if (earlier) row.errors.push("Kayıt referansı çalışma kitabında tekrar ediyor.");
+          const existing = known.get(row.entityId);
+          if (seen.has(row.entityId)) row.errors.push("Kayıt referansı çalışma kitabında tekrar ediyor.");
+          seen.add(row.entityId);
           if (existing) {
             if (isExpense(existing.value) && !existing.value.voided && same(row.value, existing.value)) row.alreadyPresent = true;
             else row.errors.push("Kayıt referansı mevcut kayıttan farklı. Gerekçeli düzeltme kullanın.");
           }
           if (!row.alreadyPresent) {
-            for (const record of [...known, ...preview.rows.filter(record => record.value).map(record => ({ entityId: record.entityId, value: record.value! }))]) {
-              if (record.entityId !== row.entityId && isExpense(record.value) && !record.value.voided && record.value.date === row.value.date && new Exact(record.value.gross).eq(row.value.gross)) row.duplicates.push(record.entityId);
-              if (row.value.loss && isExpense(record.value) && !record.value.voided && record.value.loss?.evidence === row.value.loss.evidence) row.errors.push("Kayıp kanıtı başka bir kayıtta kullanılmış.");
-            }
+            const candidate = candidates.get(duplicateKey(row.value));
+            if (candidate && candidate !== row.entityId) row.duplicates.push(candidate);
+            if (row.value.loss && losses.has(row.value.loss.evidence)) row.errors.push("Kayıp kanıtı başka bir kayıtta kullanılmış.");
           }
         } catch (error) { row.errors.push(error instanceof Error ? error.message : "Satır doğrulanamadı."); row.value = null; }
         if (row.errors.length) row.value = null;
+        if (row.value) {
+          const key = duplicateKey(row.value);
+          if (!candidates.has(key)) candidates.set(key, row.entityId);
+          if (row.value.loss) losses.add(row.value.loss.evidence);
+        }
         preview.rows.push(row);
       }
       if (!preview.rows.length) preview.errors.push("Çalışma kitabında gider satırı yok.");
@@ -72,8 +83,8 @@ export class Expenses {
     requireValid(p && p.previewId === request.previewId);
     if (p.alreadyImported) return { status: "already-imported" as const, count: 0 };
     requireValid(!p.errors.length && p.rows.length && p.rows.every(row => row.value && !row.errors.length));
-    requireValid(request.keepCandidateRows.every(row => p.rows.some(r => r.row === row && r.duplicates.length)) && new Set(request.keepCandidateRows).size === request.keepCandidateRows.length);
-    requireValid(p.rows.every(row => !row.duplicates.length || request.keepCandidateRows.includes(row.row)));
+    const candidates = new Set(p.rows.filter(row => row.duplicates.length).map(row => row.row)), keep = new Set(request.keepCandidateRows);
+    requireValid(keep.size === request.keepCandidateRows.length && keep.size === candidates.size && request.keepCandidateRows.every(row => candidates.has(row)));
     const changes = p.rows.filter(row => !row.alreadyPresent).map(row => ({ kind: "expense" as const, entityId: row.entityId, value: row.value! }));
     const imported = this.store.importExpenses(p.batchId, p.baseRevision, changes);
     this.pending = null;

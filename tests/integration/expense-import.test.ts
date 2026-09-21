@@ -48,7 +48,7 @@ test("mixed rows reject the entire batch with safe column explanations and previ
 test("repeated legitimate rows have bounded duplicate evidence without losing explicit consent", async () => {
   const store = openStore(":memory:"), expenses = new Expenses(store);
   try {
-    const count = 1000;
+    const count = 5000;
     const preview = expenses.preview(await workbook(Array.from({ length: count }, (_, index) => [`repeat-${index}`, ...row.slice(1)])));
     expect(preview.errors).toEqual([]);
     expect(preview.rows).toHaveLength(count);
@@ -58,5 +58,17 @@ test("repeated legitimate rows have bounded duplicate evidence without losing ex
     expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] })).toThrow();
     expect(expenses.confirm({ previewId: preview.previewId, keepCandidateRows: preview.rows.slice(1).map(candidate => candidate.row) })).toMatchObject({ status: "imported", count });
     expect(expenses.query({ period: "2026-01" }).rows).toHaveLength(count);
+  } finally { store.close(); }
+});
+test("bounded duplicate lookup still rejects repeated stock-loss evidence within and across batches", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const loss = [...row]; loss[4] = "inventory-loss"; loss[12] = "same-loss"; loss[13] = "separate";
+    const another = [...loss]; another[0] = "loss-ref-2"; another[1] = "16.01.2026";
+    const preview = expenses.preview(await workbook([loss, another]));
+    expect(preview.rows[1].errors).toContain("Kayıp kanıtı başka bir kayıtta kullanılmış.");
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] })).toThrow();
+    const first = expenses.preview(await workbook([loss])); expenses.confirm({ previewId: first.previewId, keepCandidateRows: [] });
+    expect(expenses.preview(await workbook([another])).rows[0].errors).toContain("Kayıp kanıtı başka bir kayıtta kullanılmış.");
   } finally { store.close(); }
 });
