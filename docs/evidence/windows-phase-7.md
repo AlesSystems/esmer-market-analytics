@@ -95,6 +95,8 @@ The first file-picker attempt used forward slashes, which the Windows dialog rej
 
 Windows Sandbox is absent. VirtualBox is installed, but its registered machines are unrelated lab environments, including Windows Server 2008, rather than an available supported clean Windows test machine. None was started or modified. The locally built installer has no `Zone.Identifier` stream. Its unsigned status alone cannot establish downloaded-installer SmartScreen behavior. Those environment-dependent checks remain open.
 
+Follow-up procedures and evidence are committed in `57ebe70`. Independent Standards and Spec reviews of `0e6b6ce...57ebe70` each reported zero actionable findings. Both checked the three new receipt hashes; Spec also rechecked all three release hashes. The comment audit found zero unnecessary comments or suppressions and prompted narrower file-preservation wording. PowerShell parsing, local document links, receipt hashes and the final diff checks pass. No application code changed, so the prior 29 unit, 159 integration and 16 packaged desktop results remain the full-suite record for this unchanged build.
+
 ## Remaining checks and boundary
 
 - Physical offline operation passed according to the user's report above. Independent observation and the exact tested interaction sequence were not supplied.
