@@ -93,3 +93,15 @@ test("every expense IPC checks sender and exact payload before service or native
   expect(service).not.toHaveBeenCalled();
   for (const [operation, payload] of Object.entries(operations).filter(([operation]) => operation !== "correctExpense")) expect(await handleRequest(true, operation, payload, availability, undefined, undefined, service)).toEqual({ status: "saved" });
 });
+test("loss evidence cannot be duplicated by correction or restoration across periods", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  const loss = [...row]; loss[4] = "inventory-loss"; loss[12] = "loss-evidence"; loss[13] = "separate";
+  const second = [...row]; second[0] = "ref-2"; second[1] = "15.02.2026";
+  const p = expenses.preview(await workbook([loss, second])); expenses.confirm({ previewId: p.previewId, keepCandidateRows: [] });
+  const first = expenses.query({ period: "2026-01" }).rows[0], other = expenses.query({ period: "2026-02" }).rows.find(record => record.entityId !== first.entityId)!;
+  expect(() => store.changeExpense({ entityId: other.entityId, expectedRevision: other.revision, replacement: { ...fields(other.value), classification: "inventory-loss", loss: { evidence: "loss-evidence", recognition: "separate" } }, reason: "Tekrar kayıp" })).toThrow();
+  const voided = store.changeExpense({ entityId: first.entityId, expectedRevision: first.revision, restoreRevision: null, reason: "İptal" });
+  store.changeExpense({ entityId: other.entityId, expectedRevision: other.revision, replacement: { ...fields(other.value), classification: "inventory-loss", loss: { evidence: "loss-evidence", recognition: "separate" } }, reason: "Doğru dönem" });
+  expect(() => store.changeExpense({ entityId: first.entityId, expectedRevision: voided, restoreRevision: first.revision, reason: "Eski döneme dönüş" })).toThrow();
+  store.close();
+});
