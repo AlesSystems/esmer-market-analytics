@@ -368,6 +368,8 @@ expect(result.confidence).toBe('estimated');
 
 **Exit gate:** Expense import, provenance, revision and completeness rules satisfy the relevant A02–A05 gates. A reveal without a real expense workbook remains useful and honest.
 
+**2026-09-21 local implementation:** See [Phase 7 evidence](../../evidence/phase-7-local.md) and the [Windows continuation](../../operations/windows-phase-7-handoff.md). The task checklist and exit gate remain open for Windows and source-dependent acceptance; synthetic macOS checks alone do not complete them.
+
 ## Phase 8 — Complete Turkish reporting, report revisions and Excel export
 
 **Outcome:** One monthly overview brings the approved analytics together without competing formulas or misleading confidence labels.

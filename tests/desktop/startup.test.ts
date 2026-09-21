@@ -34,7 +34,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
         process: typeof window.process,
       })),
     ).toEqual({
-      api: ["getAvailability", "importPackage", "inspectSales", "openSales", "queryPurchasing", "querySales"],
+      api: ["confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "getAvailability", "importPackage", "inspectSales", "openSales", "previewExpenses", "queryExpenses", "queryOperating", "queryPurchasing", "querySales", "restoreExpense", "saveExpenseTemplate"],
       node: "undefined",
       process: "undefined",
     });
@@ -259,7 +259,7 @@ test("packaged app imports through native selection, preserves data after failed
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
-    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["getAvailability", "importPackage", "inspectSales", "openSales", "queryPurchasing", "querySales"] });
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "getAvailability", "importPackage", "inspectSales", "openSales", "previewExpenses", "queryExpenses", "queryOperating", "queryPurchasing", "querySales", "restoreExpense", "saveExpenseTemplate"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -331,7 +331,7 @@ test("packaged owning worker migrates and reopens durable revisions and report p
         expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", dataset: { datasetId: before.pin.datasetId, counts: { documents: 2, lines: 2, suppliers: 0 } } });
       } finally { await app.close(); }
       const check = new DatabaseSync(databasePath, { readOnly: true });
-      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 4 }); }
+      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 5 }); }
       finally { check.close(); }
       const reopened = openStore(databasePath);
       try {

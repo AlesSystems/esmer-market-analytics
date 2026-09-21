@@ -1,3 +1,6 @@
+import { calculateOperatingResult, OPERATING_CALCULATION_VERSION } from "../analytics/operating";
+import { relevantExpenseRevision } from "../expenses/adjustments";
+import type { OperatingReportResult } from "../expenses/contracts";
 import { estimateGrossResult, COST_CALCULATION_VERSION } from "../analytics/costs";
 import { calculatePurchasing, PURCHASING_CALCULATION_VERSION } from "../analytics/purchasing";
 import type { QueryPurchasingRequest, PurchasingReportResult } from "./contracts";
@@ -84,7 +87,7 @@ export class SalesReports {
     const transactionScopes = new Map<string, string[]>();
     for (const line of lines) { const values = transactionScopes.get(line.documentId) ?? []; values.push(line.net); transactionScopes.set(line.documentId, values); }
     const active = this.store.availability();
-    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
+    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
   }
   purchasing({ context }: QueryPurchasingRequest): PurchasingReportResult {
     const session = this.resolve(context);
@@ -100,7 +103,17 @@ export class SalesReports {
     for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
     for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
     const evidence = { documents: snapshot.records.documents.filter(row => ids.has(row.id)), lines: snapshot.records.lines.filter(row => ids.has(row.documentId)) };
-    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, evidence, gross, purchasing } };
+    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, evidence, gross, purchasing } };
+  }
+  operating({ context }: QueryPurchasingRequest): OperatingReportResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const { snapshot } = session, period = range(snapshot, context.period), metadata = snapshot.metadata!;
+    const scope = { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to };
+    const sales = calculateSales(snapshot.records, scope), gross = estimateGrossResult(snapshot.records, scope);
+    const result = calculateOperatingResult({ gross, salesReconciled: sales.complete, periodCoverageComplete: period.covered && !period.partial, period: context.period, expenses: snapshot.app, confirmation: snapshot.app.find(row => row.kind === "confirmation" && row.entityId === `expense-complete:${context.period}`) ?? null, expenseRevision: relevantExpenseRevision(snapshot.expenseHistory, context.period) });
+    const current = this.store.readPin();
+    return { status: "operating", context: { ...context }, calculationVersion: OPERATING_CALCULATION_VERSION, grossCalculationVersion: COST_CALCULATION_VERSION, gross, expenseRevision: relevantExpenseRevision(snapshot.expenseHistory, context.period), expenseRecords: snapshot.app.filter(row => row.kind === "expense"), stale: current.datasetId !== context.datasetId || current.appRevision !== context.appRevision, result };
   }
   inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
     const session = this.resolve(context);
