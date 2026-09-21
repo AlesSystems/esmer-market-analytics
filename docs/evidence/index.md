@@ -77,3 +77,9 @@ The Phase 5 exit gate remains **open** for source-dependent acceptance and remai
 - [Windows verification](windows-phase-6.md) records two provenance-navigation fixes, 22 unit, 148 integration and 11 packaged Windows desktop tests, real native picker checks, isolated portable/NSIS migration and uninstall, hashes, screenshots and bounded performance observations. The same branch and PR #20 remain the review target.
 
 Tasks 6.1/6.2 have supported synthetic implementation evidence. The Phase 6 exit gate remains open for real-source semantics and acceptance. The [2026-09-21 follow-up](windows-phase-6.md#remaining-windows-checks-on-2026-09-21) records the user's physical-disconnect pass, passing actual Windows 100%/125%/150% scaling and horizontal table-wheel checks, and local interactive installer observations. No publisher warning appeared for the local artifact; downloaded-installer SmartScreen behavior remains unverified. Full imported-dataset performance and owner acceptance remain open. Synthetic accepted-report records do not represent owner acceptance. No merge, issue closure, Phase 7 or deployment follows from this record.
+
+## Phase 7 local implementation
+
+Issue [#10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) adds canonical Excel expense imports, reversible history, explicit completeness review and conditional estimated operating results. See the [local evidence](phase-7-local.md), [expense contract](../contracts/expense-completeness.md), and [Windows-agent prompt](../operations/windows-phase-7-prompt.md).
+
+The user requested a stop before Windows implementation/testing. Tasks 7.1/7.2 have synthetic local evidence; source-dependent A02–A05, Windows A07, full-volume performance and owner acceptance remain open. No merge, rollout or later phase is authorized.
