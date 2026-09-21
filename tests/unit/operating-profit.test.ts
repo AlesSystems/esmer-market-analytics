@@ -17,3 +17,21 @@ test("G06 and unsupported prerequisite evidence withhold the headline", () => {
   for (const patch of [{ salesReconciled: false }, { periodCoverageComplete: false }, { expenseRevision: 3 }, { gross: { ...gross, excluded: [{ net: "0.00001" } as GrossResult["excluded"][number]] } }]) expect(calculateOperatingResult({ ...i, ...patch }).value).toBeNull();
   for (const patch of [{ taxTreatment: "unknown" as const }, { classification: "unclassified" as const }]) expect(calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { ...expense, ...patch } }] }).value).toBeNull();
 });
+test("classifications, KDV basis, loss recognition and legacy evidence remain explicit", () => {
+  const i = input();
+  for (const classification of ["asset-purchase", "taxes", "financing-loan", "owner-contribution", "owner-withdrawal", "transfer"] as const) {
+    const result = calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { ...expense, classification, net: "500", gross: "500" } }] });
+    expect(result).toMatchObject({ status: "estimated", value: "200", expenses: "0", excluded: [{ classification, amount: "500" }] });
+  }
+  for (const [taxTreatment, expected] of [["recoverable", "150"], ["non-recoverable", "140"]] as const) {
+    expect(calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { ...expense, tax: "10", gross: "60", taxTreatment } }] }).value).toBe(expected);
+  }
+  expect(calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { ...expense, classification: "labour", labourPeriod: "2026-01" } }] }).value).toBe("150");
+  for (const [recognition, expected] of [["separate", "150"], ["already-in-cost", "200"]] as const) {
+    const loss = { ...i.expenses[0], value: { ...expense, classification: "inventory-loss" as const, loss: { evidence: "loss-1", recognition } } };
+    expect(calculateOperatingResult({ ...i, expenses: [loss] }).value).toBe(expected);
+    expect(calculateOperatingResult({ ...i, expenses: [loss, { ...loss, entityId: "duplicate" }] }).value).toBeNull();
+  }
+  expect(calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { date: expense.date, net: "50", reason: "Legacy", evidence: "legacy" } }] }).reasons).toContain("LEGACY_EXPENSE");
+  expect(calculateOperatingResult({ ...i, confirmation: { ...i.confirmation, value: { ...i.confirmation.value, complete: false } } }).value).toBeNull();
+});
