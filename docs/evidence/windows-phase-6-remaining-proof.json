@@ -1,0 +1,588 @@
+{
+  "initialCommit": "2fb25b3b1d26b124f56ee26f54ed1ad1022b3e01",
+  "fetchedCommit": "2fb25b3b1d26b124f56ee26f54ed1ad1022b3e01",
+  "applicationRevision": "bb74a3fb0a1a081784c0ad21527fbd28d0f5fc8d",
+  "environment": {
+    "caption": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build": "26200",
+    "revision": 9457,
+    "displayVersion": "25H2",
+    "architecture": "64-bit",
+    "model": "HP ZBook Studio 16 inch G9 Mobile Workstation PC",
+    "manufacturer": "HP",
+    "memoryBytes": 33974288384,
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "cores": 14,
+    "logicalProcessors": 20,
+    "powershell": "7.6.6",
+    "originalScale": 1.25,
+    "finalScale": 1.25,
+    "displayResolution": "1920x1200"
+  },
+  "physicalDisconnect": {
+    "agentObserved": false,
+    "individualStepsAndArtifactHashProvided": false,
+    "statement": "physical-disconnect testing is successfull",
+    "status": "user-reported pass",
+    "date": "2026-09-21"
+  },
+  "layoutRuns": [
+    {
+      "date": "2026-09-21T06:26:51.295Z",
+      "expectedScale": 1,
+      "executablePath": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+      "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-nd90b7",
+      "work": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-lseUzQ",
+      "archiveSha256": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+      "fixture": {
+        "identity": "business-fixture/business-long-layout-1",
+        "sha256": "f4975d373dd04d152d546dbbf098ace184b9cc9e61dc6fa94fa3af3dea59bbd1",
+        "bytes": 29488,
+        "documents": 36,
+        "lines": 36,
+        "suppliers": 1
+      },
+      "checks": {
+        "horizontalWheel": {
+          "left": 0,
+          "width": 569,
+          "scrollWidth": 624,
+          "overflowX": "auto",
+          "right": 55,
+          "restored": 0
+        },
+        "keyboardEnterEscapeFocus": true,
+        "verticalHistoryAndSourceScroll": true,
+        "sales200CoveredGross40": true
+      },
+      "screenshots": [
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-lseUzQ\\os-1-source.png",
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-lseUzQ\\os-1-overview.png"
+      ],
+      "runtime": {
+        "packaged": true,
+        "versions": {
+          "node": "24.20.0",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.8",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.2",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "149",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "0.0.0",
+          "simdjson": "4.6.6",
+          "simdutf": "7.7.0",
+          "sqlite": "3.53.4",
+          "tz": "2025c",
+          "undici": "7.29.0",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "15.2.124.19-electron.0",
+          "zlib": "1.3.2.1-motley",
+          "zstd": "1.6.0",
+          "electron": "44.3.0",
+          "chrome": "152.0.7977.78"
+        },
+        "switches": [
+          "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+          "--inspect=0",
+          "--remote-debugging-port=0",
+          "--user-data-dir=C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-nd90b7"
+        ],
+        "display": {
+          "accelerometerSupport": "unknown",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1200
+          },
+          "colorDepth": 24,
+          "colorSpace": "{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}",
+          "depthPerComponent": 8,
+          "detected": true,
+          "displayFrequency": 60,
+          "id": 3317650946,
+          "internal": true,
+          "label": "",
+          "maximumCursorSize": {
+            "width": 0,
+            "height": 0
+          },
+          "monochrome": false,
+          "nativeOrigin": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "scaleFactor": 1,
+          "size": {
+            "width": 1920,
+            "height": 1200
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 1152
+          },
+          "workAreaSize": {
+            "width": 1920,
+            "height": 1152
+          },
+          "touchSupport": "unknown"
+        },
+        "minimum": [
+          680,
+          520
+        ]
+      },
+      "geometry": {
+        "width": 664,
+        "height": 481,
+        "documentWidth": 649,
+        "devicePixelRatio": 1
+      },
+      "pointer": {
+        "x": 120,
+        "y": 240.171875,
+        "target": "<td>Örnek Tedarikçi</td>"
+      },
+      "status": "passed"
+    },
+    {
+      "date": "2026-09-21T06:25:17.777Z",
+      "expectedScale": 1.25,
+      "executablePath": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+      "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-BnkbDs",
+      "work": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-DMGM5Z",
+      "archiveSha256": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+      "fixture": {
+        "identity": "business-fixture/business-long-layout-1",
+        "sha256": "f4975d373dd04d152d546dbbf098ace184b9cc9e61dc6fa94fa3af3dea59bbd1",
+        "bytes": 29488,
+        "documents": 36,
+        "lines": 36,
+        "suppliers": 1
+      },
+      "checks": {
+        "horizontalWheel": {
+          "left": 0,
+          "width": 573,
+          "scrollWidth": 624,
+          "overflowX": "auto",
+          "right": 51.20000076293945,
+          "restored": 0
+        },
+        "keyboardEnterEscapeFocus": true,
+        "verticalHistoryAndSourceScroll": true,
+        "sales200CoveredGross40": true
+      },
+      "screenshots": [
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-DMGM5Z\\os-1.25-source.png",
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-DMGM5Z\\os-1.25-overview.png"
+      ],
+      "runtime": {
+        "packaged": true,
+        "versions": {
+          "node": "24.20.0",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.8",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.2",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "149",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "0.0.0",
+          "simdjson": "4.6.6",
+          "simdutf": "7.7.0",
+          "sqlite": "3.53.4",
+          "tz": "2025c",
+          "undici": "7.29.0",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "15.2.124.19-electron.0",
+          "zlib": "1.3.2.1-motley",
+          "zstd": "1.6.0",
+          "electron": "44.3.0",
+          "chrome": "152.0.7977.78"
+        },
+        "switches": [
+          "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+          "--inspect=0",
+          "--remote-debugging-port=0",
+          "--user-data-dir=C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-BnkbDs"
+        ],
+        "display": {
+          "accelerometerSupport": "unknown",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1536,
+            "height": 960
+          },
+          "colorDepth": 24,
+          "colorSpace": "{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}",
+          "depthPerComponent": 8,
+          "detected": true,
+          "displayFrequency": 60,
+          "id": 3317650946,
+          "internal": true,
+          "label": "",
+          "maximumCursorSize": {
+            "width": 0,
+            "height": 0
+          },
+          "monochrome": false,
+          "nativeOrigin": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "scaleFactor": 1.25,
+          "size": {
+            "width": 1536,
+            "height": 960
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1536,
+            "height": 912
+          },
+          "workAreaSize": {
+            "width": 1536,
+            "height": 912
+          },
+          "touchSupport": "unknown"
+        },
+        "minimum": [
+          680,
+          520
+        ]
+      },
+      "geometry": {
+        "width": 668,
+        "height": 483,
+        "documentWidth": 653,
+        "devicePixelRatio": 1.25
+      },
+      "pointer": {
+        "x": 120,
+        "y": 241.30001068115234,
+        "target": "<td>Örnek Tedarikçi</td>"
+      },
+      "status": "passed"
+    },
+    {
+      "date": "2026-09-21T06:26:02.501Z",
+      "expectedScale": 1.5,
+      "executablePath": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+      "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-GMZB0i",
+      "work": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-f67wWd",
+      "archiveSha256": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+      "fixture": {
+        "identity": "business-fixture/business-long-layout-1",
+        "sha256": "f4975d373dd04d152d546dbbf098ace184b9cc9e61dc6fa94fa3af3dea59bbd1",
+        "bytes": 29488,
+        "documents": 36,
+        "lines": 36,
+        "suppliers": 1
+      },
+      "checks": {
+        "horizontalWheel": {
+          "left": 0,
+          "width": 571,
+          "scrollWidth": 624,
+          "overflowX": "auto",
+          "right": 53.33333206176758,
+          "restored": 0
+        },
+        "keyboardEnterEscapeFocus": true,
+        "verticalHistoryAndSourceScroll": true,
+        "sales200CoveredGross40": true
+      },
+      "screenshots": [
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-f67wWd\\os-1.5-source.png",
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-f67wWd\\os-1.5-overview.png"
+      ],
+      "runtime": {
+        "packaged": true,
+        "versions": {
+          "node": "24.20.0",
+          "acorn": "8.18.0",
+          "ada": "4.0.0",
+          "amaro": "1.1.11",
+          "ares": "1.34.8",
+          "brotli": "1.2.0",
+          "cldr": "48.0",
+          "icu": "78.2",
+          "llhttp": "9.4.3",
+          "merve": "1.2.2",
+          "modules": "149",
+          "napi": "10",
+          "nbytes": "0.1.4",
+          "ncrypto": "0.0.1",
+          "nghttp2": "1.70.0",
+          "nghttp3": "",
+          "ngtcp2": "",
+          "openssl": "0.0.0",
+          "simdjson": "4.6.6",
+          "simdutf": "7.7.0",
+          "sqlite": "3.53.4",
+          "tz": "2025c",
+          "undici": "7.29.0",
+          "unicode": "17.0",
+          "uv": "1.52.1",
+          "uvwasi": "0.0.23",
+          "v8": "15.2.124.19-electron.0",
+          "zlib": "1.3.2.1-motley",
+          "zstd": "1.6.0",
+          "electron": "44.3.0",
+          "chrome": "152.0.7977.78"
+        },
+        "switches": [
+          "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+          "--inspect=0",
+          "--remote-debugging-port=0",
+          "--user-data-dir=C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-GMZB0i"
+        ],
+        "display": {
+          "accelerometerSupport": "unknown",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 800
+          },
+          "colorDepth": 24,
+          "colorSpace": "{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}",
+          "depthPerComponent": 8,
+          "detected": true,
+          "displayFrequency": 60,
+          "id": 3317650946,
+          "internal": true,
+          "label": "",
+          "maximumCursorSize": {
+            "width": 0,
+            "height": 0
+          },
+          "monochrome": false,
+          "nativeOrigin": {
+            "x": 0,
+            "y": 0
+          },
+          "rotation": 0,
+          "scaleFactor": 1.5,
+          "size": {
+            "width": 1280,
+            "height": 800
+          },
+          "workArea": {
+            "x": 0,
+            "y": 0,
+            "width": 1280,
+            "height": 752
+          },
+          "workAreaSize": {
+            "width": 1280,
+            "height": 752
+          },
+          "touchSupport": "unknown"
+        },
+        "minimum": [
+          680,
+          520
+        ]
+      },
+      "geometry": {
+        "width": 666,
+        "height": 484,
+        "documentWidth": 651,
+        "devicePixelRatio": 1.5
+      },
+      "pointer": {
+        "x": 120,
+        "y": 241.90625762939453,
+        "target": "<td>Örnek Tedarikçi</td>"
+      },
+      "status": "passed"
+    }
+  ],
+  "initialProbeFailure": {
+    "date": "2026-09-21T06:24:53.108Z",
+    "expectedScale": 1.25,
+    "executablePath": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+    "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-WBn0fT",
+    "work": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-6-layout-70tyuQ",
+    "archiveSha256": "bab372e4d8cfef9fa869c7ecf564504aab1fb62aebf38721b7f7dd086696bd0d",
+    "fixture": {
+      "identity": "business-fixture/business-long-layout-1",
+      "sha256": "f4975d373dd04d152d546dbbf098ace184b9cc9e61dc6fa94fa3af3dea59bbd1",
+      "bytes": 29488,
+      "documents": 36,
+      "lines": 36,
+      "suppliers": 1
+    },
+    "checks": {},
+    "screenshots": [],
+    "runtime": {
+      "packaged": true,
+      "versions": {
+        "node": "24.20.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "149",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.6",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2025c",
+        "undici": "7.29.0",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.2.124.19-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "44.3.0",
+        "chrome": "152.0.7977.78"
+      },
+      "switches": [
+        "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+        "--inspect=0",
+        "--remote-debugging-port=0",
+        "--user-data-dir=C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-layout-WBn0fT"
+      ],
+      "display": {
+        "accelerometerSupport": "unknown",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1536,
+          "height": 960
+        },
+        "colorDepth": 24,
+        "colorSpace": "{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}",
+        "depthPerComponent": 8,
+        "detected": true,
+        "displayFrequency": 60,
+        "id": 3317650946,
+        "internal": true,
+        "label": "",
+        "maximumCursorSize": {
+          "width": 0,
+          "height": 0
+        },
+        "monochrome": false,
+        "nativeOrigin": {
+          "x": 0,
+          "y": 0
+        },
+        "rotation": 0,
+        "scaleFactor": 1.25,
+        "size": {
+          "width": 1536,
+          "height": 960
+        },
+        "workArea": {
+          "x": 0,
+          "y": 0,
+          "width": 1536,
+          "height": 912
+        },
+        "workAreaSize": {
+          "width": 1536,
+          "height": 912
+        },
+        "touchSupport": "unknown"
+      },
+      "minimum": [
+        680,
+        520
+      ]
+    },
+    "geometry": {
+      "width": 668,
+      "height": 483,
+      "documentWidth": 653,
+      "devicePixelRatio": 1.25
+    },
+    "status": "failed",
+    "error": "Error: expect(received).toBeGreaterThan(expected)\n\nExpected: > 0\nReceived:   0\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate"
+  },
+  "installer": {
+    "initial": {
+      "startedAt": "2026-09-21T06:28:12.64036Z",
+      "root": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-interactive-3c2c07b331ce4315b4303d6cc5f39175",
+      "installer": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics Setup 0.1.0.exe",
+      "installerSha256": "DD4D7E2B15F05E1B2F604E31565A685D5DAD2348C298A290F7C06FDD92BF7433",
+      "target": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-interactive-3c2c07b331ce4315b4303d6cc5f39175\\nsis-app",
+      "appdata": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-interactive-3c2c07b331ce4315b4303d6cc5f39175\\appdata",
+      "localappdata": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-interactive-3c2c07b331ce4315b4303d6cc5f39175\\localappdata",
+      "pid": 3116,
+      "silent": false,
+      "zoneIdentifierPresent": false
+    },
+    "observedInstallerText": "Installing, please wait...",
+    "observedAppText": "Henüz veri içe aktarılmadı",
+    "unsignedWarningObserved": false,
+    "securityBarrierBypassed": false,
+    "settingsChanged": false,
+    "installedArchiveSha256": "BAB372E4D8CFEF9FA869C7ECF564504AAB1FB62AEBF38721B7F7DD086696BD0D",
+    "defaultProfileCreatedAt": "2026-09-21T06:28:35.6461644Z",
+    "defaultProfilePath": "C:\\Users\\esmer\\AppData\\Roaming\\esmer-market-analytics\\analytics.sqlite",
+    "defaultProfileImported": false,
+    "defaultProfileRetained": true,
+    "defaultProfileBefore": "1D679806A5B9D361CEE8F31AF8A22400FB1592919C4F52C4F5C00891C95FC52F",
+    "defaultProfileAfter": "1D679806A5B9D361CEE8F31AF8A22400FB1592919C4F52C4F5C00891C95FC52F",
+    "uninstallExitCode": 0,
+    "executableRemoved": true,
+    "limitation": "Local artifact has no Zone.Identifier. Downloaded-artifact SmartScreen behavior is not established. Installer auto-launch used the normal app-data path despite process-local APPDATA."
+  },
+  "verification": {
+    "lintExitCode": 0,
+    "npmTestExitCode": 0,
+    "unitTests": 22,
+    "integrationTests": 148,
+    "packagedWindowsDesktopTests": 11,
+    "archiveSha256AfterSuite": "BAB372E4D8CFEF9FA869C7ECF564504AAB1FB62AEBF38721B7F7DD086696BD0D",
+    "portableSha256": "4C02CCD8246934665935E90D266DCBC73D2826E2E36C506C0D98A8D9CF9C6F46",
+    "nsisSha256": "DD4D7E2B15F05E1B2F604E31565A685D5DAD2348C298A290F7C06FDD92BF7433"
+  }
+}
