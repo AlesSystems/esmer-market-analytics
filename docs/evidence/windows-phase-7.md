@@ -79,13 +79,30 @@ The comment audit found zero unnecessary comments or suppressions. It did identi
 
 The Windows procedures are committed in `d949b82` and their evidence in `327e3f9`. Independent Standards and Spec reviewers inspected `0c55462...327e3f9`; each reported zero actionable findings. Both verified the three release hashes and twelve command-log receipts against local files, including the final 29/159/16 test counts. Standards checked repository rules and profile/uninstaller isolation; Spec checked the authorized Windows prompt, synthetic calculation, Excel, scaling, lifecycle claims and declared open gates. These were read-only reviews, not additional application runs.
 
+## Follow-up verification
+
+On 2026-09-21 the user reported that physical network-disconnect operation succeeded and asked to finish the remaining PR gates. This is user-reported evidence for the Phase 7 portable build offered in this task, not an agent-observed disconnect. The user did not supply a screenshot, an independently measured hash, or the exact interaction sequence. The agent rechecked the local release hashes; they remain those listed above.
+
+The agent then completed two additional checks at evidence revision `0e6b6ce`, using the same packaged application and Windows environment. The [JSON record](windows-phase-7-proof.json) contains the reduced results and local receipt hashes.
+
+| Task / gate | Procedure and fixture | Expected and observed result | Evidence and limit |
+| --- | --- | --- | --- |
+| 7.1 / A04 / A07 | Copy the actual native-saved empty `yerel-sablon.xlsx` to `excel-duzenlenen-sablon.xlsx`. Open it in native Excel, enter one synthetic row into A2:K2, save with Ctrl+S, and close Excel. Select it through the packaged app's real native picker. | The saved 8,928-byte workbook imports successfully. Preview leaves revision 0. Confirmation creates revision 1, one row and one batch. Category `Sentetik İşçilik Çığ Şü Ö` survives. January incurred amount is 50 with no payment; February payment is 50 with no incurred amount. Completeness remains false. | [Preview](windows-phase-7-template-edited.png). Workbook SHA256 `ced0d1c8bfdfd37b0463667f69d12abbbd32a96b904e139aa81d0b6667af3645`. No dialog substitution or workbook-library edit. |
+| A04 / A07 | Hold the isolated installed archive open without delete sharing, then run the current NSIS installer against that same isolated installation. Acknowledge its failure dialog. | Installer exits 2. All 77 installed files retain their paths and hashes. Both synthetic database hashes remain unchanged. | [Failure dialog](windows-phase-7-failed-upgrade.jpg), [repeatable probe](windows-phase-7-tools/failed-upgrade.ps1), JSON `followup.failedUpgrade`. This is a same-build maintenance-upgrade failure at old-file removal, not power loss or failure midway through a schema migration. |
+| A04 / A07 | After that failure, run `node work/windows-phase-7/lifecycle-proof.mjs installed`. | Two launches pass the existing deep comparisons for the expense snapshot, batch history, accepted output and old report pin. The installed archive still matches the tested build. | JSON `followup.postFailureLaunches`; local `post-failure-lifecycle.log`. |
+
+The first file-picker attempt used forward slashes, which the Windows dialog rejected. Repeating with native backslashes succeeded. Two installer probes timed out while waiting for acknowledgement of the expected error dialog. The final probe allows three minutes for acknowledgement and passed. These were procedure failures, not financial assertion failures.
+
+Windows Sandbox is absent. VirtualBox is installed, but its registered machines are unrelated lab environments, including Windows Server 2008, rather than an available supported clean Windows test machine. None was started or modified. The locally built installer has no `Zone.Identifier` stream. Its unsigned status alone cannot establish downloaded-installer SmartScreen behavior. Those environment-dependent checks remain open.
+
 ## Remaining checks and boundary
 
-- Physical network-disconnect operation has not been performed on this Phase 7 build. Earlier-phase user reports do not establish this build's result.
+- Physical offline operation passed according to the user's report above. Independent observation and the exact tested interaction sequence were not supplied.
 - Interactive unsigned-publisher and downloaded-installer SmartScreen behavior remain open. Silent local installation and `NotSigned` inspection do not establish those prompts.
-- Failed upgrade, default-profile uninstall policy and a separate clean Windows account without development tools remain open. Removing developer tools from a child PATH is a bounded check, not that clean-machine test.
-- Native Excel editing of the empty saved template was not exercised. The canonical populated workbook was opened and saved in native Excel, and the app's empty template was saved through its native dialog.
+- Failed old-file removal now has a passing file-preservation check. Power-loss and mid-migration failures, default-profile uninstall policy, and a separate clean Windows account without development tools remain open. Removing developer tools from a child PATH is a bounded check, not that clean-machine test.
 - Full-volume two-second performance, real spreadsheet completeness, source mappings, source-backed A02–A05 acceptance and real owner confirmation remain open. Synthetic workbook limits are not full-dataset benchmarks.
 - A06 recovery, later reporting/release phases and L01 live integration remain outside this continuation. Do not close issue #10 or mark all A07 requirements complete from these checks.
+
+Phase 7's executable expense checks have passed. The listed environment-dependent and source-dependent acceptance gates remain incomplete. The broader clean lifecycle and full-data benchmark belong to plan task 10.1; report export and recovery belong to later phases. This PR does not claim full release acceptance.
 
 Continue any remaining checks on this same branch and bind new evidence to the release hashes above or a newly identified build. Do not merge, contact Eralp, access a private source, install on his machine or enable live access without the separately required direction.

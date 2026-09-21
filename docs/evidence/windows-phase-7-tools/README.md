@@ -60,3 +60,24 @@ node work/windows-phase-7/lifecycle-proof.mjs reinstalled
 ```
 
 For release inspection, reuse `node docs/evidence/windows-phase-6-tools/inspect-release.mjs release work/windows-phase-7/package-inventory.json` and `node scripts/verify-package.mjs release/win-unpacked/resources/app.asar`. Record final release hashes after the last build. Keep installer outputs, Excel documents, databases and raw local logs out of Git. Commit only reviewed synthetic screenshots and reduced evidence.
+
+## Exercise a failed maintenance upgrade
+
+Use the existing isolated installation and both synthetic lifecycle profiles from the procedure above. Close all app instances. Copy `failed-upgrade.ps1` into the work directory and run it in a separate PowerShell process. It opens `resources/app.asar` without delete sharing and runs the same-build installer against the isolated directory. The installer displays an old-files uninstall failure even with `/S`. Acknowledge **OK** within three minutes. The script expects a nonzero exit and compares every installed file and both database hashes before and after failure.
+
+```powershell
+pwsh -NoProfile -File work/windows-phase-7/failed-upgrade.ps1
+node work/windows-phase-7/lifecycle-proof.mjs installed
+```
+
+The second command verifies usable records and accepted report pins across two launches. This checks file and data preservation after locked-file removal fails. It does not simulate power loss or a failed database migration. Keep those limits with the result.
+
+## Edit the saved template in native Excel
+
+Copy the empty workbook saved through the app's native dialog to a new synthetic file. Open the copy in Excel. Paste the following tab-separated fields into A2:K2, beneath the existing headers, then save and close Excel.
+
+```text
+sentetik-bos-sablon	15.01.2026	01.02.2026	Sentetik İşçilik Çığ Şü Ö	Faaliyet gideri	50	0	50	İndirilemez	sentetik-vergi	sentetik-belge
+```
+
+Open a fresh disposable packaged profile. Select the saved workbook through the real native picker, using Windows backslashes in the file path. Check zero revisions before confirmation, then one imported row and batch afterward. Expect January incurred 50 and payment 0, February incurred 0 and payment 50, and unconfirmed completeness. Record the saved workbook hash and screenshot only synthetic application content.

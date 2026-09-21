@@ -505,10 +505,101 @@
   ],
   "limitations": [
     "Synthetic inputs only; no real source or owner acceptance",
-    "Physical network disconnection not performed on this build",
-    "Downloaded-installer publisher warning and failed upgrade not exercised",
-    "Lifecycle uses explicit disposable user-data-dir; no claim about default-profile uninstall policy",
+    "Physical offline success is user-reported; no independent observation or exact interaction sequence supplied",
+    "Downloaded-installer publisher warning remains unperformed",
+    "Failed upgrade covers locked-file removal in a same-build maintenance update, not power loss or mid-migration failure",
+    "Lifecycle uses explicit disposable user-data-dir; no claim about default-profile uninstall policy or clean supported Windows machine",
     "No full-volume performance measurement",
     "Native Excel numeric cells preserve Excel stored precision, which can differ from the displayed value"
-  ]
+  ],
+  "followup": {
+    "postFailureLaunches": [
+      {
+        "launch": 1,
+        "schema": 5,
+        "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+        "profilePreserved": true,
+        "acceptedAndPinnedPreserved": true,
+        "offlineMode": "Playwright network blocking, not physical disconnect",
+        "developerRuntimeInChildPath": false
+      },
+      {
+        "launch": 2,
+        "schema": 5,
+        "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+        "profilePreserved": true,
+        "acceptedAndPinnedPreserved": true,
+        "offlineMode": "Playwright network blocking, not physical disconnect",
+        "developerRuntimeInChildPath": false
+      }
+    ],
+    "date": "2026-09-21",
+    "editedEmptyTemplate": {
+      "category": "Sentetik İşçilik Çığ Şü Ö",
+      "name": "excel-duzenlenen-sablon.xlsx",
+      "nativeExcelEdited": true,
+      "importRevision": 1,
+      "sha256": "ced0d1c8bfdfd37b0463667f69d12abbbd32a96b904e139aa81d0b6667af3645",
+      "februaryIncurred": "0",
+      "nativePicker": true,
+      "rows": 1,
+      "completeness": false,
+      "batches": 1,
+      "previewRevision": 0,
+      "bytes": 8928,
+      "januaryIncurred": "50",
+      "januaryPayment": "0",
+      "februaryPayment": "50"
+    },
+    "physicalOffline": {
+      "independentlyObserved": false,
+      "status": "user-reported-success",
+      "exactInteractionSequenceSupplied": false
+    },
+    "receipts": [
+      {
+        "bytes": 5619,
+        "sha256": "f535f71aaa8b262cd599323fcada682589d9955fd438702d258f4c437ef5e9b6",
+        "path": "work/windows-phase-7/template-edited-proof.json"
+      },
+      {
+        "bytes": 1259,
+        "sha256": "fed78be8b6f4340963ded093ee89e0686dae0d824602ba587ff132aeeae52a0b",
+        "path": "work/windows-phase-7/failed-upgrade-proof.json"
+      },
+      {
+        "bytes": 563,
+        "sha256": "de20af70ad2ba85825ec4fb3e814cd7ba01647265a674586c7851bbefbc6fb0c",
+        "path": "work/windows-phase-7/post-failure-lifecycle.log"
+      }
+    ],
+    "failedUpgrade": {
+      "archive": "A1B29602E60FA2903DA96EFEF91CD83D49A5AE9FA5D8B77FEC4053534A46F973",
+      "installedFiles": 77,
+      "databasesAfter": [
+        {
+          "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\windows-phase-7\\lifecycle\\legacy-profile\\analytics.sqlite",
+          "Hash": "9A4A363B200EA06217A8AA16177313372E753A70ABCE7A6B104982B1BA0DFB05"
+        },
+        {
+          "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\windows-phase-7\\lifecycle\\expense-profile\\analytics.sqlite",
+          "Hash": "5509E5024790327529A923DC575767CA052FB87B2A7533153C3211AB74A7FB77"
+        }
+      ],
+      "scenario": "Same-build NSIS maintenance upgrade fails on locked archive",
+      "installedFilesUnchanged": true,
+      "databasesBefore": [
+        {
+          "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\windows-phase-7\\lifecycle\\legacy-profile\\analytics.sqlite",
+          "Hash": "9A4A363B200EA06217A8AA16177313372E753A70ABCE7A6B104982B1BA0DFB05"
+        },
+        {
+          "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\windows-phase-7\\lifecycle\\expense-profile\\analytics.sqlite",
+          "Hash": "5509E5024790327529A923DC575767CA052FB87B2A7533153C3211AB74A7FB77"
+        }
+      ],
+      "exitCode": 2
+    },
+    "evidenceBase": "0e6b6ce713222bf064307773c18f2a5c8e0da76d"
+  }
 }
