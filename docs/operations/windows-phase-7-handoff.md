@@ -1,6 +1,6 @@
 # Continue Phase 7 on Windows
 
-Continue [issue #10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) on branch `codex/phase-7-expenses-operating` and its existing PR. The user requested a stop before Windows implementation or testing. The macOS run does not establish Windows acceptance. Do not merge or close the issue during this handoff.
+Continue [issue #10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) on branch `codex/phase-7-expenses-operating` and [existing PR #21](https://github.com/AlesSystems/esmer-market-analytics/pull/21). The user requested a stop before Windows implementation or testing. The macOS run does not establish Windows acceptance. Do not merge or close the issue during this handoff.
 
 Read [local evidence](../evidence/phase-7-local.md), the [expense contract](../contracts/expense-completeness.md), [implementation plan](../superpowers/plans/esmer-market-implementation-plan.md#phase-7--expenses-adjustments-and-operating-results), repository `AGENTS.md`, and the foundation documents before changes. Use synthetic workbooks and an isolated application profile. No production access, source inspection, contact with Eralp, or installation on his computer is authorized.
 

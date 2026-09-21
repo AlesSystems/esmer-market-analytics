@@ -4,7 +4,7 @@ Tracks [issue #10](https://github.com/AlesSystems/esmer-market-analytics/issues/
 
 ## Environment and scope
 
-- Branch `codex/phase-7-expenses-operating`, baseline `b09392b0b3aeddceeb2f3b9f4100e816792d0a90`.
+- [PR #21](https://github.com/AlesSystems/esmer-market-analytics/pull/21), branch `codex/phase-7-expenses-operating`, baseline `b09392b0b3aeddceeb2f3b9f4100e816792d0a90`.
 - macOS 27.0 build 26A428, arm64; Node 24.15.0, npm 11.12.1.
 - Synthetic fixtures only. No source backup, private workbook, production connection or owner contact.
 - Baseline passed typecheck, lint, 22 unit tests, 148 integration tests and 11 packaged macOS desktop tests.
