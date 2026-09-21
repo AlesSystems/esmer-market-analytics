@@ -137,3 +137,28 @@ test("operating report stays pinned after expense edits until the owner reopens 
     await page.screenshot({ path: "test-results/phase-7-operating.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+test("initial expense query failure ends loading and can be retried", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-expense-retry-"));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await app.evaluate(({ ipcMain }) => {
+      const listeners = ipcMain as typeof ipcMain & { _invokeHandlers: Map<string, (...args: unknown[]) => unknown> };
+      const handler = listeners._invokeHandlers.get("esmer:request")!;
+      let first = true;
+      ipcMain.removeHandler("esmer:request");
+      ipcMain.handle("esmer:request", (...args) => {
+        const operation = args[1];
+        if (operation === "queryExpenses" && first) { first = false; return { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik okuma hatası" }; }
+        return handler(...args);
+      });
+    });
+    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await expect(page.getByRole("alert")).toContainText("Sentetik okuma hatası");
+    await expect(page.getByText("Giderler yükleniyor…", { exact: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "Giderleri yeniden yükle", exact: true }).click();
+    await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveCount(0);
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
