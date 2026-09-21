@@ -1,0 +1,13 @@
+import { useEffect, useState } from "react";
+import type { ReportContext } from "../reports/contracts";
+import { classificationLabels, type Classification, type OperatingReportResult } from "../expenses/contracts";
+import type { RequestError } from "../domain/contracts";
+import { money } from "./format";
+const reasonLabels: Record<string, string> = { EXPENSES_INCOMPLETE: "Giderlerin eksiksizliği henüz onaylanmadı veya kayıtlar değişti.", GROSS_INCOMPLETE: "Satış, maliyet veya dönem kapsamı kanıtları eksik.", LEGACY_EXPENSE: "Eski gider kaydının hesaplama kanıtları eksik.", UNCLASSIFIED: "Tutarı sıfır olmayan sınıflandırılmamış kayıt var.", UNKNOWN_TAX: "KDV işlemi veya kanıtı eksik.", LOSS_REVIEW: "Stok kaybı kanıtı eksik veya birden çok kayıtta kullanılmış." };
+export function OperatingSummary({ context, revision, refresh }: { context: ReportContext; revision: number; refresh: () => void }) {
+  const [report, setReport] = useState<OperatingReportResult | RequestError>();
+  useEffect(() => { let current = true; setReport(undefined); window.esmer.queryOperating({ context }).then(value => { if (current) setReport(value); }).catch(() => { if (current) setReport({ status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Faaliyet sonucu yüklenemedi. Raporu yeniden açın." }); }); return () => { current = false; }; }, [context, revision]);
+  if (!report) return <p role="status">Faaliyet sonucu yükleniyor…</p>;
+  if (report.status !== "operating") return <p className="notice warning" role="alert">{report.message}</p>;
+  return <section className="block expense-section" aria-label="Faaliyet sonucu"><h2>{report.result.headline}</h2>{report.result.value !== null && <p className="operating-value">{money(report.result.value)}</p>}<p>Yönetim amaçlı tahmindir; doğrulanmış net kâr değildir.</p>{report.result.reasons.length > 0 && <ul>{report.result.reasons.map((reason, i) => <li key={i}>{reasonLabels[reason] ?? "Hesaplama kanıtı incelenmeli."}</li>)}</ul>}<p>Hesaba alınan gider: {money(report.result.expenses)} · Ödeme tarihli brüt hareketler: {money(report.result.payments)}</p>{report.stale && <div className="notice"><strong>Gider kayıtları değişti</strong><span>Açık rapor önceki gider sürümünde sabit tutuluyor.</span><button onClick={refresh}>Raporu yeni giderlerle aç</button></div>}{report.result.excluded.length > 0 && <details><summary>Faaliyet giderinden ayrı kayıtlar ({report.result.excluded.length})</summary><ul>{report.result.excluded.map(row => <li key={row.entityId}>{row.classification === "already-in-cost" ? "Maliyette zaten yer alan stok kaybı" : classificationLabels[row.classification as Classification] ?? "Sınıflandırılmamış"} · {money(row.amount)}</li>)}</ul></details>}</section>;
+}

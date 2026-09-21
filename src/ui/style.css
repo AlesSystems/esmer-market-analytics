@@ -691,3 +691,15 @@ button:focus-visible { outline: 3px solid #759447; outline-offset: 4px; }
 }
 .purchase-filters { display: flex; flex-wrap: wrap; gap: 16px; }
 .purchase-filters label { display: grid; gap: 6px; }
+.sales-app .expense-section { margin-top:24px; }
+.sales-app .expense-actions { display:flex; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.sales-app .expense-check { display:flex; gap:10px; align-items:center; margin:14px 0; line-height:1.5; }
+.sales-app .expense-check input { min-height:20px; width:20px; flex-shrink:0; accent-color:var(--blue); }
+.sales-app .expense-reason { display:grid; gap:6px; max-width:600px; margin:16px 0; }
+.sales-app .expense-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; border:0; padding:0; margin:20px 0; }
+.sales-app .expense-fields legend { margin-bottom:12px; font-weight:600; }
+.sales-app .expense-fields label { display:grid; gap:6px; align-content:start; }
+.sales-app .expense-totals { display:flex; flex-wrap:wrap; gap:28px; margin:24px 0 8px; }
+.sales-app .expense-totals dd { font-size:24px; margin-top:8px; }
+.sales-app .operating-value { font-size:26px; font-weight:600; margin:10px 0; color:var(--ink); font-variant-numeric:tabular-nums; }
+.sales-app .expenses-workspace details small { overflow-wrap:anywhere; }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { SalesWorkspace } from "./SalesWorkspace";
 import type { SalesView } from "../reports/contracts";
 import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
@@ -23,6 +24,8 @@ function previousImportMessage(availability: Extract<Availability, { status: "re
   return `Önceki içe aktarma tamamlanamadı. ${preserved} Geçerli bir paketle yeniden deneyin.`;
 }
 function App() {
+  const [expensesOpen, setExpensesOpen] = useState(false);
+  const [expensePeriod, setExpensePeriod] = useState(new Date().toISOString().slice(0, 7));
   const [availability, setAvailability] = useState<Availability | RequestError>();
   const [sales, setSales] = useState<SalesView>();
   const [salesError, setSalesError] = useState("");
@@ -51,6 +54,7 @@ function App() {
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
     {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
   </>;
+  if (expensesOpen) return <div className="sales-app"><header className="app-header"><span className="brand">ESMER <span>MARKET</span></span><span className="offline">Canlı bağlantı kapalı</span></header><div className="workspace"><div className="workspace-header"><nav aria-label="Analiz gezinmesi"><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button></nav><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label></div><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></div></div>;
   if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
   return (
     <main className="legacy">
@@ -65,6 +69,7 @@ function App() {
             <ul className="warnings">{availability.dataset.warnings.map(code => <li key={code}>{warnings[code] ?? "Veri kalitesi uyarısı bulunuyor."}</li>)}</ul>
           </> : <p>Hazırlanmış veri paketini seçerek başlayın. Veriler bu bilgisayarda saklanır.</p>}
           <button type="button" disabled={importing} onClick={() => void importPackage()}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button>
+          <button type="button" onClick={() => setExpensesOpen(true)}>Giderler</button>
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
         </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p></>}
