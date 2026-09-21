@@ -69,3 +69,11 @@ The user subsequently authorized Windows continuation on the same branch and PR.
 On 2026-09-20, the user reported that physical-offline testing passed and authorized merging PR #19 when ready. This human report is separate from automation. The archive and distribution hashes still match the tested build. A fresh independent packaged smoke test passed, with no outstanding code findings.
 
 The Phase 5 exit gate remains **open** for source-dependent acceptance and remaining Windows checks. Actual Windows scaling changes and interactive unsigned-publisher warning review remain unverified. Automated browser-offline and forced Chromium scaling probes are recorded separately. Synthetic checks do not establish real-source semantics, full imported-data performance or all A02/A03/A07 requirements. The authorized implementation merge does not complete these gates; issue #8 remains open, and no Phase 6 work or deployment is included.
+
+## Phase 6 implementation
+
+- [Costs, purchasing, supplier returns and local verification](phase-6-local.md).
+- [Windows continuation prompt](../operations/windows-phase-6-handoff.md).
+- [Windows verification](windows-phase-6.md) records two provenance-navigation fixes, 22 unit, 148 integration and 11 packaged Windows desktop tests, real native picker checks, isolated portable/NSIS migration and uninstall, hashes, screenshots and bounded performance observations. The same branch and PR #20 remain the review target.
+
+Tasks 6.1/6.2 have supported synthetic implementation evidence. The Phase 6 exit gate remains open for real-source semantics and acceptance. The [2026-09-21 follow-up](windows-phase-6.md#remaining-windows-checks-on-2026-09-21) records the user's physical-disconnect pass, passing actual Windows 100%/125%/150% scaling and horizontal table-wheel checks, and local interactive installer observations. No publisher warning appeared for the local artifact; downloaded-installer SmartScreen behavior remains unverified. Full imported-dataset performance and owner acceptance remain open. Synthetic accepted-report records do not represent owner acceptance. No merge, issue closure, Phase 7 or deployment follows from this record.

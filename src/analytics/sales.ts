@@ -1,5 +1,5 @@
 import { Exact, sum, rounded } from "../domain/money";
-import { SALES_MAPPING_VERSION, type Records, type SalesLine } from "../source/package";
+import { BUSINESS_MAPPING_VERSION, SALES_MAPPING_VERSION, type Records, type SalesLine } from "../source/package";
 
 export const SALES_CALCULATION_VERSION = "synthetic-sales-calc-v1";
 export type SalesContext = { mappingVersion: string; from: string; to: string };
@@ -15,7 +15,7 @@ export function totals(lines: SalesComponent[]) {
 }
 export function calculateSales(records: Records, context: SalesContext): SalesResult {
   const lines: SalesComponent[] = [], documents: SalesDocumentResult[] = [], exclusions: SalesExclusion[] = [];
-  if (context.mappingVersion !== SALES_MAPPING_VERSION) return { status: "unavailable", ...totals([]), lines, documents, exclusions, complete: false };
+  if (context.mappingVersion !== SALES_MAPPING_VERSION && context.mappingVersion !== BUSINESS_MAPPING_VERSION) return { status: "unavailable", ...totals([]), lines, documents, exclusions, complete: false };
   const grouped = new Map<string, Records["lines"]>();
   for (const line of records.lines) { const group = grouped.get(line.documentId) ?? []; group.push(line); grouped.set(line.documentId, group); }
   const owners = new Map<string, number>();

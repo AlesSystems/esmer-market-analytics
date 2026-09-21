@@ -68,3 +68,17 @@ Line sales fields are `productId`, `productName`, `categoryId`, `categoryName`, 
 No unit conversion is inferred. A quantity is already expressed in its declared unit; an unknown unit remains unsupported. Supplier/purchase data does not acquire sales meaning. The application retains unsupported and excluded populations explicitly.
 
 The package parser checks representation and references. The calculator checks inclusion, conversion ambiguity, amounts and reconciliation. A package can therefore be structurally valid while its sales result remains incomplete. The [Phase 5 calculation policy](calculations.md#phase-5-synthetic-sales-policy) describes that distinction.
+
+## Phase 6 synthetic business mapping
+
+`synthetic-business-v1` retains the canonical envelope, three streams, limits, sales fields, synthetic provenance, and `sourceReconciled: false`. It adds explicit cost, purchasing, and inventory evidence. Earlier mappings remain readable and cannot gain these semantics implicitly.
+
+Every document adds nullable `purchasing`. Every line adds `business` with nullable `historicalCost` and `inventory`. Suppliers add a bounded synthetic `name`, restricted to counterparties referenced by purchase/supplier-return documents. No customer, contact, address, tax-identity, or employee field is accepted. This synthetic display field is not a reviewed real-source supplier allowlist.
+
+`historicalCost` records `unitCost`, `unit`, `taxBasis`, `evidence`, `documentedZero`, and `originalSaleLineId`. Unit cost remains a decimal string or null. Supported unit-cost magnitudes use at most 20 integral and 15 fractional digits, matching the calculation precision budget. Cost units are piece, kg, or unknown. KDV basis is net or unknown. Unknown evidence remains explicit rather than becoming a default cost. A return reference identifies an original line within the pinned dataset; the calculator validates its financial applicability.
+
+`purchasing` records invoice/dispatch representation, conversion target, invoiced flag, opaque evidence reference, physical-return state, requested recovery, recognized credit, replacement-settlement state, and settlement evidence. The parser enforces types and exact fields. Financial recognition checks relationships and reconciliation. Recognized credit and confirmed replacement require settlement evidence. Contradictions remain excluded/warned, never silently deduplicated by amount or document ID.
+
+`inventory` records observation date, nullable stock and recorded-waste quantities, opaque evidence reference, and recording completeness. The associated product/unit remains explicit. Observations are not an opening valuation or proof that all losses were recorded.
+
+The [calculation policy](calculations.md#phase-6-synthetic-cost-and-purchasing-policy) defines supported populations. All real-source evidence obligations remain open.

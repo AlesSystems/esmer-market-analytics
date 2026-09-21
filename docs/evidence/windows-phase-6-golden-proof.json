@@ -1,0 +1,1428 @@
+{
+  "generatedAt": "2026-09-20T09:42:22.354Z",
+  "runtime": {
+    "node": "24.19.0",
+    "acorn": "8.17.0",
+    "ada": "3.4.4",
+    "amaro": "1.1.10",
+    "ares": "1.34.6",
+    "brotli": "1.2.0",
+    "cldr": "48.0",
+    "icu": "78.3",
+    "llhttp": "9.4.3",
+    "merve": "1.2.2",
+    "modules": "137",
+    "napi": "10",
+    "nbytes": "0.1.4",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.69.0",
+    "nghttp3": "",
+    "ngtcp2": "",
+    "openssl": "3.5.7",
+    "simdjson": "4.6.4",
+    "simdutf": "6.4.0",
+    "sqlite": "3.53.3",
+    "tz": "2026b",
+    "undici": "7.29.0",
+    "unicode": "17.0",
+    "uv": "1.52.1",
+    "uvwasi": "0.0.23",
+    "v8": "13.6.233.17-node.51",
+    "zlib": "1.3.2.1-motley-3246f1b",
+    "zstd": "1.5.7"
+  },
+  "platform": "win32",
+  "arch": "x64",
+  "syntheticOnly": true,
+  "ownerAcceptance": false,
+  "claims": "Independent literal golden assertions against the local application engine and SQLite persistence. No source semantics or release acceptance certified.",
+  "assertionCount": 100,
+  "assertions": [
+    {
+      "gate": "G02",
+      "label": "covered identifiers and count",
+      "expected": [
+        "L1"
+      ],
+      "actual": [
+        "L1"
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "excluded identifiers and count",
+      "expected": [
+        "L2"
+      ],
+      "actual": [
+        "L2"
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "covered sales",
+      "expected": "100",
+      "actual": "100",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "covered cost",
+      "expected": "60",
+      "actual": "60",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "covered gross",
+      "expected": "40",
+      "actual": "40",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "coverage percent",
+      "expected": "50",
+      "actual": "50",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "margin percent",
+      "expected": "40",
+      "actual": "40",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "missing reason and null cost",
+      "expected": [
+        [
+          "MISSING_COST",
+          null
+        ]
+      ],
+      "actual": [
+        [
+          "MISSING_COST",
+          null
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "signed exposures",
+      "expected": {
+        "coveredSales": "100",
+        "coveredReturns": "0",
+        "excludedSales": "100",
+        "excludedReturns": "0"
+      },
+      "actual": {
+        "coveredSales": "100",
+        "coveredReturns": "0",
+        "excludedSales": "100",
+        "excludedReturns": "0"
+      },
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "no full-population gross140",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "estimated confidence",
+      "expected": "estimated",
+      "actual": "estimated",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "invalid-zero excludes L1",
+      "expected": "UNDOCUMENTED_ZERO",
+      "actual": "UNDOCUMENTED_ZERO",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "invalid-zero unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "unknown-unit excludes L1",
+      "expected": "UNKNOWN_UNIT",
+      "actual": "UNKNOWN_UNIT",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "unknown-unit unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "mismatched-unit excludes L1",
+      "expected": "UNKNOWN_UNIT",
+      "actual": "UNKNOWN_UNIT",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "mismatched-unit unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "unknown-kdv excludes L1",
+      "expected": "UNKNOWN_TAX",
+      "actual": "UNKNOWN_TAX",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "unknown-kdv unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "negative-cost excludes L1",
+      "expected": "NEGATIVE_COST",
+      "actual": "NEGATIVE_COST",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "negative-cost unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "missing-validation excludes L1",
+      "expected": "UNVALIDATED_COST",
+      "actual": "UNVALIDATED_COST",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "missing-validation unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "missing-value excludes L1",
+      "expected": "MISSING_COST",
+      "actual": "MISSING_COST",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "missing-value unavailable cost",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "documented zero participates",
+      "expected": [
+        [
+          "L1",
+          "0"
+        ]
+      ],
+      "actual": [
+        [
+          "L1",
+          "0"
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "all-zero exposure has no percentage",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "all-zero covered sales has no margin",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "all-zero retains row counts",
+      "expected": [
+        1,
+        1
+      ],
+      "actual": [
+        1,
+        1
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "prior-month linked return sales",
+      "expected": "-100",
+      "actual": "-100",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "prior-month linked return cost",
+      "expected": "-60",
+      "actual": "-60",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "negative covered sales no margin",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "return population",
+      "expected": [
+        [
+          "L2",
+          "-1"
+        ]
+      ],
+      "actual": [
+        [
+          "L2",
+          "-1"
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "signed return exposure",
+      "expected": {
+        "coveredSales": "0",
+        "coveredReturns": "-100",
+        "excludedSales": "0",
+        "excludedReturns": "0"
+      },
+      "actual": {
+        "coveredSales": "0",
+        "coveredReturns": "-100",
+        "excludedSales": "0",
+        "excludedReturns": "0"
+      },
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "missing attribution excluded",
+      "expected": "RETURN_ATTRIBUTION",
+      "actual": "RETURN_ATTRIBUTION",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "missing no latest-purchase fallback",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-product attribution excluded",
+      "expected": "RETURN_ATTRIBUTION",
+      "actual": "RETURN_ATTRIBUTION",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-product no latest-purchase fallback",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-unit attribution excluded",
+      "expected": "RETURN_ATTRIBUTION",
+      "actual": "RETURN_ATTRIBUTION",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-unit no latest-purchase fallback",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-historical-cost attribution excluded",
+      "expected": "RETURN_ATTRIBUTION",
+      "actual": "RETURN_ATTRIBUTION",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "wrong-historical-cost no latest-purchase fallback",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "ambiguous-over-return attribution excluded",
+      "expected": "RETURN_ATTRIBUTION",
+      "actual": "RETURN_ATTRIBUTION",
+      "passed": true
+    },
+    {
+      "gate": "G04",
+      "label": "ambiguous-over-return no latest-purchase fallback",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "cancellation covered sales",
+      "expected": "0",
+      "actual": "0",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "cancellation keeps denominator",
+      "expected": "66.67",
+      "actual": "66.67",
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "cancellation margin unavailable",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "cancellation signed exposures",
+      "expected": {
+        "coveredSales": "100",
+        "coveredReturns": "-100",
+        "excludedSales": "100",
+        "excludedReturns": "0"
+      },
+      "actual": {
+        "coveredSales": "100",
+        "coveredReturns": "-100",
+        "excludedSales": "100",
+        "excludedReturns": "0"
+      },
+      "passed": true
+    },
+    {
+      "gate": "G02",
+      "label": "independent integer absolute denominator",
+      "expected": "300",
+      "actual": "300",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "three units historical10",
+      "expected": "30",
+      "actual": "30",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "three units replacement25",
+      "expected": "75",
+      "actual": "75",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "replacement unit explicit",
+      "expected": "piece",
+      "actual": "piece",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "replacement50 does not rewrite cost",
+      "expected": "30",
+      "actual": "30",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "three units replacement50",
+      "expected": "150",
+      "actual": "150",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "explicit earlier cutoff excludes future price",
+      "expected": "75",
+      "actual": "75",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "nominal unit price change10 to25",
+      "expected": "150",
+      "actual": "150",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "import initial dataset",
+      "expected": "active",
+      "actual": "active",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "import replacement change",
+      "expected": "active",
+      "actual": "active",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "historical correction creates candidate",
+      "expected": "validated",
+      "actual": "validated",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "candidate staging preserves active dataset",
+      "expected": "01da6089fdd8dd2ad4c78e19bfa68e72c54d517ad434f9ef14094eda37263459",
+      "actual": "01da6089fdd8dd2ad4c78e19bfa68e72c54d517ad434f9ef14094eda37263459",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "activate corrected candidate",
+      "expected": "active",
+      "actual": "active",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "historical correction creates new dataset",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "corrected three units historical12",
+      "expected": "36",
+      "actual": "36",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "accepted output and evidence unchanged",
+      "expected": {
+        "id": "synthetic-g03-proof",
+        "pin": {
+          "datasetId": "83ca30d20de70d51f62c5c021073b9444bd04b976aa289d1e9fa50529f80cf85",
+          "appRevision": 0
+        },
+        "calculationVersion": "synthetic-cost-calc-v1",
+        "evidence": [
+          "synthetic-g03-oracle",
+          "historical-evidence"
+        ],
+        "output": {
+          "status": "ready",
+          "confidence": "estimated",
+          "method": "historical-last-purchase-estimate",
+          "coveredSales": "300",
+          "coveredCost": "30",
+          "coveredGrossProfit": "270",
+          "coveredMarginPercent": "90",
+          "costCoveragePercent": "100",
+          "covered": [
+            {
+              "lineId": "L1",
+              "documentId": "S1",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "unit": "piece",
+              "quantity": "3",
+              "net": "300",
+              "cost": "30",
+              "reason": null,
+              "evidence": "historical-evidence"
+            }
+          ],
+          "excluded": [],
+          "exposures": {
+            "coveredSales": "300",
+            "coveredReturns": "0",
+            "excludedSales": "0",
+            "excludedReturns": "0"
+          },
+          "warnings": []
+        }
+      },
+      "actual": {
+        "calculationVersion": "synthetic-cost-calc-v1",
+        "evidence": [
+          "synthetic-g03-oracle",
+          "historical-evidence"
+        ],
+        "id": "synthetic-g03-proof",
+        "output": {
+          "confidence": "estimated",
+          "costCoveragePercent": "100",
+          "covered": [
+            {
+              "cost": "30",
+              "documentId": "S1",
+              "evidence": "historical-evidence",
+              "lineId": "L1",
+              "net": "300",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "3",
+              "reason": null,
+              "unit": "piece"
+            }
+          ],
+          "coveredCost": "30",
+          "coveredGrossProfit": "270",
+          "coveredMarginPercent": "90",
+          "coveredSales": "300",
+          "excluded": [],
+          "exposures": {
+            "coveredReturns": "0",
+            "coveredSales": "300",
+            "excludedReturns": "0",
+            "excludedSales": "0"
+          },
+          "method": "historical-last-purchase-estimate",
+          "status": "ready",
+          "warnings": []
+        },
+        "pin": {
+          "appRevision": 0,
+          "datasetId": "83ca30d20de70d51f62c5c021073b9444bd04b976aa289d1e9fa50529f80cf85"
+        }
+      },
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "accepted content hash unchanged",
+      "expected": "91cbbc8c1a2364d81bd4b43da5b759098b505eb4b8d5c4ec3397e12270f4ae3e",
+      "actual": "91cbbc8c1a2364d81bd4b43da5b759098b505eb4b8d5c4ec3397e12270f4ae3e",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "pinned historical data retains cost30",
+      "expected": "30",
+      "actual": "30",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "accepted confidence remains estimated",
+      "expected": "estimated",
+      "actual": "estimated",
+      "passed": true
+    },
+    {
+      "gate": "G03",
+      "label": "accepted method remains last-purchase estimate",
+      "expected": "historical-last-purchase-estimate",
+      "actual": "historical-last-purchase-estimate",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "purchase exactly one event",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "purchase retains both source IDs",
+      "expected": [
+        "D1",
+        "I1"
+      ],
+      "actual": [
+        "D1",
+        "I1"
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "purchase invoice date",
+      "expected": "2025-09-05",
+      "actual": "2025-09-05",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "purchase signed invoice value",
+      "expected": "80",
+      "actual": "80",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "purchase dispatch date does not recognize event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier-return exactly one event",
+      "expected": 1,
+      "actual": 1,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier-return retains both source IDs",
+      "expected": [
+        "D1",
+        "I1"
+      ],
+      "actual": [
+        "D1",
+        "I1"
+      ],
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier-return invoice date",
+      "expected": "2025-09-05",
+      "actual": "2025-09-05",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier-return signed invoice value",
+      "expected": "-20",
+      "actual": "-20",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier-return dispatch date does not recognize event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "physical return evidenced",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "unknown credit remains unknown",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "unknown recovery request remains unknown",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "unknown replacement remains unknown",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "flag blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "flag warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "missing-target blocks affected dispatch",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "duplicate-owner blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "duplicate-owner warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "supplier warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "product blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "product warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "unit blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "unit warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "quantity blocks purchase event",
+      "expected": 0,
+      "actual": 0,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "quantity warns both linked documents",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "absent purchase evidence excludes document",
+      "expected": "UNSUPPORTED_PURCHASING_EVIDENCE",
+      "actual": "UNSUPPORTED_PURCHASING_EVIDENCE",
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "credit without settlement evidence rejected",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "standalone physical dispatch retains physical fact",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "standalone physical dispatch does not invent credit",
+      "expected": null,
+      "actual": null,
+      "passed": true
+    },
+    {
+      "gate": "G07",
+      "label": "standalone physical dispatch does not invent replacement",
+      "expected": "unknown",
+      "actual": "unknown",
+      "passed": true
+    }
+  ],
+  "fixtures": [
+    {
+      "identity": "golden-g02",
+      "bytes": 1840,
+      "sha256": "6086c2f3a8a57984872aa45b2e507675f5930e3e2f44e71e48c6f5f556d56dcf",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-invalid-zero",
+      "bytes": 1848,
+      "sha256": "d890a6494601841292bd9bff1d41b88a3be9c81087dc2291fdcdcf51a79339e0",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-unknown-unit",
+      "bytes": 1851,
+      "sha256": "c35ab9bf0d24c48d6dec7314d960c84a6a4cdfbf14593cb2280311aa9fad7012",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-mismatched-unit",
+      "bytes": 1849,
+      "sha256": "d2c03ee008f706a31aab49a3071e2f793ea12352da4d0ee4f0eab85763fcfeb6",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-unknown-kdv",
+      "bytes": 1852,
+      "sha256": "c5a6c8bb7c40bf751722b411be044f96e02080bbe6536b50a7634839dde1d790",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-negative-cost",
+      "bytes": 1850,
+      "sha256": "4ea3b4ac9b8a6e98b0f28e538538d82c1f2b55c086c673cb57435d3cc921ff4d",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-missing-validation",
+      "bytes": 1838,
+      "sha256": "87568dc4d6aadab3f173150d0eb9209bc0e7699570e13a6bb5f7aac3e8818a36",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-missing-value",
+      "bytes": 1850,
+      "sha256": "82680aaad0245365fb708b100039e7e335760e693114708b5f651a9d7abf4fa3",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-documented-zero",
+      "bytes": 1850,
+      "sha256": "a892e57ed50a03e2786c3d8b7ba2a275cbbf44bc9b1443c99becd87912b51798",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-zero-exposure",
+      "bytes": 1830,
+      "sha256": "cf3afd99770ab839100d454d52b07776ad398f88b313f22b8d21ad70c5443a11",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g04",
+      "bytes": 1986,
+      "sha256": "faa48afffb2b787ea110b1b614760d7c0d3479f45ee0220e0dc100bea3e1cd25",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-return-missing",
+      "bytes": 2775,
+      "sha256": "c313d2112c3ccda122c88a80540947434b140aef22603a9928fb0b02485a27cb",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-return-wrong-product",
+      "bytes": 2789,
+      "sha256": "3bd8514567f2712ad1a4bcd704fb17dab4975935bc84e943c574f2cd203604da",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-return-wrong-unit",
+      "bytes": 2775,
+      "sha256": "45c9a565d422aea9f3a45ed05cb43ce4bef54d19d4b7288bf01624b26ed0893e",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-return-wrong-historical-cost",
+      "bytes": 2789,
+      "sha256": "6240a22ac7cd445c895491cc93399d7e72ae8bca0ae930bd813e6e8929e52117",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-return-ambiguous-over-return",
+      "bytes": 3255,
+      "sha256": "b527555e60aa42ea4f4a0a5679ad3abf0f41b34fb9ad4d48a658e23f58e803d1",
+      "records": {
+        "documents": 3,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-cancellation",
+      "bytes": 2496,
+      "sha256": "61e799a7d3a89b803b4b6d1bcf3d1db441e8579c6f3ed947401900e39b5ebc88",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 0
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g03-a",
+      "bytes": 2119,
+      "sha256": "83ca30d20de70d51f62c5c021073b9444bd04b976aa289d1e9fa50529f80cf85",
+      "records": {
+        "documents": 2,
+        "lines": 2,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g03-b",
+      "bytes": 2851,
+      "sha256": "01da6089fdd8dd2ad4c78e19bfa68e72c54d517ad434f9ef14094eda37263459",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g03-correction",
+      "bytes": 2871,
+      "sha256": "4980cd80fc72e26c5361969e0ed32f46aaac0d5b972168f0183a3c8482481132",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-purchase",
+      "bytes": 3359,
+      "sha256": "709c1b3efe869834d7c3dd8b1785bc8a5462dda3b70ae43b350641c8136c2314",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-supplier-return",
+      "bytes": 3386,
+      "sha256": "effd931f6ad0387fe042a62df70343574cf68f4653e488c44e761c0e5742272d",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-flag",
+      "bytes": 3365,
+      "sha256": "0c7894948a7c003e0d81350c72e0f4f969186e517d628150a7fb23a1c82aec9f",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-missing-target",
+      "bytes": 3386,
+      "sha256": "98b88afc7def95b91a051ee29a1f5592ccd0f67934d5ba7aae2a2576b599299d",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-duplicate-owner",
+      "bytes": 4107,
+      "sha256": "d1f72862a63e61ef6a63700b1a21086378625474c895c620fc2634421ae88512",
+      "records": {
+        "documents": 5,
+        "lines": 5,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-supplier",
+      "bytes": 3417,
+      "sha256": "8a05ca29c3543752cddceb2a12fd3002aa9ff7d91f54fbbf46b89442a088e559",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 2
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-product",
+      "bytes": 3375,
+      "sha256": "157691fb3ab9118ed540c3d1faf62e5305d34f6333f4037a68f8fb756ad56d0f",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-unit",
+      "bytes": 3361,
+      "sha256": "648e2922f6a8cde64df35c7b4705e7ab9030ef82f7ad232b69b9a0b7e667d681",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-conflict-quantity",
+      "bytes": 3368,
+      "sha256": "01dd15bb94ae11497c4f5acf5a8ddd1baab66f27e53d6cf3d6eff5403d0c632c",
+      "records": {
+        "documents": 4,
+        "lines": 4,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-missing-evidence",
+      "bytes": 2418,
+      "sha256": "5c2fcbf1a4024e135b23f1477b84329cfed49022f8a3529e3355bba3026cc51b",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    },
+    {
+      "identity": "golden-g07-physical-dispatch",
+      "bytes": 2647,
+      "sha256": "2d17194a36452392dcdad155413295c395b7512f24e85753a31a4fa3092e4ec0",
+      "records": {
+        "documents": 3,
+        "lines": 3,
+        "suppliers": 1
+      },
+      "cutoff": "2025-09-30"
+    }
+  ],
+  "observations": {
+    "G02": {
+      "status": "ready",
+      "confidence": "estimated",
+      "method": "historical-last-purchase-estimate",
+      "coveredSales": "100",
+      "coveredCost": "60",
+      "coveredGrossProfit": "40",
+      "coveredMarginPercent": "40",
+      "costCoveragePercent": "50",
+      "covered": [
+        {
+          "lineId": "L1",
+          "documentId": "S1",
+          "productId": "water",
+          "productName": "İçme suyu",
+          "unit": "piece",
+          "quantity": "1",
+          "net": "100",
+          "cost": "60",
+          "reason": null,
+          "evidence": "historical-evidence"
+        }
+      ],
+      "excluded": [
+        {
+          "lineId": "L2",
+          "documentId": "S2",
+          "productId": "water",
+          "productName": "İçme suyu",
+          "unit": "piece",
+          "quantity": "1",
+          "net": "100",
+          "cost": null,
+          "reason": "MISSING_COST",
+          "evidence": null
+        }
+      ],
+      "exposures": {
+        "coveredSales": "100",
+        "coveredReturns": "0",
+        "excludedSales": "100",
+        "excludedReturns": "0"
+      },
+      "warnings": [
+        "MISSING_COST"
+      ]
+    },
+    "G04": {
+      "status": "ready",
+      "confidence": "estimated",
+      "method": "historical-last-purchase-estimate",
+      "coveredSales": "-100",
+      "coveredCost": "-60",
+      "coveredGrossProfit": "-40",
+      "coveredMarginPercent": null,
+      "costCoveragePercent": "100",
+      "covered": [
+        {
+          "lineId": "L2",
+          "documentId": "S2",
+          "productId": "water",
+          "productName": "İçme suyu",
+          "unit": "piece",
+          "quantity": "-1",
+          "net": "-100",
+          "cost": "-60",
+          "reason": null,
+          "evidence": "historical-evidence"
+        }
+      ],
+      "excluded": [],
+      "exposures": {
+        "coveredSales": "0",
+        "coveredReturns": "-100",
+        "excludedSales": "0",
+        "excludedReturns": "0"
+      },
+      "warnings": []
+    },
+    "cancellation": {
+      "result": {
+        "status": "ready",
+        "confidence": "estimated",
+        "method": "historical-last-purchase-estimate",
+        "coveredSales": "0",
+        "coveredCost": "0",
+        "coveredGrossProfit": "0",
+        "coveredMarginPercent": null,
+        "costCoveragePercent": "66.67",
+        "covered": [
+          {
+            "lineId": "L1",
+            "documentId": "S1",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "unit": "piece",
+            "quantity": "1",
+            "net": "100",
+            "cost": "60",
+            "reason": null,
+            "evidence": "historical-evidence"
+          },
+          {
+            "lineId": "L2",
+            "documentId": "S2",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "unit": "piece",
+            "quantity": "-1",
+            "net": "-100",
+            "cost": "-60",
+            "reason": null,
+            "evidence": "historical-evidence"
+          }
+        ],
+        "excluded": [
+          {
+            "lineId": "L3",
+            "documentId": "S3",
+            "productId": "water",
+            "productName": "İçme suyu",
+            "unit": "piece",
+            "quantity": "1",
+            "net": "100",
+            "cost": null,
+            "reason": "MISSING_COST",
+            "evidence": null
+          }
+        ],
+        "exposures": {
+          "coveredSales": "100",
+          "coveredReturns": "-100",
+          "excludedSales": "100",
+          "excludedReturns": "0"
+        },
+        "warnings": [
+          "MISSING_COST"
+        ]
+      },
+      "absoluteDenominator": "300"
+    },
+    "G03": {
+      "initialDataset": "83ca30d20de70d51f62c5c021073b9444bd04b976aa289d1e9fa50529f80cf85",
+      "replacementDataset": "01da6089fdd8dd2ad4c78e19bfa68e72c54d517ad434f9ef14094eda37263459",
+      "correctedDataset": "4980cd80fc72e26c5361969e0ed32f46aaac0d5b972168f0183a3c8482481132",
+      "acceptedHash": "91cbbc8c1a2364d81bd4b43da5b759098b505eb4b8d5c4ec3397e12270f4ae3e",
+      "acceptedEvidence": [
+        "synthetic-g03-oracle",
+        "historical-evidence"
+      ],
+      "initialHistoricalCost": "30",
+      "correctedHistoricalCost": "36",
+      "replacementTotals": [
+        "75",
+        "150"
+      ],
+      "syntheticAcceptanceOnly": true
+    }
+  },
+  "head": "bb74a3fb0a1a081784c0ad21527fbd28d0f5fc8d",
+  "sourceHashes": {
+    "src/analytics/costs.ts": "a1fe2e570ae07aba5cc3202d7f6fef6bbb73d86d0e262ffa1b89e2c6010d03c3",
+    "src/analytics/purchasing.ts": "6f49d5df59880a1718d48d0b599c5a539a02de3e479361bfa3ef35cc41c25ca7",
+    "src/source/package.ts": "8eea8c13f83c4079442390c23a0b53ce958bb0a171ad4bf66616c742909b4ad4",
+    "src/store/store.ts": "bac59638c8da380edbc11758c126912258bb299bdff4fcde1d57b80101f43cb5",
+    "src/store/migrations.ts": "88f23906115ce0c672a0be114e7a47a635794c67508464fc45b86f9050fa9566",
+    "src/store/schema.ts": "d9d6919ec93a709f3bbba76989e6b1e8f680667b96d5a71494128b604b83a123",
+    "tests/helpers/business-fixtures.ts": "ff209c8b8792324fe9d1d728db817326d78b0226bad85ff9cbd044ac0abda71b",
+    "work/windows-phase-6/golden-proof.mjs": "862459746296e4688f49a48f76ac2606f22de2f31b0af0bd560c640bb63bfcca"
+  }
+}

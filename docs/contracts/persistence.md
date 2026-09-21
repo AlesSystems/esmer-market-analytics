@@ -49,3 +49,9 @@ Expense spreadsheet import, duplicate classification, financial calculations, ex
 Store schema 3 adds nullable JSON sales fields to existing source document/line tables. Migrations preserve prior rows, app-owned revisions and accepted reports. Legacy rows reconstruct without an added `sales` property, preserving their canonical hashes and adjustment fingerprints. New sales fields participate in round-trip validation, activation hashes, source differences and adjustment fingerprints.
 
 The sales worker retains one immutable snapshot for the open browsing session. Importing and pruning other datasets cannot change that snapshot. Explicit report refresh replaces the session, and stale contexts fail. This is temporary browsing state, not owner report acceptance. It writes no accepted report and is not restored after application restart. Existing accepted-report persistence remains governed by its prior contract.
+
+## Phase 6 business evidence
+
+Store schema 4 adds nullable purchasing JSON on documents, business-evidence JSON on lines, and a nullable synthetic supplier display name. Migration is additive. Older rows reconstruct without new object properties, preserving their canonical hashes and adjustment fingerprints. New evidence participates in snapshot round trips, package hashes, and relevant adjustment fingerprints.
+
+Cost and purchasing reads use the existing open sales session's retained snapshot. Import and pruning cannot mix a new purchase price with an old historical report. Explicit refresh starts a new session and invalidates its old context. The result exposes separate cost and purchasing method versions. Accepted output continues to use existing immutable report storage; browsing does not accept a report or upgrade estimated confidence.

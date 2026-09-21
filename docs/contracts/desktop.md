@@ -65,3 +65,9 @@ Desktop tests launch the actual packaged application. The import test substitute
 The request guard validates exact keys, bounded identifiers and search text, date/month shape and the version context. The worker rejects a stale context instead of falling back to current data. A new report replaces the previous session. Imports update availability while navigation continues on its existing context until explicit refresh.
 
 Report results contain projected metrics and evidence only. They contain no database path, private app-owned records or raw snapshot. Calculations run in the service worker. Legacy sparse mappings return an explanation that sales semantics are unavailable; synthetic sales results remain visibly synthetic. Report errors are safe Turkish messages, including empty/unsupported data, stale contexts and unavailable service.
+
+## Phase 6 purchasing read
+
+`queryPurchasing({ context })` reads costs, purchases, supplier returns, and supported inventory observations from the existing pinned sales session. It validates the trusted sender and exact context shape before service invocation. The renderer cannot submit paths, SQL, table names, credentials, or operational transactions. A stale or altered session context is rejected.
+
+The result carries the dataset/app revision, cutoff, mapping, separate cost and purchasing calculation versions, coverage, warnings, and source evidence for displayed contributions. All financial calculations remain in the service. Supplier/product controls filter display rows without recomputing amounts. Explicit refresh replaces the session; imports alone cannot change an open report's historical cost or replacement price.

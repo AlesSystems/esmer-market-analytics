@@ -15,6 +15,7 @@ parentPort?.on("message", (request: ServiceRequest) => {
   try {
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (request.operation === "getAvailability") result = store.availability();
+    else if (request.operation === "queryPurchasing") result = reports!.purchasing(request.payload);
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);
     else if (request.operation === "inspectSales") result = reports!.inspect(request.payload);

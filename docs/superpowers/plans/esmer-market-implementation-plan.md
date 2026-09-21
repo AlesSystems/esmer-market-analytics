@@ -296,11 +296,11 @@ expect(result.averageBasket).toBe('100');
 
 **Interface:** `estimateGrossResult` consumes normalized sale/return lines with validated cost evidence and returns covered sales, covered estimated cost/profit/margin, covered/excluded counts and amounts, method and reason codes.
 
-- [ ] Implement G02: sales of 100 and 100 with cost 60 available only on the first yield covered sales 100, cost 60 and estimated gross profit 40. The full-population value 140 must never appear as gross profit.
-- [ ] Implement G03: three historical units at cost 10 keep historical cost 30 while replacement prices change. A newer source correction creates a new candidate version; ordinary price changes do not rewrite accepted history.
-- [ ] Implement G04: a validated linked return contributes sales -100 and historical cost -60. Missing attribution excludes the unsupported cost population; no fallback to the latest purchase price.
-- [ ] Distinguish missing cost, invalid zero and documented zero-cost items. Test unknown units/KDV, negative-stock warnings, all-zero monetary populations and sale/return cancellation in coverage denominators.
-- [ ] Withhold a margin for zero/negative covered net sales. Keep historical cost and profitability labelled estimated; no accepted report action promotes them to exact weighted-average cost.
+- [x] Implement G02: sales of 100 and 100 with cost 60 available only on the first yield covered sales 100, cost 60 and estimated gross profit 40. The full-population value 140 must never appear as gross profit.
+- [x] Implement G03: three historical units at cost 10 keep historical cost 30 while replacement prices change. A newer source correction creates a new candidate version; ordinary price changes do not rewrite accepted history.
+- [x] Implement G04: a validated linked return contributes sales -100 and historical cost -60. Missing attribution excludes the unsupported cost population; no fallback to the latest purchase price.
+- [x] Distinguish missing cost, invalid zero and documented zero-cost items. Test unknown units/KDV, negative-stock warnings, all-zero monetary populations and sale/return cancellation in coverage denominators.
+- [x] Withhold a margin for zero/negative covered net sales. Keep historical cost and profitability labelled estimated; no accepted report action promotes them to exact weighted-average cost.
 
 **Example assertion to add to `cost-coverage.test.ts`:**
 
@@ -321,14 +321,18 @@ expect(result.confidence).toBe('estimated');
 
 **Interface:** Purchasing queries return unit-aware historical/replacement prices, evidenced supplier identities, linked return events and explicit physical-return/claim/credit states. They do not submit operational transactions.
 
-- [ ] Build product/supplier purchase history and replacement-cost comparison from validated purchasing documents. Keep nominal price change distinct from a formal inflation or real-growth index.
-- [ ] Test G07: linked dispatch and invoice recognize one event under the approved quantity/value convention. Conflicting flags/links produce a warning or blocked metric.
-- [ ] Show supplier-return invoices and dispatches with their source evidence. Recognized credit requires supported financial evidence; a physical return alone cannot imply settlement or replacement goods.
-- [ ] Add read-only inventory/waste views only for supported data. Display negative stock and sparse recording warnings; no recorded waste must not become a claim that no losses occurred.
+- [x] Build product/supplier purchase history and replacement-cost comparison from validated purchasing documents. Keep nominal price change distinct from a formal inflation or real-growth index.
+- [x] Test G07: linked dispatch and invoice recognize one event under the approved quantity/value convention. Conflicting flags/links produce a warning or blocked metric.
+- [x] Show supplier-return invoices and dispatches with their source evidence. Recognized credit requires supported financial evidence; a physical return alone cannot imply settlement or replacement goods.
+- [x] Add read-only inventory/waste views only for supported data. Display negative stock and sparse recording warnings; no recorded waste must not become a claim that no losses occurred.
 
 **Verify:** The three named purchasing test files; inspect Turkish labels for customer versus supplier returns.
 
-**Exit gate:** A02/A03 cost, returns, purchasing and uncertainty scenarios pass. Historical estimates and replacement analysis remain distinct.
+**Local evidence (2026-09-20):** Tasks 6.1 and 6.2 have synthetic implementation and local packaged verification. [Local evidence](../../evidence/phase-6-local.md) records 22 unit, 147 integration and 10 packaged macOS desktop tests, independent review fixes, screenshots, and limitations. [Continue on Windows](../../operations/windows-phase-6-handoff.md) on the same branch and PR. The subsequent Windows continuation is recorded below.
+
+**Windows evidence (2026-09-20):** [Windows verification](../../evidence/windows-phase-6.md) records 22 unit, 148 integration and 11 actual packaged Windows desktop tests, G02/G03/G04/G07 literal checks, pinning, native selection, isolated migration/lifecycle, screenshots and hashes. Checked Task 6.1/6.2 items above mean synthetic implementation and verification under the documented synthetic convention only. They do not approve real-source mappings or close A02/A03/A07. Physical disconnection, actual Windows 125%/150% scaling, overflowing-table scrolling, interactive publisher warnings and full-volume performance remain open.
+
+**Exit gate (open):** A02/A03 cost, returns, purchasing and uncertainty scenarios pass. Historical estimates and replacement analysis remain distinct.
 
 ## Phase 7 — Expenses, adjustments and operating results
 

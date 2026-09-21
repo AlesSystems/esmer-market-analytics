@@ -1,0 +1,86 @@
+[
+  {
+    "stage": "baseline",
+    "launch": 1,
+    "executable": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\nsis-app\\Esmer Market Analytics.exe",
+    "browserPid": 1944,
+    "appRoot": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\nsis-app",
+    "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\installed-profile",
+    "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+    "exitCode": 0,
+    "availability": {
+      "status": "ready",
+      "store": "loaded",
+      "liveConnection": "disabled",
+      "dataset": {
+        "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+        "cutoff": "2025-09-03",
+        "extractedAt": "2025-09-04T00:00:00.000Z",
+        "counts": {
+          "documents": 4,
+          "lines": 7,
+          "suppliers": 0
+        },
+        "warnings": [
+          "SYNTHETIC_ONLY",
+          "MISSING_COST"
+        ]
+      }
+    },
+    "developerRuntimeInPath": false,
+    "processOwnershipVerified": true,
+    "browserOfflineReload": true,
+    "physicalDisconnect": false,
+    "schemaVersion": 3,
+    "integrity": "ok",
+    "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+    "originalTableHashesPreserved": true,
+    "acceptedSnapshotHash": "2a3b6672b8a485d08ba904e49556aa2577f6759568be16a4df0fccfe5334beb3",
+    "currentSnapshotHash": "cd8eb4d2fbf8c12288865b7c163b131d30db1ef83dcddc2a1ddae79447956676",
+    "reportHash": "61d484374d08df25e4c7848081716cc23a107c49434b421b7367e558793e02d1",
+    "activeAdjustmentBlocksReport": true,
+    "databaseRenameAfterShutdown": true
+  },
+  {
+    "stage": "baseline",
+    "launch": 2,
+    "executable": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\nsis-app\\Esmer Market Analytics.exe",
+    "browserPid": 30820,
+    "appRoot": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\nsis-app",
+    "profile": "C:\\Users\\esmer\\AppData\\Local\\Temp\\phase-6-lifecycle-5DfP5p\\installed-profile",
+    "archiveHash": "e919c3942792516715eb8c83a4c111d990eb114a42493a470b6a0e5c413c0e58",
+    "exitCode": 0,
+    "availability": {
+      "status": "ready",
+      "store": "loaded",
+      "liveConnection": "disabled",
+      "dataset": {
+        "datasetId": "bfa0d96459b702013c40b51b4b749a415f7c3d901b7ebabbdbec03df3adcffe2",
+        "cutoff": "2025-09-03",
+        "extractedAt": "2025-09-04T00:00:00.000Z",
+        "counts": {
+          "documents": 4,
+          "lines": 7,
+          "suppliers": 0
+        },
+        "warnings": [
+          "SYNTHETIC_ONLY",
+          "MISSING_COST"
+        ]
+      }
+    },
+    "developerRuntimeInPath": false,
+    "processOwnershipVerified": true,
+    "browserOfflineReload": true,
+    "physicalDisconnect": false,
+    "schemaVersion": 3,
+    "integrity": "ok",
+    "sourceAppRevisionsEvidenceReportPinsPreserved": true,
+    "originalTableHashesPreserved": true,
+    "acceptedSnapshotHash": "2a3b6672b8a485d08ba904e49556aa2577f6759568be16a4df0fccfe5334beb3",
+    "currentSnapshotHash": "cd8eb4d2fbf8c12288865b7c163b131d30db1ef83dcddc2a1ddae79447956676",
+    "reportHash": "61d484374d08df25e4c7848081716cc23a107c49434b421b7367e558793e02d1",
+    "activeAdjustmentBlocksReport": true,
+    "databaseRenameAfterShutdown": true
+  }
+]

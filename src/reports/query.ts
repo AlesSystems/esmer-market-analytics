@@ -1,7 +1,10 @@
+import { estimateGrossResult, COST_CALCULATION_VERSION } from "../analytics/costs";
+import { calculatePurchasing, PURCHASING_CALCULATION_VERSION } from "../analytics/purchasing";
+import type { QueryPurchasingRequest, PurchasingReportResult } from "./contracts";
 import { randomUUID } from "node:crypto";
 import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent } from "../analytics/sales";
 import { Exact, percentageChange, sum } from "../domain/money";
-import { SALES_MAPPING_VERSION } from "../source/package";
+import { SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION } from "../source/package";
 import type { openStore, Snapshot } from "../store/store";
 import { emptySalesFilters, type Breakdown, type Comparison, type InspectSalesRequest, type OpenSalesRequest, type QuerySalesRequest, type ReportContext, type SalesDetailResult, type SalesFailure, type SalesFilters, type SalesReportResult } from "./contracts";
 
@@ -26,7 +29,7 @@ export class SalesReports {
     this.session = null;
     const snapshot = this.store.readSnapshot();
     if (!snapshot.metadata || !snapshot.pin.datasetId) return failure("EMPTY_STORE", "Henüz veri içe aktarılmadı.");
-    if (snapshot.metadata.mappingVersion !== SALES_MAPPING_VERSION) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
+    if (![SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION].includes(snapshot.metadata.mappingVersion)) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
     if (snapshot.app.some(row => row.kind === "adjustment" && row.applicability !== "reversed")) return failure("UNSUPPORTED_ADJUSTMENTS", "Satış düzeltmelerinin etkisi henüz desteklenmiyor. Düzeltilmiş toplam gösterilemiyor.");
     const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
     this.session = { snapshot, context };
@@ -82,6 +85,22 @@ export class SalesReports {
     for (const line of lines) { const values = transactionScopes.get(line.documentId) ?? []; values.push(line.net); transactionScopes.set(line.documentId, values); }
     const active = this.store.availability();
     return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
+  }
+  purchasing({ context }: QueryPurchasingRequest): PurchasingReportResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const { snapshot } = session, metadata = snapshot.metadata!, period = range(snapshot, context.period);
+    const scope = { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, cutoff: metadata.cutoff };
+    const active = this.store.availability();
+    const gross = estimateGrossResult(snapshot.records, scope), purchasing = calculatePurchasing(snapshot.records, scope);
+    const ids = new Set([...gross.covered, ...gross.excluded].map(row => row.documentId));
+    for (const row of [...purchasing.history, ...purchasing.supplierReturns, ...purchasing.replacements]) row.sourceDocumentIds.forEach(id => ids.add(id));
+    for (const row of purchasing.exclusions) ids.add(row.documentId);
+    const lineIds = new Set(purchasing.inventory.map(row => row.lineId));
+    for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
+    for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
+    const evidence = { documents: snapshot.records.documents.filter(row => ids.has(row.id)), lines: snapshot.records.lines.filter(row => ids.has(row.documentId)) };
+    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId, evidence, gross, purchasing } };
   }
   inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
     const session = this.resolve(context);

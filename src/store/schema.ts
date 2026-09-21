@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -47,3 +47,7 @@ CREATE TRIGGER immutable_report_delete BEFORE DELETE ON report_versions BEGIN SE
 
 export const salesMigration = `ALTER TABLE source_documents ADD COLUMN sales_json TEXT CHECK(sales_json IS NULL OR json_valid(sales_json));
 ALTER TABLE source_lines ADD COLUMN sales_json TEXT CHECK(sales_json IS NULL OR json_valid(sales_json));`;
+
+export const businessMigration = `ALTER TABLE source_documents ADD COLUMN purchasing_json TEXT CHECK(purchasing_json IS NULL OR json_valid(purchasing_json));
+ALTER TABLE source_lines ADD COLUMN business_json TEXT CHECK(business_json IS NULL OR json_valid(business_json));
+ALTER TABLE source_suppliers ADD COLUMN name TEXT;`;

@@ -1,0 +1,17 @@
+[
+  {
+    "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics Setup 0.1.0.exe",
+    "Status": 2,
+    "StatusMessage": "The file C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics Setup 0.1.0.exe is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https://go.microsoft.com/fwlink/?LinkID=135170"
+  },
+  {
+    "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics 0.1.0.exe",
+    "Status": 2,
+    "StatusMessage": "The file C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics 0.1.0.exe is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https://go.microsoft.com/fwlink/?LinkID=135170"
+  },
+  {
+    "Path": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe",
+    "Status": 2,
+    "StatusMessage": "The file C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\win-unpacked\\Esmer Market Analytics.exe is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https://go.microsoft.com/fwlink/?LinkID=135170"
+  }
+]

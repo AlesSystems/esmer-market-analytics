@@ -35,7 +35,7 @@ test("file-backed migration preserves precise facts, app revisions, pins and acc
   expect(store.readPinned(before.pin)).toEqual(before);
   expect(store.readSnapshot().app.map(row => row.value)).toEqual([{ net: "60", date: "2026-01-01", reason: "Correction", evidence: "fixture:expense-2" }]);
   store.close();
-  const db = new DatabaseSync(path); expect(db.prepare("PRAGMA user_version").get()).toEqual({ user_version: 3 }); db.close();
+  const db = new DatabaseSync(path); expect(db.prepare("PRAGMA user_version").get()).toEqual({ user_version: 4 }); db.close();
 });
 
 test("unknown and future databases are rejected without changing their bytes", () => {
