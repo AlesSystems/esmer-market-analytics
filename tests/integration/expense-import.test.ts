@@ -45,3 +45,18 @@ test("mixed rows reject the entire batch with safe column explanations and previ
   expect(store.expenseBatches()).toEqual([]);
   store.close();
 });
+test("repeated legitimate rows have bounded duplicate evidence without losing explicit consent", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const count = 1000;
+    const preview = expenses.preview(await workbook(Array.from({ length: count }, (_, index) => [`repeat-${index}`, ...row.slice(1)])));
+    expect(preview.errors).toEqual([]);
+    expect(preview.rows).toHaveLength(count);
+    expect(preview.rows.every(candidate => candidate.duplicates.length <= 1)).toBe(true);
+    expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThan(count * 1200);
+    expect(preview.rows.filter(candidate => candidate.duplicates.length)).toHaveLength(count - 1);
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] })).toThrow();
+    expect(expenses.confirm({ previewId: preview.previewId, keepCandidateRows: preview.rows.slice(1).map(candidate => candidate.row) })).toMatchObject({ status: "imported", count });
+    expect(expenses.query({ period: "2026-01" }).rows).toHaveLength(count);
+  } finally { store.close(); }
+});
