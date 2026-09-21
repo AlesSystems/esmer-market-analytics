@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -51,3 +51,10 @@ ALTER TABLE source_lines ADD COLUMN sales_json TEXT CHECK(sales_json IS NULL OR 
 export const businessMigration = `ALTER TABLE source_documents ADD COLUMN purchasing_json TEXT CHECK(purchasing_json IS NULL OR json_valid(purchasing_json));
 ALTER TABLE source_lines ADD COLUMN business_json TEXT CHECK(business_json IS NULL OR json_valid(business_json));
 ALTER TABLE source_suppliers ADD COLUMN name TEXT;`;
+
+export const expenseMigration = `CREATE TABLE expense_batches (
+  batch_id TEXT PRIMARY KEY, created_at TEXT NOT NULL, count INTEGER NOT NULL,
+  first_revision INTEGER NOT NULL, last_revision INTEGER NOT NULL
+) STRICT;
+CREATE TRIGGER immutable_expense_batch_update BEFORE UPDATE ON expense_batches BEGIN SELECT RAISE(ABORT,'IMMUTABLE_BATCH'); END;
+CREATE TRIGGER immutable_expense_batch_delete BEFORE DELETE ON expense_batches BEGIN SELECT RAISE(ABORT,'IMMUTABLE_BATCH'); END;`;

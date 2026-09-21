@@ -1,8 +1,10 @@
+import { isExpense, validExpense } from "../expenses/validation";
+import type { ExpenseValue } from "../expenses/contracts";
 export type Pin = { datasetId: string | null; appRevision: number };
 export type Target = { datasetId: string; kind: "document" | "line"; sourceId: string };
 type Provenance = { reason: string; evidence: string };
 export type AppChange = { entityId: string } & (
-  | { kind: "expense"; value: Provenance & { net: string; date: string } }
+  | { kind: "expense"; value: (Provenance & { net: string; date: string }) | ExpenseValue }
   | { kind: "adjustment"; value: Provenance & { net: string; target: Target; reversed: boolean } }
   | { kind: "confirmation"; value: Provenance & { period: string; reviewedRevision: number; complete: boolean } }
   | { kind: "setting"; value: Provenance & { currency: "TRY" } }
@@ -20,6 +22,7 @@ export function validateChange(change: AppChange) {
   if (change.kind === "expense" || change.kind === "adjustment") requireValid(typeof change.value.net === "string" && /^-?(?:0|[1-9][0-9]{0,39})(?:\.[0-9]{1,30})?$/.test(change.value.net));
   switch (change.kind) {
     case "expense":
+      if (isExpense(change.value)) { requireValid(validExpense(change.value)); break; }
       exactKeys(v, ["net", "date", "reason", "evidence"]);
       requireValid(/^\d{4}-\d{2}-\d{2}$/.test(change.value.date) && new Date(change.value.date).toISOString().slice(0, 10) === change.value.date); break;
     case "adjustment": {

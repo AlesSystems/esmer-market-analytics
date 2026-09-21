@@ -1,5 +1,9 @@
+import { expenseTemplate } from "../expenses/template";
+import { MAX_EXPENSE_BYTES } from "../expenses/workbook";
+import type { ExpenseResult, OperatingReportResult } from "../expenses/contracts";
+import type { ExpenseServiceRequest } from "../domain/contracts";
 import { app, BrowserWindow, ipcMain, protocol, session, dialog } from "electron";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { APP_URL, handleRequest } from "./requests";
@@ -32,6 +36,7 @@ function requestService(request: { operation: "queryPurchasing"; payload: QueryP
 function requestService(request: { operation: "openSales"; payload: OpenSalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "inspectSales"; payload: InspectSalesRequest }): Promise<SalesDetailResult>;
+function requestService(request: ExpenseServiceRequest): Promise<ExpenseResult | OperatingReportResult>;
 function requestService(request: Omit<ServiceRequest, "id">): Promise<ServiceResponse["result"]> {
   if (!worker) return Promise.resolve(request.operation !== "importPackage" ? unavailable : { status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message });
   const id = ++requestId;
@@ -128,6 +133,22 @@ app.whenReady().then(async () => {
           }
         },
         { purchasing: payload => requestService({ operation: "queryPurchasing", payload }), open: payload => requestService({ operation: "openSales", payload }), query: payload => requestService({ operation: "querySales", payload }), inspect: payload => requestService({ operation: "inspectSales", payload }) },
+        async (operation, payload) => {
+          try {
+            if (operation === "saveExpenseTemplate") {
+              const selected = await dialog.showSaveDialog(window, { title: "Gider şablonunu kaydet", defaultPath: "Esmer-gider-sablonu.xlsx", filters: [{ name: "Excel çalışma kitabı", extensions: ["xlsx"] }] });
+              if (selected.canceled || !selected.filePath) return { status: "cancelled" };
+              await writeFile(selected.filePath, await expenseTemplate());
+              return { status: "saved" };
+            }
+            if (operation === "previewExpenses") {
+              const selected = await dialog.showOpenDialog(window, { title: "Gider çalışma kitabını seç", properties: ["openFile"], filters: [{ name: "Excel çalışma kitabı", extensions: ["xlsx"] }] });
+              if (selected.canceled || selected.filePaths.length !== 1) return { status: "cancelled" };
+              return requestService({ operation, bytes: await readPackageFile(selected.filePaths[0], MAX_EXPENSE_BYTES) });
+            }
+            return requestService({ operation, payload } as ExpenseServiceRequest);
+          } catch { return { status: "failed", code: "EXPENSE_FILE_FAILED", message: "Gider dosyası okunamadı veya kaydedilemedi. En fazla 4 MB boyutunda bir Excel dosyası kullanın." }; }
+        },
       ),
   );
   await window.loadURL(APP_URL);

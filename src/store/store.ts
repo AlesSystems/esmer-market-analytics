@@ -1,3 +1,6 @@
+import { relevantExpenseRevision } from "../expenses/adjustments";
+import { isExpense, validFields, fieldKeys } from "../expenses/validation";
+import type { ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
 import { createHash, randomUUID } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
@@ -8,8 +11,8 @@ import { type AcceptedReport, type AppChange, type AppRecord, type Pin, type Tar
 export type ImportCode = ImportErrorCode;
 export type ImportResult = { status: "active" | "unchanged" | "historical"; datasetId: string } | { status: "failed"; code: ImportCode } | { status: "cancelled" };
 export type StageResult = { status: "validated"; id: string; datasetId: string } | ImportResult;
-export type FaultBoundary = "reading" | "persistence" | "validation" | "summary" | "activation";
-export type Snapshot = { importedAt: string | null; pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[] };
+export type FaultBoundary = "reading" | "persistence" | "validation" | "summary" | "activation" | "expense-row";
+export type Snapshot = { importedAt: string | null; pin: Pin; metadata: Manifest | null; warnings: string[]; records: Records; app: AppRecord[]; expenseHistory: AppRecord[] };
 type Options = { schemaVersion?: number; fault?: (boundary: FaultBoundary) => void; maxPages?: number };
 const hash = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
 const decode = <T>(value: unknown): T => JSON.parse(String(value)) as T;
@@ -102,13 +105,15 @@ class AnalyticsStore {
       if (record.kind === "adjustment") record.applicability = record.value.reversed ? "reversed" : pin.datasetId !== null && this.fingerprint(record.value.target, pin.datasetId) === row.fingerprint ? "applicable" : "review-required";
       return record;
     });
-    return { importedAt: pin.datasetId ? (this.db.prepare("SELECT created_at FROM import_batches WHERE dataset_id=? AND state='active' ORDER BY rowid LIMIT 1").get(pin.datasetId)?.created_at as string | undefined ?? null) : null, pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app };
+    return { importedAt: pin.datasetId ? (this.db.prepare("SELECT created_at FROM import_batches WHERE dataset_id=? AND state='active' ORDER BY rowid LIMIT 1").get(pin.datasetId)?.created_at as string | undefined ?? null) : null, pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app, expenseHistory: this.revisionHistory(pin.appRevision) };
   }
   readSnapshot(): Snapshot { return this.transaction(() => this.snapshot(this.currentPin()), true); }
   readPinned(pin: Pin): Snapshot { return this.transaction(() => this.snapshot(pin), true); }
   appendRevision(change: AppChange): number {
-    validateChange(change);
-    return this.transaction(() => {
+    return this.transaction(() => this.insertRevision(change));
+  }
+  private insertRevision(change: AppChange): number {
+      validateChange(change);
       if (change.kind === "confirmation") requireValid(change.value.reviewedRevision <= this.currentPin().appRevision);
       const fingerprint = change.kind === "adjustment" ? this.fingerprint(change.value.target) : null;
       if (change.kind === "adjustment") {
@@ -120,6 +125,55 @@ class AnalyticsStore {
       const revision = Number(result.lastInsertRowid);
       if (change.kind === "adjustment") this.db.prepare("INSERT INTO adjustment_targets VALUES(?,?,?,?,?)").run(revision, change.value.target.datasetId, change.value.target.kind, change.value.target.sourceId, fingerprint);
       return revision;
+  }
+  revisionHistory(through = this.currentPin().appRevision): AppRecord[] {
+    return this.db.prepare("SELECT revision,kind,entity_id,value_json FROM app_revisions WHERE kind='expense' AND revision<=? ORDER BY revision").all(through).map(row => ({ revision: Number(row.revision), kind: "expense", entityId: String(row.entity_id), value: decode(row.value_json) } as AppRecord));
+  }
+  expenseBatches(): ExpenseBatch[] {
+    return this.db.prepare("SELECT batch_id,created_at,count,first_revision,last_revision FROM expense_batches ORDER BY rowid").all().map(row => ({ batchId: String(row.batch_id), createdAt: String(row.created_at), count: Number(row.count), firstRevision: Number(row.first_revision), lastRevision: Number(row.last_revision) }));
+  }
+  importExpenses(batchId: string, expectedRevision: number, changes: AppChange[]): boolean {
+    return this.transaction(() => {
+      requireValid(validId(batchId) && changes.every(change => change.kind === "expense" && isExpense(change.value)));
+      if (this.db.prepare("SELECT batch_id FROM expense_batches WHERE batch_id=?").get(batchId)) return false;
+      requireValid(this.currentPin().appRevision === expectedRevision);
+      const first = expectedRevision + 1;
+      for (const change of changes) {
+        requireValid(!this.db.prepare("SELECT revision FROM app_revisions WHERE kind='expense' AND entity_id=?").get(change.entityId));
+        this.insertRevision(change); this.options.fault?.("expense-row");
+      }
+      this.db.prepare("INSERT INTO expense_batches VALUES(?,?,?,?,?)").run(batchId, new Date().toISOString(), changes.length, changes.length ? first : expectedRevision, this.currentPin().appRevision);
+      return true;
+    });
+  }
+  changeExpense(request: CorrectExpenseRequest | RestoreExpenseRequest): number {
+    return this.transaction(() => {
+      const history = this.revisionHistory().filter(row => row.entityId === request.entityId);
+      const latest = history.at(-1);
+      requireValid(latest?.kind === "expense" && isExpense(latest.value) && latest.revision === request.expectedRevision);
+      let replacement: ExpenseValue;
+      if ("replacement" in request) {
+        requireValid(validFields(request.replacement));
+        requireValid(request.replacement.sourceReference === latest.value.sourceReference);
+        replacement = { ...latest.value, ...request.replacement, voided: false };
+      } else if (request.restoreRevision === null) replacement = { ...latest.value, voided: true };
+      else {
+        const previous = history.find(row => row.revision === request.restoreRevision);
+        requireValid(previous?.kind === "expense" && isExpense(previous.value));
+        const previousValue = previous.value;
+        replacement = { ...latest.value, ...Object.fromEntries(fieldKeys.map(key => [key, previousValue[key as keyof ExpenseValue]])), voided: previousValue.voided };
+      }
+      if (!replacement.voided && replacement.loss) {
+        const current = this.snapshot(this.currentPin()).app;
+        requireValid(!current.some(row => row.kind === "expense" && row.entityId !== request.entityId && isExpense(row.value) && !row.value.voided && row.value.loss?.evidence === replacement.loss!.evidence));
+      }
+      return this.insertRevision({ kind: "expense", entityId: request.entityId, value: { ...replacement, reason: request.reason, replacesRevision: latest.revision } });
+    });
+  }
+  confirmExpensesComplete(request: ConfirmExpenseCompletenessRequest): number {
+    return this.transaction(() => {
+      requireValid(relevantExpenseRevision(this.revisionHistory(), request.period) === request.reviewedRevision);
+      return this.insertRevision({ kind: "confirmation", entityId: `expense-complete:${request.period}`, value: { ...request, evidence: "owner-review" } });
     });
   }
   acceptReport(report: AcceptedReport) {
