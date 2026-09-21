@@ -16,6 +16,7 @@ test("expenses are reachable without a source and cancelled selection leaves an 
     await expect(page.getByRole("status")).toContainText("İşlem iptal edildi");
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).not.toBeChecked();
     await page.setViewportSize({ width: 680, height: 720 });
+    await page.getByText("Excel şablonu nasıl doldurulur?", { exact: true }).click();
     await page.screenshot({ path: "test-results/phase-7-expenses-empty-small.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -64,6 +65,8 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();
     await expect(page.getByText("Dönemin giderleri eksiksiz olarak onaylandı", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "İncele / düzelt" }).click();
+    await expect(page.getByText("Güncel sürüm", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("Önceki sürüm", { exact: true })).toHaveCount(2);
     await page.screenshot({ path: "test-results/phase-7-expenses-history.png", fullPage: true });
     await page.setViewportSize({ width: 680, height: 720 });
     await page.screenshot({ path: "test-results/phase-7-expenses-small.png", fullPage: true });
@@ -134,6 +137,9 @@ test("operating report stays pinned after expense edits until the owner reopens 
     await operating.getByRole("button", { name: "Raporu yeni giderlerle aç" }).click();
     await expect(operating).toContainText("Tahmini yönetim faaliyet kârı");
     await expect(operating.locator(".operating-value")).toHaveText("30,00 ₺");
+    await operating.getByText("Hesaplama ve sabit kayıtlar", { exact: true }).click();
+    await expect(operating).toContainText("Kapsanan tahmini brüt kâr: 40,00 ₺");
+    await expect(operating).toContainText("operating-ref");
     await page.screenshot({ path: "test-results/phase-7-operating.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -157,6 +163,7 @@ test("initial expense query failure ends loading and can be retried", async () =
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("alert")).toContainText("Sentetik okuma hatası");
     await expect(page.getByText("Giderler yükleniyor…", { exact: true })).toHaveCount(0);
+    await page.screenshot({ path: "test-results/phase-7-expenses-retry.png", fullPage: true });
     await page.getByRole("button", { name: "Giderleri yeniden yükle", exact: true }).click();
     await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
     await expect(page.getByRole("alert")).toHaveCount(0);
