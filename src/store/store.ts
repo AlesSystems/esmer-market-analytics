@@ -107,6 +107,7 @@ class AnalyticsStore {
     });
     return { importedAt: pin.datasetId ? (this.db.prepare("SELECT created_at FROM import_batches WHERE dataset_id=? AND state='active' ORDER BY rowid LIMIT 1").get(pin.datasetId)?.created_at as string | undefined ?? null) : null, pin: { ...pin }, metadata: dataset ? decode<Manifest>(dataset.manifest_json) : null, warnings: dataset ? decode<string[]>(dataset.warnings_json) : [], records: pin.datasetId === null ? { documents: [], lines: [], suppliers: [] } : this.facts(pin.datasetId), app, expenseHistory: this.revisionHistory(pin.appRevision) };
   }
+  readPin(): Pin { return this.transaction(() => this.currentPin(), true); }
   readSnapshot(): Snapshot { return this.transaction(() => this.snapshot(this.currentPin()), true); }
   readPinned(pin: Pin): Snapshot { return this.transaction(() => this.snapshot(pin), true); }
   appendRevision(change: AppChange): number {

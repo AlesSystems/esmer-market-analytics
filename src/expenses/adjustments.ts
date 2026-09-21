@@ -1,5 +1,4 @@
 import type { AppRecord } from "../store/revisions";
-// Full history retains both sides of a period move, bounded by the report pin.
 export function relevantExpenseRevision(history: AppRecord[], period: string): number {
   const previous = new Map<string, string>(); let revision = 0;
   for (const row of history) if (row.kind === "expense") {
