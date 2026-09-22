@@ -34,7 +34,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
         process: typeof window.process,
       })),
     ).toEqual({
-      api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportVersion", "restoreExpense", "saveExpenseTemplate"],
+      api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate"],
       node: "undefined",
       process: "undefined",
     });
@@ -259,7 +259,7 @@ test("packaged app imports through native selection, preserves data after failed
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
-    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportVersion", "restoreExpense", "saveExpenseTemplate"] });
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 

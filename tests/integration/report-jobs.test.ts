@@ -76,6 +76,11 @@ test("real worker rejects unknown work, observes shared cancellation, and stays 
     expect(await request("exportReportVersion", {payload: {reportId: "missing"}})).toMatchObject({status: "unavailable", code: "REPORT_NOT_FOUND"});
     expect(await request("openMonthly", {payload: {period: "2025-09", path: "/private"}})).toMatchObject({status: "rejected", code: "INVALID_PAYLOAD"});
     if (monthly.status !== "monthly") throw new Error("NO_REPORT");
+    expect(monthly.report).not.toHaveProperty("salesEvidence");
+    const evidence = { reportId: monthly.report.id, section: "components", offset: 0, search: "", range: "current", documentId: null };
+    expect(await request("readReportEvidence", { payload: evidence })).toMatchObject({ status: "evidence", total: 1, rows: [{ net: "180" }] });
+    expect(await request("readReportEvidence", { payload: { ...evidence, offset: -1 } })).toMatchObject({ status: "rejected", code: "INVALID_PAYLOAD" });
+    expect(await request("readReportEvidence", { payload: { ...evidence, reportId: "missing" } })).toMatchObject({ status: "unavailable", code: "REPORT_NOT_FOUND" });
     const exported = await request("exportReportVersion", {payload: {reportId: monthly.report.id}});
     expect(exported.status).toBe("export");
     if (exported.status !== "export") throw new Error("NO_EXPORT");

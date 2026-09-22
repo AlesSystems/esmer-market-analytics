@@ -51,3 +51,16 @@ test("evidence requests reject unbounded pages and arbitrary selectors", () => {
     expect(validMonthlyRequest("readReportEvidence", invalid)).toBe(false);
   }
 });
+
+test("revisiting an accepted candidate keeps its review and saved display", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly report");
+    versions.accept({ candidateId: opened.report.id, previousAcceptedId: null, reason: "Sentetik kontrol" });
+    const saved = versions.display({ reportId: opened.report.id });
+    expect(versions.currentDisplay({ context: opened.report.context })).toEqual(saved);
+  } finally { store.close(); }
+});
