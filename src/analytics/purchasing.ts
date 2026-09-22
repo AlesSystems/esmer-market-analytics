@@ -1,13 +1,13 @@
 import { Exact, percentageChange, sum } from "../domain/money";
 import { BUSINESS_MAPPING_VERSION, type Records, type PurchaseEvidence } from "../source/package";
-import { estimateGrossResult } from "./costs";
+import { estimateGrossResult, type GrossResult } from "./costs";
 export const PURCHASING_CALCULATION_VERSION = "synthetic-purchasing-calc-v1";
 export type PurchaseRow = { documentId: string; lineId: string; date: string; productId: string; productName: string; supplierId: string; supplierName: string; unit: "piece" | "kg"; quantity: string; net: string; unitCost: string; representation: "invoice" | "dispatch"; sourceDocumentIds: string[]; evidence: string };
 export type SupplierReturnRow = PurchaseRow & { physicalReturn: boolean; requestedRecovery: string | null; recognizedCredit: string | null; replacementSettlement: "unknown" | "confirmed"; settlementEvidence: string | null; settlementEvidenceReferences: string[] };
 export type ReplacementRow = { productId: string; productName: string; unit: "piece" | "kg"; historicalUnitCost: string | null; latestUnitCost: string; nominalChangePercent: string | null; quantity: string; historicalCost: string | null; replacementCost: string; documentId: string; sourceDocumentIds: string[]; date: string };
 export type InventoryRow = { lineId: string; productId: string; productName: string; unit: "piece" | "kg"; date: string; stock: string | null; recordedWaste: string | null; evidence: string; complete: boolean };
 export type PurchasingResult = { status: "ready" | "unavailable"; history: PurchaseRow[]; supplierReturns: SupplierReturnRow[]; replacements: ReplacementRow[]; inventory: InventoryRow[]; warnings: string[]; exclusions: { documentId: string; reason: string }[] };
-export function calculatePurchasing(records: Records, context: { mappingVersion: string; from: string; to: string; cutoff?: string }): PurchasingResult {
+export function calculatePurchasing(records: Records, context: { mappingVersion: string; from: string; to: string; cutoff?: string }, calculated: { gross?: GrossResult } = {}): PurchasingResult {
   const result: PurchasingResult = { status: context.mappingVersion === BUSINESS_MAPPING_VERSION ? "ready" : "unavailable", history: [], supplierReturns: [], replacements: [], inventory: [], warnings: [], exclusions: [] };
   if (result.status === "unavailable") { result.warnings.push("UNSUPPORTED_PURCHASING_MAPPING"); return result; }
   const cutoff = context.cutoff ?? context.to;
@@ -50,7 +50,7 @@ export function calculatePurchasing(records: Records, context: { mappingVersion:
     const i = line.business?.inventory, s = line.sales;
     if (i && s && s.meaning === "known" && s.unit !== "unknown" && i.date <= cutoff) { result.inventory.push({ ...i, lineId: line.id, productId: s.productId, productName: s.productName, unit: s.unit }); if (i.stock !== null && new Exact(i.stock).lt(0)) result.warnings.push("NEGATIVE_STOCK"); if (!i.complete || i.recordedWaste === null || new Exact(i.recordedWaste).isZero()) result.warnings.push("SPARSE_WASTE_RECORDING"); }
   }
-  const gross = estimateGrossResult(records, context);
+  const gross = calculated.gross ?? estimateGrossResult(records, context);
   const latest = new Map<string, PurchaseRow>();
   const purchaseGroups = new Map<string, PurchaseRow[]>();
   for (const row of allPurchases) { const key = `${row.productId}:${row.unit}`, group = purchaseGroups.get(key) ?? []; group.push(row); purchaseGroups.set(key, group); }
