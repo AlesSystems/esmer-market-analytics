@@ -1,6 +1,6 @@
 # Continue Phase 8 on Windows
 
-Continue [issue #11](https://github.com/AlesSystems/esmer-market-analytics/issues/11), Tasks 8.1 and 8.2, on branch `codex/phase-8-reporting`. Update the existing Phase 8 PR. The implementation run stopped before Windows packaging, testing or platform changes at the user's request. macOS evidence does not establish Windows acceptance. Do not merge or close the issue during this handoff.
+Continue [issue #11](https://github.com/AlesSystems/esmer-market-analytics/issues/11), Tasks 8.1 and 8.2, on branch `codex/phase-8-reporting`. Update [PR #22](https://github.com/AlesSystems/esmer-market-analytics/pull/22). Implementation source is `534c091`; initial evidence/handoff commit is `23a7368`. Fetch the latest branch tip before continuing. The implementation run stopped before Windows packaging, testing or platform changes at the user's request. macOS evidence does not establish Windows acceptance. Do not merge or close the issue during this handoff.
 
 Read `AGENTS.md`, the foundation documents, [Phase 8 in the roadmap](../superpowers/plans/esmer-market-implementation-plan.md#phase-8--complete-turkish-reporting-report-revisions-and-excel-export), [local evidence](../evidence/phase-8-local.md), and [report contract](../contracts/reports.md). Preserve unrelated work. Use isolated application profiles and synthetic fixtures. No production access, renewed source inspection, owner contact, installation on Eralp's computer or later-phase implementation is authorized.
 

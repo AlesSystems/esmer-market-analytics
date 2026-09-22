@@ -1,6 +1,8 @@
 # Windows-agent prompt for Phase 8
 
-Continue Phase 8 of AlesSystems/esmer-market-analytics, GitHub issue #11, on branch `codex/phase-8-reporting` and the existing PR for that branch. The macOS implementation intentionally stopped before Windows work. Inspect branch/worktree/status, preserve unrelated changes, fetch the latest branch and attach the existing PR to this task. Do not create a replacement PR or merge.
+Continue Phase 8 of AlesSystems/esmer-market-analytics, GitHub issue #11, on branch `codex/phase-8-reporting` and [PR #22](https://github.com/AlesSystems/esmer-market-analytics/pull/22). The macOS implementation intentionally stopped before Windows work. Inspect branch/worktree/status, preserve unrelated changes, fetch the latest branch and attach the existing PR to this task. Do not create a replacement PR or merge.
+
+Implementation source is `534c091`; the initial evidence/handoff commit is `23a7368`. Fetch the branch tip so this prompt includes later documentation links.
 
 Read repository AGENTS.md, the foundation specification/audit/acceptance checklist, Phase 8 of the roadmap, `docs/evidence/phase-8-local.md`, `docs/contracts/reports.md`, and `docs/operations/windows-phase-8-handoff.md`. Follow the handoff's exact commands and native checks. Record the tested SHA and Windows hardware/OS/scaling/toolchain.
 
