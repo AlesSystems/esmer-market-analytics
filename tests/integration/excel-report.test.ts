@@ -6,6 +6,25 @@ import { SalesReports } from "../../src/reports/query";
 import { ReportVersions } from "../../src/reports/versions";
 import { excelReport } from "../../src/reports/export";
 import { businessPackage } from "../helpers/business-fixtures";
+import { Expenses } from "../../src/expenses/import";
+import { workbook, row } from "../helpers/expense-fixtures";
+
+test("source coverage does not hide independently recorded expenses or payments in Excel", async () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const expenses = new Expenses(store);
+    const preview = expenses.preview(await workbook([[row[0], "15.10.2025", "16.10.2025", ...row.slice(3)]]));
+    expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] });
+    const result = new ReportVersions(store, new SalesReports(store)).open({ period: "2025-10" });
+    if (result.status !== "monthly") throw new Error("Expected monthly");
+    expect(result.report.sales.coverage).toBe("unavailable");
+    expect(result.report.operating.result).toMatchObject({ expenses: "50", payments: "50", value: null });
+    const summary = await readSheet(await excelReport(result.report), "Özet");
+    for (const title of ["Faaliyet gideri", "Hesaba alınan giderler", "Ödemeler"]) expect(summary.find(row => row[0] === title)?.[1]).toBe(50);
+    expect(summary.find(row => row[0] === "Net satış")?.[1]).toBeNull();
+  } finally { store.close(); }
+});
 
 test("Excel uses the selected immutable report across refresh and preserves Turkish numeric and text cells", async () => {
   const store = openStore(":memory:");
