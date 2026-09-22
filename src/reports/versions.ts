@@ -3,27 +3,55 @@ import { Exact } from "../domain/money";
 import type { openStore } from "../store/store";
 import type { SalesReports } from "./query";
 import type { MonthlyReport, MonthlyResult, OperationControl, ReportContext, ReportDifference, ReportHistoryResult } from "./contracts";
+import { displayResult, monthlyDisplay, reportEvidence, type ReportEvidenceRequest } from "./display";
 
 function monthly(value: unknown): value is MonthlyReport {
   return !!value && typeof value === "object" && "format" in value && value.format === "monthly-report-v1";
 }
 export class ReportVersions {
   private candidate: MonthlyReport | null = null;
+  private retained: MonthlyReport | null = null;
   constructor(private readonly store: ReturnType<typeof openStore>, private readonly sales: SalesReports) {}
   open(request: { period: string | null }, control?: OperationControl): MonthlyResult {
     const result = this.sales.open(request);
     return result.status === "report" ? this.current({ context: result.view.context }, control) : result;
   }
   current({ context }: { context: ReportContext }, control?: OperationControl): MonthlyResult {
-    const result = this.sales.monthly(context, control);
-    if (result.status === "monthly") this.candidate = structuredClone(result.report);
+    return structuredClone(this.calculate(context, control));
+  }
+  private calculate(context: ReportContext, control?: OperationControl): MonthlyResult {
+    const result = this.sales.monthlyCandidate(context, control);
+    if (result.status === "monthly") {
+      if (this.candidate?.id === result.report.id && this.candidate.review) return { status: "monthly", report: this.candidate };
+      this.candidate = result.report;
+    }
     return result;
+  }
+  openDisplay(request: { period: string | null }, control?: OperationControl) {
+    const result = this.sales.open(request);
+    return result.status === "report" ? this.currentDisplay({ context: result.view.context }, control) : result;
+  }
+  currentDisplay({ context }: { context: ReportContext }, control?: OperationControl) {
+    return structuredClone(displayResult(this.calculate(context, control)));
+  }
+  display({ reportId }: { reportId: string }) {
+    return { status: "monthly" as const, report: structuredClone(monthlyDisplay(this.resolve(reportId))) };
+  }
+  evidence(request: ReportEvidenceRequest) {
+    return structuredClone(reportEvidence(this.resolve(request.reportId), request));
+  }
+  purchasing({ reportId }: { reportId: string }) {
+    return { status: "purchasing" as const, view: structuredClone(this.resolve(reportId).purchasing) };
   }
   protectedDatasetIds(): string[] { return this.candidate ? [this.candidate.context.datasetId] : []; }
   selected(reportId: string): MonthlyReport {
-    try { const stored = this.store.readReport(reportId); if (monthly(stored.output.report)) return structuredClone(stored.output.report); }
+    return structuredClone(this.resolve(reportId));
+  }
+  private resolve(reportId: string): MonthlyReport {
+    if (this.retained?.id === reportId) return this.retained;
+    try { const stored = this.store.readReport(reportId); if (monthly(stored.output.report)) { this.retained = stored.output.report; return this.retained; } }
     catch (error) { if (!(error instanceof Error) || error.message !== "REPORT_NOT_FOUND") throw error; }
-    if (this.candidate?.id === reportId) return structuredClone(this.candidate);
+    if (this.candidate?.id === reportId) return this.candidate;
     throw new Error("REPORT_NOT_FOUND");
   }
   read({ reportId }: { reportId: string }): MonthlyResult { return { status: "monthly", report: this.selected(reportId) }; }
@@ -42,6 +70,8 @@ export class ReportVersions {
     if (previousAcceptedId) this.compare({ candidateId, acceptedId: previousAcceptedId });
     report.review = { acceptedAt: new Date().toISOString(), reason, previousAcceptedId };
     this.store.acceptReport({ id: report.id, pin: { datasetId: report.context.datasetId, appRevision: report.context.appRevision }, calculationVersion: report.calculations.report, evidence: [`package:${report.context.datasetId}`, report.rules.artifact], output: { report } });
+    this.retained = structuredClone(report);
+    if (this.candidate?.id === report.id) this.candidate = this.retained;
     return { status: "monthly", report };
   }
   compare({ candidateId, acceptedId }: { candidateId: string; acceptedId: string }): ReportDifference {

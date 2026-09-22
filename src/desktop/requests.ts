@@ -19,11 +19,17 @@ export function validReportRequest(operation: string, value: unknown): boolean {
   return exact(c, ["sessionId", "datasetId", "appRevision", "calculationVersion", "period"]) && validId(c.sessionId) && validId(c.datasetId) && validId(c.calculationVersion) && period(c.period) && Number.isSafeInteger(c.appRevision) && Number(c.appRevision) >= 0
     && exact(f, ["categoryId", "productId", "search", "kind"]) && (f.categoryId === null || validId(f.categoryId)) && (f.productId === null || validId(f.productId)) && typeof f.search === "string" && f.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(f.search) && ["all", "sale", "customer-return"].includes(String(f.kind)) && typeof f.kind === "string";
 }
-export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion"];
+export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportPurchasing"];
 export function validMonthlyRequest(operation: string, value: unknown): boolean {
+  if (operation === "readReportEvidence") return exact(value, ["reportId", "section", "offset", "search", "range", "documentId"])
+    && validId(value.reportId) && typeof value.section === "string" && ["components", "exclusions", "documents", "lines"].includes(value.section)
+    && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0
+    && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
+    && typeof value.range === "string" && ["current", "month", "year"].includes(value.range)
+    && (value.section === "lines" ? validId(value.documentId) : value.documentId === null);
   if (operation === "openMonthly" || operation === "queryMonthly") return validReportRequest(operation, value);
   if (operation === "listReportVersions") return exact(value, ["period"]) && period(value.period);
-  if (operation === "readReportVersion" || operation === "exportReportVersion") return exact(value, ["reportId"]) && validId(value.reportId);
+  if (operation === "readReportVersion" || operation === "exportReportVersion" || operation === "readReportPurchasing") return exact(value, ["reportId"]) && validId(value.reportId);
   if (operation === "compareReportVersion") return exact(value, ["candidateId", "acceptedId"]) && validId(value.candidateId) && validId(value.acceptedId);
   if (operation === "acceptReportVersion") return exact(value, ["candidateId", "previousAcceptedId", "reason"]) && validId(value.candidateId) && (value.previousAcceptedId === null || validId(value.previousAcceptedId)) && typeof value.reason === "string" && !!value.reason.trim() && value.reason.length <= 1000 && !/[\u0000-\u001f\u007f]/.test(value.reason);
   return false;

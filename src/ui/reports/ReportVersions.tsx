@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import type { MonthlyReport, ReportDifference, ReportSummary } from "../../reports/contracts";
+import type { ReportDifference, ReportSummary } from "../../reports/contracts";
+import type { MonthlyDisplay } from "../../reports/display";
 import { date, decimal, money, percent } from "../format";
 import { salesReasonLabels } from "../report-labels";
 import { purchasingWarningLabels } from "../purchasing/PurchasingWorkspace";
@@ -10,8 +11,8 @@ const fieldLabels: Record<string, string> = { net: "Net tutar", netSales: "Net s
 const valueLabels: Record<string, string> = { estimated: "Tahmini", unavailable: "Kullanılamıyor", incomplete: "Eksik", missing: "Henüz sağlanmadı", available: "Mevcut", complete: "Tam", partial: "Kısmi", ready: "Hazır", unknown: "Bilinmiyor", sale: "Satış", "customer-return": "Müşteri iadesi", purchase: "Alış", "supplier-return": "Tedarikçi iadesi", labour: "İşçilik", "operating-expense": "Faaliyet gideri", "inventory-loss": "Stok kaybı", recoverable: "İndirilebilir", "non-recoverable": "İndirilemez", piece: "adet", kg: "kg", true: "Evet", false: "Hayır" };
 function changeLabel(path: string) { if (changeLabels[path]) return changeLabels[path]; const parts = path.split("."); const section = parts[0] === "salesEvidence" ? "Satış kaynak kanıtı" : parts[0] === "appEvidence" || parts[0].startsWith("appEvidence[") ? "Gider ve düzeltme kanıtı" : parts[0] === "calculations" ? "Hesaplama yöntemi" : fieldLabels[parts[0]] ?? "Rapor kanıtı"; const last = parts.at(-1)!.replace(/\[.*$/, ""); return `${section} · ${fieldLabels[last] ?? "Kaynak kaydı"}`; }
 function changeValue(path: string, value: string | number | boolean | null) { if (value === null) return "Yok / hesaplanamıyor"; if (typeof value === "boolean") return value ? "Evet" : "Hayır"; if (typeof value === "number") return value.toLocaleString("tr-TR"); const field = path.split(".").at(-1)!; if (/^-?\d+(?:\.\d+)?$/.test(value)) { if (["net", "netSales", "gross", "tax", "unitNet", "unitCost", "cost", "coveredCost", "coveredSales", "coveredGrossProfit", "value", "amount", "expenses", "payments", "operatingExpense", "labour", "separateLoss", "averageBasket", "basketNumerator"].includes(field)) return money(value); if (/Percent$|Change$|Rate$/.test(field)) return percent(value); if (["quantity", "piece", "kg"].includes(field)) return decimal(value); } return valueLabels[value] ?? salesReasonLabels[value] ?? purchasingWarningLabels[value] ?? value; }
-export function ReportVersions({ candidate, onAccepted }: { candidate: MonthlyReport; onAccepted: (report: MonthlyReport) => void }) {
-  const [history, setHistory] = useState<ReportSummary[]>([]), [selected, setSelected] = useState<MonthlyReport>(candidate);
+export function ReportVersions({ candidate, onAccepted }: { candidate: MonthlyDisplay; onAccepted: (report: MonthlyDisplay) => void }) {
+  const [history, setHistory] = useState<ReportSummary[]>([]), [selected, setSelected] = useState<MonthlyDisplay>(candidate);
   const [difference, setDifference] = useState<ReportDifference>();
   const [differencePage, setDifferencePage] = useState(0);
   const [reason, setReason] = useState(""), [message, setMessage] = useState(""), [busy, setBusy] = useState(false), [loaded, setLoaded] = useState(false), [loadingHistory, setLoadingHistory] = useState(true), [attempt, setAttempt] = useState(0);

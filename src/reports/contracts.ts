@@ -45,5 +45,7 @@ export type ReportRequestMap = {
   compareReportVersion: { candidateId: string; acceptedId: string };
   acceptReportVersion: { candidateId: string; previousAcceptedId: string | null; reason: string };
   exportReportVersion: { reportId: string };
+  readReportEvidence: import("./display").ReportEvidenceRequest;
+  readReportPurchasing: { reportId: string };
 };
-export type ReportResponse = MonthlyResult | ReportHistoryResult | ReportDifference;
+export type ReportResponse = import("./display").MonthlyDisplayResult | import("./display").ReportEvidencePage | PurchasingReportResult | ReportHistoryResult | ReportDifference;

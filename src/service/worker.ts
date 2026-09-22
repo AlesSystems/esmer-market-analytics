@@ -1,4 +1,5 @@
 import { ReportVersions } from "../reports/versions";
+import { displayResult } from "../reports/display";
 import { excelReport } from "../reports/export";
 import type { OperationControl } from "../reports/contracts";
 import { Expenses } from "../expenses/import";
@@ -60,12 +61,14 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);
     else if (request.operation === "inspectSales") result = reports!.inspect(request.payload);
-    else if (request.operation === "openMonthly") result = versions!.open(request.payload, control);
-    else if (request.operation === "queryMonthly") result = versions!.current(request.payload, control);
+    else if (request.operation === "openMonthly") result = versions!.openDisplay(request.payload, control);
+    else if (request.operation === "queryMonthly") result = versions!.currentDisplay(request.payload, control);
     else if (request.operation === "listReportVersions") result = versions!.list(request.payload);
-    else if (request.operation === "readReportVersion") result = versions!.read(request.payload);
+    else if (request.operation === "readReportVersion") result = versions!.display(request.payload);
+    else if (request.operation === "readReportEvidence") result = versions!.evidence(request.payload);
+    else if (request.operation === "readReportPurchasing") result = versions!.purchasing(request.payload);
     else if (request.operation === "compareReportVersion") result = versions!.compare(request.payload);
-    else if (request.operation === "acceptReportVersion") result = versions!.accept(request.payload);
+    else if (request.operation === "acceptReportVersion") result = displayResult(versions!.accept(request.payload));
     else if (request.operation === "exportReportVersion") result = {status: "export", bytes: await excelReport(versions!.selected(request.payload.reportId))};
     else if (request.operation === "importPackage") {
       store.prune(versions!.protectedDatasetIds());

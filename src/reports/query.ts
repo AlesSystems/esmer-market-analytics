@@ -39,6 +39,9 @@ export class SalesReports {
     return this.query({ context, filters: { ...emptySalesFilters } });
   }
   monthly(context: ReportContext, control: OperationControl = {}): MonthlyResult {
+    return structuredClone(this.monthlyCandidate(context, control));
+  }
+  monthlyCandidate(context: ReportContext, control: OperationControl = {}): MonthlyResult {
     const session = this.resolve(context);
     if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
     control.checkCancelled?.();
@@ -75,15 +78,15 @@ export class SalesReports {
     return current && current.sessionId === context.sessionId && current.datasetId === context.datasetId && current.appRevision === context.appRevision && current.calculationVersion === context.calculationVersion && current.period === context.period ? this.session! : null;
   }
   private monthlyResponse(session: NonNullable<SalesReports["session"]>, report: MonthlyReport): MonthlyReport {
-    const response = structuredClone(report);
     const active = this.store.availability();
     const pin = this.store.readPin();
     const sourceStale = active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== session.context.datasetId;
     const revisionStale = pin.appRevision !== session.context.appRevision;
-    response.sales.stale = sourceStale || revisionStale;
-    response.purchasing.stale = sourceStale || revisionStale;
-    response.operating.stale = pin.datasetId !== session.context.datasetId || revisionStale;
-    return response;
+    return { ...report,
+      sales: { ...report.sales, stale: sourceStale || revisionStale },
+      purchasing: { ...report.purchasing, stale: sourceStale || revisionStale },
+      operating: { ...report.operating, stale: pin.datasetId !== session.context.datasetId || revisionStale },
+    };
   }
   private sales(session: NonNullable<SalesReports["session"]>, from: string, to: string): SalesResult {
     const key = `${from}\u0000${to}`;

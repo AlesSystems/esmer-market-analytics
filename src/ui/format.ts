@@ -5,6 +5,7 @@ export function decimal(value: string, minimum = 0) {
   return tail ? `${digits},${tail}` : digits;
 }
 export const money = (value: string) => `${decimal(value, 2)} ₺`;
-export const date = (value: string) => new Intl.DateTimeFormat("tr-TR", { timeZone: "UTC" }).format(new Date(value));
+const dateFormatter = new Intl.DateTimeFormat("tr-TR", { timeZone: "UTC" });
+export const date = (value: string) => dateFormatter.format(new Date(value));
 export const quantity = (value: { piece: string; kg: string }) => `${decimal(value.piece)} adet · ${decimal(value.kg)} kg`;
 export const percent = (value: string | null) => value === null ? "Karşılaştırılamıyor" : `%${decimal(value)}`;

@@ -1,6 +1,7 @@
+import type { MonthlyDisplayResult, ReportEvidencePage } from "../reports/display";
 import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../expenses/contracts";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
-import type { ReportRequestMap, ReportResponse, MonthlyResult, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
+import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
 export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "openMonthly" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
 export type JobOutcome = { status: "busy" } | { status: "cancelled" };
 export type ReportExportResult = SalesFailure | { status: "saved" } | { status: "cancelled" } | { status: "failed"; code: "REPORT_EXPORT_FAILED"; message: string };
@@ -21,13 +22,15 @@ export type ImportOutcome =
   | { status: "cancelled" }
   | { status: "failed"; code: ImportErrorCode | "SERVICE_UNAVAILABLE"; message: string };
 export interface DesktopApi {
-  openMonthly(request: ReportRequestMap["openMonthly"]): Promise<MonthlyResult | JobOutcome | RequestError>;
-  queryMonthly(request: ReportRequestMap["queryMonthly"]): Promise<MonthlyResult | JobOutcome | RequestError>;
+  openMonthly(request: ReportRequestMap["openMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
+  queryMonthly(request: ReportRequestMap["queryMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
   listReportVersions(request: ReportRequestMap["listReportVersions"]): Promise<ReportHistoryResult | SalesFailure | RequestError>;
-  readReportVersion(request: ReportRequestMap["readReportVersion"]): Promise<MonthlyResult | RequestError>;
+  readReportVersion(request: ReportRequestMap["readReportVersion"]): Promise<MonthlyDisplayResult | RequestError>;
   compareReportVersion(request: ReportRequestMap["compareReportVersion"]): Promise<ReportDifference | SalesFailure | RequestError>;
-  acceptReportVersion(request: ReportRequestMap["acceptReportVersion"]): Promise<MonthlyResult | RequestError>;
+  acceptReportVersion(request: ReportRequestMap["acceptReportVersion"]): Promise<MonthlyDisplayResult | RequestError>;
   exportReportVersion(request: ReportRequestMap["exportReportVersion"]): Promise<ReportExportResult | RequestError>;
+  readReportEvidence(request: ReportRequestMap["readReportEvidence"]): Promise<ReportEvidencePage | SalesFailure | RequestError>;
+  readReportPurchasing(request: ReportRequestMap["readReportPurchasing"]): Promise<PurchasingReportResult | RequestError>;
   getOperationStatus(): Promise<OperationStatus | RequestError>;
   cancelOperation(request: {id: number}): Promise<{status: "cancelling"} | {status: "idle"} | RequestError>;
   saveExpenseTemplate(): Promise<ExpenseResult | RequestError>;

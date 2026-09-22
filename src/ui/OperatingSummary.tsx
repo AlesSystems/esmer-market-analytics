@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import type { ReportContext } from "../reports/contracts";
 import { classificationLabels, type Classification, type OperatingReportResult } from "../expenses/contracts";
 import type { RequestError } from "../domain/contracts";
+import type { OperatingDisplay } from "../reports/display";
 import { date, money } from "./format";
 const reasonLabels: Record<string, string> = { EXPENSES_INCOMPLETE: "Giderlerin eksiksizliği henüz onaylanmadı veya kayıtlar değişti.", GROSS_INCOMPLETE: "Satış, maliyet veya dönem kapsamı kanıtları eksik.", LEGACY_EXPENSE: "Eski gider kaydının hesaplama kanıtları eksik.", UNCLASSIFIED: "Tutarı sıfır olmayan sınıflandırılmamış kayıt var.", UNKNOWN_TAX: "KDV işlemi veya kanıtı eksik.", LOSS_REVIEW: "Stok kaybı kanıtı eksik veya birden çok kayıtta kullanılmış." };
-export function OperatingSummary({ context, revision, refresh, saved }: { context: ReportContext; revision: number; refresh: () => void; saved?: Extract<OperatingReportResult, { status: "operating" }> }) {
-  const [report, setReport] = useState<OperatingReportResult | RequestError | undefined>(saved);
+export function OperatingSummary({ context, revision, refresh, saved }: { context: ReportContext; revision: number; refresh: () => void; saved?: Extract<OperatingReportResult, { status: "operating" }> | OperatingDisplay }) {
+  const [report, setReport] = useState<OperatingReportResult | RequestError | OperatingDisplay | undefined>(saved);
   useEffect(() => { if (saved) { setReport(saved); return; } let current = true; setReport(undefined); window.esmer.queryOperating({ context }).then(value => { if (current) setReport(value); }).catch(() => { if (current) setReport({ status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Faaliyet sonucu yüklenemedi. Raporu yeniden açın." }); }); return () => { current = false; }; }, [context, revision, saved]);
   if (!report) return <p role="status">Faaliyet sonucu yükleniyor…</p>;
   if (report.status !== "operating") return <p className="notice warning" role="alert">{report.message}</p>;

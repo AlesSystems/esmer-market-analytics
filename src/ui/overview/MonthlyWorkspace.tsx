@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import type { MonthlyReport, ReportContext } from "../../reports/contracts";
+import type { ReportContext } from "../../reports/contracts";
+import type { MonthlyDisplay } from "../../reports/display";
 import { MonthlyOverview } from "./MonthlyOverview";
 import { ReportVersions } from "../reports/ReportVersions";
 export function MonthlyWorkspace({ context, versions, refresh, revision }: { context: ReportContext; versions: boolean; refresh: () => void; revision: number }) {
-  const [report, setReport] = useState<MonthlyReport>(), [loading, setLoading] = useState(true), [error, setError] = useState(""), [attempt, setAttempt] = useState(0);
+  const [report, setReport] = useState<MonthlyDisplay>(), [loading, setLoading] = useState(true), [error, setError] = useState(""), [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let current = true; setLoading(true); setError("");
     window.esmer.queryMonthly({ context }).then(result => { if (!current) return; if (result.status === "monthly") setReport(result.report); else setError(result.status === "cancelled" ? "Rapor hesaplaması iptal edildi. Önceki rapor korundu." : result.status === "busy" ? "Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin." : result.message); }).catch(() => { if (current) setError("Aylık rapor yüklenemedi. Yeniden deneyin."); }).finally(() => { if (current) setLoading(false); });
