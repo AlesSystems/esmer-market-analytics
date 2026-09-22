@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { OperationProgress } from "./OperationProgress";
 import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { SalesWorkspace } from "./SalesWorkspace";
 import type { SalesView } from "../reports/contracts";
-import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
+import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
 
 const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." } satisfies Availability;
 const warnings: Record<string, string> = { SYNTHETIC_ONLY: "Sentetik gösterim verisi — gerçek market verisi değildir.", PARTIAL_COVERAGE: "Veri kapsamı eksik; bazı dönemler tamamlanmamış olabilir.", MISSING_COST: "Bazı kayıtlarda maliyet bilgisi yok. Eksik maliyet sıfır kabul edilmez." };
 function date(value: string) { return new Intl.DateTimeFormat("tr-TR", { timeZone: "UTC" }).format(new Date(value)); }
-function importMessage(result: ImportOutcome | RequestError): string {
+function importMessage(result: ImportOutcome | RequestError | JobOutcome): string {
   switch (result.status) {
+    case "busy": return "Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.";
     case "active": return "Veri paketi içe aktarıldı.";
     case "unchanged": return "Bu veri paketi zaten etkin. Veriler değiştirilmedi.";
     case "historical": return "Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.";
@@ -30,7 +32,7 @@ function App() {
   const [sales, setSales] = useState<SalesView>();
   const [salesError, setSalesError] = useState("");
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<ImportOutcome | RequestError>();
+  const [result, setResult] = useState<ImportOutcome | RequestError | JobOutcome>();
   useEffect(() => { window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); }, []);
   useEffect(() => {
     if (availability?.status !== "ready" || availability.store !== "loaded" || sales) return;
@@ -51,10 +53,11 @@ function App() {
     finally { setImporting(false); }
   }
   const messages = <>
+    <OperationProgress />
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
     {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
   </>;
-  if (expensesOpen) return <div className="sales-app"><header className="app-header"><span className="brand">ESMER <span>MARKET</span></span><span className="offline">Canlı bağlantı kapalı</span></header><div className="workspace"><div className="workspace-header"><nav aria-label="Analiz gezinmesi"><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button></nav><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label></div><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></div></div>;
+  if (expensesOpen) return <div className="sales-app"><header className="app-header"><span className="brand">ESMER <span>MARKET</span></span><span className="offline">Canlı bağlantı kapalı</span></header><div className="workspace"><div className="workspace-header"><nav aria-label="Analiz gezinmesi"><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button></nav><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label></div><OperationProgress /><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></div></div>;
   if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
   return (
     <main className="legacy">
