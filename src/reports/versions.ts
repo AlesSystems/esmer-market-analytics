@@ -22,7 +22,12 @@ export class ReportVersions {
   private calculate(context: ReportContext, control?: OperationControl): MonthlyResult {
     const result = this.sales.monthlyCandidate(context, control);
     if (result.status === "monthly") {
-      if (this.candidate?.id === result.report.id && this.candidate.review) return { status: "monthly", report: this.candidate };
+      if (this.candidate?.id === result.report.id && this.candidate.review) return { status: "monthly", report: {
+        ...this.candidate,
+        sales: { ...this.candidate.sales, stale: result.report.sales.stale },
+        purchasing: { ...this.candidate.purchasing, stale: result.report.purchasing.stale },
+        operating: { ...this.candidate.operating, stale: result.report.operating.stale },
+      } };
       this.candidate = result.report;
     }
     return result;
