@@ -64,3 +64,24 @@ test("revisiting an accepted candidate keeps its review and saved display", () =
     expect(versions.currentDisplay({ context: opened.report.context })).toEqual(saved);
   } finally { store.close(); }
 });
+
+test.each(["expense", "source"])("an accepted pinned candidate signals a newer %s revision without rewriting history", revision => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly report");
+    versions.accept({ candidateId: opened.report.id, previousAcceptedId: null, reason: "Sentetik kontrol" });
+    const accepted = versions.selected(opened.report.id);
+    if (revision === "expense") store.appendRevision({ kind: "expense", entityId: "expense", value: { net: "50", date: "2025-09-01", reason: "Sentetik gider", evidence: "fixture:expense" } });
+    else store.importPackage(businessPackage({ documents: [], lines: [], suppliers: [] }, { extractionId: "deleted" }));
+    expect(versions.current({ context: opened.report.context })).toMatchObject({ status: "monthly", report: {
+      review: accepted.review, sales: { metrics: { netSales: "200" }, stale: true }, purchasing: { stale: true }, operating: { stale: true },
+    } });
+    expect(versions.currentDisplay({ context: opened.report.context })).toMatchObject({ status: "monthly", report: { sales: { stale: true }, operating: { stale: true } } });
+    expect(versions.selected(opened.report.id)).toEqual(accepted);
+    const restarted = new ReportVersions(store, new SalesReports(store));
+    expect(restarted.selected(opened.report.id)).toEqual(accepted);
+  } finally { store.close(); }
+});
