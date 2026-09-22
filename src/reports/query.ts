@@ -3,7 +3,7 @@ import { relevantExpenseRevision } from "../expenses/adjustments";
 import type { OperatingReportResult } from "../expenses/contracts";
 import { estimateGrossResult, COST_CALCULATION_VERSION } from "../analytics/costs";
 import { calculatePurchasing, PURCHASING_CALCULATION_VERSION } from "../analytics/purchasing";
-import type { QueryPurchasingRequest, PurchasingReportResult } from "./contracts";
+import type { QueryPurchasingRequest, PurchasingReportResult, MonthlyResult, OperationControl } from "./contracts";
 import { randomUUID } from "node:crypto";
 import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent } from "../analytics/sales";
 import { Exact, percentageChange, sum } from "../domain/money";
@@ -37,6 +37,31 @@ export class SalesReports {
     const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
     this.session = { snapshot, context };
     return this.query({ context, filters: { ...emptySalesFilters } });
+  }
+  monthly(context: ReportContext, control: OperationControl = {}): MonthlyResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const step = (phase: string, count: number) => { control.checkCancelled?.(); control.onProgress?.(phase, count, 4); };
+    step("sales", 0);
+    const sales = this.query({ context, filters: { ...emptySalesFilters } });
+    if (sales.status !== "report") return sales;
+    step("purchasing", 1);
+    const purchasing = this.purchasing({ context });
+    if (purchasing.status !== "purchasing") return purchasing;
+    step("operating", 2);
+    const operating = this.operating({ context });
+    if (operating.status !== "operating") return operating;
+    const { snapshot } = session;
+    step("evidence", 3);
+    const components = calculateSales(snapshot.records, { mappingVersion: snapshot.metadata!.mappingVersion, from: sales.view.from, to: sales.view.to }).lines;
+    const report = { format: "monthly-report-v1" as const, id: randomUUID(), context: { ...context },
+      calculations: { report: "monthly-calc-v1", sales: SALES_CALCULATION_VERSION, costs: COST_CALCULATION_VERSION, purchasing: PURCHASING_CALCULATION_VERSION, operating: OPERATING_CALCULATION_VERSION },
+      rules: { artifact: "esmer-market:monthly-v1", decimalPrecision: 100, rounding: "ROUND_HALF_UP", conventions: ["Sales: signed customer returns; completed sale-document basket denominator", "Comparisons: matched covered days; positive denominators only", "Cost: covered historical last-purchase estimate, no replacement fallback", "Operating: incurred date, classified costs, reviewed completeness", "Percentages: 2 decimal places; source and calculation values retain precision"] },
+      state: sales.view.coverage === "partial" ? "open" as const : "provisional" as const,
+      sales: sales.view, salesEvidence: { documents: snapshot.records.documents, lines: snapshot.records.lines, components },
+      purchasing: purchasing.view, operating, appEvidence: [...snapshot.expenseHistory, ...snapshot.app.filter(row => row.kind !== "expense")], review: null };
+    step("complete", 4);
+    return { status: "monthly", report: structuredClone(report) };
   }
   private resolve(context: ReportContext) {
     const current = this.session?.context;
