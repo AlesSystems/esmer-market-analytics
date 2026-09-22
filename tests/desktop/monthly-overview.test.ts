@@ -74,6 +74,7 @@ test("reviewed monthly values and source explanations survive refresh and export
     await page.getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
     await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
     expect((await stat(exportPath)).size).toBeGreaterThan(0);
-    await page.screenshot({ path: "test-results/phase-8-report-history.png", fullPage: true });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: "test-results/phase-8-report-history.png" });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
