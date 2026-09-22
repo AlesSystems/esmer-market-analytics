@@ -1,3 +1,8 @@
+import { OperationJobs } from "./jobs";
+import { saveReportExport } from "./report-export";
+import { atomicWriteFile } from "./atomic-file";
+import type { ReportServiceRequest, JobOutcome, RequestError, ServiceProgress } from "../domain/contracts";
+import type { ReportResponse } from "../reports/contracts";
 import { expenseTemplate } from "../expenses/template";
 import { MAX_EXPENSE_BYTES } from "../expenses/workbook";
 import type { ExpenseResult, OperatingReportResult } from "../expenses/contracts";
@@ -25,6 +30,7 @@ const unavailable = {
 } satisfies Availability;
 let worker: Worker | undefined;
 let requestId = 0;
+const jobs = new OperationJobs();
 const pending = new Map<number, (result: ServiceResponse["result"]) => void>();
 function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
@@ -32,6 +38,8 @@ function serviceUnavailable() {
 }
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
+function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
+function requestService(request: Extract<ReportServiceRequest, {operation: "exportReportVersion"}>): Promise<ServiceResponse["result"]>;
 function requestService(request: { operation: "queryPurchasing"; payload: QueryPurchasingRequest }): Promise<PurchasingReportResult>;
 function requestService(request: { operation: "openSales"; payload: OpenSalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
@@ -87,7 +95,10 @@ app.whenReady().then(async () => {
     });
   });
   worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite") } });
-  worker.on("message", ({ id, result }: ServiceResponse) => { const resolve = pending.get(id); pending.delete(id); resolve?.(result); });
+  worker.on("message", (message: ServiceResponse | ServiceProgress) => {
+    if ("jobId" in message) { jobs.progress(message.jobId, message.phase, message.completed, message.total); return; }
+    const resolve = pending.get(message.id); pending.delete(message.id); resolve?.(message.result);
+  });
   worker.on("exit", serviceUnavailable);
   worker.on("error", serviceUnavailable);
   const window = new BrowserWindow({
@@ -122,16 +133,19 @@ app.whenReady().then(async () => {
         operation,
         payload,
         () => requestService({ operation: "getAvailability" }),
-        async () => {
+        () => jobs.run("importPackage", async job => {
           try {
             const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Analiz veri paketi", extensions: ["json"] }] });
-            if (selected.canceled || selected.filePaths.length !== 1) return { status: "cancelled" };
+            if (selected.canceled || selected.filePaths.length !== 1 || Atomics.load(new Int32Array(job.cancellation), 0)) return { status: "cancelled" } as const;
+            jobs.progress(job.id, "reading-file", 0, 1);
             const bytes = await readPackageFile(selected.filePaths[0]);
-            return await requestService({ operation: "importPackage", bytes });
+            if (Atomics.load(new Int32Array(job.cancellation), 0)) return {status: "cancelled"} as const;
+            return await requestService({ operation: "importPackage", bytes, job });
           } catch {
-            return { status: "failed", code: "INVALID_PACKAGE", message: "Veri paketi okunamadı veya boyutu sınırı aşıyor. Son geçerli veriler korundu." };
+            if (Atomics.load(new Int32Array(job.cancellation), 0)) return {status: "cancelled"} as const;
+            return { status: "failed", code: "INVALID_PACKAGE", message: "Veri paketi okunamadı veya boyutu sınırı aşıyor. Son geçerli veriler korundu." } as const;
           }
-        },
+        }),
         { purchasing: payload => requestService({ operation: "queryPurchasing", payload }), open: payload => requestService({ operation: "openSales", payload }), query: payload => requestService({ operation: "querySales", payload }), inspect: payload => requestService({ operation: "inspectSales", payload }) },
         async (operation, payload) => {
           try {
@@ -149,6 +163,17 @@ app.whenReady().then(async () => {
             return requestService({ operation, payload } as ExpenseServiceRequest);
           } catch { return { status: "failed", code: "EXPENSE_FILE_FAILED", message: "Gider dosyası okunamadı veya kaydedilemedi. En fazla 4 MB boyutunda bir Excel dosyası kullanın." }; }
         },
+        async (operation, payload) => {
+          const request = {operation, payload} as ReportServiceRequest;
+          if (request.operation === "exportReportVersion") return saveReportExport(
+            () => requestService(request),
+            () => dialog.showSaveDialog(window, {title: "Seçili raporu Excel olarak kaydet", defaultPath: "Esmer-aylik-rapor.xlsx", filters: [{name: "Excel çalışma kitabı", extensions: ["xlsx"]}]}),
+            atomicWriteFile,
+          );
+          if (request.operation === "openMonthly" || request.operation === "queryMonthly") return jobs.run(request.operation, job => requestService({...request, job}));
+          return requestService(request);
+        },
+        {status: () => jobs.status(), cancel: request => jobs.cancel(request)},
       ),
   );
   await window.loadURL(APP_URL);

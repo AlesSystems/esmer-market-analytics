@@ -1,5 +1,10 @@
 import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../expenses/contracts";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
+import type { ReportRequestMap, ReportResponse, MonthlyResult, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
+export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "openMonthly" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
+export type JobOutcome = { status: "busy" } | { status: "cancelled" };
+export type ReportExportResult = SalesFailure | { status: "saved" } | { status: "cancelled" } | { status: "failed"; code: "REPORT_EXPORT_FAILED"; message: string };
+export type ReportServiceRequest = { [K in keyof ReportRequestMap]: { operation: K; payload: ReportRequestMap[K] } }[keyof ReportRequestMap];
 export type ImportErrorCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
 export type DatasetMetadata = { datasetId: string; cutoff: string; extractedAt: string; counts: { documents: number; lines: number; suppliers: number }; warnings: string[] };
 export type Availability =
@@ -16,6 +21,15 @@ export type ImportOutcome =
   | { status: "cancelled" }
   | { status: "failed"; code: ImportErrorCode | "SERVICE_UNAVAILABLE"; message: string };
 export interface DesktopApi {
+  openMonthly(request: ReportRequestMap["openMonthly"]): Promise<MonthlyResult | JobOutcome | RequestError>;
+  queryMonthly(request: ReportRequestMap["queryMonthly"]): Promise<MonthlyResult | JobOutcome | RequestError>;
+  listReportVersions(request: ReportRequestMap["listReportVersions"]): Promise<ReportHistoryResult | SalesFailure | RequestError>;
+  readReportVersion(request: ReportRequestMap["readReportVersion"]): Promise<MonthlyResult | RequestError>;
+  compareReportVersion(request: ReportRequestMap["compareReportVersion"]): Promise<ReportDifference | SalesFailure | RequestError>;
+  acceptReportVersion(request: ReportRequestMap["acceptReportVersion"]): Promise<MonthlyResult | RequestError>;
+  exportReportVersion(request: ReportRequestMap["exportReportVersion"]): Promise<ReportExportResult | RequestError>;
+  getOperationStatus(): Promise<OperationStatus | RequestError>;
+  cancelOperation(request: {id: number}): Promise<{status: "cancelling"} | {status: "idle"} | RequestError>;
   saveExpenseTemplate(): Promise<ExpenseResult | RequestError>;
   previewExpenses(): Promise<ExpenseResult | RequestError>;
   confirmExpenses(request: ExpenseRequests["confirmExpenses"]): Promise<ExpenseResult | RequestError>;
@@ -29,8 +43,10 @@ export interface DesktopApi {
   querySales(request: QuerySalesRequest): Promise<SalesReportResult | RequestError>;
   inspectSales(request: InspectSalesRequest): Promise<SalesDetailResult | RequestError>;
   getAvailability(): Promise<Availability | RequestError>;
-  importPackage(): Promise<ImportOutcome | RequestError>;
+  importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number } & (ExpenseServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
-export type ServiceResponse = { id: number; result: ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult };
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & (ReportServiceRequest | ExpenseServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceResponse = { id: number; result: ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult };
+
+export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };
