@@ -2,6 +2,16 @@
 
 These scripts support [the Windows evidence](../windows-phase-8.md). They are not shipped application files. Use only disposable profiles and synthetic files.
 
+## Repeat the performance continuation
+
+Use Node 24 and the locked dependencies. From the repository root, build `npm run package:win`, then run `node docs/evidence/windows-phase-8-tools/profile-performance.mjs`. On a Windows host whose npm script shell is Windows PowerShell 5, set `$env:npm_config_script_shell = "$env:SystemRoot\System32\cmd.exe"` for these package scripts, which contain `&&`. Do not run builds, tests, installers or other application probes concurrently with the benchmark.
+
+The profiler creates a new ignored `work/performance/profile-fixed-*` directory, generates and checks the exact 25,000-document fixture hash, seeds isolated synthetic profiles and records source/build hashes. It separates database reads, calculations, full and compact serialization, named IPC roundtrips and rendered interactions. Three fresh application processes measure first and warm interactions by clicking within the renderer, waiting for the actual content and two animation frames, and returning only small numeric receipts through Playwright. No complete monthly artifact crosses the automation bridge. Cold here means a fresh process with ordinary OS filesystem caching, not a cleared filesystem cache. Background startup calculation is reported separately. Three samples support a median and maximum, not a reliable population percentile.
+
+The integrity run substitutes only the native import picker result, corrects a synthetic source value, checks accepted totals and evidence, cancels an uncached monthly operation, measures navigation and retries. Screenshots contain synthetic content. The JSON receipt records failures as well as successes; retain failed runs. Renderer heap and app working-set samples are not continuous memory profiling or a leak test. See [performance evidence](../windows-phase-8-performance.md) for measured results and remaining gates.
+
+The remaining procedures document the pre-performance archive recorded in the original Windows evidence. In particular, the old lifecycle probe compares `readReportVersion` with a full artifact; the current named operation returns a compact display. Do not reuse that assertion or claim the old native/lifecycle procedures were rerun on the new archive. Full selected artifacts remain in the local store and exports, while current renderer evidence is read through bounded named page requests.
+
 ## Prepare the fixtures
 
 Preserve existing `work/windows-phase-8` evidence. Copy `prepare.mjs` into that directory and run it with Node 24. It builds `api.mjs` and refuses to overwrite existing fixtures.

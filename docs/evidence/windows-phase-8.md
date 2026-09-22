@@ -4,7 +4,7 @@ Windows continuation of [issue #11](https://github.com/AlesSystems/esmer-market-
 
 Verification commits are `cf2446011e2e6b372b1f56958cf6683d7883c405` for the installer guard contract and `f78d646b50f5ce1e74f0cdb1cd147da0526c35bf` for the guarded probes. The evidence follows in a separate documentation commit.
 
-The synthetic Windows reporting and export checks passed. The two-second performance gate remains unmet. A 25,000-document synthetic report took about 59 seconds to calculate. This is not complete A03/A07 acceptance, a real-source validation or an owner acceptance record.
+The synthetic Windows reporting and export checks passed. The original automated large-report calls were slow, but included transfer of complete report graphs into the test runner; their 49–59 second timings do not isolate background calculation. The subsequent [performance investigation and fixes](windows-phase-8-performance.md) separate ordinary interactions, calculation, serialization and transfer. This historical record is not complete A03/A07 acceptance, a real-source validation or an owner acceptance record.
 
 ## Environment and artifacts
 
@@ -71,15 +71,15 @@ The large fixture contains 25,000 documents and 25,000 lines, 16,442,389 bytes, 
 | --- | --- |
 | Import retry | 9.448 s |
 | Open sales | 8.256 s |
-| Monthly calculation retry | 59.156 s |
+| Monthly operation including full test-runner transfer | 59.156 s |
 | Import cancellation during reading | 25.6 ms |
 | Navigation during import | 62.4 ms |
 | Monthly cancellation during sales phase | 1.600 s |
 | Navigation during calculation | 27.1 ms |
 
-These values leave D18/A07 performance unmet even for this synthetic workload. They do not diagnose a cause or establish full imported-dataset behavior. The 100% run briefly overlapped integration tests and is unsuitable as a quiet timing baseline. The 125% run ran without competing test or installer work. Post-calculation Electron metrics include per-process peak working sets, including about 2.34 million KB for the renderer; they are not a continuously sampled total-app peak.
+These values did not establish D18/A07 performance. They do not diagnose a cause or establish full imported-dataset behavior. The later investigation measured a clean 3.943-second ordinary transaction render on the baseline, independently confirming a failed interaction target. The 100% run briefly overlapped integration tests and is unsuitable as a quiet timing baseline. The 125% run ran without competing test or installer work. Post-calculation Electron metrics include per-process peak working sets, including about 2.34 million KB for the renderer; they include full report transfer through the automation bridge and are not a continuously sampled total-app peak.
 
-The separate 150% run confirmed the slow large-fixture behavior. Import took 7.47 seconds, sales 8.30 seconds and monthly calculation 48.57 seconds. Monthly cancellation took 1.205 seconds, with navigation in 40.5 ms. Small-fixture process starts ranged from 1.60 to 2.53 seconds. All four shutdowns completed in 0.13–0.19 seconds. The full receipts retain repeated samples rather than selecting only the fastest result.
+The separate 150% run confirmed the slow automated large-fixture calls. Import took 7.47 seconds, sales 8.30 seconds and monthly operation plus test-runner transfer 48.57 seconds. Monthly cancellation took 1.205 seconds, with navigation in 40.5 ms. Small-fixture process starts ranged from 1.60 to 2.53 seconds. All four shutdowns completed in 0.13–0.19 seconds. The full receipts retain repeated samples rather than selecting only the fastest result.
 
 ## Synthetic screenshots
 
