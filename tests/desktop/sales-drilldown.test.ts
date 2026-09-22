@@ -17,6 +17,7 @@ test("packaged sales workspace follows a number through product, document and so
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.getByLabel("Dönem")).toHaveValue("2025-09");
     await expect(page.locator(".metric").first()).toContainText("365,00 ₺");
@@ -91,6 +92,7 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.getByText("Kısmi dönem · Uzlaşma eksik", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "S003", exact: true }).click();

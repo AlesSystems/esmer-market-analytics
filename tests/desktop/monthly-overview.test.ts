@@ -32,3 +32,48 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
     await page.screenshot({ path: "test-results/phase-8-monthly-small.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+test("reviewed monthly values and source explanations survive refresh and export selection", async () => {
+  const { businessRecords } = await import("../helpers/business-fixtures");
+  const { stat } = await import("node:fs/promises");
+  const userData = await mkdtemp(join(tmpdir(), "esmer-monthly-history-")), packagePath = join(userData, "synthetic.json"), exportPath = join(userData, "report.xlsx");
+  const initial = businessRecords(); initial.lines[1].sales!.productName = "Çay"; initial.lines[1].sales!.productId = "tea";
+  await writeFile(packagePath, businessPackage(initial));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await app.evaluate(({ dialog }, paths) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [paths.packagePath] }); dialog.showSaveDialog = async () => ({ canceled: false, filePath: paths.exportPath }); }, { packagePath, exportPath });
+    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Rapor sürümleri", exact: true }).press("Enter");
+    await page.getByLabel("Rapor inceleme açıklaması").fill("Eylül sentetik kontrolü");
+    await page.getByRole("button", { name: "İncelenen raporu kaydet" }).click();
+    await expect(page.getByRole("region", { name: "Seçili rapor", exact: true })).toContainText("Kaydedilmiş sürüm");
+    await expect(page.getByText("Dönem: Geçici", { exact: true })).toBeVisible();
+    const records = businessRecords(); records.documents = [records.documents[0]]; records.lines = [records.lines[0]];
+    await writeFile(packagePath, businessPackage(records, { extractionId: "business-2", extractedAt: "2025-10-02T00:00:00.000Z" }));
+    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Raporu yenile", exact: true }).click();
+    await page.getByRole("button", { name: "Rapor sürümleri", exact: true }).click();
+    await page.getByRole("button", { name: "Adayla karşılaştır", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Sürüm farkları" })).toContainText("Net satış");
+    await page.getByRole("button", { name: "Kaydedilmiş sürümü aç", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("200,00 ₺");
+    await page.getByRole("button", { name: "Sabit rapor kanıtlarını göster" }).click();
+    const sourceRows = page.locator(".saved-evidence > details > summary").filter({ hasText: "100,00 ₺" });
+    await expect(sourceRows).toHaveCount(2);
+    await expect(sourceRows.nth(0)).toContainText("Çay");
+    await expect(sourceRows.nth(1)).toContainText("İçme suyu");
+    await sourceRows.nth(0).press("Enter");
+    await expect(page.locator(".saved-evidence")).toContainText("S2 / L2");
+    await page.getByLabel("Kanıtlarda ürün ara").fill("İÇ");
+    await expect(sourceRows).toHaveCount(1);
+    await expect(sourceRows.first()).toContainText("İçme suyu");
+    await expect(page.locator(".saved-evidence")).toContainText("Türkçe sıralama");
+    await page.getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
+    await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
+    expect((await stat(exportPath)).size).toBeGreaterThan(0);
+    await page.screenshot({ path: "test-results/phase-8-report-history.png", fullPage: true });
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});

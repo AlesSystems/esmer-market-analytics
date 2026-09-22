@@ -86,3 +86,15 @@ test("monthly and export requests reject spoofed fields before privileged work",
   expect(await invoke(false, "exportReportVersion", { reportId: "report-1" })).toMatchObject({ code: "UNTRUSTED_SENDER" });
   expect(report).not.toHaveBeenCalled();
 });
+
+test("job status and cancellation validate sender and exact payload before changing shared state", async () => {
+  const status = vi.fn().mockReturnValue({status: "idle"});
+  const cancel = vi.fn().mockReturnValue({status: "cancelling"});
+  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, {status, cancel});
+  expect(await invoke(true, "getOperationStatus", null)).toEqual({status: "idle"});
+  expect(await invoke(true, "cancelOperation", {id: 1})).toEqual({status: "cancelling"});
+  cancel.mockClear();
+  expect(await invoke(false, "cancelOperation", {id: 1})).toMatchObject({code: "UNTRUSTED_SENDER"});
+  for (const value of [null, {id: 0}, {id: 1.5}, {id: 1, cancellation: "spoof"}, {id: "1"}]) expect(await invoke(true, "cancelOperation", value)).toMatchObject({code: "INVALID_PAYLOAD"});
+  expect(cancel).not.toHaveBeenCalled();
+});
