@@ -403,6 +403,8 @@ expect(result.confidence).toBe('estimated');
 
 **Exit gate:** A03 traceability/revision gates and A07 UI/export gates pass for every released KPI.
 
+**2026-09-22 local implementation:** See [Phase 8 evidence](../../evidence/phase-8-local.md), the [report contract](../../contracts/reports.md), and the [Windows continuation](../../operations/windows-phase-8-handoff.md). The user requested a stop before Windows work. The checklist and exit gate remain open for Windows and source-dependent acceptance.
+
 ## Phase 9 — Encrypted backup and independent recovery
 
 **Outcome:** The application can recover financial records and report history after the original computer is lost.
