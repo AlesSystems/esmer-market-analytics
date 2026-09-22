@@ -71,3 +71,18 @@ test("sales operations validate exact contexts and filters before touching repor
     expect(await invoke(true, "querySales", { ...valid, context: { ...valid.context, sessionId: "wrong" } })).toMatchObject({ code: "STALE_CONTEXT" });
   } finally { store.close(); }
 });
+
+test("monthly and export requests reject spoofed fields before privileged work", async () => {
+  const report = vi.fn().mockResolvedValue({ status: "history", reports: [] });
+  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, report);
+  expect(await invoke(true, "listReportVersions", { period: "2025-09" })).toEqual({ status: "history", reports: [] });
+  report.mockClear();
+  for (const [operation, payload] of [
+    ["exportReportVersion", { reportId: "report-1", path: "/private/out.xlsx" }],
+    ["readReportVersion", { reportId: "report-1", sql: "SELECT *" }],
+    ["acceptReportVersion", { candidateId: "candidate", previousAcceptedId: null, reason: "" }],
+    ["openMonthly", { period: "2025-99" }],
+  ] as const) expect(await invoke(true, operation, payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
+  expect(await invoke(false, "exportReportVersion", { reportId: "report-1" })).toMatchObject({ code: "UNTRUSTED_SENDER" });
+  expect(report).not.toHaveBeenCalled();
+});
