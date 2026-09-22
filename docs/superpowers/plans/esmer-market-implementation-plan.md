@@ -403,6 +403,10 @@ expect(result.confidence).toBe('estimated');
 
 **Exit gate:** A03 traceability/revision gates and A07 UI/export gates pass for every released KPI.
 
+**2026-09-22 local implementation:** See [Phase 8 evidence](../../evidence/phase-8-local.md), the [report contract](../../contracts/reports.md), and the [Windows continuation](../../operations/windows-phase-8-handoff.md). The user requested a stop before Windows work. The checklist and exit gate remain open for Windows and source-dependent acceptance.
+
+**2026-09-22 Windows continuation:** The user subsequently authorized the Windows work on PR #22. [Windows evidence](../../evidence/windows-phase-8.md) records packaged reporting and revision preservation, native save/Excel checks, actual 100%/125%/150% scaling and cancellation/retry. The original 49–59 second large-report calls included full graph transfer through the test runner and did not isolate background calculation. The subsequent [performance continuation](../../evidence/windows-phase-8-performance.md) profiles the same 25,000-document fixture, bounds rendered tables, pages monthly evidence and reuses pinned calculations while preserving accepted reports. Ordinary interactions and background work have separate measurements. Physical disconnection on this build, publisher/downloaded SmartScreen behavior, full-volume/source acceptance and broader release gates remain open. Keep the same branch and PR; do not merge, close the issue or begin later phases from this status note.
+
 ## Phase 9 — Encrypted backup and independent recovery
 
 **Outcome:** The application can recover financial records and report history after the original computer is lost.

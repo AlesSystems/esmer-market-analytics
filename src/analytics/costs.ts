@@ -1,6 +1,6 @@
 import { Exact, sum, rounded } from "../domain/money";
 import { BUSINESS_MAPPING_VERSION, type Records, type HistoricalCost } from "../source/package";
-import { calculateSales, type SalesContext } from "./sales";
+import { calculateSales, type SalesContext, type SalesResult } from "./sales";
 export const COST_CALCULATION_VERSION = "synthetic-cost-calc-v1";
 export type CostReason = "MISSING_COST" | "UNVALIDATED_COST" | "UNKNOWN_UNIT" | "UNKNOWN_TAX" | "NEGATIVE_COST" | "UNDOCUMENTED_ZERO" | "RETURN_ATTRIBUTION";
 export type CostRow = { lineId: string; documentId: string; productId: string; productName: string; unit: "piece" | "kg"; quantity: string; net: string; cost: string | null; reason: CostReason | null; evidence: string | null };
@@ -14,10 +14,10 @@ function costReason(c: HistoricalCost | null | undefined, unit: string): CostRea
   if (new Exact(c.unitCost).isZero() && !c.documentedZero) return "UNDOCUMENTED_ZERO";
   return null;
 }
-export function estimateGrossResult(records: Records, context: SalesContext): GrossResult {
+export function estimateGrossResult(records: Records, context: SalesContext, calculated: { sales?: SalesResult; allSales?: SalesResult } = {}): GrossResult {
   const supported = context.mappingVersion === BUSINESS_MAPPING_VERSION;
-  const sales = calculateSales(records, context);
-  const allSales = calculateSales(records, { ...context, from: "1900-01-01", to: "9998-12-31" });
+  const sales = calculated.sales ?? calculateSales(records, context);
+  const allSales = calculated.allSales ?? calculateSales(records, { ...context, from: "1900-01-01", to: "9998-12-31" });
   const byId = new Map(records.lines.map(line => [line.id, line]));
   const originals = new Map(allSales.lines.filter(line => line.kind === "sale").map(line => [line.lineId, line]));
   const returned = new Map<string, string[]>();

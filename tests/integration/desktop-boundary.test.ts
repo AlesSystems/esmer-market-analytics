@@ -71,3 +71,33 @@ test("sales operations validate exact contexts and filters before touching repor
     expect(await invoke(true, "querySales", { ...valid, context: { ...valid.context, sessionId: "wrong" } })).toMatchObject({ code: "STALE_CONTEXT" });
   } finally { store.close(); }
 });
+
+test("monthly and export requests reject spoofed fields before privileged work", async () => {
+  const report = vi.fn().mockResolvedValue({ status: "history", reports: [] });
+  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, report);
+  expect(await invoke(true, "listReportVersions", { period: "2025-09" })).toEqual({ status: "history", reports: [] });
+  report.mockClear();
+  for (const [operation, payload] of [
+    ["exportReportVersion", { reportId: "report-1", path: "/private/out.xlsx" }],
+    ["readReportVersion", { reportId: "report-1", sql: "SELECT *" }],
+    ["readReportPurchasing", { reportId: "report-1", datasetId: "current" }],
+    ["readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null, limit: 10000 }],
+    ["acceptReportVersion", { candidateId: "candidate", previousAcceptedId: null, reason: "" }],
+    ["openMonthly", { period: "2025-99" }],
+  ] as const) expect(await invoke(true, operation, payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
+  expect(await invoke(false, "exportReportVersion", { reportId: "report-1" })).toMatchObject({ code: "UNTRUSTED_SENDER" });
+  expect(await invoke(false, "readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null })).toMatchObject({ code: "UNTRUSTED_SENDER" });
+  expect(report).not.toHaveBeenCalled();
+});
+
+test("job status and cancellation validate sender and exact payload before changing shared state", async () => {
+  const status = vi.fn().mockReturnValue({status: "idle"});
+  const cancel = vi.fn().mockReturnValue({status: "cancelling"});
+  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, {status, cancel});
+  expect(await invoke(true, "getOperationStatus", null)).toEqual({status: "idle"});
+  expect(await invoke(true, "cancelOperation", {id: 1})).toEqual({status: "cancelling"});
+  cancel.mockClear();
+  expect(await invoke(false, "cancelOperation", {id: 1})).toMatchObject({code: "UNTRUSTED_SENDER"});
+  for (const value of [null, {id: 0}, {id: 1.5}, {id: 1, cancellation: "spoof"}, {id: "1"}]) expect(await invoke(true, "cancelOperation", value)).toMatchObject({code: "INVALID_PAYLOAD"});
+  expect(cancel).not.toHaveBeenCalled();
+});

@@ -1,0 +1,1073 @@
+{
+  "scope": "Phase 8 synthetic Windows verification, not full acceptance",
+  "environment": {
+    "powershell": "7.6.6",
+    "version": "10.0.26200",
+    "date": "2026-09-22",
+    "developmentNode": "24.19.0",
+    "excel": "16.0.15128.20246",
+    "os": "Microsoft Windows 11 Pro",
+    "npm": "10.9.3",
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "displayVersion": "25H2",
+    "testedCommit": "98a540a4f681b2909af45ef7b66bed10617c9009",
+    "ramBytes": 33974288384,
+    "build": "26200.9457",
+    "architecture": "64-bit"
+  },
+  "artifacts": [
+    {
+      "path": "release/Esmer Market Analytics 0.1.0.exe",
+      "signature": "NotSigned",
+      "sha256": "815592da8761d2e43db782ebeb39442fc852e54ab702d30e78d2b4c2b0ce108c",
+      "bytes": 112701286
+    },
+    {
+      "path": "release/Esmer Market Analytics Setup 0.1.0.exe",
+      "signature": "NotSigned",
+      "sha256": "9410ee2faaf6d5e61c552cfd0c55890eea0bbee991cd324b39afa954b51636b4",
+      "bytes": 112868589
+    },
+    {
+      "path": "release/win-unpacked/resources/app.asar",
+      "signature": null,
+      "sha256": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "bytes": 10978513
+    }
+  ],
+  "fixtures": [
+    {
+      "name": "sentetik-satış.json",
+      "bytes": 1879,
+      "sha256": "6ee3e935e5bbf55db1d0d3bcaceb5508cd2e97c78cad1dcba449babdd6146ef8"
+    },
+    {
+      "name": "sentetik-düzeltme.json",
+      "bytes": 1355,
+      "sha256": "060a1421d8246107e5d462fd4d0d33eb09d3f7d1225e5c2375641ba92735bce0"
+    },
+    {
+      "name": "sentetik-gider.xlsx",
+      "bytes": 3111,
+      "sha256": "2068855f95c29ad91c7f99974125d9440187a2504af29f0f2c9847ed75c0e2cc"
+    }
+  ],
+  "display": {
+    "physicalPixels": [
+      2560,
+      1440
+    ],
+    "originalScale": 1,
+    "restoredScale": 1,
+    "actualWindowsSettingsUsed": true
+  },
+  "packaged": [
+    {
+      "status": "passed",
+      "startedAt": "2026-09-22T11:13:03.109Z",
+      "run": "work\\windows-phase-8\\packaged-1-YdWW9h",
+      "profile": "work\\windows-phase-8\\packaged-1-YdWW9h\\profile",
+      "scale": 1,
+      "commit": "98a540a4f681b2909af45ef7b66bed10617c9009",
+      "archiveSha256": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "substitutions": [
+        "Native open and save dialog results are substituted. Deferred save verifies the packaged export boundary."
+      ],
+      "limitations": [
+        "Synthetic fixtures only.",
+        "Cold means a new app process with warm OS filesystem caches.",
+        "Timings do not establish full-dataset acceptance.",
+        "No native spreadsheet round-trip, physical disconnect or installer lifecycle in this script."
+      ],
+      "fixtures": [
+        {
+          "name": "sentetik-başlangıç.json",
+          "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\sentetik-başlangıç.json",
+          "bytes": 1867,
+          "sha256": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+          "counts": {
+            "documents": 2,
+            "lines": 2
+          }
+        },
+        {
+          "name": "sentetik-gider.xlsx",
+          "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\sentetik-gider.xlsx",
+          "bytes": 3111,
+          "sha256": "a74b9320040671269580bf5fc4c66e217c1e8f27407f6f19eec4c451f309211d",
+          "counts": {
+            "expenseRows": 1
+          }
+        },
+        {
+          "name": "sentetik-düzeltme.json",
+          "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\sentetik-düzeltme.json",
+          "bytes": 1346,
+          "sha256": "8d29a31060fda41d8bdf9fc3238da7b76217c4670bb144341ae384c75d12cf15",
+          "counts": {
+            "documents": 1,
+            "lines": 1
+          }
+        },
+        {
+          "name": "sentetik-silinmiş.json",
+          "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\sentetik-silinmiş.json",
+          "bytes": 716,
+          "sha256": "90d04e99f6017bb2a397b7dcd25456251fe74c8f2365d9b3d16ed2497c240fce",
+          "counts": {
+            "documents": 0,
+            "lines": 0
+          }
+        },
+        {
+          "name": "sentetik-büyük.json",
+          "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\sentetik-büyük.json",
+          "bytes": 16442389,
+          "sha256": "902c301a65750541160e39374d0ba9572d00282d60a9bed94f0d92fe3b5bfaf8",
+          "counts": {
+            "documents": 25000,
+            "lines": 25000
+          }
+        }
+      ],
+      "assertions": [
+        "UI review retains net 200, covered cost 60, gross estimate 40, expense 50 and unavailable operating profit",
+        "Reviewed monthly object and literal net 200 survive three packaged process restarts",
+        "Source correction 100 to 120, deletion of S2 and expense correction 50 to 60 leave the accepted report and deleted Turkish evidence unchanged",
+        "Deferred substituted save exports original 200/60/40/50 and original report metadata on every sheet after a deletion refresh",
+        "Cancelled 25,000-document import preserves active data, expense 60 and accepted report; import and monthly calculation retry successfully"
+      ],
+      "timings": {
+        "cold": [
+          {
+            "processStartToMonthlyMs": 1416.3561999999997
+          },
+          {
+            "processStartToMonthlyMs": 8077.4186
+          },
+          {
+            "processStartToMonthlyMs": 1431.3225000000002
+          },
+          {
+            "processStartToMonthlyMs": 1503.9781999999996
+          }
+        ],
+        "warm": [
+          {
+            "monthlyMs": 15.299999952316284,
+            "drillMs": 2.8000000715255737,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 5.200000047683716,
+            "drillMs": 1.7999999523162842,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 3.799999952316284,
+            "drillMs": 1,
+            "net": "200",
+            "detailStatus": "detail"
+          }
+        ],
+        "shutdown": [
+          {
+            "elapsedMs": 134.85820000000012,
+            "completed": true
+          },
+          {
+            "elapsedMs": 106.57430000000022,
+            "completed": true
+          },
+          {
+            "elapsedMs": 133.5764999999992,
+            "completed": true
+          },
+          {
+            "elapsedMs": 2346.7464000000036,
+            "completed": true
+          }
+        ],
+        "importCancellation": {
+          "phase": "reading",
+          "latencyMs": 1673.8999999761581,
+          "result": {
+            "status": "cancelled"
+          },
+          "navigationMs": 50.35440000000017
+        },
+        "calculationCancellation": {
+          "phase": "sales",
+          "latencyMs": 1563.3000000715256,
+          "status": "cancelled",
+          "navigationMs": 35.27089999999589
+        }
+      },
+      "observedScale": 1,
+      "runtime": {
+        "window": {
+          "x": 720,
+          "y": 316,
+          "width": 1120,
+          "height": 760
+        },
+        "displays": [
+          {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 2560,
+              "height": 1440
+            },
+            "scaleFactor": 1
+          }
+        ]
+      },
+      "saved": {
+        "id": "b08ea3ca-259c-44c6-82eb-508a56ec64a7",
+        "datasetId": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+        "appRevision": 1,
+        "sha256": "c3e091cb2d150c7ecc2f6f1c80d0db766ed890c56f17b1f3f32c09ad626a81d5"
+      },
+      "minimum": {
+        "table": {
+          "clientWidth": 569,
+          "scrollWidth": 689
+        },
+        "horizontalWheel": "passed",
+        "keyboardEvidence": "Enter opens focused retained evidence"
+      },
+      "workbook": {
+        "path": "work\\windows-phase-8\\packaged-1-YdWW9h\\Seçili-İşçilik-raporu.xlsx",
+        "sha256": "44238844d829c2d2873de4c463571a2798f6942d73f4754acaffca55f3ec05fc",
+        "sheets": 17,
+        "frozenAfterRefresh": true
+      },
+      "finishedAt": "2026-09-22T11:14:38.971Z"
+    },
+    {
+      "status": "passed",
+      "startedAt": "2026-09-22T11:21:31.013Z",
+      "run": "work\\windows-phase-8\\packaged-1.25-AShrpJ",
+      "profile": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\profile",
+      "scale": 1.25,
+      "commit": "98a540a4f681b2909af45ef7b66bed10617c9009",
+      "archiveSha256": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "substitutions": [
+        "Native open and save dialog results are substituted. Deferred save verifies the packaged export boundary."
+      ],
+      "limitations": [
+        "Synthetic fixtures only.",
+        "Cold means a new app process with warm OS filesystem caches.",
+        "Timings do not establish full-dataset acceptance.",
+        "No native spreadsheet round-trip, physical disconnect or installer lifecycle in this script."
+      ],
+      "fixtures": [
+        {
+          "name": "sentetik-başlangıç.json",
+          "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\sentetik-başlangıç.json",
+          "bytes": 1867,
+          "sha256": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+          "counts": {
+            "documents": 2,
+            "lines": 2
+          }
+        },
+        {
+          "name": "sentetik-gider.xlsx",
+          "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\sentetik-gider.xlsx",
+          "bytes": 3111,
+          "sha256": "8db82a39efd9d3171e92cd0b83eb010278f78be92a2a025463d157924328b3d3",
+          "counts": {
+            "expenseRows": 1
+          }
+        },
+        {
+          "name": "sentetik-düzeltme.json",
+          "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\sentetik-düzeltme.json",
+          "bytes": 1346,
+          "sha256": "8d29a31060fda41d8bdf9fc3238da7b76217c4670bb144341ae384c75d12cf15",
+          "counts": {
+            "documents": 1,
+            "lines": 1
+          }
+        },
+        {
+          "name": "sentetik-silinmiş.json",
+          "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\sentetik-silinmiş.json",
+          "bytes": 716,
+          "sha256": "90d04e99f6017bb2a397b7dcd25456251fe74c8f2365d9b3d16ed2497c240fce",
+          "counts": {
+            "documents": 0,
+            "lines": 0
+          }
+        },
+        {
+          "name": "sentetik-büyük.json",
+          "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\sentetik-büyük.json",
+          "bytes": 16442389,
+          "sha256": "902c301a65750541160e39374d0ba9572d00282d60a9bed94f0d92fe3b5bfaf8",
+          "counts": {
+            "documents": 25000,
+            "lines": 25000
+          }
+        }
+      ],
+      "assertions": [
+        "UI review retains net 200, covered cost 60, gross estimate 40, expense 50 and unavailable operating profit",
+        "Reviewed monthly object and literal net 200 survive three packaged process restarts",
+        "Source correction 100 to 120, deletion of S2 and expense correction 50 to 60 leave the accepted report and deleted Turkish evidence unchanged",
+        "Deferred substituted save exports original 200/60/40/50 and original report metadata on every sheet after a deletion refresh",
+        "Cancelled 25,000-document import preserves active data, expense 60 and accepted report; import and monthly calculation retry successfully"
+      ],
+      "timings": {
+        "cold": [
+          {
+            "processStartToMonthlyMs": 1474.0263
+          },
+          {
+            "processStartToMonthlyMs": 1395.0682000000002
+          },
+          {
+            "processStartToMonthlyMs": 1382.0495
+          },
+          {
+            "processStartToMonthlyMs": 1453.0421999999999
+          }
+        ],
+        "warm": [
+          {
+            "monthlyMs": 3.600000023841858,
+            "drillMs": 1,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 4,
+            "drillMs": 1.2999999523162842,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 3.600000023841858,
+            "drillMs": 0.8000000715255737,
+            "net": "200",
+            "detailStatus": "detail"
+          }
+        ],
+        "shutdown": [
+          {
+            "elapsedMs": 127.30010000000038,
+            "completed": true
+          },
+          {
+            "elapsedMs": 212.01010000000042,
+            "completed": true
+          },
+          {
+            "elapsedMs": 126.98340000000007,
+            "completed": true
+          },
+          {
+            "elapsedMs": 153.93360000000393,
+            "completed": true
+          }
+        ],
+        "importCancellation": {
+          "phase": "reading-file",
+          "latencyMs": 25.600000023841858,
+          "result": {
+            "status": "cancelled"
+          },
+          "navigationMs": 62.38459999999941
+        },
+        "importRetryMs": 9447.6505,
+        "largeSalesMs": 8255.5729,
+        "calculationCancellation": {
+          "phase": "sales",
+          "latencyMs": 1600.3000000715256,
+          "status": "cancelled",
+          "navigationMs": 27.13680000000022
+        },
+        "calculationRetryMs": 59155.63480000001
+      },
+      "overviewScreenshot": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\monthly-overview.png",
+      "observedScale": 1.25,
+      "runtime": {
+        "window": {
+          "x": 464,
+          "y": 172,
+          "width": 1120,
+          "height": 760
+        },
+        "displays": [
+          {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 2048,
+              "height": 1152
+            },
+            "scaleFactor": 1.25
+          }
+        ]
+      },
+      "saved": {
+        "id": "e806e425-aa5a-4ff1-b5c3-b9d35904f220",
+        "datasetId": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+        "appRevision": 1,
+        "sha256": "aa68ea509080e6d258876866f43324c174bd72760300991e3fccc170504f8ee6"
+      },
+      "minimum": {
+        "table": {
+          "clientWidth": 573,
+          "scrollWidth": 689
+        },
+        "horizontalWheel": "passed",
+        "keyboardEvidence": "Enter opens focused retained evidence"
+      },
+      "workbook": {
+        "path": "work\\windows-phase-8\\packaged-1.25-AShrpJ\\Seçili-İşçilik-raporu.xlsx",
+        "sha256": "ad1487b867e47b4dc73f5c4f5891b2428e369707f66b8ebce0f6cb9afb68daf2",
+        "sheets": 17,
+        "frozenAfterRefresh": true
+      },
+      "memoryAfterLargeCalculation": [
+        {
+          "type": "Browser",
+          "memory": {
+            "workingSetSize": 206344,
+            "peakWorkingSetSize": 612496,
+            "privateBytes": 169024
+          }
+        },
+        {
+          "type": "GPU",
+          "memory": {
+            "workingSetSize": 145644,
+            "peakWorkingSetSize": 542888,
+            "privateBytes": 115592
+          }
+        },
+        {
+          "type": "Utility",
+          "memory": {
+            "workingSetSize": 49988,
+            "peakWorkingSetSize": 50336,
+            "privateBytes": 12256
+          }
+        },
+        {
+          "type": "Tab",
+          "memory": {
+            "workingSetSize": 139128,
+            "peakWorkingSetSize": 2339012,
+            "privateBytes": 79696
+          }
+        }
+      ],
+      "finishedAt": "2026-09-22T11:23:03.310Z"
+    },
+    {
+      "status": "passed",
+      "startedAt": "2026-09-22T11:27:53.896Z",
+      "run": "work\\windows-phase-8\\packaged-1.5-FPbw3f",
+      "profile": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\profile",
+      "scale": 1.5,
+      "commit": "98a540a4f681b2909af45ef7b66bed10617c9009",
+      "archiveSha256": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "substitutions": [
+        "Native open and save dialog results are substituted. Deferred save verifies the packaged export boundary."
+      ],
+      "limitations": [
+        "Synthetic fixtures only.",
+        "Cold means a new app process with warm OS filesystem caches.",
+        "Timings do not establish full-dataset acceptance.",
+        "No native spreadsheet round-trip, physical disconnect or installer lifecycle in this script."
+      ],
+      "fixtures": [
+        {
+          "name": "sentetik-başlangıç.json",
+          "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\sentetik-başlangıç.json",
+          "bytes": 1867,
+          "sha256": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+          "counts": {
+            "documents": 2,
+            "lines": 2
+          }
+        },
+        {
+          "name": "sentetik-gider.xlsx",
+          "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\sentetik-gider.xlsx",
+          "bytes": 3111,
+          "sha256": "69607e9754bff85646fb635894932e83d8099df0312efb958acb21710bf3cacd",
+          "counts": {
+            "expenseRows": 1
+          }
+        },
+        {
+          "name": "sentetik-düzeltme.json",
+          "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\sentetik-düzeltme.json",
+          "bytes": 1346,
+          "sha256": "8d29a31060fda41d8bdf9fc3238da7b76217c4670bb144341ae384c75d12cf15",
+          "counts": {
+            "documents": 1,
+            "lines": 1
+          }
+        },
+        {
+          "name": "sentetik-silinmiş.json",
+          "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\sentetik-silinmiş.json",
+          "bytes": 716,
+          "sha256": "90d04e99f6017bb2a397b7dcd25456251fe74c8f2365d9b3d16ed2497c240fce",
+          "counts": {
+            "documents": 0,
+            "lines": 0
+          }
+        },
+        {
+          "name": "sentetik-büyük.json",
+          "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\sentetik-büyük.json",
+          "bytes": 16442389,
+          "sha256": "902c301a65750541160e39374d0ba9572d00282d60a9bed94f0d92fe3b5bfaf8",
+          "counts": {
+            "documents": 25000,
+            "lines": 25000
+          }
+        }
+      ],
+      "assertions": [
+        "UI review retains net 200, covered cost 60, gross estimate 40, expense 50 and unavailable operating profit",
+        "Reviewed monthly object and literal net 200 survive three packaged process restarts",
+        "Source correction 100 to 120, deletion of S2 and expense correction 50 to 60 leave the accepted report and deleted Turkish evidence unchanged",
+        "Deferred substituted save exports original 200/60/40/50 and original report metadata on every sheet after a deletion refresh",
+        "Cancelled 25,000-document import preserves active data, expense 60 and accepted report; import and monthly calculation retry successfully"
+      ],
+      "timings": {
+        "cold": [
+          {
+            "processStartToMonthlyMs": 1596.6909999999998
+          },
+          {
+            "processStartToMonthlyMs": 2531.6136000000006
+          },
+          {
+            "processStartToMonthlyMs": 1776.3219
+          },
+          {
+            "processStartToMonthlyMs": 1714.8253999999997
+          }
+        ],
+        "warm": [
+          {
+            "monthlyMs": 6,
+            "drillMs": 1.3000000715255737,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 5.900000095367432,
+            "drillMs": 1.0999999046325684,
+            "net": "200",
+            "detailStatus": "detail"
+          },
+          {
+            "monthlyMs": 5.899999976158142,
+            "drillMs": 1.3000000715255737,
+            "net": "200",
+            "detailStatus": "detail"
+          }
+        ],
+        "shutdown": [
+          {
+            "elapsedMs": 133.64609999999993,
+            "completed": true
+          },
+          {
+            "elapsedMs": 175.35530000000017,
+            "completed": true
+          },
+          {
+            "elapsedMs": 173.58230000000003,
+            "completed": true
+          },
+          {
+            "elapsedMs": 185.6753000000026,
+            "completed": true
+          }
+        ],
+        "importCancellation": {
+          "phase": "reading-file",
+          "latencyMs": 18.899999976158142,
+          "result": {
+            "status": "cancelled"
+          },
+          "navigationMs": 40.44419999999991
+        },
+        "importRetryMs": 7466.625900000001,
+        "largeSalesMs": 8297.251199999999,
+        "calculationCancellation": {
+          "phase": "sales",
+          "latencyMs": 1204.8999999761581,
+          "status": "cancelled",
+          "navigationMs": 40.54910000000018
+        },
+        "calculationRetryMs": 48573.40090000001
+      },
+      "overviewScreenshot": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\monthly-overview.png",
+      "observedScale": 1.5,
+      "runtime": {
+        "window": {
+          "x": 293,
+          "y": 76,
+          "width": 1121,
+          "height": 760
+        },
+        "displays": [
+          {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 1707,
+              "height": 960
+            },
+            "scaleFactor": 1.5
+          }
+        ]
+      },
+      "saved": {
+        "id": "9777b53a-86fd-4d8c-8f72-8443c91c7c28",
+        "datasetId": "b8b2bb76d89bf2f2582fdbe99f1ffd45d166cbf15eb9c8cd1e8a9115cd78f874",
+        "appRevision": 1,
+        "sha256": "9f4d894e28d034cb6790d0dc2acfaa1dae2a9fc9a52c7646aed5582f841feefd"
+      },
+      "minimum": {
+        "table": {
+          "clientWidth": 571,
+          "scrollWidth": 689
+        },
+        "horizontalWheel": "passed",
+        "keyboardEvidence": "Enter opens focused retained evidence"
+      },
+      "workbook": {
+        "path": "work\\windows-phase-8\\packaged-1.5-FPbw3f\\Seçili-İşçilik-raporu.xlsx",
+        "sha256": "c983cdfa7cf712d01b5350f928ed7d193ae2c5ca6a3b78a28aa92925eba96686",
+        "sheets": 17,
+        "frozenAfterRefresh": true
+      },
+      "memoryAfterLargeCalculation": [
+        {
+          "type": "Browser",
+          "memory": {
+            "workingSetSize": 207328,
+            "peakWorkingSetSize": 594524,
+            "privateBytes": 170828
+          }
+        },
+        {
+          "type": "GPU",
+          "memory": {
+            "workingSetSize": 146888,
+            "peakWorkingSetSize": 976240,
+            "privateBytes": 116196
+          }
+        },
+        {
+          "type": "Utility",
+          "memory": {
+            "workingSetSize": 50140,
+            "peakWorkingSetSize": 50504,
+            "privateBytes": 12364
+          }
+        },
+        {
+          "type": "Tab",
+          "memory": {
+            "workingSetSize": 140380,
+            "peakWorkingSetSize": 2339576,
+            "privateBytes": 81540
+          }
+        }
+      ],
+      "finishedAt": "2026-09-22T11:29:14.486Z"
+    }
+  ],
+  "native": {
+    "testedCommit": "98a540a4f681b2909af45ef7b66bed10617c9009",
+    "fixtures": "work/windows-phase-8/fixtures.json",
+    "nativeDialogs": [
+      {
+        "operation": "import",
+        "path": "sentetik-İşçilik/sentetik-satış.json",
+        "result": "active",
+        "actualNative": true
+      },
+      {
+        "operation": "export-cancel",
+        "actualNative": true,
+        "result": "Excel kaydı iptal edildi.",
+        "falseSuccess": false
+      },
+      {
+        "operation": "overwrite",
+        "confirmationObserved": true,
+        "result": "saved",
+        "net": 200
+      }
+    ],
+    "limitations": [
+      "Concurrent import picker substituted; save dialog was native.",
+      "No physical network disconnection.",
+      "Native procedure recorded by UI automation, not asserted by workbook verifier."
+    ],
+    "profile": "work/windows-phase-8/native-profile-eBoWOL",
+    "runtime": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "selected": {
+      "id": "6e10cec8-7a96-4850-88bc-96b1e463de79",
+      "net": "200",
+      "cost": "60",
+      "gross": "40"
+    },
+    "refreshDuringNativeSave": {
+      "result": {
+        "status": "active",
+        "datasetId": "060a1421d8246107e5d462fd4d0d33eb09d3f7d1225e5c2375641ba92735bce0"
+      },
+      "importPickerSubstituted": true,
+      "saveDialogActualNative": true
+    },
+    "export": {
+      "path": "work/windows-phase-8/sentetik-İşçilik/Seçili-İşçilik-Çığ.xlsx",
+      "bytes": 26542,
+      "sha256": "6153cce39bf8e06fc4d47306d333c4a12bd460a8acc19803200ec52e4e1dfc25",
+      "sheets": 17,
+      "net": 200,
+      "cost": 60,
+      "gross": 40,
+      "frozenDuringRefresh": true,
+      "hashAppliesTo": "First save before native overwrite; final destination hash is workbookVerification.originalSha256"
+    },
+    "excel": {
+      "version": "16.0.15128.20246",
+      "openedWithoutRepairPrompt": true,
+      "observedNet": 200,
+      "observedCost": 60,
+      "observedGross": 40,
+      "path": "work/windows-phase-8/sentetik-İşçilik/Excel-kaydedildi-Çığ.xlsx",
+      "bytes": 32539,
+      "sha256": "3fd5a0245a498c5e98b66d6271b01881add7f4e4dd6d478ab84f3f56a9267c5a",
+      "allSheetValuesAndTypesPreserved": true,
+      "formulaLikeTextPreserved": true,
+      "formulaElements": 0
+    }
+  },
+  "workbookVerification": {
+    "selectedReportId": "6e10cec8-7a96-4850-88bc-96b1e463de79",
+    "originalSha256": "ed78cd68334b533e4ae7009461cd8202969b521ff40b7b909245cfa4a80a8934",
+    "excelSavedSha256": "3fd5a0245a498c5e98b66d6271b01881add7f4e4dd6d478ab84f3f56a9267c5a",
+    "sheets": 17,
+    "allValuesAndTypesEqual": true,
+    "literalTotals": {
+      "net": 200,
+      "cost": 60,
+      "coveredGross": 40
+    },
+    "turkishAndFormulaLikeTextPreserved": true,
+    "formulas": 0
+  },
+  "lifecycle": {
+    "baseline-proof.json": {
+      "stage": "baseline",
+      "profile": "work\\windows-phase-8\\lifecycle\\synthetic-profile",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "3a5d4e3a8a69e80c90c459e1f89e374675a2fe30e379b7a59af9116892ef4c0a",
+          "runningExecutableHash": "3a5d4e3a8a69e80c90c459e1f89e374675a2fe30e379b7a59af9116892ef4c0a",
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "3a5d4e3a8a69e80c90c459e1f89e374675a2fe30e379b7a59af9116892ef4c0a",
+          "runningExecutableHash": "3a5d4e3a8a69e80c90c459e1f89e374675a2fe30e379b7a59af9116892ef4c0a",
+          "archive": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    "install-prior-installer-proof.json": {
+      "profileAfter": "BE06FD13C19EB67E32136B29120DE7872C7E88136A96BE9C5CFA85001EF99E58",
+      "executableHash": "3A5D4E3A8A69E80C90C459E1F89E374675A2FE30E379B7A59AF9116892EF4C0A",
+      "profileBefore": "BE06FD13C19EB67E32136B29120DE7872C7E88136A96BE9C5CFA85001EF99E58",
+      "exitCode": 0,
+      "archiveHash": "a1b29602e60fa2903da96efef91cd83d49a5ae9fa5d8b77fec4053534a46f973",
+      "stage": "install-prior",
+      "install": "work\\windows-phase-8\\lifecycle\\installed",
+      "syntheticOnly": true,
+      "installer": "work\\windows-phase-8\\prior-setup.exe",
+      "installerHash": "4f0e812ed64f10f7262079c9c362cd6c172224e4d03da97cd5d8cbfcb44a43b9"
+    },
+    "installed-proof.json": {
+      "stage": "installed",
+      "profile": "work\\windows-phase-8\\lifecycle\\synthetic-profile",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    "portable-proof.json": {
+      "stage": "portable",
+      "profile": "work\\windows-phase-8\\lifecycle\\synthetic-profile",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "executable": "release\\Esmer Market Analytics 0.1.0.exe",
+          "executableHash": "815592da8761d2e43db782ebeb39442fc852e54ab702d30e78d2b4c2b0ce108c",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "executable": "release\\Esmer Market Analytics 0.1.0.exe",
+          "executableHash": "815592da8761d2e43db782ebeb39442fc852e54ab702d30e78d2b4c2b0ce108c",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    "reinstall-installer-proof.json": {
+      "stage": "reinstall",
+      "installerHash": "9410ee2faaf6d5e61c552cfd0c55890eea0bbee991cd324b39afa954b51636b4",
+      "syntheticOnly": true,
+      "install": "work\\windows-phase-8\\lifecycle\\installed",
+      "profileBefore": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "exitCode": 0,
+      "profileAfter": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "installer": "release\\Esmer Market Analytics Setup 0.1.0.exe",
+      "archiveHash": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "executableHash": "D2533B521906616487759C73EA30AC20939AB73B30041C18E351C241971A0770"
+    },
+    "reinstalled-proof.json": {
+      "stage": "reinstalled",
+      "profile": "work\\windows-phase-8\\lifecycle\\synthetic-profile",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    },
+    "uninstall-proof.json": {
+      "uninstallExit": 0,
+      "executableRemoved": true,
+      "profileBefore": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "profileAfter": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "uninstallerHash": "6265129A1A50BA38FA9FD6DCE1BA48995DE66576BA824AEF9B9FC58EAD63B971"
+    },
+    "upgrade-installer-proof.json": {
+      "profileAfter": "BE06FD13C19EB67E32136B29120DE7872C7E88136A96BE9C5CFA85001EF99E58",
+      "stage": "upgrade",
+      "install": "work\\windows-phase-8\\lifecycle\\installed",
+      "installer": "release\\Esmer Market Analytics Setup 0.1.0.exe",
+      "archiveHash": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+      "exitCode": 0,
+      "executableHash": "D2533B521906616487759C73EA30AC20939AB73B30041C18E351C241971A0770",
+      "syntheticOnly": true,
+      "profileBefore": "BE06FD13C19EB67E32136B29120DE7872C7E88136A96BE9C5CFA85001EF99E58",
+      "installerHash": "9410ee2faaf6d5e61c552cfd0c55890eea0bbee991cd324b39afa954b51636b4"
+    },
+    "upgraded-proof.json": {
+      "stage": "upgraded",
+      "profile": "work\\windows-phase-8\\lifecycle\\synthetic-profile",
+      "results": [
+        {
+          "launch": 1,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "schema": 5,
+          "executable": "work\\windows-phase-8\\lifecycle\\installed\\Esmer Market Analytics.exe",
+          "executableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "runningExecutableHash": "d2533b521906616487759c73ea30ac20939ab73b30041c18e351c241971a0770",
+          "archive": "4c966a6aec7da48cf49aa859c8a1af0bc45a457d9434c8256a0d02cfcdd9a4a5",
+          "profilePreserved": true,
+          "acceptedAndPinnedPreserved": true,
+          "syntheticOnly": true,
+          "offlineMode": "Playwright network blocking, not physical disconnect",
+          "developerRuntimeInChildPath": false
+        }
+      ]
+    }
+  },
+  "precision": {
+    "status": "passed",
+    "syntheticQuantitySubstitution": true,
+    "quantities": [
+      "0.125000000000000001",
+      "12345678901234567890.123456789"
+    ],
+    "originalSha256": "f9d34ce4f8d49f1d82ed96a4df3edb71160c6127f5f2d6d0116bd3976df7df3e",
+    "excelSavedSha256": "9df043e44cfe67e1b1d395acb4008ee5d145d98fe3fef13ea4cfc1fd67fc7ab5",
+    "allSheetValuesAndTypesEqual": true
+  },
+  "saveFailure": {
+    "selectedReportId": "6e10cec8-7a96-4850-88bc-96b1e463de79",
+    "nativeSaveDialog": true,
+    "nativeOverwriteConfirmation": true,
+    "failureMechanism": "Disposable destination handle allows reading/writing but denies deletion for atomic rename.",
+    "message": "Rapor dosyası kaydedilemedi. Seçili rapor korundu; yeniden deneyin.",
+    "selectedReportUnchanged": true,
+    "destinationUnchangedSha256": "ed78cd68334b533e4ae7009461cd8202969b521ff40b7b909245cfa4a80a8934",
+    "retry": "saved",
+    "retryAllSheetValuesAndTypesPreserved": true,
+    "retrySha256": "69b28d31cdb5747db7bb08c32f5014b87eb161681616d119bbd981011863e0f5"
+  },
+  "finalChecks": [
+    {
+      "exit": 0,
+      "log": "work/windows-phase-8/lint-final.log",
+      "ended": "2026-09-22T13:40:48.2346370+02:00",
+      "command": "npm run lint"
+    },
+    {
+      "exit": 0,
+      "log": "work/windows-phase-8/test-final.log",
+      "ended": "2026-09-22T13:43:12.4023202+02:00",
+      "command": "npm run test"
+    }
+  ],
+  "registryPreflight": {
+    "registrations": [
+      {
+        "QuietUninstallString": "\"work\\windows-phase-8\\lifecycle\\installed\\Uninstall Esmer Market Analytics.exe\" /currentuser /S",
+        "Registry": "CurrentUser/Registry32/8e91cbd9-bbd3-57fa-8f49-7c1219d1ede4",
+        "UninstallString": "\"work\\windows-phase-8\\lifecycle\\installed\\Uninstall Esmer Market Analytics.exe\" /currentuser",
+        "InstallLocation": "work\\windows-phase-8\\lifecycle\\installed"
+      },
+      {
+        "QuietUninstallString": "\"work\\windows-phase-8\\lifecycle\\installed\\Uninstall Esmer Market Analytics.exe\" /currentuser /S",
+        "Registry": "CurrentUser/Registry64/8e91cbd9-bbd3-57fa-8f49-7c1219d1ede4",
+        "UninstallString": "\"work\\windows-phase-8\\lifecycle\\installed\\Uninstall Esmer Market Analytics.exe\" /currentuser",
+        "InstallLocation": "work\\windows-phase-8\\lifecycle\\installed"
+      }
+    ],
+    "installerInvoked": false,
+    "preflightPassed": true,
+    "checked": "2026-09-22T13:45:27.9551549+02:00"
+  }
+}

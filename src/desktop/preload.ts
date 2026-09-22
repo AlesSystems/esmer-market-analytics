@@ -1,6 +1,17 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { DesktopApi } from "../domain/contracts";
 const api: DesktopApi = {
+  openMonthly: request => ipcRenderer.invoke("esmer:request", "openMonthly", request),
+  queryMonthly: request => ipcRenderer.invoke("esmer:request", "queryMonthly", request),
+  listReportVersions: request => ipcRenderer.invoke("esmer:request", "listReportVersions", request),
+  readReportVersion: request => ipcRenderer.invoke("esmer:request", "readReportVersion", request),
+  compareReportVersion: request => ipcRenderer.invoke("esmer:request", "compareReportVersion", request),
+  acceptReportVersion: request => ipcRenderer.invoke("esmer:request", "acceptReportVersion", request),
+  exportReportVersion: request => ipcRenderer.invoke("esmer:request", "exportReportVersion", request),
+  cancelOperation: request => ipcRenderer.invoke("esmer:request", "cancelOperation", request),
+  readReportEvidence: request => ipcRenderer.invoke("esmer:request", "readReportEvidence", request),
+  readReportPurchasing: request => ipcRenderer.invoke("esmer:request", "readReportPurchasing", request),
+  getOperationStatus: () => ipcRenderer.invoke("esmer:request", "getOperationStatus", null),
   saveExpenseTemplate: () => ipcRenderer.invoke("esmer:request", "saveExpenseTemplate", null),
   previewExpenses: () => ipcRenderer.invoke("esmer:request", "previewExpenses", null),
   confirmExpenses: request => ipcRenderer.invoke("esmer:request", "confirmExpenses", request),

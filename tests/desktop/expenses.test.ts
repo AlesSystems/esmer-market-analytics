@@ -121,6 +121,7 @@ test("operating report stays pinned after expense edits until the owner reopens 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
     const operating = page.getByRole("region", { name: "Faaliyet sonucu", exact: true });
     await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
     await page.getByRole("button", { name: "Giderler", exact: true }).click();

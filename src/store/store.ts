@@ -1,3 +1,4 @@
+import type { OperationControl, ReportSummary } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
 import type { ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
@@ -179,13 +180,23 @@ class AnalyticsStore {
   }
   acceptReport(report: AcceptedReport) {
     requireValid(report && validId(report.id) && validId(report.calculationVersion) && Array.isArray(report.evidence) && report.evidence.length > 0 && report.evidence.length <= 100 && report.evidence.every(validId));
-    requireValid(report.output && typeof report.output === "object" && !Array.isArray(report.output) && Buffer.byteLength(canonical(report)) <= 1024 * 1024);
+    requireValid(report.output && typeof report.output === "object" && !Array.isArray(report.output));
+    if (Buffer.byteLength(canonical(report)) > 256 * 1024 * 1024) throw new Error("REPORT_TOO_LARGE");
     this.transaction(() => {
       this.snapshot(report.pin);
       this.db.prepare("INSERT INTO report_versions VALUES(?,?,?,?,?)").run(report.id, report.pin.datasetId, report.pin.appRevision || null, report.calculationVersion, canonical(report));
       const insert = this.db.prepare("INSERT INTO evidence_references(report_id,identity) VALUES(?,?)");
       for (const identity of report.evidence) insert.run(report.id, identity);
     });
+  }
+  listMonthlyReports(period: string): ReportSummary[] {
+    return this.db.prepare(`SELECT id, dataset_id AS datasetId, COALESCE(app_revision,0) AS appRevision,
+      json_extract(content_json,'$.output.report.context.period') AS period,
+      json_extract(content_json,'$.output.report.review.acceptedAt') AS acceptedAt,
+      json_extract(content_json,'$.output.report.review.reason') AS reason
+      FROM report_versions WHERE json_extract(content_json,'$.output.report.format')='monthly-report-v1'
+      AND json_extract(content_json,'$.output.report.context.period')=?
+      AND json_extract(content_json,'$.output.report.review.acceptedAt') IS NOT NULL ORDER BY rowid DESC`).all(period) as ReportSummary[];
   }
   readReport(id: string): AcceptedReport {
     const row = this.db.prepare("SELECT content_json FROM report_versions WHERE id=?").get(id);
@@ -197,13 +208,15 @@ class AnalyticsStore {
     } catch { /* A full disk can also prevent recording the failure. Never mask the original error. */ }
     return { status: "failed", code } as const;
   }
-  stage(bytes: Uint8Array): StageResult {
+  stage(bytes: Uint8Array, control: OperationControl = {}): StageResult {
     const id = randomUUID(); let datasetId: string | null = null;
     try {
       this.db.prepare("INSERT INTO import_batches(id,state,created_at) VALUES(?,'staged',?)").run(id, new Date().toISOString());
+      control.checkCancelled?.(); control.onProgress?.("reading", 0, 1);
       this.options.fault?.("reading");
       const parsed = readPackage(bytes);
       if (!parsed.ok) return this.failure(id, null, parsed.code);
+      control.checkCancelled?.();
       datasetId = createHash("sha256").update(bytes).digest("hex");
       this.db.prepare("UPDATE import_batches SET dataset_id=? WHERE id=?").run(datasetId, id);
       if (this.currentPin().datasetId === datasetId) {
@@ -219,13 +232,16 @@ class AnalyticsStore {
         this.db.prepare("INSERT INTO package_history VALUES(?,0) ON CONFLICT DO NOTHING").run(candidateId);
         if (!this.db.prepare("SELECT id FROM datasets WHERE id=?").get(candidateId)) {
           this.db.prepare("INSERT INTO datasets VALUES(?,?,?,?,?)").run(candidateId, parsed.metadata.lineage, canonical(parsed.metadata), canonical(parsed.warnings), "{}");
+          let completed = 0; const total = parsed.records.suppliers.length + parsed.records.documents.length + parsed.records.lines.length;
+          const progress = () => { control.checkCancelled?.(); completed++; if (completed === 1 || completed === total || completed % 256 === 0) control.onProgress?.("persistence", completed, total); };
           const supplier = this.db.prepare(`INSERT INTO source_suppliers VALUES(?,?,?${this.businessEnabled ? ",?" : ""})`);
-          for (const [ordinal, row] of parsed.records.suppliers.entries()) supplier.run(candidateId, row.id, ordinal, ...(this.businessEnabled ? [row.name ?? null] : []));
+          for (const [ordinal, row] of parsed.records.suppliers.entries()) { progress(); supplier.run(candidateId, row.id, ordinal, ...(this.businessEnabled ? [row.name ?? null] : [])); }
           const document = this.db.prepare(`INSERT INTO source_documents VALUES(?,?,?,?,?,?${this.salesEnabled ? ",?" : ""}${this.businessEnabled ? ",?" : ""})`);
-          for (const [ordinal, row] of parsed.records.documents.entries()) document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.purchasing === undefined ? null : canonical(row.purchasing)] : []));
+          for (const [ordinal, row] of parsed.records.documents.entries()) { progress(); document.run(candidateId, row.id, row.kind, row.date, row.supplierId, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.purchasing === undefined ? null : canonical(row.purchasing)] : [])); }
           const line = this.db.prepare(`INSERT INTO source_lines VALUES(?,?,?,?,?,?,?${this.salesEnabled ? ",?" : ""}${this.businessEnabled ? ",?" : ""})`);
-          for (const [ordinal, row] of parsed.records.lines.entries()) line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.business ? canonical(row.business) : null] : []));
+          for (const [ordinal, row] of parsed.records.lines.entries()) { progress(); line.run(candidateId, row.id, row.documentId, row.quantity, row.net, row.cost, ordinal, ...(this.salesEnabled ? [row.sales ? canonical(row.sales) : null] : []), ...(this.businessEnabled ? [row.business ? canonical(row.business) : null] : [])); }
         }
+        control.checkCancelled?.();
         this.options.fault?.("persistence");
         const facts = this.facts(candidateId);
         requireValid(canonical(facts) === canonical(parsed.records));
@@ -234,15 +250,17 @@ class AnalyticsStore {
         const summary = { documents: facts.documents.length, lines: facts.lines.length, suppliers: facts.suppliers.length, warnings: parsed.warnings };
         this.db.prepare("UPDATE datasets SET summary_json=? WHERE id=?").run(canonical(summary), candidateId);
         this.options.fault?.("summary");
+        control.checkCancelled?.();
         this.db.prepare("UPDATE import_batches SET state='validated' WHERE id=?").run(id);
       });
       return { status: "validated", id, datasetId };
-    } catch (error) { return this.failure(id, datasetId, importErrorCode(error)); }
+    } catch (error) { if (error instanceof Error && error.message === "CANCELLED") return this.cancel(id); return this.failure(id, datasetId, importErrorCode(error)); }
   }
-  activate(id: string): ImportResult {
+  activate(id: string, control: OperationControl = {}): ImportResult {
     let datasetId: string | null = null;
     try {
       return this.transaction(() => {
+        control.checkCancelled?.(); control.onProgress?.("activation", 0, 1);
         const batch = this.db.prepare("SELECT dataset_id,state FROM import_batches WHERE id=?").get(id);
         if (!batch || batch.state !== "validated") return { status: "failed", code: "INVALID_CANDIDATE" };
         datasetId = String(batch.dataset_id);
@@ -262,17 +280,19 @@ class AnalyticsStore {
           const next = new Map(records[stream].map(row => [row.id, canonical(row)]));
           return [stream, { inserted: [...next.keys()].filter(key => lineageChanged || !previous.has(key)), deleted: [...previous.keys()].filter(key => lineageChanged || !next.has(key)), changed: [...next.keys()].filter(key => !lineageChanged && previous.has(key) && previous.get(key) !== next.get(key)) }];
         })) };
+        control.checkCancelled?.();
         if (before.datasetId) this.db.prepare("INSERT INTO rollback_dataset VALUES(1,?) ON CONFLICT(singleton) DO UPDATE SET dataset_id=excluded.dataset_id").run(before.datasetId);
         this.db.prepare("INSERT INTO active_dataset VALUES(1,?) ON CONFLICT(singleton) DO UPDATE SET dataset_id=excluded.dataset_id").run(datasetId);
         this.db.prepare("UPDATE package_history SET activated=1 WHERE hash=?").run(datasetId);
         this.db.prepare("UPDATE import_batches SET state='active',difference_json=? WHERE id=?").run(canonical(difference), id);
         this.db.prepare("INSERT INTO evidence_references(batch_id,identity) VALUES(?,?)").run(id, `package:${datasetId}`);
         this.options.fault?.("activation");
+        control.checkCancelled?.();
         return { status: "active", datasetId };
       });
-    } catch (error) { return this.failure(id, datasetId, importErrorCode(error)); }
+    } catch (error) { if (error instanceof Error && error.message === "CANCELLED") return this.cancel(id); return this.failure(id, datasetId, importErrorCode(error)); }
   }
-  importPackage(bytes: Uint8Array): ImportResult { const staged = this.stage(bytes); return staged.status === "validated" ? this.activate(staged.id) : staged; }
+  importPackage(bytes: Uint8Array, control: OperationControl = {}): ImportResult { const staged = this.stage(bytes, control); return staged.status === "validated" ? this.activate(staged.id, control) : staged; }
   cancel(id: string): ImportResult {
     const result = this.db.prepare("UPDATE import_batches SET state='cancelled' WHERE id=? AND state IN ('staged','validated')").run(id);
     return result.changes ? { status: "cancelled" } : { status: "failed", code: "INVALID_CANDIDATE" };
@@ -280,11 +300,11 @@ class AnalyticsStore {
   history() {
     return this.db.prepare("SELECT id,dataset_id AS datasetId,state,error_code AS errorCode,difference_json FROM import_batches ORDER BY rowid").all().map(({ difference_json, ...row }) => ({ id: String(row.id), datasetId: row.datasetId === null ? null : String(row.datasetId), state: String(row.state), errorCode: row.errorCode === null ? null : String(row.errorCode), difference: difference_json === null ? null : decode(difference_json) }));
   }
-  prune(): number {
-    return this.transaction(() => Number(this.db.prepare(`DELETE FROM datasets WHERE id NOT IN (SELECT dataset_id FROM active_dataset)
+  prune(protectedDatasetIds: string[] = []): number {
+    return this.transaction(() => Number(this.db.prepare(`DELETE FROM datasets WHERE id NOT IN (SELECT value FROM json_each(?)) AND id NOT IN (SELECT dataset_id FROM active_dataset)
       AND id NOT IN (SELECT dataset_id FROM rollback_dataset)
       AND id NOT IN (SELECT dataset_id FROM report_versions WHERE dataset_id IS NOT NULL)
       AND id NOT IN (SELECT dataset_id FROM adjustment_targets)
-      AND id NOT IN (SELECT dataset_id FROM import_batches WHERE state IN ('staged','validated') AND dataset_id IS NOT NULL)`).run().changes));
+      AND id NOT IN (SELECT dataset_id FROM import_batches WHERE state IN ('staged','validated') AND dataset_id IS NOT NULL)`).run(JSON.stringify(protectedDatasetIds)).changes));
   }
 }

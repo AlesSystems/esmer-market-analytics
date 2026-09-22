@@ -1,11 +1,11 @@
 import { calculateOperatingResult, OPERATING_CALCULATION_VERSION } from "../analytics/operating";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import type { OperatingReportResult } from "../expenses/contracts";
-import { estimateGrossResult, COST_CALCULATION_VERSION } from "../analytics/costs";
-import { calculatePurchasing, PURCHASING_CALCULATION_VERSION } from "../analytics/purchasing";
-import type { QueryPurchasingRequest, PurchasingReportResult } from "./contracts";
+import { estimateGrossResult, COST_CALCULATION_VERSION, type GrossResult } from "../analytics/costs";
+import { calculatePurchasing, PURCHASING_CALCULATION_VERSION, type PurchasingResult } from "../analytics/purchasing";
+import type { QueryPurchasingRequest, PurchasingReportResult, MonthlyReport, MonthlyResult, OperationControl } from "./contracts";
 import { randomUUID } from "node:crypto";
-import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent } from "../analytics/sales";
+import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent, type SalesResult } from "../analytics/sales";
 import { Exact, percentageChange, sum } from "../domain/money";
 import { SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION } from "../source/package";
 import type { openStore, Snapshot } from "../store/store";
@@ -26,7 +26,7 @@ function range(snapshot: Snapshot, period: string) {
   return { from, to, overlap, covered: overlap && coverage.complete, partial: from !== start || to !== end || !coverage.complete };
 }
 export class SalesReports {
-  private session: { snapshot: Snapshot; context: ReportContext } | null = null;
+  private session: { snapshot: Snapshot; context: ReportContext; calculations: { sales: Map<string, SalesResult>; gross: GrossResult | null; purchasing: PurchasingResult | null; monthly: MonthlyReport | null } } | null = null;
   constructor(private readonly store: ReturnType<typeof openStore>) {}
   open(request: OpenSalesRequest): SalesReportResult {
     this.session = null;
@@ -35,19 +35,83 @@ export class SalesReports {
     if (![SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION].includes(snapshot.metadata.mappingVersion)) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
     if (snapshot.app.some(row => row.kind === "adjustment" && row.applicability !== "reversed")) return failure("UNSUPPORTED_ADJUSTMENTS", "Satış düzeltmelerinin etkisi henüz desteklenmiyor. Düzeltilmiş toplam gösterilemiyor.");
     const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
-    this.session = { snapshot, context };
+    this.session = { snapshot, context, calculations: { sales: new Map(), gross: null, purchasing: null, monthly: null } };
     return this.query({ context, filters: { ...emptySalesFilters } });
+  }
+  monthly(context: ReportContext, control: OperationControl = {}): MonthlyResult {
+    return structuredClone(this.monthlyCandidate(context, control));
+  }
+  monthlyCandidate(context: ReportContext, control: OperationControl = {}): MonthlyResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    control.checkCancelled?.();
+    const cached = session.calculations.monthly;
+    if (cached) {
+      control.onProgress?.("complete", 4, 4);
+      return { status: "monthly", report: this.monthlyResponse(session, cached) };
+    }
+    const step = (phase: string, count: number) => { control.checkCancelled?.(); control.onProgress?.(phase, count, 4); };
+    step("sales", 0);
+    const sales = this.query({ context, filters: { ...emptySalesFilters } });
+    if (sales.status !== "report") return sales;
+    step("purchasing", 1);
+    const purchasing = this.purchasing({ context });
+    if (purchasing.status !== "purchasing") return purchasing;
+    step("operating", 2);
+    const operating = this.operating({ context });
+    if (operating.status !== "operating") return operating;
+    const { snapshot } = session;
+    step("evidence", 3);
+    const components = this.sales(session, sales.view.from, sales.view.to).lines;
+    const report = { format: "monthly-report-v1" as const, id: randomUUID(), context: { ...context },
+      calculations: { report: "monthly-calc-v1", sales: SALES_CALCULATION_VERSION, costs: COST_CALCULATION_VERSION, purchasing: PURCHASING_CALCULATION_VERSION, operating: OPERATING_CALCULATION_VERSION },
+      rules: { artifact: "esmer-market:monthly-v1", decimalPrecision: 100, rounding: "ROUND_HALF_UP", conventions: ["Sales: signed customer returns; completed sale-document basket denominator", "Comparisons: matched covered days; positive denominators only", "Cost: covered historical last-purchase estimate, no replacement fallback", "Operating: incurred date, classified costs, reviewed completeness", "Percentages: 2 decimal places; source and calculation values retain precision"] },
+      state: sales.view.coverage === "partial" ? "open" as const : "provisional" as const,
+      sales: sales.view, salesEvidence: { documents: snapshot.records.documents, lines: snapshot.records.lines, components },
+      purchasing: purchasing.view, operating, appEvidence: [...snapshot.expenseHistory, ...snapshot.app.filter(row => row.kind !== "expense")], review: null };
+    step("complete", 4);
+    session.calculations.monthly = report;
+    return { status: "monthly", report: this.monthlyResponse(session, report) };
   }
   private resolve(context: ReportContext) {
     const current = this.session?.context;
     return current && current.sessionId === context.sessionId && current.datasetId === context.datasetId && current.appRevision === context.appRevision && current.calculationVersion === context.calculationVersion && current.period === context.period ? this.session! : null;
+  }
+  private monthlyResponse(session: NonNullable<SalesReports["session"]>, report: MonthlyReport): MonthlyReport {
+    const active = this.store.availability();
+    const pin = this.store.readPin();
+    const sourceStale = active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== session.context.datasetId;
+    const revisionStale = pin.appRevision !== session.context.appRevision;
+    return { ...report,
+      sales: { ...report.sales, stale: sourceStale || revisionStale },
+      purchasing: { ...report.purchasing, stale: sourceStale || revisionStale },
+      operating: { ...report.operating, stale: pin.datasetId !== session.context.datasetId || revisionStale },
+    };
+  }
+  private sales(session: NonNullable<SalesReports["session"]>, from: string, to: string): SalesResult {
+    const key = `${from}\u0000${to}`;
+    let result = session.calculations.sales.get(key);
+    if (!result) {
+      result = calculateSales(session.snapshot.records, { mappingVersion: session.snapshot.metadata!.mappingVersion, from, to });
+      session.calculations.sales.set(key, result);
+    }
+    return result;
+  }
+  private gross(session: NonNullable<SalesReports["session"]>, from: string, to: string): GrossResult {
+    if (!session.calculations.gross) {
+      session.calculations.gross = estimateGrossResult(session.snapshot.records, { mappingVersion: session.snapshot.metadata!.mappingVersion, from, to }, {
+        sales: this.sales(session, from, to),
+        allSales: this.sales(session, "1900-01-01", "9998-12-31"),
+      });
+    }
+    return session.calculations.gross;
   }
   query({ context, filters }: QuerySalesRequest): SalesReportResult {
     const session = this.resolve(context);
     if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
     const { snapshot } = session, metadata = snapshot.metadata!;
     const period = range(snapshot, context.period);
-    const current = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to });
+    const current = this.sales(session, period.from, period.to);
     const lines = current.lines.filter(line => matches(line, filters));
     const metrics = totals(lines);
     const compare = (months: number): { comparison: Comparison; lines: SalesComponent[]; currentLines: SalesComponent[] } => {
@@ -58,7 +122,7 @@ export class SalesReports {
       const to = period.partial && `${comparisonPeriod}-${period.to.slice(8)}` < endOfMonth(comparisonPeriod) ? `${comparisonPeriod}-${period.to.slice(8)}` : endOfMonth(comparisonPeriod);
       const currentFrom = period.from;
       const currentTo = hasMatchingDays && period.partial && to.slice(8) < period.to.slice(8) ? `${context.period}-${to.slice(8)}` : period.to;
-      const result = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from, to });
+      const result = this.sales(session, from, to);
       const currentLines = lines.filter(line => line.date >= currentFrom && line.date <= currentTo);
       const currentMetrics = totals(currentLines);
       const available = hasMatchingDays && period.covered && metadata.coverage.complete && metadata.coverage.from <= from && metadata.coverage.to >= to && from <= to && currentFrom <= currentTo && current.complete && result.complete;
@@ -87,7 +151,7 @@ export class SalesReports {
     const transactionScopes = new Map<string, string[]>();
     for (const line of lines) { const values = transactionScopes.get(line.documentId) ?? []; values.push(line.net); transactionScopes.set(line.documentId, values); }
     const active = this.store.availability();
-    return { status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } };
+    return structuredClone({ status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } } satisfies SalesReportResult);
   }
   purchasing({ context }: QueryPurchasingRequest): PurchasingReportResult {
     const session = this.resolve(context);
@@ -95,7 +159,8 @@ export class SalesReports {
     const { snapshot } = session, metadata = snapshot.metadata!, period = range(snapshot, context.period);
     const scope = { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, cutoff: metadata.cutoff };
     const active = this.store.availability();
-    const gross = estimateGrossResult(snapshot.records, scope), purchasing = calculatePurchasing(snapshot.records, scope);
+    const gross = this.gross(session, period.from, period.to);
+    const purchasing = session.calculations.purchasing ??= calculatePurchasing(snapshot.records, scope, { gross });
     const ids = new Set([...gross.covered, ...gross.excluded].map(row => row.documentId));
     for (const row of [...purchasing.history, ...purchasing.supplierReturns, ...purchasing.replacements]) row.sourceDocumentIds.forEach(id => ids.add(id));
     for (const row of purchasing.exclusions) ids.add(row.documentId);
@@ -103,17 +168,16 @@ export class SalesReports {
     for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
     for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
     const evidence = { documents: snapshot.records.documents.filter(row => ids.has(row.id)), lines: snapshot.records.lines.filter(row => ids.has(row.documentId)) };
-    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, evidence, gross, purchasing } };
+    return structuredClone({ status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, evidence, gross, purchasing } } satisfies PurchasingReportResult);
   }
   operating({ context }: QueryPurchasingRequest): OperatingReportResult {
     const session = this.resolve(context);
     if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
-    const { snapshot } = session, period = range(snapshot, context.period), metadata = snapshot.metadata!;
-    const scope = { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to };
-    const sales = calculateSales(snapshot.records, scope), gross = estimateGrossResult(snapshot.records, scope);
+    const { snapshot } = session, period = range(snapshot, context.period);
+    const sales = this.sales(session, period.from, period.to), gross = this.gross(session, period.from, period.to);
     const result = calculateOperatingResult({ gross, salesReconciled: sales.complete, periodCoverageComplete: period.covered && !period.partial, period: context.period, expenses: snapshot.app, confirmation: snapshot.app.find(row => row.kind === "confirmation" && row.entityId === `expense-complete:${context.period}`) ?? null, expenseRevision: relevantExpenseRevision(snapshot.expenseHistory, context.period) });
     const current = this.store.readPin();
-    return { status: "operating", context: { ...context }, calculationVersion: OPERATING_CALCULATION_VERSION, grossCalculationVersion: COST_CALCULATION_VERSION, gross, expenseRevision: relevantExpenseRevision(snapshot.expenseHistory, context.period), expenseRecords: snapshot.app.filter(row => row.kind === "expense"), stale: current.datasetId !== context.datasetId || current.appRevision !== context.appRevision, result };
+    return structuredClone({ status: "operating", context: { ...context }, calculationVersion: OPERATING_CALCULATION_VERSION, grossCalculationVersion: COST_CALCULATION_VERSION, gross, expenseRevision: relevantExpenseRevision(snapshot.expenseHistory, context.period), expenseRecords: snapshot.app.filter(row => row.kind === "expense"), stale: current.datasetId !== context.datasetId || current.appRevision !== context.appRevision, result } satisfies OperatingReportResult);
   }
   inspect({ context, filters, documentId }: InspectSalesRequest): SalesDetailResult {
     const session = this.resolve(context);
@@ -122,10 +186,10 @@ export class SalesReports {
     const period = range(snapshot, context.period);
     const doc = snapshot.records.documents.find(row => row.id === documentId && row.date >= period.from && row.date <= period.to);
     if (!doc) return failure("NOT_FOUND", "Belge bu raporda bulunamadı.");
-    const result = calculateSales(snapshot.records, { mappingVersion: metadata.mappingVersion, from: period.from, to: period.to });
+    const result = this.sales(session, period.from, period.to);
     const total = result.documents.find(row => row.documentId === documentId);
     const lines = result.lines.filter(line => line.documentId === documentId).map(line => ({ ...line, matchesScope: matches(line, filters) }));
     const exclusion = result.exclusions.find(row => row.documentId === documentId)?.reason ?? null;
-    return { status: "detail", detail: { context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, importedAt: snapshot.importedAt, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, documentId, date: doc.date, kind: doc.kind, state: doc.sales?.state ?? "unknown", scopeNet: sum(lines.filter(line => line.matchesScope).map(line => line.net)), totals: { net: total?.net ?? "0", tax: total?.tax ?? "0", gross: total?.gross ?? "0" }, recorded: doc.sales ? { net: doc.sales.net, tax: doc.sales.tax, gross: doc.sales.gross } : null, reconciled: total?.reconciled ?? false, exclusion, lines, excludedLines: exclusion ? snapshot.records.lines.filter(line => line.documentId === documentId).map(line => ({ lineId: line.id, quantity: line.quantity, net: line.net, productName: line.sales?.productName ?? "Bilinmeyen ürün", reason: exclusion, input: line.sales ? { ...line.sales } : null })) : [] } };
+    return structuredClone({ status: "detail", detail: { context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, importedAt: snapshot.importedAt, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, documentId, date: doc.date, kind: doc.kind, state: doc.sales?.state ?? "unknown", scopeNet: sum(lines.filter(line => line.matchesScope).map(line => line.net)), totals: { net: total?.net ?? "0", tax: total?.tax ?? "0", gross: total?.gross ?? "0" }, recorded: doc.sales ? { net: doc.sales.net, tax: doc.sales.tax, gross: doc.sales.gross } : null, reconciled: total?.reconciled ?? false, exclusion, lines, excludedLines: exclusion ? snapshot.records.lines.filter(line => line.documentId === documentId).map(line => ({ lineId: line.id, quantity: line.quantity, net: line.net, productName: line.sales?.productName ?? "Bilinmeyen ürün", reason: exclusion, input: line.sales ? { ...line.sales } : null })) : [] } } satisfies SalesDetailResult);
   }
 }
