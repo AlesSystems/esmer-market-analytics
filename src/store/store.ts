@@ -38,7 +38,7 @@ class AnalyticsStore {
     db.prepare("UPDATE import_batches SET state='failed',error_code='INTERRUPTED' WHERE state IN ('staged','validated')").run();
   }
   close() { this.db.close(); }
-  backupTo(path: string): Promise<number> { return backup(this.db, path); }
+  backupTo(path: string, progress?: (info: {remainingPages: number; totalPages: number}) => void): Promise<number> { return backup(this.db, path, {progress}); }
   recoveryGeneration() {
     const row = this.db.prepare("SELECT changed,verified,last_verified_at FROM recovery_state WHERE singleton=1").get()!;
     return { changed: Number(row.changed), verified: Number(row.verified), lastVerifiedAt: row.last_verified_at as string | null };

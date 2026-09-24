@@ -1,6 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { DesktopApi } from "../domain/contracts";
 const api: DesktopApi = {
+  getRecoveryStatus: () => ipcRenderer.invoke("esmer:request", "getRecoveryStatus", null),
+  setupRecovery: () => ipcRenderer.invoke("esmer:request", "setupRecovery", null),
+  backupNow: () => ipcRenderer.invoke("esmer:request", "backupNow", null),
+  pinBackup: request => ipcRenderer.invoke("esmer:request", "pinBackup", request),
+  prepareRestore: () => ipcRenderer.invoke("esmer:request", "prepareRestore", null),
+  confirmRestore: request => ipcRenderer.invoke("esmer:request", "confirmRestore", request),
+  cancelRestore: request => ipcRenderer.invoke("esmer:request", "cancelRestore", request),
   openMonthly: request => ipcRenderer.invoke("esmer:request", "openMonthly", request),
   queryMonthly: request => ipcRenderer.invoke("esmer:request", "queryMonthly", request),
   listReportVersions: request => ipcRenderer.invoke("esmer:request", "listReportVersions", request),

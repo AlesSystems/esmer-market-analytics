@@ -15,6 +15,9 @@ import { APP_URL, handleRequest } from "./requests";
 import type { Availability, ImportOutcome, ServiceRequest, ServiceResponse } from "../domain/contracts";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { readPackageFile } from "./package-file";
+import { loadRecoveryConfig, outsideUserData, saveRecoveryConfig, restoreRecoveryConfig, validRecoveryLocations, readRecoveryKeyFile } from "./recovery-config";
+import { generateRecoveryKey, encodeRecoveryKey } from "../recovery/keys";
+import type { RecoveryResult, RecoveryServiceRequest } from "../recovery/contracts";
 
 app.commandLine.appendSwitch("lang", "tr");
 protocol.registerSchemesAsPrivileged([
@@ -29,6 +32,9 @@ const unavailable = {
   message: "Yerel hizmet başlatılamadı. Uygulamayı yeniden açın.",
 } satisfies Availability;
 let worker: Worker | undefined;
+let recoveryConfigError = false;
+let restoring = false;
+let nativeRecoveryBusy = false;
 let requestId = 0;
 const jobs = new OperationJobs();
 const pending = new Map<number, (result: ServiceResponse["result"]) => void>();
@@ -45,7 +51,9 @@ function requestService(request: { operation: "openSales"; payload: OpenSalesReq
 function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "inspectSales"; payload: InspectSalesRequest }): Promise<SalesDetailResult>;
 function requestService(request: ExpenseServiceRequest): Promise<ExpenseResult | OperatingReportResult>;
+function requestService(request: RecoveryServiceRequest): Promise<RecoveryResult>;
 function requestService(request: Omit<ServiceRequest, "id">): Promise<ServiceResponse["result"]> {
+  if (restoring && request.operation !== "confirmRestore" && request.operation !== "cancelRestore") return Promise.resolve({status: "recovery-failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."});
   if (!worker) return Promise.resolve(request.operation !== "importPackage" ? unavailable : { status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message });
   const id = ++requestId;
   return new Promise(resolve => {
@@ -94,7 +102,10 @@ app.whenReady().then(async () => {
       },
     });
   });
-  worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite") } });
+  let recoveryConfig;
+  try { recoveryConfig = await loadRecoveryConfig(app.getPath("userData")) ?? undefined; }
+  catch { recoveryConfigError = true; }
+  worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite"), recoveryConfig, recoveryConfigUnavailable: recoveryConfigError } });
   worker.on("message", (message: ServiceResponse | ServiceProgress) => {
     if ("jobId" in message) { jobs.progress(message.jobId, message.phase, message.completed, message.total); return; }
     const resolve = pending.get(message.id); pending.delete(message.id); resolve?.(message.result);
@@ -125,11 +136,14 @@ app.whenReady().then(async () => {
   );
   ipcMain.handle(
     "esmer:request",
-    (event, operation: unknown, payload: unknown) =>
-      handleRequest(
-        event.sender === window.webContents &&
+    (event, operation: unknown, payload: unknown) => {
+      const trusted = event.sender === window.webContents &&
           event.senderFrame === window.webContents.mainFrame &&
-          event.senderFrame?.url === APP_URL,
+          event.senderFrame?.url === APP_URL;
+      if (trusted && restoring && operation !== "confirmRestore" && operation !== "cancelRestore" && operation !== "getOperationStatus")
+        return {status: "recovery-failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."};
+      return handleRequest(
+        trusted,
         operation,
         payload,
         () => requestService({ operation: "getAvailability" }),
@@ -174,7 +188,80 @@ app.whenReady().then(async () => {
           return requestService(request);
         },
         {status: () => jobs.status(), cancel: request => jobs.cancel(request)},
-      ),
+        async (operation, payload) => {
+          const failed = (code: string, message: string) => ({status: "recovery-failed", code, message} as const);
+          const userData = app.getPath("userData");
+          if (restoring && operation !== "confirmRestore" && operation !== "cancelRestore") return failed("RESTORE_BUSY", "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin.");
+          const nativeAction = operation === "setupRecovery" || operation === "prepareRestore" || operation === "confirmRestore";
+          if (nativeAction && nativeRecoveryBusy) return failed("RECOVERY_BUSY", "Başka bir kurtarma işlemi sürüyor. Tamamlanınca yeniden deneyin.");
+          if (nativeAction) nativeRecoveryBusy = true;
+          try {
+          if (operation === "getRecoveryStatus") {
+            const result = await requestService({operation: "getRecoveryStatus"});
+            return recoveryConfigError && result.status === "recovery" ? {...result, state: "failed" as const, error: {code: "RECOVERY_CONFIG_UNAVAILABLE", message: "Yerel kurtarma ayarı okunamadı. Kurulumu yenilerseniz eski yedekler için önceki ayrı saklanan anahtar yine gerekir."}} : result;
+          }
+          if (operation === "setupRecovery") {
+            let previousConfig: Buffer | undefined;
+            let configSaved = false;
+            try {
+              const destination = await dialog.showOpenDialog(window, {title: "Yedek klasörünü seçin", properties: ["openDirectory", "createDirectory"]});
+              if (destination.canceled || destination.filePaths.length !== 1) return {status: "cancelled"};
+              if (!outsideUserData(destination.filePaths[0], userData)) return failed("INVALID_DESTINATION", "Yedek klasörü uygulama veri klasörünün dışında olmalıdır.");
+              let existingKey: Uint8Array | undefined;
+              try { existingKey = (await loadRecoveryConfig(userData))?.key; } catch { /* damaged local wrapper can be replaced with a new exported key */ }
+              const key = existingKey ?? generateRecoveryKey();
+              const selected = await dialog.showSaveDialog(window, {title: "Kurtarma anahtarını ayrı bir konuma kaydedin", defaultPath: "esmer-kurtarma-anahtari.txt", filters: [{name: "Kurtarma anahtarı", extensions: ["txt"]}]});
+              if (selected.canceled || !selected.filePath) return {status: "cancelled"};
+              if (!await validRecoveryLocations(destination.filePaths[0], selected.filePath, userData)) return failed("INVALID_KEY_LOCATION", "Kurtarma anahtarını yedekten ve uygulama klasöründen ayrı saklayın.");
+              await writeFile(selected.filePath, encodeRecoveryKey(key), {mode: 0o600, flag: "wx"});
+              const verify = await dialog.showOpenDialog(window, {title: "Kaydettiğiniz kurtarma anahtarını yeniden seçin", properties: ["openFile"], filters: [{name: "Kurtarma anahtarı", extensions: ["txt"]}]});
+              if (verify.canceled || verify.filePaths.length !== 1 || !(await readRecoveryKeyFile(verify.filePaths[0])).equals(key)) return failed("KEY_EXPORT_FAILED", "Kurtarma anahtarı doğrulanamadı. Kurulumu yeniden deneyin.");
+              const acknowledgement = await dialog.showMessageBox(window, {type: "warning", buttons: ["Ayrı sakladım", "İptal"], defaultId: 1, cancelId: 1, message: "Yedek hedefini ve kurtarma anahtarını ayrı konumlarda sakladınız mı?", detail: "İkisi de bu bilgisayarla birlikte kaybolursa veriler geri yüklenemez."});
+              if (acknowledgement.response !== 0) return {status: "cancelled"};
+              try { previousConfig = await readFile(join(userData, "recovery-config.json")); }
+              catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+              await saveRecoveryConfig(userData, {destination: destination.filePaths[0], key});
+              configSaved = true;
+              const result = await requestService({operation: "setupRecovery", payload: {destination: destination.filePaths[0], key}});
+              if (result.status !== "saved" && result.status !== "recovery") { await restoreRecoveryConfig(userData, previousConfig); configSaved = false; }
+              else recoveryConfigError = false;
+              return result;
+            } catch {
+              if (configSaved) try { await restoreRecoveryConfig(userData, previousConfig); } catch { recoveryConfigError = true; }
+              return failed("RECOVERY_SETUP_FAILED", "Kurtarma kurulamadı. Hedefi ve anahtar dosyasını kontrol edip yeniden deneyin.");
+            }
+          }
+          if (operation === "prepareRestore") {
+            try {
+              const backup = await dialog.showOpenDialog(window, {title: "Şifreli yedeği seçin", properties: ["openFile"]});
+              if (backup.canceled || backup.filePaths.length !== 1) return {status: "cancelled"};
+              const keyFile = await dialog.showOpenDialog(window, {title: "Ayrı saklanan kurtarma anahtarını seçin", properties: ["openFile"], filters: [{name: "Kurtarma anahtarı", extensions: ["txt"]}]});
+              if (keyFile.canceled || keyFile.filePaths.length !== 1) return {status: "cancelled"};
+              return requestService({operation: "prepareRestore", payload: {backupPath: backup.filePaths[0], key: await readRecoveryKeyFile(keyFile.filePaths[0])}});
+            } catch { return failed("RESTORE_SELECTION_FAILED", "Yedek veya kurtarma anahtarı okunamadı."); }
+          }
+          if (operation === "confirmRestore") {
+            if (jobs.status().status !== "idle") return failed("RECOVERY_BUSY", "Başka bir işlem sürüyor. Tamamlanınca yeniden deneyin.");
+            const confirm = await dialog.showMessageBox(window, {type: "warning", buttons: ["Geri yükle", "Vazgeç"], defaultId: 1, cancelId: 1, message: "Mevcut veriler yedekteki sürümle değiştirilsin mi?", detail: "İşlemden sonra raporlar yeniden yüklenir. Mevcut kayıtların korunmuş kopyası saklanır."});
+            if (confirm.response !== 0) return {status: "cancelled"};
+            restoring = true;
+            try {
+              const deadline = Date.now() + 30_000;
+              while (pending.size > 0) {
+                if (Date.now() >= deadline) return failed("RECOVERY_BUSY", "Açık işlemler tamamlanmadı. Geri yüklemeyi yeniden deneyin.");
+                await new Promise(resolve => setTimeout(resolve, 10));
+              }
+              const result = await requestService({operation: "confirmRestore", payload: payload as {token: string}});
+              return result;
+            } finally { restoring = false; }
+          }
+          if (operation === "backupNow") return requestService({operation: "backupNow"});
+          if (operation === "pinBackup") return requestService({operation: "pinBackup", payload: payload as {backupId: string; pinned: boolean}});
+          return requestService({operation: "cancelRestore", payload: payload as {token: string}});
+          } finally { if (nativeAction) nativeRecoveryBusy = false; }
+        },
+      );
+    },
   );
   await window.loadURL(APP_URL);
 });

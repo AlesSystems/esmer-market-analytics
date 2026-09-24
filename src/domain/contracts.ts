@@ -2,6 +2,7 @@ import type { MonthlyDisplayResult, ReportEvidencePage } from "../reports/displa
 import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../expenses/contracts";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
+import type { RecoveryResult, RecoveryServiceRequest } from "../recovery/contracts";
 export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "openMonthly" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
 export type JobOutcome = { status: "busy" } | { status: "cancelled" };
 export type ReportExportResult = SalesFailure | { status: "saved" } | { status: "cancelled" } | { status: "failed"; code: "REPORT_EXPORT_FAILED"; message: string };
@@ -22,6 +23,13 @@ export type ImportOutcome =
   | { status: "cancelled" }
   | { status: "failed"; code: ImportErrorCode | "SERVICE_UNAVAILABLE"; message: string };
 export interface DesktopApi {
+  getRecoveryStatus(): Promise<RecoveryResult | RequestError>;
+  setupRecovery(): Promise<RecoveryResult | RequestError>;
+  backupNow(): Promise<RecoveryResult | RequestError>;
+  pinBackup(request: {backupId: string; pinned: boolean}): Promise<RecoveryResult | RequestError>;
+  prepareRestore(): Promise<RecoveryResult | RequestError>;
+  confirmRestore(request: {token: string}): Promise<RecoveryResult | RequestError>;
+  cancelRestore(request: {token: string}): Promise<RecoveryResult | RequestError>;
   openMonthly(request: ReportRequestMap["openMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
   queryMonthly(request: ReportRequestMap["queryMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
   listReportVersions(request: ReportRequestMap["listReportVersions"]): Promise<ReportHistoryResult | SalesFailure | RequestError>;
@@ -49,7 +57,7 @@ export interface DesktopApi {
   importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & (ReportServiceRequest | ExpenseServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
-export type ServiceResponse = { id: number; result: ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult };
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & (ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceResponse = { id: number; result: ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
 
 export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };

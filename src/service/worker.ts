@@ -1,3 +1,5 @@
+import { Recovery } from "../recovery/backup";
+import { recoveryFailure, recoveryOperations, type RecoveryServiceRequest } from "../recovery/contracts";
 import { ReportVersions } from "../reports/versions";
 import { displayResult } from "../reports/display";
 import { excelReport } from "../reports/export";
@@ -6,7 +8,7 @@ import { Expenses } from "../expenses/import";
 import { monthlyOperations, validMonthlyRequest, validReportRequest, validExpenseRequest } from "../desktop/requests";
 import { parentPort, workerData } from "node:worker_threads";
 import type { ServiceRequest, ServiceResponse } from "../domain/contracts";
-import { importErrorCode, openStore } from "../store/store";
+import { importErrorCode, type openStore } from "../store/store";
 import { importOutcome } from "./operations";
 import { SalesReports } from "../reports/query";
 const reportErrors = {
@@ -21,16 +23,68 @@ const reportErrors = {
 };
 let reports: SalesReports | undefined;
 let store: ReturnType<typeof openStore> | undefined;
-try {
-  if (!workerData || typeof workerData.databasePath !== "string") throw new Error("INVALID_SERVICE_CONFIG");
-  store = openStore(workerData.databasePath);
-  reports = new SalesReports(store);
-} catch { store?.close(); store = undefined; }
-const versions = store && reports ? new ReportVersions(store, reports) : undefined;
-const expenses = store ? new Expenses(store) : undefined;
+let recovery: Recovery | undefined;
+let versions: ReportVersions | undefined;
+let expenses: Expenses | undefined;
+function rebuildServices() {
+  store=recovery?.store??undefined;
+  reports=store?new SalesReports(store):undefined;
+  versions=store&&reports?new ReportVersions(store,reports):undefined;
+  expenses=store?new Expenses(store):undefined;
+}
+const initialized=(async()=> {
+  if (!workerData || typeof workerData.databasePath!=="string") throw new Error("INVALID_SERVICE_CONFIG");
+  recovery=await Recovery.open(workerData.databasePath,workerData.recoveryConfig,{holdStoreUntilConfigured:workerData.recoveryConfigUnavailable===true});
+  rebuildServices();
+  void recovery.resume().catch(()=>{});
+})().catch(()=>{});
+let active=0, restoring=false, recoveryBusy=false;
+const drained=new Set<()=>void>();
+async function waitForRequests() {
+  if (!active) return;
+  await new Promise<void>((resolve,reject)=> {
+    const done=()=>{clearTimeout(timer);drained.delete(done);resolve();};
+    const timer=setTimeout(()=>{drained.delete(done);reject(new Error("RECOVERY_BUSY"));},30_000);
+    drained.add(done);
+  });
+}
+async function recoveryRequest(request:RecoveryServiceRequest) {
+  if (!recovery) throw new Error("RECOVERY_UNAVAILABLE");
+  switch(request.operation) {
+    case "getRecoveryStatus": return recovery.status();
+    case "backupNow": return recovery.backupNow();
+    case "setupRecovery":
+      if (!request.payload || typeof request.payload.destination!=="string" || !(request.payload.key instanceof Uint8Array)) throw new Error("INVALID_PAYLOAD");
+      try { return await recovery.configure(request.payload); } finally { rebuildServices(); }
+    case "pinBackup":
+      if (!request.payload || typeof request.payload.backupId!=="string" || typeof request.payload.pinned!=="boolean") throw new Error("INVALID_PAYLOAD");
+      return recovery.pinBackup(request.payload.backupId,request.payload.pinned);
+    case "prepareRestore":
+      if (!request.payload || typeof request.payload.backupPath!=="string" || !(request.payload.key instanceof Uint8Array)) throw new Error("INVALID_PAYLOAD");
+      return recovery.prepareRestore(request.payload.backupPath,request.payload.key);
+    case "confirmRestore":
+      if (!request.payload || typeof request.payload.token!=="string") throw new Error("INVALID_PAYLOAD");
+      try { return await recovery.confirmRestore(request.payload.token); } finally { rebuildServices(); }
+    case "cancelRestore":
+      if (!request.payload || typeof request.payload.token!=="string") throw new Error("INVALID_PAYLOAD");
+      return recovery.cancelRestore(request.payload.token);
+  }
+}
 parentPort?.on("message", async (request: ServiceRequest) => {
+  if (restoring) { parentPort?.postMessage({id:request.id,result:recoveryFailure("RECOVERY_BUSY")}); return; }
+  const exclusiveRecovery=recoveryOperations.includes(request.operation)&&request.operation!=="getRecoveryStatus";
+  if (exclusiveRecovery && recoveryBusy) { parentPort?.postMessage({id:request.id,result:recoveryFailure("RECOVERY_BUSY")}); return; }
+  if (exclusiveRecovery) recoveryBusy=true;
+  const committing=request.operation==="confirmRestore";
+  if (committing) restoring=true; else active++;
   let result: ServiceResponse["result"];
   try {
+    await initialized;
+    if (committing) await waitForRequests();
+    if (recoveryOperations.includes(request.operation)) {
+      const result=await recoveryRequest(request as RecoveryServiceRequest);
+      parentPort?.postMessage({id:request.id,result}); return;
+    }
     const known = ["previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
@@ -75,13 +129,19 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       result = importOutcome(store.importPackage(request.bytes, control));
     } else throw new Error("UNKNOWN_OPERATION");
   } catch (error) {
-    result = error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"}
+    result = recoveryOperations.includes(request.operation) ? recoveryFailure(error instanceof Error && ["RESTORE_STALE","RECOVERY_BUSY","RECOVERY_SETUP_REQUIRED","INVALID_RESTORE_TOKEN","RESTORE_RECOVERY_REQUIRED","RESTORE_COMMITTED_RESTART_REQUIRED","AUDIT_UNAVAILABLE","RECOVERY_CONFIG_UNAVAILABLE"].includes(error.message)?error.message:"RECOVERY_FAILED") : error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"}
       : error instanceof Error && (error.message === "UNKNOWN_OPERATION" || error.message === "INVALID_PAYLOAD") ? {status: "rejected", code: error.message, message: "İstek geçerli değil."}
       : error instanceof Error && Object.hasOwn(reportErrors, error.message) ? {status: "unavailable", code: error.message as keyof typeof reportErrors, message: reportErrors[error.message as keyof typeof reportErrors]}
       : ["previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"].includes(request.operation) ? { status: "failed", code: "EXPENSE_REQUEST_FAILED", message: "İşlem tamamlanamadı. Kayıt değişmiş veya istek geçersiz olabilir; giderleri yenileyip yeniden inceleyin." } : request.operation !== "importPackage"
       ? { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmet başlatılamadı. Uygulamayı yeniden açın." }
       : store ? importOutcome({ status: "failed", code: importErrorCode(error) }) : { status: "failed", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." };
   }
+  finally {
+    if (exclusiveRecovery) recoveryBusy=false;
+    if (committing) restoring=false;
+    else { active--; if (!active) for (const done of [...drained]) done(); }
+    if (!restoring && recovery) setImmediate(()=>{void recovery?.resume().catch(()=>{});});
+  }
   parentPort?.postMessage({ id: request.id, result } satisfies ServiceResponse);
 });
-parentPort?.on("close", () => store?.close());
+parentPort?.on("close", () => { void recovery?.close(); });

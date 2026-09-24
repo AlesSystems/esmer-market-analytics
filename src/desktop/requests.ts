@@ -5,6 +5,7 @@ import { validFields, validPeriod } from "../expenses/validation";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { validId } from "../store/revisions";
 import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
+import { recoveryOperations } from "../recovery/contracts";
 export const APP_URL = "esmer://app/index.html";
 function exact(value: unknown, fields: string[]): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join() === fields.sort().join();
@@ -36,6 +37,12 @@ export function validMonthlyRequest(operation: string, value: unknown): boolean 
 }
 export type MonthlyService = (operation: keyof ReportRequestMap, payload: ReportRequestMap[keyof ReportRequestMap]) => Promise<ReportResponse | ReportExportResult | JobOutcome | RequestError>;
 export type JobService = {status: () => OperationStatus; cancel: (request: {id: number}) => {status: "cancelling"} | {status: "idle"}};
+export type RecoveryService = (operation: string, payload: null | {backupId: string; pinned: boolean} | {token: string}) => Promise<import("../recovery/contracts").RecoveryResult>;
+function validRecoveryRequest(operation: string, payload: unknown): boolean {
+  if (["getRecoveryStatus", "setupRecovery", "backupNow", "prepareRestore"].includes(operation)) return payload === null;
+  if (operation === "pinBackup") return exact(payload, ["backupId", "pinned"]) && validId(payload.backupId) && typeof payload.pinned === "boolean";
+  return exact(payload, ["token"]) && validId(payload.token);
+}
 const expenseOperations = ["saveExpenseTemplate", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating"];
 export function validExpenseRequest(operation: string, payload: unknown): boolean {
   const revision = (v: unknown) => Number.isSafeInteger(v) && Number(v) >= 0;
@@ -60,13 +67,18 @@ export async function handleRequest(
   expenses?: ExpenseService,
   monthly?: MonthlyService,
   jobs?: JobService,
-): Promise<ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult> {
+  recovery?: RecoveryService,
+): Promise<ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
       code: "UNTRUSTED_SENDER",
       message: "Bu pencerenin işlem yapma izni yok.",
     };
+  if (recovery && typeof operation === "string" && recoveryOperations.includes(operation)) {
+    if (!validRecoveryRequest(operation, payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return recovery(operation, payload as Parameters<RecoveryService>[1]);
+  }
   if (jobs && (operation === "getOperationStatus" || operation === "cancelOperation")) {
     if (operation === "getOperationStatus" && payload === null) return jobs.status();
     if (operation === "cancelOperation" && exact(payload, ["id"]) && Number.isSafeInteger(payload.id) && Number(payload.id) > 0) return jobs.cancel({id: Number(payload.id)});
