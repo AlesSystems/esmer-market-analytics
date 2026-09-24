@@ -1,6 +1,6 @@
 # Continue Phase 9 on Windows
 
-Continue [issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/12), Tasks 9.1 and 9.2, on `codex/phase-9-recovery`. Fetch its latest tip and update the existing phase 9 PR. The macOS run stops before Windows-specific implementation and testing. A06 remains open. Do not merge or close the issue from this handoff.
+Continue [issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/12), Tasks 9.1 and 9.2, on `codex/phase-9-recovery`. Fetch its latest tip and update [PR #23](https://github.com/AlesSystems/esmer-market-analytics/pull/23). The locally tested implementation is `e12aa5b`; fetch later documentation commits too. The macOS run stops before Windows-specific implementation and testing. A06 remains open. Do not merge or close the issue from this handoff.
 
 Read `AGENTS.md`, the foundation specification/audit/acceptance checklist, [Phase 9](../superpowers/plans/esmer-market-implementation-plan.md#phase-9--encrypted-backup-and-independent-recovery), [local evidence](../evidence/phase-9-local.md), and [Turkish recovery instructions](recovery-tr.md). Use synthetic fixtures and disposable profiles. No source access, owner contact, production connection, installation on Eralp's PC or later phase is authorized.
 

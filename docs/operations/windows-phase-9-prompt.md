@@ -1,6 +1,6 @@
 # Windows-agent prompt for Phase 9
 
-Continue Phase 9 of AlesSystems/esmer-market-analytics, issue #12, on branch `codex/phase-9-recovery`. Fetch the latest branch, inspect status/worktrees and preserve unrelated work. Update the existing PR for this branch. Do not create a replacement PR, merge or close the issue.
+Continue Phase 9 of AlesSystems/esmer-market-analytics, issue #12, on branch `codex/phase-9-recovery`. Fetch the latest branch, inspect status/worktrees and preserve unrelated work. Update [PR #23](https://github.com/AlesSystems/esmer-market-analytics/pull/23). The macOS handoff implementation is `e12aa5b`; subsequent handoff commits contain evidence and links. Do not create a replacement PR, merge or close the issue.
 
 The macOS implementation intentionally stops before Windows-specific implementation and testing. Read AGENTS.md, the three foundation documents, Phase 9 of the implementation plan, `docs/decisions/phase-9-recovery.md`, `docs/evidence/phase-9-local.md`, `docs/operations/recovery-tr.md`, and `docs/operations/windows-phase-9-handoff.md`. Follow the handoff's commands and native proof checklist. Record the tested commit, package hashes and Windows hardware/OS/toolchain.
 

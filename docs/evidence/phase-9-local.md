@@ -4,7 +4,7 @@ Tracks [issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/
 
 ## Environment and scope
 
-Branch `codex/phase-9-recovery` starts from `a7f0cd8`, the updated merged main branch. Dependencies #7, #10 and #11 were closed when work began. Host is macOS 27.0 build 26A428, arm64, Node 24.15.0, npm 11.12.1. Inputs are synthetic. No source connection, private backup, identifiable customer/employee data or owner contact was used.
+[Draft PR #23](https://github.com/AlesSystems/esmer-market-analytics/pull/23) is the continuation target. Branch `codex/phase-9-recovery` starts from `a7f0cd8`, the updated merged main branch. Dependencies #7, #10 and #11 were closed when work began. Host is macOS 27.0 build 26A428, arm64, Node 24.15.0, npm 11.12.1. Inputs are synthetic. No source connection, private backup, identifiable customer/employee data or owner contact was used.
 
 The [recovery decision](../decisions/phase-9-recovery.md) records two independently explored designs and the independent judgment. Astra Low owns the recovery core, Sol 6 Low owns desktop/UI integration, and Astra High reviews the complex recovery contracts. The existing SQLite worker owns the store throughout. No runtime dependency is added.
 
