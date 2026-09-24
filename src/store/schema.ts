@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -58,3 +58,13 @@ export const expenseMigration = `CREATE TABLE expense_batches (
 ) STRICT;
 CREATE TRIGGER immutable_expense_batch_update BEFORE UPDATE ON expense_batches BEGIN SELECT RAISE(ABORT,'IMMUTABLE_BATCH'); END;
 CREATE TRIGGER immutable_expense_batch_delete BEFORE DELETE ON expense_batches BEGIN SELECT RAISE(ABORT,'IMMUTABLE_BATCH'); END;`;
+
+export const recoveryMigration = `CREATE TABLE recovery_state (
+  singleton INTEGER PRIMARY KEY CHECK(singleton=1), changed INTEGER NOT NULL, verified INTEGER NOT NULL,
+  last_verified_at TEXT, last_backup_id TEXT
+) STRICT;
+INSERT INTO recovery_state VALUES(1,1,0,NULL,NULL);
+CREATE TRIGGER backup_revision AFTER INSERT ON app_revisions BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
+CREATE TRIGGER backup_report AFTER INSERT ON report_versions BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
+CREATE TRIGGER backup_activation_insert AFTER INSERT ON active_dataset BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
+CREATE TRIGGER backup_activation_update AFTER UPDATE ON active_dataset BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;
