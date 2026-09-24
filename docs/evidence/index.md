@@ -91,3 +91,9 @@ The user subsequently authorized Windows continuation on PR #21. The [Windows re
 The user authorized Windows continuation of [issue #11](https://github.com/AlesSystems/esmer-market-analytics/issues/11) on [PR #22](https://github.com/AlesSystems/esmer-market-analytics/pull/22). The [Windows record](windows-phase-8.md) supplements [local evidence](phase-8-local.md) with packaged reporting/revision checks, native save and Excel round-trip, actual Windows scaling, cancellation/retry measurements, artifact hashes and repeatable verification tools. The application source and schema are unchanged by this continuation.
 
 The 25,000-document synthetic monthly calculation took 49–59 seconds, so D18/A07 performance remains unmet. Physical disconnection on this build, publisher/downloaded SmartScreen behavior, full imported-data/source acceptance and the broader release gates remain open. The [Windows handoff](../operations/windows-phase-8-handoff.md) remains the procedure. No merge, issue closure, later phase or owner rollout follows from this evidence.
+
+## Phase 9 encrypted recovery
+
+[Issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/12) is implemented locally on `codex/phase-9-recovery` through the macOS verification boundary. See [local evidence](phase-9-local.md), the [recovery decision](../decisions/phase-9-recovery.md), [Turkish instructions](../operations/recovery-tr.md), and [Windows-agent prompt](../operations/windows-phase-9-prompt.md).
+
+A06 remains open for actual Windows key protection, file-system behavior, independent-media clean recovery and the remaining checks in the [Windows handoff](../operations/windows-phase-9-handoff.md). No merge, issue closure, owner installation or later-phase work is included.

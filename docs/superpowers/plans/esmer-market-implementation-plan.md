@@ -440,6 +440,8 @@ expect(result.confidence).toBe('estimated');
 
 **Exit gate:** Every A06 criterion has evidence, including independent recovery and safe failure. Creating an encrypted file alone does not pass.
 
+**2026-09-24 local implementation:** Tasks 9.1/9.2 have synthetic macOS implementation evidence in the [Phase 9 record](../../evidence/phase-9-local.md). The user requested a stop before Windows-specific implementation and testing. Continue on `codex/phase-9-recovery` using the [Windows handoff](../../operations/windows-phase-9-handoff.md). The checklist and A06 exit gate remain open pending platform and independent-recovery proof.
+
 ## Phase 10 — Windows acceptance and reveal package
 
 **Outcome:** A tested local release is ready to present with accurate limitations and no operational dependency on the market system.

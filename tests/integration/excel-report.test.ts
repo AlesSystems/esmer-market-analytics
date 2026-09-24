@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { readSheet } from "read-excel-file/node";
+import readAll, { readSheet } from "read-excel-file/node";
 import { unzipSync, strFromU8 } from "fflate";
 import { openStore } from "../../src/store/store";
 import { SalesReports } from "../../src/reports/query";
@@ -8,6 +8,7 @@ import { excelReport } from "../../src/reports/export";
 import { businessPackage } from "../helpers/business-fixtures";
 import { Expenses } from "../../src/expenses/import";
 import { workbook, row } from "../helpers/expense-fixtures";
+import { canonical } from "../../src/source/package";
 
 test("source coverage does not hide independently recorded expenses or payments in Excel", async () => {
   const store = openStore(":memory:");
@@ -51,6 +52,17 @@ test("Excel uses the selected immutable report across refresh and preserves Turk
   } finally { store.close(); }
 });
 
+test("Excel sheets retain their order after a report is read from canonical JSON", async () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const result = new ReportVersions(store, new SalesReports(store)).open({ period: "2025-09" });
+    if (result.status !== "monthly") throw new Error("Expected monthly report");
+    const persisted = JSON.parse(canonical(result.report));
+    expect(await readAll(await excelReport(persisted))).toEqual(await readAll(await excelReport(result.report)));
+  } finally { store.close(); }
+});
+
 test("workbook has Turkish tables, report metadata on every sheet, exact unsafe decimals and explicit cell bounds", async () => {
   const store = openStore(":memory:");
   try {
@@ -62,7 +74,6 @@ test("workbook has Turkish tables, report metadata on every sheet, exact unsafe 
     report.sales.products[0].name = "@Çeşit + ürün";
     report.sales.products[0].quantities.kg = "12345678901234567890.123456789";
     const bytes = await excelReport(report);
-    const { default: readAll } = await import("read-excel-file/node");
     const sheets = await readAll(bytes);
     for (const sheet of sheets) {
       expect(sheet.data[0].slice(0, 2)).toEqual(["Rapor sürümü", report.id]);

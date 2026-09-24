@@ -3,7 +3,7 @@ import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
 import type { ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
 import { createHash, randomUUID } from "node:crypto";
-import { DatabaseSync } from "node:sqlite";
+import { backup, DatabaseSync } from "node:sqlite";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
 import { migrate } from "./migrations";
 import type { Availability, ImportErrorCode } from "../domain/contracts";
@@ -38,6 +38,15 @@ class AnalyticsStore {
     db.prepare("UPDATE import_batches SET state='failed',error_code='INTERRUPTED' WHERE state IN ('staged','validated')").run();
   }
   close() { this.db.close(); }
+  backupTo(path: string, progress?: (info: {remainingPages: number; totalPages: number}) => void): Promise<number> { return backup(this.db, path, {progress}); }
+  recoveryGeneration() {
+    const row = this.db.prepare("SELECT changed,verified,last_verified_at FROM recovery_state WHERE singleton=1").get()!;
+    return { changed: Number(row.changed), verified: Number(row.verified), lastVerifiedAt: row.last_verified_at as string | null };
+  }
+  markBackupVerified(generation: number, id: string, createdAt: string) {
+    this.db.prepare("UPDATE recovery_state SET verified=MAX(verified,?),last_backup_id=?,last_verified_at=? WHERE singleton=1").run(generation,id,createdAt);
+  }
+
   private lastImportError(): ImportCode | undefined {
     const batch = this.db.prepare("SELECT state,error_code FROM import_batches WHERE state IN ('failed','active') ORDER BY rowid DESC LIMIT 1").get();
     return batch?.state === "failed" ? batch.error_code as ImportCode : undefined;

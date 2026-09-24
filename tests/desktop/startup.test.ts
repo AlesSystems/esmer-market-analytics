@@ -34,7 +34,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
         process: typeof window.process,
       })),
     ).toEqual({
-      api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate"],
+      api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate", "setupRecovery"],
       node: "undefined",
       process: "undefined",
     });
@@ -259,7 +259,7 @@ test("packaged app imports through native selection, preserves data after failed
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
-    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "cancelOperation", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate"] });
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate", "setupRecovery"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -331,7 +331,7 @@ test("packaged owning worker migrates and reopens durable revisions and report p
         expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", dataset: { datasetId: before.pin.datasetId, counts: { documents: 2, lines: 2, suppliers: 0 } } });
       } finally { await app.close(); }
       const check = new DatabaseSync(databasePath, { readOnly: true });
-      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 5 }); }
+      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 6 }); }
       finally { check.close(); }
       const reopened = openStore(databasePath);
       try {
@@ -343,4 +343,23 @@ test("packaged owning worker migrates and reopens durable revisions and report p
       await rename(`${databasePath}.released`, databasePath);
     }
   } finally { await rm(userData, { recursive: true, force: true }); }
+});
+
+test("unreadable recovery config keeps an older database untouched and restore reachable", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-recovery-config-startup-"));
+  const databasePath = join(userData, "analytics.sqlite");
+  const store = openStore(databasePath, {schemaVersion: 1});
+  store.close();
+  await writeFile(join(userData, "recovery-config.json"), "{corrupt");
+  const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
+  try {
+    const page = await app.firstWindow();
+    await expect(page.getByRole("heading", {name: "Yerel hizmet kullanılamıyor"})).toBeVisible();
+    await page.getByRole("button", {name: "Yedekten geri yükle"}).click();
+    await expect(page.getByRole("heading", {name: "Yedekleme ve kurtarma"})).toBeVisible();
+    await expect(page.getByRole("alert")).toContainText("Yerel kurtarma ayarı okunamadı");
+    const db = new DatabaseSync(databasePath, {readOnly: true});
+    try { expect(db.prepare("PRAGMA user_version").get()).toEqual({user_version: 1}); }
+    finally { db.close(); }
+  } finally { await app.close(); await rm(userData, {recursive: true, force: true}); }
 });

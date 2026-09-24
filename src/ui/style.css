@@ -99,6 +99,17 @@ button:disabled { opacity: 0.6; cursor: wait; }
 button:focus-visible { outline: 3px solid #759447; outline-offset: 4px; }
 .warnings { padding-left: 22px; color: #735525; line-height: 1.6; }
 [role="alert"] { color: #8e3529; }
+.sales-app main.recovery-workspace { max-width: 1000px; margin: auto; padding: 28px 36px 60px; }
+.recovery-workspace > nav { margin-bottom: 24px; }
+.recovery-workspace > p { margin: 10px 0 24px; }
+.sales-app section.recovery-section { max-width: none; margin: 20px 0; padding: 24px; border: 1px solid #d8e3f0; border-radius: 8px; background: #fff; }
+.recovery-section h2 { margin: 0 0 12px; }
+.recovery-section h3 { margin: 22px 0 10px; }
+.recovery-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.recovery-backups { padding: 0; list-style: none; }
+.recovery-backups li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid #d8e3f0; }
+.recovery-preview { padding-top: 18px; border-top: 1px solid #d8e3f0; margin-top: 18px; }
+@media (max-width: 720px) { .sales-app main.recovery-workspace { padding: 24px; } .sales-app section.recovery-section { padding: 18px; } .recovery-backups li { align-items: flex-start; flex-direction: column; } }
 
 .sales-app {
   --ink:#172b43;

@@ -1,6 +1,7 @@
 import writeXlsxFile, { type Row, type Cell } from "write-excel-file/node";
 import { Exact } from "../domain/money";
 import { classificationLabels, type Classification } from "../expenses/contracts";
+import { canonical } from "../source/package";
 import type { MonthlyReport } from "./contracts";
 
 const text = (value: unknown): Cell => value === null || value === undefined ? null : { type: String, value: String(value) };
@@ -33,21 +34,21 @@ function table<T>(records: T[], columns: Column<T>[]): Row[] {
 function technical(value: unknown, prefix = ""): Row[] {
   if (Array.isArray(value)) {
     const flatten = (item: unknown, path = "", target: Record<string, unknown> = {}): Record<string, unknown> => {
-      if (item !== null && typeof item === "object" && !Array.isArray(item)) for (const [key, v] of Object.entries(item)) flatten(v, path ? `${path}.${key}` : key, target);
-      else target[path] = Array.isArray(item) ? JSON.stringify(item) : item;
+      if (item !== null && typeof item === "object" && !Array.isArray(item)) for (const [key, v] of Object.entries(item).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)) flatten(v, path ? `${path}.${key}` : key, target);
+      else target[path] = Array.isArray(item) ? canonical(item) : item;
       return target;
     };
-    const records = value.map(item => flatten(item)), keys = [...new Set(records.flatMap(row => Object.keys(row)))];
+    const records = value.map(item => flatten(item)), keys = [...new Set(records.flatMap(row => Object.keys(row)))].sort();
     return [[text(prefix)], ...table(records, keys.map(key => ({ title: key, value: row => row[key] })))];
   }
-  if (value !== null && typeof value === "object") return Object.entries(value).flatMap(([key, v]) => technical(v, prefix ? `${prefix}.${key}` : key));
+  if (value !== null && typeof value === "object") return Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).flatMap(([key, v]) => technical(v, prefix ? `${prefix}.${key}` : key));
   return [[text(prefix), text(value)]];
 }
 export async function excelReport(input: MonthlyReport): Promise<Buffer> {
   const r = structuredClone(input), s = r.sales, g = r.purchasing.gross, p = r.purchasing.purchasing, o = r.operating.result;
   const metadata: Row[] = [
     [text("Rapor sürümü"), text(r.id)], [text("Dönem"), text(r.context.period)], [text("Veri kesimi"), text(s.cutoff)],
-    [text("Kaynak veri kümesi"), text(r.context.datasetId)], [text("Hesaplama sürümleri"), text(JSON.stringify(r.calculations))],
+    [text("Kaynak veri kümesi"), text(r.context.datasetId)], [text("Hesaplama sürümleri"), text(canonical(r.calculations))],
     [text("Rapor durumu"), text(r.review ? "İncelenmiş kayıt; tahminler güvenilir kâr değildir" : "Aday")],
     [text("Dönem kapsamı"), text(label(s.coverage))], [text("Para birimi"), text("TRY")],
     [text("Maliyet yöntemi"), text("Tarihsel son alış maliyeti tahmini; yalnız kapsanan satışlar")],

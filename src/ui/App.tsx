@@ -5,6 +5,7 @@ import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { SalesWorkspace } from "./SalesWorkspace";
 import type { SalesView } from "../reports/contracts";
 import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
+import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
 
 const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." } satisfies Availability;
 const warnings: Record<string, string> = { SYNTHETIC_ONLY: "Sentetik gösterim verisi — gerçek market verisi değildir.", PARTIAL_COVERAGE: "Veri kapsamı eksik; bazı dönemler tamamlanmamış olabilir.", MISSING_COST: "Bazı kayıtlarda maliyet bilgisi yok. Eksik maliyet sıfır kabul edilmez." };
@@ -26,6 +27,7 @@ function previousImportMessage(availability: Extract<Availability, { status: "re
   return `Önceki içe aktarma tamamlanamadı. ${preserved} Geçerli bir paketle yeniden deneyin.`;
 }
 function App() {
+  const [recoveryOpen, setRecoveryOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [expensePeriod, setExpensePeriod] = useState(new Date().toISOString().slice(0, 7));
   const [availability, setAvailability] = useState<Availability | RequestError>();
@@ -57,8 +59,9 @@ function App() {
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
     {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
   </>;
+  if (recoveryOpen) return <RecoveryWorkspace onClose={() => setRecoveryOpen(false)} onRestored={() => { setRecoveryOpen(false); setSales(undefined); void window.esmer.getAvailability().then(setAvailability); }} />;
   if (expensesOpen) return <div className="sales-app"><header className="app-header"><span className="brand">ESMER <span>MARKET</span></span><span className="offline">Canlı bağlantı kapalı</span></header><div className="workspace"><div className="workspace-header"><nav aria-label="Analiz gezinmesi"><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button></nav><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label></div><OperationProgress /><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></div></div>;
-  if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
+  if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} openRecovery={() => setRecoveryOpen(true)} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
   return (
     <main className="legacy">
       <header><span className="brand">ESMER MARKET</span><span>Yerel analiz</span></header>
@@ -73,9 +76,10 @@ function App() {
           </> : <p>Hazırlanmış veri paketini seçerek başlayın. Veriler bu bilgisayarda saklanır.</p>}
           <button type="button" disabled={importing} onClick={() => void importPackage()}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button>
           <button type="button" onClick={() => setExpensesOpen(true)}>Giderler</button>
+          <button type="button" onClick={() => setRecoveryOpen(true)}>Yedekleme ve kurtarma</button>
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
-        </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p></>}
+        </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p><button type="button" onClick={() => setRecoveryOpen(true)}>Yedekten geri yükle</button></>}
         {salesError && <p role="status">Satış raporu kullanılamıyor. {salesError}</p>}
         {messages}
       </section>
