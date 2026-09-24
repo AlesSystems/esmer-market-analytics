@@ -14,6 +14,10 @@ vi.mock("../../src/recovery/files",async importOriginal=>{
   const original=await importOriginal<typeof import("../../src/recovery/files")>();
   return {...original,durableWrite:vi.fn(original.durableWrite)};
 });
+vi.mock("node:fs/promises",async importOriginal=>{
+  const original=await importOriginal<typeof import("node:fs/promises")>();
+  return {...original,rm:vi.fn(original.rm)};
+});
 const directories:string[]=[];
 afterEach(()=>{for(const directory of directories.splice(0))rmSync(directory,{recursive:true,force:true});});
 function setup(){const directory=mkdtempSync(join(tmpdir(),"restore-failure-"));directories.push(directory);const destination=join(directory,"external");mkdirSync(destination);return{directory,path:join(directory,"analytics.sqlite"),config:{destination,key:generateRecoveryKey()}};}
@@ -152,4 +156,14 @@ test("unavailable rollback audit retains original files and reports recovery req
   await expect(recoverInterruptedSwitch(path,(point,index)=>{if(point==="rollback-advanced"&&index===2)mkdirSync(outcome);})).rejects.toThrow();
   let recovery=await Recovery.open(path);expect(recovery.store).toBeNull();expect(recovery.status()).toMatchObject({state:"failed",error:{code:"RESTORE_RECOVERY_REQUIRED"}});await recovery.close();
   rmSync(outcome,{recursive:true});recovery=await Recovery.open(path);try{expect(recovery.store!.readSnapshot().app[0].entityId).toBe("original");}finally{await recovery.close();}
+});
+
+test("post-commit temporary cleanup failure reports committed state instead of preservation",async()=>{
+  const {path,config}=setup();const recovery=await Recovery.open(path,config);const actual=await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises"),{rm}=await import("node:fs/promises");
+  try{
+    change(recovery,"backup");await recovery.backupNow();const artifact=join(config.destination,`${recovery.status().backups[0].id}.esmerbackup`);change(recovery,"newer");const preview=await recovery.prepareRestore(artifact,config.key);
+    let failed=false;vi.mocked(rm).mockImplementation(async(target,options)=>{if(!failed&&String(target).includes(".esmer-recovery-")&&options?.recursive){failed=true;throw new Error("cleanup unavailable");}return actual.rm(target,options);});
+    await expect(recovery.confirmRestore(preview.token)).rejects.toThrow("RESTORE_COMMITTED_RESTART_REQUIRED");
+    expect(recovery.store!.readSnapshot().app.map(row=>row.entityId)).toEqual(["backup"]);
+  }finally{vi.mocked(rm).mockImplementation(actual.rm);await recovery.close();}
 });

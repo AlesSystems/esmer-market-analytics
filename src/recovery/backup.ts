@@ -174,7 +174,7 @@ export class Recovery {
     const preview=this.preview;
     if (preview.generation!==(this.store?.recoveryGeneration().changed??null)) throw new Error("RESTORE_STALE");
     this.switching=true;
-    let closed=false;
+    let closed=false,committed=false;
     const candidate=join(dirname(this.databasePath),`.esmer-candidate-${randomUUID()}.sqlite`);
     try {
       if (this.running) {
@@ -188,7 +188,7 @@ export class Recovery {
       await rename(preview.candidate,candidate);
       this.store?.close(); this.store=null; closed=true;
       await switchStore(this.databasePath,candidate,()=>{this.store=openStore(this.databasePath);},this.options.fault,preview.backupId,preview.generation);
-      this.error=null; return {status:"restored"};
+      committed=true; this.error=null; return {status:"restored"};
     } catch(error) {
       if (closed) {
         this.store?.close(); this.store=null;
@@ -208,8 +208,14 @@ export class Recovery {
       await this.audit("restore","failed",preview.backupId,preview.generation,"RESTORE_FAILED"); throw error;
     } finally {
       this.switching=false; this.preview=null;
-      await rm(preview.directory,{recursive:true,force:true});
-      if (!await stat(`${this.databasePath}.restore-journal`).then(()=>true,()=>false)) await rm(candidate,{force:true});
+      try {
+        await rm(preview.directory,{recursive:true,force:true});
+        if (!await stat(`${this.databasePath}.restore-journal`).then(()=>true,()=>false)) await rm(candidate,{force:true});
+      } catch(error) {
+        if (committed || this.error==="RESTORE_COMMITTED_RESTART_REQUIRED") { this.error="RESTORE_COMMITTED_RESTART_REQUIRED"; throw new Error(this.error); }
+        if (this.error==="RESTORE_RECOVERY_REQUIRED") throw new Error(this.error);
+        throw error;
+      }
     }
   }
   private async audit(operation:string,result:"ok"|"failed",identity:string|null=null,generation:number|null=null,code:string|null=null,required=false) {
