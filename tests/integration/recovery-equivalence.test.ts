@@ -35,7 +35,8 @@ test("independent artifact and exported key recover financial history and every 
     const status = await recovery.backupNow();
     expect(status.state).toBe("ready");
     expect(status.backups.length).toBeGreaterThan(0);
-    const artifact = join(destination, `${status.backups.at(-1)!.id}.esmerbackup`);
+    const latest = [...status.backups].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+    const artifact = join(destination, `${latest.id}.esmerbackup`);
     expect((await readFile(artifact)).includes(Buffer.from("Sentetik kira düzeltmesi"))).toBe(false);
     await recovery.close(); recovery = undefined;
     await rm(original, { recursive: true });
