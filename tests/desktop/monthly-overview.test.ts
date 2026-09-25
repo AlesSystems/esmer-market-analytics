@@ -55,12 +55,14 @@ test("reviewed monthly values and source explanations survive refresh and export
     await writeFile(packagePath, businessPackage(records, { extractionId: "business-2", extractedAt: "2025-10-02T00:00:00.000Z" }));
     await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
+    await page.screenshot({ path: "test-results/shadcn-stale-source.png", fullPage: true });
     await page.getByRole("button", { name: "Raporu yenile", exact: true }).click();
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await page.getByRole("button", { name: "Adayla karşılaştır", exact: true }).click();
     await expect(page.getByRole("region", { name: "Sürüm farkları" })).toContainText("Net satış");
     await page.getByRole("button", { name: "Kaydedilmiş sürümü aç", exact: true }).click();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("200,00 ₺");
+    await page.screenshot({ path: "test-results/shadcn-saved-report.png", fullPage: true });
     await page.getByText("Rapor kanıtı", { exact: true }).click();
     await page.getByRole("button", { name: "Sabit rapor kanıtlarını göster" }).click();
     const sourceRows = page.locator(".saved-evidence > details > summary").filter({ hasText: "100,00 ₺" });

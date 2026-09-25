@@ -30,10 +30,12 @@ test("monthly loading, failure retry and missing period preserve useful navigati
     await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeEnabled();
     await expect(page.getByRole("alert")).toContainText("Sentetik yükleme hatası.");
     await expect(page.getByText("Aylık rapor hesaplanıyor…", { exact: true })).toHaveCount(0);
+    await page.screenshot({ path: "test-results/shadcn-monthly-error.png", fullPage: true });
     await page.getByRole("button", { name: "Aylık raporu yeniden yükle" }).click();
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     await expect(page.locator(".notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
     await expect(page.getByText("Açık", { exact: true })).toBeVisible();
+    await page.screenshot({ path: "test-results/shadcn-monthly-partial.png", fullPage: true });
     await page.getByLabel("Dönem", { exact: true }).fill("2024-01");
     await expect(page.getByRole("alert")).toContainText("Sentetik dönem yükleme hatası.");
     await expect(page.locator(".monthly-amount")).toHaveCount(0);
@@ -62,6 +64,7 @@ test("real background import exposes progress, cancels and leaves previous data 
     await writeFile(packagePath, businessPackage(records, { extractionId: "synthetic-background", extractedAt: "2025-10-02T00:00:00.000Z" }));
     await importPackage(page);
     await expect(page.getByRole("progressbar", { name: "İşlem ilerlemesi" })).toBeVisible();
+    await page.screenshot({ path: "test-results/shadcn-import-progress.png", fullPage: true });
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "İşlemi iptal et", exact: true }).click();
