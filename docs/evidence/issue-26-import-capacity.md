@@ -67,9 +67,9 @@ The Sol High audit checked artifacts and the [decision trail](issue-26-decisions
 
 ## Open gates and continuation
 
-The user authorized completion, including renewed isolated-source validation, on 2026-09-25 after this PR opened. Authorization is no longer an open prerequisite. R1 still needs an accessible isolated restored backup and validated source semantics.
+The user authorized completion, including renewed isolated-source validation, on 2026-09-25 after this PR opened. Authorization is no longer an open prerequisite. The later [OrbStack continuation](issue-26-source-validation.md) obtained an accessible isolated copy and implemented repeatable metadata/population evidence collection. R1 still needs validated source semantics.
 
-The resumed Windows environment check found SQL Server Express running and Docker stopped. File discovery found a candidate MDF/LDF pair, but Windows denied both read-only file-open attempts. No database connection, record query, file copy, service change, permission change, or source-container start occurred. The candidate's relationship to the audited Mac copy remains unverified. Its locator stays outside Git. Resume inspection on an accessible isolated restore, created from a readable backup or isolated detached copy. A historical audit cannot replace that source evidence.
+The earlier Windows environment check found SQL Server Express running and Docker stopped. File discovery found a candidate MDF/LDF pair, but Windows denied both read-only file-open attempts. No database connection, record query, file copy, service change, permission change, or source-container start occurred during that Windows attempt. The candidate's relationship to the audited Mac copy remains unverified. Its locator stays outside Git. The subsequent Mac evidence does not establish that relationship or replace the outstanding financial contract.
 
 R2 needs the approved raw-column allowlist, observed engine and TLS requirements, a selected driver, and restricted-account extraction proof. R3 still needs real provenance and measured transport bounds. R4 needs the real preview and source oracles. R5 needs the approved full population, budgets, per-process and worker peaks, temporary disk peaks, cancellation, overlap, failure, retention, and response measurements. This uniform synthetic scenario does not cover those obligations.
 

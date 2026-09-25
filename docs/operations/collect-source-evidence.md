@@ -27,6 +27,8 @@ Create a private JSON file with this shape. Rejecting unknown keys prevents acci
 
 `scope`, `server`, `database` and `user` are required. `sqlcmdPath` defaults to `sqlcmd` on PATH. It is a trusted executable, optionally an operator-owned private wrapper. The collector does not implement container management. A wrapper must forward arguments, stdin, exit status and signals correctly and must not log credentials. `trustServerCertificate` defaults to false. Setting it true adds `-C` and records `server-certificate-not-validated` in the private artifact.
 
+If a wrapper starts a remote Docker container, give the operator a separate cleanup procedure. Killing the local process group does not guarantee removal of that container. The [OrbStack verification](../evidence/issue-26-source-validation.md) records this distinction and the explicit cleanup of instrumented test helpers.
+
 Supply `SQLCMDPASSWORD` through a protected environment mechanism. Do not place the password in shell arguments, scripts, Git, command logs or this configuration file. The collector passes it only in the child environment and removes other inherited `SQLCMD*` variables. The command has three positional arguments.
 
 ```sh

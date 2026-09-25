@@ -34,6 +34,10 @@ The historical audit evidences names such as `FIS.ID`, `FIS_DETAY.BELGE_TARIHIND
 
 ## Synthetic privacy tests
 
+The developer-only [source evidence collector](../operations/collect-source-evidence.md) has a separate aggregate-use allowlist. It may read document IDs, document types, raw document timestamps and currency references from `FIS`; line and parent/product IDs from `FIS_DETAY`; product IDs from `STOK`; and currency dictionary IDs/codes from `DOVIZ_AD`. IDs remain inside SQL aggregates and joins. The artifact contains counts, bounded type/currency groups and raw timestamp bounds, not document, product or counterparty records. Currency names outside the fixed recognized codes become `OTHER`.
+
+Catalog inspection is restricted to the collector's named column list, including selected quantity, multiplier, amount and historical-cost column types/scales. Catalog visibility does not authorize reading those monetary values. Customer fields, product display names, supplier records, staff records and free text remain excluded. This allowlist does not approve a real analytics package or source financial mapping.
+
 The fixture suite uses conspicuously fake private sentinels only as hostile input. Permitted outputs and snapshots must exclude both prohibited keys and sentinel values. Mutation tests add unknown/private fields at record boundaries and must fail with safe diagnostics rather than printing submitted values. Attack inputs are separate from valid analytics-shaped fixtures.
 
 These tests verify the declared fixture boundary. They do not prove the future extractor avoids broad SELECTs, filters every log path or publishes private-data-free packages. Phase 3 must exercise the actual extraction and publication workflow against its approved allowlist, with purchasing-only supplier membership and synthetic sentinels. A field projection simulated inside a test cannot pass A05 extraction acceptance.

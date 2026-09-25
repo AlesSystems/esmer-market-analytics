@@ -4,7 +4,7 @@
 
 Mapping `source-contract-v1` belongs to [Phase 2, issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5), tasks 2.1 and 2.2. It records approved product policy, historical observations and synthetic assumptions separately. The [foundation specification](../superpowers/specs/2026-09-04-esmer-market-rebuild-design.md) and [audit](../superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md) govern the contract.
 
-No source has been accessed for this phase. No clean restore, newer backup, restricted-account check or reduced real fixture is available to this work. The historical audit retained neither a backup hash nor sufficient redacted examples to complete source validation. All real-source financial mappings remain unsupported. A reviewed synthetic contract does not confer source-reconciled status.
+Phase 2 did not access a source. The authorized [issue 26 OrbStack continuation](../evidence/issue-26-source-validation.md) now records schema and population observations from an isolated copy, plus restricted-account checks. A clean restore, newer backup comparison and approved reduced real fixture remain unavailable. All real-source financial mappings remain unsupported. A reviewed synthetic contract does not confer source-reconciled status.
 
 The executable registry is [src/source/contract.ts](../../src/source/contract.ts). It is declarative and has no source I/O. Its historical dictionary entries are observations, not a complete financial inclusion allowlist. Unknown types and missing essential identities require candidate rejection until explicitly classified.
 
@@ -59,7 +59,17 @@ Known historical exceptions include 13,030 sales lines without a recorded purcha
 
 ## Revalidation gate
 
-A future separately authorized isolated audit must record an opaque source-batch identity, source lineage, backup hash where available, actual cutoff/coverage, clean/restored schema differences and legacy additions. It must use approved read-only queries and scoped permission checks. Credentials and full records stay outside Git and logs.
+### Observed isolated copy on 2026-09-25
+
+Batch `67e45d4c-8d47-4f78-8eef-34e65b9aca7a` contains 529,001 headers, 1,873,553 lines and 16,870 products. Its source timestamp range is `2005-01-20T18:02:44` through `2025-10-12T18:06:48`. These are raw `FIS_TARIHI` bounds, not validated market-local coverage or a claim that intervening periods are complete.
+
+The currency dictionary identifies code 1 as TRY and code 2 as USD. Two purchase invoices and two supplier-return invoices use USD. A future TRY mapping must explicitly account for those four records and their relationships. It must not relabel their amounts as TRY or silently drop them.
+
+Schema inspection establishes `bigint` record IDs, `datetime` document timestamps, `decimal(18,3)` document quantities and `decimal(18,8)` multipliers, historical cost snapshots and selected line amounts. These storage types do not validate unit meaning, tax basis, rounding or economic identity. All 1,873,553 observed line multipliers equal one; this does not prove that every quantity and historical cost share a unit.
+
+An exploratory left join found 100 type-11 headers, one type-12 header and two type-35 headers without current detail lines. They remain an explicit unresolved population. No source-reconciled sales or completed-transaction count is enabled by these observations.
+
+Further checks on the already authorized isolated source must record an opaque source-batch identity, source lineage, backup hash where available, actual cutoff/coverage, clean/restored schema differences and legacy additions. Existing authorization does not need to be requested again for that source and scope. A different source or production access requires separate authorization. Checks must use approved read-only queries and scoped permission tests. Credentials and full records stay outside Git and logs.
 
 A contract revision can support a source rule only after representative reduced examples and independent expectations establish that rule for its declared population. Record exclusions and their monetary exposure. Unknown raw column names, decimal scale and time interpretation stay unresolved until that evidence exists. Financial implementation remains blocked for affected source rules even if synthetic fixture checks pass.
 

@@ -1,0 +1,199 @@
+{
+  "format": "esmer-source-validation-verification-v1",
+  "recordedAt": "2026-09-25T15:29:42.395863+00:00",
+  "codeCommit": "19877d8e1d6d6de1258369db24f3eb0f673cb5eb",
+  "issue": "26",
+  "gates": [
+    "R1 partial",
+    "R2 prerequisites only",
+    "A01 partial",
+    "A05 partial"
+  ],
+  "environment": {
+    "os": "macOS 27.0",
+    "build": "26A428",
+    "hardware": "Apple M4 Pro",
+    "memoryBytes": 25769803776,
+    "node": "24.15.0",
+    "sqlEngine": "Azure SQL Edge Developer 15.0.2000.1574",
+    "compatibilityLevel": "120",
+    "sqlcmd": "Microsoft (R) SQL Server Command Line Tool Version 13.1.0007.0 Linux; observed ODBC13; linux/amd64 container"
+  },
+  "sourceBatch": "67e45d4c-8d47-4f78-8eef-34e65b9aca7a",
+  "privateEvidence": {
+    "artifactSha256": "bf5704642c4bf67e43ef072bac35d9a119932b5b58a4089a4eeafbb37c0e17ce",
+    "schemaFingerprint": "04870db25f035a782d7b5ee64d02d80ccb0f106c502bc4ff166b761269f33f00",
+    "schemaFingerprintScope": "17 allowlisted catalog columns only",
+    "fileMode": "0o600",
+    "stdoutBytes": 1547,
+    "elapsedMs": 540,
+    "groups": 15,
+    "expectedPopulations": {
+      "headers": "529001",
+      "lines": "1873553",
+      "products": "16870"
+    },
+    "actualMatches": true
+  },
+  "originalPreservation": {
+    "same": true,
+    "files": 15,
+    "manifestHash": "83e6704ccc90bc589ca46bcab998bb239e63e2e2a8f721f2a3a7edb3b56826ae",
+    "originalStopped": true
+  },
+  "permissions": {
+    "allowed": {
+      "exit": 0,
+      "sqlErrors": []
+    },
+    "privateColumn": {
+      "exit": 1,
+      "sqlErrors": [
+        "230"
+      ]
+    },
+    "update": {
+      "exit": 1,
+      "sqlErrors": [
+        "229"
+      ]
+    },
+    "delete": {
+      "exit": 1,
+      "sqlErrors": [
+        "229"
+      ]
+    },
+    "ddl": {
+      "exit": 1,
+      "sqlErrors": [
+        "262"
+      ]
+    },
+    "admin": {
+      "exit": 1,
+      "sqlErrors": [
+        "15406"
+      ]
+    },
+    "deleteInitial": {
+      "exit": 1,
+      "sqlErrors": [
+        "1934"
+      ]
+    }
+  },
+  "collectorFailureChecks": {
+    "existing-output": {
+      "exit": 1,
+      "stdout": "EVIDENCE_FAILED\n",
+      "stderr": "",
+      "preexistingOutputRetained": true,
+      "newArtifactPublished": false
+    },
+    "bad-login": {
+      "exit": 1,
+      "stdout": "EVIDENCE_FAILED\n",
+      "stderr": "",
+      "published": false
+    },
+    "certificate-validation": {
+      "exit": 1,
+      "stdout": "EVIDENCE_FAILED\n",
+      "stderr": "",
+      "published": false
+    },
+    "originalUnchanged": "c1f031193b9aafb38ea77d28d0fcc619280fa238844b2673fe2cb012c31394d2"
+  },
+  "collectorStateChecks": {
+    "writable-rejected": {
+      "exit": 1,
+      "stdout": "EVIDENCE_FAILED\n",
+      "stderr": "",
+      "published": false
+    },
+    "revoked-read": {
+      "exit": 1,
+      "stdout": "EVIDENCE_FAILED\n",
+      "stderr": "",
+      "published": false
+    }
+  },
+  "retryAndCleanup": {
+    "retryPassed": true,
+    "sameObservations": true,
+    "remainingReaderSessions": 0
+  },
+  "interruptedQuery": {
+    "mode": "SIGINT during instrumented WAITFOR on actual SQL connection",
+    "connectedBeforeAbort": true,
+    "exit": 1,
+    "stdout": "EVIDENCE_FAILED\n",
+    "stderr": "",
+    "remainingReaderSessions": 0,
+    "published": false
+  },
+  "queryDeadline": {
+    "mode": "2s collector timeout against10s instrumented SQL WAITFOR",
+    "result": {
+      "ok": false,
+      "code": "EVIDENCE_FAILED"
+    },
+    "remainingReaderSessions": 0,
+    "published": false
+  },
+  "verification": {
+    "unit": {
+      "passed": 29,
+      "command": "npm run test:unit"
+    },
+    "integration": {
+      "passed": 245,
+      "command": "npm run test:integration"
+    },
+    "desktop": {
+      "passed": 26,
+      "skipped": 3,
+      "command": "npm run test:desktop; rerun option-b.test.ts and workspace-subviews.test.ts using ESMER_EXECUTABLE for the packaged Mac executable",
+      "initialFailure": "Three existing tests defaulted to Windows .exe and failed ENOENT before launch; all three passed with their supported environment override",
+      "skippedReason": "Windows-specific lifecycle, performance and pagination checks"
+    },
+    "typecheck": "pass",
+    "lint": "pass",
+    "buildAndMacPackaging": "pass via test:desktop",
+    "notices": "PACKAGE_NOTICES_OK 7 dependencies",
+    "macArchive": {
+      "archiveSha256": "7cdd1efc9fa6f2110b954f385150cf0d6cabbf6bde9167e704591a89506d9607",
+      "archiveFiles": 305,
+      "projectToolsOrPrivateDataFiles": 0,
+      "scope": "Project artifact paths; third-party package documentation permitted; not the Windows distribution inventory"
+    },
+    "windowsInventory": "Not executed successfully; existing inventory expects Windows distribution layout. Mac call failed ENOENT; no Windows acceptance inferred"
+  },
+  "review": {
+    "standards": "One P2 process-group cleanup issue resolved in19877d8; independent re-review passed",
+    "spec": "One P2 Windows executable-fixture issue resolved in19877d8; independent re-review passed",
+    "commentAudit": "One redundant catch comment removed; no suppressions",
+    "models": "Astra High standards/spec, Sol High comments/design; one model family",
+    "trailAudit": "Sol High audit checked public receipt, diff and local links; two ambiguous labels corrected. No transcript supplied or independent access to private SQL evidence."
+  },
+  "limitations": [
+    "No real financial mapping or analytics package",
+    "No source-reconciled metrics",
+    "Self-signed isolated server certificate explicitly trusted for successful checks; default validation fails",
+    "Source is cold copied legacy restore; pristine backup hash and permanent lineage unverified",
+    "Production and Windows SQL compatibility unproven",
+    "Instrumented WAITFOR tests exercise active SQL cancellation; not abrupt collector/host termination or the complete future extractor lifecycle",
+    "R1-R6 and release gates remain open",
+    "Instrumented Docker wrapper helpers required separate operator cleanup; local process groups do not own remote container lifecycle"
+  ],
+  "disposableCleanup": {
+    "originalStopped": true,
+    "disposableContainerRemoved": true,
+    "disposableVolumeRemoved": true,
+    "internalNetworkRemoved": true,
+    "temporaryCredentialFilesRemoved": true,
+    "instrumentedDockerHelpersExplicitlyRemoved": 2,
+    "limitation": "Local process-group kill does not manage remote Docker containers; isolated operator cleaned helpers separately."
+  }
+}
