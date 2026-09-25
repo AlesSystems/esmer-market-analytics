@@ -40,3 +40,5 @@ for (const notice of ["LICENSE", "LICENSES.chromium.html"]) {
     `dist/licences/${notice}`,
   );
 }
+await copyFile("third-party/shadcn-LICENSE", "dist/licences/shadcn-LICENSE");
+await copyFile("node_modules/tailwindcss/LICENSE", "dist/licences/tailwindcss-LICENSE");
