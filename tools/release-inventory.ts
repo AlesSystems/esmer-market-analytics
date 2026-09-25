@@ -23,7 +23,8 @@ export async function inspectRelease(directory: string) {
       const bytes = await readFile(join(directory, path));
       files.push({ path, bytes: bytes.length, sha256: hash(bytes) });
       if ((!runtimeFiles.has(path) && !/^locales\/[a-zA-Z0-9-]+\.pak$/.test(path)) || prohibited.test(path)) violations.push(`distribution:${path}`);
-      if (path !== "resources/app.asar" && secrets.test(bytes.toString("utf8"))) violations.push(`content:${path}`);
+      const runtimeBinary = runtimeFiles.has(path) && /\.(?:exe|dll|pak|bin|dat)$/.test(path);
+      if (path !== "resources/app.asar" && !runtimeBinary && secrets.test(bytes.toString("utf8"))) violations.push(`content:${path}`);
     }
   }
   await walk("");

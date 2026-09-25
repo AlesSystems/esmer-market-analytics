@@ -2,6 +2,7 @@ import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { openStore } from "../../src/store/store";
 import { populateRecoveryStore } from "../helpers/recovery-fixtures";
 
@@ -11,6 +12,16 @@ const lifecycleProfile = process.env.ESMER_LIFECYCLE_PROFILE;
 const workRoot = resolve("work/phase-10-lifecycle");
 const phase8Root = resolve("work/windows-phase-8/lifecycle");
 const reusePhase8 = process.env.ESMER_LIFECYCLE_REUSE_PHASE8 === "1";
+
+function storedBusinessData(path: string, acceptedId: string) {
+  const database = new DatabaseSync(path, { readOnly: true });
+  try {
+    const tables = ["datasets", "source_suppliers", "source_documents", "source_lines", "active_dataset", "app_revisions", "adjustment_targets", "report_versions", "evidence_references", "expense_batches"];
+    const records = Object.fromEntries(tables.map(table => [table, database.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()]));
+    const row = database.prepare("SELECT content_json FROM report_versions WHERE id=?").get(acceptedId);
+    return { records, accepted: JSON.parse(String(row?.content_json)) };
+  } finally { database.close(); }
+}
 
 test("packaged Windows profile retains app-owned history across launch and restart", async () => {
   test.skip(process.platform !== "win32", "Windows package lifecycle acceptance");
@@ -39,16 +50,8 @@ test("packaged Windows profile retains app-owned history across launch and resta
         await writeFile(marker, acceptedId, { flag: "wx" });
       }
     }
-    const store = openStore(join(profile, "analytics.sqlite"));
-    const accepted = store.readReport(acceptedId);
-    const baseline = {
-      snapshot: store.readSnapshot(),
-      revisions: store.revisionHistory(),
-      reports: store.listMonthlyReports("2025-09"),
-      expenses: store.expenseBatches(),
-    };
-    store.close();
-    expect(accepted).toMatchObject({ output: { report: { sales: { metrics: { netSales: "100" } }, purchasing: { gross: { coveredGrossProfit: "40" } }, operating: { result: { expenses: reusePhase8 ? "50" : "60" } } } } });
+    const baseline = storedBusinessData(join(profile, "analytics.sqlite"), acceptedId);
+    expect(baseline.accepted).toMatchObject({ output: { report: { sales: { metrics: { netSales: "100" } }, purchasing: { gross: { coveredGrossProfit: "40" } }, operating: { result: { expenses: reusePhase8 ? "50" : "60" } } } } });
     for (let launch = 0; launch < 2; launch++) {
       app = await electron.launch({ executablePath, args: [`--user-data-dir=${profile}`] });
       const page = await app.firstWindow();
@@ -60,11 +63,7 @@ test("packaged Windows profile retains app-owned history across launch and resta
       expect(report).toMatchObject({ status: "monthly", report: { sales: { metrics: { netSales: "100" } }, purchasing: { gross: { coveredGrossProfit: "40" } }, operating: { result: { expenses: reusePhase8 ? "50" : "60" } } } });
       await app.close();
       app = undefined;
-      const reopened = openStore(join(profile, "analytics.sqlite"));
-      try {
-        expect({ snapshot: reopened.readSnapshot(), revisions: reopened.revisionHistory(), reports: reopened.listMonthlyReports("2025-09"), expenses: reopened.expenseBatches() }).toEqual(baseline);
-        expect(reopened.readReport(acceptedId)).toEqual(accepted);
-      } finally { reopened.close(); }
+      expect(storedBusinessData(join(profile, "analytics.sqlite"), acceptedId)).toEqual(baseline);
     }
   } finally {
     if (app) await app.close();
