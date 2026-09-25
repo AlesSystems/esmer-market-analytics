@@ -1,0 +1,29 @@
+
+> esmer-market-analytics@0.2.0 package:win
+> npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar && node tools/release-inventory.ts release/win-unpacked release/release-inventory.json && node scripts/verify-distributions.mjs
+
+
+> esmer-market-analytics@0.2.0 build
+> install-electron && node scripts/build.mjs
+
+  • electron-builder  version=26.15.3 os=10.0.26200
+  • loaded configuration  file=package.json ("build" field)
+  • skipped dependencies rebuild  reason=npmRebuild is set to false
+  • packaging       platform=win32 arch=x64 electron=44.3.0 appOutDir=release\win-unpacked
+  • downloaded      label=electron progress=100%
+  • downloaded electron zip extracted successfully  output=C:\Users\esmer\.codex\worktrees\esmer-option-b\esmer-market-analytics\release\win-unpacked
+  • searching for node modules  pm=npm searchDir=C:\Users\esmer\.codex\worktrees\esmer-option-b\esmer-market-analytics
+  • cannot find path for dependency  dependencies=["fflate@undefined","scheduler@undefined"]
+  • updating asar integrity executable resource  executablePath=release\win-unpacked\Esmer Market Analytics.exe
+  • default Electron icon is used  reason=application icon is not set
+  • signing with signtool.exe  path=release\win-unpacked\Esmer Market Analytics.exe
+  • building        target=nsis file=release\Esmer Market Analytics Setup 0.2.0.exe archs=x64 oneClick=true perMachine=false
+  • signing with signtool.exe  path=release\win-unpacked\resources\elevate.exe
+  • signing with signtool.exe  path=release\Esmer Market Analytics Setup 0.2.0.__uninstaller.exe
+  • signing with signtool.exe  path=release\Esmer Market Analytics Setup 0.2.0.exe
+  • building block map  blockMapFile=release\Esmer Market Analytics Setup 0.2.0.exe.blockmap
+  • building        target=portable file=release\Esmer Market Analytics 0.2.0.exe archs=x64
+  • signing with signtool.exe  path=release\Esmer Market Analytics 0.2.0.exe
+PACKAGE_NOTICES_OK 6 dependencies
+{"files":75,"archiveFiles":291,"violations":[]}
+DISTRIBUTIONS_MATCH_INSPECTED_PAYLOAD

@@ -1,0 +1,12 @@
+
+> esmer-market-analytics@0.2.0 test:integration
+> vitest run --dir tests/integration
+
+
+ RUN  v5.0.1 C:/Users/esmer/.codex/worktrees/esmer-option-b/esmer-market-analytics
+
+
+ Test Files  30 passed (30)
+      Tests  229 passed (229)
+   Start at  15:17:11
+   Duration  7.15s (tests 74%, transform 21%, import 5%)

@@ -4,7 +4,7 @@ import type { MonthlyReport, MonthlyResult, SalesFailure, SalesView } from "./co
 export type GrossSummary = Omit<GrossResult, "covered" | "excluded"> & { coveredCount: number; excludedCount: number };
 export type OperatingDisplay = Omit<MonthlyReport["operating"], "gross"> & { gross: GrossSummary };
 export type MonthlyDisplay = Omit<MonthlyReport, "sales" | "salesEvidence" | "appEvidence" | "purchasing" | "operating"> & {
-  sales: Omit<SalesView, "transactions" | "products" | "categories" | "daily" | "exclusions"> & { exclusionCount: number };
+  sales: Omit<SalesView, "transactions" | "products" | "categories" | "exclusions"> & { exclusionCount: number; topCategories: SalesView["categories"] };
   purchasing: Pick<MonthlyReport["purchasing"], "lineage" | "extractionId"> & { gross: GrossSummary };
   operating: OperatingDisplay;
 };
@@ -28,7 +28,7 @@ export function monthlyDisplay(report: MonthlyReport): MonthlyDisplay {
     state: report.state, review: report.review,
     sales: { context: s.context, cutoff: s.cutoff, importedAt: s.importedAt, extractedAt: s.extractedAt, mappingVersion: s.mappingVersion,
       from: s.from, to: s.to, coverage: s.coverage, stale: s.stale, complete: s.complete, filters: s.filters, metrics: s.metrics,
-      comparisons: s.comparisons, warnings: s.warnings, exclusionCount: s.exclusions.length },
+      comparisons: s.comparisons, warnings: s.warnings, exclusionCount: s.exclusions.length, daily: s.daily.slice(0, 31), topCategories: s.categories.slice(0, 5) },
     purchasing: { lineage: report.purchasing.lineage, extractionId: report.purchasing.extractionId, gross: grossSummary(report.purchasing.gross) },
     operating: { ...report.operating, gross: grossSummary(report.operating.gross) },
   };

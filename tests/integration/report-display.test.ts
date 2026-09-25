@@ -52,6 +52,31 @@ test("evidence requests reject unbounded pages and arbitrary selectors", () => {
   }
 });
 
+test("monthly overview keeps bounded trend and leading categories with the saved report", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords(), document = records.documents[0], line = records.lines[0];
+    records.documents = Array.from({ length: 7 }, (_, index) => ({ ...document, id: `S${index}`, date: `2025-09-0${index + 1}` }));
+    records.lines = records.documents.map((row, index) => ({ ...line, id: `L${index}`, documentId: row.id, sales: { ...line.sales!, productId: `product-${index}`, categoryId: `category-${index}`, categoryName: `Kategori ${index}` } }));
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly report");
+    const reportId = opened.report.id;
+    const { sales } = versions.display({ reportId }).report;
+    expect(sales.daily).toHaveLength(7);
+    expect(sales.daily[0]).toEqual({ date: "2025-09-01", netSales: "100", height: "100", negative: false });
+    expect(sales.topCategories).toHaveLength(5);
+    expect(sales.topCategories[0]).toMatchObject({ id: "category-0", name: "Kategori 0", netSales: "100", share: "14.29" });
+    versions.accept({ candidateId: reportId, previousAcceptedId: null, reason: "Sentetik kontrol" });
+    store.importPackage(businessPackage({ documents: [], lines: [], suppliers: [] }, { extractionId: "deleted" }));
+    versions.open({ period: "2025-09" });
+    const historical = new ReportVersions(store, new SalesReports(store)).display({ reportId }).report.sales;
+    expect(historical.daily[6]).toMatchObject({ date: "2025-09-07", netSales: "100" });
+    expect(historical.topCategories[0]).toMatchObject({ id: "category-0", netSales: "100" });
+  } finally { store.close(); }
+});
+
 test("revisiting an accepted candidate keeps its review and saved display", () => {
   const store = openStore(":memory:");
   try {

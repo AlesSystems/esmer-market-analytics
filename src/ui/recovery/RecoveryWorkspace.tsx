@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RecoveryResult, RecoveryStatus, RestorePreview } from "../../recovery/contracts";
 
 const date = (value: string) => new Intl.DateTimeFormat("tr-TR", {dateStyle: "medium", timeStyle: "short"}).format(new Date(value));
 const cutoffDate = (value: string) => new Intl.DateTimeFormat("tr-TR", {timeZone: "UTC"}).format(new Date(`${value}T00:00:00Z`));
 
-export function RecoveryWorkspace({onClose, onRestored}: {onClose: () => void; onRestored: () => void}) {
+export function RecoveryWorkspace({onClose, onRestored, embedded = false}: {embedded?: boolean; onClose: () => void; onRestored: () => void}) {
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { title.current?.focus(); }, []);
   const [status, setStatus] = useState<RecoveryStatus>();
   const [preview, setPreview] = useState<RestorePreview>();
   const [busy, setBusy] = useState(false);
@@ -37,9 +39,9 @@ export function RecoveryWorkspace({onClose, onRestored}: {onClose: () => void; o
     } catch { setError("İşlem tamamlanamadı. Uygulamayı yeniden açıp tekrar deneyin."); }
     finally { setBusy(false); setBusyAction(""); }
   }
-  return <div className="sales-app"><header className="app-header"><button className="brand" onClick={onClose}>ESMER <span>MARKET</span></button><span className="offline">Canlı bağlantı kapalı</span></header>
+  return <div className={embedded ? "recovery-content" : "sales-app"}>{!embedded && <header className="app-header"><button className="brand" onClick={onClose}>ESMER <span>MARKET</span></button><span className="offline">Canlı bağlantı kapalı</span></header>}
     <main className="recovery-workspace"><nav aria-label="Kurtarma gezinmesi"><button onClick={onClose}>Ana sayfaya dön</button></nav>
-      <h1>Yedekleme ve kurtarma</h1><p>Şifreli yedekleri ve kurtarma anahtarını bu bilgisayardan ayrı saklayın. Geri yükleme için ikisi de gereklidir.</p>
+      <h1 ref={title} tabIndex={-1}>Yedekleme ve kurtarma</h1><p>Şifreli yedekleri ve kurtarma anahtarını bu bilgisayardan ayrı saklayın. Geri yükleme için ikisi de gereklidir.</p>
       {status?.error && <p role="alert">{status.error.message}</p>}
       {error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}
       <section className="recovery-section" aria-label="Yedekleme durumu"><h2>Yedekleme</h2>

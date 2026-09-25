@@ -1,0 +1,83 @@
+{
+  "records": [
+    {
+      "kind": "installer",
+      "name": "Esmer Market Analytics Setup 0.2.0.exe",
+      "bytes": 112880726,
+      "sha256": "238892fd37c2fc5823fe49717ad4a4ba5dda957d73ddf8e5faa8de707899014e",
+      "containerFiles": [
+        {
+          "path": "$PLUGINSDIR/app-64.7z",
+          "bytes": 112374899,
+          "sha256": "d4b1f259555e5396907d525e79b0a52378279c4ca6f6017da8192280cb29d30f"
+        },
+        {
+          "path": "$PLUGINSDIR/nsExec.dll",
+          "bytes": 6656,
+          "sha256": "5d9ceb1ce5f35aea5f9e5a0c0edeeec04dfefe0c77890c80c70e98209b58b962"
+        },
+        {
+          "path": "$PLUGINSDIR/nsis7z.dll",
+          "bytes": 434176,
+          "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+        },
+        {
+          "path": "$PLUGINSDIR/SpiderBanner.dll",
+          "bytes": 9216,
+          "sha256": "996a259e53ca18b89ec36d038c40148957c978c0fd600a268497d4c92f882a93"
+        },
+        {
+          "path": "$PLUGINSDIR/StdUtils.dll",
+          "bytes": 102400,
+          "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+        },
+        {
+          "path": "$PLUGINSDIR/System.dll",
+          "bytes": 12288,
+          "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+        },
+        {
+          "path": "$PLUGINSDIR/WinShell.dll",
+          "bytes": 3072,
+          "sha256": "9be85b986ea66a6997dde658abe82b3147ed2a1a3dcb784bb5176f41d22815a6"
+        },
+        {
+          "path": "$R0/Uninstall Esmer Market Analytics.exe",
+          "bytes": 140068,
+          "sha256": "db41bd5a76970591989b626c4e1137184512ce33201fc9366971fd582a59c2b4"
+        }
+      ],
+      "payloadMatchesUnpacked": true
+    },
+    {
+      "kind": "portable",
+      "name": "Esmer Market Analytics 0.2.0.exe",
+      "bytes": 112713432,
+      "sha256": "87816702d29dbf7c69975e5e274edd13ba42ac87f97eaf64c1a137ab2018a004",
+      "containerFiles": [
+        {
+          "path": "$PLUGINSDIR/app-64.7z",
+          "bytes": 112374899,
+          "sha256": "d4b1f259555e5396907d525e79b0a52378279c4ca6f6017da8192280cb29d30f"
+        },
+        {
+          "path": "$PLUGINSDIR/nsis7z.dll",
+          "bytes": 434176,
+          "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+        },
+        {
+          "path": "$PLUGINSDIR/StdUtils.dll",
+          "bytes": 102400,
+          "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+        },
+        {
+          "path": "$PLUGINSDIR/System.dll",
+          "bytes": 12288,
+          "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+        }
+      ],
+      "payloadMatchesUnpacked": true
+    }
+  ],
+  "limitations": "Generated NSIS plugin files are inventoried by name/hash. This is not a general detector of identifying data or a signature trust check."
+}

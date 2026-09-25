@@ -38,13 +38,14 @@ test("packaged recovery restores a real encrypted backup after original user dat
       })).toBe(true);
     }
     const page = await app.firstWindow();
+    await page.getByText("İşlemler", { exact: true }).click();
     await page.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
     await page.getByRole("button", {name: "Yedeklemeyi kur"}).click();
     await expect(page.getByText("Kurtarma anahtarı doğrulandı ve yedekleme kuruldu.")).toBeVisible();
     await expect.poll(async () => (await readdir(destination)).filter(name => name.endsWith(".esmerbackup")).length).toBeGreaterThan(0);
     await page.screenshot({path: "test-results/phase-9-recovery-1120.png", fullPage: true});
     await page.setViewportSize({width: 680, height: 720});
-    await expect(page.getByRole("button", {name: "ESMER MARKET"})).toBeVisible();
+    await expect(page.locator(".brand")).toBeVisible();
     await page.screenshot({path: "test-results/phase-9-recovery-680.png", fullPage: true});
     expect((await readFile(keyPath)).length).toBeGreaterThan(50);
     await app.close();
@@ -62,16 +63,16 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(restored.getByText(/Veri kesim tarihi: 30\.09\.2025/)).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-1120.png", fullPage: true});
     await restored.setViewportSize({width: 680, height: 720});
-    await expect(restored.getByRole("button", {name: "ESMER MARKET"})).toBeVisible();
+    await expect(restored.locator(".brand")).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
     await expect(restored.getByRole("heading", {name: "Aylık Market Özeti"})).toBeVisible();
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
-    await restored.getByRole("button", {name: "Rapor sürümleri"}).click();
+    await restored.getByRole("button", {name: "Raporlar"}).click();
     await restored.getByRole("button", {name: "Kaydedilmiş sürümü aç"}).click();
-    await expect(restored.getByRole("heading", {name: "Kapsanan net satış"}).locator("..").locator("strong")).toHaveText("100,00 ₺");
-    await expect(restored.locator("dt", {hasText: "Kapsanan tahmini brüt kâr"}).locator("xpath=following-sibling::dd")).toHaveText("40,00 ₺");
-    await expect(restored.locator("dt", {hasText: "Hesaba alınan faaliyet gideri"}).locator("xpath=following-sibling::dd")).toHaveText("60,00 ₺");
+    await expect(restored.locator(".monthly-amount")).toHaveText("100,00 ₺");
+    await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Kapsanan tahmini brüt kâr"}).locator("xpath=following-sibling::dd")).toContainText("40,00 ₺");
+    await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Hesaba alınan faaliyet gideri"}).locator("xpath=following-sibling::dd")).toContainText("60,00 ₺");
     const restoredStore = openStore(join(fresh, "analytics.sqlite"));
     try { expect(restoredStore.readReport(accepted.id)?.output.report).toEqual(accepted); }
     finally { restoredStore.close(); }

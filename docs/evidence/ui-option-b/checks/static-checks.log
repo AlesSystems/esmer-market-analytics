@@ -1,0 +1,7 @@
+
+> esmer-market-analytics@0.2.0 typecheck
+> tsc --noEmit
+
+
+> esmer-market-analytics@0.2.0 lint
+> eslint .

@@ -27,6 +27,7 @@ test("accepted monthly output preserves deleted source facts, app revisions and 
     const restarted = new ReportVersions(store, new SalesReports(store));
     expect(restarted.selected(saved.id)).toEqual(saved);
     expect(restarted.list({ period: "2025-09" }).reports).toHaveLength(1);
+    expect(restarted.list({ period: "2025-09" }).reports[0]).toMatchObject({ cutoff: "2025-09-30" });
   } finally { store.close(); }
 });
 
@@ -117,5 +118,25 @@ test("acceptance rejects a stale predecessor without replacing review history", 
     expect(() => versions.accept({ candidateId: next.report.id, previousAcceptedId: null, reason: "Eski inceleme" })).toThrow("REVIEW_CONFLICT");
     expect(versions.accept({ candidateId: next.report.id, previousAcceptedId: first.report.id, reason: "İkinci" }).status).toBe("monthly");
     expect(versions.list({ period: "2025-09" }).reports).toHaveLength(2);
+  } finally { store.close(); }
+});
+
+test("two saved versions compare their retained values after a newer candidate is opened", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const first = versions.open({ period: "2025-09" }); if (first.status !== "monthly") throw new Error("Expected report");
+    versions.accept({ candidateId: first.report.id, previousAcceptedId: null, reason: "İlk inceleme" });
+    const records = businessRecords(); records.documents = [records.documents[0]]; records.lines = [records.lines[0]];
+    store.importPackage(businessPackage(records, { extractionId: "second" }));
+    const second = versions.open({ period: "2025-09" }); if (second.status !== "monthly") throw new Error("Expected report");
+    versions.accept({ candidateId: second.report.id, previousAcceptedId: first.report.id, reason: "İkinci inceleme" });
+    const current = versions.open({ period: "2025-09" }); if (current.status !== "monthly") throw new Error("Expected candidate");
+    const comparison = versions.compare({ candidateId: second.report.id, acceptedId: first.report.id });
+    expect(comparison.changes).toContainEqual({ path: "sales.metrics.netSales", before: "200", after: "100", delta: "-100" });
+    expect(versions.selected(first.report.id).sales.metrics.netSales).toBe("200");
+    expect(versions.selected(second.report.id).sales.metrics.netSales).toBe("100");
+    expect(versions.selected(current.report.id).review).toBeNull();
   } finally { store.close(); }
 });

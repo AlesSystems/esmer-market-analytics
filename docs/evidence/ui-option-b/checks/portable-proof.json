@@ -1,0 +1,33 @@
+{
+  "executable": "C:\\Users\\esmer\\.codex\\worktrees\\esmer-option-b\\esmer-market-analytics\\release\\Esmer Market Analytics 0.2.0.exe",
+  "wrapperHash": "87816702d29dbf7c69975e5e274edd13ba42ac87f97eaf64c1a137ab2018a004",
+  "expectedArchive": "6d931a6c27b83651e987a7ae7ee55a8ed1b19d91a8ee8e39e28892f83aed2097",
+  "profile": "C:\\Users\\esmer\\.codex\\worktrees\\esmer-option-b\\esmer-market-analytics\\work\\phase-10-lifecycle\\option-b-portable",
+  "baseline": {
+    "schema": 6,
+    "businessHash": "817e91cc6e2499d02d0006e9f57d1987dc8be316560392ff15e38a6f3cfbd970",
+    "acceptedHash": "4d40271513e2849d6ae7cc1c0d7a0acdb2a1a3511ebc6897478b90e5722181e7"
+  },
+  "runs": [
+    {
+      "launch": 1,
+      "processPath": "C:\\Users\\esmer\\AppData\\Local\\Temp\\3JozbghLFn32v9rwOo9tSm2NUkC\\Esmer Market Analytics.exe",
+      "runningArchiveHash": "6d931a6c27b83651e987a7ae7ee55a8ed1b19d91a8ee8e39e28892f83aed2097",
+      "exitCode": 0,
+      "profilePreserved": true,
+      "acceptedReportPreserved": true,
+      "developerRuntimeInChildPath": false
+    },
+    {
+      "launch": 2,
+      "processPath": "C:\\Users\\esmer\\AppData\\Local\\Temp\\3JozbghLFn32v9rwOo9tSm2NUkC\\Esmer Market Analytics.exe",
+      "runningArchiveHash": "6d931a6c27b83651e987a7ae7ee55a8ed1b19d91a8ee8e39e28892f83aed2097",
+      "exitCode": 0,
+      "profilePreserved": true,
+      "acceptedReportPreserved": true,
+      "developerRuntimeInChildPath": false
+    }
+  ],
+  "syntheticOnly": true,
+  "offlineMode": "Playwright network blocking, not physical disconnection"
+}

@@ -1,0 +1,49 @@
+{
+  "packaged": true,
+  "platform": "win32",
+  "electron": "44.3.0",
+  "node": "24.20.0",
+  "display": {
+    "accelerometerSupport": "unknown",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 1440
+    },
+    "colorDepth": 24,
+    "colorSpace": "{primaries:BT709, transfer:SRGB, matrix:RGB, range:FULL}",
+    "depthPerComponent": 8,
+    "detected": true,
+    "displayFrequency": 165,
+    "id": 4018695227,
+    "internal": false,
+    "label": "Odyssey G5",
+    "maximumCursorSize": {
+      "width": 0,
+      "height": 0
+    },
+    "monochrome": false,
+    "nativeOrigin": {
+      "x": 0,
+      "y": 0
+    },
+    "rotation": 0,
+    "scaleFactor": 1,
+    "size": {
+      "width": 2560,
+      "height": 1440
+    },
+    "workArea": {
+      "x": 0,
+      "y": 0,
+      "width": 2560,
+      "height": 1392
+    },
+    "workAreaSize": {
+      "width": 2560,
+      "height": 1392
+    },
+    "touchSupport": "unknown"
+  }
+}

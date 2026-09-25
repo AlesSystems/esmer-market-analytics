@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { openStore } from "../store/store";
 import { canonical } from "../source/package";
+import { calculateExpenseComponents } from "../analytics/operating";
 import { Exact, sum } from "../domain/money";
 import { requireValid } from "../store/revisions";
 import { classificationLabels, classifications, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
@@ -96,6 +97,10 @@ export class Expenses {
     const rows = snapshot.app.filter(row => row.kind === "expense").filter(row => (row.value.date.startsWith(period) || isExpense(row.value) && row.value.paymentDate?.startsWith(period)));
     const confirmation = snapshot.app.find(row => row.kind === "confirmation" && row.entityId === `expense-complete:${period}`);
     const current = rows.filter(row => isExpense(row.value) && !row.value.voided);
-    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), complete: confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.reviewedRevision === expenseRevision, incurred: sum(current.filter(row => row.value.date.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
+    const complete = confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.reviewedRevision === expenseRevision;
+    const components = calculateExpenseComponents({ period, expenses: snapshot.app });
+    const coverage = components.reasons.length ? "incomplete" : complete || Object.values(components.breakdownCoverage).includes("available") ? "available" : "missing";
+    const summary: ExpensePeriod["summary"] = { expenses: coverage === "available" ? components.expenses : null, coverage, labour: components.breakdownCoverage.labour === "available" ? components.breakdown.labour : null, labourCoverage: components.breakdownCoverage.labour, reasons: components.reasons, excluded: components.excluded };
+    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, incurred: sum(current.filter(row => row.value.date.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
   }
 }

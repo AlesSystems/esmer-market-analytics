@@ -6,7 +6,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { backup, DatabaseSync } from "node:sqlite";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
 import { migrate } from "./migrations";
-import type { Availability, ImportErrorCode } from "../domain/contracts";
+import type { Availability, ImportErrorCode, ImportHistoryEntry } from "../domain/contracts";
 import { type AcceptedReport, type AppChange, type AppRecord, type Pin, type Target, requireValid, validId, validateChange } from "./revisions";
 
 export type ImportCode = ImportErrorCode;
@@ -53,7 +53,10 @@ class AnalyticsStore {
   }
   availability(): Availability {
     const lastImportError = this.lastImportError();
-    const error = lastImportError ? { lastImportError } : {};
+    const recentImports = this.db.prepare(`SELECT b.id, b.created_at AS createdAt, b.state, b.error_code AS errorCode,
+      json_extract(d.manifest_json,'$.cutoff') AS cutoff FROM import_batches b
+      LEFT JOIN datasets d ON d.id=b.dataset_id ORDER BY b.rowid DESC LIMIT 10`).all() as ImportHistoryEntry[];
+    const error = { ...(lastImportError ? { lastImportError } : {}), ...(recentImports.length ? { recentImports } : {}) };
     const row = this.db.prepare("SELECT d.id,d.manifest_json,d.warnings_json,d.summary_json FROM active_dataset a JOIN datasets d ON d.id=a.dataset_id").get();
     if (!row) return { status: "ready", store: "empty", liveConnection: "disabled", ...error };
     const manifest = decode<Manifest>(row.manifest_json);
@@ -201,6 +204,7 @@ class AnalyticsStore {
   listMonthlyReports(period: string): ReportSummary[] {
     return this.db.prepare(`SELECT id, dataset_id AS datasetId, COALESCE(app_revision,0) AS appRevision,
       json_extract(content_json,'$.output.report.context.period') AS period,
+      json_extract(content_json,'$.output.report.sales.cutoff') AS cutoff,
       json_extract(content_json,'$.output.report.review.acceptedAt') AS acceptedAt,
       json_extract(content_json,'$.output.report.review.reason') AS reason
       FROM report_versions WHERE json_extract(content_json,'$.output.report.format')='monthly-report-v1'
