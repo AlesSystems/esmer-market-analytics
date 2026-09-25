@@ -34,7 +34,7 @@ export type MonthlyReport = {
   review: { acceptedAt: string; reason: string; previousAcceptedId: string | null } | null;
 };
 export type MonthlyResult = { status: "monthly"; report: MonthlyReport } | SalesFailure;
-export type ReportSummary = { id: string; period: string; datasetId: string; appRevision: number; acceptedAt: string; reason: string };
+export type ReportSummary = { cutoff: string; id: string; period: string; datasetId: string; appRevision: number; acceptedAt: string; reason: string };
 export type ReportHistoryResult = { status: "history"; reports: ReportSummary[] };
 export type ReportDifference = { status: "difference"; candidateId: string; acceptedId: string; changes: { path: string; before: string | number | boolean | null; after: string | number | boolean | null; delta: string | null }[] };
 export type ReportRequestMap = {

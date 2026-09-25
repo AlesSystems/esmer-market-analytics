@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -12,7 +13,7 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await importPackage(page);
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     const overview = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(overview).toContainText("200,00 ₺");
@@ -21,14 +22,14 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
     await expect(overview).toContainText("%50");
     await expect(overview).toContainText("İşçilik");
     await expect(overview).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-    await expect(page.getByText("Sentetik gösterim verisi; gerçek market verisi değildir.", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Satış Özeti", exact: true }).press("Enter");
+    await expect(page.getByText("Sentetik veri", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Satışlar", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Aylık Market Özeti", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Özet", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/phase-8-monthly-overview.png", fullPage: true });
     await page.setViewportSize({ width: 680, height: 720 });
-    await expect(page.getByRole("button", { name: "Rapor sürümleri", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Raporlar", exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/phase-8-monthly-small.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -43,23 +44,24 @@ test("reviewed monthly values and source explanations survive refresh and export
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, paths) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [paths.packagePath] }); dialog.showSaveDialog = async () => ({ canceled: false, filePath: paths.exportPath }); }, { packagePath, exportPath });
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await importPackage(page);
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Rapor sürümleri", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Raporlar", exact: true }).press("Enter");
     await page.getByLabel("Rapor inceleme açıklaması").fill("Eylül sentetik kontrolü");
     await page.getByRole("button", { name: "İncelenen raporu kaydet" }).click();
     await expect(page.getByRole("region", { name: "Seçili rapor", exact: true })).toContainText("Kaydedilmiş sürüm");
-    await expect(page.getByText("Dönem: Geçici", { exact: true })).toBeVisible();
+    await expect(page.getByText("Geçici", { exact: true })).toBeVisible();
     const records = businessRecords(); records.documents = [records.documents[0]]; records.lines = [records.lines[0]];
     await writeFile(packagePath, businessPackage(records, { extractionId: "business-2", extractedAt: "2025-10-02T00:00:00.000Z" }));
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Raporu yenile", exact: true }).click();
-    await page.getByRole("button", { name: "Rapor sürümleri", exact: true }).click();
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await page.getByRole("button", { name: "Adayla karşılaştır", exact: true }).click();
     await expect(page.getByRole("region", { name: "Sürüm farkları" })).toContainText("Net satış");
     await page.getByRole("button", { name: "Kaydedilmiş sürümü aç", exact: true }).click();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("200,00 ₺");
+    await page.getByText("Rapor kanıtı", { exact: true }).click();
     await page.getByRole("button", { name: "Sabit rapor kanıtlarını göster" }).click();
     const sourceRows = page.locator(".saved-evidence > details > summary").filter({ hasText: "100,00 ₺" });
     await expect(sourceRows).toHaveCount(2);

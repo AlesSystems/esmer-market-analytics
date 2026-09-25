@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -23,7 +24,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
   try {
     const page = await app.firstWindow();
     await expect(
-      page.getByRole("heading", { name: "Henüz veri içe aktarılmadı" }),
+      page.getByRole("heading", { name: "Henüz veri yok" }),
     ).toBeVisible();
     await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(page.locator("input[type=password]")).toHaveCount(0);
@@ -211,7 +212,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
     });
     const reopened = await app.firstWindow();
     await expect(
-      reopened.getByRole("heading", { name: "Henüz veri içe aktarılmadı" }),
+      reopened.getByRole("heading", { name: "Henüz veri yok" }),
     ).toBeVisible();
     await expect(reopened.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(reopened.locator("input[type=password]")).toHaveCount(0);
@@ -235,24 +236,24 @@ test("packaged app imports through native selection, preserves data after failed
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Henüz veri içe aktarılmadı" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
     await expect(page.getByText("Sentetik gösterim verisi — gerçek market verisi değildir.")).toBeVisible();
     await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
     const availability = await page.evaluate(() => window.esmer.getAvailability());
     expect(availability).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled", dataset: { cutoff: "2025-02-02", counts: { documents: 2, lines: 2, suppliers: 0 }, warnings: ["SYNTHETIC_ONLY"] } });
     await page.screenshot({ path: "test-results/phase-4-imported.png" });
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByText("Bu veri paketi zaten etkin. Veriler değiştirilmedi.")).toBeVisible();
     await writeFile(packagePath, "invalid package");
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByRole("alert")).toHaveText("Veri paketi geçersiz. Son geçerli veriler korundu.");
     expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
     await page.screenshot({ path: "test-results/phase-4-import-failed.png" });
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
     await app.close();
@@ -277,24 +278,24 @@ for (const loaded of [false, true]) {
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
       const page = await app.firstWindow();
-      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri içe aktarılmadı" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok" })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
       expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
       await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
-      await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+      await importPackage(page);
       await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
       await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
       if (loaded) {
         await writeFile(packagePath, sourcePackage("a", "earlier-lineage"));
         await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-        await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+        await importPackage(page);
         await expect(page.getByText("Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.")).toBeVisible();
         await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
         expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
         await writeFile(packagePath, sourcePackage("b"));
       }
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-      await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+      await importPackage(page);
       await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveCount(0);
       expect(await page.evaluate(() => window.esmer.getAvailability())).not.toHaveProperty("lastImportError");
@@ -354,7 +355,7 @@ test("unreadable recovery config keeps an older database untouched and restore r
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole("heading", {name: "Yerel hizmet kullanılamıyor"})).toBeVisible();
+    await expect(page.getByRole("heading", {name: "Yerel veriler açılamadı"})).toBeVisible();
     await page.getByRole("button", {name: "Yedekten geri yükle"}).click();
     await expect(page.getByRole("heading", {name: "Yedekleme ve kurtarma"})).toBeVisible();
     await expect(page.getByRole("alert")).toContainText("Yerel kurtarma ayarı okunamadı");

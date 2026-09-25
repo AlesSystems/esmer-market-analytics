@@ -27,6 +27,7 @@ test("accepted monthly output preserves deleted source facts, app revisions and 
     const restarted = new ReportVersions(store, new SalesReports(store));
     expect(restarted.selected(saved.id)).toEqual(saved);
     expect(restarted.list({ period: "2025-09" }).reports).toHaveLength(1);
+    expect(restarted.list({ period: "2025-09" }).reports[0]).toMatchObject({ cutoff: "2025-09-30" });
   } finally { store.close(); }
 });
 

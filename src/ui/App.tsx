@@ -5,6 +5,7 @@ import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { SalesWorkspace } from "./SalesWorkspace";
 import type { SalesView } from "../reports/contracts";
 import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
+import { AppShell } from "./AppShell";
 import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
 
 const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." } satisfies Availability;
@@ -59,16 +60,16 @@ function App() {
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
     {result && <p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>}
   </>;
-  if (recoveryOpen) return <RecoveryWorkspace onClose={() => setRecoveryOpen(false)} onRestored={() => { setRecoveryOpen(false); setSales(undefined); void window.esmer.getAvailability().then(setAvailability); }} />;
-  if (expensesOpen) return <div className="sales-app"><header className="app-header"><span className="brand">ESMER <span>MARKET</span></span><span className="offline">Canlı bağlantı kapalı</span></header><div className="workspace"><div className="workspace-header"><nav aria-label="Analiz gezinmesi"><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button></nav><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label></div><OperationProgress /><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></div></div>;
-  if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} openRecovery={() => setRecoveryOpen(true)} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
+  if (!sales && (recoveryOpen || expensesOpen)) return <AppShell destination={expensesOpen ? "expenses" : undefined} controls={<span>Yerel veriler</span>}>
+    {recoveryOpen ? <RecoveryWorkspace embedded onClose={() => setRecoveryOpen(false)} onRestored={() => { setRecoveryOpen(false); setSales(undefined); void window.esmer.getAvailability().then(setAvailability); }} /> : <><button onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</button><label className="period-label">Dönem<input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label><OperationProgress /><ExpensesWorkspace key={expensePeriod} period={expensePeriod} /></>}
+  </AppShell>;
+  if (sales) return <SalesWorkspace view={sales} setView={setSales} importing={importing} importPackage={importPackage} openRecovery={() => setRecoveryOpen(true)} recoveryOpen={recoveryOpen} closeRecovery={() => setRecoveryOpen(false)} onRestored={() => { setRecoveryOpen(false); setSales(undefined); void window.esmer.getAvailability().then(setAvailability); }} stale={availability?.status === "ready" && availability.store === "loaded" && availability.dataset.datasetId !== sales.context.datasetId} messages={messages} />;
   return (
-    <main className="legacy">
-      <header><span className="brand">ESMER MARKET</span><span>Yerel analiz</span></header>
-      <section aria-live="polite" aria-busy={importing}>
-        <p className="eyebrow">MARKETİNİZİN GENEL GÖRÜNÜMÜ</p>
-        {!availability ? <h1>Yerel hizmet başlatılıyor…</h1> : availability.status === "ready" ? <>
-          <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri içe aktarılmadı"}</h1>
+    <AppShell controls={<span>Yerel analiz</span>}><main className="start-workspace">
+      <section className="block start-state" aria-live="polite" aria-busy={importing}>
+        
+        {!availability ? <h1>Yerel veriler açılıyor</h1> : availability.status === "ready" ? <>
+          <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok"}</h1>
           {availability.store === "loaded" ? <>
             <p>Veri kesim tarihi: <strong>{date(availability.dataset.cutoff)}</strong><br />Paket hazırlanma tarihi: {date(availability.dataset.extractedAt)}</p>
             <p>{new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.documents)} belge · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.lines)} satır · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.suppliers)} tedarikçi</p>
@@ -79,12 +80,12 @@ function App() {
           <button type="button" onClick={() => setRecoveryOpen(true)}>Yedekleme ve kurtarma</button>
           <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
           <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
-        </> : <><h1>Yerel hizmet kullanılamıyor</h1><p>{availability.message}</p><button type="button" onClick={() => setRecoveryOpen(true)}>Yedekten geri yükle</button></>}
+        </> : <><h1>Yerel veriler açılamadı</h1><p>{availability.message}</p><button onClick={() => { setAvailability(undefined); void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); }}>Yeniden dene</button><button type="button" onClick={() => setRecoveryOpen(true)}>Yedekten geri yükle</button></>}
         {salesError && <p role="status">Satış raporu kullanılamıyor. {salesError}</p>}
         {messages}
       </section>
       <footer>Esmer Market · Çevrimdışı analiz</footer>
-    </main>
+    </main></AppShell>
   );
 }
 createRoot(document.getElementById("root")!).render(<App />);

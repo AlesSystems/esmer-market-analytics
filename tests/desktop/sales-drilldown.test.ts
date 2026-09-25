@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -16,8 +17,8 @@ test("packaged sales workspace follows a number through product, document and so
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
+    await importPackage(page);
+    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.getByLabel("Dönem")).toHaveValue("2025-09");
     await expect(page.locator(".metric").first()).toContainText("365,00 ₺");
@@ -32,8 +33,9 @@ test("packaged sales workspace follows a number through product, document and so
     await page.getByRole("button", { name: "İçecekler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Kategori / Ürün Detayı", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Gazoz", exact: true })).toBeVisible();
+    await page.locator("main > .metric-evidence > summary").click();
     await expect(page.locator(".comparison-boundaries")).toContainText("01.08.2025 – 03.08.2025");
-    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
+    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
     await page.getByLabel("Ürün ara").fill("İÇME");
     await page.getByRole("button", { name: "İçme suyu", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "İşlemler", exact: true })).toBeVisible();
@@ -59,7 +61,7 @@ test("packaged sales workspace follows a number through product, document and so
     await page.getByRole("button", { name: "S002", exact: true }).press("Enter");
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().click();
     await writeFile(packagePath, salesPackage(journeyRecords(), { extractionId: "sales-2" }));
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
     await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Ürün ara")).toHaveValue("İÇME");
@@ -91,8 +93,8 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
+    await importPackage(page);
+    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.getByText("Kısmi dönem · Uzlaşma eksik", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "S003", exact: true }).click();

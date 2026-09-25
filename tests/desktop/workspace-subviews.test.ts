@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -14,7 +15,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByRole("navigation", { name: "Alış ve maliyet görünümleri" })).toBeVisible();
     await expect(page.getByRole("region", { name: "Alış geçmişi", exact: true })).toBeVisible();

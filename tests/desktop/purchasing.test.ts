@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -12,7 +13,7 @@ test("legacy sales remain usable while purchasing evidence is explicitly unavail
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true })).toBeVisible();
     await expect(page.getByText("Maliyet ve alış kanıtı yok", { exact: true })).toBeVisible();
@@ -30,7 +31,7 @@ test("purchasing shows covered estimates and follows converted return evidence w
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.locator(".metric").first()).toContainText("40,00 ₺");
     await page.getByRole("button", { name: "Kapsam ve dışlananlar", exact: true }).click();
@@ -64,8 +65,7 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await page.screenshot({ path: "test-results/phase-6-purchasing-small.png", fullPage: true });
     await page.setViewportSize({ width: 1120, height: 850 });
     await writeFile(packagePath, businessPackage(purchasingJourney(), { extractionId: "business-2" }));
-    await page.getByText("İşlemler", { exact: true }).click();
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "D1", exact: true }).click();
     await expect(panel.getByText("business-1", { exact: true })).toBeVisible();
@@ -89,7 +89,7 @@ test("customer return evidence opens its original sale from the prior month and 
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await page.getByRole("button", { name: "Kapsam ve dışlananlar", exact: true }).click();
     await page.getByText("Satır maliyet kanıtları", { exact: true }).click();
@@ -114,7 +114,7 @@ test("purchasing distinguishes partial source coverage from a period with no sou
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
+    await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByText("Kaynak dönem kapsamı eksik", { exact: true })).toBeVisible();
     await expect(page.locator(".metric").first()).toContainText("40,00 ₺");

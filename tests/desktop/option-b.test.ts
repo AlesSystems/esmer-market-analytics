@@ -1,3 +1,4 @@
+import { importPackage } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -12,7 +13,7 @@ test("sidebar keeps the reporting period through analysis and recovery", async (
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+    await importPackage(page);
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
     await expect(nav.getByRole("button", { name: "Özet", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
