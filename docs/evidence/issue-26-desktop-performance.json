@@ -1,0 +1,65 @@
+{
+  "gate": "D18/A07",
+  "scope": "Complete imported synthetic package, not full market source volume",
+  "commit": "2f3d60798917a34633fda090845eeafb2aaf7409",
+  "archiveSha256": "e457037cf9cbd89b0e57f245591da0564c6e2eeb9c7133f8748c49f7b085da7c",
+  "environment": {
+    "os": "10.0.26200",
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "logicalCpus": 20,
+    "ramBytes": 33974288384,
+    "arch": "x64"
+  },
+  "dataset": {
+    "documents": 25000,
+    "lines": 25000,
+    "bytes": 16442402,
+    "sha256": "8966544a2aeb51bef3facad8716dc71d56602be5a7d3dda1e01d5aa900f2928b",
+    "cutoff": "2025-09-30"
+  },
+  "conditions": "Three fresh processes, same imported profile; OS caches not cleared. First navigation and repeated navigation. Two rendered frames after content readiness. Startup calculation reported separately.",
+  "samples": [
+    {
+      "process": 1,
+      "startupMs": 2473.1119,
+      "ordinary": {
+        "salesFirst": 297.19999998807907,
+        "transactionsFirst": 287.30000001192093,
+        "nextPage": 12.900000005960464,
+        "transactionDetail": 19.69999998807907,
+        "monthlyReturn": 36.80000001192093,
+        "salesWarm": 289.30000001192093,
+        "transactionsWarm": 283.40000000596046,
+        "monthlyWarm": 15.799999982118607
+      }
+    },
+    {
+      "process": 2,
+      "startupMs": 2499.654699999999,
+      "ordinary": {
+        "salesFirst": 300.2999999821186,
+        "transactionsFirst": 288.19999998807907,
+        "nextPage": 13.199999988079071,
+        "transactionDetail": 20,
+        "monthlyReturn": 37,
+        "salesWarm": 289.2999999821186,
+        "transactionsWarm": 276.69999998807907,
+        "monthlyWarm": 16.30000001192093
+      }
+    },
+    {
+      "process": 3,
+      "startupMs": 2449.7229000000007,
+      "ordinary": {
+        "salesFirst": 299,
+        "transactionsFirst": 281,
+        "nextPage": 11.300000011920929,
+        "transactionDetail": 26.200000017881393,
+        "monthlyReturn": 36.099999994039536,
+        "salesWarm": 288.69999998807907,
+        "transactionsWarm": 283,
+        "monthlyWarm": 24
+      }
+    }
+  ]
+}
