@@ -9,9 +9,10 @@ export type ReportExportResult = SalesFailure | { status: "saved" } | { status: 
 export type ReportServiceRequest = { [K in keyof ReportRequestMap]: { operation: K; payload: ReportRequestMap[K] } }[keyof ReportRequestMap];
 export type ImportErrorCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
 export type DatasetMetadata = { datasetId: string; cutoff: string; extractedAt: string; counts: { documents: number; lines: number; suppliers: number }; warnings: string[] };
+export type ImportHistoryEntry = { id: string; createdAt: string; state: string; cutoff: string | null; errorCode: string | null };
 export type Availability =
-  | { status: "ready"; store: "empty"; liveConnection: "disabled"; lastImportError?: ImportErrorCode }
-  | { status: "ready"; store: "loaded"; liveConnection: "disabled"; dataset: DatasetMetadata; lastImportError?: ImportErrorCode }
+  | { status: "ready"; store: "empty"; liveConnection: "disabled"; lastImportError?: ImportErrorCode; recentImports?: ImportHistoryEntry[] }
+  | { status: "ready"; store: "loaded"; liveConnection: "disabled"; dataset: DatasetMetadata; lastImportError?: ImportErrorCode; recentImports?: ImportHistoryEntry[] }
   | { status: "unavailable"; code: "SERVICE_UNAVAILABLE"; message: string };
 export type RequestError = {
   status: "rejected";

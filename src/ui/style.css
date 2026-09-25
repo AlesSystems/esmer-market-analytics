@@ -31,7 +31,7 @@ header {
   letter-spacing: 0.09em;
   color: #10213A;
 }
-section {
+.legacy section {
   margin: 72px 0;
   background: #fff;
   border: 1px solid #dce3da;
@@ -81,7 +81,7 @@ footer {
   main {
     padding: 24px;
   }
-  section {
+  .legacy section {
     margin: 40px 0;
     padding: 28px;
   }
@@ -746,7 +746,7 @@ input, textarea { caret-color: #0057D9; }
 .sales-app button.primary { background: var(--blue); color: white; border-color: var(--blue); }
 .sales-app .app-header { max-width: none; min-height: 80px; padding: 18px 32px; gap: 18px; flex-wrap: wrap; color: var(--ink); }
 .app-shell { display: grid; grid-template-columns: 220px minmax(0,1fr); }
-.sales-app .sidebar { background: var(--navy); color: white; padding: 32px 16px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 42px; }
+.sales-app .sidebar { background: var(--navy); color: white; padding: 32px 16px; position: sticky; z-index: 2; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 42px; }
 .sales-app .sidebar .brand { color: white; font-size: 20px; line-height: 1.4; padding: 0 12px; letter-spacing: .02em; }
 .sales-app .sidebar .brand span { display: block; color: white; font-size: 14px; font-weight: 400; letter-spacing: .17em; }
 .sales-app .sidebar nav { display: grid; gap: 6px; align-items: stretch; }
@@ -817,7 +817,7 @@ input, textarea { caret-color: #0057D9; }
 }
 @media (max-width: 800px) {
   .app-shell { display: block; }
-  .sales-app .sidebar { height: auto; position: static; padding: 16px 20px; gap: 18px; }
+  .sales-app .sidebar { height: auto; position: relative; padding: 16px 20px; gap: 18px; }
   .sales-app .sidebar .brand span { display: inline; font-size: inherit; font-weight: inherit; letter-spacing: inherit; }
   .sales-app .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
   .sales-app .sidebar nav button { min-height: 42px; padding: 9px 10px; }
@@ -856,7 +856,7 @@ input, textarea { caret-color: #0057D9; }
 .sales-app .sidebar-controls .period-label { display: grid; gap: 8px; font-size: 14px; color: #DCE6F5; }
 .sales-app .sidebar-controls input { color-scheme: dark; background: #172A46; border-color: #566781; color: white; width: 100%; }
 .sales-app .sidebar-controls .synthetic-label { justify-self: start; color: #FFE3A0; border-color: #9A8250; background: #302C24; }
-.sales-app .sidebar-controls summary { color: #DCE6F5; border-color: #566781; }
+.sales-app .sidebar-controls > details > summary { color: #DCE6F5; border-color: #566781; }
 .sales-app .sidebar-controls .data-status summary { padding-left: 0; border-color: transparent; flex-wrap: wrap; }
 .sales-app .sidebar-controls .data-popover { left: calc(100% + 20px); right: auto; top: 0; color: var(--ink); }
 .sales-app .sidebar-controls .operations-menu { margin: 0; }
@@ -905,3 +905,15 @@ input, textarea { caret-color: #0057D9; }
  .sales-app .monthly-supporting > div + div { border: 0; padding-top: 0; }
 }
 @media (max-width: 500px) { .sales-app .monthly-supporting { grid-template-columns: 1fr; } .sales-app .financial-ledger > div { grid-template-columns: 1fr; } }
+
+.sales-app .import-outcome { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.sales-app .import-outcome button { padding: 4px 8px; font-size: 14px; }
+.import-history { list-style: none; padding: 0; max-height: 40vh; overflow: auto; }
+.import-history li { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.import-history span { display: block; margin-top: 6px; }
+
+.sales-app .report-actions label { display: grid; gap: 8px; max-width: 100%; min-width: 0; flex: 1 1 240px; }
+.sales-app .report-actions select { width: 100%; min-width: 0; }
+.sales-app .purchase-filters { margin-bottom: 20px; }
+.sales-app .workspace > div > div > .block + .block { margin-top: 20px; }
+.sales-app .monthly-finance { padding: 0; background: transparent; border: 0; border-radius: 0; }
