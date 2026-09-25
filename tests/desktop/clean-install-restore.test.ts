@@ -71,8 +71,8 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await restored.getByRole("button", {name: "Raporlar"}).click();
     await restored.getByRole("button", {name: "Kaydedilmiş sürümü aç"}).click();
     await expect(restored.locator(".monthly-amount")).toHaveText("100,00 ₺");
-    await expect(restored.locator("dt", {hasText: "Kapsanan tahmini brüt kâr"}).locator("xpath=following-sibling::dd")).toContainText("40,00 ₺");
-    await expect(restored.locator("dt", {hasText: "Hesaba alınan faaliyet gideri"}).locator("xpath=following-sibling::dd")).toContainText("60,00 ₺");
+    await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Kapsanan tahmini brüt kâr"}).locator("xpath=following-sibling::dd")).toContainText("40,00 ₺");
+    await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Hesaba alınan faaliyet gideri"}).locator("xpath=following-sibling::dd")).toContainText("60,00 ₺");
     const restoredStore = openStore(join(fresh, "analytics.sqlite"));
     try { expect(restoredStore.readReport(accepted.id)?.output.report).toEqual(accepted); }
     finally { restoredStore.close(); }
