@@ -15,7 +15,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByRole("navigation", { name: "Alış ve maliyet görünümleri" })).toBeVisible();
     await expect(page.getByRole("region", { name: "Alış geçmişi", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true })).toHaveCount(0);

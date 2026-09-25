@@ -13,10 +13,10 @@ test("legacy sales remain usable while purchasing evidence is explicitly unavail
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Maliyet ve Alışlar", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true })).toBeVisible();
     await expect(page.getByText("Maliyet ve alış kanıtı yok", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Satış Özeti", exact: true }).click();
+    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
     await expect(page.locator(".metric").first()).toContainText("180,00 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -31,12 +31,14 @@ test("purchasing shows covered estimates and follows converted return evidence w
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
-    await expect(page.locator(".metric").nth(2)).toContainText("40,00 ₺");
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await expect(page.locator(".metric").first()).toContainText("40,00 ₺");
+    await page.getByRole("button", { name: "Kapsam ve dışlananlar", exact: true }).click();
     await expect(page.getByText("1 kapsanan / 1 dışlanan satır", { exact: false })).toContainText("%50");
     await expect(page.getByText("Negatif stok kaydı var", { exact: false })).toBeVisible();
     await expect(page.getByText("Fire kayıtları seyrek", { exact: false })).toBeVisible();
-    const returnTable = page.locator("section").filter({ has: page.getByRole("heading", { name: "Alış geçmişi ve tedarikçi iadeleri", exact: true }) }).locator("table").nth(1);
+    await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
+    const returnTable = page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).locator("table");
     await expect(returnTable.getByRole("row")).toHaveCount(2);
     await expect(returnTable.getByRole("cell", { name: "Bilinmiyor", exact: true })).toHaveCount(3);
     await page.getByLabel("Tedarikçi", { exact: true }).selectOption("supplier-1");
@@ -62,12 +64,14 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await page.screenshot({ path: "test-results/phase-6-purchasing-small.png", fullPage: true });
     await page.setViewportSize({ width: 1120, height: 850 });
     await writeFile(packagePath, businessPackage(purchasingJourney(), { extractionId: "business-2" }));
+    await page.getByText("İşlemler", { exact: true }).click();
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "D1", exact: true }).click();
     await expect(panel.getByText("business-1", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Raporu yenile" }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
     await page.getByRole("button", { name: "D1", exact: true }).click();
     await expect(panel.getByText("business-2", { exact: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
@@ -86,7 +90,8 @@ test("customer return evidence opens its original sale from the prior month and 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await page.getByRole("button", { name: "Kapsam ve dışlananlar", exact: true }).click();
     await page.getByText("Satır maliyet kanıtları", { exact: true }).click();
     const opener = page.getByRole("button", { name: "C1", exact: true });
     await opener.press("Enter");
@@ -110,12 +115,12 @@ test("purchasing distinguishes partial source coverage from a period with no sou
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await page.getByRole("button", { name: "Veri paketi içe aktar" }).click();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByText("Kaynak dönem kapsamı eksik", { exact: true })).toBeVisible();
-    await expect(page.locator(".metric").nth(2)).toContainText("40,00 ₺");
+    await expect(page.locator(".metric").first()).toContainText("40,00 ₺");
     await page.getByLabel("Dönem").fill("2025-10");
-    await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Maliyet ve Alışlar", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await expect(page.getByText("Maliyet ve alışlar için dönem verisi yok", { exact: true })).toBeVisible();
     await expect(page.locator(".metric")).toHaveCount(0);
     await page.screenshot({ path: "test-results/phase-6-purchasing-unavailable.png", fullPage: true });
