@@ -5,14 +5,39 @@ import { join, resolve } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { importPackage } from "../helpers/desktop-navigation";
 import { workbook, row } from "../helpers/expense-fixtures";
-import { monthlyUiExpected, representativeMonthPackage } from "../helpers/shadcn-fixtures";
+import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } from "../helpers/shadcn-fixtures";
 
 const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/win-unpacked/Esmer Market Analytics.exe");
 
-async function importedApp() {
+test("forced colors keeps a keyboard focus outline on actions and period input", async ({}, testInfo) => {
+  const { app, userData, packagePath } = await importedApp();
+  try {
+    const page = await app.firstWindow();
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+    await importPackage(page);
+    await page.emulateMedia({ forcedColors: "active" });
+    for (const control of [page.getByRole("button", { name: "Giderleri incele", exact: true }), page.getByLabel("Dönem", { exact: true })]) {
+      await control.focus();
+      await control.press("Tab");
+      await page.keyboard.press("Shift+Tab");
+      await expect(control).toBeFocused();
+      const outline = await control.evaluate(node => {
+        const style = getComputedStyle(node);
+        return { style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+      });
+      expect(outline.style).not.toBe("none");
+      expect(outline.width).toBeGreaterThanOrEqual(2);
+    }
+    await capture(page, testInfo.outputPath("forced-colors-keyboard-focus.png"));
+  } finally {
+    await app.close();
+    await rm(userData, { recursive: true, force: true });
+  }
+});
+
+async function importedApp(bytes = representativeMonthPackage()) {
   const userData = await mkdtemp(join(tmpdir(), "esmer-shadcn-ui-"));
   const packagePath = join(userData, "representative-month.json");
-  const bytes = representativeMonthPackage();
   await writeFile(packagePath, bytes);
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   return { app, userData, packagePath, fixtureHash: createHash("sha256").update(bytes).digest("hex") };
@@ -21,6 +46,42 @@ async function importedApp() {
 async function capture(page: Page, path: string, fullPage = false) {
   await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
   await page.screenshot({ path, fullPage, animations: "disabled" });
+}
+
+async function checkContrast(page: Page) {
+  const ratios = await page.evaluate(() => {
+    function channels(value: string) {
+      const parts = value.match(/[\d.]+/g)?.map(Number) ?? [];
+      return parts.length >= 3 ? { rgb: parts.slice(0, 3), alpha: parts[3] ?? 1 } : null;
+    }
+    function background(element: Element) {
+      for (let current: Element | null = element; current; current = current.parentElement) {
+        const color = channels(getComputedStyle(current).backgroundColor);
+        if (color && color.alpha > 0) return color.rgb;
+      }
+      return [255, 255, 255];
+    }
+    function luminance(rgb: number[]) {
+      const linear = rgb.map(value => {
+        const channel = value / 255;
+        return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    }
+    function ratio(element: Element) {
+      const foreground = channels(getComputedStyle(element).color)?.rgb;
+      if (!foreground) throw new Error("Text color unavailable");
+      const values = [luminance(foreground), luminance(background(element))].sort((a, b) => b - a);
+      return (values[0] + 0.05) / (values[1] + 0.05);
+    }
+    const heading = document.querySelector(".monthly-overview h1");
+    const action = [...document.querySelectorAll("button")].find(node => node.textContent?.trim() === "Giderleri incele");
+    const period = document.querySelector('input[type="month"]');
+    if (!heading || !action || !period) throw new Error("Representative text, action or period control missing");
+    return { heading: ratio(heading), action: ratio(action), period: ratio(period) };
+  });
+  for (const [name, ratio] of Object.entries(ratios)) expect(ratio, `${name} text contrast`).toBeGreaterThanOrEqual(4.5);
+  return ratios;
 }
 
 test("a representative month exposes the trend, gaps, cost exposure and evidence in the first desktop view", async ({}, testInfo) => {
@@ -71,6 +132,36 @@ test("a representative month exposes the trend, gaps, cost exposure and evidence
   }
 });
 
+test("long Turkish labels and a large amount remain usable in a paginated narrow table", async ({}, testInfo) => {
+  test.skip(process.platform !== "win32", "Packaged Windows visual stress check");
+  const { app, userData, packagePath, fixtureHash } = await importedApp(stressMonthPackage());
+  try {
+    const page = await app.firstWindow();
+    await page.setViewportSize({ width: 453, height: 900 });
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
+    await importPackage(page);
+    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Tüm ürünler", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Uzun ömürlü çamaşır deterjanı", exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await capture(page, testInfo.outputPath("stress-long-category-453.png"), true);
+    await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
+    await page.getByRole("button", { name: "Tüm işlemleri göster", exact: true }).click();
+    await expect(page.locator("main tbody tr")).toHaveCount(100);
+    await expect(page.getByRole("row").filter({ has: page.getByRole("button", { name: "UIS001", exact: true }) })).toContainText("123.456.789,12 ₺");
+    await page.getByRole("button", { name: "Sonraki 100", exact: true }).click();
+    await expect(page.locator("main tbody tr")).toHaveCount(100);
+    await expect(page.getByRole("navigation", { name: "İşlemler sayfaları" })).toContainText("Sayfa 2 / 3");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await capture(page, testInfo.outputPath("stress-transactions-453.png"), true);
+    await writeFile(testInfo.outputPath("stress-fixture.json"), JSON.stringify({ sha256: fixtureHash, documents: 204, lines: 204, synthetic: true }, null, 2));
+  } finally {
+    await app.close();
+    await rm(userData, { recursive: true, force: true });
+  }
+});
+
 test("packaged visual journey retains every destination and important desktop state", async ({}, testInfo) => {
   test.skip(process.platform !== "win32", "Packaged Windows visual evidence");
   const { app, userData, packagePath, fixtureHash } = await importedApp();
@@ -85,6 +176,17 @@ test("packaged visual journey retains every destination and important desktop st
     const dismiss = page.getByRole("button", { name: "Bildirimi kapat" });
     if (await dismiss.isVisible()) await dismiss.click();
     await capture(page, testInfo.outputPath("overview-1440.png"));
+    const contrast = await checkContrast(page);
+    const gapAction = page.getByRole("button", { name: "Giderleri incele", exact: true });
+    await gapAction.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(gapAction).toBeFocused();
+    const focus = await gapAction.evaluate(element => {
+      const style = getComputedStyle(element);
+      return { width: Number.parseFloat(style.outlineWidth), kind: style.outlineStyle, shadow: style.boxShadow };
+    });
+    expect((focus.kind !== "none" && focus.width >= 2) || /\b3px\b/.test(focus.shadow), "keyboard focus has a visible outline or ring").toBe(true);
 
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
     await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
@@ -153,6 +255,12 @@ test("packaged visual journey retains every destination and important desktop st
       await expect(page.getByRole("button", { name: "Giderleri incele", exact: true })).toBeVisible();
       await capture(page, testInfo.outputPath(`overview-${width}.png`), true);
     }
+    for (const [destination, file] of [["Satışlar", "sales-summary-453.png"], ["Alışlar ve maliyet", "purchasing-history-453.png"], ["Giderler", "expenses-records-453.png"], ["Raporlar", "reports-list-453.png"]] as const) {
+      await nav.getByRole("button", { name: destination, exact: true }).click();
+      await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `document overflow in ${destination} at 453px`).toBe(true);
+      await capture(page, testInfo.outputPath(file), true);
+    }
     await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster", exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "document overflow around the narrow transaction table").toBe(true);
@@ -171,6 +279,7 @@ test("packaged visual journey retains every destination and important desktop st
     await capture(page, testInfo.outputPath("offline-reload.png"), true);
     await writeFile(testInfo.outputPath("environment.json"), JSON.stringify({
       fixtureSha256: fixtureHash, fixture: "synthetic representative 30-day September month",
+      contrast,
       runtime: await app.evaluate(({ app, screen }) => ({ packaged: app.isPackaged, platform: process.platform, versions: process.versions, display: screen.getPrimaryDisplay() })),
       viewport: { width: 453, height: 900 }, forcedColors: "emulated", reducedMotion: "emulated", offline: "Playwright browser context",
     }, null, 2));

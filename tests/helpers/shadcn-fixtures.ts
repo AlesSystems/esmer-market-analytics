@@ -49,13 +49,35 @@ export function representativeMonthRecords(): Records {
 }
 
 export function representativeMonthPackage() {
+  return packageFor(representativeMonthRecords(), "shadcn-ui-month-1");
+}
+
+export function stressMonthPackage() {
   const records = representativeMonthRecords();
+  const document = records.documents.find(row => row.id === "UI04")!;
+  const line = records.lines.find(row => row.documentId === "UI04")!;
+  for (let index = 1; index <= 172; index++) {
+    const id = `UIS${String(index).padStart(3, "0")}`;
+    const net = index === 1 ? "123456789.12" : "100";
+    const tax = index === 1 ? "0" : "5";
+    const gross = index === 1 ? net : "105";
+    records.documents.push({ ...structuredClone(document), id, sales: { ...document.sales!, net, tax, gross } });
+    records.lines.push({
+      ...structuredClone(line), id: `${id}-line`, documentId: id, net,
+      sales: { ...line.sales!, unitNet: net, taxRate: index === 1 ? "0" : "5", tax, gross },
+      business: { historicalCost: null, inventory: null },
+    });
+  }
+  return packageFor(records, "shadcn-ui-stress-1");
+}
+
+function packageFor(records: Records, extractionId: string) {
   return writePackage([
     { stream: "documents", records: records.documents },
     { stream: "lines", records: records.lines },
     { stream: "suppliers", records: records.suppliers },
   ], {
-    lineage: "shadcn-ui-fixture", extractionId: "shadcn-ui-month-1", extractedAt: "2025-10-01T00:00:00.000Z",
+    lineage: "shadcn-ui-fixture", extractionId, extractedAt: "2025-10-01T00:00:00.000Z",
     cutoff: "2025-09-30", coverage: { from: "2025-09-01", to: "2025-09-30", complete: true },
   }, BUSINESS_MAPPING_VERSION);
 }
