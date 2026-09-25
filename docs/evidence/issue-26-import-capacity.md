@@ -67,7 +67,9 @@ The Sol High audit checked artifacts and the [decision trail](issue-26-decisions
 
 ## Open gates and continuation
 
-R1 remains blocked on renewed authorization and an available isolated restored backup. The repository's source-access rule requires separate authorization. No source was opened in this session. Docker's Linux-engine pipe was unavailable when checked; no Docker daemon or source container was started. A historical audit cannot fill these gaps.
+The user authorized completion, including renewed isolated-source validation, on 2026-09-25 after this PR opened. Authorization is no longer an open prerequisite. R1 still needs an accessible isolated restored backup and validated source semantics.
+
+The resumed Windows environment check found SQL Server Express running and Docker stopped. File discovery found a candidate MDF/LDF pair, but Windows denied both read-only file-open attempts. No database connection, record query, file copy, service change, permission change, or source-container start occurred. The candidate's relationship to the audited Mac copy remains unverified. Its locator stays outside Git. Resume inspection on an accessible isolated restore, created from a readable backup or isolated detached copy. A historical audit cannot replace that source evidence.
 
 R2 needs the approved raw-column allowlist, observed engine and TLS requirements, a selected driver, and restricted-account extraction proof. R3 still needs real provenance and measured transport bounds. R4 needs the real preview and source oracles. R5 needs the approved full population, budgets, per-process and worker peaks, temporary disk peaks, cancellation, overlap, failure, retention, and response measurements. This uniform synthetic scenario does not cover those obligations.
 
