@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-25T09:19:26Z",
+  "title": "Design System: Esmer Market prototype",
+  "extensions": {
+    "scope": "Throwaway prototype only; primitives live in adjacent DESIGN.md frontmatter.",
+    "shadows": [
+      { "name": "evidence-drawer", "value": "-10px 0 40px rgb(11 24 48 / 12%)", "purpose": "Separate the temporary evidence panel from the underlying page." },
+      { "name": "prototype-switcher", "value": "0 6px 24px rgb(11 24 48 / 22%)", "purpose": "Identify the experiment controls." }
+    ],
+    "motion": [
+      { "name": "panel-in", "value": "180ms ease-out", "purpose": "Drawer enters from 20px right; disabled by prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "wide", "value": "1500px" },
+      { "name": "compact-desktop", "value": "1100px" },
+      { "name": "narrow", "value": "760px" }
+    ],
+    "focus": { "width": "3px", "offset": "4px", "purpose": "Visible keyboard focus; lighter outline on navy shell." }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "Provisional financial statement",
+    "overview": "A foregrounds net sales; B tests sidebar and two-column navigation; C tests ledger density. A is recommended as closest to the brief. User preference remains pending.",
+    "keyCharacteristics": ["Dominant financial answer", "Inspectable per-metric evidence", "Explicit missing data", "Turkish synthetic demonstration"],
+    "rules": [
+      { "name": "Action color", "body": "Blue denotes action or selection, never financial gain.", "section": "colors" }
+    ],
+    "dos": ["Keep period, cutoff and synthetic warning visible.", "Keep scope contribution distinct from full receipt total."],
+    "donts": ["Do not treat simulated actions as persisted operations.", "Do not claim UI or Windows acceptance from this prototype."]
+  }
+}

@@ -10,6 +10,7 @@
     "node": ">=24.15.0 <25"
   },
   "scripts": {
+    "prototype:ui": "node src/ui/redesign-prototype/serve.mjs",
     "build": "install-electron && node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
