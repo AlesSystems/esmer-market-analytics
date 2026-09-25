@@ -74,7 +74,7 @@
   summary { cursor: pointer; color: var(--secondary-foreground); font-weight: 500; }
   details[open] > summary { margin-bottom: 14px; }
   ul { padding-left: 22px; }
-  footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 }
 @layer components {
   .sales-app { min-height: 100vh; }
@@ -164,7 +164,6 @@
   .metric-evidence p { margin-top: 10px; }
   .figure-status { font-size: 13px; font-weight: 400; padding: 0; margin: 8px 0 0; border: 0; }
   .figure-status summary { font-size: 12px; color: var(--muted); }
-  .figure-confidence { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .subview-nav, .report-actions, .expense-actions, .recovery-actions, .operation-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
   .subview-nav button[aria-pressed="true"], .subview-nav button[aria-current="page"] { background: var(--accent); color: var(--accent-foreground); border-color: #bddbd2; }
   .purchase-filters { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
@@ -200,15 +199,12 @@
   .coverage-summary { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
   .coverage-summary p, .coverage-summary li { font-size: 13px; }
   .coverage-summary .warnings { margin: 8px 0 0; }
-  .metric-confidence { display: block; margin-top: 5px; font-size: 12px; font-weight: 400; color: var(--muted); }
-  .confidence-label { font-weight: 500; }
   .monthly-finance { grid-area: finance; }
   .monthly-categories { grid-area: categories; padding: 0; border: 0; }
   .monthly-finance > h2, .monthly-categories > .section-heading { margin-bottom: 16px; }
   .financial-ledger { margin: 0; }
   .financial-ledger > div { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--line); }
   .financial-ledger dd { font-size: 17px; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
-  .financial-ledger .figure-confidence { justify-content: flex-end; }
   .monthly-operating { margin-top: 16px; padding: 14px; background: #fffbf2; color: #80580b; border: 1px solid #e4cea4; border-radius: 8px; }
   .monthly-operating h3 { margin: 0; font-size: 14px; }
   .monthly-values { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; margin: 20px 0; }
@@ -263,6 +259,8 @@
     .monthly-values { grid-template-columns: minmax(0,1fr); }
   }
   @media (max-width: 650px) {
+    .bar-column small { visibility: hidden; }
+    .bar-column:first-child small, .bar-column:last-child small, .bar-column:nth-child(5n) small, .bar-column:has(.negative-bar) small { visibility: visible; }
     .attention-items { grid-template-columns: minmax(0,1fr); }
     .page-heading, .workspace-header { align-items: flex-start; flex-direction: column; }
     .section-heading { flex-wrap: wrap; }
@@ -280,7 +278,6 @@
     .monthly-supporting { gap: 12px; }
     .financial-ledger > div { grid-template-columns: minmax(0,1fr); gap: 6px; }
     .financial-ledger dd { text-align: left; }
-    .financial-ledger .figure-confidence { justify-content: flex-start; }
     .detail-panel { inset: 12px; width: auto; max-width: none; }
     .start-state { padding: 22px; }
   }
