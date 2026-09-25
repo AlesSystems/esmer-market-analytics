@@ -16,7 +16,7 @@ const reusePhase8 = process.env.ESMER_LIFECYCLE_REUSE_PHASE8 === "1";
 function storedBusinessData(path: string, acceptedId: string) {
   const database = new DatabaseSync(path, { readOnly: true });
   try {
-    const tables = ["datasets", "source_suppliers", "source_documents", "source_lines", "active_dataset", "app_revisions", "adjustment_targets", "report_versions", "evidence_references", "expense_batches"];
+    const tables = ["datasets", "package_history", "import_batches", "source_suppliers", "source_documents", "source_lines", "active_dataset", "rollback_dataset", "app_revisions", "adjustment_targets", "report_versions", "evidence_references", "expense_batches"];
     const records = Object.fromEntries(tables.map(table => [table, database.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()]));
     const row = database.prepare("SELECT content_json FROM report_versions WHERE id=?").get(acceptedId);
     return { records, accepted: JSON.parse(String(row?.content_json)) };

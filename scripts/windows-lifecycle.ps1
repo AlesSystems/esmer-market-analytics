@@ -15,7 +15,23 @@ if ($ReusePhase8) {
     if (-not $PreservedCopy) { throw 'Provide a preserved copy of the Phase 8 lifecycle directory' }
     $PreservedCopy = [IO.Path]::GetFullPath($PreservedCopy)
     $workParent = [IO.Path]::GetFullPath((Join-Path $repo 'work'))
-    if (-not $PreservedCopy.StartsWith($workParent + '\', [StringComparison]::OrdinalIgnoreCase) -or $PreservedCopy.StartsWith($work + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Preserved copy must be a separate directory under work' }
+    if (-not $PreservedCopy.StartsWith($workParent + '\', [StringComparison]::OrdinalIgnoreCase) -or $PreservedCopy -ieq $work -or $PreservedCopy.StartsWith($work + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Preserved copy must be a separate directory under work' }
+    $ancestor = $PreservedCopy
+    while ($ancestor) {
+        if ((Test-Path -LiteralPath $ancestor) -and ((Get-Item -LiteralPath $ancestor).Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw 'Refuse linked preserved copy' }
+        $ancestor = [IO.Path]::GetDirectoryName($ancestor)
+    }
+    $preservedInventory = @(Get-ChildItem -LiteralPath $PreservedCopy -Recurse -Force | ForEach-Object {
+        if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Refuse links within preserved copy' }
+        if (-not $_.PSIsContainer) { @{ path = [IO.Path]::GetRelativePath($PreservedCopy, $_.FullName); hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash } }
+    } | Sort-Object { $_.path })
+    if ($Stage -eq 'upgrade') {
+        $originalInventory = @(Get-ChildItem -LiteralPath $work -Recurse -Force | ForEach-Object {
+            if ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Refuse links within historical lifecycle directory' }
+            if (-not $_.PSIsContainer) { @{ path = [IO.Path]::GetRelativePath($work, $_.FullName); hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash } }
+        } | Sort-Object { $_.path })
+        if (($originalInventory | ConvertTo-Json -Compress) -ne ($preservedInventory | ConvertTo-Json -Compress)) { throw 'Preserved copy must contain every historical lifecycle file with matching content' }
+    }
     foreach ($relative in @('installed/resources/app.asar', 'synthetic-profile/analytics.sqlite', 'monthly-expected.json')) {
         $original = Join-Path $work $relative
         $copy = Join-Path $PreservedCopy $relative

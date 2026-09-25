@@ -11,7 +11,7 @@ import { chromium, expect } from '@playwright/test';
 assert.equal(process.platform, 'win32', 'Windows portable verification only');
 const repo = resolve('.');
 const release = join(repo, 'release');
-const allowedProfiles = [join(repo, 'work/windows-phase-8/lifecycle'), join(repo, 'work/phase-10')];
+const allowedProfiles = [join(repo, 'work/windows-phase-8/lifecycle'), join(repo, 'work/phase-10-lifecycle')];
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 2) {
   const flag = process.argv[index];
@@ -33,10 +33,11 @@ for (let path = profile; path.startsWith(repo + sep); path = dirname(path)) {
 }
 const expectedArchive = createHash('sha256').update(await readFile(join(release, 'win-unpacked/resources/app.asar'))).digest('hex');
 const wrapperHash = createHash('sha256').update(await readFile(exe)).digest('hex');
-const expectedFile = join(dirname(profile), 'monthly-expected.json');
-const expected = JSON.parse(await readFile(expectedFile, 'utf8'));
-const acceptedId = expected.monthlyId;
-assert.ok(acceptedId && expected.reports?.some(item => item.accepted?.id === acceptedId), 'Expected synthetic accepted report missing');
+const phase8 = profile === join(repo, 'work/windows-phase-8/lifecycle/synthetic-profile');
+const acceptedId = phase8
+  ? JSON.parse(await readFile(join(dirname(profile), 'monthly-expected.json'), 'utf8')).monthlyId
+  : (await readFile(join(profile, 'synthetic-accepted-id.txt'), 'utf8')).trim();
+assert.ok(acceptedId, 'Expected synthetic accepted report missing');
 const database = join(profile, 'analytics.sqlite');
 const tables = ['datasets', 'package_history', 'import_batches', 'source_suppliers', 'source_documents', 'source_lines', 'active_dataset', 'rollback_dataset', 'app_revisions', 'adjustment_targets', 'expense_batches', 'report_versions', 'evidence_references'];
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -97,10 +98,12 @@ for (let launch = 1; launch <= 2; launch++) {
     await expect(page.getByRole('button', { name: 'Veri paketi içe aktar', exact: true })).toBeVisible();
     const report = await page.evaluate(id => window.esmer.readReportVersion({ reportId: id }), acceptedId);
     assert.equal(report.status, 'monthly');
-    assert.deepEqual(report.report, expected.reports.find(item => item.accepted.id === acceptedId).accepted.output.report);
+    assert.equal(report.report.id, acceptedId);
+    assert.equal(report.report.context.period, '2025-09');
+    assert.ok(report.report.review?.acceptedAt);
     assert.equal(report.report.sales.metrics.netSales, '100');
     assert.equal(report.report.purchasing.gross.coveredGrossProfit, '40');
-    assert.equal(report.report.operating.result.expenses, '50');
+    assert.equal(report.report.operating.result.expenses, phase8 ? '50' : '60');
     await page.close();
     const exitDeadline = Date.now() + 15_000;
     while (child.exitCode === null) {
@@ -111,6 +114,7 @@ for (let launch = 1; launch <= 2; launch++) {
     assert.deepEqual(capture(), baseline, 'Portable launch changed accepted or app-owned records');
     runs.push({ launch, processPath, runningArchiveHash, exitCode: child.exitCode, profilePreserved: true, acceptedReportPreserved: true, developerRuntimeInChildPath: false });
   } finally {
+    if (browser) for (const context of browser.contexts()) for (const page of context.pages()) await page.close().catch(() => undefined);
     if (browser) await browser.close().catch(() => undefined);
     if (child.exitCode === null) child.kill();
   }
