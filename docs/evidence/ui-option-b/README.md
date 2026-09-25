@@ -1,7 +1,7 @@
 # Option B implementation evidence
 
-Date: 2026-09-25. Branch: `codex/option-b-ui`. Implementation build: `baaa256`.
-Baseline: `9af7305`. Related issue: [#3](https://github.com/AlesSystems/esmer-market-analytics/issues/3).
+Date: 2026-09-25. Branch: `codex/option-b-ui`. Initial implementation build: `baaa256`; final runtime build: `a56d925`, with test adapters through `ac394ad`.
+Initial baseline: `9af7305`. Current main `76ca815` was merged before handoff. Related issue: [#3](https://github.com/AlesSystems/esmer-market-analytics/issues/3).
 
 This implements the user-selected Option B from the [redesign specification](../../superpowers/specs/2026-09-25-ui-redesign.md). It supplies synthetic implementation evidence for A03 and A07, not completed owner or source acceptance.
 
@@ -21,7 +21,7 @@ Applied Poteto principles: Model the Domain kept one typed report context; Lazin
 - The overview capture intentionally has net sales 200 TRY, covered estimated gross profit 40 TRY, estimated cost 60 TRY and 50% cost coverage. Expenses are unavailable. This small fixture has one category and one daily data point.
 - The implementation worktree uses the existing dependency directory via a junction. Windows builder warned about `fflate@undefined` and `scheduler@undefined` path discovery; dependencies are bundled by the existing build. Runtime journeys exercise the resulting package.
 
-## Verification record
+## Initial verification record
 
 | Gate / procedure | Expected | Actual |
 | --- | --- | --- |
@@ -57,16 +57,29 @@ The repeatable capture procedure is `tests/desktop/option-b.test.ts`. It runs th
 
 Relative sRGB luminance calculation gives contrast ratios of 16.15:1 for ink/white, 7.58:1 for secondary/white, 6.24:1 for primary blue/white, 5.14:1 for green/white, 6.57:1 for red/white, 6.64:1 for amber text/light amber and 14.05:1 for sidebar labels/navy. These are token-pair checks, not an exhaustive accessibility certification.
 
-The independent visual review required three fixes: dark import-history text on white, a sidebar stacking level that keeps the operations panel above report controls, and a blue primary import action in the empty state. All three were applied together and the same views were recaptured. The [detector result](impeccable-detector.json) was empty. A separate standards/code review found no new material findings in `9af7305..baaa256` and confirmed all three earlier context/focus findings resolved.
+The independent visual review required three fixes: dark import-history text on white, a sidebar stacking level that keeps the operations panel above report controls, and a blue primary import action in the empty state. All three were applied together and the same views were recaptured. The reviewer scored all three resolved and returned `ship` for that fix list; this is not whole-surface acceptance. All eleven captures were valid. The [detector result](impeccable-detector.json) was empty. A separate standards/code review found no new material findings in `9af7305..baaa256` and confirmed all three earlier context/focus findings resolved.
 
-## Final package checks
+## Verification after merging current main
 
-`npm run package:win` passed on `baaa256`, produced NSIS and portable x64 artifacts, and reported `PACKAGE_NOTICES_OK 6 dependencies`. No installer was executed. Final `app.asar` SHA256 is `3b1cde1840f357c88ad2fed80bb644dac9fefcb8286c3f179cb73cb6a5c6abb0`.
+Remote main advanced during implementation. Merge `a56d925` brought in `76ca815`, including its Windows recovery filesystem fixes and release checks. The earlier recovery failures above are historical observations and no longer describe the final branch.
 
-Final `typecheck` and `lint` passed. The final packaged rerun of `option-b.test.ts`, `report-version-comparison.test.ts` and `unavailable-states.test.ts` passed all 5 tests. Both sales drill-down tests passed on their focused rerun. Combining the full run with these focused reruns gives 26 passing desktop cases and the 1 unchanged-baseline recovery setup failure; this was not a subsequent all-green full-suite run. The last UI changes were limited to explicit select names, operations stacking/contrast and primary import styling.
+| Procedure | Final result |
+| --- | --- |
+| `npm run test:unit` | 29 passed in 9 files |
+| `npm run test:integration` | [229 passed in 30 files](checks/final-integration.log) |
+| Packaged Playwright full suite | [28 passed, 1 locator failure](checks/final-desktop.log); the restore assertion matched both visible ledger and collapsed evidence values |
+| Focused packaged restore after scoping that assertion | [1 passed](checks/final-restore.log), including real Windows key protection, encrypted backup, fresh-profile restore, pinned report and Excel checks |
+| `npm run typecheck`, `npm run lint`, `git diff --check` | Passed |
+| `npm run package:win` | [Passed](checks/final-package.log); notices for 6 dependencies, 75 runtime files / 291 archive entries, no inventory violations, both distributions match the inspected payload |
+
+Thus all 29 desktop cases have passing results across the full run and the focused correction; this is not a claim of a subsequent all-green full-suite run. New workload coverage uses three fresh processes and a complete 25,000-document synthetic package. All measured ordinary interactions passed the 2-second threshold, without claiming real market-volume performance.
+
+The [workload receipt](checks/performance.json) records samples and synthetic package identity. The final portable wrapper also passed two launches against an isolated seeded profile, with accepted-report/business hashes preserved, network-blocked offline reload and no development runtime in the child PATH. See the [portable proof](checks/portable-proof.json) and [distribution inspection](checks/distribution-inspection.json). Its profile-seeding lifecycle test passed separately.
+
+The final x64 NSIS and portable artifacts are version `0.2.0`. No installer was executed. Final `app.asar` SHA256 is `6d931a6c27b83651e987a7ae7ee55a8ed1b19d91a8ee8e39e28892f83aed2097`. Visual captures remain from the reviewed `baaa256` build; the merge changed recovery/runtime release handling, with no further UI-source edits.
 
 ## Remaining acceptance
 
-A03 and A07 remain open. Actual Windows 150% system scaling, owner task acceptance, real-source reconciliation and the failing Windows recovery gates are not completed by this PR. Forced-colors emulation is not a claim that native Windows high-contrast configuration was tested. No source inspection, owner contact, installation on the owner's computer or live connection occurred.
+A03 and A07 remain open. Actual Windows 150% system scaling, owner task acceptance and real-source reconciliation are not completed by this PR. Forced-colors emulation is not a claim that native Windows high-contrast configuration was tested. No source inspection, owner contact, installation on the owner's computer or live connection occurred.
 
-Continue on `codex/option-b-ui`. Resolve the baseline Windows recovery failures separately, rerun the full integration and packaged recovery gates, then test the packaged app at actual Windows 150% scale with a 680px window. Exercise period/cutoff visibility, wrapped navigation, ledger scrolling, receipt/source focus return, expense review, saved-version export and recovery preview/cancel. Record actual results against A03/A07 before closing either gate.
+Continue on `codex/option-b-ui`. Test the packaged app at actual Windows 150% scale with a 680px window. Exercise period/cutoff visibility, wrapped navigation, ledger scrolling, receipt/source focus return, expense review, saved-version export and recovery preview/cancel. Record actual results against A03/A07 before closing either gate. The merged [Windows recovery limitations](../phase-10-windows-recovery-files.md) still apply, including unproven directory-entry persistence after power loss.
