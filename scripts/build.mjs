@@ -1,5 +1,7 @@
 import { build } from "esbuild";
-import { rm, mkdir, copyFile } from "node:fs/promises";
+import { rm, mkdir, copyFile, readFile, writeFile } from "node:fs/promises";
+import postcss from "postcss";
+import tailwindcss from "@tailwindcss/postcss";
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist/ui", { recursive: true });
 await build({
@@ -26,7 +28,10 @@ await build({
   define: { "process.env.NODE_ENV": '"production"' },
 });
 await copyFile("src/ui/index.html", "dist/ui/index.html");
-await copyFile("src/ui/style.css", "dist/ui/style.css");
+const stylesheet = await postcss([tailwindcss()]).process(await readFile("src/ui/style.css", "utf8"), {
+  from: "src/ui/style.css", to: "dist/ui/style.css", map: false,
+});
+await writeFile("dist/ui/style.css", stylesheet.css);
 
 await mkdir("dist/licences", { recursive: true });
 for (const notice of ["LICENSE", "LICENSES.chromium.html"]) {
