@@ -90,5 +90,3 @@ AssertionError: promise resolved "Buffer[ 49, 50, 51, 52, 53 ]" instead of rejec
       Tests  3 failed | 1 passed (4)
    Start at  16:23:21
    Duration  403ms (tests 37%, transform 36%, import 25%, worker 2%)
-
-

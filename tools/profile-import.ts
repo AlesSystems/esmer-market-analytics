@@ -141,4 +141,3 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   try { process.stdout.write(`${JSON.stringify(await runProfile(parseProfileCount(process.argv.slice(2))), null, 2)}\n`); }
   catch { process.stderr.write("PROFILE_FAILED\n"); process.exitCode = 1; }
 }
-
