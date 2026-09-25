@@ -4,11 +4,8 @@ import type { AppRecord } from "../store/revisions";
 import type { OperatingResult } from "../expenses/contracts";
 import { isExpense } from "../expenses/validation";
 export const OPERATING_CALCULATION_VERSION = "synthetic-operating-calc-v1";
-export function calculateOperatingResult(input: { gross: GrossResult; salesReconciled: boolean; periodCoverageComplete: boolean; period: string; expenses: AppRecord[]; confirmation: AppRecord | null; expenseRevision: number }): OperatingResult {
+export function calculateExpenseComponents(input: { period: string; expenses: AppRecord[] }): Pick<OperatingResult, "expenses" | "payments" | "breakdown" | "breakdownCoverage" | "excluded" | "reasons"> {
   const reasons: string[] = [], amounts: string[] = [], payments: string[] = [], excluded: OperatingResult["excluded"] = [];
-  const confirmation = input.confirmation;
-  if (confirmation?.kind !== "confirmation" || !confirmation.value.complete || confirmation.value.period !== input.period || confirmation.value.reviewedRevision !== input.expenseRevision) reasons.push("EXPENSES_INCOMPLETE");
-  if (input.gross.status !== "ready" || input.gross.excluded.length || !input.salesReconciled || !input.periodCoverageComplete) reasons.push("GROSS_INCOMPLETE");
   const losses = new Set<string>();
   const breakdown = { operatingExpense: "0", labour: "0", separateLoss: "0" };
   const breakdownCoverage: OperatingResult["breakdownCoverage"] = { operatingExpense: "missing", labour: "missing", separateLoss: "missing" };
@@ -33,6 +30,15 @@ export function calculateOperatingResult(input: { gross: GrossResult; salesRecon
     if (breakdownCoverage[key] !== "incomplete") breakdownCoverage[key] = "available";
     breakdown[key] = new Exact(breakdown[key]).plus(amount).toFixed();
   }
-  const expenses = sum(amounts), value = reasons.length ? null : new Exact(input.gross.coveredGrossProfit).minus(expenses).toFixed();
-  return { status: value === null ? "unavailable" : "estimated", headline: reasons.includes("EXPENSES_INCOMPLETE") ? "Faaliyet kârı hesaplanamıyor — gider verileri eksik." : value === null ? "Faaliyet kârı hesaplanamıyor — hesaplama kanıtları eksik." : "Tahmini yönetim faaliyet kârı", value, expenses, breakdown, breakdownCoverage, payments: sum(payments), excluded, reasons: [...new Set(reasons)] };
+  return { expenses: sum(amounts), payments: sum(payments), breakdown, breakdownCoverage, excluded, reasons: [...new Set(reasons)] };
+}
+export function calculateOperatingResult(input: { gross: GrossResult; salesReconciled: boolean; periodCoverageComplete: boolean; period: string; expenses: AppRecord[]; confirmation: AppRecord | null; expenseRevision: number }): OperatingResult {
+  const reasons: string[] = [];
+  const confirmation = input.confirmation;
+  if (confirmation?.kind !== "confirmation" || !confirmation.value.complete || confirmation.value.period !== input.period || confirmation.value.reviewedRevision !== input.expenseRevision) reasons.push("EXPENSES_INCOMPLETE");
+  if (input.gross.status !== "ready" || input.gross.excluded.length || !input.salesReconciled || !input.periodCoverageComplete) reasons.push("GROSS_INCOMPLETE");
+  const components = calculateExpenseComponents(input);
+  reasons.push(...components.reasons);
+  const value = reasons.length ? null : new Exact(input.gross.coveredGrossProfit).minus(components.expenses).toFixed();
+  return { ...components, status: value === null ? "unavailable" : "estimated", headline: reasons.includes("EXPENSES_INCOMPLETE") ? "Faaliyet kârı hesaplanamıyor — gider verileri eksik." : value === null ? "Faaliyet kârı hesaplanamıyor — hesaplama kanıtları eksik." : "Tahmini yönetim faaliyet kârı", value, reasons: [...new Set(reasons)] };
 }

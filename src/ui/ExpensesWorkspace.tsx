@@ -8,6 +8,8 @@ const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in ro
 export function ExpensesWorkspace({ period, onChange }: { period: string; onChange?: () => void }) {
   const [task, setTask] = useState<"records" | "import" | "completeness">("records");
   const opener = useRef<() => void>(() => undefined);
+  const restoreFocus = useRef(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
   const taskTitle = useRef<HTMLHeadingElement>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -21,7 +23,8 @@ export function ExpensesWorkspace({ period, onChange }: { period: string; onChan
   const [reviewed, setReviewed] = useState(false);
   const [reviewReason, setReviewReason] = useState("");
   const generation = useRef(0);
-  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); requestAnimationFrame(() => opener.current()); }
+  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); restoreFocus.current = true; }
+  useEffect(() => { if (restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading]);
   useEffect(() => { if (task !== "records") taskTitle.current?.focus(); }, [task]);
   async function load() {
     const id = ++generation.current;
@@ -34,7 +37,7 @@ export function ExpensesWorkspace({ period, onChange }: { period: string; onChan
     } catch { if (id === generation.current) setLoadError(failed); }
     finally { if (id === generation.current) setLoading(false); }
   }
-  useEffect(() => { setTask("records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period]);
+  useEffect(() => { restoreFocus.current = false; setSummaryOpen(false); setTask("records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period]);
   async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false) {
     setBusy(true); setError(""); setMessage("");
     try {
@@ -60,7 +63,10 @@ export function ExpensesWorkspace({ period, onChange }: { period: string; onChan
     {view && <>
       {task === "records" && !selected && <>
       <div className={`notice ${view.complete ? "" : "warning"}`}><strong>{view.complete ? "Dönemin giderleri eksiksiz olarak onaylandı" : "Faaliyet kârı hesaplanamıyor — gider verileri eksik."}</strong><span>İçe aktarma ve her değişiklik sonrasında dönem yeniden incelenmelidir.</span></div>
-      <dl className="expense-totals"><div><dt>Oluşma tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.incurred)}</dd></div><div><dt>Ödeme tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.payments)}</dd></div></dl><details className="expense-help"><summary>Kayıt toplamları neyi gösterir?</summary><p className="caption">Oluşma tarihi ile ödeme tarihi ayrıdır. Bu toplamlar faaliyet sonucundan ayrı kayıt toplamlarıdır; işletme sahibinin katkısı gibi gider olmayan hareketleri de içerir. Kayıtlı toplamın sıfır olması dönemde gider olmadığı anlamına gelmez.</p></details>
+      <div className="metrics expense-summary" aria-label="Gider göstergeleri"><article className="metric"><h2>Dönem giderleri</h2><strong>{view.summary.expenses === null ? "Hesaplanamıyor" : money(view.summary.expenses)}</strong><button className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.coverage === "missing" ? "Kanıt eksik · gider kaydı yok" : view.summary.coverage === "incomplete" ? "Kanıt eksik" : view.complete ? "İncelenmiş kayıtlar" : "Kayıtlı tutar · tamlık onaysız"}</button></article><article className="metric"><h2>İşçilik</h2><strong>{view.summary.labour === null ? "Hesaplanamıyor" : money(view.summary.labour)}</strong><button className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.labourCoverage === "missing" ? "Kanıt eksik · toplam verilmedi" : view.summary.labourCoverage === "incomplete" ? "Kanıt eksik" : "Kayıtlı aylık toplam"}</button></article><article className="metric"><h2>Tamlık durumu</h2><strong>{view.complete ? "Onaylı" : "Onay bekliyor"}</strong><button className="metric-status" onClick={() => setSummaryOpen(true)}>Dönem ve kapsam</button></article></div>
+      <details className="block expense-help" open={summaryOpen} onToggle={event => setSummaryOpen(event.currentTarget.open)}><summary>Bu sayı nasıl oluştu?</summary><p>{period} döneminin oluşma tarihine göre sınıflandırılmış faaliyet gideri, işçilik ve maliyette yer almayan ayrı stok kaybı kayıtları kapsanır. KDV işlemi kanıtına göre net veya brüt tutar kullanılır.</p><p>{view.complete ? "Bu gider revizyonunun dönem tamlığı onaylanmıştır; bu onay kârı kesinleştirmez." : "Dönem tamlığı onaylanmamıştır; gösterilen kayıtlı tutar dönemin tüm giderlerini temsil etmeyebilir."}</p>{view.summary.reasons.length > 0 && <ul className="warnings">{view.summary.reasons.map(reason => <li key={reason}>{({ UNKNOWN_TAX: "KDV işlemi veya kanıtı eksik.", LEGACY_EXPENSE: "Eski gider kaydının sınıflandırma ve KDV kanıtları eksik.", UNCLASSIFIED: "Sınıflandırılmamış hareket var.", LOSS_REVIEW: "Stok kaybı kanıtı incelenmeli." } as Record<string, string>)[reason] ?? "Gider hesabının kanıtı eksik."}</li>)}</ul>}{view.summary.excluded.length > 0 && <><h3>Gider toplamı dışında</h3><ul>{view.summary.excluded.map(item => <li key={item.entityId}>{item.classification === "already-in-cost" ? "Maliyette yer alan stok kaybı" : classificationLabels[item.classification as keyof typeof classificationLabels]} · {money(item.amount)}</li>)}</ul></>}
+      <dl className="expense-totals"><div><dt>Oluşma tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.incurred)}</dd></div><div><dt>Ödeme tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.payments)}</dd></div></dl><p className="caption">Oluşma tarihi ile ödeme tarihi ayrıdır. Bu toplamlar faaliyet sonucundan ayrı kayıt toplamlarıdır; işletme sahibinin katkısı gibi gider olmayan hareketleri de içerir. Kayıtlı toplamın sıfır olması dönemde gider olmadığı anlamına gelmez.</p>
+      </details>
       <section className="block expense-section"><h2>Dönem kayıtları</h2>{!view.rows.length ? <p className="empty-state">Bu dönemde gider kaydı yok.</p> : <div className="table-scroll" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih / ödeme</th><th>Kategori / sınıf</th><th className="number">Net / KDV / brüt</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>{view.rows.map(row => { const value = currentValue(row); return <tr key={row.entityId}><td>{date(row.value.date)}<small>{value?.paymentDate ? date(value.paymentDate) : "Ödeme tarihi yok"}</small></td><td>{value?.category ?? "Eski kayıt"}<small>{value && classificationLabels[value.classification]}</small></td><td className="number">{money(row.value.net)}<small>{value ? `${money(value.tax)} / ${money(value.gross)}` : "KDV / brüt kanıtı yok"}</small></td><td>{value?.voided ? "Geri alınmış" : "Etkin"}<small>Sürüm {row.revision}</small></td><td><button id={`expense-record-${row.entityId}`} disabled={busy} onClick={() => { opener.current = () => document.getElementById(`expense-record-${row.entityId}`)?.focus(); setSelected(row); }}>İncele / düzelt</button></td></tr>; })}</tbody></table></div>}</section>
       <details><summary>İçe aktarma geçmişi ({view.batches.length})</summary><ul>{view.batches.map(batch => <li key={batch.batchId}>{date(batch.createdAt)} · {batch.count} kayıt · sürümler {batch.firstRevision}–{batch.lastRevision}<small>{batch.batchId}</small></li>)}</ul></details>
       </>}
