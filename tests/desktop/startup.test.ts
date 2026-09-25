@@ -250,16 +250,16 @@ test("packaged app imports through native selection, preserves data after failed
     await writeFile(packagePath, "invalid package");
     await importPackage(page);
     await expect(page.getByRole("alert")).toHaveText("Veri paketi geçersiz. Son geçerli veriler korundu.");
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
     await page.screenshot({ path: "test-results/phase-4-import-failed.png" });
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await importPackage(page);
     await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
     await app.close();
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...availability, lastImportError: "INVALID_PACKAGE" });
+    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
     expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate", "setupRecovery"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -280,7 +280,7 @@ for (const loaded of [false, true]) {
       const page = await app.firstWindow();
       await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok" })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
-      expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
+      expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array), lastImportError: "INTERRUPTED" });
       await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
       await importPackage(page);
       await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
@@ -291,7 +291,7 @@ for (const loaded of [false, true]) {
         await importPackage(page);
         await expect(page.getByText("Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.")).toBeVisible();
         await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
-        expect(await page.evaluate(() => window.esmer.getAvailability())).toEqual({ ...before, lastImportError: "INTERRUPTED" });
+        expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array), lastImportError: "INTERRUPTED" });
         await writeFile(packagePath, sourcePackage("b"));
       }
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);

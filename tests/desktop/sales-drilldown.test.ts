@@ -48,6 +48,7 @@ test("packaged sales workspace follows a number through product, document and so
     await page.screenshot({ path: "test-results/phase-5-sales-receipt.png" });
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().press("Enter");
     await expect(panel.getByRole("heading", { name: "Kaynak Detayı" })).toBeFocused();
+    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
     await expect(panel.getByText("S002 / L003", { exact: true })).toBeVisible();
     await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
     await panel.getByText("Teknik ayrıntılar", { exact: true }).click();
@@ -63,6 +64,7 @@ test("packaged sales workspace follows a number through product, document and so
     await writeFile(packagePath, salesPackage(journeyRecords(), { extractionId: "sales-2" }));
     await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
+    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
     await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
     await expect(page.getByLabel("Ürün ara")).toHaveValue("İÇME");
     await page.screenshot({ path: "test-results/phase-5-sales-journey.png" });
@@ -78,6 +80,7 @@ test("packaged sales workspace follows a number through product, document and so
     await page.screenshot({ path: "test-results/phase-5-sales-return.png" });
     await page.getByRole("button", { name: "R001", exact: true }).click();
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).click();
+    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
     await expect(panel.getByText("sales-2", { exact: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -96,13 +99,14 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     await importPackage(page);
     await page.getByRole("button", { name: "Satışlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
-    await expect(page.getByText("Kısmi dönem · Uzlaşma eksik", { exact: true })).toBeVisible();
+    await expect(page.locator(".notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "S003", exact: true }).click();
     const panel = page.getByRole("complementary");
     await expect(panel.getByText("Net satış katkısı bilinmiyor; sıfır sayılmaz.", { exact: false }).first()).toBeVisible();
     await expect(panel.locator(".selected-total")).toContainText("Hesaplama dışında");
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().click();
     await expect(panel.getByRole("heading", { name: "Kaynak Detayı" })).toBeVisible();
+    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
     await expect(panel.getByText("S003 / L005", { exact: true })).toBeVisible();
     await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
     await expect(panel.getByText("synthetic-sales-v1", { exact: true })).toBeVisible();
@@ -120,7 +124,7 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     await page.screenshot({ path: "test-results/phase-5-sales-discrepancy.png" });
     await panel.getByRole("button", { name: "Kapat" }).click();
     await page.getByLabel("Dönem").fill("2025-10");
-    await expect(page.getByText("Dönem verisi yok · Uzlaşma eksik", { exact: true })).toBeVisible();
+    await expect(page.getByText("Dönem verisi yok", { exact: true })).toBeVisible();
     await expect(page.locator(".metric").first()).toContainText("Veri yok");
     await expect(page.locator(".metric").first()).not.toContainText("0,00 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

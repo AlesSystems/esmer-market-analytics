@@ -17,10 +17,11 @@ test("monthly loading, failure retry and missing period preserve useful navigati
       dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] });
       const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
       const original = registry._invokeHandlers.get("esmer:request")!;
-      let failed = false;
+      let failed = false, periodFailed = false;
       ipcMain.removeHandler("esmer:request");
       ipcMain.handle("esmer:request", async (event, operation, payload) => {
         if (operation === "queryMonthly" && !failed) { failed = true; await new Promise(resolve => setTimeout(resolve, 700)); return { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik yükleme hatası." }; }
+        if (operation === "queryMonthly" && (payload as { context?: { period?: string } }).context?.period === "2024-01" && !periodFailed) { periodFailed = true; return { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik dönem yükleme hatası." }; }
         return original(event, operation, payload);
       });
     }, packagePath);
@@ -34,7 +35,10 @@ test("monthly loading, failure retry and missing period preserve useful navigati
     await expect(page.locator(".notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
     await expect(page.getByText("Açık", { exact: true })).toBeVisible();
     await page.getByLabel("Dönem", { exact: true }).fill("2024-01");
-    await page.getByRole("button", { name: "Özet", exact: true }).click();
+    await expect(page.getByRole("alert")).toContainText("Sentetik dönem yükleme hatası.");
+    await expect(page.locator(".monthly-amount")).toHaveCount(0);
+    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2024-01");
+    await page.getByRole("button", { name: "Aylık raporu yeniden yükle" }).click();
     await expect(page.getByText("Dönem verisi yok", { exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("Hesaplanamıyor");
     await page.screenshot({ path: "test-results/phase-8-unavailable.png", fullPage: true });

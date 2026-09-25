@@ -131,8 +131,8 @@ test("operating report stays pinned after expense edits until the owner reopens 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
-    const operating = page.getByRole("region", { name: "Faaliyet sonucu", exact: true });
+    await page.getByRole("button", { name: "Özet", exact: true }).click();
+    const operating = page.locator(".monthly-operating");
     await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
@@ -144,10 +144,11 @@ test("operating report stays pinned after expense edits until the owner reopens 
     await page.getByLabel("İnceleme açıklaması").fill("Eylül kontrolü");
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();
     await expect(page.getByText("Dönemin giderleri eksiksiz olarak onaylandı", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
-    await expect(operating).toContainText("Gider kayıtları değişti");
+    await page.getByRole("button", { name: "Özet", exact: true }).click();
+    await expect(page.getByText("Gider kayıtları değişti", { exact: true }).first()).toBeVisible();
     await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-    await operating.getByRole("button", { name: "Raporu yeni giderlerle aç" }).click();
+    await page.getByRole("button", { name: "Aylık raporu yeni giderlerle aç" }).click();
+    await operating.locator(".figure-status > summary").click();
     await expect(operating).toContainText("Tahmini yönetim faaliyet kârı");
     await expect(operating.locator(".operating-value")).toHaveText("30,00 ₺");
     await operating.getByText("Hesaplama ve sabit kayıtlar", { exact: true }).click();
