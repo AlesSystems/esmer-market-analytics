@@ -60,13 +60,17 @@ test("deadline and abort await child termination and leave no artifact", async (
   for (const abort of [false, true]) {
     const f = await fixture("require('node:fs').writeFileSync(process.argv[1] + '.pid', String(process.pid)); process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);");
     const controller = new AbortController();
-    const timer = abort ? setTimeout(() => controller.abort(), 100) : undefined;
+    const pending = collectSourceEvidence({ ...f, timeoutMs: 3000, signal: controller.signal });
+    let pid: number | undefined;
     try {
-      expect(await collectSourceEvidence({ ...f, timeoutMs: 150, signal: controller.signal })).toEqual({ ok: false, code: "EVIDENCE_FAILED" });
+      await expect.poll(async () => {
+        try { pid = Number(await readFile(join(f.dir, "sqlcmd.pid"), "utf8")); return true; } catch { return false; }
+      }, { timeout: 2000 }).toBe(true);
+      if (abort) controller.abort();
+      expect(await pending).toEqual({ ok: false, code: "EVIDENCE_FAILED" });
       expect(await readdir(f.dir)).toEqual(expect.not.arrayContaining(["evidence.json"]));
-      const pid = Number(await readFile(join(f.dir, "sqlcmd.pid"), "utf8"));
-      expect(() => process.kill(pid, 0)).toThrow();
-    } finally { clearTimeout(timer); await rm(f.dir, { recursive: true, force: true }); }
+      expect(() => process.kill(pid!, 0)).toThrow();
+    } finally { controller.abort(); await pending; await rm(f.dir, { recursive: true, force: true }); }
   }
 });
 

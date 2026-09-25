@@ -104,18 +104,20 @@ async function runSqlcmd(config: Config, password: string, timeoutMs: number, si
     const args = ["-S", config.server, "-d", config.database, "-U", config.user, "-N", "-b", "-r1", "-h", "-1", "-W", "-w", "65535", "-l", "15", "-t", "30", "-x", ...(config.trustServerCertificate ? ["-C"] : [])];
     const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.toUpperCase().startsWith("SQLCMD")));
     const child = spawn(config.sqlcmdPath ?? "sqlcmd", args, { env: { ...env, SQLCMDPASSWORD: password }, stdio: ["pipe", "pipe", "pipe"], detached: process.platform !== "win32" });
-    const chunks: Buffer[] = []; let bytes = 0; let failed = false; let escalation: NodeJS.Timeout | undefined;
+    const chunks: Buffer[] = []; let bytes = 0; let failed = false; let escalation: Promise<void> | undefined;
     function kill(signal: NodeJS.Signals) {
-      try { if (process.platform !== "win32" && child.pid) process.kill(-child.pid, signal); else child.kill(signal); } catch { /* The process may already have exited. */ }
+      try { if (process.platform !== "win32" && child.pid) process.kill(-child.pid, signal); else child.kill(signal); } catch { }
     }
-    function stop() { if (!failed) { failed = true; kill("SIGTERM"); escalation = setTimeout(() => kill("SIGKILL"), 250); } }
+    function stop() { if (!failed) { failed = true; kill("SIGTERM"); escalation = new Promise(resolve => setTimeout(() => { kill("SIGKILL"); resolve(); }, 250)); } }
     const timer = setTimeout(stop, timeoutMs);
     signal?.addEventListener("abort", stop, { once: true });
     child.stdout.on("data", (data: Buffer) => { bytes += data.length; if (bytes > maxBytes) stop(); else if (!failed) chunks.push(data); });
     child.stderr.on("data", (data: Buffer) => { bytes += data.length; if (bytes > maxBytes) stop(); });
     child.on("error", stop); child.stdin.on("error", stop);
-    child.on("close", code => {
-      clearTimeout(timer); clearTimeout(escalation); signal?.removeEventListener("abort", stop);
+    child.on("close", async code => {
+      clearTimeout(timer); signal?.removeEventListener("abort", stop);
+      if (code !== 0) stop();
+      await escalation;
       if (failed || code !== 0 || signal?.aborted) reject(new Error()); else resolve(Buffer.concat(chunks));
     });
     child.stdin.end(query);
