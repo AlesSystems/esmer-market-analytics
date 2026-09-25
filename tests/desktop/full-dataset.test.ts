@@ -55,17 +55,17 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
         const sample = { process: iteration + 1, startupMs: performance.now() - start, ordinary: {} as Record<string, number> };
         samples.push(sample);
         await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-        sample.ordinary.salesFirst = await measure(page, "Satış Özeti", "h1", "Satış Özeti");
+        sample.ordinary.salesFirst = await measure(page, "Satışlar", "h1", "Satış Özeti");
         sample.ordinary.transactionsFirst = await measure(page, "Tüm işlemleri göster", "h1", "İşlemler");
         await expect(page.locator("main tbody tr")).toHaveCount(100);
         sample.ordinary.nextPage = await measure(page, "Sonraki 100", 'nav[aria-label="İşlemler sayfaları"]', "Sayfa 2 / 250");
         const firstId = await page.locator("main tbody .row-link").first().textContent();
         sample.ordinary.transactionDetail = await measure(page, firstId!, 'aside[aria-label="İşlem detayı"] h2', "İşlem Detayı");
         await expect(page.getByRole("complementary", { name: "İşlem detayı" })).toContainText("100,00 ₺");
-        sample.ordinary.monthlyReturn = await measure(page, "Aylık Market Özeti", "h1", "Aylık Market Özeti");
-        sample.ordinary.salesWarm = await measure(page, "Satış Özeti", "h1", "Satış Özeti");
+        sample.ordinary.monthlyReturn = await measure(page, "Özet", "h1", "Aylık Market Özeti");
+        sample.ordinary.salesWarm = await measure(page, "Satışlar", "h1", "Satış Özeti");
         sample.ordinary.transactionsWarm = await measure(page, "Tüm işlemleri göster", "h1", "İşlemler");
-        sample.ordinary.monthlyWarm = await measure(page, "Aylık Market Özeti", "h1", "Aylık Market Özeti");
+        sample.ordinary.monthlyWarm = await measure(page, "Özet", "h1", "Aylık Market Özeti");
         if (iteration === 0) await page.screenshot({ path: testInfo.outputPath("full-synthetic-monthly.png"), fullPage: true });
       } finally { await app.close(); }
     }

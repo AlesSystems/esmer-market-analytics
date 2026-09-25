@@ -57,7 +57,7 @@ test("packaged Windows profile retains app-owned history across launch and resta
       const page = await app.firstWindow();
       expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
       expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(actualProfile);
-      await expect(page.getByRole("button", { name: "Rapor sürümleri" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Raporlar", exact: true })).toBeVisible();
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled" });
       const report = await page.evaluate(id => window.esmer.readReportVersion({ reportId: id }), acceptedId);
       expect(report).toMatchObject({ status: "monthly", report: { sales: { metrics: { netSales: "100" } }, purchasing: { gross: { coveredGrossProfit: "40" } }, operating: { result: { expenses: reusePhase8 ? "50" : "60" } } } });
