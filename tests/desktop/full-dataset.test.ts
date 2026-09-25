@@ -29,8 +29,8 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
   test.skip(process.platform !== "win32", "Windows performance evidence");
   test.setTimeout(180_000);
   const root = await mkdtemp(join(tmpdir(), "esmer-full-dataset-"));
-  const records = businessRecords(), document = records.documents[0], line = records.lines[0];
-  records.documents = Array.from({ length: 25_000 }, (_, i) => ({ ...document, id: `bulk-${i}` }));
+  const records = businessRecords(), saleDocument = records.documents[0], line = records.lines[0];
+  records.documents = Array.from({ length: 25_000 }, (_, i) => ({ ...saleDocument, id: `bulk-${i}` }));
   records.lines = Array.from({ length: 25_000 }, (_, i) => ({ ...line, id: `bulk-line-${i}`, documentId: `bulk-${i}` }));
   const bytes = businessPackage(records, { extractionId: "phase-10-complete-synthetic" });
   const samples: { process: number; startupMs: number; ordinary: Record<string, number> }[] = [];
