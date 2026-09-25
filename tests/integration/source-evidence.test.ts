@@ -1,10 +1,12 @@
-import { expect, test } from "vitest";
+import { expect, test as platformTest } from "vitest";
 import { mkdtemp, writeFile, readFile, readdir, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { collectSourceEvidence } from "../../tools/collect-source-evidence";
 
+// Executable shebang fixtures require POSIX; Windows collector verification remains open.
+const test = platformTest.skipIf(process.platform === "win32");
 const batch = "10000000-0000-4000-8000-000000000001";
 const schema = [
   "FIS|ID|bigint|19|0", "FIS|FIS_TURU|int|10|0", "FIS|FIS_TARIHI|datetime|23|3", "FIS|DOVIZ_AD|bigint|19|0", "FIS|DURUM|bit|1|0", "FIS|AKTIF|bit|1|0",
@@ -96,4 +98,27 @@ test("unapproved config keys fail before starting the trusted executable", async
       expect(await readdir(f.dir)).not.toContain("sqlcmd.started");
     }
   } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+test("abort kills a descendant even when its wrapper exits before escalation", async () => {
+  const descendant = "process.on('SIGTERM', () => {}); require('node:fs').writeFileSync(process.argv[1], String(process.pid)); setInterval(() => {}, 1000);";
+  const f = await fixture(`require('node:child_process').spawn(process.execPath, ['-e', ${JSON.stringify(descendant)}, process.argv[1] + '.descendant'], { stdio: 'ignore' }); process.on('SIGTERM', () => process.exit(0)); setInterval(() => {}, 1000);`);
+  const controller = new AbortController();
+  const pending = collectSourceEvidence({ ...f, signal: controller.signal });
+  let pid: number | undefined;
+  try {
+    await expect.poll(async () => {
+      try { pid = Number(await readFile(join(f.dir, "sqlcmd.descendant"), "utf8")); return true; } catch { return false; }
+    }, { timeout: 2000 }).toBe(true);
+    controller.abort();
+    expect(await pending).toEqual({ ok: false, code: "EVIDENCE_FAILED" });
+    await expect.poll(() => {
+      try { process.kill(pid!, 0); return true; } catch { return false; }
+    }, { timeout: 500 }).toBe(false);
+    expect(await readdir(f.dir)).not.toContain("evidence.json");
+  } finally {
+    controller.abort(); await pending;
+    if (pid) { try { process.kill(pid, "SIGKILL"); } catch { } }
+    await rm(f.dir, { recursive: true, force: true });
+  }
 });
