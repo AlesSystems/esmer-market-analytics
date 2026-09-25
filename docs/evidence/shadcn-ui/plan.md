@@ -15,8 +15,8 @@ The user authorized implementation and a PR on 2026-09-25, superseding the issue
 - [x] U5. Migrate expense, report, import and recovery controls without changing workflow authority.
 - [x] U6. Run regression, Windows packaging, visual and accessibility checks.
 - [x] Phase D: Keep the audit trail.
-- [ ] Phase E: Verify and hand back.
-- [ ] Review Standards and Spec independently, resolve findings, commit and open a PR.
+- [x] Phase E: Verify and hand back.
+- [x] Review Standards and Spec independently, resolve findings, commit and open a PR.
 
 Done means the packaged application uses the selected lighter system across all existing destinations; its first desktop overview shows the monthly result, trend and important gaps; existing financial and recovery journeys pass; evidence and remaining acceptance limits are recorded; and the PR is open. Owner acceptance and real-source gates remain separate.
 

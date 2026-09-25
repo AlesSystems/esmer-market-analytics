@@ -2,6 +2,8 @@
 
 Implementation on `codex/shadcn-monthly-ui` starts from `dc99905821d9d265670787c067a8ec01910974c7`. The user authorized implementation and a PR on 25 September 2026 after the planning-only issue. This evidence contributes to U1–U6 and A03/A07; it does not certify owner, real-source or rollout acceptance.
 
+Handoff: [PR #29](https://github.com/AlesSystems/esmer-market-analytics/pull/29). Commits: `d14173f` establishes the failing journey; `96b283f` implements the workspace; `14a940a` adds stress/focus contracts; `97752e0` fixes focus and signed charts; `88d3a20` packages notices; `34887f8` retains state captures; `c471b69` records final evidence. The later handoff commit changes documentation only.
+
 The monthly overview now presents sales and the daily trend together, followed by missing expenses and costs with direct actions. All existing destinations share the lighter system. Only Button, Input and Badge were added as shared shadcn controls; native tables, selects, disclosures and the existing SVG chart retain their behavior. Financial calculations, database schema, IPC authority and source access are unchanged.
 
 ## Build and fixtures
