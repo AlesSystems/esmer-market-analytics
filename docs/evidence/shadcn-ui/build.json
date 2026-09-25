@@ -1,0 +1,322 @@
+{
+  "sourceCommit": "88d3a207f416f278b8e6e31aecb0ece42b77bce0",
+  "branch": "codex/shadcn-monthly-ui",
+  "baseCommit": "dc99905821d9d265670787c067a8ec01910974c7",
+  "packaging": {
+    "files": 77,
+    "violations": [],
+    "noticeDependencies": 10,
+    "distributions": "match inspected payload",
+    "archiveFiles": 344,
+    "signature": "NotSigned"
+  },
+  "date": "2026-09-25",
+  "captureTests": "10 selected packaged desktop tests passed; commands and limits in README.md",
+  "artifacts": [
+    {
+      "sha256": "cc2850b9b8fbb57949949be38ecb60b2974a292f58ddae104696a5a4e859c690",
+      "path": "release/win-unpacked/resources/app.asar",
+      "bytes": 11795763
+    },
+    {
+      "sha256": "8c0843185b48a428b1196913c1a5993dd4e34c63da9ea4aef156537afb5a1bd4",
+      "path": "release/Esmer Market Analytics Setup 0.2.0.exe",
+      "bytes": 112938650
+    },
+    {
+      "sha256": "964e7c03ada6de988c2d1cd9c789a9a5bba2057fa4967374cf21d592dad0332f",
+      "path": "release/Esmer Market Analytics 0.2.0.exe",
+      "bytes": 112771344
+    }
+  ],
+  "images": [
+    {
+      "sha256": "6ea52aa1387a8175a754467cb239b161e10bd6cd0fdc7e6c8f0f24162f386a1f",
+      "path": "images/empty-1440.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 28304
+    },
+    {
+      "sha256": "7a01cd5397c92e152a5b2870a462d3320aeaa1ffd508bb1e2038ed4f7a2f739e",
+      "path": "images/expenses-completeness.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 45640
+    },
+    {
+      "sha256": "51ed5465aa43fcd2a2e09c8e125de7aae06e218ea0e8c6cdff2356c73db70afc",
+      "path": "images/expenses-import.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 39571
+    },
+    {
+      "sha256": "5d2a4598b57c8ad2235da9cdb0a4dc22bcbd002c3591713a83214738d475fcda",
+      "path": "images/expenses-preview.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 71941
+    },
+    {
+      "sha256": "70036f89d50f2dc9db1d0297d9ccb22c15033d6999c8e7f52ff58936670f27ee",
+      "path": "images/expenses-records-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 55582
+    },
+    {
+      "sha256": "e0d27e01c0a4848b57d95f59db6600bd0b711767796f14ee977e111a2eb6fabc",
+      "path": "images/expenses-records.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 59435
+    },
+    {
+      "sha256": "cbd8a70a83cd0f69bd4fa20f94c003e258e72f33f4b45233b6b4a987fa3295b6",
+      "path": "images/forced-colors-keyboard-focus.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 70552
+    },
+    {
+      "sha256": "d0587d6c7236aafa360110d4d39887e161d673ffb745f5e5b733104451d2448e",
+      "path": "images/forced-colors-reduced-motion.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 121884
+    },
+    {
+      "sha256": "caf5a3b9da80a21cacb7c902f09ce0a10790f6d13a35653c8c95d52348733767",
+      "path": "images/full-synthetic-monthly.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 117855
+    },
+    {
+      "sha256": "6452da033225d8925f7f5fc4dede1cb71d3fe80f7d9bac09dbaf4026ac80f046",
+      "path": "images/offline-reload.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 129850
+    },
+    {
+      "sha256": "1034e4222cffdb0bd5d96c273334fdb7e09475128984c6e88d58fa4b5bc039db",
+      "path": "images/operations-history.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 93158
+    },
+    {
+      "sha256": "f7d2f31af3e019d14717cc9eacdf635839d7fe823936d9805c8bdf1ba0c372d5",
+      "path": "images/overview-1440.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 102149
+    },
+    {
+      "sha256": "6452da033225d8925f7f5fc4dede1cb71d3fe80f7d9bac09dbaf4026ac80f046",
+      "path": "images/overview-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 129850
+    },
+    {
+      "sha256": "434f7954fc0725fca02015d745ad419c8d199c3890881414a7e3817459c800d5",
+      "path": "images/overview-680.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 131439
+    },
+    {
+      "sha256": "88f02fed9b14fb378eac3fbd6a285f2c6faf1b2c1de73591adc79bd9d61dd8e0",
+      "path": "images/phase-8-cancelled.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 125057
+    },
+    {
+      "sha256": "7ae27d50b34516a5e383d08a88c1c2706dfaf31cad4a3643571a8657f29f65f9",
+      "path": "images/phase-8-monthly-overview.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 125429
+    },
+    {
+      "sha256": "4274a6227036be6a4a367aab54ef7fdd2cdb05c8ddf6140094e8f58ff48d8184",
+      "path": "images/phase-8-monthly-small.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 118261
+    },
+    {
+      "sha256": "2472873b5f41bc6d79120f35f6933f32ee48b0f1e4fa0d87684f1aa170dfa8db",
+      "path": "images/phase-8-report-history.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 69795
+    },
+    {
+      "sha256": "e2ce13b5bb552d8aa1ca6591fcbb4a760b555fa6a6ee531917727c67c4a28124",
+      "path": "images/phase-8-unavailable.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 122206
+    },
+    {
+      "sha256": "d3c684bb50e7f5cecd1f7a924712c02664c16f8ca0b68fcd1331b157f8c53d5c",
+      "path": "images/phase-9-recovery-1120.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 59893
+    },
+    {
+      "sha256": "74165c03913ca35002e0de83872034e66cdf484c320b3e7da62bc34eb34531eb",
+      "path": "images/phase-9-recovery-680.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 55427
+    },
+    {
+      "sha256": "692b8ba07836840d2376f2d0acb708f651afa2942cf8282dd4c7915f649a1474",
+      "path": "images/phase-9-restore-preview-1120.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 56744
+    },
+    {
+      "sha256": "9188f0bc5847d7d61bd1d46a155d091c7f9122f73772e2af1561c6d7f6d0f808",
+      "path": "images/phase-9-restore-preview-680.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 55092
+    },
+    {
+      "sha256": "293d29707e7293b5d3d80de737d2a96559f5846fba7471f00130110ba25f8611",
+      "path": "images/purchasing-history-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 68944
+    },
+    {
+      "sha256": "86a408675763a3e2589c161aa94a6b4f9519cc4577df27c66c71596d8de9b9fd",
+      "path": "images/purchasing-history.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 72616
+    },
+    {
+      "sha256": "005e9382859da172c31f95e3abda96550994b204dd7d463690050983218a92cb",
+      "path": "images/purchasing-replacement.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 76241
+    },
+    {
+      "sha256": "af766197eb8d778947fe988dabed24301173168c69c29a3c6cd372461b910375",
+      "path": "images/purchasing-returns.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 75005
+    },
+    {
+      "sha256": "bfbe998507b0b27285462fe5cfe5330799405fbc44861f9281ea6569d5fe9c8d",
+      "path": "images/purchasing-stock.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 71755
+    },
+    {
+      "sha256": "923703e4db32b1abba09f5123e25e1cb8ea3d6031058908db131f42612e4b9a1",
+      "path": "images/recovery.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 54462
+    },
+    {
+      "sha256": "b6658e2142a6d04efdc210553e80c9d2f0f8851b3d193478961a4e2daaa7a90d",
+      "path": "images/reports-candidate.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 94537
+    },
+    {
+      "sha256": "927c539cdc1097165a71410f7815ba761e31591bcf88aa18e1e847367507f654",
+      "path": "images/reports-list-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 46530
+    },
+    {
+      "sha256": "ec24cf6b03d718e44072196e24c5dafba1a62506692ba7790f07ff75d3b13ab5",
+      "path": "images/reports-list.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 56776
+    },
+    {
+      "sha256": "64a98627551e66eeab3c3314acabf284d0dc6e12e06fa77f7cc9889b648c3052",
+      "path": "images/representative-month-1440.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 96294
+    },
+    {
+      "sha256": "53f90dfde770e4358d9043da5f7f887946286b00e7bf9a06bd069d6f82170ab8",
+      "path": "images/sales-products.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 69980
+    },
+    {
+      "sha256": "ae33dfe150299dda027c3f1dec6c356a9145712e29aed430b0d31de5b801a3c4",
+      "path": "images/sales-receipt.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 87564
+    },
+    {
+      "sha256": "fbb58ad6d2937e83a7863d2f93e79b60a1f9ec0a1ec65126005f4959c976c939",
+      "path": "images/sales-source.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 78565
+    },
+    {
+      "sha256": "e22b3b50fcc128bdee1ff7ea5fff269d87fef0da3808775c110bda36fbe1bae0",
+      "path": "images/sales-summary-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 97031
+    },
+    {
+      "sha256": "a073ff9fe73176876327ad08d8878c201f0ef9b465b28e166dda7948fd347771",
+      "path": "images/sales-summary.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 87281
+    },
+    {
+      "sha256": "e87a8726b89fac2d09ae1654e414384fdb86edf91acf15cd4e21bb9a9a95c0b0",
+      "path": "images/sales-transactions-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 118944
+    },
+    {
+      "sha256": "fd9abd688a7e39490b3b561a38df32d5c52a2acf453144e5d20e2f1fcffc0169",
+      "path": "images/sales-transactions.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 65056
+    },
+    {
+      "sha256": "0db61089a907ff39fae80f8a4bcf0105a6259addf8841f883001f152fb0e536c",
+      "path": "images/shadcn-import-progress.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 124458
+    },
+    {
+      "sha256": "bad32f919ea99597507f6fa35fab6af5aa9088d4bc335a5bd6e433c87bebb43e",
+      "path": "images/shadcn-monthly-error.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 28497
+    },
+    {
+      "sha256": "4c7008a67b144137aa55f85707716c3df26a667d43c270b31b29113e40fe2c2a",
+      "path": "images/shadcn-monthly-partial.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 126175
+    },
+    {
+      "sha256": "1d87fd5a08bd6339f28779ede3a7fe21a228c08722e114e291a8db01f10c77bf",
+      "path": "images/shadcn-saved-report.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 155200
+    },
+    {
+      "sha256": "cadae53063afb59105ed5a09112663fdcee8e3b4800cd60f8a0f375ce9dc2884",
+      "path": "images/shadcn-stale-source.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 164362
+    },
+    {
+      "sha256": "11e2c2678bae9bffe3fee3a02d72f6be138c04941cfccba8ef60711e2e998df4",
+      "path": "images/stress-long-category-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 61969
+    },
+    {
+      "sha256": "9c5abde1a34d1c31c4b3bdedd54432453fb21baba1b3131418c1a8675f9b69d7",
+      "path": "images/stress-transactions-453.png",
+      "capture": "Final packaged run, 2026-09-25; synthetic fixture only",
+      "bytes": 377255
+    }
+  ],
+  "stage": "U2-U6",
+  "gates": [
+    "A03",
+    "A07",
+    "D18"
+  ]
+}

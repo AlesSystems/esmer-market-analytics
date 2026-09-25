@@ -1,0 +1,9 @@
+ts	phase	decision	why	evidence	result
+2026-09-25T14:17:09.6959245Z	U1	Use the latest merged UI in an isolated worktree	Preserve the user's existing checkouts	plan.md	base dc99905
+2026-09-25T14:17:09.6959245Z	U1	Keep three shared shadcn controls and native table and disclosure behavior	Avoid competing state and unnecessary components	plan.md	selected before production edits
+2026-09-25T14:17:09.6959245Z	U3	Added the packaged overview contract before UI edits	Observe the missing expense action against the prior package	red/baseline-context.md	missing Giderleri incele reproduced
+2026-09-25T14:17:09.6959245Z	U2-U5	Integrated three controls and replaced the legacy stylesheet	Retain existing workflow state and remove repeated styling	src/ui/style.css	2 focused packaged tests pass
+2026-09-25T14:17:09.6959245Z	U6	Corrected navigation alignment and chart sign presentation after first captures	Utility precedence centered navigation and negative bars used color alone	images/overview-1440.png	fix batch awaiting recapture
+2026-09-25T14:30:25.0081279Z	U6	Reproduced and fixed forced-colors focus suppression	Independent review found outline-none defeated global keyboard focus	red/forced-colors-context.md	final packaged regression passes
+2026-09-25T14:30:25.0081279Z	U6	Recaptured all47 screenshots from the inspected final Windows package	Bind visual evidence to exact artifact and retain synthetic-only proof	build.json	10final selected tests and package inventory pass
+2026-09-25T14:30:25.0081279Z	U6	Independent Standards and Spec reviews clear	Resolve findings and preserve explicit manual acceptance gaps	review.md	no actionable findings; ship for scored fixes

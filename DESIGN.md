@@ -1,237 +1,246 @@
 ---
-name: Esmer Market Option B
-description: A navy working desk and crisp financial statements for offline store analysis.
+name: Esmer Market
+description: A light, restrained desktop analysis system for an offline market owner.
 colors:
-  navy: "#0B1830"
-  blue: "#0057D9"
-  ink: "#10213A"
-  muted: "#475569"
-  paper: "#FFFFFF"
-  canvas: "#F3F5F8"
-  line: "#D5DCE5"
-  control-border: "#8295af"
-  blue-wash: "#eaf3ff"
-  sidebar-text: "#DCE6F5"
-  sidebar-hover: "#192C49"
-  sidebar-field: "#172A46"
-  sidebar-border: "#566781"
-  positive: "#147D52"
-  negative: "#B42318"
-  attention-text: "#795000"
-  attention-bg: "#FFF7E2"
-  attention-border: "#C9AE6C"
+  background: "#ffffff"
+  foreground: "#202124"
+  primary: "#27272a"
+  primary-foreground: "#ffffff"
+  secondary: "#f4f4f5"
+  secondary-foreground: "#3f3f46"
+  muted-surface: "#fafafa"
+  muted: "#62626b"
+  accent: "#e6f2ef"
+  accent-foreground: "#215e54"
+  accent-border: "#bddbd2"
+  line: "#e1e1e5"
+  input: "#b7b7bf"
+  ring: "#28796b"
+  positive: "#236c59"
+  positive-chart: "#3a8a7a"
+  negative: "#b42318"
+  warning: "#fff8e9"
+  warning-foreground: "#80580b"
+  warning-border: "#e4cea4"
+  selection-background: "#cae7df"
 typography:
-  display:
+  chart-label:
     fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(36px, 3.6vw, 56px)"
+    fontSize: "11px"
+  status:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "12px"
+  supporting:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "13px"
+  headline:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "clamp(25px, 2.3vw, 32px)"
+    fontWeight: 650
+    lineHeight: 1.2
+    letterSpacing: "-0.025em"
+  amount:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "clamp(34px, 3.3vw, 48px)"
     fontWeight: 650
     lineHeight: 1.15
     letterSpacing: "-0.035em"
-  headline:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(25px, 2.4vw, 34px)"
-    fontWeight: 650
-    lineHeight: 1.2
-    letterSpacing: "-0.03em"
   title:
     fontFamily: "Segoe UI, system-ui, sans-serif"
     fontSize: "18px"
-    fontWeight: 700
+    fontWeight: 600
+    lineHeight: 1.35
   body:
     fontFamily: "Segoe UI, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.5
+  ledger-value:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "17px"
+    fontWeight: 600
+  brand:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "20px"
+    fontWeight: 700
+  panel-title:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "22px"
+  total:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "24px"
+  operating-total:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "25px"
+    fontWeight: 600
+  metric:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "30px"
+    fontWeight: 650
+  amount-compact:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "36px"
+    fontWeight: 650
+    lineHeight: 1.15
   label:
     fontFamily: "Segoe UI, system-ui, sans-serif"
     fontSize: "14px"
-    fontWeight: 400
-  ledger-value:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "18px"
-    fontWeight: 600
+    fontWeight: 500
 rounded:
-  surface: "4px"
-  control: "5px"
-  marker: "3px"
+  control: "6px"
+  notice: "8px"
+  surface: "10px"
 spacing:
   compact: "8px"
-  control-gap: "12px"
-  field-gap: "16px"
-  group-gap: "20px"
-  section-gap: "24px"
-  page-inset: "32px"
+  control-inline: "12px"
+  field: "16px"
+  surface: "22px"
+  section: "24px"
+  page-inline: "32px"
 components:
-  button-primary:
-    backgroundColor: "{colors.blue}"
-    textColor: "{colors.paper}"
+  button-default:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.primary-foreground}"
     rounded: "{rounded.control}"
-    padding: "8px 11px"
-  button-secondary:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
+    padding: "8px 12px"
+    height: "40px"
+  button-outline:
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.control}"
-    padding: "8px 11px"
-  button-secondary-hover:
-    backgroundColor: "{colors.blue-wash}"
-  row-link:
-    backgroundColor: "transparent"
-    textColor: "{colors.blue}"
-    padding: "3px 0"
-    rounded: "0"
+    padding: "8px 12px"
+    height: "40px"
   input:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.control}"
-    padding: "8px 11px"
-  navigation:
-    backgroundColor: "transparent"
-    textColor: "{colors.sidebar-text}"
-    padding: "12px"
-    rounded: "{rounded.surface}"
-  navigation-current:
-    backgroundColor: "{colors.blue}"
-    textColor: "{colors.paper}"
-  attention-marker:
-    backgroundColor: "{colors.attention-bg}"
-    textColor: "{colors.attention-text}"
-    typography: "{typography.label}"
-    padding: "6px 10px"
-  sheet:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.surface}"
-    padding: "24px"
-  figure-status:
-    textColor: "{colors.blue}"
-    typography: "{typography.label}"
+    padding: "8px 12px"
+    height: "40px"
+  badge-secondary:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.secondary-foreground}"
+    rounded: "{rounded.control}"
+    padding: "4px 8px"
+  badge-warning:
+    backgroundColor: "{colors.warning}"
+    textColor: "{colors.warning-foreground}"
+    rounded: "{rounded.control}"
+    padding: "4px 8px"
 ---
 
 # Design System: Esmer Market
 
 ## Overview
 
-**Creative North Star: "The Working Desk"**
+**Creative North Star: "The Quiet Market Ledger"**
 
-A deep navy navigation rail holds the period, data cutoff and operations beside white financial sheets on a cool gray canvas. The interface is compact and direct: a Turkish label explains each figure, tabular numerals support comparison, and visible rules separate ledger rows.
+This is a light desktop operating system for reading a market month without turning the work into a dashboard spectacle. White working space, soft zinc surfaces, charcoal actions, a restrained teal selection, and visible rules let the figures, evidence, and Turkish labels do the work.
 
-Blue identifies actions and the selected path. Material uncertainty stays beside the affected figure; fuller methods and source records open through labelled disclosures. This records the implemented Option B world, selected by the user, rather than every historical style still present in the stylesheet.
+The sidebar keeps the working context close while the content area stays broad, dense, and calm. Colour carries state sparingly: teal locates the current path, green and red support signed values, and amber keeps incomplete evidence visible. The system is intentionally light-only and uses native controls where they already serve the workflow.
 
 **Key Characteristics:**
 
-- Navy navigation and white financial sheets.
-- Large primary amounts, compact ledger rows and tabular numerals.
-- Turkish labels and explicit evidence states.
-- Modest corners, visible dividers and restrained overlay depth.
-
-Source of truth: [stylesheet](src/ui/style.css), [shell](src/ui/AppShell.tsx), [monthly overview](src/ui/overview/MonthlyOverview.tsx) and the [approved direction](.impeccable/surfaces/src-ui-app-tsx.md). The [redesign specification](docs/superpowers/specs/2026-09-25-ui-redesign.md) governs the intended experience; the tokens above describe the final CSS cascade. This document does not close acceptance gates or establish actual Windows 150% scaling acceptance.
+- Light zinc shell with charcoal primary actions and restrained teal selection.
+- Segoe UI hierarchy, tabular figures, visible rules, and compact operational density.
+- Native tables, selects, disclosures, and SVG trend chart retained beside three shared controls.
+- Explicit warning, unavailable, synthetic, and report-evidence states.
 
 ## Colors
 
-The palette pairs cool, dark navigation with bright paper and a blue action accent.
+The palette is neutral first: charcoal directs action, teal establishes location, and financial state colours remain supporting signals.
 
 ### Primary
 
-- **Electric blue:** active primary navigation, primary buttons, links, keyboard focus and evidence disclosures. It is an interaction color, not a gain indicator.
-- **Deep navy:** the persistent navigation rail and selected local subviews.
+- **Charcoal action:** primary buttons and the strongest interactive commitment.
+- **Teal focus and selection:** the current destination, focus ring, caret, progress accent, and selected local state.
 
 ### Secondary
 
-- **Positive green / negative red:** supplement signed comparisons and return information. Keep the sign, label or accessible textual amount.
-- **Attention amber:** partial periods, missing evidence and unavailable operating results use attention text, background and border together.
+- **Zinc support surface:** quiet controls, neutral markers, and subdued table structure.
+- **Teal selection wash:** selected navigation and related active states, paired with darker teal text.
+- **Teal selection border:** the boundary for pressed local navigation; it keeps the selected state legible on paper.
+- **Selection wash:** the browser text-selection background, paired with dark teal selected text.
+- **Amber evidence state:** incomplete, synthetic, partial-period, and unavailable operating-result context, always with its border and written explanation.
+- **Positive green and negative red:** signed comparisons and returns; the daily chart uses its dedicated positive bar green. These are never the only carrier of financial meaning.
 
 ### Neutral
 
-- **Ink / muted:** primary figures and text versus supporting explanation.
-- **Paper / canvas / line:** white sheets against the cool gray workspace, separated by visible rules.
-- **Sidebar text / hover / field / border:** the pale text, darker field and restrained hover treatment that keep controls legible inside the rail.
-- **Control border / blue wash:** field edges and secondary-button hover.
+- **Paper canvas:** the application background and standard control surface.
+- **Charcoal text and muted text:** primary reading order, then supporting metadata and explanation.
+- **Fine zinc line:** the recurring separator around controls, surfaces, tables, and ledger rows.
 
-**The Action Blue Rule.** Blue identifies a path or a control; it does not certify financial performance.
+**The Accent Is Location Rule.** Teal marks focus, selection, and progress. It does not certify profit or a favourable financial result.
 
 ## Typography
 
-**Interface Font:** Segoe UI with system-ui and sans-serif fallbacks. This is the explicitly selected Windows workhorse face; there is no separate decorative display face.
+**Interface Font:** Segoe UI with system-ui and sans-serif fallbacks.
+
+**Character:** The system uses the Windows-native reading face already present in the build. Hierarchy comes from compact size and weight changes, while tabular numerals make financial comparison stable.
 
 ### Hierarchy
 
-- **Display:** the dominant monthly amount, using the frontmatter's fluid size and tight tracking. This role names a financial figure, not a marketing headline.
-- **Headline:** the page title, using a restrained fluid scale.
-- **Title:** section headings. Smaller section headings use the implemented 16px size; ledger values use a separate medium-weight role.
-- **Body:** ordinary interface text and prose. The recorded line height applies to paragraphs; controls inherit the font with their native line-height behavior.
-- **Label:** table text, metadata, disclosures and status text. Status meaning remains written out.
+- **Amount:** the monthly result uses the largest, tightly tracked role; it is a figure, not a promotional headline.
+- **Headline:** page titles use the responsive headline role.
+- **Title:** section headings use the sturdy 18px role.
+- **Body:** ordinary workspace copy uses the 15px body role; explanatory paragraphs open their line-height to 1.6.
+- **Label:** 14px labels anchor controls, table headers, and metadata; supporting text is 13px, status markers are 12px, and chart ticks are 11px.
+- **Financial scale:** ledger values use 17px; brand, panel, total, operating-total, and metric roles use 20px, 22px, 24px, 25px, and 30px respectively. The monthly amount has a 36px compact-width fallback.
 
-**The Comparable Figures Rule.** Use tabular numerals for amounts, totals and tables; align numeric table columns to the right and retain their units.
+**The Comparable Figures Rule.** Amounts, totals, and tables use tabular numerals; numeric table columns align right and retain their units and signs.
 
 ## Layout
 
-The desktop shell uses a 220px rail and a flexible content column. The rail is sticky and fills the viewport height. Content is capped at 1600px, with 32px top and horizontal insets and a 48px lower inset. Shared sections use the spacing scale above; forms wrap instead of forcing the page wider.
+The desktop shell is a 208px sticky sidebar beside a flexible main area. The workspace is capped at 1660px and uses 28px top, 32px inline, and 48px lower padding. Reused spacing moves from 8px inside compact controls through 16px fields and 22–24px surface groups.
 
-The monthly overview places the main answer beside a ledger and category table, with the daily trend spanning both columns. This composition belongs to that surface; other workspaces use the shared sheet, table and disclosure vocabulary without copying its arrangement.
+The monthly workspace uses a two-to-three-column grid: answer and daily trend first, a full-width attention row, then finance and category regions. At 1050px it becomes a single sequence. At 800px the sidebar becomes a wrapping top strip; at 650px summary and attention groups simplify to one column; at 500px the ledger values return beneath their labels. Dense tables scroll within their own region.
 
-At 1100px and below the rail narrows to 190px, the monthly columns stack and the horizontal workspace inset becomes 24px. At 800px and below navigation becomes a wrapping labelled strip, the period and operations wrap with it, and horizontal padding becomes 20px. At 500px and below sheet padding is 20px and the financial ledger stacks its labels and values.
-
-Sales detail uses a 390px evidence panel. At 1250px and below it becomes a fixed overlay; at 500px and below it uses 12px viewport insets. Sales overview columns stack at 900px, metric groups at 650px. Wide tables scroll within their own region and keep the row-identity column sticky. These CSS breakpoints do not substitute for checking physical Windows display scaling.
+The evidence panel is 390px wide on large screens. At 1250px it becomes a fixed overlay with viewport-safe inset behavior. Popovers open beside their sidebar triggers and become fixed within the compact sidebar layout.
 
 ## Elevation & Depth
 
-Sheets are flat, with a thin line defining their edges. Depth appears only where a surface overlays other content: the data popover, operations menu and compact-window evidence panel. Neither sheet hover lifts nor animated transitions are defined in the current stylesheet.
+The working surface is flat: borders and tonal differences establish ordinary structure. Only a popover, operations hub, or compact evidence panel receives depth, because it temporarily overlaps the ledger.
 
 ### Shadow Vocabulary
 
-- **Popover:** `0 12px 32px #0B18301F` for the data and operations overlays.
-- **Evidence overlay:** `-8px 12px 30px #224b7630` for the fixed detail panel.
+- **Sidebar overlay:** `0 8px 28px #20212426` for data and operations popovers.
+- **Compact evidence panel:** `0 10px 32px #20212426` when the detail panel is fixed below the wide layout.
 
-**The Overlay Depth Rule.** Use shadow to explain overlap; ordinary financial sheets keep borders and no shadow.
+**The Overlap-Only Depth Rule.** Shadows explain an overlay. Standard cards, rows, and figures stay flat.
 
 ## Shapes
 
-Sheets and navigation items have modest surface corners, controls use the control radius, and report-version markers use the smaller marker radius. Ledger rows and attention bands stay square. Borders remain visible; the statement character comes from alignment, rules and type rather than decorative surface effects.
+Controls and compact status markers use a 6px radius. Notices and attention groups widen to 8px; reusable workspace blocks, recovery sections, and overlays use 10px. Borders are fine and visible. Tables, ledgers, and charts are defined by alignment and separators rather than decorative containers.
 
 ## Components
 
-### Buttons
+### Button
 
-Primary buttons use electric blue with white text. Secondary buttons use paper, ink and a visible control border; their hover becomes blue wash. Both have a 40px minimum height and the control padding in the frontmatter. The current primary hover keeps its blue fill. Keyboard focus uses a blue 3px outline with 3px offset; disabled controls use 0.6 opacity and a not-allowed cursor. Text row links retain their compact padding and underline on hover.
+The shared native button is the system's primary action primitive. It has a 40px minimum height, a 6px corner, 8px by 12px padding, and default, outline, ghost, link, and destructive variants. Default is charcoal with white text; outline keeps the paper surface and visible line; ghost stays quiet until hover. The normal palette uses the teal focus ring and the global 2px outline with a 3px offset; forced colours replace it with a 2px `Highlight` outline. Disabled actions reduce opacity and keep the not-allowed cursor.
 
-### Inputs / Fields
+### Input
 
-Inputs and selects use paper, ink and a visible control border, with the same minimum height and padding as buttons. Sidebar period input uses its darker field and border palette, white text and native dark color scheme. Textareas have surface corners, a line border, 10px padding and vertical resize. Focus uses the shared visible outline.
+The shared native input fills its available width with the same 40px minimum height and 6px corner. It uses paper, the input border, readable foreground text, placeholder muting, the teal focus ring, and the same global outline policy as buttons. Native selects and textareas retain the same visual family through the global stylesheet.
 
-### Navigation
+### Badge
 
-Primary navigation combines an inline outline SVG with a Turkish destination label. Desktop rows have a 46px minimum height; the selected row is blue and hover is sidebar-hover. Focus is white against navy. Compact navigation retains labels, hides the icons and uses a 42px minimum height. Local subviews use bordered buttons and a navy selected state.
+The shared native span badge is a compact 12px status marker with 4px by 8px padding and a 6px corner. Default, secondary, outline, destructive, and warning variants cover the build's reusable status language. Warning is reserved for the amber evidence state.
 
-### Chips / Status Markers
+### Native Working Elements
 
-Partial-period markers are square amber labels, not interactive filter pills. Synthetic identity remains visible in the sidebar with its dark amber variant. The report marker is a neutral bordered label. Meaning comes from text as well as color.
-
-### Cards / Containers
-
-A sheet has paper fill, a line border, surface corners and section padding. The monthly answer uses a larger inset. The financial ledger and category region share the statement rhythm without creating an additional outer card around each row.
-
-### Figure Evidence
-
-A concise blue status is a native disclosure summary. Its expanded content contains the explanation and relevant source or method; the status itself stays beside the figure. Unavailable values remain explicit text. Disclosure movement is immediate; no motion token is established.
-
-### Tables and Operations
-
-Tables use compact rows, right-aligned numeric columns and visible separators. Row links lead to evidence. The operations menu and data cutoff open white overlays from the sidebar; compact layouts position them below their triggers. Long values wrap or remain inside the table's scroll region.
+Tables, select controls, `details` disclosures, and the existing SVG chart remain native or purpose-built. They are not replaced with generated data, select, disclosure, or chart frameworks; their existing state ownership and interaction semantics are part of the system.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** keep the period, actual cutoff and synthetic identity readable alongside navigation.
-- **Do** pair financial color with signs, labels and accessible textual amounts.
-- **Do** preserve explicit unavailable and estimated states beside the affected figures.
-- **Do** use visible borders, tabular numerals and aligned rows to make comparisons easy.
-- **Do** retain labelled keyboard focus and the implemented forced-colors treatment.
+- **Do** keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.
+- **Do** use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.
+- **Do** use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.
+- **Do** preserve native table scrolling and disclosure behavior when extending an existing workflow.
 
 ### Don't:
 
-- **Don't** use blue as a gain signal or treat an estimate as verified profit.
-- **Don't** replace missing financial evidence with a zero.
-- **Don't** add gradients, glass, glow or color-only status.
-- **Don't** turn every ledger row into a separate raised card.
-- **Don't** hide period, cutoff or financial caveats to make a narrow layout fit.
+- **Don't** restore the superseded navy rail, electric-blue action system, or dark component variants.
+- **Don't** use teal, green, or red alone to assert financial meaning.
+- **Don't** replace missing evidence with a zero or hide it to make a compact view cleaner.
+- **Don't** add a generated control framework where the native table, select, disclosure, or chart already owns the task.

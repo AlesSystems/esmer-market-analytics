@@ -4,7 +4,7 @@ This record applies to preview 0.2.0 for [Task 10.1](../superpowers/plans/esmer-
 
 ## Shipped dependencies
 
-The locked production packages below have the stated licences. Build bundling does not by itself preserve the package notices in a separately readable form. The release licence collection must therefore include the notices for the UI foundation packages listed below, alongside the existing notices checked by `scripts/verify-package.mjs`.
+The locked production packages below have the stated licences. Their complete package notices remain in `app.asar`, including the three UI helpers, following the existing distribution policy. `scripts/verify-package.mjs` checks every packed dependency for a nonempty notice; bundling alone is not the notice evidence.
 
 | Package | Version | Licence |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ The Tailwind build chain is development-only: it produces the application's stat
 
 The MIT and Apache-2.0 terms permit this private `UNLICENSED` application's distribution when their required copyright, permission, and licence text are retained. Apache-2.0 adds its patent grant and notice conditions; its notice must remain with the distributed third-party notices. No copyleft or source-disclosure obligation was identified for these reviewed additions. This is a licence compatibility record, not a legal opinion.
 
-The shadcn/ui source notice is retained verbatim at [`third-party/shadcn-LICENSE`](../../third-party/shadcn-LICENSE). The Windows package licence-copy step must include that file and the listed package notices in `resources/licences`; the source components and their generated bundles must not rely on `app.asar` to supply those notices.
+The shadcn/ui source notice is retained verbatim at [`third-party/shadcn-LICENSE`](../../third-party/shadcn-LICENSE) and copied to `resources/licences`, alongside the Tailwind CSS notice. These two sources have no runtime package in `app.asar`, so their notices are distributed separately. The three runtime helper notices are retained with their packages in `app.asar` and verified by the package inspection.
 
 ## Security and publisher state
 

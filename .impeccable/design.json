@@ -1,433 +1,85 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T13:20:07.966Z",
+  "generatedAt": "2026-09-25T14:21:14.1895446Z",
   "title": "Design System: Esmer Market",
   "extensions": {
     "colorMeta": {
-      "navy": {
-        "role": "primary",
-        "displayName": "Deep navy",
-        "tonalRamp": [
-          "oklch(15% 0.0510 261.61)",
-          "oklch(26% 0.0510 261.61)",
-          "oklch(38% 0.0510 261.61)",
-          "oklch(49% 0.0510 261.61)",
-          "oklch(61% 0.0510 261.61)",
-          "oklch(72% 0.0510 261.61)",
-          "oklch(84% 0.0510 261.61)",
-          "oklch(95% 0.0510 261.61)"
-        ]
-      },
-      "blue": {
-        "role": "primary",
-        "displayName": "Electric blue",
-        "tonalRamp": [
-          "oklch(15% 0.2115 260.60)",
-          "oklch(26% 0.2115 260.60)",
-          "oklch(38% 0.2115 260.60)",
-          "oklch(49% 0.2115 260.60)",
-          "oklch(61% 0.2115 260.60)",
-          "oklch(72% 0.2115 260.60)",
-          "oklch(84% 0.2115 260.60)",
-          "oklch(95% 0.2115 260.60)"
-        ]
-      },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Ink",
-        "tonalRamp": [
-          "oklch(15% 0.0531 257.96)",
-          "oklch(26% 0.0531 257.96)",
-          "oklch(38% 0.0531 257.96)",
-          "oklch(49% 0.0531 257.96)",
-          "oklch(61% 0.0531 257.96)",
-          "oklch(72% 0.0531 257.96)",
-          "oklch(84% 0.0531 257.96)",
-          "oklch(95% 0.0531 257.96)"
-        ]
-      },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Muted",
-        "tonalRamp": [
-          "oklch(15% 0.0374 257.28)",
-          "oklch(26% 0.0374 257.28)",
-          "oklch(38% 0.0374 257.28)",
-          "oklch(49% 0.0374 257.28)",
-          "oklch(61% 0.0374 257.28)",
-          "oklch(72% 0.0374 257.28)",
-          "oklch(84% 0.0374 257.28)",
-          "oklch(95% 0.0374 257.28)"
-        ]
-      },
-      "paper": {
-        "role": "neutral",
-        "displayName": "Paper",
-        "tonalRamp": [
-          "oklch(15% 0.0000 89.88)",
-          "oklch(26% 0.0000 89.88)",
-          "oklch(38% 0.0000 89.88)",
-          "oklch(49% 0.0000 89.88)",
-          "oklch(61% 0.0000 89.88)",
-          "oklch(72% 0.0000 89.88)",
-          "oklch(84% 0.0000 89.88)",
-          "oklch(95% 0.0000 89.88)"
-        ]
-      },
-      "canvas": {
-        "role": "neutral",
-        "displayName": "Canvas",
-        "tonalRamp": [
-          "oklch(15% 0.0045 258.32)",
-          "oklch(26% 0.0045 258.32)",
-          "oklch(38% 0.0045 258.32)",
-          "oklch(49% 0.0045 258.32)",
-          "oklch(61% 0.0045 258.32)",
-          "oklch(72% 0.0045 258.32)",
-          "oklch(84% 0.0045 258.32)",
-          "oklch(95% 0.0045 258.32)"
-        ]
-      },
-      "line": {
-        "role": "neutral",
-        "displayName": "Line",
-        "tonalRamp": [
-          "oklch(15% 0.0145 254.61)",
-          "oklch(26% 0.0145 254.61)",
-          "oklch(38% 0.0145 254.61)",
-          "oklch(49% 0.0145 254.61)",
-          "oklch(61% 0.0145 254.61)",
-          "oklch(72% 0.0145 254.61)",
-          "oklch(84% 0.0145 254.61)",
-          "oklch(95% 0.0145 254.61)"
-        ]
-      },
-      "control-border": {
-        "role": "neutral",
-        "displayName": "Control border",
-        "tonalRamp": [
-          "oklch(15% 0.0445 256.29)",
-          "oklch(26% 0.0445 256.29)",
-          "oklch(38% 0.0445 256.29)",
-          "oklch(49% 0.0445 256.29)",
-          "oklch(61% 0.0445 256.29)",
-          "oklch(72% 0.0445 256.29)",
-          "oklch(84% 0.0445 256.29)",
-          "oklch(95% 0.0445 256.29)"
-        ]
-      },
-      "blue-wash": {
-        "role": "neutral",
-        "displayName": "Blue wash",
-        "tonalRamp": [
-          "oklch(15% 0.0188 255.53)",
-          "oklch(26% 0.0188 255.53)",
-          "oklch(38% 0.0188 255.53)",
-          "oklch(49% 0.0188 255.53)",
-          "oklch(61% 0.0188 255.53)",
-          "oklch(72% 0.0188 255.53)",
-          "oklch(84% 0.0188 255.53)",
-          "oklch(95% 0.0188 255.53)"
-        ]
-      },
-      "sidebar-text": {
-        "role": "neutral",
-        "displayName": "Sidebar text",
-        "tonalRamp": [
-          "oklch(15% 0.0231 258.36)",
-          "oklch(26% 0.0231 258.36)",
-          "oklch(38% 0.0231 258.36)",
-          "oklch(49% 0.0231 258.36)",
-          "oklch(61% 0.0231 258.36)",
-          "oklch(72% 0.0231 258.36)",
-          "oklch(84% 0.0231 258.36)",
-          "oklch(95% 0.0231 258.36)"
-        ]
-      },
-      "sidebar-hover": {
-        "role": "neutral",
-        "displayName": "Sidebar hover",
-        "tonalRamp": [
-          "oklch(15% 0.0588 258.60)",
-          "oklch(26% 0.0588 258.60)",
-          "oklch(38% 0.0588 258.60)",
-          "oklch(49% 0.0588 258.60)",
-          "oklch(61% 0.0588 258.60)",
-          "oklch(72% 0.0588 258.60)",
-          "oklch(84% 0.0588 258.60)",
-          "oklch(95% 0.0588 258.60)"
-        ]
-      },
-      "sidebar-field": {
-        "role": "neutral",
-        "displayName": "Sidebar field",
-        "tonalRamp": [
-          "oklch(15% 0.0575 257.97)",
-          "oklch(26% 0.0575 257.97)",
-          "oklch(38% 0.0575 257.97)",
-          "oklch(49% 0.0575 257.97)",
-          "oklch(61% 0.0575 257.97)",
-          "oklch(72% 0.0575 257.97)",
-          "oklch(84% 0.0575 257.97)",
-          "oklch(95% 0.0575 257.97)"
-        ]
-      },
-      "sidebar-border": {
-        "role": "neutral",
-        "displayName": "Sidebar border",
-        "tonalRamp": [
-          "oklch(15% 0.0464 258.76)",
-          "oklch(26% 0.0464 258.76)",
-          "oklch(38% 0.0464 258.76)",
-          "oklch(49% 0.0464 258.76)",
-          "oklch(61% 0.0464 258.76)",
-          "oklch(72% 0.0464 258.76)",
-          "oklch(84% 0.0464 258.76)",
-          "oklch(95% 0.0464 258.76)"
-        ]
-      },
-      "positive": {
-        "role": "secondary",
-        "displayName": "Positive green",
-        "tonalRamp": [
-          "oklch(15% 0.1130 159.57)",
-          "oklch(26% 0.1130 159.57)",
-          "oklch(38% 0.1130 159.57)",
-          "oklch(49% 0.1130 159.57)",
-          "oklch(61% 0.1130 159.57)",
-          "oklch(72% 0.1130 159.57)",
-          "oklch(84% 0.1130 159.57)",
-          "oklch(95% 0.1130 159.57)"
-        ]
-      },
-      "negative": {
-        "role": "secondary",
-        "displayName": "Negative red",
-        "tonalRamp": [
-          "oklch(15% 0.1821 29.51)",
-          "oklch(26% 0.1821 29.51)",
-          "oklch(38% 0.1821 29.51)",
-          "oklch(49% 0.1821 29.51)",
-          "oklch(61% 0.1821 29.51)",
-          "oklch(72% 0.1821 29.51)",
-          "oklch(84% 0.1821 29.51)",
-          "oklch(95% 0.1821 29.51)"
-        ]
-      },
-      "attention-text": {
-        "role": "secondary",
-        "displayName": "Attention text",
-        "tonalRamp": [
-          "oklch(15% 0.0981 74.99)",
-          "oklch(26% 0.0981 74.99)",
-          "oklch(38% 0.0981 74.99)",
-          "oklch(49% 0.0981 74.99)",
-          "oklch(61% 0.0981 74.99)",
-          "oklch(72% 0.0981 74.99)",
-          "oklch(84% 0.0981 74.99)",
-          "oklch(95% 0.0981 74.99)"
-        ]
-      },
-      "attention-bg": {
-        "role": "secondary",
-        "displayName": "Attention background",
-        "tonalRamp": [
-          "oklch(15% 0.0288 89.57)",
-          "oklch(26% 0.0288 89.57)",
-          "oklch(38% 0.0288 89.57)",
-          "oklch(49% 0.0288 89.57)",
-          "oklch(61% 0.0288 89.57)",
-          "oklch(72% 0.0288 89.57)",
-          "oklch(84% 0.0288 89.57)",
-          "oklch(95% 0.0288 89.57)"
-        ]
-      },
-      "attention-border": {
-        "role": "secondary",
-        "displayName": "Attention border",
-        "tonalRamp": [
-          "oklch(15% 0.0906 87.98)",
-          "oklch(26% 0.0906 87.98)",
-          "oklch(38% 0.0906 87.98)",
-          "oklch(49% 0.0906 87.98)",
-          "oklch(61% 0.0906 87.98)",
-          "oklch(72% 0.0906 87.98)",
-          "oklch(84% 0.0906 87.98)",
-          "oklch(95% 0.0906 87.98)"
-        ]
-      }
+      "primary": { "role": "primary", "displayName": "Charcoal Action", "canonical": "#27272a", "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#fafafa"] },
+      "background": { "role": "neutral", "displayName": "Paper Canvas", "canonical": "#ffffff", "tonalRamp": ["#202124", "#3f3f46", "#62626b", "#a1a1aa", "#d4d4d8", "#e1e1e5", "#f4f4f5", "#ffffff"] },
+      "accent": { "role": "secondary", "displayName": "Teal Selection", "canonical": "#e6f2ef", "tonalRamp": ["#123a34", "#164b40", "#215e54", "#236c59", "#28796b", "#4a9d90", "#8ac8bd", "#e6f2ef"] },
+      "warning": { "role": "secondary", "displayName": "Amber Evidence", "canonical": "#fff8e9", "tonalRamp": ["#4a3306", "#80580b", "#a77414", "#c69b48", "#e4cea4", "#f3e5c6", "#fff8e9", "#fffbf2"] },
+      "positive": { "role": "secondary", "displayName": "Positive Green", "canonical": "#236c59", "tonalRamp": ["#123a34", "#164b40", "#215e54", "#236c59", "#418d78", "#75b9a6", "#b5ded2", "#edf8f4"] },
+      "negative": { "role": "secondary", "displayName": "Negative Red", "canonical": "#b42318", "tonalRamp": ["#4d100c", "#741710", "#982017", "#b42318", "#d0554c", "#e69089", "#f5c6c1", "#fff1f0"] },
+      "accent-border": { "role": "secondary", "displayName": "Teal Selection Border", "canonical": "#bddbd2" },
+      "positive-chart": { "role": "secondary", "displayName": "Positive Chart Bar", "canonical": "#3a8a7a" },
+      "selection-background": { "role": "secondary", "displayName": "Selection Wash", "canonical": "#cae7df" }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Primary financial amount",
-        "purpose": "Dominant monthly amount; tabular numerals, not a decorative display face."
-      },
-      "headline": {
-        "displayName": "Page heading",
-        "purpose": "Workspace title."
-      },
-      "title": {
-        "displayName": "Section heading",
-        "purpose": "Primary sheet or ledger heading."
-      },
-      "body": {
-        "displayName": "Interface body",
-        "purpose": "Turkish interface text; 1.6 line height applies to paragraphs."
-      },
-      "label": {
-        "displayName": "Supporting text",
-        "purpose": "Table text, metadata and evidence states."
-      },
-      "ledger-value": {
-        "displayName": "Ledger amount",
-        "purpose": "Secondary financial amount with medium emphasis."
-      }
+      "chart-label": { "displayName": "Chart Label", "purpose": "The compact daily trend tick." },
+      "status": { "displayName": "Status Marker", "purpose": "Compact badge and figure-status text." },
+      "supporting": { "displayName": "Supporting Text", "purpose": "Captions, evidence detail, and muted operational context." },
+      "amount": { "displayName": "Monthly Amount", "purpose": "The primary monthly financial figure." },
+      "amount-compact": { "displayName": "Compact Monthly Amount", "purpose": "The narrow-width fallback for the monthly amount." },
+      "headline": { "displayName": "Workspace Headline", "purpose": "Page titles and the first reading level." },
+      "title": { "displayName": "Section Title", "purpose": "Ledger, table, and workspace section headings." },
+      "body": { "displayName": "Operational Body", "purpose": "Turkish explanatory copy and ordinary workspace reading." },
+      "label": { "displayName": "Control Label", "purpose": "Controls, metadata, and table headers." },
+      "ledger-value": { "displayName": "Ledger Value", "purpose": "Right-aligned financial line values." },
+      "brand": { "displayName": "Brand", "purpose": "The sidebar product identity." },
+      "panel-title": { "displayName": "Panel Title", "purpose": "The evidence detail-panel heading." },
+      "total": { "displayName": "Total", "purpose": "Expense-total disclosure." },
+      "operating-total": { "displayName": "Operating Total", "purpose": "Operating summary emphasis." },
+      "metric": { "displayName": "Metric", "purpose": "Supporting dashboard metric values." }
     },
     "shadows": [
-      {
-        "name": "popover",
-        "value": "0 12px 32px #0B18301F",
-        "purpose": "Data cutoff and operations overlays."
-      },
-      {
-        "name": "evidence-overlay",
-        "value": "-8px 12px 30px #224b7630",
-        "purpose": "Fixed sales detail panel at compact widths."
-      }
+      { "name": "sidebar-overlay", "value": "0 8px 28px #20212426", "purpose": "Data and operations popovers overlapping the sidebar context." },
+      { "name": "detail-overlay", "value": "0 10px 32px #20212426", "purpose": "The fixed compact-width evidence panel." }
     ],
     "motion": [],
     "breakpoints": [
-      {
-        "name": "detail-overlay",
-        "value": "1250px"
-      },
-      {
-        "name": "monthly-stack",
-        "value": "1100px"
-      },
-      {
-        "name": "sales-stack",
-        "value": "900px"
-      },
-      {
-        "name": "navigation-wrap",
-        "value": "800px"
-      },
-      {
-        "name": "metrics-stack",
-        "value": "650px"
-      },
-      {
-        "name": "compact-sheet",
-        "value": "500px"
-      }
+      { "name": "detail-overlay", "value": "1250px" },
+      { "name": "monthly-stack", "value": "1050px" },
+      { "name": "compact-sidebar", "value": "800px" },
+      { "name": "compact-summary", "value": "650px" },
+      { "name": "narrow-ledger", "value": "500px" }
     ]
   },
   "components": [
     {
-      "name": "Primary button",
+      "name": "Default Button",
       "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Primary confirmation or package import.",
-      "html": "<button class=\"ds-button ds-primary\">Veri paketi içe aktar</button>",
-      "css": ".ds-button{font-family:\"Segoe UI\",system-ui,sans-serif;font-size:15px;border:1px solid #8295af;border-radius:5px;padding:8px 11px;min-height:40px;cursor:pointer}.ds-button:disabled{opacity:.6;cursor:not-allowed}.ds-button:focus-visible{outline:3px solid var(--blue,#0057D9);outline-offset:3px}.ds-primary,.ds-primary:hover{background:var(--blue,#0057D9);color:white;border-color:var(--blue,#0057D9)}"
+      "refersTo": "button-default",
+      "description": "The charcoal action for the main step in a local workflow.",
+      "html": "<button class=\"ds-button-default\">Kaydet</button>",
+      "css": ".ds-button-default { min-height: 40px; padding: 8px 12px; border: 1px solid transparent; border-radius: 6px; background: #27272a; color: #ffffff; font: 500 14px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; } .ds-button-default:hover { background: color-mix(in srgb, #27272a 90%, transparent); } .ds-button-default:focus-visible { outline: 2px solid #28796b; outline-offset: 3px; border-color: #28796b; box-shadow: 0 0 0 3px color-mix(in srgb, #28796b 50%, transparent); } @media (forced-colors: active) { .ds-button-default:focus-visible { outline: 2px solid Highlight; outline-offset: 3px; } } .ds-button-default:disabled { cursor: not-allowed; opacity: .5; }"
     },
     {
-      "name": "Secondary button",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Supporting action on the financial sheet.",
-      "html": "<button class=\"ds-button ds-secondary\">Tüm kategoriler</button>",
-      "css": ".ds-button{font-family:\"Segoe UI\",system-ui,sans-serif;font-size:15px;border:1px solid #8295af;border-radius:5px;padding:8px 11px;min-height:40px;cursor:pointer}.ds-button:disabled{opacity:.6;cursor:not-allowed}.ds-button:focus-visible{outline:3px solid var(--blue,#0057D9);outline-offset:3px}.ds-secondary{background:white;color:var(--ink,#10213A)}.ds-secondary:hover{background:#eaf3ff}"
-    },
-    {
-      "name": "Row link",
-      "kind": "button",
-      "refersTo": "row-link",
-      "description": "Open the records behind a table row.",
-      "html": "<button class=\"ds-row-link\">Örnek kategori</button>",
-      "css": ".ds-row-link{font-family:\"Segoe UI\",system-ui,sans-serif;font-size:15px;font-weight:600;background:transparent;color:var(--blue,#0057D9);border:0;border-radius:0;padding:3px 0;min-height:28px;text-align:left;cursor:pointer}.ds-row-link:hover{background:#eaf3ff;text-decoration:underline;text-underline-offset:4px}.ds-row-link:focus-visible{outline:3px solid var(--blue,#0057D9);outline-offset:3px}"
-    },
-    {
-      "name": "Text field",
+      "name": "Text Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "A labelled search or record-entry field.",
-      "html": "<label class=\"ds-field\">Ürün ara<input type=\"text\" placeholder=\"Ürün adı\" /></label>",
-      "css": ".ds-field{font-family:\"Segoe UI\",system-ui,sans-serif;display:grid;gap:5px;color:var(--ink,#10213A);font-size:14px}.ds-field input{font-family:\"Segoe UI\",system-ui,sans-serif;font-size:15px;background:white;color:var(--ink,#10213A);border:1px solid #8295af;border-radius:5px;padding:8px 11px;min-height:40px;caret-color:#0057D9;max-width:100%}.ds-field input:focus-visible{outline:3px solid var(--blue,#0057D9);outline-offset:3px}"
+      "description": "A full-width paper field for period, filter, and operational entry.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ara\" />",
+      "css": ".ds-input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid #b7b7bf; border-radius: 6px; background: #ffffff; color: #202124; font: 400 14px/1.2 Segoe UI, system-ui, sans-serif; } .ds-input::placeholder { color: #62626b; } .ds-input:focus-visible { outline: 2px solid #28796b; outline-offset: 3px; border-color: #28796b; box-shadow: 0 0 0 3px color-mix(in srgb, #28796b 50%, transparent); } @media (forced-colors: active) { .ds-input:focus-visible { outline: 2px solid Highlight; outline-offset: 3px; } } .ds-input:disabled { cursor: not-allowed; opacity: .5; }"
     },
     {
-      "name": "Primary navigation",
-      "kind": "nav",
-      "refersTo": "navigation",
-      "description": "A labelled destination on the persistent navy rail.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Ana gezinme\"><button aria-current=\"page\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z\"/></svg>Özet</button><button><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 20V4 M3 20h18 M7 16l4-6 4 3 6-9\"/></svg>Satışlar</button></nav>",
-      "css": ".ds-nav{background:var(--navy,#0B1830);padding:16px;display:grid;gap:6px}.ds-nav button{font-family:\"Segoe UI\",system-ui,sans-serif;display:flex;align-items:center;gap:12px;padding:12px;text-align:left;font-size:15px;color:#DCE6F5;border:1px solid transparent;border-radius:4px;min-height:46px;background:transparent;cursor:pointer}.ds-nav button:hover{background:#192C49;color:white}.ds-nav button[aria-current=\"page\"]{background:var(--blue,#0057D9);color:white}.ds-nav button:focus-visible{outline:3px solid white;outline-offset:3px}.ds-nav svg{width:20px;height:20px;flex:0 0 20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}"
-    },
-    {
-      "name": "Period attention marker",
+      "name": "Warning Badge",
       "kind": "chip",
-      "refersTo": "attention-marker",
-      "description": "Noninteractive text marker for an incomplete period.",
-      "html": "<span class=\"ds-period-state\">Kısmi dönem</span>",
-      "css": ".ds-period-state{font-family:\"Segoe UI\",system-ui,sans-serif;display:inline-block;color:#795000;background:#FFF7E2;padding:6px 10px;border:1px solid #C9AE6C;font-size:14px}"
-    },
-    {
-      "name": "Financial sheet",
-      "kind": "card",
-      "refersTo": "sheet",
-      "description": "Flat grouping for a table, form or supporting figures.",
-      "html": "<section class=\"ds-sheet\"><h2>Dönem giderleri</h2><p>Bu dönem için gider kaydı yok.</p></section>",
-      "css": ".ds-sheet{font-family:\"Segoe UI\",system-ui,sans-serif;padding:24px;background:white;color:var(--ink,#10213A);border:1px solid var(--line,#D5DCE5);border-radius:4px;box-shadow:none;min-width:0}.ds-sheet h2{margin:0;font-size:18px;font-weight:700}.ds-sheet p{margin:12px 0 0;font-size:15px;line-height:1.6;color:var(--muted,#475569)}"
-    },
-    {
-      "name": "Figure evidence disclosure",
-      "kind": "custom",
-      "refersTo": "figure-status",
-      "description": "A concise financial status opens its explanation.",
-      "html": "<details class=\"ds-evidence\"><summary>Tahmini · kapsamı incele</summary><p>Tarihsel son alış maliyeti tahmini. Eksik maliyet sıfır kabul edilmez.</p></details>",
-      "css": ".ds-evidence{font-family:\"Segoe UI\",system-ui,sans-serif;font-size:14px;color:var(--blue,#0057D9);margin-top:12px;font-weight:400}.ds-evidence summary{cursor:pointer;color:var(--blue,#0057D9)}.ds-evidence summary:focus-visible{outline:3px solid var(--blue,#0057D9);outline-offset:3px}.ds-evidence p{margin:10px 0 0;color:var(--ink,#10213A);line-height:1.6}"
+      "refersTo": "badge-warning",
+      "description": "A compact written marker for incomplete or cautionary evidence.",
+      "html": "<span class=\"ds-badge-warning\">Eksik veri</span>",
+      "css": ".ds-badge-warning { display: inline-flex; width: fit-content; gap: 4px; padding: 4px 8px; border: 1px solid #e4cea4; border-radius: 6px; background: #fff8e9; color: #80580b; font: 500 12px/1.5 Segoe UI, system-ui, sans-serif; }"
     }
   ],
   "narrative": {
-    "northStar": "The Working Desk",
-    "overview": "A deep navy navigation rail holds the period, data cutoff and operations beside white financial sheets on a cool gray canvas. The interface is compact and direct: a Turkish label explains each figure, tabular numerals support comparison, and visible rules separate ledger rows.\n\nBlue identifies actions and the selected path. Material uncertainty stays beside the affected figure; fuller methods and source records open through labelled disclosures. This records the implemented Option B world, selected by the user, rather than every historical style still present in the stylesheet.",
-    "keyCharacteristics": [
-      "Navy navigation and white financial sheets.",
-      "Large primary amounts, compact ledger rows and tabular numerals.",
-      "Turkish labels and explicit evidence states.",
-      "Modest corners, visible dividers and restrained overlay depth."
-    ],
+    "northStar": "The Quiet Market Ledger",
+    "overview": "This is a light desktop operating system for reading a market month without turning the work into a dashboard spectacle. White working space, soft zinc surfaces, charcoal actions, a restrained teal selection, and visible rules let the figures, evidence, and Turkish labels do the work. The sidebar keeps the working context close while the content area stays broad, dense, and calm. Colour carries state sparingly: teal locates the current path, green and red support signed values, and amber keeps incomplete evidence visible. The system is intentionally light-only and uses native controls where they already serve the workflow.",
+    "keyCharacteristics": ["Light zinc shell with charcoal primary actions and restrained teal selection.", "Segoe UI hierarchy, tabular figures, visible rules, and compact operational density.", "Native tables, selects, disclosures, and SVG trend chart retained beside three shared controls.", "Explicit warning, unavailable, synthetic, and report-evidence states."],
     "rules": [
-      {
-        "name": "The Action Blue Rule",
-        "body": "Blue identifies a path or a control; it does not certify financial performance.",
-        "section": "colors"
-      },
-      {
-        "name": "The Comparable Figures Rule",
-        "body": "Use tabular numerals for amounts, totals and tables; align numeric table columns to the right and retain their units.",
-        "section": "typography"
-      },
-      {
-        "name": "The Overlay Depth Rule",
-        "body": "Use shadow to explain overlap; ordinary financial sheets keep borders and no shadow.",
-        "section": "elevation"
-      }
+      { "name": "The Accent Is Location Rule", "body": "Teal marks focus, selection, and progress. It does not certify profit or a favourable financial result.", "section": "colors" },
+      { "name": "The Comparable Figures Rule", "body": "Amounts, totals, and tables use tabular numerals; numeric table columns align right and retain their units and signs.", "section": "typography" },
+      { "name": "The Overlap-Only Depth Rule", "body": "Shadows explain an overlay. Standard cards, rows, and figures stay flat.", "section": "elevation" }
     ],
-    "dos": [
-      "**Do** keep the period, actual cutoff and synthetic identity readable alongside navigation.",
-      "**Do** pair financial color with signs, labels and accessible textual amounts.",
-      "**Do** preserve explicit unavailable and estimated states beside the affected figures.",
-      "**Do** use visible borders, tabular numerals and aligned rows to make comparisons easy.",
-      "**Do** retain labelled keyboard focus and the implemented forced-colors treatment."
-    ],
-    "donts": [
-      "**Don't** use blue as a gain signal or treat an estimate as verified profit.",
-      "**Don't** replace missing financial evidence with a zero.",
-      "**Don't** add gradients, glass, glow or color-only status.",
-      "**Don't** turn every ledger row into a separate raised card.",
-      "**Don't** hide period, cutoff or financial caveats to make a narrow layout fit."
-    ]
+    "dos": ["Do keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.", "Do use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.", "Do use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.", "Do preserve native table scrolling and disclosure behavior when extending an existing workflow."],
+    "donts": ["Don't restore the superseded navy rail, electric-blue action system, or dark component variants.", "Don't use teal, green, or red alone to assert financial meaning.", "Don't replace missing evidence with a zero or hide it to make a compact view cleaner.", "Don't add a generated control framework where the native table, select, disclosure, or chart already owns the task."]
   }
 }

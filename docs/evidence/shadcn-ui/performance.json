@@ -1,0 +1,65 @@
+{
+  "gate": "D18/A07",
+  "scope": "Complete imported synthetic package, not full market source volume",
+  "commit": "88d3a207f416f278b8e6e31aecb0ece42b77bce0",
+  "archiveSha256": "cc2850b9b8fbb57949949be38ecb60b2974a292f58ddae104696a5a4e859c690",
+  "environment": {
+    "os": "10.0.26200",
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "logicalCpus": 20,
+    "ramBytes": 33974288384,
+    "arch": "x64"
+  },
+  "dataset": {
+    "documents": 25000,
+    "lines": 25000,
+    "bytes": 16442402,
+    "sha256": "8966544a2aeb51bef3facad8716dc71d56602be5a7d3dda1e01d5aa900f2928b",
+    "cutoff": "2025-09-30"
+  },
+  "conditions": "Three fresh processes, same imported profile; OS caches not cleared. First navigation and repeated navigation. Two rendered frames after content readiness. Startup calculation reported separately.",
+  "samples": [
+    {
+      "process": 1,
+      "startupMs": 2626.2721999999994,
+      "ordinary": {
+        "salesFirst": 302.7000000178814,
+        "transactionsFirst": 311.80000001192093,
+        "nextPage": 11.900000005960464,
+        "transactionDetail": 18.900000005960464,
+        "monthlyReturn": 46.79999998211861,
+        "salesWarm": 307.40000000596046,
+        "transactionsWarm": 300.90000000596046,
+        "monthlyWarm": 16.299999982118607
+      }
+    },
+    {
+      "process": 2,
+      "startupMs": 2635.7381000000005,
+      "ordinary": {
+        "salesFirst": 474.5,
+        "transactionsFirst": 311.40000000596046,
+        "nextPage": 10.900000005960464,
+        "transactionDetail": 19.200000017881393,
+        "monthlyReturn": 46,
+        "salesWarm": 349.69999998807907,
+        "transactionsWarm": 305.90000000596046,
+        "monthlyWarm": 16.299999982118607
+      }
+    },
+    {
+      "process": 3,
+      "startupMs": 2824.8976000000002,
+      "ordinary": {
+        "salesFirst": 325,
+        "transactionsFirst": 307,
+        "nextPage": 10.099999994039536,
+        "transactionDetail": 17.700000017881393,
+        "monthlyReturn": 46.19999998807907,
+        "salesWarm": 289,
+        "transactionsWarm": 295.10000002384186,
+        "monthlyWarm": 16.399999976158142
+      }
+    }
+  ]
+}
