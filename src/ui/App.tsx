@@ -67,7 +67,7 @@ function App() {
   return (
     <AppShell controls={<span>Yerel analiz</span>}><main className="start-workspace">
       <section className="block start-state" aria-live="polite" aria-busy={importing}>
-        
+
         {!availability ? <h1>Yerel veriler açılıyor</h1> : availability.status === "ready" ? <>
           <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok"}</h1>
           {availability.store === "loaded" ? <>

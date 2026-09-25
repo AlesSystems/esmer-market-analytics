@@ -1,0 +1,12 @@
+
+> esmer-market-analytics@0.2.0 test:unit
+> vitest run --dir tests/unit
+
+
+ RUN  v5.0.1 C:/Users/esmer/.codex/worktrees/esmer-option-b/esmer-market-analytics
+
+
+ Test Files  9 passed (9)
+      Tests  29 passed (29)
+   Start at  15:25:29
+   Duration  1.90s (tests 51%, transform 25%, import 22%, worker 1%)

@@ -65,16 +65,18 @@ Remote main advanced during implementation. Merge `a56d925` brought in `76ca815`
 
 | Procedure | Final result |
 | --- | --- |
-| `npm run test:unit` | 29 passed in 9 files |
+| `npm run test:unit` | [29 passed in 9 files](checks/final-unit.log) |
 | `npm run test:integration` | [229 passed in 30 files](checks/final-integration.log) |
-| Packaged Playwright full suite | [28 passed, 1 locator failure](checks/final-desktop.log); the restore assertion matched both visible ledger and collapsed evidence values |
+| Packaged Playwright full suite after all corrections | [29 passed in one complete run](checks/desktop-green.log) |
 | Focused packaged restore after scoping that assertion | [1 passed](checks/final-restore.log), including real Windows key protection, encrypted backup, fresh-profile restore, pinned report and Excel checks |
-| `npm run typecheck`, `npm run lint`, `git diff --check` | Passed |
+| `npm run typecheck`, `npm run lint`, `git diff --check` | [Passed](checks/static-checks.log) |
 | `npm run package:win` | [Passed](checks/final-package.log); notices for 6 dependencies, 75 runtime files / 291 archive entries, no inventory violations, both distributions match the inspected payload |
 
-Thus all 29 desktop cases have passing results across the full run and the focused correction; this is not a claim of a subsequent all-green full-suite run. New workload coverage uses three fresh processes and a complete 25,000-document synthetic package. All measured ordinary interactions passed the 2-second threshold, without claiming real market-volume performance.
+The earlier post-merge run had [28 passes and one strict-locator failure](checks/final-desktop.log) because the restored value appeared in both the visible ledger and collapsed evidence. After the selector correction, the focused restore passed, followed by the final complete 29-test green run. New workload coverage uses three fresh processes and a complete 25,000-document synthetic package. All measured ordinary interactions passed the 2-second threshold, without claiming real market-volume performance.
 
 The [workload receipt](checks/performance.json) records samples and synthetic package identity. The final portable wrapper also passed two launches against an isolated seeded profile, with accepted-report/business hashes preserved, network-blocked offline reload and no development runtime in the child PATH. See the [portable proof](checks/portable-proof.json) and [distribution inspection](checks/distribution-inspection.json). Its profile-seeding lifecycle test passed separately.
+
+The [independent review record](reviews.md) retains code-review findings, the three visual fixes and their scored verdict. The audit is limited to retained artifacts and supplied reviewer messages because the harness exposed no transcript directory. TSV timestamps record when entries were written, including batches; commit timestamps establish implementation order. Retained console receipts have trailing whitespace removed only.
 
 The final x64 NSIS and portable artifacts are version `0.2.0`. No installer was executed. Final `app.asar` SHA256 is `6d931a6c27b83651e987a7ae7ee55a8ed1b19d91a8ee8e39e28892f83aed2097`. Visual captures remain from the reviewed `baaa256` build; the merge changed recovery/runtime release handling, with no further UI-source edits.
 
