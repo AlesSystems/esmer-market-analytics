@@ -36,7 +36,9 @@ test("release inventory hashes every file and rejects data inside an archive", a
 test("release inspection rejects unexpected outer files and credential sentinels in bundles", async () => {
   const release = await fixture("dist/desktop/preload.cjs", "const secret = '-----BEGIN PRIVATE KEY-----';");
   await writeFile(join(release, "customer-export.csv"), "synthetic");
+  await writeFile(join(release, "private.dat"), "synthetic");
   const result = await inspectRelease(release);
   expect(result.violations).toContain("content:dist/desktop/preload.cjs");
   expect(result.violations).toContain("distribution:customer-export.csv");
+  expect(result.violations).toContain("distribution:private.dat");
 });

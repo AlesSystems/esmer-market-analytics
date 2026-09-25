@@ -9,7 +9,8 @@ const hash = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex")
 const bundles = new Set(["dist/desktop/main.cjs", "dist/desktop/preload.cjs", "dist/service/worker.cjs", "dist/ui/app.js", "dist/ui/index.html", "dist/ui/style.css", "package.json"]);
 const prohibited = /(?:^|\/)(?:\.env[^/]*|credentials?[^/]*|[^/]+\.(?:bak|sqlite(?:-wal|-shm)?|db|mdf|ldf|esmerbackup|pem|pfx|csv|xlsx))$/i;
 const secrets = /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|(?:ghp_|github_pat_)[A-Za-z0-9_]{20,}|(?:AKIA|ASIA)[A-Z0-9]{16}/;
-const outerFile = /^(?:Esmer Market Analytics\.exe|LICENSE(?:S\.chromium\.html|\.electron\.txt)?|[^/]+\.(?:dll|pak|bin|dat)|vk_swiftshader_icd\.json|locales\/[a-zA-Z0-9-]+\.pak|resources\/app\.asar|resources\/app-update\.yml|resources\/elevate\.exe|resources\/licences\/(?:LICENSE|LICENSES\.chromium\.html))$/;
+const runtimeFiles = new Set(["Esmer Market Analytics.exe", "LICENSE.electron.txt", "LICENSES.chromium.html", "chrome_100_percent.pak", "chrome_200_percent.pak", "d3dcompiler_47.dll", "dxcompiler.dll", "dxil.dll", "ffmpeg.dll", "icudtl.dat", "resources.pak", "snapshot_blob.bin", "v8_context_snapshot.bin", "vk_swiftshader_icd.json", "vk_swiftshader.dll", "vulkan-1.dll", "resources/app.asar", "resources/app-update.yml", "resources/elevate.exe", "resources/licences/LICENSE", "resources/licences/LICENSES.chromium.html"]);
+const dependencyFile = /^node_modules\/(?:decimal\.js|fflate|react|react-dom|scheduler|saxen|write-excel-file)\//;
 
 export async function inspectRelease(directory: string) {
   const files: FileIdentity[] = [], archiveFiles: FileIdentity[] = [], violations: string[] = [];
@@ -21,7 +22,8 @@ export async function inspectRelease(directory: string) {
       if (metadata.isDirectory()) { await walk(path); continue; }
       const bytes = await readFile(join(directory, path));
       files.push({ path, bytes: bytes.length, sha256: hash(bytes) });
-      if (!outerFile.test(path) || prohibited.test(path)) violations.push(`distribution:${path}`);
+      if ((!runtimeFiles.has(path) && !/^locales\/[a-zA-Z0-9-]+\.pak$/.test(path)) || prohibited.test(path)) violations.push(`distribution:${path}`);
+      if (path !== "resources/app.asar" && secrets.test(bytes.toString("utf8"))) violations.push(`content:${path}`);
     }
   }
   await walk("");
@@ -33,7 +35,7 @@ export async function inspectRelease(directory: string) {
     if ("link" in metadata || ("unpacked" in metadata && metadata.unpacked)) { violations.push(`archive-link:${path}`); continue; }
     const bytes = extractFile(archive, raw.slice(1));
     archiveFiles.push({ path, bytes: bytes.length, sha256: hash(bytes) });
-    if ((!bundles.has(path) && !path.startsWith("node_modules/")) || prohibited.test(path)) violations.push(`archive:${path}`);
+    if ((!bundles.has(path) && !dependencyFile.test(path)) || prohibited.test(path)) violations.push(`archive:${path}`);
     if (secrets.test(bytes.toString("utf8"))) violations.push(`content:${path}`);
   }
   return { format: "esmer-release-inventory-v1", files, archiveFiles, violations };
