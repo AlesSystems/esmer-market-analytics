@@ -23,7 +23,7 @@ async function fixture(program = `process.stdout.write(${JSON.stringify(protocol
 }
 
 test("collector spawns fixed SQL and preserves exact counts in private exclusive evidence", async () => {
-  const f = await fixture(`let sql = ''; process.stdin.on('data', d => sql += d); process.stdin.on('end', () => { if (!sql.includes('COUNT_BIG') || process.argv.includes('PRIVATE_PASSWORD') || process.env.SQLCMDPASSWORD !== 'PRIVATE_PASSWORD' || !process.argv.includes('-N')) process.exit(9); process.stdout.write(${JSON.stringify(protocol)}); });`);
+  const f = await fixture(`let sql = ''; process.stdin.on('data', d => sql += d); process.stdin.on('end', () => { if (!sql.includes('COUNT_BIG') || process.argv.includes('PRIVATE_PASSWORD') || process.env.SQLCMDPASSWORD !== 'PRIVATE_PASSWORD' || !process.argv.includes('-N') || process.argv.includes('-X1')) process.exit(9); process.stdout.write(${JSON.stringify(protocol)}); });`);
   try {
     expect(await collectSourceEvidence(f)).toEqual({ ok: true });
     const bytes = await readFile(f.destination, "utf8"); const evidence = JSON.parse(bytes);
@@ -56,12 +56,14 @@ test.each([
 
 test("deadline and abort await child termination and leave no artifact", async () => {
   for (const abort of [false, true]) {
-    const f = await fixture("process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);");
+    const f = await fixture("require('node:fs').writeFileSync(process.argv[1] + '.pid', String(process.pid)); process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);");
     const controller = new AbortController();
     const timer = abort ? setTimeout(() => controller.abort(), 100) : undefined;
     try {
       expect(await collectSourceEvidence({ ...f, timeoutMs: 150, signal: controller.signal })).toEqual({ ok: false, code: "EVIDENCE_FAILED" });
       expect(await readdir(f.dir)).toEqual(expect.not.arrayContaining(["evidence.json"]));
+      const pid = Number(await readFile(join(f.dir, "sqlcmd.pid"), "utf8"));
+      expect(() => process.kill(pid, 0)).toThrow();
     } finally { clearTimeout(timer); await rm(f.dir, { recursive: true, force: true }); }
   }
 });
@@ -80,5 +82,18 @@ test("CLI errors are fixed tokens and invalid config is rejected before spawn", 
     await writeFile(f.configPath, JSON.stringify({ scope: "isolated-copy", server: "PRIVATE_SERVER", database: "db", user: "sa", sql: "PRIVATE_SQL" }));
     expect(await run()).toEqual({ code: 1, output: "EVIDENCE_FAILED\n" });
     expect(await readdir(f.dir)).toEqual(expect.not.arrayContaining(["evidence.json"]));
+  } finally { await rm(f.dir, { recursive: true, force: true }); }
+});
+
+
+test("unapproved config keys fail before starting the trusted executable", async () => {
+  const f = await fixture("require('node:fs').writeFileSync(process.argv[1] + '.started', 'yes');");
+  try {
+    const config = JSON.parse(await readFile(f.configPath, "utf8"));
+    for (const extra of [{ sql: "PRIVATE_SQL" }, { password: "PRIVATE_PASSWORD" }, { scope: "production" }, { user: "sa" }]) {
+      await writeFile(f.configPath, JSON.stringify({ ...config, ...extra }));
+      expect(await collectSourceEvidence(f)).toEqual({ ok: false, code: "EVIDENCE_FAILED" });
+      expect(await readdir(f.dir)).not.toContain("sqlcmd.started");
+    }
   } finally { await rm(f.dir, { recursive: true, force: true }); }
 });
