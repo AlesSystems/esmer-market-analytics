@@ -48,4 +48,3 @@ test.each(["1", "12345"])("rejects file size changes after stat and closes the h
   await expect(readPackageFile(path)).rejects.toThrow("INVALID_PACKAGE");
   expect(selected?.fd).toBe(-1);
 });
-
