@@ -1,0 +1,9 @@
+ts	phase	decision	why	evidence	result
+2026-09-25T12:00:00Z	frame	Retain the current report session owner and implement selected Option B	Avoid a second session lifecycle during a presentation redesign	src/ui/SalesWorkspace.tsx	open
+2026-09-25T13:16:01.1350907Z	audit	Correct the initial planning timestamp	The first row used a placeholder time; file creation was 2026-09-25T12:44:27Z and the decision remains valid	src/ui/SalesWorkspace.tsx	initial timestamp superseded
+2026-09-25T13:16:01.1350907Z	implementation	Retain one typed analysis session and local task views	Avoid competing report owners while preserving filters and pinned data	7e62f00	implemented
+2026-09-25T13:16:01.1350907Z	review	Add expense summaries and saved-version comparison	Independent spec review found missing daily headline and comparison paths	74ef299;9cbd974	focused service checks passed
+2026-09-25T13:16:01.1350907Z	review	Guard monthly context and defer focus restoration	Independent code review found stale period and focus races	baaa256;tests/desktop/unavailable-states.test.ts	5 final packaged checks passed
+2026-09-25T13:16:01.1350907Z	verification	Treat Windows recovery failures as baseline failures	Unchanged baseline reproduced27integration failures and1packaged setup failure	docs/evidence/ui-option-b/README.md	acceptance remains open
+2026-09-25T13:16:01.1350907Z	finish	Fix operations contrast and stacking plus primary import action	Independent visual review identified three material defects	1545644;docs/evidence/ui-option-b/images/operations.png;docs/evidence/ui-option-b/images/empty.png	recaptured for verdict
+2026-09-25T13:16:01.1350907Z	package	Build Windows installer and portable artifact	Validate the real distribution without owner installation	docs/evidence/ui-option-b/README.md	package notices passed
