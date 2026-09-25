@@ -14,16 +14,16 @@ Bu prosedür yalnızca `work/phase-10-lifecycle` içindeki sentetik profil ve ku
 
 ```powershell
 $env:ESMER_LIFECYCLE_PROFILE = (Join-Path (Get-Location) 'work/phase-10-lifecycle/profile')
-pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage install -Installer 'C:\path\to\approved-prior-setup.exe'
+pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage install -Installer 'release\Esmer Market Analytics Setup 0.2.0.exe'
 $env:ESMER_EXECUTABLE = (Join-Path (Get-Location) 'work/phase-10-lifecycle/installed/Esmer Market Analytics.exe')
 npx playwright test tests/desktop/package-lifecycle.test.ts
-pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage upgrade -Installer 'C:\path\to\candidate-setup.exe'
+pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage upgrade -Installer 'release\Esmer Market Analytics Setup 0.2.0.exe'
 npx playwright test tests/desktop/package-lifecycle.test.ts
 node scripts/verify-portable.mjs --exe (Join-Path (Get-Location) 'release/Esmer Market Analytics 0.2.0.exe') --profile $env:ESMER_LIFECYCLE_PROFILE
 pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage uninstall
 ```
 
-İlk test sentetik satış, gider, düzeltme ve kabul edilmiş rapor oluşturur. Sonraki testler aynı profilin mantıksal kayıtlarını karşılaştırır. Kurucu aşamaları uygulama kapalıyken veritabanının SHA-256 değerini karşılaştırır. Taşınabilir adını ve önceki kurucu yolunu gerçekten üretilen dosyalara göre değiştirin. `upgrade-proof.json` önceki ve sonraki ürün sürümünü ve uygulama arşivi özetini ayrı kaydeder. Aynı sürümlü kod değişimini sürüm artışı saymayın. Başarısız güncelleme bu prosedürle henüz kanıtlanmaz; kontrollü gerçek hata ve eski kurulumun yeniden açılması ayrıca belgelenmelidir.
+İlk test sentetik satış, gider, düzeltme ve kabul edilmiş rapor oluşturur. Sonraki testler aynı profilin mantıksal kayıtlarını karşılaştırır. Kurucu aşamaları uygulama kapalıyken veritabanının SHA-256 değerini karşılaştırır. Yukarıdaki akış aynı 0.2.0 kurucusunu yeniden çalıştırır; sürüm artışını kanıtlamaz. `phase-10-upgrade-proof.json` önceki ve sonraki ürün sürümünü ve uygulama arşivi özetini ayrı kaydeder. Başarısız güncelleme bu prosedürle henüz kanıtlanmaz; kontrollü gerçek hata ve eski kurulumun yeniden açılması ayrıca belgelenmelidir.
 
 Test `--user-data-dir` ile açıkça ayrılmış profili kullanır. Gerçek kullanıcı varsayılan profilinin kaldırma davranışı, ayrı temiz Windows hesabı, fiziksel ağ bağlantısı kesilmesi ve bağımsız ortamdan kurtarma bu sentetik kontrolün dışında ayrıca doğrulanmalıdır.
 

@@ -1,0 +1,65 @@
+{
+  "gate": "D18/A07",
+  "scope": "Complete imported synthetic package, not full market source volume",
+  "commit": "255c84d2a521184434c44a0022299695f06ba61f",
+  "archiveSha256": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+  "environment": {
+    "os": "10.0.26200",
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "logicalCpus": 20,
+    "ramBytes": 33974288384,
+    "arch": "x64"
+  },
+  "dataset": {
+    "documents": 25000,
+    "lines": 25000,
+    "bytes": 16442402,
+    "sha256": "8966544a2aeb51bef3facad8716dc71d56602be5a7d3dda1e01d5aa900f2928b",
+    "cutoff": "2025-09-30"
+  },
+  "conditions": "Three fresh processes, same imported profile; OS caches not cleared. First navigation and repeated navigation. Two rendered frames after content readiness. Startup calculation reported separately.",
+  "samples": [
+    {
+      "process": 1,
+      "startupMs": 2438.5232000000033,
+      "ordinary": {
+        "salesFirst": 416.89999997615814,
+        "transactionsFirst": 297.69999998807907,
+        "nextPage": 44.30000001192093,
+        "transactionDetail": 42.79999998211861,
+        "monthlyReturn": 44.69999998807907,
+        "salesWarm": 395.30000001192093,
+        "transactionsWarm": 297.5,
+        "monthlyWarm": 48.099999994039536
+      }
+    },
+    {
+      "process": 2,
+      "startupMs": 2459.8767000000007,
+      "ordinary": {
+        "salesFirst": 403.90000000596046,
+        "transactionsFirst": 297.59999999403954,
+        "nextPage": 44.70000001788139,
+        "transactionDetail": 42.599999994039536,
+        "monthlyReturn": 43.29999998211861,
+        "salesWarm": 397.5,
+        "transactionsWarm": 281.59999999403954,
+        "monthlyWarm": 47.80000001192093
+      }
+    },
+    {
+      "process": 3,
+      "startupMs": 2403.486600000004,
+      "ordinary": {
+        "salesFirst": 419.59999999403954,
+        "transactionsFirst": 296.5,
+        "nextPage": 44.39999997615814,
+        "transactionDetail": 44.599999994039536,
+        "monthlyReturn": 44.099999994039536,
+        "salesWarm": 395.69999998807907,
+        "transactionsWarm": 281.59999999403954,
+        "monthlyWarm": 47.5
+      }
+    }
+  ]
+}

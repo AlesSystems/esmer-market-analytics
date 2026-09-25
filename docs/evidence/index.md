@@ -97,3 +97,9 @@ The 25,000-document synthetic monthly calculation took 49–59 seconds, so D18/A
 [Issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/12) is implemented locally on `codex/phase-9-recovery` through the macOS verification boundary. See [local evidence](phase-9-local.md), the [recovery decision](../decisions/phase-9-recovery.md), [Turkish instructions](../operations/recovery-tr.md), and [Windows-agent prompt](../operations/windows-phase-9-prompt.md).
 
 A06 remains open for actual Windows key protection, file-system behavior, independent-media clean recovery and the remaining checks in the [Windows handoff](../operations/windows-phase-9-handoff.md). No merge, issue closure, owner installation or later-phase work is included.
+
+## Phase 10
+
+- [Windows verification](windows-acceptance.md), [release acceptance and open gates](release-acceptance.md), [licences](licences.md).
+- [Build and command proof](phase-10-proof.json), [performance samples](phase-10-performance.json), [decision trail](phase-10-decisions.tsv).
+- [Windows recovery filesystem boundary](phase-10-windows-recovery-files.md).
