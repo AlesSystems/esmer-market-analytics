@@ -19,8 +19,7 @@ $env:ESMER_EXECUTABLE = (Join-Path (Get-Location) 'work/phase-10-lifecycle/insta
 npx playwright test tests/desktop/package-lifecycle.test.ts
 pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage upgrade -Installer 'C:\path\to\candidate-setup.exe'
 npx playwright test tests/desktop/package-lifecycle.test.ts
-$env:ESMER_EXECUTABLE = (Join-Path (Get-Location) 'release/Esmer Market Analytics 0.1.0.exe')
-npx playwright test tests/desktop/package-lifecycle.test.ts
+node scripts/verify-portable.mjs --exe (Join-Path (Get-Location) 'release/Esmer Market Analytics 0.2.0.exe') --profile $env:ESMER_LIFECYCLE_PROFILE
 pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage uninstall
 ```
 
@@ -37,7 +36,10 @@ $env:ESMER_LIFECYCLE_PROFILE = (Join-Path (Get-Location) 'work/windows-phase-8/l
 $env:ESMER_LIFECYCLE_REUSE_PHASE8 = '1'
 $env:ESMER_EXECUTABLE = (Join-Path (Get-Location) 'work/windows-phase-8/lifecycle/installed/Esmer Market Analytics.exe')
 npx playwright test tests/desktop/package-lifecycle.test.ts
+node scripts/verify-portable.mjs --exe (Join-Path (Get-Location) 'release/Esmer Market Analytics 0.2.0.exe') --profile $env:ESMER_LIFECYCLE_PROFILE
 pwsh -NoProfile -File scripts/windows-lifecycle.ps1 -Stage uninstall -ReusePhase8 -PreservedCopy $copy
 ```
 
 Phase 8 profili sürüm 5 şeması, sentetik giderler ve kabul edilmiş rapor içerir. Yeni paket açılışta şema geçişini yapar; test kabul edilmiş 100 ₺ satış, 40 ₺ kapsanan brüt kâr ve 50 ₺ gideri, ayrıca değişmeyen kayıtları iki açılışta doğrular. Yükseltme öncesi eski paketin bu profil üzerindeki açılışı Phase 8 kanıtında yer alır; yeni bir eski-paket açılışı yapıldıysa ayrıca kaydedin. Bu akış yalnızca gerçek 0.1.0 kurucusu ve 0.2.0 aday kurucusu kullanılırsa sürüm artışını kanıtlar. Kopyalanan kanıt arşivini veya varsayılan kullanıcı profilini silmeyin.
+
+Taşınabilir `.exe` bir sarmalayıcıdır ve uygulamayı geçici konuma çıkarır. Bu nedenle masaüstü testinin doğrudan Electron başlatma yöntemi yerine `verify-portable.mjs` sarmalayıcıyı çalıştırır. Ayrılmış profili iki kez açar, çalışan sürecin `app.asar` özetini aday paketle karşılaştırır, ağ erişimini Playwright içinde kapatıp kabul edilmiş raporu okur ve uygulama kayıtlarının değişmediğini doğrular. Sonucu `work/phase-10/portable-proof.json` içine bir kez yazar. Bu ağ denetimi fiziksel bağlantı kesilmesi kanıtı değildir.
