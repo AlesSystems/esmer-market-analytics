@@ -34,7 +34,7 @@ test("recovery locations reject prefix tricks and symlinks into app data", async
   const userData = join(root, "data"), destination = join(root, "data-backups"), keyDirectory = join(root, "key"), alias = join(root, "alias");
   try {
     await Promise.all([mkdir(userData), mkdir(destination), mkdir(keyDirectory)]);
-    await symlink(userData, alias);
+    await symlink(userData, alias, process.platform === "win32" ? "junction" : "dir");
     const {validRecoveryLocations} = await import("../../src/desktop/recovery-config");
     expect(await validRecoveryLocations(destination, join(keyDirectory, "key.txt"), userData)).toBe(true);
     expect(await validRecoveryLocations(alias, join(keyDirectory, "key.txt"), userData)).toBe(false);
