@@ -49,6 +49,8 @@ function totals(report: MonthlyReport, count: number, corrected: boolean) {
   const net = String(BigInt(count) * 100n + (corrected ? 20n : 0n));
   const cost = String(BigInt(count) * 60n), gross = String(BigInt(count) * 40n + (corrected ? 20n : 0n));
   assert.equal(report.sales.metrics.netSales, net);
+  assert.equal(report.sales.metrics.saleDocumentCount, count);
+  assert.equal(report.salesEvidence.lines.length, count);
   assert.equal(report.purchasing.gross.coveredCost, cost);
   assert.equal(report.purchasing.gross.coveredGrossProfit, gross);
   assert.equal(report.purchasing.gross.confidence, "estimated");
@@ -128,7 +130,7 @@ export async function runProfile(count: number): Promise<ProfileReceipt> {
       stages, files: { packageBytes: first.length, replacementPackageBytes: replacement.length, readBackingBufferBytes: bytes.buffer.byteLength, databaseBytes: sizes[0], walBytes: sizes[1], backupBytes: sizes[2], excelBytes: excel.length },
       results: { firstNetSales: initial.net, firstEstimatedCost: initial.cost, firstEstimatedGrossProfit: initial.gross, replacementNetSales: corrected.net, replacementEstimatedCost: corrected.cost, replacementEstimatedGrossProfit: corrected.gross, preserved: true, exactText: true },
       backgroundElapsedMs: performance.now() - started,
-      limitations: ["Synthetic bounded scenario only; no full-population acceptance", "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement", "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak", "Disk sizes are end-of-run observations, not temporary disk peaks", "Background duration is not dashboard interaction latency"],
+      limitations: ["Synthetic bounded scenario only; no full-population acceptance", "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint", "Excel measures buffer generation only; this run does not read back the workbook", "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement", "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak", "Disk sizes are end-of-run observations, not temporary disk peaks", "Background duration is not dashboard interaction latency"],
     };
   } finally {
     store?.close();
@@ -139,3 +141,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   try { process.stdout.write(`${JSON.stringify(await runProfile(parseProfileCount(process.argv.slice(2))), null, 2)}\n`); }
   catch { process.stderr.write("PROFILE_FAILED\n"); process.exitCode = 1; }
 }
+
