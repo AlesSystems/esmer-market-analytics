@@ -1,6 +1,6 @@
 {
   "name": "esmer-market-analytics",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Esmer Market çevrimdışı analiz uygulaması",
   "author": "Ales Systems",
@@ -18,7 +18,7 @@
     "test:desktop": "node scripts/test-desktop.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:desktop",
     "package:local": "npm run build && electron-builder --dir",
-    "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar"
+    "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar && node tools/release-inventory.ts release/win-unpacked release/release-inventory.json && node scripts/verify-distributions.mjs"
   },
   "dependencies": {
     "decimal.js": "10.6.0",
@@ -57,6 +57,11 @@
     ],
     "asar": true,
     "npmRebuild": false,
+    "nsis": {
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": false
+    },
     "mac": {
       "identity": null
     },

@@ -1,9 +1,16 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, open, readdir, rename, rm } from "node:fs/promises";
+import { mkdir, open, readdir, rename, rm, stat } from "node:fs/promises";
 import { dirname, join } from "node:path";
 export async function syncDirectory(path: string) {
+  if (process.platform === "win32") {
+    // Node cannot flush Windows directory handles. File data is flushed separately;
+    // recovery journals cover process interruption, not power-loss persistence.
+    if (!(await stat(path)).isDirectory()) throw new Error("RECOVERY_DIRECTORY_REQUIRED");
+    return "unsupported" as const;
+  }
   const handle = await open(path,"r");
   try { await handle.sync(); } finally { await handle.close(); }
+  return "synced" as const;
 }
 export async function durableWrite(path: string, bytes: Uint8Array | string) {
   const temporary = `${path}.${randomUUID()}.partial`;

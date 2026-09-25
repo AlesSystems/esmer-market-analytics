@@ -1,0 +1,10 @@
+ts	phase	decision	why	evidence	result
+2026-09-25T08:01:56.7944328Z	frame	Start from merged phases 8 and 9 at db776c9	Local main was 35 commits behind origin/main	db776c9	clean branch created
+2026-09-25T08:01:56.7944328Z	recovery	Repair Windows directory sync before packaged acceptance	Focused encrypted backup baseline failed six tests on Windows	work/phase-10/recovery-baseline.log	failure reproduced
+2026-09-25T08:01:56.7944328Z	scope	Keep real-data reveal and independent recovery gates open	Only synthetic mapping is accepted and independent Windows recovery evidence is absent	src/source/package.ts;docs/operations/windows-phase-9-handoff.md	open
+2026-09-25T08:11:00.1983261Z	inventory	Restrict runtime filenames and inspect both compressed payloads	Independent review reproduced a private.dat false negative	tests/integration/release-inventory.test.ts;scripts/verify-distributions.mjs	verified
+2026-09-25T08:11:00.1983261Z	inventory	Hash native runtime binaries instead of applying PEM marker matching	Electron includes cryptographic parser markers that are not credentials	docs/evidence/licences.md	limitation recorded
+2026-09-25T08:11:00.1983261Z	lifecycle	Read migration baseline without opening the current store	The packaged app must perform schema migration itself	tests/desktop/package-lifecycle.test.ts	verified
+2026-09-25T08:11:00.1983261Z	portable	Launch portable wrapper with native spawn and CDP	Electron launcher cannot attach to the NSIS wrapper; compact IPC cannot equal the full stored report	scripts/verify-portable.mjs;work/phase-10/portable-native.log	corrected probe passed
+2026-09-25T08:11:00.1983261Z	review	Compare all business tables and the entire preserved directory	Independent Standards review found omitted history tables and incomplete copy guards	3f63e2a	resolved
+2026-09-25T08:11:00.1983261Z	verify	Keep source and independent recovery release gates open	29 unit,224 integration,25 desktop tests and successful lifecycle proof establish only the recorded synthetic scope	docs/evidence/phase-10-proof.json	preview verified; release blocked
