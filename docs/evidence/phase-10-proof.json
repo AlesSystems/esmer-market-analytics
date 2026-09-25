@@ -1,0 +1,413 @@
+{
+  "task": "Phase 10, issue #13, Tasks 10.1 and 10.2",
+  "recordedAt": "2026-09-25T08:10:37.0895306Z",
+  "releaseStatus": "BLOCKED",
+  "previewVersion": "0.2.0",
+  "branch": "codex/phase-10-windows-acceptance",
+  "base": "db776c9",
+  "implementationCommit": "3f63e2a8b8c28760545ee165727e10862079e320",
+  "sourceState": "Application/runtime changes committed; evidence documents being assembled. Successful current-build packaged tests share the recorded app.asar hash. Final packaging followed verifier-only fixes. Stale-artifact and probe failures are documented separately.",
+  "environment": {
+    "harnessNode": "24.19.0",
+    "hardware": {
+      "os": "10.0.26200",
+      "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+      "logicalCpus": 20,
+      "ramBytes": 33974288384,
+      "arch": "x64"
+    },
+    "build": "26200",
+    "version": "10.0.26200",
+    "packagedVersions": {
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
+      "brotli": "1.2.0",
+      "cldr": "48.0",
+      "icu": "78.2",
+      "llhttp": "9.4.3",
+      "merve": "1.2.2",
+      "modules": "149",
+      "napi": "10",
+      "nbytes": "0.1.4",
+      "ncrypto": "0.0.1",
+      "nghttp2": "1.70.0",
+      "nghttp3": "",
+      "ngtcp2": "",
+      "openssl": "0.0.0",
+      "simdjson": "4.6.6",
+      "simdutf": "7.7.0",
+      "sqlite": "3.53.4",
+      "tz": "2025c",
+      "undici": "7.29.0",
+      "unicode": "17.0",
+      "uv": "1.52.1",
+      "uvwasi": "0.0.23",
+      "v8": "15.2.124.19-electron.0",
+      "zlib": "1.3.2.1-motley",
+      "zstd": "1.6.0",
+      "electron": "44.3.0",
+      "chrome": "152.0.7977.78"
+    },
+    "os": "Microsoft Windows 11 Pro",
+    "ubr": 9457
+  },
+  "commands": [
+    {
+      "command": "npm run test:unit",
+      "actual": "29 passed",
+      "logIdentity": {
+        "path": "work/phase-10/unit.log",
+        "bytes": 299,
+        "sha256": "f34e6191a7526a213bca55bb5d8f98d3b692d70ba3510e86f13e68258e86a538"
+      },
+      "expected": "All unit tests pass",
+      "log": "work/phase-10/unit.log"
+    },
+    {
+      "command": "npm run test:integration",
+      "actual": "224 passed",
+      "logIdentity": {
+        "path": "work/phase-10/integration.log",
+        "bytes": 305,
+        "sha256": "5134c201baf8e785975e6720edd25bfd91d069d5c8504df049f9f9e09906351a"
+      },
+      "expected": "All integration tests pass",
+      "log": "work/phase-10/integration.log"
+    },
+    {
+      "command": "npm run test:desktop",
+      "actual": "25 passed, none skipped",
+      "logIdentity": {
+        "path": "work/phase-10/desktop-full.log",
+        "bytes": 5197,
+        "sha256": "ff3b613a68bdaf0d4cf0e3c97efcc13d7b10d455f63affab98787da543846b47"
+      },
+      "expected": "Actual Windows packaged application passes",
+      "log": "work/phase-10/desktop-full.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "actual": "Passed",
+      "logIdentity": {
+        "path": "work/phase-10/typecheck.log",
+        "bytes": 62,
+        "sha256": "6c8c3ed84964bdc77f20f588936f103c3783b8f7d7e5e7e9a91858605cfe2700"
+      },
+      "expected": "Exit 0",
+      "log": "work/phase-10/typecheck.log"
+    },
+    {
+      "command": "npm run lint",
+      "actual": "Passed",
+      "logIdentity": {
+        "path": "work/phase-10/lint.log",
+        "bytes": 53,
+        "sha256": "eb48831f5115cacb952ca118834d6a87d7016ee93c70c0fd23884a702c11c25d"
+      },
+      "expected": "Exit 0",
+      "log": "work/phase-10/lint.log"
+    },
+    {
+      "command": "npm run package:win (includes npm run build)",
+      "actual": "76 outer files, 305 ASAR files, 7 notices, no violations; both compressed payloads match",
+      "logIdentity": {
+        "path": "work/phase-10/package-win-final.log",
+        "bytes": 2039,
+        "sha256": "ae53ae9584c3d1056f889641db09933c2b5b69bb468102796d1421a311083837"
+      },
+      "expected": "Both Windows outputs, notices and both payload inspections pass",
+      "log": "work/phase-10/package-win-final.log"
+    },
+    {
+      "command": "Packaged migrated-profile lifecycle test",
+      "actual": "1 passed",
+      "logIdentity": {
+        "path": "work/phase-10/upgraded-profile.log",
+        "bytes": 363,
+        "sha256": "2e574f32a6693191ba1dec46cf79901afbce4ecfa65b3ba6c3d24b4c4912ddc5"
+      },
+      "expected": "100 sales, 40 covered gross, 50 expenses; unchanged accepted output and history on two launches",
+      "log": "work/phase-10/upgraded-profile.log"
+    },
+    {
+      "command": "Packaged fresh installed-profile lifecycle test",
+      "actual": "1 passed",
+      "logIdentity": {
+        "path": "work/phase-10/clean-profile.log",
+        "bytes": 363,
+        "sha256": "b44ea9d2c19fc1be8bf1550c587e4e5cd46ff6aa7df8101afa8109d1847d4223"
+      },
+      "expected": "100 sales, 40 covered gross, 60 expenses; all business tables and accepted output unchanged on two launches",
+      "log": "work/phase-10/clean-profile.log"
+    }
+  ],
+  "distributions": [
+    {
+      "artifact": {
+        "path": "release/Esmer Market Analytics Setup 0.2.0.exe",
+        "bytes": 112881216,
+        "sha256": "ea94e52670299b1acfb47a57816731cb9c6e4f2dc95a8e8f7d4f14297c51d5a6"
+      },
+      "authenticode": "NotSigned"
+    },
+    {
+      "artifact": {
+        "path": "release/Esmer Market Analytics 0.2.0.exe",
+        "bytes": 112713915,
+        "sha256": "fed60b380c1362123c3ba1bbe4e6cd785e8a59c5b697cab279704c6fcaf0c686"
+      },
+      "authenticode": "NotSigned"
+    }
+  ],
+  "archive": {
+    "path": "release/win-unpacked/resources/app.asar",
+    "bytes": 11055311,
+    "sha256": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df"
+  },
+  "distributionInspection": {
+    "records": [
+      {
+        "kind": "installer",
+        "name": "Esmer Market Analytics Setup 0.2.0.exe",
+        "bytes": 112881216,
+        "sha256": "ea94e52670299b1acfb47a57816731cb9c6e4f2dc95a8e8f7d4f14297c51d5a6",
+        "containerFiles": [
+          {
+            "path": "$PLUGINSDIR/app-64.7z",
+            "bytes": 112375384,
+            "sha256": "2fdcc3e76e2c7d9ab660143d95acdc8bfa11d661e0e945a4c351208c9547daac"
+          },
+          {
+            "path": "$PLUGINSDIR/nsExec.dll",
+            "bytes": 6656,
+            "sha256": "5d9ceb1ce5f35aea5f9e5a0c0edeeec04dfefe0c77890c80c70e98209b58b962"
+          },
+          {
+            "path": "$PLUGINSDIR/nsis7z.dll",
+            "bytes": 434176,
+            "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+          },
+          {
+            "path": "$PLUGINSDIR/SpiderBanner.dll",
+            "bytes": 9216,
+            "sha256": "996a259e53ca18b89ec36d038c40148957c978c0fd600a268497d4c92f882a93"
+          },
+          {
+            "path": "$PLUGINSDIR/StdUtils.dll",
+            "bytes": 102400,
+            "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+          },
+          {
+            "path": "$PLUGINSDIR/System.dll",
+            "bytes": 12288,
+            "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+          },
+          {
+            "path": "$PLUGINSDIR/WinShell.dll",
+            "bytes": 3072,
+            "sha256": "9be85b986ea66a6997dde658abe82b3147ed2a1a3dcb784bb5176f41d22815a6"
+          },
+          {
+            "path": "$R0/Uninstall Esmer Market Analytics.exe",
+            "bytes": 140068,
+            "sha256": "db41bd5a76970591989b626c4e1137184512ce33201fc9366971fd582a59c2b4"
+          }
+        ],
+        "payloadMatchesUnpacked": true
+      },
+      {
+        "kind": "portable",
+        "name": "Esmer Market Analytics 0.2.0.exe",
+        "bytes": 112713915,
+        "sha256": "fed60b380c1362123c3ba1bbe4e6cd785e8a59c5b697cab279704c6fcaf0c686",
+        "containerFiles": [
+          {
+            "path": "$PLUGINSDIR/app-64.7z",
+            "bytes": 112375384,
+            "sha256": "2fdcc3e76e2c7d9ab660143d95acdc8bfa11d661e0e945a4c351208c9547daac"
+          },
+          {
+            "path": "$PLUGINSDIR/nsis7z.dll",
+            "bytes": 434176,
+            "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+          },
+          {
+            "path": "$PLUGINSDIR/StdUtils.dll",
+            "bytes": 102400,
+            "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+          },
+          {
+            "path": "$PLUGINSDIR/System.dll",
+            "bytes": 12288,
+            "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+          }
+        ],
+        "payloadMatchesUnpacked": true
+      }
+    ],
+    "limitations": "Generated NSIS plugin files are inventoried by name/hash. This is not a general detector of identifying data or a signature trust check."
+  },
+  "inventory": {
+    "path": "docs/evidence/phase-10-package-inventory.json",
+    "bytes": 70949,
+    "sha256": "1bc879e46a6a8072f27cd6ffd0fd37a1e31a5dc0603727c3af75fea7186161dd"
+  },
+  "performance": {
+    "path": "docs/evidence/phase-10-performance.json",
+    "bytes": 2154,
+    "sha256": "95fafab4fadf0f6a7c2ec3b6dbbb0bb71bee92e24a28e4a19fa4d49051e9838e"
+  },
+  "lifecycle": {
+    "priorPortable": {
+      "wrapperSha256": "e6b528f98a8d80e3196d281ec97efc02cd641c677fe9692f7f068c646c87d23a",
+      "archiveSha256": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+      "baseline": {
+        "schema": 6,
+        "businessHash": "8726cf02f042af7f8e308fde6a39d8ff63e1a90b663103348e4d4677c0ec4837",
+        "acceptedHash": "1ca46afb223ca0ff30d6d6021f8deddbc9daa13117ad90a357ff3681c6669f2e"
+      },
+      "runs": [
+        {
+          "launch": 1,
+          "runningArchiveHash": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "runningArchiveHash": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        }
+      ],
+      "offlineMode": "Playwright network blocking, not physical disconnection"
+    },
+    "finalPortable": {
+      "wrapperSha256": "fed60b380c1362123c3ba1bbe4e6cd785e8a59c5b697cab279704c6fcaf0c686",
+      "archiveSha256": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+      "baseline": {
+        "schema": 6,
+        "businessHash": "953d38112b2856fa785f6ce05aabb35a26a728266a1242a266d65f85b3248f3f",
+        "acceptedHash": "641e59c1ea3ffe9e865418c50b14a8c9738e547a7e1d2e7a26fd0edcfbcd1905"
+      },
+      "runs": [
+        {
+          "launch": 1,
+          "runningArchiveHash": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "runningArchiveHash": "0b36730f4c7d2a0d86f8a1ea272b4d1f1885ddbedc8492b30494a9d4e4cd85df",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        }
+      ],
+      "offlineMode": "Playwright network blocking, not physical disconnection"
+    },
+    "upgrade": {
+      "versionIncreased": true,
+      "profileAfter": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "installerHash": "967C41F8D683E8A9ECE23D3056365935FC997C75289434953210F1905235D288",
+      "exitCode": 0,
+      "productVersionAfter": "0.2.0.0",
+      "codeChanged": true,
+      "archiveAfter": "0B36730F4C7D2A0D86F8A1EA272B4D1F1885DDBEDC8492B30494A9D4E4CD85DF",
+      "profileBefore": "4380493786C32E8C9A7A284C39AB25CD5CCABBA39F75F4B6DF94F08910F60D25",
+      "productVersionBefore": "0.1.0.0",
+      "syntheticOnly": true,
+      "archiveBefore": "4C966A6AEC7DA48CF49AA859C8A1AF0BC45A457D9434C8256A0D02CFCDD9A4A5",
+      "stage": "upgrade"
+    },
+    "finalCleanUninstall": {
+      "profileBefore": "8426A4F805A9B0EF25CCF58457704F8C9D649E5C58D64102A48AB5B701A05E29",
+      "exitCode": 0,
+      "syntheticOnly": true,
+      "uninstallerHash": "DB41BD5A76970591989B626C4E1137184512CE33201FC9366971FD582A59C2B4",
+      "executableRemoved": true,
+      "profileAfter": "8426A4F805A9B0EF25CCF58457704F8C9D649E5C58D64102A48AB5B701A05E29",
+      "stage": "uninstall"
+    },
+    "upgradedUninstall": {
+      "uninstallerHash": "DB41BD5A76970591989B626C4E1137184512CE33201FC9366971FD582A59C2B4",
+      "syntheticOnly": true,
+      "stage": "uninstall",
+      "profileBefore": "CF3D9951AE6A39389DCC26C09D210B6B0812D45E02FDEA209AEF251225C9B50F",
+      "exitCode": 0,
+      "profileAfter": "CF3D9951AE6A39389DCC26C09D210B6B0812D45E02FDEA209AEF251225C9B50F",
+      "executableRemoved": true
+    },
+    "finalCleanInstall": {
+      "stage": "install",
+      "versionIncreased": false,
+      "exitCode": 0,
+      "productVersionBefore": null,
+      "archiveBefore": null,
+      "profileBefore": null,
+      "codeChanged": false,
+      "productVersionAfter": "0.2.0.0",
+      "installerHash": "EA94E52670299B1ACFB47A57816731CB9C6E4F2DC95A8E8F7D4F14297C51D5A6",
+      "archiveAfter": "0B36730F4C7D2A0D86F8A1EA272B4D1F1885DDBEDC8492B30494A9D4E4CD85DF",
+      "profileAfter": null,
+      "syntheticOnly": true
+    }
+  },
+  "dependencyAudit": {
+    "command": "npm audit --json",
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "evidence": {
+      "path": "work/phase-10/npm-audit.json",
+      "bytes": 386,
+      "sha256": "a6112ac5718c724d37a93443d8f9b56fe62ab6b72f43b7cbfeeff2db926c703f"
+    }
+  },
+  "fixtures": [
+    {
+      "path": "tests/helpers/business-fixtures.ts",
+      "bytes": 2682,
+      "sha256": "ff209c8b8792324fe9d1d728db817326d78b0226bad85ff9cbd044ac0abda71b"
+    },
+    {
+      "path": "tests/helpers/recovery-fixtures.ts",
+      "bytes": 3176,
+      "sha256": "16940ef2eeed866c8c0a301f5932752ce9c93029e530ac49b462a76fb2ca2ad0"
+    },
+    {
+      "path": "tests/helpers/expense-fixtures.ts",
+      "bytes": 590,
+      "sha256": "3e97c5bdd79054b3105bcd04023a9c061893a5900d4e6c19e593acd13619ee55"
+    }
+  ],
+  "limits": [
+    "Synthetic inputs only; no approved real prepared package or renewed source access.",
+    "No source-account denied-write proof or real mapping/privacy acceptance.",
+    "Full source volume exceeds validated synthetic package scope.",
+    "Same Windows host and disk; independent machine-loss/media recovery unpassed.",
+    "Directory namespace power-loss durability and actual disk exhaustion/ACL verification open.",
+    "Default-profile lifecycle, failed NSIS upgrade, clean OS, native dialog/scaling and downloaded SmartScreen checks open.",
+    "Renderer network blocking and restricted runtime PATH are not physical network disconnection."
+  ],
+  "reviews": {
+    "spec": "Astra High independently reviewed; inventory false negative fixed, total-record limit corrected, acceptance blockers retained",
+    "standards": "Sol High independently reviewed; three findings resolved and rechecked at 3f63e2a"
+  }
+}

@@ -19,15 +19,24 @@ test("packaged recovery restores a real encrypted backup after original user dat
   let app = await electron.launch({executablePath, args: [`--user-data-dir=${original}`]});
   try {
     await app.evaluate(({safeStorage, dialog}, paths) => {
-      // Mock only the OS credential adapter to avoid a machine Keychain prompt.
-      safeStorage.isEncryptionAvailable = () => true;
-      safeStorage.getSelectedStorageBackend = () => "kwallet";
-      safeStorage.encryptString = value => Buffer.from(value, "utf8");
-      safeStorage.decryptString = bytes => bytes.toString("utf8");
+      if (process.platform !== "win32") {
+        // Avoid a machine Keychain prompt outside Windows acceptance.
+        safeStorage.isEncryptionAvailable = () => true;
+        safeStorage.getSelectedStorageBackend = () => "kwallet";
+        safeStorage.encryptString = value => Buffer.from(value, "utf8");
+        safeStorage.decryptString = bytes => bytes.toString("utf8");
+      }
       dialog.showMessageBox = async () => ({response: 0, checkboxChecked: false});
       dialog.showSaveDialog = async () => ({canceled: false, filePath: paths.keyPath});
       dialog.showOpenDialog = (async (...args: unknown[]) => { const options = args.at(-1) as {properties?: string[]}; return {canceled: false, filePaths: options.properties?.includes("openDirectory") ? [paths.destination] : [paths.keyPath]}; }) as typeof dialog.showOpenDialog;
     }, {destination, keyPath});
+    if (process.platform === "win32") {
+      expect(await app.evaluate(({safeStorage}) => {
+        const sample = "synthetic-dpapi-proof";
+        const protectedBytes = safeStorage.encryptString(sample);
+        return safeStorage.isEncryptionAvailable() && !protectedBytes.equals(Buffer.from(sample)) && safeStorage.decryptString(protectedBytes) === sample;
+      })).toBe(true);
+    }
     const page = await app.firstWindow();
     await page.getByText("İşlemler", { exact: true }).click();
     await page.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();

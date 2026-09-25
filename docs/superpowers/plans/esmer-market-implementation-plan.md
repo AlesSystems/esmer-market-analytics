@@ -474,6 +474,8 @@ expect(result.confidence).toBe('estimated');
 
 **Exit gate:** First-release acceptance is evidenced. Known cost/expense limitations are visible, and the reveal does not require production integration.
 
+Phase 10 implementation and Windows synthetic verification are recorded in [Windows acceptance](../../evidence/windows-acceptance.md) and [the release record](../../evidence/release-acceptance.md). The Phase 10 exit gate remains open. Passing synthetic suites, versioned upgrade, encrypted restore and distribution inspection does not replace real-source or independent-recovery evidence.
+
 ## Phase 11 — Conditional live integration
 
 **Outcome:** Authorized source changes feed the same local report model while the application remains usable when the source is unavailable.
