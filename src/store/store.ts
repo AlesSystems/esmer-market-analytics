@@ -75,6 +75,9 @@ class AnalyticsStore {
     if(!parsed||createHash("sha256").update(String(row.package_json)).digest("hex")!==row.hash)throw Error("INVALID_PACKAGE");
     return querySource(parsed,String(row.hash),request);
   }
+  hasSourcePreview(): boolean {
+    return !!this.db.prepare("SELECT 1 FROM source_preview WHERE singleton=1").get();
+  }
   readSourcePreview(request: SourcePreviewRequest): SourcePreviewResult {
     if (!validSourcePreviewRequest(request)) throw new Error("INVALID_PAYLOAD");
     const row = this.db.prepare("SELECT package_json,hash FROM source_preview WHERE singleton=1").get();
