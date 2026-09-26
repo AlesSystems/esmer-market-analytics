@@ -107,3 +107,22 @@ test("preview requests enforce trusted sender, fixed stream and bounded offset",
   for (const payload of [{stream:"headers",offset:0,sql:"SELECT *"},{stream:"customers",offset:0},{stream:"lines",offset:-1},{stream:"headers",offset:100001}]) expect(await request(true,payload)).toMatchObject({code:"INVALID_PAYLOAD"});
   expect(await request(true,{stream:"headers",offset:0})).toEqual({status:"source-preview-empty"});
 });
+
+test("reimport repairs corrupted stored bytes even when the retained package hash matches", async () => {
+  const {mkdtemp,rm}=await import("node:fs/promises");const {join}=await import("node:path");const {tmpdir}=await import("node:os");const {DatabaseSync}=await import("node:sqlite");
+  const directory=await mkdtemp(join(tmpdir(),"preview-repair-")),path=join(directory,"analytics.sqlite");
+  const store=openStore(path);
+  try {
+    const bytes=writeRawPackage(rawSnapshot(),"fixture:repair","batch-1");
+    store.importSourcePreview(bytes);
+    const expected=store.readSourcePreview({stream:"headers",offset:0});
+    const corrupt=new DatabaseSync(path);try{corrupt.prepare("UPDATE source_preview SET package_json='{}'").run();}finally{corrupt.close();}
+    expect(()=>store.readSourcePreview({stream:"headers",offset:0})).toThrow("INVALID_PACKAGE");
+    const generation=store.recoveryGeneration().changed;
+    expect(store.importSourcePreview(bytes).status).toBe("preview-imported");
+    expect(store.readSourcePreview({stream:"headers",offset:0})).toEqual(expected);
+    expect(store.recoveryGeneration().changed).toBe(generation+1);
+    store.importSourcePreview(bytes);
+    expect(store.recoveryGeneration().changed).toBe(generation+1);
+  } finally {store.close();await rm(directory,{recursive:true,force:true});}
+});
