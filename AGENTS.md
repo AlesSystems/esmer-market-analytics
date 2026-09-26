@@ -10,6 +10,7 @@
   3. [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md): required evidence for A01–A07 and L01.
   4. [Implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md): phase dependencies, tasks and verification.
 - The three foundation documents govern requirements; the plan organizes delivery. Surface conflicts rather than silently changing the product contract.
+- For the isolated SQL live check and the prepared SQL backup import, follow [Show recorded SQL rows](https://github.com/AlesSystems/AlesSystems-Workstreams/blob/main/Esmer%20Market%20Analytics/plans/2026-09-26-live-and-backup-display.md) before editing those paths. The first priority is recorded source rows in the source workspace. Do not treat those rows as sales, cost, or profit. Do not add customer, employee, product-name, or supplier columns.
 - Check files and scripts on the current branch. Proposed paths, unchecked plan items and historical status paragraphs are not evidence of current implementation or acceptance. Honor authorization already given in the conversation without asking for it again.
 
 ## Product and data boundaries
