@@ -168,7 +168,7 @@ test("packaged visual journey retains every destination and important desktop st
   try {
     const page = await app.firstWindow();
     await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await capture(page, testInfo.outputPath("empty-1440.png"));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);

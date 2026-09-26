@@ -76,7 +76,7 @@ function App() {
       <section className="block start-state" aria-live="polite" aria-busy={importing}>
 
         {!availability ? <h1>Yerel veriler açılıyor</h1> : availability.status === "ready" ? <>
-          <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok"}</h1>
+          <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz mali rapor verisi yok"}</h1>
           {availability.store === "loaded" ? <>
             <p>Veri kesim tarihi: <strong>{date(availability.dataset.cutoff)}</strong><br />Paket hazırlanma tarihi: {date(availability.dataset.extractedAt)}</p>
             <p>{new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.documents)} belge · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.lines)} satır · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.suppliers)} tedarikçi</p>

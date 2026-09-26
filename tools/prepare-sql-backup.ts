@@ -3,7 +3,6 @@ import { randomUUID } from "node:crypto";
 import { extractSqlServer, parseSqlServerConfig } from "../src/source/sql-server.ts";
 import { writeRawPackage } from "../src/source/raw-package.ts";
 
-// Preparation runs only against the user's isolated restored copy. The desktop never restores SQL databases.
 try {
   const [configPath, outputPath, ...extra] = process.argv.slice(2);
   if (!configPath || !outputPath || extra.length) throw Error("INVALID_ARGUMENTS");

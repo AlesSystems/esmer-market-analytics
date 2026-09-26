@@ -12,7 +12,7 @@ test("monthly loading, failure retry and missing period preserve useful navigati
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await app.evaluate(({ ipcMain, dialog }, path) => {
       dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] });
       const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };

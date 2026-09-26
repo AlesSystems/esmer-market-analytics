@@ -24,7 +24,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
   try {
     const page = await app.firstWindow();
     await expect(
-      page.getByRole("heading", { name: "Henüz veri yok" }),
+      page.getByRole("heading", { name: "Henüz mali rapor verisi yok" }),
     ).toBeVisible();
     await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(page.locator("input[type=password]")).toHaveCount(0);
@@ -212,7 +212,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
     });
     const reopened = await app.firstWindow();
     await expect(
-      reopened.getByRole("heading", { name: "Henüz veri yok" }),
+      reopened.getByRole("heading", { name: "Henüz mali rapor verisi yok" }),
     ).toBeVisible();
     await expect(reopened.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(reopened.locator("input[type=password]")).toHaveCount(0);
@@ -236,7 +236,7 @@ test("packaged app imports through native selection, preserves data after failed
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
@@ -278,7 +278,7 @@ for (const loaded of [false, true]) {
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
       const page = await app.firstWindow();
-      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz mali rapor verisi yok" })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array), lastImportError: "INTERRUPTED" });
       await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });

@@ -20,7 +20,8 @@ export function SourcePreview({revision}: {revision: unknown}) {
   }, [stream, offset, revision]);
   if (error) return <p role="alert">{error}</p>;
   if (!result || result.status === "source-preview-empty") return null;
-  const columns = Object.keys(result.rows[0] ?? {});
+  const first = ["ID", "FIS", "FIS_TURU"];
+  const columns = Object.keys(result.rows[0] ?? {}).sort((a,b) => (first.includes(a) ? first.indexOf(a) : 3) - (first.includes(b) ? first.indexOf(b) : 3));
   return <section className="block source-preview" aria-label="Gerçek kaynak kayıtları">
     <h2>SQL yedeğinden gerçek kayıt örneği</h2>
     <p>Yalıtılmış yedekten alınan ham kayıtlar. Mali eşleme doğrulanmadı; bu kayıtlar satış veya kâr raporlarına katılmaz. Mevcut rapor verileri korunur.</p>
@@ -30,7 +31,7 @@ export function SourcePreview({revision}: {revision: unknown}) {
     <details><summary>Kaynak izi</summary><p>Kaynak: {result.metadata.lineage}<br />İçe aktarma kimliği: {result.metadata.extractionId}<br />Veritabanı kimliği: {result.metadata.databaseId}<br />Paket özeti: {result.hash}</p></details>
     <label>Kayıt türü <select value={stream} onChange={event => {setStream(event.target.value as "headers" | "lines"); setOffset(0);}}><option value="headers">Belgeler (FIS)</option><option value="lines">Satırlar (FIS_DETAY)</option></select></label>
     <p>Alan adları kaynaktaki adlardır. Tutarlar ve miktarlar kaynak hassasiyetiyle gösterilir; boş alanlar “—” ile belirtilir. Tür ve durum kodları mali yorum içermez.</p>
-    <div style={{overflowX: "auto"}}><table><thead><tr>{columns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead><tbody>{result.rows.map(row => <tr key={row.ID}>{columns.map(column => <td key={column}>{row[column] ?? "—"}</td>)}</tr>)}</tbody></table></div>
+    <div style={{overflow: "auto", maxHeight: 360}}><table><thead><tr>{columns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead><tbody>{result.rows.map(row => <tr key={row.ID}>{columns.map(column => <td key={column} style={{whiteSpace: "nowrap"}}>{row[column] ?? "—"}</td>)}</tr>)}</tbody></table></div>
     <p>{result.total === 0 ? "Kayıt yok" : `${offset + 1}–${Math.min(offset + 50, result.total)} / ${result.total}`}</p>
     <Button variant="outline" disabled={offset === 0} onClick={() => setOffset(Math.max(0,offset-50))}>Önceki kaynak kayıtları</Button>
     <Button variant="outline" disabled={offset+50 >= result.total} onClick={() => setOffset(offset+50)}>Sonraki kaynak kayıtları</Button>

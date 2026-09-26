@@ -44,7 +44,7 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
   try {
     const page = await app.firstWindow();
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await page.screenshot({ path: `${directory}/empty.png` });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);

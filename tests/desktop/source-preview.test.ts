@@ -1,18 +1,23 @@
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join, resolve, relative, isAbsolute } from "node:path";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { readRawPackage, writeRawPackage } from "../../src/source/raw-package";
 import { importPackage } from "../helpers/desktop-navigation";
 
+test.use({trace: "off", video: "off", screenshot: "off"});
+
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin"
   ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`)
   : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
-for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : "synthetic raw"} preview imports and survives offline restart`, async () => {
+for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : "synthetic raw"} preview imports and survives offline restart`, async ({}, testInfo) => {
   test.skip(actual && !process.env.ESMER_SQL_PREVIEW_PACKAGE, "Private prepared SQL preview not configured");
   test.setTimeout(60_000);
-  // Actual source values must never enter traces, screenshots or assertion output.
+  if (actual) {
+    const output = relative(process.cwd(),testInfo.outputDir);
+    if (process.env.PLAYWRIGHT_NO_COPY_PROMPT !== "1" || (!output.startsWith(`..${process.platform === "win32" ? "\\" : "/"}`) && !isAbsolute(output))) throw Error("PRIVATE_TEST_OUTPUT_REQUIRED");
+  }
 
   const userData = await mkdtemp(join(tmpdir(), "esmer-preview-desktop-"));
   const snapshot = rawSnapshot();
@@ -23,7 +28,7 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
   let app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading",{name:"Henüz veri yok"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Henüz mali rapor verisi yok"})).toBeVisible();
     await app.evaluate(({dialog},path) => {dialog.showOpenDialog = async () => ({canceled:false,filePaths:[path]});},sourceFile);
     await importPackage(page);
     await expect(page.getByRole("heading",{name:"SQL yedeğinden gerçek kayıt örneği"})).toBeVisible();
