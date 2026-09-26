@@ -24,10 +24,14 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await expect(page.getByText("999 · Tür anlamı doğrulanmadı",{exact:true})).toBeVisible();
   await page.screenshot({path:testInfo.outputPath("source-workspace.png"),fullPage:true});
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Ürün kimliklerini göster",exact:true}).click();
+  await page.getByRole("button",{name:"333",exact:true}).click();
+  await expect(page.getByRole("button",{name:"1",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
   await page.getByLabel("Ürün kimliği",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
   await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("button",{name:"2",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
-  await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await expect(page.getByText("Kira",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await expect(page.getByRole("cell",{name:"Kira Faaliyet gideri",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Raporlar",exact:true})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toBeVisible();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true}).click();await expect(page.getByText("Sentetik gösterim raporu — gerçek market sonuçları değildir.",{exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Özet",exact:true}).click();await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
