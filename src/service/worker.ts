@@ -42,7 +42,7 @@ let liveConfig: SqlServerConfig | undefined;
 let liveChanging = false;
 function liveResult(): LiveResult {
   const available = store?.availability();
-  return {status: "live", configured: !!liveConfig, live: live?.status() ?? {phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, persistenceError: false}, cutoff: available?.status === "ready" && available.store === "loaded" ? available.dataset.cutoff : null};
+  return {status: "live", configured: !!liveConfig, live: live?.status() ?? {phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, lastRecord: "none", persistenceError: false}, cutoff: available?.status === "ready" && available.store === "loaded" ? available.dataset.cutoff : null};
 }
 function createLive(initialStatus?: unknown) {
   live = new LiveSynchronizer({
@@ -50,8 +50,15 @@ function createLive(initialStatus?: unknown) {
     activeDataset: () => { const active = store?.activeManifest(); return active ? {datasetId: active.datasetId, fingerprint: liveFingerprint(active.metadata), identity: liveIdentity(active.metadata)} : null; },
     importCandidate: bytes => {
       if (!store || restoring || liveChanging) throw new Error("INTERRUPTED");
+      if (readRawPackage(bytes)) throw new Error("INVALID_CANDIDATE");
       store.prune(versions!.protectedDatasetIds());
       return importOutcome(store.importPackage(bytes));
+    },
+    importPreview: bytes => {
+      if (!store || restoring || liveChanging) throw new Error("INTERRUPTED");
+      const preview = store.importSourcePreview(bytes);
+      if (preview.status === "failed") throw new Error(preview.code === "STORAGE_FULL" ? "STORAGE_FULL" : "INVALID_CANDIDATE");
+      return preview;
     },
     initialStatus,
     persist: (status: LiveStatus) => {
