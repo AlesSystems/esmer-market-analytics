@@ -99,7 +99,7 @@ export function SalesWorkspace({ view, setView, importing, importPackage, openRe
   }
   return <AppShell destination={recoveryOpen ? undefined : destination} navigate={navigate} controls={<>
     <label className="period-label">Dönem <Input type="month" lang="tr" disabled={opening.current} value={view.context.period} onChange={event => { if (event.target.value) void open(event.target.value); }} /></label>
-    <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Canlı bağlantı kapalı</p></div></details>
+    <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Raporlar yerel veri sürümünden okunur.</p></div></details>
     {view.warnings.includes("SYNTHETIC_ONLY") && <span className="synthetic-label" title="Gerçek market verisi değildir.">Sentetik veri</span>}
   </>} operations={<>
     <h2>Veri ve bakım</h2><p>Etkin raporun veri sonu: {date(view.cutoff)}</p>

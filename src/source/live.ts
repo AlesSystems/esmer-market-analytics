@@ -32,6 +32,7 @@ export class LiveSynchronizer {
     const previous = readLiveStatus(options.initialStatus);
     if (previous) {this.state = {...previous, phase: "disabled", error: null}; this.resumed = true;}
   }
+  isBusy(): boolean { return !!(this.running || this.sourceWork); }
   private now() { return this.options.now?.() ?? Date.now(); }
   status(): LiveStatus {
     if (this.state.phase !== "disabled" && this.state.lastDatasetId && this.options.activeDataset()?.datasetId !== this.state.lastDatasetId) {
@@ -48,7 +49,7 @@ export class LiveSynchronizer {
   private schedule() {
     clearTimeout(this.timer);
     if (!this.enabled) return;
-    this.timer = setTimeout(() => {void this.refresh();}, LIVE_POLL_MS);
+    this.timer = setTimeout(() => {void this.refresh().then(result => {if (result.status === "busy") this.schedule();});}, LIVE_POLL_MS);
     this.timer.unref?.();
   }
   enable(): LiveStatus {

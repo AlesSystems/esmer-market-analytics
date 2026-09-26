@@ -1,3 +1,5 @@
+import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
+import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
 import { OperationJobs } from "./jobs";
 import { saveReportExport } from "./report-export";
 import { atomicWriteFile } from "./atomic-file";
@@ -33,6 +35,9 @@ const unavailable = {
 } satisfies Availability;
 let worker: Worker | undefined;
 let recoveryConfigError = false;
+let liveConfigError = false;
+let savedLive: SavedLiveConfig | null = null;
+let nativeLiveBusy = false;
 let restoring = false;
 let nativeRecoveryBusy = false;
 let requestId = 0;
@@ -52,6 +57,7 @@ function requestService(request: { operation: "querySales"; payload: QuerySalesR
 function requestService(request: { operation: "inspectSales"; payload: InspectSalesRequest }): Promise<SalesDetailResult>;
 function requestService(request: ExpenseServiceRequest): Promise<ExpenseResult | OperatingReportResult>;
 function requestService(request: RecoveryServiceRequest): Promise<RecoveryResult>;
+function requestService(request: LiveServiceRequest): Promise<LiveResult>;
 function requestService(request: Omit<ServiceRequest, "id">): Promise<ServiceResponse["result"]> {
   if (restoring && request.operation !== "confirmRestore" && request.operation !== "cancelRestore") return Promise.resolve({status: "recovery-failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."});
   if (!worker) return Promise.resolve(request.operation !== "importPackage" ? unavailable : { status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message });
@@ -105,7 +111,8 @@ app.whenReady().then(async () => {
   let recoveryConfig;
   try { recoveryConfig = await loadRecoveryConfig(app.getPath("userData")) ?? undefined; }
   catch { recoveryConfigError = true; }
-  worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite"), recoveryConfig, recoveryConfigUnavailable: recoveryConfigError } });
+  try { savedLive = await loadLiveConfig(app.getPath("userData")); } catch { liveConfigError = true; }
+  worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite"), recoveryConfig, recoveryConfigUnavailable: recoveryConfigError, liveConfig: savedLive?.config, liveEnabled: savedLive?.enabled === true } });
   worker.on("message", (message: ServiceResponse | ServiceProgress) => {
     if ("jobId" in message) { jobs.progress(message.jobId, message.phase, message.completed, message.total); return; }
     const resolve = pending.get(message.id); pending.delete(message.id); resolve?.(message.result);
@@ -244,6 +251,12 @@ app.whenReady().then(async () => {
             if (jobs.status().status !== "idle") return failed("RECOVERY_BUSY", "Başka bir işlem sürüyor. Tamamlanınca yeniden deneyin.");
             const confirm = await dialog.showMessageBox(window, {type: "warning", buttons: ["Geri yükle", "Vazgeç"], defaultId: 1, cancelId: 1, message: "Mevcut veriler yedekteki sürümle değiştirilsin mi?", detail: "İşlemden sonra raporlar yeniden yüklenir. Mevcut kayıtların korunmuş kopyası saklanır."});
             if (confirm.response !== 0) return {status: "cancelled"};
+            if (nativeLiveBusy) return failed("RECOVERY_BUSY", "Kaynak ayarı değiştiriliyor. Tamamlanınca yeniden deneyin.");
+            if (savedLive) {
+              savedLive = {...savedLive, enabled: false};
+              try { await saveLiveConfig(userData, savedLive); } catch { return failed("LIVE_CONFIG_UNAVAILABLE", "Canlı bağlantı ayarı kaydedilemedi. Geri yükleme başlatılmadı."); }
+            }
+            await requestService({operation: "setLiveEnabled", payload: {enabled: false}});
             restoring = true;
             try {
               const deadline = Date.now() + 30_000;
@@ -259,6 +272,40 @@ app.whenReady().then(async () => {
           if (operation === "pinBackup") return requestService({operation: "pinBackup", payload: payload as {backupId: string; pinned: boolean}});
           return requestService({operation: "cancelRestore", payload: payload as {token: string}});
           } finally { if (nativeAction) nativeRecoveryBusy = false; }
+        },
+        async (operation, payload) => {
+          const failure = (): LiveResult => ({status: "live-failed", code: "LIVE_CONFIG_UNAVAILABLE", message: "İzole test bağlantısı ayarlanamadı. Yerel veriler korunuyor. Bağlantı dosyasını yeniden seçin."});
+          const userData = app.getPath("userData");
+          if (operation === "getLiveStatus") {
+            const result = await requestService({operation});
+            return result.status === "live" ? {...result, configurationError: liveConfigError} : result;
+          }
+          if (nativeLiveBusy || nativeRecoveryBusy || restoring) return {status: "busy"};
+          if (operation === "refreshLiveSource") return requestService({operation});
+          nativeLiveBusy = true;
+          try {
+            if (operation === "configureLiveSource") {
+              const selected = await dialog.showOpenDialog(window, {title: "İzole test bağlantısı dosyasını seçin", properties: ["openFile"], filters: [{name: "Bağlantı ayarı", extensions: ["json"]}]});
+              if (selected.canceled || selected.filePaths.length !== 1) return {status: "cancelled"};
+              const config = await readLiveConfigFile(selected.filePaths[0]);
+              await requestService({operation: "setLiveEnabled", payload: {enabled: false}});
+              const next = {config, enabled: false};
+              await saveLiveConfig(userData, next);
+              savedLive = next;
+              const result = await requestService({operation: "configureLiveSource", payload: next});
+              liveConfigError = result.status !== "live";
+              return result;
+            }
+            if (!savedLive || !payload) return failure();
+            const next = {...savedLive, enabled: payload.enabled};
+            if (!next.enabled) await requestService({operation: "setLiveEnabled", payload: {enabled: false}});
+            await saveLiveConfig(userData, next);
+            savedLive = next;
+            const result = await requestService({operation: "setLiveEnabled", payload: {enabled: next.enabled}});
+            liveConfigError = result.status !== "live";
+            return result;
+          } catch { liveConfigError = true; return failure(); }
+          finally { nativeLiveBusy = false; }
         },
       );
     },

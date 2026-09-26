@@ -1,3 +1,4 @@
+import { LiveStatus } from "./LiveStatus";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { useEffect, useState } from "react";
@@ -59,6 +60,7 @@ function App() {
   }
   const messages = <>
     <OperationProgress />
+    <LiveStatus onChanged={() => {void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable));}} />
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}
     {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="ghost" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
   </>;
@@ -80,8 +82,7 @@ function App() {
           <Button variant="default" type="button" disabled={importing} onClick={() => void importPackage()}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</Button>
           <Button variant="outline" type="button" onClick={() => setExpensesOpen(true)}>Giderler</Button>
           <Button variant="outline" type="button" onClick={() => setRecoveryOpen(true)}>Yedekleme ve kurtarma</Button>
-          <div><span className="status"><span aria-hidden="true">●</span> Canlı bağlantı kapalı</span></div>
-          <p className="note">Uygulama çevrimdışı çalışır. Market sistemine bağlanmaz.</p>
+          <p className="note">Raporlar bu bilgisayardaki verileri kullanır. İsteğe bağlı izole test bağlantısı aşağıdan yönetilir.</p>
         </> : <><h1>Yerel veriler açılamadı</h1><p>{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); }}>Yeniden dene</Button><Button variant="outline" type="button" onClick={() => setRecoveryOpen(true)}>Yedekten geri yükle</Button></>}
         {salesError && <p role="status">Satış raporu kullanılamıyor. {salesError}</p>}
         {messages}

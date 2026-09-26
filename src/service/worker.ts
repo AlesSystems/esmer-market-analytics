@@ -1,3 +1,11 @@
+import { readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, rmSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { LiveSynchronizer, liveFingerprint, liveIdentity } from "../source/live";
+import { parseSqlServerConfig, type SqlServerConfig } from "../source/sql-server";
+import { prepareSqlCandidate } from "../source/sql-package";
+import type { LiveStatus } from "../source/live-contracts";
+import type { LiveResult } from "../domain/contracts";
+import { liveOperations, validLiveRequest } from "../desktop/requests";
 import { Recovery } from "../recovery/backup";
 import { recoveryFailure, recoveryOperations, type RecoveryServiceRequest } from "../recovery/contracts";
 import { ReportVersions } from "../reports/versions";
@@ -26,6 +34,34 @@ let store: ReturnType<typeof openStore> | undefined;
 let recovery: Recovery | undefined;
 let versions: ReportVersions | undefined;
 let expenses: Expenses | undefined;
+let live: LiveSynchronizer | undefined;
+let liveConfig: SqlServerConfig | undefined;
+let liveChanging = false;
+function liveResult(): LiveResult {
+  const available = store?.availability();
+  return {status: "live", configured: !!liveConfig, live: live?.status() ?? {phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, persistenceError: false}, cutoff: available?.status === "ready" && available.store === "loaded" ? available.dataset.cutoff : null};
+}
+function createLive(initialStatus?: unknown) {
+  live = new LiveSynchronizer({
+    extract: signal => { if (!liveConfig) throw new Error("SOURCE_UNAVAILABLE"); return prepareSqlCandidate(liveConfig, signal); },
+    activeDataset: () => { const active = store?.activeManifest(); return active ? {datasetId: active.datasetId, fingerprint: liveFingerprint(active.metadata), identity: liveIdentity(active.metadata)} : null; },
+    importCandidate: bytes => {
+      if (!store || restoring || liveChanging) throw new Error("INTERRUPTED");
+      store.prune(versions!.protectedDatasetIds());
+      return importOutcome(store.importPackage(bytes));
+    },
+    initialStatus,
+    persist: (status: LiveStatus) => {
+      const file = join(dirname(workerData.databasePath), "live-status.json"), temporary = `${file}.partial`;
+      try {
+        const fd = openSync(temporary, "w", 0o600);
+        try { writeFileSync(fd, JSON.stringify(status)); fsyncSync(fd); } finally { closeSync(fd); }
+        renameSync(temporary, file);
+        if (process.platform !== "win32") { const directory = openSync(dirname(file), "r"); try { fsyncSync(directory); } finally { closeSync(directory); } }
+      } finally { rmSync(temporary, {force: true}); }
+    },
+  });
+}
 function rebuildServices() {
   store=recovery?.store??undefined;
   reports=store?new SalesReports(store):undefined;
@@ -36,6 +72,11 @@ const initialized=(async()=> {
   if (!workerData || typeof workerData.databasePath!=="string") throw new Error("INVALID_SERVICE_CONFIG");
   recovery=await Recovery.open(workerData.databasePath,workerData.recoveryConfig,{holdStoreUntilConfigured:workerData.recoveryConfigUnavailable===true});
   rebuildServices();
+  let previousStatus: unknown;
+  try { previousStatus = JSON.parse(readFileSync(join(dirname(workerData.databasePath), "live-status.json"), "utf8")); } catch {}
+  try { if (workerData.liveConfig) liveConfig = parseSqlServerConfig(workerData.liveConfig); } catch { liveConfig = undefined; }
+  createLive(previousStatus);
+  if (liveConfig && workerData.liveEnabled === true) live!.enable();
   void recovery.resume().catch(()=>{});
 })().catch(()=>{});
 let active=0, restoring=false, recoveryBusy=false;
@@ -64,7 +105,7 @@ async function recoveryRequest(request:RecoveryServiceRequest) {
       return recovery.prepareRestore(request.payload.backupPath,request.payload.key);
     case "confirmRestore":
       if (!request.payload || typeof request.payload.token!=="string") throw new Error("INVALID_PAYLOAD");
-      try { return await recovery.confirmRestore(request.payload.token); } finally { rebuildServices(); }
+      try { return await recovery.confirmRestore(request.payload.token); } finally { rebuildServices(); createLive(); await live!.disable(); }
     case "cancelRestore":
       if (!request.payload || typeof request.payload.token!=="string") throw new Error("INVALID_PAYLOAD");
       return recovery.cancelRestore(request.payload.token);
@@ -80,10 +121,31 @@ parentPort?.on("message", async (request: ServiceRequest) => {
   let result: ServiceResponse["result"];
   try {
     await initialized;
-    if (committing) await waitForRequests();
+    if (committing) { await live?.disable(); await waitForRequests(); }
     if (recoveryOperations.includes(request.operation)) {
       const result=await recoveryRequest(request as RecoveryServiceRequest);
       parentPort?.postMessage({id:request.id,result}); return;
+    }
+    if (liveOperations.includes(request.operation)) {
+      if (!live) throw new Error("SERVICE_UNAVAILABLE");
+      if (liveChanging) { parentPort?.postMessage({id: request.id, result: {status: "busy"}}); return; }
+      if (request.operation === "configureLiveSource") {
+        if (!request.payload || Object.keys(request.payload).sort().join() !== "config,enabled" || typeof request.payload.enabled !== "boolean") throw new Error("INVALID_PAYLOAD");
+        let config: SqlServerConfig;
+        try { config = parseSqlServerConfig(request.payload.config); } catch { throw new Error("INVALID_PAYLOAD"); }
+        liveChanging = true;
+        try { await live.close(); liveConfig = config; createLive(); if (request.payload.enabled) live!.enable(); } finally { liveChanging = false; }
+      } else {
+        if (!validLiveRequest(request.operation, "payload" in request ? request.payload : null)) throw new Error("INVALID_PAYLOAD");
+        if (request.operation === "setLiveEnabled") {
+          liveChanging = true;
+          try { if (request.payload.enabled) { if (!liveConfig) throw new Error("SERVICE_UNAVAILABLE"); live.enable(); } else await live.disable(); } finally { liveChanging = false; }
+        } else if (request.operation === "refreshLiveSource") {
+          const refreshed = await live.refresh();
+          if (refreshed.status === "busy") { parentPort?.postMessage({id: request.id, result: refreshed}); return; }
+        }
+      }
+      parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
     const known = ["previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
@@ -110,7 +172,10 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "restoreExpense") { store.changeExpense(request.payload); result = { status: "saved" }; }
     else if (request.operation === "confirmExpenseCompleteness") { store.confirmExpensesComplete(request.payload); result = { status: "saved" }; }
     else if (request.operation === "queryOperating") result = reports!.operating(request.payload);
-    else if (request.operation === "getAvailability") result = store.availability();
+    else if (request.operation === "getAvailability") {
+      const available = store.availability();
+      result = available.status === "ready" ? {...available, liveConnection: live?.status().phase !== "disabled" && liveConfig ? "enabled" : "disabled"} : available;
+    }
     else if (request.operation === "queryPurchasing") result = reports!.purchasing(request.payload);
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);
@@ -125,6 +190,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "acceptReportVersion") result = displayResult(versions!.accept(request.payload));
     else if (request.operation === "exportReportVersion") result = {status: "export", bytes: await excelReport(versions!.selected(request.payload.reportId))};
     else if (request.operation === "importPackage") {
+      if (liveChanging || live?.isBusy()) { parentPort?.postMessage({id: request.id, result: {status: "busy"}}); return; }
       store.prune(versions!.protectedDatasetIds());
       result = importOutcome(store.importPackage(request.bytes, control));
     } else throw new Error("UNKNOWN_OPERATION");
@@ -144,4 +210,4 @@ parentPort?.on("message", async (request: ServiceRequest) => {
   }
   parentPort?.postMessage({ id: request.id, result } satisfies ServiceResponse);
 });
-parentPort?.on("close", () => { void recovery?.close(); });
+parentPort?.on("close", () => { void (async () => { await live?.close(); await recovery?.close(); })(); });

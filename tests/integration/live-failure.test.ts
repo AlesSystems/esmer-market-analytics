@@ -153,3 +153,23 @@ test("invalid persisted status is ignored without importing untrusted fields", (
   controllers.push(controller);
   expect(controller.status()).toEqual({phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, persistenceError: false});
 });
+
+test("polling resumes after timeout cleanup outlasts the next scheduled poll", async () => {
+  vi.useFakeTimers();
+  let release!: (bytes: Uint8Array) => void;
+  const extract = vi.fn().mockImplementationOnce(() => new Promise<Uint8Array>(resolve => {release = resolve;})).mockImplementation(async () => sourcePackage("b", undefined, "after-delayed-cleanup"));
+  const {store, controller} = fixture(extract);
+  try {
+    controller.enable();
+    const initial = controller.refresh();
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(await initial).toEqual({status: "failed", code: "REFRESH_TIMEOUT"});
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    expect(extract).toHaveBeenCalledTimes(1);
+    release(sourcePackage("b", undefined, "late-cancelled-capture"));
+    await vi.advanceTimersByTimeAsync(0);
+    await vi.advanceTimersByTimeAsync(5 * 60_000);
+    expect(extract).toHaveBeenCalledTimes(2);
+    expect(controller.status()).toMatchObject({phase: "idle", lastSuccessAt: expect.any(String)});
+  } finally {await controller.close(); store.close();}
+});
