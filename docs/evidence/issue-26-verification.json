@@ -1,0 +1,70 @@
+{
+  "codeCommit": "2f3d60798917a34633fda090845eeafb2aaf7409",
+  "environment": {
+    "os": "Windows 11 Pro x64 build 26200",
+    "node": "v24.19.0"
+  },
+  "checks": [
+    {
+      "exitCode": 0,
+      "command": "npm run test:unit",
+      "passed": 29
+    },
+    {
+      "exitCode": 0,
+      "command": "npm run test:integration",
+      "passed": 234
+    },
+    {
+      "exitCode": 0,
+      "command": "npm run test:desktop",
+      "passed": 29
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    {
+      "exitCode": 0,
+      "command": "npm run package:win",
+      "includes": "npm run build, ASAR notices, release inventory, distribution payload equivalence"
+    }
+  ],
+  "readerRegression": {
+    "baselineProductionCommit": "dc99905821d9d265670787c067a8ec01910974c7",
+    "testCommit": "e51c34d",
+    "reproduction": "Temporarily substituted only the baseline reader, ran the committed reader tests, restored exact current bytes in finally, reran tests and checked git diff was empty for that file",
+    "red": {
+      "exitCode": 1,
+      "passed": 1,
+      "evidence": "issue-26-reader-red.txt",
+      "failed": 3
+    },
+    "green": {
+      "passed": 4,
+      "exitCode": 0
+    }
+  },
+  "artifacts": [
+    {
+      "path": "release/win-unpacked/resources/app.asar",
+      "bytes": 11092441,
+      "sha256": "e457037cf9cbd89b0e57f245591da0564c6e2eeb9c7133f8748c49f7b085da7c"
+    },
+    {
+      "path": "release/Esmer Market Analytics Setup 0.2.0.exe",
+      "bytes": 112887501,
+      "sha256": "4fd73d5dbba2cec249327debdfce962bfd5462c6b0ee0c322a412c705a71d5f0"
+    },
+    {
+      "path": "release/Esmer Market Analytics 0.2.0.exe",
+      "bytes": 112720201,
+      "sha256": "8cab06fce7c1d6056d0d9e015f5c4e689d36e0af2e9618f6b321bd764f5bde31"
+    }
+  ],
+  "scope": "Synthetic development verification only. No installer execution, production access, owner rollout, or full-source acceptance."
+}

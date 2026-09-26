@@ -1,0 +1,3317 @@
+{
+  "scope": "Issue 26 R3/R5 source-independent synthetic measurements; not acceptance",
+  "baselineProfilerCommit": "4b6bf97",
+  "baselineProductionCommit": "dc99905821d9d265670787c067a8ec01910974c7",
+  "changedCommit": "2f3d607",
+  "conditions": "One fresh Node process per count per series, same Windows host; OS caches not cleared. Timing samples are not a speedup claim. Receipts include end-of-process git HEAD; baseline series overlapped only a test-file commit.",
+  "measurements": [
+    {
+      "documents": 100,
+      "baseline": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "4b6bf97b430b8349f8d18204706985cf97232667"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 100,
+          "lines": 100,
+          "firstSha256": "bec6917ab0b76434461a8356c4f8191b3a8a1a60abb78c7f88bd8cab71d8d78e",
+          "replacementSha256": "cb9924ed363553192eb835e36e72984cd0dfc45aa821e085093c641d962dc081"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 9.180099999999996,
+            "before": {
+              "rss": 53899264,
+              "heapTotal": 12709888,
+              "heapUsed": 8165432,
+              "external": 3088141,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 59711488,
+              "heapTotal": 17952768,
+              "heapUsed": 11801776,
+              "external": 3010987,
+              "arrayBuffers": 490070
+            },
+            "processHighWaterRssKiB": 58312
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 4.818000000000012,
+            "before": {
+              "rss": 59801600,
+              "heapTotal": 17952768,
+              "heapUsed": 8281640,
+              "external": 3011403,
+              "arrayBuffers": 490486
+            },
+            "after": {
+              "rss": 93437952,
+              "heapTotal": 17952768,
+              "heapUsed": 8306992,
+              "external": 36566668,
+              "arrayBuffers": 34045751
+            },
+            "processHighWaterRssKiB": 91248
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 6.57729999999998,
+            "before": {
+              "rss": 93437952,
+              "heapTotal": 17952768,
+              "heapUsed": 8308200,
+              "external": 36566668,
+              "arrayBuffers": 34045751
+            },
+            "after": {
+              "rss": 94310400,
+              "heapTotal": 17690624,
+              "heapUsed": 9099768,
+              "external": 36499640,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 92100
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 44.2414,
+            "before": {
+              "rss": 94314496,
+              "heapTotal": 17690624,
+              "heapUsed": 9125208,
+              "external": 36499640,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 95391744,
+              "heapTotal": 17952768,
+              "heapUsed": 11885568,
+              "external": 36501688,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 94256
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 16.376799999999974,
+            "before": {
+              "rss": 95391744,
+              "heapTotal": 17952768,
+              "heapUsed": 11886840,
+              "external": 36501688,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 95375360,
+              "heapTotal": 17952768,
+              "heapUsed": 8645040,
+              "external": 36501688,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 95968
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 1.3171999999999855,
+            "before": {
+              "rss": 95477760,
+              "heapTotal": 17952768,
+              "heapUsed": 8674328,
+              "external": 36501688,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 95543296,
+              "heapTotal": 17952768,
+              "heapUsed": 9117320,
+              "external": 36501688,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 95968
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 28.187100000000015,
+            "before": {
+              "rss": 95698944,
+              "heapTotal": 18214912,
+              "heapUsed": 9585320,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 97570816,
+              "heapTotal": 19001344,
+              "heapUsed": 11296712,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 96744
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 2.122700000000009,
+            "before": {
+              "rss": 97570816,
+              "heapTotal": 19001344,
+              "heapUsed": 11300608,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 97447936,
+              "heapTotal": 19001344,
+              "heapUsed": 12026704,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 96744
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 28.648400000000038,
+            "before": {
+              "rss": 97447936,
+              "heapTotal": 19001344,
+              "heapUsed": 12027992,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 111575040,
+              "heapTotal": 31895552,
+              "heapUsed": 15981080,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "processHighWaterRssKiB": 110648
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 3.6835000000000377,
+            "before": {
+              "rss": 111575040,
+              "heapTotal": 31895552,
+              "heapUsed": 16698984,
+              "external": 36532959,
+              "arrayBuffers": 33978723
+            },
+            "after": {
+              "rss": 109776896,
+              "heapTotal": 29966336,
+              "heapUsed": 14177896,
+              "external": 36613070,
+              "arrayBuffers": 34058834
+            },
+            "processHighWaterRssKiB": 110648
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 4.6329000000000065,
+            "before": {
+              "rss": 109715456,
+              "heapTotal": 29966336,
+              "heapUsed": 14203240,
+              "external": 36613486,
+              "arrayBuffers": 34059250
+            },
+            "after": {
+              "rss": 143273984,
+              "heapTotal": 29966336,
+              "heapUsed": 14223040,
+              "external": 70168751,
+              "arrayBuffers": 67614515
+            },
+            "processHighWaterRssKiB": 139916
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 4.927400000000034,
+            "before": {
+              "rss": 143327232,
+              "heapTotal": 29966336,
+              "heapUsed": 14224736,
+              "external": 70168751,
+              "arrayBuffers": 67614515
+            },
+            "after": {
+              "rss": 143110144,
+              "heapTotal": 30273536,
+              "heapUsed": 14522008,
+              "external": 70168751,
+              "arrayBuffers": 67613267
+            },
+            "processHighWaterRssKiB": 140444
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 50.92950000000002,
+            "before": {
+              "rss": 143110144,
+              "heapTotal": 30273536,
+              "heapUsed": 14523304,
+              "external": 70168751,
+              "arrayBuffers": 67613267
+            },
+            "after": {
+              "rss": 143163392,
+              "heapTotal": 30273536,
+              "heapUsed": 17690192,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "processHighWaterRssKiB": 140444
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 12.079700000000003,
+            "before": {
+              "rss": 143163392,
+              "heapTotal": 30273536,
+              "heapUsed": 17691496,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "after": {
+              "rss": 144232448,
+              "heapTotal": 30273536,
+              "heapUsed": 15726200,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "processHighWaterRssKiB": 140852
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 12.647600000000011,
+            "before": {
+              "rss": 144232448,
+              "heapTotal": 30273536,
+              "heapUsed": 15727504,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "after": {
+              "rss": 143953920,
+              "heapTotal": 30273536,
+              "heapUsed": 16311600,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "processHighWaterRssKiB": 141640
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 19.518500000000017,
+            "before": {
+              "rss": 143953920,
+              "heapTotal": 30273536,
+              "heapUsed": 16313664,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "after": {
+              "rss": 144289792,
+              "heapTotal": 30273536,
+              "heapUsed": 19548928,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "processHighWaterRssKiB": 141640
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 56.91410000000002,
+            "before": {
+              "rss": 144293888,
+              "heapTotal": 30273536,
+              "heapUsed": 19550168,
+              "external": 70167503,
+              "arrayBuffers": 67613267
+            },
+            "after": {
+              "rss": 193593344,
+              "heapTotal": 49410048,
+              "heapUsed": 25366688,
+              "external": 105854477,
+              "arrayBuffers": 103300241
+            },
+            "processHighWaterRssKiB": 189056
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 17.08729999999997,
+            "before": {
+              "rss": 193593344,
+              "heapTotal": 49410048,
+              "heapUsed": 25367928,
+              "external": 105854477,
+              "arrayBuffers": 103300241
+            },
+            "after": {
+              "rss": 159924224,
+              "heapTotal": 49147904,
+              "heapUsed": 12739824,
+              "external": 105854477,
+              "arrayBuffers": 69741085
+            },
+            "processHighWaterRssKiB": 190036
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 11.733699999999999,
+            "before": {
+              "rss": 159924224,
+              "heapTotal": 49147904,
+              "heapUsed": 12741424,
+              "external": 105854477,
+              "arrayBuffers": 69741085
+            },
+            "after": {
+              "rss": 161132544,
+              "heapTotal": 49741824,
+              "heapUsed": 17520824,
+              "external": 105854477,
+              "arrayBuffers": 69741085
+            },
+            "processHighWaterRssKiB": 190036
+          }
+        ],
+        "files": {
+          "packageBytes": 80107,
+          "replacementPackageBytes": 80111,
+          "readBackingBufferBytes": 33554433,
+          "databaseBytes": 622592,
+          "walBytes": 0,
+          "backupBytes": 622592,
+          "excelBytes": 49762
+        },
+        "results": {
+          "firstNetSales": "10000",
+          "firstEstimatedCost": "6000",
+          "firstEstimatedGrossProfit": "4000",
+          "replacementNetSales": "10020",
+          "replacementEstimatedCost": "6000",
+          "replacementEstimatedGrossProfit": "4020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 499.82259999999997,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      },
+      "changed": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "2f3d60798917a34633fda090845eeafb2aaf7409"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 100,
+          "lines": 100,
+          "firstSha256": "bec6917ab0b76434461a8356c4f8191b3a8a1a60abb78c7f88bd8cab71d8d78e",
+          "replacementSha256": "cb9924ed363553192eb835e36e72984cd0dfc45aa821e085093c641d962dc081"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 7.5197,
+            "before": {
+              "rss": 60436480,
+              "heapTotal": 12709888,
+              "heapUsed": 8152920,
+              "external": 3088141,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 65626112,
+              "heapTotal": 17690624,
+              "heapUsed": 11783264,
+              "external": 3010987,
+              "arrayBuffers": 490070
+            },
+            "processHighWaterRssKiB": 64088
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 0.698299999999989,
+            "before": {
+              "rss": 65687552,
+              "heapTotal": 17690624,
+              "heapUsed": 8263128,
+              "external": 3011403,
+              "arrayBuffers": 490486
+            },
+            "after": {
+              "rss": 65687552,
+              "heapTotal": 17690624,
+              "heapUsed": 8288968,
+              "external": 3092343,
+              "arrayBuffers": 571426
+            },
+            "processHighWaterRssKiB": 64148
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 3.133800000000008,
+            "before": {
+              "rss": 65687552,
+              "heapTotal": 17690624,
+              "heapUsed": 8290176,
+              "external": 3092343,
+              "arrayBuffers": 571426
+            },
+            "after": {
+              "rss": 65908736,
+              "heapTotal": 17690624,
+              "heapUsed": 11047784,
+              "external": 3092343,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 64364
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 42.381099999999975,
+            "before": {
+              "rss": 65916928,
+              "heapTotal": 17690624,
+              "heapUsed": 11050808,
+              "external": 3092343,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 66895872,
+              "heapTotal": 17952768,
+              "heapUsed": 12629984,
+              "external": 3093142,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 67056
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 13.245799999999974,
+            "before": {
+              "rss": 66895872,
+              "heapTotal": 17952768,
+              "heapUsed": 12631256,
+              "external": 3093142,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 67108864,
+              "heapTotal": 18214912,
+              "heapUsed": 12499880,
+              "external": 3093142,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 67056
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 2.425799999999981,
+            "before": {
+              "rss": 67125248,
+              "heapTotal": 18214912,
+              "heapUsed": 12530904,
+              "external": 3093142,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 67158016,
+              "heapTotal": 18214912,
+              "heapUsed": 12975288,
+              "external": 3093142,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 67056
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 25.9889,
+            "before": {
+              "rss": 67383296,
+              "heapTotal": 18214912,
+              "heapUsed": 9856736,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 70176768,
+              "heapTotal": 19263488,
+              "heapUsed": 10996520,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 69708
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 2.17410000000001,
+            "before": {
+              "rss": 70189056,
+              "heapTotal": 19263488,
+              "heapUsed": 11000416,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 69459968,
+              "heapTotal": 19263488,
+              "heapUsed": 11746936,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 69708
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 27.16210000000001,
+            "before": {
+              "rss": 69459968,
+              "heapTotal": 19263488,
+              "heapUsed": 11748224,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 80625664,
+              "heapTotal": 32681984,
+              "heapUsed": 19704832,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "processHighWaterRssKiB": 79880
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 4.120100000000036,
+            "before": {
+              "rss": 81334272,
+              "heapTotal": 32681984,
+              "heapUsed": 20422696,
+              "external": 3124413,
+              "arrayBuffers": 570177
+            },
+            "after": {
+              "rss": 81764352,
+              "heapTotal": 30752768,
+              "heapUsed": 17407080,
+              "external": 3204524,
+              "arrayBuffers": 650288
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 3.3583999999999605,
+            "before": {
+              "rss": 81203200,
+              "heapTotal": 30535680,
+              "heapUsed": 10599600,
+              "external": 3204940,
+              "arrayBuffers": 584924
+            },
+            "after": {
+              "rss": 81252352,
+              "heapTotal": 30535680,
+              "heapUsed": 10620160,
+              "external": 3220104,
+              "arrayBuffers": 665868
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 4.816599999999994,
+            "before": {
+              "rss": 81252352,
+              "heapTotal": 30535680,
+              "heapUsed": 10643968,
+              "external": 3220104,
+              "arrayBuffers": 665868
+            },
+            "after": {
+              "rss": 80969728,
+              "heapTotal": 30535680,
+              "heapUsed": 18425744,
+              "external": 3220104,
+              "arrayBuffers": 665868
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 39.44380000000001,
+            "before": {
+              "rss": 80969728,
+              "heapTotal": 30535680,
+              "heapUsed": 18427440,
+              "external": 3220104,
+              "arrayBuffers": 665868
+            },
+            "after": {
+              "rss": 82071552,
+              "heapTotal": 30535680,
+              "heapUsed": 15990216,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 14.845100000000002,
+            "before": {
+              "rss": 82071552,
+              "heapTotal": 30535680,
+              "heapUsed": 15991520,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "after": {
+              "rss": 82292736,
+              "heapTotal": 30535680,
+              "heapUsed": 13927824,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 13.444900000000018,
+            "before": {
+              "rss": 82292736,
+              "heapTotal": 30535680,
+              "heapUsed": 13929128,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "after": {
+              "rss": 81891328,
+              "heapTotal": 30535680,
+              "heapUsed": 14579352,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 28.024900000000002,
+            "before": {
+              "rss": 81891328,
+              "heapTotal": 30535680,
+              "heapUsed": 14581416,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "after": {
+              "rss": 82272256,
+              "heapTotal": 30535680,
+              "heapUsed": 17823440,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "processHighWaterRssKiB": 82636
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 55.585000000000036,
+            "before": {
+              "rss": 82272256,
+              "heapTotal": 30535680,
+              "heapUsed": 17824680,
+              "external": 3219271,
+              "arrayBuffers": 665035
+            },
+            "after": {
+              "rss": 120852480,
+              "heapTotal": 48885760,
+              "heapUsed": 16314824,
+              "external": 38906251,
+              "arrayBuffers": 36352015
+            },
+            "processHighWaterRssKiB": 118020
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 17.243499999999926,
+            "before": {
+              "rss": 120856576,
+              "heapTotal": 48885760,
+              "heapUsed": 16521688,
+              "external": 38906251,
+              "arrayBuffers": 36352015
+            },
+            "after": {
+              "rss": 85037056,
+              "heapTotal": 48885760,
+              "heapUsed": 12042368,
+              "external": 38906251,
+              "arrayBuffers": 714384
+            },
+            "processHighWaterRssKiB": 119304
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 11.745900000000006,
+            "before": {
+              "rss": 85037056,
+              "heapTotal": 48885760,
+              "heapUsed": 12043968,
+              "external": 38906251,
+              "arrayBuffers": 714384
+            },
+            "after": {
+              "rss": 85803008,
+              "heapTotal": 49479680,
+              "heapUsed": 16811784,
+              "external": 38906251,
+              "arrayBuffers": 714384
+            },
+            "processHighWaterRssKiB": 119304
+          }
+        ],
+        "files": {
+          "packageBytes": 80107,
+          "replacementPackageBytes": 80111,
+          "readBackingBufferBytes": 80107,
+          "databaseBytes": 622592,
+          "walBytes": 0,
+          "backupBytes": 622592,
+          "excelBytes": 49765
+        },
+        "results": {
+          "firstNetSales": "10000",
+          "firstEstimatedCost": "6000",
+          "firstEstimatedGrossProfit": "4000",
+          "replacementNetSales": "10020",
+          "replacementEstimatedCost": "6000",
+          "replacementEstimatedGrossProfit": "4020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 480.8028,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      }
+    },
+    {
+      "documents": 1000,
+      "baseline": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "4b6bf97b430b8349f8d18204706985cf97232667"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 1000,
+          "lines": 1000,
+          "firstSha256": "8c982a5b258d20d65ecdb3fad0554fa82e4e213a9f892fa5040a957d3eac58f2",
+          "replacementSha256": "9bd41f594ae65f806a187f6fbbe16f83be177988d41de9e44eb546f2396935bc"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 35.897800000000004,
+            "before": {
+              "rss": 54308864,
+              "heapTotal": 13234176,
+              "heapUsed": 8136008,
+              "external": 3088141,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 67366912,
+              "heapTotal": 22970368,
+              "heapUsed": 15410248,
+              "external": 3725589,
+              "arrayBuffers": 1204672
+            },
+            "processHighWaterRssKiB": 65924
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 4.997500000000002,
+            "before": {
+              "rss": 66936832,
+              "heapTotal": 22970368,
+              "heapUsed": 15479912,
+              "external": 3726213,
+              "arrayBuffers": 1205296
+            },
+            "after": {
+              "rss": 100515840,
+              "heapTotal": 22970368,
+              "heapUsed": 15505264,
+              "external": 37281478,
+              "arrayBuffers": 34760561
+            },
+            "processHighWaterRssKiB": 98160
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 34.485299999999995,
+            "before": {
+              "rss": 100515840,
+              "heapTotal": 22970368,
+              "heapUsed": 15506472,
+              "external": 37281478,
+              "arrayBuffers": 34760561
+            },
+            "after": {
+              "rss": 110399488,
+              "heapTotal": 32153600,
+              "heapUsed": 20720552,
+              "external": 37214242,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 108696
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 101.76719999999995,
+            "before": {
+              "rss": 110403584,
+              "heapTotal": 32153600,
+              "heapUsed": 20745992,
+              "external": 37214242,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 135475200,
+              "heapTotal": 56283136,
+              "heapUsed": 26895136,
+              "external": 37216290,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 132300
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 38.44870000000003,
+            "before": {
+              "rss": 135475200,
+              "heapTotal": 56283136,
+              "heapUsed": 26896408,
+              "external": 37216290,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 134299648,
+              "heapTotal": 54366208,
+              "heapUsed": 30315648,
+              "external": 37216290,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 133944
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 7.085100000000011,
+            "before": {
+              "rss": 134332416,
+              "heapTotal": 54366208,
+              "heapUsed": 30337672,
+              "external": 37216290,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 135143424,
+              "heapTotal": 54366208,
+              "heapUsed": 34566904,
+              "external": 37216290,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 133944
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 104.70250000000004,
+            "before": {
+              "rss": 135196672,
+              "heapTotal": 54890496,
+              "heapUsed": 23258008,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 136867840,
+              "heapTotal": 87588864,
+              "heapUsed": 22420280,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 141464
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 15.496999999999957,
+            "before": {
+              "rss": 136867840,
+              "heapTotal": 87588864,
+              "heapUsed": 22446544,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 137207808,
+              "heapTotal": 87756800,
+              "heapUsed": 29368568,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 141464
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 144.0706,
+            "before": {
+              "rss": 137207808,
+              "heapTotal": 87756800,
+              "heapUsed": 29369856,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 252252160,
+              "heapTotal": 197513216,
+              "heapUsed": 90416080,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "processHighWaterRssKiB": 257592
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 32.52080000000001,
+            "before": {
+              "rss": 254652416,
+              "heapTotal": 197681152,
+              "heapUsed": 97399552,
+              "external": 37247561,
+              "arrayBuffers": 34693325
+            },
+            "after": {
+              "rss": 268255232,
+              "heapTotal": 181248000,
+              "heapUsed": 80260208,
+              "external": 38042274,
+              "arrayBuffers": 35488038
+            },
+            "processHighWaterRssKiB": 279648
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 5.387200000000007,
+            "before": {
+              "rss": 252358656,
+              "heapTotal": 173404160,
+              "heapUsed": 34568448,
+              "external": 38042898,
+              "arrayBuffers": 35488662
+            },
+            "after": {
+              "rss": 285917184,
+              "heapTotal": 173404160,
+              "heapUsed": 34588656,
+              "external": 71598163,
+              "arrayBuffers": 69043927
+            },
+            "processHighWaterRssKiB": 279648
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 26.78800000000001,
+            "before": {
+              "rss": 285917184,
+              "heapTotal": 173404160,
+              "heapUsed": 34612464,
+              "external": 71598163,
+              "arrayBuffers": 69043927
+            },
+            "after": {
+              "rss": 294453248,
+              "heapTotal": 179240960,
+              "heapUsed": 91041728,
+              "external": 71598163,
+              "arrayBuffers": 69043927
+            },
+            "processHighWaterRssKiB": 287552
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 99.81880000000001,
+            "before": {
+              "rss": 294457344,
+              "heapTotal": 179240960,
+              "heapUsed": 91043424,
+              "external": 71598163,
+              "arrayBuffers": 69043927
+            },
+            "after": {
+              "rss": 300466176,
+              "heapTotal": 179236864,
+              "heapUsed": 62578824,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "processHighWaterRssKiB": 293424
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 44.320100000000025,
+            "before": {
+              "rss": 300466176,
+              "heapTotal": 179236864,
+              "heapUsed": 62589680,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "after": {
+              "rss": 296538112,
+              "heapTotal": 174678016,
+              "heapUsed": 52805736,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "processHighWaterRssKiB": 296004
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 82.46270000000004,
+            "before": {
+              "rss": 296538112,
+              "heapTotal": 174678016,
+              "heapUsed": 52807040,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "after": {
+              "rss": 297533440,
+              "heapTotal": 175894528,
+              "heapUsed": 71435504,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "processHighWaterRssKiB": 296004
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 61.283300000000054,
+            "before": {
+              "rss": 297533440,
+              "heapTotal": 175894528,
+              "heapUsed": 71437568,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "after": {
+              "rss": 297918464,
+              "heapTotal": 176062464,
+              "heapUsed": 103060552,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "processHighWaterRssKiB": 296004
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 239.44079999999985,
+            "before": {
+              "rss": 297918464,
+              "heapTotal": 176062464,
+              "heapUsed": 103061792,
+              "external": 71597331,
+              "arrayBuffers": 69043095
+            },
+            "after": {
+              "rss": 362741760,
+              "heapTotal": 198242304,
+              "heapUsed": 108132856,
+              "external": 122537000,
+              "arrayBuffers": 119982764
+            },
+            "processHighWaterRssKiB": 354240
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 34.82769999999982,
+            "before": {
+              "rss": 362741760,
+              "heapTotal": 198242304,
+              "heapUsed": 108250272,
+              "external": 122537000,
+              "arrayBuffers": 119982764
+            },
+            "after": {
+              "rss": 332873728,
+              "heapTotal": 188264448,
+              "heapUsed": 43584936,
+              "external": 122537000,
+              "arrayBuffers": 89853260
+            },
+            "processHighWaterRssKiB": 354712
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 62.63489999999979,
+            "before": {
+              "rss": 332873728,
+              "heapTotal": 188264448,
+              "heapUsed": 43586536,
+              "external": 122537000,
+              "arrayBuffers": 89853260
+            },
+            "after": {
+              "rss": 339808256,
+              "heapTotal": 194260992,
+              "heapUsed": 87038608,
+              "external": 122537000,
+              "arrayBuffers": 89853260
+            },
+            "processHighWaterRssKiB": 354712
+          }
+        ],
+        "files": {
+          "packageBytes": 794709,
+          "replacementPackageBytes": 794713,
+          "readBackingBufferBytes": 33554433,
+          "databaseBytes": 5128192,
+          "walBytes": 0,
+          "backupBytes": 5128192,
+          "excelBytes": 248050
+        },
+        "results": {
+          "firstNetSales": "100000",
+          "firstEstimatedCost": "60000",
+          "firstEstimatedGrossProfit": "40000",
+          "replacementNetSales": "100020",
+          "replacementEstimatedCost": "60000",
+          "replacementEstimatedGrossProfit": "40020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 1480.4864,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      },
+      "changed": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "2f3d60798917a34633fda090845eeafb2aaf7409"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 1000,
+          "lines": 1000,
+          "firstSha256": "8c982a5b258d20d65ecdb3fad0554fa82e4e213a9f892fa5040a957d3eac58f2",
+          "replacementSha256": "9bd41f594ae65f806a187f6fbbe16f83be177988d41de9e44eb546f2396935bc"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 34.3802,
+            "before": {
+              "rss": 60358656,
+              "heapTotal": 12709888,
+              "heapUsed": 8083720,
+              "external": 2930840,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 74080256,
+              "heapTotal": 22970368,
+              "heapUsed": 15339984,
+              "external": 3725589,
+              "arrayBuffers": 1204672
+            },
+            "processHighWaterRssKiB": 72364
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 0.9946000000000197,
+            "before": {
+              "rss": 72314880,
+              "heapTotal": 22970368,
+              "heapUsed": 15429304,
+              "external": 3726213,
+              "arrayBuffers": 1205296
+            },
+            "after": {
+              "rss": 73121792,
+              "heapTotal": 22970368,
+              "heapUsed": 15455144,
+              "external": 4521755,
+              "arrayBuffers": 2000838
+            },
+            "processHighWaterRssKiB": 72428
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 30.172600000000017,
+            "before": {
+              "rss": 73121792,
+              "heapTotal": 22970368,
+              "heapUsed": 15456352,
+              "external": 4521755,
+              "arrayBuffers": 2000838
+            },
+            "after": {
+              "rss": 88489984,
+              "heapTotal": 35319808,
+              "heapUsed": 21337368,
+              "external": 4520298,
+              "arrayBuffers": 1999381
+            },
+            "processHighWaterRssKiB": 86568
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 103.97449999999998,
+            "before": {
+              "rss": 88145920,
+              "heapTotal": 35319808,
+              "heapUsed": 21340392,
+              "external": 4520298,
+              "arrayBuffers": 1999381
+            },
+            "after": {
+              "rss": 106729472,
+              "heapTotal": 53678080,
+              "heapUsed": 31420600,
+              "external": 4456566,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 104228
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 35.929899999999975,
+            "before": {
+              "rss": 106729472,
+              "heapTotal": 53678080,
+              "heapUsed": 31444240,
+              "external": 4456566,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 103387136,
+              "heapTotal": 51019776,
+              "heapUsed": 19798456,
+              "external": 4456566,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 104884
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 7.9295999999999935,
+            "before": {
+              "rss": 103395328,
+              "heapTotal": 51019776,
+              "heapUsed": 19824488,
+              "external": 4456566,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 104112128,
+              "heapTotal": 51019776,
+              "heapUsed": 24058560,
+              "external": 4456566,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 104884
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 101.27100000000002,
+            "before": {
+              "rss": 104206336,
+              "heapTotal": 51019776,
+              "heapUsed": 28157544,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 111763456,
+              "heapTotal": 90771456,
+              "heapUsed": 38433720,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 114052
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 16.152600000000007,
+            "before": {
+              "rss": 111763456,
+              "heapTotal": 90771456,
+              "heapUsed": 38437616,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 117772288,
+              "heapTotal": 90939392,
+              "heapUsed": 45370944,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 117600
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 157.59429999999998,
+            "before": {
+              "rss": 117772288,
+              "heapTotal": 90939392,
+              "heapUsed": 45372232,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 222728192,
+              "heapTotal": 193798144,
+              "heapUsed": 87778656,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "processHighWaterRssKiB": 227316
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 28.933200000000056,
+            "before": {
+              "rss": 221868032,
+              "heapTotal": 193966080,
+              "heapUsed": 94773120,
+              "external": 4487837,
+              "arrayBuffers": 1933601
+            },
+            "after": {
+              "rss": 223834112,
+              "heapTotal": 186318848,
+              "heapUsed": 86749936,
+              "external": 5282550,
+              "arrayBuffers": 2728314
+            },
+            "processHighWaterRssKiB": 227316
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 1.4347999999999956,
+            "before": {
+              "rss": 219475968,
+              "heapTotal": 186318848,
+              "heapUsed": 86831080,
+              "external": 5283174,
+              "arrayBuffers": 2728938
+            },
+            "after": {
+              "rss": 220237824,
+              "heapTotal": 186318848,
+              "heapUsed": 86851576,
+              "external": 6078720,
+              "arrayBuffers": 3524484
+            },
+            "processHighWaterRssKiB": 227316
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 33.83050000000003,
+            "before": {
+              "rss": 220237824,
+              "heapTotal": 186318848,
+              "heapUsed": 86853272,
+              "external": 6078720,
+              "arrayBuffers": 3524484
+            },
+            "after": {
+              "rss": 261439488,
+              "heapTotal": 195764224,
+              "heapUsed": 83281352,
+              "external": 6078720,
+              "arrayBuffers": 3523027
+            },
+            "processHighWaterRssKiB": 255316
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 95.60000000000002,
+            "before": {
+              "rss": 261447680,
+              "heapTotal": 195764224,
+              "heapUsed": 83282648,
+              "external": 6078720,
+              "arrayBuffers": 3523027
+            },
+            "after": {
+              "rss": 264564736,
+              "heapTotal": 201744384,
+              "heapUsed": 123222072,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "processHighWaterRssKiB": 259604
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 48.46040000000005,
+            "before": {
+              "rss": 264564736,
+              "heapTotal": 201744384,
+              "heapUsed": 123223376,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "after": {
+              "rss": 259670016,
+              "heapTotal": 196476928,
+              "heapUsed": 110633496,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "processHighWaterRssKiB": 260224
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 82.13569999999993,
+            "before": {
+              "rss": 259670016,
+              "heapTotal": 196476928,
+              "heapUsed": 110634800,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "after": {
+              "rss": 259981312,
+              "heapTotal": 196530176,
+              "heapUsed": 127331168,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "processHighWaterRssKiB": 260224
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 73.99720000000002,
+            "before": {
+              "rss": 259981312,
+              "heapTotal": 196530176,
+              "heapUsed": 127333232,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "after": {
+              "rss": 261513216,
+              "heapTotal": 198103040,
+              "heapUsed": 101230864,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "processHighWaterRssKiB": 260224
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 232.8198,
+            "before": {
+              "rss": 261513216,
+              "heapTotal": 198103040,
+              "heapUsed": 101232104,
+              "external": 6077263,
+              "arrayBuffers": 3523027
+            },
+            "after": {
+              "rss": 326991872,
+              "heapTotal": 219664384,
+              "heapUsed": 98651440,
+              "external": 57016938,
+              "arrayBuffers": 54462702
+            },
+            "processHighWaterRssKiB": 319328
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 46.1407999999999,
+            "before": {
+              "rss": 326991872,
+              "heapTotal": 219664384,
+              "heapUsed": 98652680,
+              "external": 57016938,
+              "arrayBuffers": 54462702
+            },
+            "after": {
+              "rss": 329183232,
+              "heapTotal": 219664384,
+              "heapUsed": 98665488,
+              "external": 57016938,
+              "arrayBuffers": 54462702
+            },
+            "processHighWaterRssKiB": 321468
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 66.97090000000003,
+            "before": {
+              "rss": 329183232,
+              "heapTotal": 219664384,
+              "heapUsed": 98667088,
+              "external": 57016938,
+              "arrayBuffers": 54462702
+            },
+            "after": {
+              "rss": 335708160,
+              "heapTotal": 225923072,
+              "heapUsed": 142010808,
+              "external": 57016938,
+              "arrayBuffers": 54462702
+            },
+            "processHighWaterRssKiB": 333148
+          }
+        ],
+        "files": {
+          "packageBytes": 794709,
+          "replacementPackageBytes": 794713,
+          "readBackingBufferBytes": 794709,
+          "databaseBytes": 5128192,
+          "walBytes": 0,
+          "backupBytes": 5128192,
+          "excelBytes": 248055
+        },
+        "results": {
+          "firstNetSales": "100000",
+          "firstEstimatedCost": "60000",
+          "firstEstimatedGrossProfit": "40000",
+          "replacementNetSales": "100020",
+          "replacementEstimatedCost": "60000",
+          "replacementEstimatedGrossProfit": "40020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 1513.4427,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      }
+    },
+    {
+      "documents": 10000,
+      "baseline": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "4b6bf97b430b8349f8d18204706985cf97232667"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 10000,
+          "lines": 10000,
+          "firstSha256": "529374b7dfb239083ccfc3e7e8e622f5bbd2fe90f6fff8f981f840edc59fbb96",
+          "replacementSha256": "d3af7bbc4459bb65af41536c14bad347d81c71fa6a79e41471f425e5557bdb72"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 273.1855,
+            "before": {
+              "rss": 54226944,
+              "heapTotal": 12709888,
+              "heapUsed": 8206472,
+              "external": 2930840,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 184799232,
+              "heapTotal": 131432448,
+              "heapUsed": 76465576,
+              "external": 10806019,
+              "arrayBuffers": 8285102
+            },
+            "processHighWaterRssKiB": 180468
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 10.077200000000175,
+            "before": {
+              "rss": 185098240,
+              "heapTotal": 131432448,
+              "heapUsed": 76554080,
+              "external": 10809555,
+              "arrayBuffers": 8288638
+            },
+            "after": {
+              "rss": 218685440,
+              "heapTotal": 131432448,
+              "heapUsed": 76580056,
+              "external": 44364820,
+              "arrayBuffers": 41843903
+            },
+            "processHighWaterRssKiB": 213560
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 272.07400000000007,
+            "before": {
+              "rss": 218685440,
+              "heapTotal": 131432448,
+              "heapUsed": 76581264,
+              "external": 44364820,
+              "arrayBuffers": 41843903
+            },
+            "after": {
+              "rss": 298811392,
+              "heapTotal": 193773568,
+              "heapUsed": 98125256,
+              "external": 60201666,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 291808
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 719.9585,
+            "before": {
+              "rss": 298815488,
+              "heapTotal": 193773568,
+              "heapUsed": 98150696,
+              "external": 60201666,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 381759488,
+              "heapTotal": 273010688,
+              "heapUsed": 143545784,
+              "external": 60203714,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 372812
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 262.3647000000001,
+            "before": {
+              "rss": 381759488,
+              "heapTotal": 273010688,
+              "heapUsed": 143569424,
+              "external": 60203714,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 397598720,
+              "heapTotal": 286769152,
+              "heapUsed": 212693344,
+              "external": 60203714,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 393988
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 81.31849999999986,
+            "before": {
+              "rss": 397611008,
+              "heapTotal": 286769152,
+              "heapUsed": 212722000,
+              "external": 60203714,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 400183296,
+              "heapTotal": 289611776,
+              "heapUsed": 197931832,
+              "external": 60203714,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 394600
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 848.5960999999998,
+            "before": {
+              "rss": 403972096,
+              "heapTotal": 294330368,
+              "heapUsed": 177042944,
+              "external": 60234985,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 401494016,
+              "heapTotal": 249778176,
+              "heapUsed": 144003808,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 454732
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 158.52049999999963,
+            "before": {
+              "rss": 401494016,
+              "heapTotal": 249778176,
+              "heapUsed": 144030072,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 405348352,
+              "heapTotal": 271319040,
+              "heapUsed": 200168704,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 454732
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 1279.6995000000002,
+            "before": {
+              "rss": 405348352,
+              "heapTotal": 271319040,
+              "heapUsed": 200169992,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 767553536,
+              "heapTotal": 624271360,
+              "heapUsed": 551710600,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "processHighWaterRssKiB": 965344
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 245.70740000000023,
+            "before": {
+              "rss": 806506496,
+              "heapTotal": 675065856,
+              "heapUsed": 594332888,
+              "external": 44393563,
+              "arrayBuffers": 41839327
+            },
+            "after": {
+              "rss": 901722112,
+              "heapTotal": 763023360,
+              "heapUsed": 688985656,
+              "external": 52334278,
+              "arrayBuffers": 49780042
+            },
+            "processHighWaterRssKiB": 965344
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 5.703599999999824,
+            "before": {
+              "rss": 885878784,
+              "heapTotal": 747180032,
+              "heapUsed": 611520208,
+              "external": 52337814,
+              "arrayBuffers": 49783578
+            },
+            "after": {
+              "rss": 919437312,
+              "heapTotal": 747180032,
+              "heapUsed": 611540464,
+              "external": 85893079,
+              "arrayBuffers": 83338843
+            },
+            "processHighWaterRssKiB": 965344
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 241.09860000000026,
+            "before": {
+              "rss": 919437312,
+              "heapTotal": 747180032,
+              "heapUsed": 611542160,
+              "external": 85893079,
+              "arrayBuffers": 83338843
+            },
+            "after": {
+              "rss": 986255360,
+              "heapTotal": 797790208,
+              "heapUsed": 716907168,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "processHighWaterRssKiB": 965344
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 749.9805999999999,
+            "before": {
+              "rss": 986255360,
+              "heapTotal": 797790208,
+              "heapUsed": 716908464,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "after": {
+              "rss": 741507072,
+              "heapTotal": 533225472,
+              "heapUsed": 403393632,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 415.71419999999944,
+            "before": {
+              "rss": 741507072,
+              "heapTotal": 533225472,
+              "heapUsed": 403394936,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "after": {
+              "rss": 739819520,
+              "heapTotal": 577925120,
+              "heapUsed": 468106872,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 852.8641000000007,
+            "before": {
+              "rss": 739819520,
+              "heapTotal": 577925120,
+              "heapUsed": 468108176,
+              "external": 101730141,
+              "arrayBuffers": 83334475
+            },
+            "after": {
+              "rss": 701972480,
+              "heapTotal": 459972608,
+              "heapUsed": 352370544,
+              "external": 85883737,
+              "arrayBuffers": 83334475
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 498.9803000000011,
+            "before": {
+              "rss": 701972480,
+              "heapTotal": 459972608,
+              "heapUsed": 352372608,
+              "external": 85883737,
+              "arrayBuffers": 83334475
+            },
+            "after": {
+              "rss": 701456384,
+              "heapTotal": 546971648,
+              "heapUsed": 448466480,
+              "external": 85883737,
+              "arrayBuffers": 83334475
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 1875.126400000001,
+            "before": {
+              "rss": 701464576,
+              "heapTotal": 546971648,
+              "heapUsed": 448467720,
+              "external": 85883737,
+              "arrayBuffers": 83334475
+            },
+            "after": {
+              "rss": 945041408,
+              "heapTotal": 534360064,
+              "heapUsed": 348446752,
+              "external": 198073065,
+              "arrayBuffers": 195523803
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 199.72520000000077,
+            "before": {
+              "rss": 945041408,
+              "heapTotal": 534360064,
+              "heapUsed": 348447992,
+              "external": 198073065,
+              "arrayBuffers": 195523803
+            },
+            "after": {
+              "rss": 884305920,
+              "heapTotal": 484028416,
+              "heapUsed": 345394432,
+              "external": 198073065,
+              "arrayBuffers": 113629151
+            },
+            "processHighWaterRssKiB": 986712
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 645.6025999999983,
+            "before": {
+              "rss": 884305920,
+              "heapTotal": 484028416,
+              "heapUsed": 345396032,
+              "external": 198073065,
+              "arrayBuffers": 113629151
+            },
+            "after": {
+              "rss": 945311744,
+              "heapTotal": 639188992,
+              "heapUsed": 554557184,
+              "external": 116178413,
+              "arrayBuffers": 113629151
+            },
+            "processHighWaterRssKiB": 986712
+          }
+        ],
+        "files": {
+          "packageBytes": 7940711,
+          "replacementPackageBytes": 7940715,
+          "readBackingBufferBytes": 33554433,
+          "databaseBytes": 50532352,
+          "walBytes": 0,
+          "backupBytes": 50532352,
+          "excelBytes": 2244922
+        },
+        "results": {
+          "firstNetSales": "1000000",
+          "firstEstimatedCost": "600000",
+          "firstEstimatedGrossProfit": "400000",
+          "replacementNetSales": "1000020",
+          "replacementEstimatedCost": "600000",
+          "replacementEstimatedGrossProfit": "400020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 11470.4571,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      },
+      "changed": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "2f3d60798917a34633fda090845eeafb2aaf7409"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 10000,
+          "lines": 10000,
+          "firstSha256": "529374b7dfb239083ccfc3e7e8e622f5bbd2fe90f6fff8f981f840edc59fbb96",
+          "replacementSha256": "d3af7bbc4459bb65af41536c14bad347d81c71fa6a79e41471f425e5557bdb72"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 280.9301,
+            "before": {
+              "rss": 60465152,
+              "heapTotal": 12709888,
+              "heapUsed": 8085768,
+              "external": 2930840,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 191123456,
+              "heapTotal": 131956736,
+              "heapUsed": 68468272,
+              "external": 10806019,
+              "arrayBuffers": 8285102
+            },
+            "processHighWaterRssKiB": 186644
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 3.2422999999998865,
+            "before": {
+              "rss": 191332352,
+              "heapTotal": 131956736,
+              "heapUsed": 68556832,
+              "external": 10809555,
+              "arrayBuffers": 8288638
+            },
+            "after": {
+              "rss": 199286784,
+              "heapTotal": 131956736,
+              "heapUsed": 68583320,
+              "external": 18751099,
+              "arrayBuffers": 16230182
+            },
+            "processHighWaterRssKiB": 194616
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 277.7844,
+            "before": {
+              "rss": 199286784,
+              "heapTotal": 131956736,
+              "heapUsed": 68584528,
+              "external": 18751099,
+              "arrayBuffers": 16230182
+            },
+            "after": {
+              "rss": 298426368,
+              "heapTotal": 197799936,
+              "heapUsed": 91417832,
+              "external": 34587944,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 291432
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 688.4954,
+            "before": {
+              "rss": 298434560,
+              "heapTotal": 197799936,
+              "heapUsed": 91443272,
+              "external": 34587944,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 396001280,
+              "heapTotal": 291692544,
+              "heapUsed": 220615328,
+              "external": 50431414,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 386720
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 267.25139999999965,
+            "before": {
+              "rss": 396001280,
+              "heapTotal": 291692544,
+              "heapUsed": 220616600,
+              "external": 50431414,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 290459648,
+              "heapTotal": 187539456,
+              "heapUsed": 103483088,
+              "external": 18748570,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 389868
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 82.30450000000019,
+            "before": {
+              "rss": 290467840,
+              "heapTotal": 187539456,
+              "heapUsed": 103534136,
+              "external": 18748570,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 284549120,
+              "heapTotal": 190582784,
+              "heapUsed": 92736504,
+              "external": 18748570,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 389868
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 848.6745000000001,
+            "before": {
+              "rss": 285040640,
+              "heapTotal": 197136384,
+              "heapUsed": 71691832,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 374161408,
+              "heapTotal": 297426944,
+              "heapUsed": 193319200,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 391020
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 185.99509999999964,
+            "before": {
+              "rss": 374161408,
+              "heapTotal": 297426944,
+              "heapUsed": 193323096,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 385810432,
+              "heapTotal": 351891456,
+              "heapUsed": 176836312,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 414120
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 1249.7211000000007,
+            "before": {
+              "rss": 385810432,
+              "heapTotal": 351891456,
+              "heapUsed": 176859968,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 933765120,
+              "heapTotal": 824135680,
+              "heapUsed": 750824056,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 250.77080000000024,
+            "before": {
+              "rss": 925253632,
+              "heapTotal": 815509504,
+              "heapUsed": 734884952,
+              "external": 18779841,
+              "arrayBuffers": 16225605
+            },
+            "after": {
+              "rss": 1024552960,
+              "heapTotal": 906022912,
+              "heapUsed": 775843528,
+              "external": 26720556,
+              "arrayBuffers": 24166320
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 2.892899999999827,
+            "before": {
+              "rss": 596455424,
+              "heapTotal": 456519680,
+              "heapUsed": 273586288,
+              "external": 26724092,
+              "arrayBuffers": 24169856
+            },
+            "after": {
+              "rss": 604397568,
+              "heapTotal": 456519680,
+              "heapUsed": 273606784,
+              "external": 34665640,
+              "arrayBuffers": 32111404
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 269.20230000000083,
+            "before": {
+              "rss": 604397568,
+              "heapTotal": 456519680,
+              "heapUsed": 273630592,
+              "external": 34665640,
+              "arrayBuffers": 32111404
+            },
+            "after": {
+              "rss": 652034048,
+              "heapTotal": 489566208,
+              "heapUsed": 380836376,
+              "external": 50506237,
+              "arrayBuffers": 32110571
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 701.1793000000007,
+            "before": {
+              "rss": 652034048,
+              "heapTotal": 489566208,
+              "heapUsed": 380838072,
+              "external": 50506237,
+              "arrayBuffers": 32110571
+            },
+            "after": {
+              "rss": 718839808,
+              "heapTotal": 542490624,
+              "heapUsed": 428808360,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 652.3044,
+            "before": {
+              "rss": 718839808,
+              "heapTotal": 542490624,
+              "heapUsed": 428809664,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "after": {
+              "rss": 717254656,
+              "heapTotal": 585093120,
+              "heapUsed": 503207640,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 1030.2290000000003,
+            "before": {
+              "rss": 717254656,
+              "heapTotal": 585093120,
+              "heapUsed": 503208944,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "after": {
+              "rss": 823209984,
+              "heapTotal": 690450432,
+              "heapUsed": 574564560,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 530.7855,
+            "before": {
+              "rss": 823209984,
+              "heapTotal": 690450432,
+              "heapUsed": 574566624,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "after": {
+              "rss": 906448896,
+              "heapTotal": 771682304,
+              "heapUsed": 670972072,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "processHighWaterRssKiB": 1013456
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 2415.1332999999995,
+            "before": {
+              "rss": 906448896,
+              "heapTotal": 771682304,
+              "heapUsed": 670973312,
+              "external": 66347667,
+              "arrayBuffers": 32110571
+            },
+            "after": {
+              "rss": 1023631360,
+              "heapTotal": 492679168,
+              "heapUsed": 346778760,
+              "external": 103308361,
+              "arrayBuffers": 100759099
+            },
+            "processHighWaterRssKiB": 1142776
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 319.66979999999967,
+            "before": {
+              "rss": 1023631360,
+              "heapTotal": 492679168,
+              "heapUsed": 346780000,
+              "external": 103308361,
+              "arrayBuffers": 100759099
+            },
+            "after": {
+              "rss": 1025536000,
+              "heapTotal": 492679168,
+              "heapUsed": 346633800,
+              "external": 103308361,
+              "arrayBuffers": 100759099
+            },
+            "processHighWaterRssKiB": 1142776
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 657.3431999999993,
+            "before": {
+              "rss": 1025536000,
+              "heapTotal": 492679168,
+              "heapUsed": 346635400,
+              "external": 103308361,
+              "arrayBuffers": 100759099
+            },
+            "after": {
+              "rss": 1077981184,
+              "heapTotal": 640499712,
+              "heapUsed": 555384800,
+              "external": 96382909,
+              "arrayBuffers": 93833647
+            },
+            "processHighWaterRssKiB": 1142776
+          }
+        ],
+        "files": {
+          "packageBytes": 7940711,
+          "replacementPackageBytes": 7940715,
+          "readBackingBufferBytes": 7940711,
+          "databaseBytes": 50532352,
+          "walBytes": 0,
+          "backupBytes": 50532352,
+          "excelBytes": 2244927
+        },
+        "results": {
+          "firstNetSales": "1000000",
+          "firstEstimatedCost": "600000",
+          "firstEstimatedGrossProfit": "400000",
+          "replacementNetSales": "1000020",
+          "replacementEstimatedCost": "600000",
+          "replacementEstimatedGrossProfit": "400020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 12385.1877,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      }
+    },
+    {
+      "documents": 25000,
+      "baseline": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "e51c34da40bb0498063309628854f6c98cbe3ecb"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 25000,
+          "lines": 25000,
+          "firstSha256": "815212164f05b81be34270c11eb433803da10dd6676f6e67ac0688e9ae89c95c",
+          "replacementSha256": "3ac8de837d851dfb39bf2ce75ea1f7c4cc83d28c4e5a3a6d26a0069be892d155"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 628.9267,
+            "before": {
+              "rss": 53985280,
+              "heapTotal": 12972032,
+              "heapUsed": 8117800,
+              "external": 3088141,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 358105088,
+              "heapTotal": 289005568,
+              "heapUsed": 155612984,
+              "external": 22716019,
+              "arrayBuffers": 20195102
+            },
+            "processHighWaterRssKiB": 349712
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 14.545100000000048,
+            "before": {
+              "rss": 292950016,
+              "heapTotal": 168566784,
+              "heapUsed": 27188960,
+              "external": 22724131,
+              "arrayBuffers": 20203214
+            },
+            "after": {
+              "rss": 326520832,
+              "heapTotal": 168566784,
+              "heapUsed": 27214936,
+              "external": 56279396,
+              "arrayBuffers": 53758479
+            },
+            "processHighWaterRssKiB": 349728
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 646.2669999999998,
+            "before": {
+              "rss": 326520832,
+              "heapTotal": 168566784,
+              "heapUsed": 27216144,
+              "external": 56279396,
+              "arrayBuffers": 53758479
+            },
+            "after": {
+              "rss": 442732544,
+              "heapTotal": 300015616,
+              "heapUsed": 168335752,
+              "external": 95871666,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 432356
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 1720.1151,
+            "before": {
+              "rss": 442736640,
+              "heapTotal": 300015616,
+              "heapUsed": 168361192,
+              "external": 95871666,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 670937088,
+              "heapTotal": 523968512,
+              "heapUsed": 450523760,
+              "external": 95873714,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 655212
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 687.5030000000002,
+            "before": {
+              "rss": 670937088,
+              "heapTotal": 523968512,
+              "heapUsed": 450525032,
+              "external": 95873714,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 506916864,
+              "heapTotal": 233336832,
+              "heapUsed": 151080536,
+              "external": 56272292,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 716264
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 222.8750999999993,
+            "before": {
+              "rss": 507047936,
+              "heapTotal": 233336832,
+              "heapUsed": 151131584,
+              "external": 56272292,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 498556928,
+              "heapTotal": 236060672,
+              "heapUsed": 166624704,
+              "external": 56272292,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 716264
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 2126.7124000000003,
+            "before": {
+              "rss": 498827264,
+              "heapTotal": 260763648,
+              "heapUsed": 150266152,
+              "external": 56303563,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 625876992,
+              "heapTotal": 503373824,
+              "heapUsed": 307325168,
+              "external": 56303563,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 716264
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 429.9504999999999,
+            "before": {
+              "rss": 625876992,
+              "heapTotal": 503373824,
+              "heapUsed": 307351432,
+              "external": 56303563,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 642191360,
+              "heapTotal": 524554240,
+              "heapUsed": 441708608,
+              "external": 56303563,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 716264
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 3272.0226000000002,
+            "before": {
+              "rss": 642191360,
+              "heapTotal": 524554240,
+              "heapUsed": 441709896,
+              "external": 56303563,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 1500164096,
+              "heapTotal": 1266040832,
+              "heapUsed": 1185708680,
+              "external": 56298589,
+              "arrayBuffers": 53749327
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 609.2599000000009,
+            "before": {
+              "rss": 1602744320,
+              "heapTotal": 1398886400,
+              "heapUsed": 1319535304,
+              "external": 56298589,
+              "arrayBuffers": 53749327
+            },
+            "after": {
+              "rss": 1819705344,
+              "heapTotal": 1592659968,
+              "heapUsed": 1486331024,
+              "external": 76149304,
+              "arrayBuffers": 73600042
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 764.9775999999983,
+            "before": {
+              "rss": 1819705344,
+              "heapTotal": 1592659968,
+              "heapUsed": 1486424584,
+              "external": 76157416,
+              "arrayBuffers": 73608154
+            },
+            "after": {
+              "rss": 1853263872,
+              "heapTotal": 1592659968,
+              "heapUsed": 1486445216,
+              "external": 109712681,
+              "arrayBuffers": 107163419
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 716.3451999999997,
+            "before": {
+              "rss": 1853263872,
+              "heapTotal": 1592659968,
+              "heapUsed": 1486446912,
+              "external": 109712681,
+              "arrayBuffers": 107163419
+            },
+            "after": {
+              "rss": 1393004544,
+              "heapTotal": 966664192,
+              "heapUsed": 831287440,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 1868.999600000001,
+            "before": {
+              "rss": 1393004544,
+              "heapTotal": 966664192,
+              "heapUsed": 831288736,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "after": {
+              "rss": 1474809856,
+              "heapTotal": 1203916800,
+              "heapUsed": 1129944600,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 1054.1057,
+            "before": {
+              "rss": 1474809856,
+              "heapTotal": 1203916800,
+              "heapUsed": 1129973712,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "after": {
+              "rss": 1608720384,
+              "heapTotal": 1377771520,
+              "heapUsed": 1299756136,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "processHighWaterRssKiB": 1868112
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 2051.796599999998,
+            "before": {
+              "rss": 1608720384,
+              "heapTotal": 1377771520,
+              "heapUsed": 1299757440,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "after": {
+              "rss": 1896898560,
+              "heapTotal": 1656700928,
+              "heapUsed": 1570292176,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "processHighWaterRssKiB": 1916520
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 1296.8310999999994,
+            "before": {
+              "rss": 1896898560,
+              "heapTotal": 1656700928,
+              "heapUsed": 1570294240,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "after": {
+              "rss": 2144612352,
+              "heapTotal": 1896771584,
+              "heapUsed": 1817849280,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "processHighWaterRssKiB": 2094416
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 4870.727600000002,
+            "before": {
+              "rss": 2144612352,
+              "heapTotal": 1896771584,
+              "heapUsed": 1817850520,
+              "external": 149305167,
+              "arrayBuffers": 107154475
+            },
+            "after": {
+              "rss": 2483765248,
+              "heapTotal": 1004314624,
+              "heapUsed": 854602336,
+              "external": 267489367,
+              "arrayBuffers": 264940105
+            },
+            "processHighWaterRssKiB": 2736472
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 499.95730000000185,
+            "before": {
+              "rss": 2483765248,
+              "heapTotal": 1004314624,
+              "heapUsed": 854754544,
+              "external": 267489367,
+              "arrayBuffers": 264940105
+            },
+            "after": {
+              "rss": 2485362688,
+              "heapTotal": 1004314624,
+              "heapUsed": 854645208,
+              "external": 267489367,
+              "arrayBuffers": 264940105
+            },
+            "processHighWaterRssKiB": 2736472
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 1767.5924000000014,
+            "before": {
+              "rss": 2485362688,
+              "heapTotal": 1004314624,
+              "heapUsed": 854646808,
+              "external": 267489367,
+              "arrayBuffers": 264940105
+            },
+            "after": {
+              "rss": 2312118272,
+              "heapTotal": 1174585344,
+              "heapUsed": 1096464408,
+              "external": 115266756,
+              "arrayBuffers": 112717494
+            },
+            "processHighWaterRssKiB": 2736472
+          }
+        ],
+        "files": {
+          "packageBytes": 19850711,
+          "replacementPackageBytes": 19850715,
+          "readBackingBufferBytes": 33554433,
+          "databaseBytes": 128602112,
+          "walBytes": 0,
+          "backupBytes": 128602112,
+          "excelBytes": 5563019
+        },
+        "results": {
+          "firstNetSales": "2500000",
+          "firstEstimatedCost": "1500000",
+          "firstEstimatedGrossProfit": "1000000",
+          "replacementNetSales": "2500020",
+          "replacementEstimatedCost": "1500000",
+          "replacementEstimatedGrossProfit": "1000020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 26676.2644,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      },
+      "changed": {
+        "format": "synthetic-import-profile-v1",
+        "environment": {
+          "node": "v24.19.0",
+          "platform": "win32",
+          "arch": "x64",
+          "osRelease": "10.0.26200",
+          "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+          "totalMemoryBytes": 33974288384,
+          "commit": "2f3d60798917a34633fda090845eeafb2aaf7409"
+        },
+        "fixture": {
+          "name": "synthetic-business-profile-v1",
+          "mapping": "synthetic-business-v1",
+          "documents": 25000,
+          "lines": 25000,
+          "firstSha256": "815212164f05b81be34270c11eb433803da10dd6676f6e67ac0688e9ae89c95c",
+          "replacementSha256": "3ac8de837d851dfb39bf2ce75ea1f7c4cc83d28c4e5a3a6d26a0069be892d155"
+        },
+        "stages": [
+          {
+            "name": "prepare-first",
+            "elapsedMs": 700.8822,
+            "before": {
+              "rss": 62152704,
+              "heapTotal": 13234176,
+              "heapUsed": 8093640,
+              "external": 3088141,
+              "arrayBuffers": 409963
+            },
+            "after": {
+              "rss": 361693184,
+              "heapTotal": 286580736,
+              "heapUsed": 154766952,
+              "external": 22716019,
+              "arrayBuffers": 20195102
+            },
+            "processHighWaterRssKiB": 353216
+          },
+          {
+            "name": "read-first",
+            "elapsedMs": 7.615300000000161,
+            "before": {
+              "rss": 295665664,
+              "heapTotal": 168566784,
+              "heapUsed": 27189312,
+              "external": 22724131,
+              "arrayBuffers": 20203214
+            },
+            "after": {
+              "rss": 315518976,
+              "heapTotal": 168566784,
+              "heapUsed": 27215800,
+              "external": 42575675,
+              "arrayBuffers": 40054758
+            },
+            "processHighWaterRssKiB": 353236
+          },
+          {
+            "name": "parse-first",
+            "elapsedMs": 685.6137000000001,
+            "before": {
+              "rss": 315518976,
+              "heapTotal": 168566784,
+              "heapUsed": 27217008,
+              "external": 42575675,
+              "arrayBuffers": 40054758
+            },
+            "after": {
+              "rss": 454234112,
+              "heapTotal": 319463424,
+              "heapUsed": 187263408,
+              "external": 82168360,
+              "arrayBuffers": 40046021
+            },
+            "processHighWaterRssKiB": 443588
+          },
+          {
+            "name": "stage-first",
+            "elapsedMs": 1926.179,
+            "before": {
+              "rss": 454234112,
+              "heapTotal": 319463424,
+              "heapUsed": 187266480,
+              "external": 82168360,
+              "arrayBuffers": 40046021
+            },
+            "after": {
+              "rss": 663674880,
+              "heapTotal": 523444224,
+              "heapUsed": 450414704,
+              "external": 82169992,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 648120
+          },
+          {
+            "name": "activate-first",
+            "elapsedMs": 701.6655000000001,
+            "before": {
+              "rss": 663674880,
+              "heapTotal": 523444224,
+              "heapUsed": 450527880,
+              "external": 82169992,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 499712000,
+              "heapTotal": 239104000,
+              "heapUsed": 153841744,
+              "external": 42568570,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 708728
+          },
+          {
+            "name": "snapshot-first",
+            "elapsedMs": 346.58500000000004,
+            "before": {
+              "rss": 499826688,
+              "heapTotal": 239104000,
+              "heapUsed": 153892792,
+              "external": 42568570,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 492335104,
+              "heapTotal": 236060672,
+              "heapUsed": 166929576,
+              "external": 42568570,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 708728
+          },
+          {
+            "name": "monthly-cold",
+            "elapsedMs": 2445.4775,
+            "before": {
+              "rss": 491692032,
+              "heapTotal": 261025792,
+              "heapUsed": 151241640,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 616882176,
+              "heapTotal": 508354560,
+              "heapUsed": 308282920,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 708728
+          },
+          {
+            "name": "monthly-warm",
+            "elapsedMs": 450.4868999999999,
+            "before": {
+              "rss": 616882176,
+              "heapTotal": 508354560,
+              "heapUsed": 308309184,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 635240448,
+              "heapTotal": 526913536,
+              "heapUsed": 442625032,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 708728
+          },
+          {
+            "name": "accept-first",
+            "elapsedMs": 3429.5545999999995,
+            "before": {
+              "rss": 635240448,
+              "heapTotal": 526913536,
+              "heapUsed": 442626320,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 1489252352,
+              "heapTotal": 1263157248,
+              "heapUsed": 1183201608,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "prepare-replacement",
+            "elapsedMs": 988.4050000000007,
+            "before": {
+              "rss": 1591656448,
+              "heapTotal": 1396002816,
+              "heapUsed": 1316998704,
+              "external": 42599841,
+              "arrayBuffers": 40045605
+            },
+            "after": {
+              "rss": 1809588224,
+              "heapTotal": 1589776384,
+              "heapUsed": 1481009840,
+              "external": 62450556,
+              "arrayBuffers": 59896320
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "read-replacement",
+            "elapsedMs": 542.4542000000001,
+            "before": {
+              "rss": 1809588224,
+              "heapTotal": 1589776384,
+              "heapUsed": 1481103344,
+              "external": 62458668,
+              "arrayBuffers": 59904432
+            },
+            "after": {
+              "rss": 1829441536,
+              "heapTotal": 1589776384,
+              "heapUsed": 1481124176,
+              "external": 82310216,
+              "arrayBuffers": 79755980
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "parse-replacement",
+            "elapsedMs": 971.9763999999996,
+            "before": {
+              "rss": 1829441536,
+              "heapTotal": 1589776384,
+              "heapUsed": 1481125872,
+              "external": 82310216,
+              "arrayBuffers": 79755980
+            },
+            "after": {
+              "rss": 1368199168,
+              "heapTotal": 965353472,
+              "heapUsed": 830797200,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "stage-replacement",
+            "elapsedMs": 2290.2844000000005,
+            "before": {
+              "rss": 1368199168,
+              "heapTotal": 965353472,
+              "heapUsed": 830798496,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "after": {
+              "rss": 1450115072,
+              "heapTotal": 1187139584,
+              "heapUsed": 1110988984,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "activate-replacement",
+            "elapsedMs": 1331.5864000000001,
+            "before": {
+              "rss": 1450115072,
+              "heapTotal": 1187139584,
+              "heapUsed": 1110990288,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "after": {
+              "rss": 1572028416,
+              "heapTotal": 1360994304,
+              "heapUsed": 1282785688,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "processHighWaterRssKiB": 1856292
+          },
+          {
+            "name": "monthly-replacement",
+            "elapsedMs": 2354.403299999998,
+            "before": {
+              "rss": 1572028416,
+              "heapTotal": 1360994304,
+              "heapUsed": 1282786992,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "after": {
+              "rss": 1859756032,
+              "heapTotal": 1641144320,
+              "heapUsed": 1554292080,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "processHighWaterRssKiB": 1880260
+          },
+          {
+            "name": "verify-preservation",
+            "elapsedMs": 1899.8886999999995,
+            "before": {
+              "rss": 1859756032,
+              "heapTotal": 1641144320,
+              "heapUsed": 1554294144,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "after": {
+              "rss": 2107465728,
+              "heapTotal": 1880690688,
+              "heapUsed": 1801960296,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "processHighWaterRssKiB": 2058072
+          },
+          {
+            "name": "excel-export",
+            "elapsedMs": 5796.7523,
+            "before": {
+              "rss": 2107465728,
+              "heapTotal": 1880690688,
+              "heapUsed": 1801961536,
+              "external": 121897727,
+              "arrayBuffers": 79747035
+            },
+            "after": {
+              "rss": 2445643776,
+              "heapTotal": 1012965376,
+              "heapUsed": 854617264,
+              "external": 240081909,
+              "arrayBuffers": 237532647
+            },
+            "processHighWaterRssKiB": 2699984
+          },
+          {
+            "name": "backup",
+            "elapsedMs": 749.0054999999993,
+            "before": {
+              "rss": 2445643776,
+              "heapTotal": 1012965376,
+              "heapUsed": 854656392,
+              "external": 240081909,
+              "arrayBuffers": 237532647
+            },
+            "after": {
+              "rss": 2446807040,
+              "heapTotal": 1012965376,
+              "heapUsed": 854660192,
+              "external": 240081909,
+              "arrayBuffers": 237532647
+            },
+            "processHighWaterRssKiB": 2699984
+          },
+          {
+            "name": "backup-reopen",
+            "elapsedMs": 2146.3212999999996,
+            "before": {
+              "rss": 2446807040,
+              "heapTotal": 1012965376,
+              "heapUsed": 854661792,
+              "external": 240081909,
+              "arrayBuffers": 237532647
+            },
+            "after": {
+              "rss": 2274750464,
+              "heapTotal": 1175109632,
+              "heapUsed": 1096481928,
+              "external": 87859307,
+              "arrayBuffers": 85310045
+            },
+            "processHighWaterRssKiB": 2699984
+          }
+        ],
+        "files": {
+          "packageBytes": 19850711,
+          "replacementPackageBytes": 19850715,
+          "readBackingBufferBytes": 19850711,
+          "databaseBytes": 128602112,
+          "walBytes": 0,
+          "backupBytes": 128602112,
+          "excelBytes": 5563010
+        },
+        "results": {
+          "firstNetSales": "2500000",
+          "firstEstimatedCost": "1500000",
+          "firstEstimatedGrossProfit": "1000000",
+          "replacementNetSales": "2500020",
+          "replacementEstimatedCost": "1500000",
+          "replacementEstimatedGrossProfit": "1000020",
+          "preserved": true,
+          "exactText": true
+        },
+        "backgroundElapsedMs": 31051.344999999998,
+        "limitations": [
+          "Synthetic bounded scenario only; no full-population acceptance",
+          "Inputs, parsed records, snapshots and reports are retained for assertions; memory includes the profiling program and is not the service footprint",
+          "Excel measures buffer generation only; this run does not read back the workbook",
+          "No source extraction, IPC, UI responsiveness, cancellation or encrypted recovery measurement",
+          "Memory values are stage-boundary samples; maxRSS is the process-lifetime high water in KiB, not a stage heap peak",
+          "Disk sizes are end-of-run observations, not temporary disk peaks",
+          "Background duration is not dashboard interaction latency"
+        ]
+      }
+    }
+  ]
+}

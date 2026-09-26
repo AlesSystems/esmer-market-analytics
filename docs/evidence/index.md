@@ -103,3 +103,9 @@ A06 remains open for actual Windows key protection, file-system behavior, indepe
 - [Windows verification](windows-acceptance.md), [release acceptance and open gates](release-acceptance.md), [licences](licences.md).
 - [Build and command proof](phase-10-proof.json), [performance samples](phase-10-performance.json), [decision trail](phase-10-decisions.tsv).
 - [Windows recovery filesystem boundary](phase-10-windows-recovery-files.md).
+
+## Issue 26 import prerequisites
+
+- [Synthetic capacity evidence and open source gates](issue-26-import-capacity.md), [profile receipts](issue-26-import-profiles.json), and [decision trail](issue-26-decisions.tsv).
+- [Capacity decision](../decisions/issue-26-import-capacity.md) and [repeatable profiling procedure](../operations/profile-import.md).
+- [Isolated source validation](issue-26-source-validation.md), [OrbStack verification receipt](issue-26-orbstack-verification.json), and [repeatable evidence collection](../operations/collect-source-evidence.md).

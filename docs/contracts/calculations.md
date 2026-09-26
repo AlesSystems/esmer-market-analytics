@@ -37,6 +37,8 @@ Money, quantity, multipliers, costs and source IDs are serialized as decimal/int
 
 Source scale, intermediate precision, header/line rounding order, discount order and cost KDV basis remain **unresolved**. No global source precision or rounding policy is adopted in this phase. Any rounding/unit-conversion edge fixture declares a local synthetic assumption that applies only to that scenario. Display rounding must never alter stored source values. In particular, the audit's 0.01 comparison is an observed reconciliation check, not approval of a universal tolerance.
 
+The [issue 26 isolated inspection](../evidence/issue-26-source-validation.md) subsequently observed storage scales for selected raw columns. This resolves their schema metadata only. Intermediate precision, calculation order, unit meaning, tax basis and rounding policy remain unresolved. Exploratory header/line comparisons have exceptions and do not approve a financial formula or tolerance.
+
 Kilograms and pieces remain separate measures. An unknown unit or multiplier cannot default to one. Missing historical cost, undocumented zero cost, negative cost and a documented genuine zero-cost item are distinct states. Only a documented zero-cost case can participate as zero. Unsupported returned-cost attribution remains excluded even when return sales are known.
 
 ## Dates and revisions
