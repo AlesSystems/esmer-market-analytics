@@ -1,6 +1,8 @@
 # Page usability audit and real-backup reporting diagnosis
 
-Date: 2026-09-26. Status: analysis and future-update backlog; no application behavior changed.
+Date: 2026-09-26. Status: observation record at `447e3c1`. No application behavior changed in this audit.
+
+The [owner workspace follow-up](2026-09-26-owner-workspace.md) later added the daily count chart, document-type bars, clearer filters, the expense empty state and report-history retry described below. This file remains the earlier observation. It is not the current screen inventory.
 
 Method: two independent reviewers — design assessment `/root/page_design_audit`, detector/source assessment `/root/page_evidence_audit` — plus a packaged-app walkthrough and report reproduction by the orchestrator. Assessment A completed before Assessment B findings entered the synthesis.
 

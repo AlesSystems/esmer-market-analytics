@@ -10,13 +10,13 @@ A dataset contains an immutable source snapshot. Its identity includes the packa
 
 Source documents, lines and suppliers use fixed relational tables matching the validated package. Composite foreign keys enforce source links within a dataset. Stored row positions preserve each stream's supplied order, so valid unsorted packages retain their original hashes. Quantities, money and historical cost retain their exact decimal text. Missing cost remains null. Structural import summaries contain counts and warnings; this phase does not compute financial totals.
 
-App-owned records have their own append-only revisions. The initial persistence API represents expenses by incurred date, exact net value, reason and opaque evidence identity. It does not yet implement spreadsheet mapping, KDV classification or payment analysis. A correction appends a revision for that entity, preserving its original value and provenance. Reading revision N selects each entity's latest value at or before N. It does not select only the latest global row. Expenses, adjustments, confirmations and settings are never replaced by a source import. Revision history is the audit trail.
+App-owned records have their own append-only revisions. The Phase 4 API stored an expense by incurred date, exact net value, reason and opaque evidence identity. Spreadsheet columns, KDV classification and payment dates are specified in the [expense contract](expense-completeness.md). A correction appends a revision for that entity, preserving its original value and provenance. Reading revision N selects each entity's latest value at or before N. It does not select only the latest global row. Expenses, adjustments, confirmations and settings are never replaced by a source import. Revision history is the audit trail.
 
 ## Coherent reads and accepted reports
 
 A current read captures the active dataset and app revision together. An explicit pinned read resolves immutable source facts and app-owned values at that pair. New imports and later corrections cannot change those values.
 
-Accepted report records pin the dataset, app revision, calculation version and required evidence. Accepted content cannot be overwritten. This phase persists report records for reproducibility tests; financial calculations and report presentation remain later-phase work. Accepting a synthetic report does not certify its figures or promote estimated profit to verified profit.
+Accepted report records pin the dataset, app revision, calculation version and required evidence. Accepted content cannot be overwritten. Phase 4 persisted report records so reproducibility tests could pin them. Sales, cost, expense and monthly presentation are specified in the later sections of this contract and in the [calculation](calculations.md), [expense](expense-completeness.md) and [report](reports.md) contracts. Accepting a synthetic report does not certify its figures or promote estimated profit to verified profit.
 
 An adjustment retains its original dataset, lineage, target ID and target content. Its review status compares that target with the selected source snapshot. A changed or missing target requires review. A document change also affects adjustments to its lines. The original link and value remain recoverable, including when another lineage reuses the same ID.
 
@@ -42,7 +42,7 @@ Storage pressure produces a visible error. It never relaxes retention or silentl
 
 The [local evidence record](../evidence/phase-4-local.md) records initial implementation and verification. The [Windows evidence](../evidence/windows-phase-4.md) records subsequent fixes, packaged verification, native import and lifecycle results. The [Windows handoff](../operations/windows-phase-4-handoff.md) remains the procedure. Migration, interruption, locking, packaging and lifecycle claims apply only to the environment actually tested.
 
-Expense spreadsheet import, duplicate classification, financial calculations, exports and encrypted backup/recovery retain their later-phase gates. No real-source mapping, source reconciliation, SQL Server permission or full-volume performance claim follows from synthetic persistence tests.
+Expense spreadsheet import, financial calculations, exports and encrypted recovery are specified in their own contracts. Real-source mapping, source reconciliation, SQL Server permission and full-volume performance remain open. No claim for those gates follows from synthetic persistence tests.
 
 ## Phase 5 sales fields and browsing sessions
 
@@ -55,3 +55,11 @@ The sales worker retains one immutable snapshot for the open browsing session. I
 Store schema 4 adds nullable purchasing JSON on documents, business-evidence JSON on lines, and a nullable synthetic supplier display name. Migration is additive. Older rows reconstruct without new object properties, preserving their canonical hashes and adjustment fingerprints. New evidence participates in snapshot round trips, package hashes, and relevant adjustment fingerprints.
 
 Cost and purchasing reads use the existing open sales session's retained snapshot. Import and pruning cannot mix a new purchase price with an old historical report. Explicit refresh starts a new session and invalidates its old context. The result exposes separate cost and purchasing method versions. Accepted output continues to use existing immutable report storage; browsing does not accept a report or upgrade estimated confidence.
+
+## Later store versions
+
+`SCHEMA_VERSION` in [`src/store/schema.ts`](../../src/store/schema.ts) is 7. Migrations through schema 4 are described above.
+
+- Schema 5 adds immutable `expense_batches`. Workbook mapping and KDV classification belong to the [expense contract](expense-completeness.md).
+- Schema 6 adds `recovery_state` and the triggers that advance backup intent. See the [recovery decision](../decisions/phase-9-recovery.md).
+- Schema 7 stores one raw `source_preview` package apart from the active financial dataset. See the [source contract](source.md).

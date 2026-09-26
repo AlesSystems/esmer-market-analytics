@@ -4,9 +4,9 @@ Implements [issue #4](https://github.com/AlesSystems/esmer-market-analytics/issu
 
 ## Application boundary
 
-One Electron application owns a React renderer and a local Node worker. The renderer asks for service availability through one named preload method. The main process validates the sender and payload before it calls the worker. No HTTP service, source driver, source credentials, or business schema is needed for this phase.
+One Electron application owns a React renderer and a local Node worker. In Phase 1, the renderer asked for service availability through one named preload method. The main process validates the sender and payload before it calls the worker. No HTTP service, source driver, source credentials, or business schema was required for that phase. The current preload inventory is the [desktop contract](../contracts/desktop.md).
 
-The worker must prove that its empty local SQLite connection works before reporting availability. Durable storage and migrations belong to Phase 4. Availability distinguishes an empty, ready service from an unavailable service.
+In Phase 1, the worker had to prove that its empty local SQLite connection worked before reporting availability. Durable storage and migrations were left to Phase 4 and are now specified in the [persistence contract](../contracts/persistence.md). Availability still distinguishes an empty, ready service from an unavailable service.
 
 ## Dependency selections
 
@@ -18,6 +18,13 @@ The direct versions are exact pins in `package.json`; `package-lock.json` locks 
 | React and React DOM | 19.3.0 | MIT | Approved renderer stack |
 | SQLite | 3.53.4 through Electron's bundled `node:sqlite` | SQLite is public domain; Node includes its own notices | Avoid an additional native module and Electron ABI rebuild |
 | decimal.js | 10.6.0 | MIT | Parse decimal strings without binary floating-point arithmetic |
+| tedious | 20.0.0 | MIT | Read-only TDS client for the isolated SQL preview. See the [live-sync contract](../contracts/live-sync.md). |
+| class-variance-authority | 0.7.1 | Apache-2.0 | Variant classes for the shared Button, Input and Badge controls |
+| clsx | 2.1.1 | MIT | Join conditional class names for those controls |
+| tailwind-merge | 3.7.0 | MIT | Merge Tailwind class strings for those controls |
+| tailwindcss | 4.3.3 | MIT | Development compiler for the static stylesheet. Not an application service. |
+| @tailwindcss/postcss | 4.3.3 | MIT | Development PostCSS plugin for that compiler |
+| postcss | 8.5.28 | MIT | Development CSS transform used by the Tailwind plugin |
 | read-excel-file | 9.3.10, development only | MIT declaration; transitive notice unresolved | Check `.xlsx` compatibility with an explicit number parser; not distributed in Phase 1 |
 | write-excel-file | 4.1.1 | MIT | Write typed `.xlsx` cells, sheets, and number formats |
 | fflate | 0.8.3, direct runtime dependency from Phase 7 | MIT with bundled `LICENSE` | Inspect bounded expense workbook ZIP content; already present through the workbook writer |

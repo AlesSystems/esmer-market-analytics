@@ -535,4 +535,4 @@ Phase 10 implementation and Windows synthetic verification are recorded in [Wind
 | A07 — Packaging, usability and performance | 1, 8, 10 | Windows lifecycle, measured full-data behaviour and Excel evidence |
 | L01 — Later live integration | 11 | Permission, consistency, reconciliation, impact and rollout evidence |
 
-Repository setup and transfer of the approved planning artifacts are complete. All application execution checkboxes and release gates remain open. No application code, source reconnection or release action is represented as completed.
+Repository setup and transfer of the approved planning artifacts are complete. The checkboxes above are the original plan. They were not all reticked when later evidence landed. The [evidence index](../../evidence/index.md) is the completion record. Synthetic implementation through Phase 10, and the isolated live preview, are on `main`. Real-source acceptance, the remaining Windows gates and L01 stay open. No production rollout is complete.
