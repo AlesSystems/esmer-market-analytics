@@ -42,3 +42,8 @@ test("release inspection rejects unexpected outer files and credential sentinels
   expect(result.violations).toContain("distribution:customer-export.csv");
   expect(result.violations).toContain("distribution:private.dat");
 });
+
+test("SQL dependencies are allowed while unreviewed packages remain rejected", async () => {
+  expect((await inspectRelease(await fixture("node_modules/tedious/LICENSE"))).violations).toEqual([]);
+  expect((await inspectRelease(await fixture("node_modules/unreviewed-driver/index.js"))).violations).toEqual(["archive:node_modules/unreviewed-driver/index.js"]);
+});
