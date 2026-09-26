@@ -56,6 +56,8 @@ test("cancellation rolls back replacement, paging is bounded and recovery preser
     const generation = store.recoveryGeneration().changed;
     expect(store.importSourcePreview(bytes).status).toBe("preview-imported");
     expect(store.recoveryGeneration().changed).toBe(generation+1);
+    expect(store.importSourcePreview(bytes).status).toBe("preview-imported");
+    expect(store.recoveryGeneration().changed).toBe(generation+1);
     const expected = store.readSourcePreview({stream:"lines",offset:50});
     expect(expected).toMatchObject({status:"source-preview",total:60,rows: expect.any(Array)});
     if (expected.status !== "source-preview") throw Error("missing");

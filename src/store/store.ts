@@ -60,7 +60,7 @@ class AnalyticsStore {
       const value = canonical(parsed), digest = createHash("sha256").update(value).digest("hex");
       return this.transaction(() => {
         control.checkCancelled?.();
-        this.db.prepare("INSERT INTO source_preview VALUES(1,?,?) ON CONFLICT(singleton) DO UPDATE SET package_json=excluded.package_json,hash=excluded.hash").run(value,digest);
+        this.db.prepare("INSERT INTO source_preview VALUES(1,?,?) ON CONFLICT(singleton) DO UPDATE SET package_json=excluded.package_json,hash=excluded.hash WHERE source_preview.hash != excluded.hash").run(value,digest);
         control.checkCancelled?.();
         return {status: "preview-imported", hash: digest};
       });
