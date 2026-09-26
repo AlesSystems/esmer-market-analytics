@@ -70,3 +70,5 @@ Independent Astra High reviewers examined standards/correctness and specificatio
 - Full population and resource profiling beyond this bounded window (#26 R5).
 - Windows verification of this new preview slice and schema upgrade (#26 R6). Earlier PR #30 Windows checks cover the preceding implementation only.
 - Actual production engine/TLS compatibility, source acceptance and rollout permission.
+
+The subsequent [source workspace continuation](source-workspace.md) restores all five application destinations around this retained sample. Its later build and verification results are recorded separately.
