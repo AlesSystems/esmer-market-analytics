@@ -6,6 +6,8 @@ Date: 2026-09-26. Branch: `codex/issue-14-live-sync`. Baseline: `4663ddf`. Relat
 
 **Partial technical implementation; #14 and L01 remain open.** The app can read the supplied database copy with a restricted account and preserve its local reports after rejection or source failure. Real SQL data cannot yet activate a financial dataset: `prepareSqlCandidate` always rejects it with `UNSUPPORTED_MAPPING`. Successful candidate reconciliation/activation is verified using synthetic packages. This is not a completed real financial integration.
 
+The subsequent [Windows continuation](live-windows-acceptance.md) records successful NSIS/portable packaging, all 34 installed-app desktop tests, protected Windows settings and synthetic lifecycle checks. Native connection-file selection, Windows actual-source compatibility and the financial gates remain open. The Mac observations below remain their original platform evidence.
+
 #26 still owns financial identity, conversions/returns, dates, discounts, quantities, cost/tax interpretation, real provenance, population and capacity acceptance. The isolated observations below are not independent financial oracles. No source rule was promoted from unsupported to verified. Original source/production rollout was not performed.
 
 ## Environment and private source evidence
@@ -78,13 +80,13 @@ Package contents are inspected with the existing fixed runtime/dependency allowl
 | L01 item | Status |
 | --- | --- |
 | Product acceptance and specific production permission | Open; this session authorizes isolated development only. |
-| Restricted reader and protected credentials | Isolated Mac proof only; target source/account and Windows proof open. |
+| Restricted reader and protected credentials | Isolated Mac reader proof and Windows protected-storage synthetic checks pass; target source/account and Windows actual-source compatibility remain open. |
 | Mutations, partial transactions, reset, reconnect | Synthetic SQL mutation/coherence/reconnect pass; complete reset detection and real financial activation open. |
 | Log/archive coverage and reconciliation | Counts/limitations characterized; log completeness unproven. Bounded full rescan demonstrated, full approved history open. |
 | Early IDs and header/line visibility | Forced actual-engine synthetic ordering/lock test passes. |
 | Coherent financial candidate | Raw serial extraction and synthetic activation pass separately; real normalized candidate blocked by #26. |
 | 5–15 minute freshness/source impact | Open. Fake timers and isolated elapsed reads are not representative load acceptance. |
-| Visible fallback after failure/delay | Controller, worker and packaged Mac checks pass within this preview. |
+| Visible fallback after failure/delay | Controller, worker, packaged Mac and installed Windows synthetic checks pass within this preview. |
 | Full/recent reconciliation without duplicate financial events | Synthetic packages pass; real approved population open. |
 
 Continue on this same branch and commit on a Windows x64 host. Run `npm ci`, `npm run test:unit`, `npm run test:integration`, `npm run typecheck`, `npm run lint`, `npm run package:win`, and `npm run test:desktop`. Configure only an authorized isolated source for the optional SQL tests. Verify DPAPI/native picker/enable-disable/restart and installer/portable lifecycle, then repeat the actual financial path only after #26 has approved mappings and independent expected results. Retain exact build, fixture identity, commands, expected/actual outcomes and private evidence references. Do not mark platform-skipped Mac tests or cross-built Windows files as Windows acceptance.
