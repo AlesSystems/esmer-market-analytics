@@ -1,3 +1,4 @@
+import { SourcePreview } from "./SourcePreview";
 import { LiveStatus } from "./LiveStatus";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -17,6 +18,7 @@ function date(value: string) { return new Intl.DateTimeFormat("tr-TR", { timeZon
 function importMessage(result: ImportOutcome | RequestError | JobOutcome): string {
   switch (result.status) {
     case "busy": return "Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.";
+    case "preview-imported": return "Gerçek kaynak kayıtları içe aktarıldı. Mali raporlar değiştirilmedi.";
     case "active": return "Veri paketi içe aktarıldı.";
     case "unchanged": return "Bu veri paketi zaten etkin. Veriler değiştirilmedi.";
     case "historical": return "Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.";
@@ -59,6 +61,7 @@ function App() {
     finally { setImporting(false); }
   }
   const messages = <>
+    <SourcePreview revision={availability} />
     <OperationProgress />
     <LiveStatus onChanged={() => {void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable));}} />
     {(!result || result.status === "cancelled" || result.status === "historical") && availability?.status === "ready" && availability.lastImportError && <p role="alert">{previousImportMessage(availability)}</p>}

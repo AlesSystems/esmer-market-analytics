@@ -1,3 +1,5 @@
+import { readPackage } from "../source/package";
+import { readRawPackage, validSourcePreviewRequest } from "../source/raw-package";
 import { readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { LiveSynchronizer, liveFingerprint, liveIdentity } from "../source/live";
@@ -147,7 +149,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
       parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
-    const known = ["previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
+    const known = ["readSourcePreview", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (monthlyOperations.includes(request.operation) && (!("payload" in request) || !validMonthlyRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
@@ -176,6 +178,10 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       const available = store.availability();
       result = available.status === "ready" ? {...available, liveConnection: live?.status().phase !== "disabled" && liveConfig ? "enabled" : "disabled"} : available;
     }
+    else if (request.operation === "readSourcePreview") {
+      if (!validSourcePreviewRequest(request.payload)) throw new Error("INVALID_PAYLOAD");
+      result = store.readSourcePreview(request.payload);
+    }
     else if (request.operation === "queryPurchasing") result = reports!.purchasing(request.payload);
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);
@@ -191,8 +197,13 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "exportReportVersion") result = {status: "export", bytes: await excelReport(versions!.selected(request.payload.reportId))};
     else if (request.operation === "importPackage") {
       if (liveChanging || live?.isBusy()) { parentPort?.postMessage({id: request.id, result: {status: "busy"}}); return; }
-      store.prune(versions!.protectedDatasetIds());
-      result = importOutcome(store.importPackage(request.bytes, control));
+      if (readRawPackage(request.bytes)) {
+        const preview = store.importSourcePreview(request.bytes, control);
+        result = preview.status === "preview-imported" ? preview : importOutcome(preview);
+      } else {
+        if (readPackage(request.bytes).ok) store.prune(versions!.protectedDatasetIds());
+        result = importOutcome(store.importPackage(request.bytes, control));
+      }
     } else throw new Error("UNKNOWN_OPERATION");
   } catch (error) {
     result = recoveryOperations.includes(request.operation) ? recoveryFailure(error instanceof Error && ["RESTORE_STALE","RECOVERY_BUSY","RECOVERY_SETUP_REQUIRED","INVALID_RESTORE_TOKEN","RESTORE_RECOVERY_REQUIRED","RESTORE_COMMITTED_RESTART_REQUIRED","AUDIT_UNAVAILABLE","RECOVERY_CONFIG_UNAVAILABLE"].includes(error.message)?error.message:"RECOVERY_FAILED") : error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"}

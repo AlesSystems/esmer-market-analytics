@@ -1,3 +1,4 @@
+import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { LiveResult } from "../domain/contracts";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
@@ -75,13 +76,18 @@ export async function handleRequest(
   jobs?: JobService,
   recovery?: RecoveryService,
   live?: LiveService,
-): Promise<LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
+): Promise<SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
       code: "UNTRUSTED_SENDER",
       message: "Bu pencerenin işlem yapma izni yok.",
     };
+  if (operation === "readSourcePreview" && sourcePreview) {
+    if (!validSourcePreviewRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return sourcePreview(payload);
+  }
   if (live && typeof operation === "string" && liveOperations.includes(operation)) {
     if (!validLiveRequest(operation, payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
     return live(operation, payload as null | {enabled: boolean});

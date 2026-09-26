@@ -1,3 +1,4 @@
+import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
@@ -50,6 +51,32 @@ class AnalyticsStore {
   private lastImportError(): ImportCode | undefined {
     const batch = this.db.prepare("SELECT state,error_code FROM import_batches WHERE state IN ('failed','active') ORDER BY rowid DESC LIMIT 1").get();
     return batch?.state === "failed" ? batch.error_code as ImportCode : undefined;
+  }
+  importSourcePreview(bytes: Uint8Array, control: OperationControl = {}): {status: "preview-imported"; hash: string} | {status: "failed"; code: ImportCode} | {status: "cancelled"} {
+    try {
+      control.checkCancelled?.();
+      const parsed = readRawPackage(bytes);
+      if (!parsed) return {status: "failed", code: "INVALID_PACKAGE"};
+      const value = canonical(parsed), digest = createHash("sha256").update(value).digest("hex");
+      return this.transaction(() => {
+        control.checkCancelled?.();
+        this.db.prepare("INSERT INTO source_preview VALUES(1,?,?) ON CONFLICT(singleton) DO UPDATE SET package_json=excluded.package_json,hash=excluded.hash").run(value,digest);
+        control.checkCancelled?.();
+        return {status: "preview-imported", hash: digest};
+      });
+    } catch (error) { return error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"} : {status: "failed", code: importErrorCode(error)}; }
+  }
+  readSourcePreview(request: SourcePreviewRequest): SourcePreviewResult {
+    if (!validSourcePreviewRequest(request)) throw new Error("INVALID_PAYLOAD");
+    const row = this.db.prepare("SELECT package_json,hash FROM source_preview WHERE singleton=1").get();
+    if (!row) return {status: "source-preview-empty"};
+    const parsed = readRawPackage(Buffer.from(String(row.package_json)));
+    if (!parsed || createHash("sha256").update(String(row.package_json)).digest("hex") !== row.hash) throw new Error("INVALID_PACKAGE");
+    const {snapshot, ...rest} = parsed;
+    const metadata = {schemaVersion: rest.schemaVersion, provenance: rest.provenance, sourceReconciled: rest.sourceReconciled, lineage: rest.lineage, extractionId: rest.extractionId};
+    const {headers, lines, ...source} = snapshot;
+    const referencedHeaders = new Set(lines.map(line => line.FIS));
+    return {status: "source-preview", hash: String(row.hash), metadata: {...metadata, ...source}, counts: {headers: headers.length, lines: lines.length, emptyHeaders: headers.filter(header => !referencedHeaders.has(header.ID)).length}, stream: request.stream, offset: request.offset, total: snapshot[request.stream].length, rows: snapshot[request.stream].slice(request.offset,request.offset+50)};
   }
   availability(): Availability {
     const lastImportError = this.lastImportError();

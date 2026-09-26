@@ -1,3 +1,4 @@
+import { readRawPackage } from "../source/raw-package";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { migrate } from "../store/migrations";
@@ -17,6 +18,10 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
     requireValid(canonical(db.prepare(objects).all()) === canonical(expected.prepare(objects).all()));
   } finally { expected.close(); }
   requireValid(db.prepare("PRAGMA integrity_check").all().every(row => row.integrity_check === "ok") && !db.prepare("PRAGMA foreign_key_check").all().length);
+  if (version >= 7) for (const row of db.prepare("SELECT package_json,hash FROM source_preview").all()) {
+    const bytes = Buffer.from(String(row.package_json));
+    requireValid(readRawPackage(bytes) && createHash("sha256").update(bytes).digest("hex") === row.hash);
+  }
   const revisions=db.prepare("SELECT revision,kind,entity_id,value_json FROM app_revisions ORDER BY revision").all();
   for (const row of revisions) validateChange({kind:row.kind,entityId:row.entity_id,value:decode(row.value_json)} as AppChange);
   const facts=new Map<string,Records>();

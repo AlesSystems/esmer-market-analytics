@@ -1,3 +1,4 @@
+import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
 import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
 import { OperationJobs } from "./jobs";
@@ -47,6 +48,7 @@ function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
   pending.clear(); worker = undefined;
 }
+function requestService(request: {operation: "readSourcePreview"; payload: SourcePreviewRequest}): Promise<SourcePreviewResult>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
 function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
@@ -307,6 +309,7 @@ app.whenReady().then(async () => {
           } catch { liveConfigError = true; return failure(); }
           finally { nativeLiveBusy = false; }
         },
+        payload => requestService({operation: "readSourcePreview", payload}),
       );
     },
   );
