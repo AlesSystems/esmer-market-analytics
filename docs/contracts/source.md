@@ -74,3 +74,11 @@ Further checks on the already authorized isolated source must record an opaque s
 A contract revision can support a source rule only after representative reduced examples and independent expectations establish that rule for its declared population. Record exclusions and their monetary exposure. Unknown raw column names, decimal scale and time interpretation stay unresolved until that evidence exists. Financial implementation remains blocked for affected source rules even if synthetic fixture checks pass.
 
 See [calculation policies](calculations.md), [privacy allowlists](privacy.md) and [golden oracle evidence](../evidence/golden-oracles.md).
+
+## Isolated raw-record preview
+
+`sql-backup-preview-v1` is a separate, nonfinancial package accepted by the desktop import picker. Its provenance is `isolated-sql-backup`, and `sourceReconciled` must be `false`. It carries declared lineage, extraction identity, database GUID, engine version, capture time, source timestamp window, exact projected rows and a content digest. It does not satisfy any unsupported financial rule above.
+
+The preview retains source record IDs, type/status codes, source timestamps and decimal strings. It does not infer financial document kinds, economic deduplication, market-local dates, units, tax treatment or profit. Current headers without lines remain present. Unknown source type codes remain visible as codes; they cannot enter financial calculators.
+
+Schema 7 stores the latest valid preview separately from active and rollback financial datasets. A rejected or cancelled import preserves the prior preview and financial state. The preview participates in encrypted application backup and validation on restore. Existing synthetic packages and accepted report versions keep their original contracts. See the [real preview evidence](../evidence/real-sql-preview.md).

@@ -1,0 +1,41 @@
+{
+  "headers": 5508,
+  "lines": 18858,
+  "offlineRestart": true,
+  "firstLastPagesExact": true,
+  "financialDataset": "empty",
+  "timings": [
+    {
+      "operation": "import",
+      "elapsedMs": 225
+    },
+    {
+      "operation": "headers-page",
+      "offset": 0,
+      "elapsedMs": 95
+    },
+    {
+      "operation": "headers-page",
+      "offset": 5458,
+      "elapsedMs": 93
+    },
+    {
+      "operation": "lines-page",
+      "offset": 0,
+      "elapsedMs": 90
+    },
+    {
+      "operation": "lines-page",
+      "offset": 18808,
+      "elapsedMs": 88
+    }
+  ],
+  "sourceBatch": "e2731e28-d5b8-418f-b1fe-b955b1c9de5b",
+  "commit": "cec1634",
+  "build": "macOS arm64 Electron 44.3.0",
+  "appArchiveSha256": "d746a78584996cfd4712bb4905c2db1fe8d180c49ad049a5f44dd4b1136c8245",
+  "packageBytes": 5920726,
+  "persistedPackageExact": true,
+  "originalContainerStopped": true,
+  "privateRowsPublished": false
+}
