@@ -31,7 +31,7 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
     await expect(page.getByRole("heading",{name:"Henüz mali rapor verisi yok"})).toBeVisible();
     await app.evaluate(({dialog},path) => {dialog.showOpenDialog = async () => ({canceled:false,filePaths:[path]});},sourceFile);
     await importPackage(page);
-    await expect(page.getByRole("heading",{name:"SQL yedeğinden gerçek kayıt örneği"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
     const status = await page.evaluate(() => window.esmer.getAvailability());
     expect(status.status === "ready" && status.store === "empty").toBe(true);
     const countsMatch = await page.evaluate(async expected => {
@@ -41,15 +41,18 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
     expect(countsMatch).toBe(true);
     if (!actual) {
       await page.screenshot({path:"test-results/source-preview.png",fullPage:true});
+      await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
       await page.getByRole("button",{name:"Sonraki kaynak kayıtları"}).click();
       await expect(page.getByText("51–60 / 60",{exact:true})).toBeVisible();
       await writeFile(sourceFile,writeRawPackage(rawSnapshot(),"fixture:raw","batch-2"));
       await importPackage(page);
+      await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+      await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
       await expect(page.getByText("1–1 / 1",{exact:true})).toBeVisible();
     }
     await app.close();
     app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();
-    await expect(page.getByRole("heading",{name:"SQL yedeğinden gerçek kayıt örneği"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status:"live", live:{phase:"disabled"}});
   } finally {await app.close().catch(() => {}); await rm(userData,{recursive:true,force:true});}
 });

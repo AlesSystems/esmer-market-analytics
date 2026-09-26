@@ -1,0 +1,37 @@
+import {test,expect,_electron as electron} from "@playwright/test";
+import {mkdtemp,rm} from "node:fs/promises";
+import {tmpdir} from "node:os";
+import {join,resolve} from "node:path";
+import {openStore} from "../../src/store/store";
+import {writeRawPackage} from "../../src/source/raw-package";
+import {rawSnapshot} from "../helpers/raw-fixture";
+import {businessPackage} from "../helpers/business-fixtures";
+import {SalesReports} from "../../src/reports/query";
+import {ReportVersions} from "../../src/reports/versions";
+import {Expenses} from "../../src/expenses/import";
+import {workbook,row} from "../helpers/expense-fixtures";
+const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
+test("raw backup drives all destinations, preserved reports and scoped detail offline",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"source-workspace-")),database=join(userData,"analytics.sqlite");
+ const snapshot=rawSnapshot();snapshot.headers=[snapshot.headers[0],{...snapshot.headers[0],ID:"2",FIS_TURU:"1"},{...snapshot.headers[0],ID:"3",FIS_TURU:"999"}];snapshot.lines=[{...snapshot.lines[0],STOK:"333"},{...snapshot.lines[0],ID:"3",FIS:"2",FIS_TURU:"1",STOK:"444"}];
+ const store=openStore(database);store.importPackage(businessPackage());
+ const reports=new ReportVersions(store,new SalesReports(store));const candidate=reports.open({period:"2025-09"});if(candidate.status!=="monthly")throw Error("missingreport");reports.accept({candidateId:candidate.report.id,previousAcceptedId:null,reason:"Synthetic retained report"});
+ const expenses=new Expenses(store);const preview=expenses.preview(await workbook([[row[0],"15.10.2025","01.11.2025",...row.slice(3)]]));expenses.confirm({previewId:preview.previewId,keepCandidateRows:[]});
+ store.importSourcePreview(writeRawPackage(snapshot,"fixture:workspace","batch-1"));store.close();
+ let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  let page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  await expect(page.getByText("999 · Tür anlamı doğrulanmadı",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
+  await page.getByLabel("Ürün kimliği",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
+  await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("button",{name:"2",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
+  await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await expect(page.getByText("Kira",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Raporlar",exact:true})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toBeVisible();
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true}).click();await expect(page.getByText("Sentetik gösterim raporu — gerçek market sonuçları değildir.",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Özet",exact:true}).click();await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  const writer=openStore(database);writer.importSourcePreview(writeRawPackage(snapshot,"fixture:workspace","batch-2"));writer.close();
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByText("Kaynak sürümü değişti. Yeni sürümü açın.",{exact:false})).toBeVisible();await page.getByRole("button",{name:"Kaynağı yeniden aç",exact:true}).click();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"Satışlar",exact:true})).toBeVisible();
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
