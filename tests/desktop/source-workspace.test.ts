@@ -21,15 +21,23 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   let page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
+  await expect(page.getByRole("img",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
+  await expect(page.getByRole("table",{name:"Günlük kaynak belge kayıtları tablosu"})).toBeVisible();
+  await expect(page.getByRole("table",{name:"Kaynak belge türleri tablosu"})).toBeVisible();
+  await expect(page.getByText("3 / 3 tür kodu gösteriliyor",{exact:false})).toBeVisible();
   await expect(page.getByText("999 · Tür anlamı doğrulanmadı",{exact:true})).toBeVisible();
   await page.screenshot({path:testInfo.outputPath("source-workspace.png"),fullPage:true});
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
+  await page.getByLabel("Ürün kayıt ID’si",{exact:true}).fill("333");
+  await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
+  await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
   await page.getByRole("button",{name:"Ürün kimliklerini göster",exact:true}).click();
   await page.getByRole("button",{name:"333",exact:true}).click();
   await expect(page.getByRole("button",{name:"1",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
-  await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("");
-  await page.getByLabel("Ürün kimliği",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
+  await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
+  await page.getByLabel("Ürün kayıt ID’si",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
   await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("button",{name:"2",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
   await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await expect(page.getByRole("cell",{name:"Kira Faaliyet gideri",exact:true})).toBeVisible();
