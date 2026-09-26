@@ -14,7 +14,7 @@ The application takes Electron's single-instance lock before opening the store. 
 
 ## Availability
 
-An empty store returns:
+`getAvailability()` takes a `null` payload and reads the current store. An empty store returns:
 
 ```json
 {"status":"ready","store":"empty","liveConnection":"disabled"}
