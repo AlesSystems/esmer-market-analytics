@@ -23,12 +23,17 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   let page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
   await expect(page.getByRole("img",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
+  await page.getByText("Belge türlerinin tam sayılarını göster",{exact:true}).click();
+  await page.getByText("Günlük tam sayıları göster",{exact:true}).click();
   await expect(page.getByRole("table",{name:"Günlük kaynak belge kayıtları tablosu"})).toBeVisible();
   await expect(page.getByRole("table",{name:"Kaynak belge türleri tablosu"})).toBeVisible();
   await expect(page.getByText("3 / 3 tür kodu gösteriliyor",{exact:false})).toBeVisible();
-  await expect(page.getByText("999 · Tür anlamı doğrulanmadı",{exact:true})).toBeVisible();
+  await expect(page.getByRole("table",{name:"Kaynak belge türleri tablosu"}).getByRole("button",{name:"999 · Tür anlamı doğrulanmadı"})).toBeVisible();
   await page.screenshot({path:testInfo.outputPath("source-workspace.png"),fullPage:true});
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
+  await expect(page.getByRole("cell",{name:"123,4567890123456789",exact:true})).toBeVisible();
+  await expect(page.getByRole("cell",{name:"01.10.2025",exact:true})).toBeVisible();
+  await page.getByText("Gelişmiş filtreler",{exact:true}).click();
   await page.getByLabel("Ürün kayıt ID’si",{exact:true}).fill("333");
   await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
@@ -46,6 +51,10 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await page.getByRole("button",{name:"Özet",exact:true}).click();await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   const writer=openStore(database);writer.importSourcePreview(writeRawPackage(snapshot,"fixture:workspace","batch-2"));writer.close();
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByText("Kaynak sürümü değişti. Yeni sürümü açın.",{exact:false})).toBeVisible();await page.getByRole("button",{name:"Kaynağı yeniden aç",exact:true}).click();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Özet",exact:true}).click();await page.getByLabel("Dönem",{exact:true}).fill("2025-11");
+  await expect(page.getByText("Kapsam dışında",{exact:true}).first()).toBeVisible();
+  await expect(page.getByText("Belge türleri bu dönem için gösterilemiyor; dönem yedek kapsamında değil.",{exact:true})).toBeVisible();
+  await expect(page.getByText("Günlük kayıtlar bu dönem için gösterilemiyor; dönem yedek kapsamında değil.",{exact:true})).toBeVisible();
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"Satışlar",exact:true})).toBeVisible();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });

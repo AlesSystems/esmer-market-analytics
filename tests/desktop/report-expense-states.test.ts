@@ -40,14 +40,23 @@ test("source expenses and opened saved reports expose one main landmark and usef
   const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Giderler",exact:true}).click();
   await expect(page.getByRole("main")).toHaveCount(1);
-  await expect(page.getByText("Bu dönem için gider kaydı yok.",{exact:true})).toBeVisible();
+  await expect(page.getByText("Bu dönemde gider kaydı yok.",{exact:true})).toBeVisible();
   await expect(page.getByRole("button",{name:"Excel’den gider ekle"})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Şablonu kaydet"})).toBeVisible();
   await page.getByRole("button",{name:"Excel’den gider ekle"}).click();
   await expect(page.getByRole("heading",{name:"1. Şablonu indir / dosya seç"})).toBeFocused();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
+  await expect(page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true})).toBeVisible();
+  const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
+  await page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true}).click();
+  await expect(page.getByRole("alert")).toContainText("Yerel hizmet başlatılamadı. Uygulamayı yeniden açın.");
+  const restored=new DatabaseSync(database);restored.exec("ALTER TABLE report_versions_unavailable RENAME TO report_versions");restored.close();
   await page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true}).click();
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByText("Sentetik gösterim raporu — gerçek market sonuçları değildir.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Raporlar",exact:true})).toBeFocused();
+  await page.getByRole("button",{name:"Rapor listesine dön",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Raporlar",exact:true})).toBeFocused();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });

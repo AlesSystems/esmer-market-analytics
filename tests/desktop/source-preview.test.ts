@@ -42,13 +42,13 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
     if (!actual) {
       await page.screenshot({path:"test-results/source-preview.png",fullPage:true});
       await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
-      await page.getByRole("button",{name:"Sonraki kaynak kayıtları"}).click();
-      await expect(page.getByText("51–60 / 60",{exact:true})).toBeVisible();
+      await page.getByRole("button",{name:"Sonraki kaynak kayıtları"}).first().click();
+      await expect(page.getByText("51–60 / 60",{exact:true}).first()).toBeVisible();
       await writeFile(sourceFile,writeRawPackage(rawSnapshot(),"fixture:raw","batch-2"));
       await importPackage(page);
       await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
       await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
-      await expect(page.getByText("1–1 / 1",{exact:true})).toBeVisible();
+      await expect(page.getByText("1–1 / 1",{exact:true}).first()).toBeVisible();
     }
     await app.close();
     app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();
