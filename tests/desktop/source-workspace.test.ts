@@ -28,6 +28,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await page.getByRole("button",{name:"333",exact:true}).click();
   await expect(page.getByRole("button",{name:"1",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
+  await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("");
   await page.getByLabel("Ürün kimliği",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kimliği",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
   await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("button",{name:"2",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
