@@ -47,3 +47,13 @@ test("SQL dependencies are allowed while unreviewed packages remain rejected", a
   expect((await inspectRelease(await fixture("node_modules/tedious/LICENSE"))).violations).toEqual([]);
   expect((await inspectRelease(await fixture("node_modules/unreviewed-driver/index.js"))).violations).toEqual(["archive:node_modules/unreviewed-driver/index.js"]);
 });
+
+test("reviewed SQL library credential modules remain scanned for secrets and cannot admit credential data", async () => {
+  for (const path of ["node_modules/@azure/identity/dist/commonjs/credentials/credentialPersistenceOptions.js", "node_modules/@azure/identity/dist/browser/msal/credentials.js", "node_modules/@azure/msal-common/src/cache/entities/CredentialEntity.ts", "node_modules/@typespec/ts-http-runtime/dist/commonjs/auth/credentials.js"]) {
+    expect((await inspectRelease(await fixture(path, "export const credential = {};"))).violations).toEqual([]);
+    expect((await inspectRelease(await fixture(path, "const privateKey = '-----BEGIN PRIVATE KEY-----';"))).violations).toContain(`content:${path}`);
+  }
+  for (const path of ["node_modules/@azure/identity/dist/commonjs/credentials.json", "node_modules/@azure/identity/dist/commonjs/.env", "node_modules/@azure/identity/dist/commonjs/data.bak", "node_modules/@azure/identity/dist/commonjs/credentials.js", "node_modules/unreviewed-driver/credentials.js"]) {
+    expect((await inspectRelease(await fixture(path))).violations).toContain(`archive:${path}`);
+  }
+});

@@ -60,7 +60,8 @@
       "package.json",
       "!**/*.map",
       "!**/*.test.*",
-      "!dist/licences/**/*"
+      "!dist/licences/**/*",
+      "!node_modules/@azure/msal-node/src/**/*"
     ],
     "asar": true,
     "npmRebuild": false,
