@@ -48,3 +48,7 @@ Financial normalization, source names/unit/cost validation, full historical impo
 The screenshot below uses generated fixture records only. It verifies the five destinations and source-aware overview layout; no real rows are published.
 
 ![Source workspace with synthetic fixture](images/source-workspace-synthetic.png)
+
+## Subsequent usability review
+
+The [26 September page audit](2026-09-26-page-audit.md) records all five pages, the real-backup reporting gap, screenshots, label proposals and the future-update backlog. Restored navigation does not complete real financial reporting.
