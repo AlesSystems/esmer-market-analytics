@@ -49,8 +49,10 @@ export function LiveStatus({onChanged}: {onChanged: () => void}) {
     {state?.live.persistenceError && <p role="alert">Kontrol geçmişi kaydedilemedi. Yeniden açılışta kaynak tekrar doğrulanmalıdır.</p>}
     {result && "message" in result && <p role="alert">{result.message}</p>}
     {result?.status === "busy" && <p role="status">Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.</p>}
-    <Button variant="outline" disabled={busy || state?.live.phase === "refreshing"} onClick={() => void run(() => window.esmer.configureLiveSource())}>Test bağlantısını ayarla</Button>
-    {state?.configured && <Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.setLiveEnabled({enabled: !enabled}))}>{enabled ? "Bağlantıyı kapat" : "Test bağlantısını aç"}</Button>}
-    {enabled && <Button variant="outline" disabled={busy || state.live.phase === "refreshing"} onClick={() => void run(() => window.esmer.refreshLiveSource())}>Kaynağı yeniden kontrol et</Button>}
+    <details className="data-status"><summary>Bağlantı ayarları</summary><div className="report-actions">
+      <Button variant="outline" disabled={busy || state?.live.phase === "refreshing"} onClick={() => void run(() => window.esmer.configureLiveSource())}>Test bağlantısını ayarla</Button>
+      {state?.configured && <Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.setLiveEnabled({enabled: !enabled}))}>{enabled ? "Bağlantıyı kapat" : "Test bağlantısını aç"}</Button>}
+      {enabled && <Button variant="outline" disabled={busy || state.live.phase === "refreshing"} onClick={() => void run(() => window.esmer.refreshLiveSource())}>Kaynağı yeniden kontrol et</Button>}
+    </div></details>
   </section>;
 }

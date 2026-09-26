@@ -23,6 +23,8 @@ test("packaged SQL connection preserves local reports and encrypts configuration
   try {
     let page = await app.firstWindow();
     await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
+    await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toBeHidden();
+    await page.getByText("Bağlantı ayarları", {exact: true}).click();
     await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);
     await page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true}).click();
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
@@ -41,6 +43,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     page = await app.firstWindow();
+    await page.getByText("Bağlantı ayarları", {exact: true}).click();
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
     await expect(page.getByRole("region", {name: "Aylık göstergeler"})).toContainText("200,00 ₺");
