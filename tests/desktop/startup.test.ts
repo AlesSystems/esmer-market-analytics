@@ -24,7 +24,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
   try {
     const page = await app.firstWindow();
     await expect(
-      page.getByRole("heading", { name: "Henüz veri yok" }),
+      page.getByRole("heading", { name: "Henüz mali rapor verisi yok" }),
     ).toBeVisible();
     await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(page.locator("input[type=password]")).toHaveCount(0);
@@ -35,7 +35,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
         process: typeof window.process,
       })),
     ).toEqual({
-      api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate", "setupRecovery"],
+      api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "configureLiveSource", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getLiveStatus", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "querySourceWorkspace", "readReportEvidence", "readReportPurchasing", "readReportVersion", "readSourcePreview", "refreshLiveSource", "restoreExpense", "saveExpenseTemplate", "setLiveEnabled", "setupRecovery"],
       node: "undefined",
       process: "undefined",
     });
@@ -212,7 +212,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
     });
     const reopened = await app.firstWindow();
     await expect(
-      reopened.getByRole("heading", { name: "Henüz veri yok" }),
+      reopened.getByRole("heading", { name: "Henüz mali rapor verisi yok" }),
     ).toBeVisible();
     await expect(reopened.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(reopened.locator("input[type=password]")).toHaveCount(0);
@@ -236,7 +236,7 @@ test("packaged app imports through native selection, preserves data after failed
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
@@ -260,7 +260,7 @@ test("packaged app imports through native selection, preserves data after failed
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır" })).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
-    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "readReportEvidence", "readReportPurchasing", "readReportVersion", "restoreExpense", "saveExpenseTemplate", "setupRecovery"] });
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["acceptReportVersion", "backupNow", "cancelOperation", "cancelRestore", "compareReportVersion", "configureLiveSource", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "exportReportVersion", "getAvailability", "getLiveStatus", "getOperationStatus", "getRecoveryStatus", "importPackage", "inspectSales", "listReportVersions", "openMonthly", "openSales", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "queryMonthly", "queryOperating", "queryPurchasing", "querySales", "querySourceWorkspace", "readReportEvidence", "readReportPurchasing", "readReportVersion", "readSourcePreview", "refreshLiveSource", "restoreExpense", "saveExpenseTemplate", "setLiveEnabled", "setupRecovery"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -278,7 +278,7 @@ for (const loaded of [false, true]) {
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
       const page = await app.firstWindow();
-      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz veri yok" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: loaded ? "Verileriniz bu bilgisayarda hazır" : "Henüz mali rapor verisi yok" })).toBeVisible();
       await expect(page.getByRole("alert")).toHaveText(loaded ? "Önceki içe aktarma yarıda kaldı. Son geçerli veriler korundu. Paketi yeniden içe aktarın." : "Önceki içe aktarma yarıda kaldı. Henüz etkin veri yok. Paketi yeniden içe aktarın.");
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array), lastImportError: "INTERRUPTED" });
       await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
@@ -332,7 +332,7 @@ test("packaged owning worker migrates and reopens durable revisions and report p
         expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", dataset: { datasetId: before.pin.datasetId, counts: { documents: 2, lines: 2, suppliers: 0 } } });
       } finally { await app.close(); }
       const check = new DatabaseSync(databasePath, { readOnly: true });
-      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 6 }); }
+      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 7 }); }
       finally { check.close(); }
       const reopened = openStore(databasePath);
       try {

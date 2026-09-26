@@ -40,7 +40,7 @@ export function RecoveryWorkspace({onClose, onRestored, embedded = false}: {embe
     } catch { setError("İşlem tamamlanamadı. Uygulamayı yeniden açıp tekrar deneyin."); }
     finally { setBusy(false); setBusyAction(""); }
   }
-  return <div className={embedded ? "recovery-content" : "sales-app"}>{!embedded && <header className="app-header"><Button variant="ghost" className="brand" onClick={onClose}>ESMER <span>MARKET</span></Button><span className="offline">Canlı bağlantı kapalı</span></header>}
+  return <div className={embedded ? "recovery-content" : "sales-app"}>{!embedded && <header className="app-header"><Button variant="ghost" className="brand" onClick={onClose}>ESMER <span>MARKET</span></Button><span className="offline">Yerel kurtarma</span></header>}
     <main className="recovery-workspace"><nav aria-label="Kurtarma gezinmesi"><Button variant="outline" onClick={onClose}>Ana sayfaya dön</Button></nav>
       <h1 ref={title} tabIndex={-1}>Yedekleme ve kurtarma</h1><p>Şifreli yedekleri ve kurtarma anahtarını bu bilgisayardan ayrı saklayın. Geri yükleme için ikisi de gereklidir.</p>
       {status?.error && <p role="alert">{status.error.message}</p>}

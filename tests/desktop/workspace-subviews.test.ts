@@ -27,11 +27,11 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toHaveCount(0);
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).toHaveCount(0);
-    await page.getByRole("button", { name: "Gider tamlığını onayla", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).not.toBeChecked();
     await expect(page.getByRole("button", { name: "Eksiksizliği onayla", exact: true })).toBeDisabled();
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Dönem kayıtları", exact: true })).toHaveCount(0);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

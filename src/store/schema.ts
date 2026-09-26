@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -68,3 +68,9 @@ CREATE TRIGGER backup_revision AFTER INSERT ON app_revisions BEGIN UPDATE recove
 CREATE TRIGGER backup_report AFTER INSERT ON report_versions BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
 CREATE TRIGGER backup_activation_insert AFTER INSERT ON active_dataset BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
 CREATE TRIGGER backup_activation_update AFTER UPDATE ON active_dataset BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;
+
+export const sourcePreviewMigration = `CREATE TABLE source_preview (
+  singleton INTEGER PRIMARY KEY CHECK(singleton=1), package_json TEXT NOT NULL CHECK(json_valid(package_json)), hash TEXT NOT NULL
+) STRICT;
+CREATE TRIGGER backup_preview_insert AFTER INSERT ON source_preview BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
+CREATE TRIGGER backup_preview_update AFTER UPDATE ON source_preview BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;

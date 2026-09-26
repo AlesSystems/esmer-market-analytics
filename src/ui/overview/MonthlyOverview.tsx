@@ -11,7 +11,7 @@ function FigureStatus({ label, children }: { label: string; children: ReactNode 
   return <details className="figure-status"><summary>{label}</summary><div className="metric-evidence"><strong>Bu sayı nasıl oluştu?</strong>{children}</div></details>;
 }
 
-export function MonthlyOverview({ report, refresh, onSales, onExpenses, onPurchasing }: { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void }) {
+export function MonthlyOverview({ report, refresh, onSales, onExpenses, onPurchasing, embedded = false }: { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean }) {
   const [evidence, setEvidence] = useState(false);
   const s = report.sales, g = report.purchasing.gross, operating = report.operating.result, comparison = s.comparisons.month;
   const chartBaseline = s.daily.some(day => day.negative) ? 55 : 100;
@@ -25,7 +25,8 @@ export function MonthlyOverview({ report, refresh, onSales, onExpenses, onPurcha
   const salesEvidence = <><p>{date(s.from)} – {date(s.to)} · Tüm ürünler. {s.complete ? "Doğrulanmış kaynak nüfusuyla uzlaşır; gerçek dünyadaki tüm olayların kaydedildiğini kanıtlamaz." : "Kaynak veya dönem kanıtları eksik. Tutarlar kapsanan katkıları gösterir."}</p><p>İndirim sonrası, kayıtlı KDV hariç, müşteri iadeleri düşülmüş. Yöntem: {report.calculations.sales}.</p><p>{available ? quantity(s.metrics.quantities) : "Miktar verisi yok"}. Adet ve kg ayrı tutulur.</p><p>Veri: {date(s.cutoff)} · Paket: {report.purchasing.extractionId}.</p></>;
   const costEvidence = <><p>Tarihsel son alış maliyeti tahmini · {report.calculations.costs}. Eksik maliyet sıfır kabul edilmez.</p>{g.status === "unavailable" ? <p>Maliyet ve alış kanıtı yok. Tutarlar hesaplanamıyor.</p> : <><p>Kapsanan satış: {money(g.coveredSales)} · {g.coveredCount} kapsanan / {g.excludedCount} dışlanan satır.</p><p>Kapsanan satış / müşteri iadesi: {money(g.exposures.coveredSales)} / {money(g.exposures.coveredReturns)}. Dışlanan satış / müşteri iadesi: {money(g.exposures.excludedSales)} / {money(g.exposures.excludedReturns)}.</p><p>Kapsam, mutlak net tutara dayanır.</p></>}{g.warnings.length > 0 && <ul>{g.warnings.map(code => <li key={code}>{purchasingWarningLabels[code] ?? "Maliyet kanıtı eksik veya desteklenmiyor"}</li>)}</ul>}<p>Veri: {date(s.cutoff)} · Paket: {report.purchasing.extractionId}. Satır kanıtları Rapor kanıtı bölümündedir.</p></>;
   const expenseEvidence = <><p>Dönemde oluşan, uygun sınıflandırılmış kayıtlar. Gider revizyonu {report.operating.expenseRevision} · {report.calculations.operating}.</p><p>Sıfır kayıt, gider olmadığı veya giderlerin eksiksiz olduğu anlamına gelmez. İçe aktarma başarısı tamlık onayı değildir.</p><p>Ödeme tarihli brüt hareketler: {money(operating.payments)}. Nakit hareketi faaliyet gideri değildir.</p></>;
-  return <main className="monthly-overview">
+  const Container = embedded ? "section" : "main";
+  return <Container className="monthly-overview">
     <div className="page-heading"><div><h1>Aylık Market Özeti</h1><Badge variant="warning" className="period-state">{report.state === "open" ? "Açık" : "Geçici"}</Badge></div><Badge variant="outline" className="report-marker">{report.review ? "İncelenmiş sürüm" : "Aday rapor"}</Badge></div>
     {(!available || s.coverage === "partial" || !s.complete) && <div className="notice warning"><strong>{!available ? "Dönem verisi yok" : s.coverage === "partial" ? "Kısmi dönem" : "Kanıt eksik"}</strong><span>{date(s.from)} – {date(s.to)}. {!available ? "Kaynak kapsamı dışındaki dönem sıfır faaliyet anlamına gelmez." : !s.complete ? "Kaynak veya dönem kanıtları eksik; tutarlar kapsanan katkıları gösterir." : "Gösterilen değerler bu aralığı kapsar."}</span></div>}
     {report.operating.stale && <div className="notice"><strong>Gider kayıtları değişti</strong><span>Bu rapor önceki gider sürümünde sabit tutuluyor.</span><Button variant="outline" onClick={refresh}>Aylık raporu yeni giderlerle aç</Button></div>}
@@ -63,5 +64,5 @@ export function MonthlyOverview({ report, refresh, onSales, onExpenses, onPurcha
     <section className="block"><h2>Kaynak ve yöntem</h2><dl className="evidence"><dt>Rapor sürümü</dt><dd>{report.id}</dd><dt>Veri sonu / içe aktarım</dt><dd>{date(s.cutoff)} / {s.importedAt ? date(s.importedAt) : "Kayıt yok"}</dd><dt>Kaynak / paket</dt><dd>{report.purchasing.lineage} / {report.purchasing.extractionId}</dd><dt>Hesaplama sürümleri</dt><dd>{Object.values(report.calculations).join(" · ")}</dd><dt>Kural kaydı</dt><dd>{report.rules.artifact}</dd></dl><Button variant="outline" onClick={() => setEvidence(value => !value)} aria-expanded={evidence}>Sabit rapor kanıtlarını {evidence ? "gizle" : "göster"}</Button>{evidence && <ReportEvidence report={report} />}</section>
 
     </details>
-  </main>;
+  </Container>;
 }

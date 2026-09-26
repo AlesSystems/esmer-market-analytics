@@ -13,14 +13,14 @@ test("expenses are reachable without a source and cancelled selection leaves an 
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("İşlem iptal edildi");
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
-    await page.getByRole("button", { name: "Gider tamlığını onayla", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).not.toBeChecked();
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await page.setViewportSize({ width: 680, height: 720 });
     await page.getByText("Excel şablonu nasıl doldurulur?", { exact: true }).click();
     await page.screenshot({ path: "test-results/phase-7-expenses-empty-small.png", fullPage: true });
@@ -41,7 +41,7 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, templatePath);
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await page.getByRole("button", { name: "Şablonu kaydet" }).click();
     await expect(page.getByRole("status")).toContainText("Gider şablonu kaydedildi");
     expect((await stat(templatePath)).size).toBeGreaterThan(0);
@@ -68,7 +68,7 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.getByLabel("Değişiklik gerekçesi").fill("İlk belgeyi geri yükle");
     await page.getByRole("button", { name: "Sürüm 1 geri yükle", exact: true }).click();
     await expect(page.locator(".expense-totals")).toContainText("50,00 ₺");
-    await page.getByRole("button", { name: "Gider tamlığını onayla", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum").check();
     await page.getByLabel("İnceleme açıklaması").fill("Ocak kayıtları kontrol edildi");
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();
@@ -99,7 +99,7 @@ test("invalid rows block a whole workbook and duplicate candidates require expli
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await expect(page.getByRole("button", { name: "İçe aktarmayı onayla" })).toBeDisabled();
     await expect(page.getByRole("alert")).toContainText("geçersiz");
@@ -136,10 +136,10 @@ test("operating report stays pinned after expense edits until the owner reopens 
     await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await page.getByRole("button", { name: "İçe aktarmayı onayla" }).click();
-    await page.getByRole("button", { name: "Gider tamlığını onayla", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum").check();
     await page.getByLabel("İnceleme açıklaması").fill("Eylül kontrolü");
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();

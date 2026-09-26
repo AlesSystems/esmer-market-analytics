@@ -47,3 +47,15 @@ These tests verify the declared fixture boundary. They do not prove the future e
 Before real reduced data enters Git, review every generated field and its purpose, confirm authorized source provenance, inspect the generated content and record reviewer/evidence identity. Keep original backup, credential and identifiable records outside Git. Review release archives and logs as separate artefacts. Phase 2 fixtures remain excluded from the desktop build under existing packaging rules.
 
 See [source revalidation obligations](source.md#revalidation-gate) and [local evidence](../evidence/phase-2-local.md) for performed checks and open gates.
+
+## Isolated backup record preview allowlist
+
+The authorized preview may extract the following fields from the disposable restored copy. It uses explicit SQL projections and preserves only string or null values. Package validation rejects extra columns and text that does not match the expected numeric, timestamp or fixed currency format.
+
+- `FIS`: `ID`, `FIS_TURU`, `DOVIZ_AD`, `DURUM`, `AKTIF`, `SATIR_TOPLAM`, `SATIR_ISKONTO_TOPLAM`, `FIS_ISKONTO_TOPLAM`, `KDV_TOPLAM`, `OTV_TOPLAM`, `TEFKIFAT_TOPLAM`, `GENELTOPLAM`, `FIS_TARIHI`.
+- `FIS_DETAY`: `ID`, `FIS`, `STOK`, `FIS_TURU`, `CARPAN`, `MIKTAR_FIS`, `TOPLAM_KDV_MATRAHI`, `TOPLAM_KDV`, `TOPLAM_OTV`, `TOPLAM_TEVKIF`.
+- `DOVIZ_AD`: `ID` and `AD` for the SQL join and fixed `CURRENCY` classification (`TRY`, `USD`, `OTHER` or null). Arbitrary currency display text is not exported.
+
+The package includes opaque source lineage and extraction identity, database GUID, numeric engine version, capture timestamp and selected source-date bounds. It contains no server locator, account name, password, customer/product/supplier display text or source file path. Use opaque identifiers for lineage and extraction identity.
+
+Prepared real packages, source snapshots, exact-value oracles and real screenshots stay outside Git and release assets. Public UI evidence uses generated rows. Import does not make private source material suitable for publication.

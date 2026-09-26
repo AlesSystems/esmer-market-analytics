@@ -1,0 +1,347 @@
+{
+  "task": "PR 30 Windows continuation, Tasks 10.1 and 11.2",
+  "recordedAt": "2026-09-26T10:47:38.9775854Z",
+  "branch": "codex/issue-14-live-sync",
+  "applicationCommit": "7828c75daa2ed1a1d86b6d34f3954b142c329c2e",
+  "testRunnerCommit": "2c60f578f59e27cf849f94416de52ee5fbd5d664",
+  "environment": {
+    "node": "24.19.0",
+    "version": "10.0.26200",
+    "npm": "10.9.3",
+    "logicalProcessors": 20,
+    "memoryBytes": 33974288384,
+    "cpu": "12th Gen Intel(R) Core(TM) i9-12900H",
+    "build": "26200",
+    "commit": "7828c75daa2ed1a1d86b6d34f3954b142c329c2e",
+    "date": "2026-09-26T12:27:26.8717007+02:00",
+    "os": "Microsoft Windows 11 Pro"
+  },
+  "applicationVersion": "0.2.0",
+  "electron": "44.3.0",
+  "archiveSha256": "f02dfa3472cee12a45328e3a1c1ff02a075c0170074fb515b843459914b88ebc",
+  "distributions": [
+    {
+      "kind": "installer",
+      "name": "Esmer Market Analytics Setup 0.2.0.exe",
+      "bytes": 116376309,
+      "sha256": "fc8acc0f68b6b424adf6dbdf1ea0e59f273da5f529eca27766f9761493677bf9",
+      "containerFiles": [
+        {
+          "path": "$PLUGINSDIR/app-64.7z",
+          "bytes": 115870479,
+          "sha256": "593d63c434c3f4baf3a5b6f2ab790d63105add63d43df77874c4ca18279140c7"
+        },
+        {
+          "path": "$PLUGINSDIR/nsExec.dll",
+          "bytes": 6656,
+          "sha256": "5d9ceb1ce5f35aea5f9e5a0c0edeeec04dfefe0c77890c80c70e98209b58b962"
+        },
+        {
+          "path": "$PLUGINSDIR/nsis7z.dll",
+          "bytes": 434176,
+          "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+        },
+        {
+          "path": "$PLUGINSDIR/SpiderBanner.dll",
+          "bytes": 9216,
+          "sha256": "996a259e53ca18b89ec36d038c40148957c978c0fd600a268497d4c92f882a93"
+        },
+        {
+          "path": "$PLUGINSDIR/StdUtils.dll",
+          "bytes": 102400,
+          "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+        },
+        {
+          "path": "$PLUGINSDIR/System.dll",
+          "bytes": 12288,
+          "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+        },
+        {
+          "path": "$PLUGINSDIR/WinShell.dll",
+          "bytes": 3072,
+          "sha256": "9be85b986ea66a6997dde658abe82b3147ed2a1a3dcb784bb5176f41d22815a6"
+        },
+        {
+          "path": "$R0/Uninstall Esmer Market Analytics.exe",
+          "bytes": 140068,
+          "sha256": "db41bd5a76970591989b626c4e1137184512ce33201fc9366971fd582a59c2b4"
+        }
+      ],
+      "payloadMatchesUnpacked": true
+    },
+    {
+      "kind": "portable",
+      "name": "Esmer Market Analytics 0.2.0.exe",
+      "bytes": 116209013,
+      "sha256": "b903b0155fcfeaf500566dd678d3c9e1a3f625a052864859a194b83383f12bd4",
+      "containerFiles": [
+        {
+          "path": "$PLUGINSDIR/app-64.7z",
+          "bytes": 115870479,
+          "sha256": "593d63c434c3f4baf3a5b6f2ab790d63105add63d43df77874c4ca18279140c7"
+        },
+        {
+          "path": "$PLUGINSDIR/nsis7z.dll",
+          "bytes": 434176,
+          "sha256": "b393f05e8ff919ef071181050e1873c9a776e1a0ae8329aefff7007d0cadf592"
+        },
+        {
+          "path": "$PLUGINSDIR/StdUtils.dll",
+          "bytes": 102400,
+          "sha256": "b72e9013a6204e9f01076dc38dabbf30870d44dfc66962adbf73619d4331601e"
+        },
+        {
+          "path": "$PLUGINSDIR/System.dll",
+          "bytes": 12288,
+          "sha256": "3eb38ae99653a7dbc724132ee240f6e5c4af4bfe7c01d31d23faf373f9f2eaca"
+        }
+      ],
+      "payloadMatchesUnpacked": true
+    }
+  ],
+  "signatures": {
+    "installer": "NotSigned",
+    "portable": "NotSigned"
+  },
+  "inventory": {
+    "violations": [],
+    "procedure": "npm run package:win",
+    "archiveFiles": 3075,
+    "unpackedFiles": 78,
+    "dependencyNotices": 80
+  },
+  "tests": {
+    "unit": {
+      "passed": 29,
+      "skipped": 0
+    },
+    "lint": "passed",
+    "packageWin": "passed",
+    "integration": {
+      "passed": 257,
+      "originalDeadlinesPreserved": true,
+      "sqlAdminSkips": 3,
+      "windowsMaxWorkers": 2,
+      "skipped": 15,
+      "sqlReaderSkips": 1,
+      "windowsCollectorSkips": 11
+    },
+    "desktop": {
+      "nativeDialogsSubstituted": true,
+      "command": "ESMER_EXECUTABLE=<installed exe> npm run test:desktop",
+      "passed": 34,
+      "executable": "work/phase-10-lifecycle/installed/Esmer Market Analytics.exe",
+      "skipped": 0
+    },
+    "installedLifecycle": {
+      "reinstalledTwoLaunches": "passed",
+      "upgradedTwoLaunches": "passed",
+      "priorTwoLaunches": "passed with old label in scratch test"
+    },
+    "typecheck": "passed"
+  },
+  "lifecycle": {
+    "priorInstall": {
+      "exitCode": 0,
+      "profileBefore": null,
+      "syntheticOnly": true,
+      "codeChanged": false,
+      "productVersionAfter": "0.2.0.0",
+      "versionIncreased": false,
+      "profileAfter": null,
+      "installerHash": "EA94E52670299B1ACFB47A57816731CB9C6E4F2DC95A8E8F7D4F14297C51D5A6",
+      "productVersionBefore": null,
+      "archiveAfter": "0B36730F4C7D2A0D86F8A1EA272B4D1F1885DDBEDC8492B30494A9D4E4CD85DF",
+      "stage": "install",
+      "archiveBefore": null
+    },
+    "reinstall": {
+      "codeChanged": false,
+      "archiveBefore": null,
+      "installerHash": "FC8ACC0F68B6B424ADF6DBDF1EA0E59F273DA5F529ECA27766F9761493677BF9",
+      "exitCode": 0,
+      "productVersionBefore": null,
+      "versionIncreased": false,
+      "archiveAfter": "F02DFA3472CEE12A45328E3A1C1FF02A075C0170074FB515B843459914B88EBC",
+      "profileBefore": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "productVersionAfter": "0.2.0.0",
+      "syntheticOnly": true,
+      "profileAfter": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "stage": "install"
+    },
+    "upgrade": {
+      "codeChanged": true,
+      "archiveAfter": "F02DFA3472CEE12A45328E3A1C1FF02A075C0170074FB515B843459914B88EBC",
+      "installerHash": "FC8ACC0F68B6B424ADF6DBDF1EA0E59F273DA5F529ECA27766F9761493677BF9",
+      "versionIncreased": false,
+      "stage": "upgrade",
+      "profileBefore": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "archiveBefore": "0B36730F4C7D2A0D86F8A1EA272B4D1F1885DDBEDC8492B30494A9D4E4CD85DF",
+      "syntheticOnly": true,
+      "exitCode": 0,
+      "productVersionBefore": "0.2.0.0",
+      "productVersionAfter": "0.2.0.0",
+      "profileAfter": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C"
+    },
+    "portable": {
+      "executable": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\release\\Esmer Market Analytics 0.2.0.exe",
+      "wrapperHash": "b903b0155fcfeaf500566dd678d3c9e1a3f625a052864859a194b83383f12bd4",
+      "expectedArchive": "f02dfa3472cee12a45328e3a1c1ff02a075c0170074fb515b843459914b88ebc",
+      "profile": "C:\\Users\\esmer\\Desktop\\Ales\\esmer-market-analytics\\work\\phase-10-lifecycle\\profile",
+      "baseline": {
+        "schema": 6,
+        "businessHash": "be4d5c665d3ca50e3768e337cd788727b21393706eabd8353b111b008f49df8a",
+        "acceptedHash": "634e53f11cab6daf5d5057a89e04309ba27595ce41169b7b0a47f7edd415e94a"
+      },
+      "runs": [
+        {
+          "launch": 1,
+          "processPath": "C:\\Users\\esmer\\AppData\\Local\\Temp\\3JrUmKWVRpQH1DqjcjzwZdfzS9l\\Esmer Market Analytics.exe",
+          "runningArchiveHash": "f02dfa3472cee12a45328e3a1c1ff02a075c0170074fb515b843459914b88ebc",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        },
+        {
+          "launch": 2,
+          "processPath": "C:\\Users\\esmer\\AppData\\Local\\Temp\\3JrUmKWVRpQH1DqjcjzwZdfzS9l\\Esmer Market Analytics.exe",
+          "runningArchiveHash": "f02dfa3472cee12a45328e3a1c1ff02a075c0170074fb515b843459914b88ebc",
+          "exitCode": 0,
+          "profilePreserved": true,
+          "acceptedReportPreserved": true,
+          "developerRuntimeInChildPath": false
+        }
+      ],
+      "syntheticOnly": true,
+      "offlineMode": "Playwright network blocking, not physical disconnection"
+    },
+    "finalUninstall": {
+      "syntheticOnly": true,
+      "executableRemoved": true,
+      "stage": "uninstall",
+      "profileBefore": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "exitCode": 0,
+      "profileAfter": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "uninstallerHash": "DB41BD5A76970591989B626C4E1137184512CE33201FC9366971FD582A59C2B4"
+    },
+    "uninstallAfterUpgrade": {
+      "exitCode": 0,
+      "profileBefore": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "profileAfter": "F1199C2DDC4A559D6CFBF11B715F0BC4CFBC106BBD3F249A649604C3E346C08C",
+      "stage": "uninstall",
+      "syntheticOnly": true,
+      "uninstallerHash": "DB41BD5A76970591989B626C4E1137184512CE33201FC9366971FD582A59C2B4",
+      "executableRemoved": true
+    }
+  },
+  "nativePicker": {
+    "packageImport": "passed with synthetic-business.json, 200 TRY",
+    "realCredentialsUsed": false,
+    "connectionSelection": "unverified: stale control IDs/geometry/non-settable error after automation reset"
+  },
+  "performanceEvidence": "live-windows-performance.json",
+  "screenshot": "images/live-windows-fallback.png",
+  "logs": [
+    {
+      "bytes": 888,
+      "path": "work/pr30-windows/npm-ci-supported-runtime.log",
+      "sha256": "5d3f383abc1d0a8b24db4bfefcbd2db549de076410c4849f74e6689bb9edc4ec"
+    },
+    {
+      "bytes": 501,
+      "path": "work/pr30-windows/test-unit-passed.log",
+      "sha256": "aa6b1f51832dead3dcb6b63522e4b45320fc4d7c04cdbc4bb7e7b037d5bec65c"
+    },
+    {
+      "bytes": 533,
+      "path": "work/pr30-windows/test-integration-passed.log",
+      "sha256": "4998f71b93fcf49e7db30e2aac41d3b3e2fc5fb682d3762d9b8fe364cb5d1e57"
+    },
+    {
+      "bytes": 62,
+      "path": "work/pr30-windows/typecheck-passed.log",
+      "sha256": "6c8c3ed84964bdc77f20f588936f103c3783b8f7d7e5e7e9a91858605cfe2700"
+    },
+    {
+      "bytes": 53,
+      "path": "work/pr30-windows/lint-passed.log",
+      "sha256": "eb48831f5115cacb952ca118834d6a87d7016ee93c70c0fd23884a702c11c25d"
+    },
+    {
+      "bytes": 3267,
+      "path": "work/pr30-windows/package-win.log",
+      "sha256": "cfc2f9b8fa82c818afa7bda35fcd6ca104a9e06b3d67d2cfe9a8249cfcf88c47"
+    },
+    {
+      "bytes": 7669,
+      "path": "work/pr30-windows/test-desktop.log",
+      "sha256": "daa306bd6a58fccc6c7931faafffc504bcd6ac5fd258f78331cc5299e68d792b"
+    },
+    {
+      "bytes": 365,
+      "path": "work/pr30-windows/prior-desktop-corrected.log",
+      "sha256": "99a238881d145dab7f4ae84d586f32a62c6b4977eb55a1d847b3b4c53f6f0beb"
+    },
+    {
+      "bytes": 363,
+      "path": "work/pr30-windows/upgraded-desktop.log",
+      "sha256": "126a2f55551684c0f780dc14628282c608c052e8059939337f42b07fbc5cb227"
+    },
+    {
+      "bytes": 23,
+      "path": "work/pr30-windows/portable.log",
+      "sha256": "e455ffc080b1ef449b5837825f0a9692bd212049880f502b056f77d659d833b1"
+    },
+    {
+      "bytes": 362,
+      "path": "work/pr30-windows/reinstalled-desktop.log",
+      "sha256": "765c5b0cd040ca727c58f073bbf690056612b9befb699e050788bcfe3baf7bf5"
+    },
+    {
+      "bytes": 2926,
+      "path": "work/pr30-windows/test-integration.log",
+      "sha256": "5e778efcd7cee9c30df38b3d19b5f812c4513f6019fc34f2f1a2a99051129241"
+    },
+    {
+      "bytes": 2059,
+      "path": "work/pr30-windows/test-integration-final.log",
+      "sha256": "7e9f2b966b169c5671460e3b964c74dd8d2f268f7a4a8e9d4da19c00eb599a3c"
+    },
+    {
+      "bytes": 2926,
+      "path": "work/pr30-windows/test-integration-idle.log",
+      "sha256": "fdfd1d649f053ad84539dded9865d04c271c2740fbec5a9d14a13bb11d11545b"
+    },
+    {
+      "bytes": 350,
+      "path": "work/pr30-windows/test-integration-timing.log",
+      "sha256": "e396cdb6f29ec4c350f07feaead70ff454b377cec2c03e6ea54db4b42295fe88"
+    },
+    {
+      "bytes": 1950,
+      "path": "work/pr30-windows/test-integration-verified.log",
+      "sha256": "3f087afe0a15cd9176e98880c447ac8cc1586c7b00994ef9f706a7c15fbde7f1"
+    },
+    {
+      "bytes": 416,
+      "path": "work/pr30-windows/worker-focused.log",
+      "sha256": "d696a8abb2fc07281287e800d2aba20fd98cebcb775e4654aa33fde017295aa6"
+    },
+    {
+      "bytes": 549,
+      "path": "work/pr30-windows/test-integration-bounded.log",
+      "sha256": "6e671f0578202a63a72685f490feb3e7b2f401ea8ed5a5931702a8eb962116a2"
+    }
+  ],
+  "limitations": [
+    "Synthetic developer-host verification only. No source access or production installation.",
+    "Same-version 0.2.0 code replacement; no version-number increase or failed NSIS upgrade proof.",
+    "Explicit disposable user-data-dir; default-profile lifecycle and separate clean Windows account/VM remain open.",
+    "Native connection-file selection remains unverified. Automated fallback substitutes file dialogs.",
+    "Fifteen integration skips are not Windows acceptance.",
+    "No independent machine-loss or physical-media/power-loss recovery proof.",
+    "Real financial mappings/population/capacity depend on issue 26. Issue 14 and L01 remain open.",
+    "Two-worker cap avoids observed Windows timeouts; contention is inferred, optimal concurrency not measured."
+  ]
+}

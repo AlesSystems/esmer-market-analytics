@@ -168,7 +168,7 @@ test("packaged visual journey retains every destination and important desktop st
   try {
     const page = await app.firstWindow();
     await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.getByRole("heading", { name: "Henüz veri yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await capture(page, testInfo.outputPath("empty-1440.png"));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
@@ -220,14 +220,14 @@ test("packaged visual journey retains every destination and important desktop st
     await nav.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("expenses-records.png"));
-    await page.getByRole("button", { name: "Gider tamlığını onayla", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Dönem eksiksizlik incelemesi", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("expenses-completeness.png"));
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
     const expensePath = join(userData, "synthetic-expense.xlsx");
     await writeFile(expensePath, await workbook([["ui-rent-1", "15.09.2025", "01.10.2025", ...row.slice(3)]]));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, expensePath);
-    await page.getByRole("button", { name: "Gider içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
     await capture(page, testInfo.outputPath("expenses-import.png"));
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await expect(page.getByRole("region", { name: "Excel önizlemesi" })).toBeVisible();

@@ -1,3 +1,6 @@
+import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
+import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
+import type { LiveResult } from "../domain/contracts";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
 import type { ExpenseRequests, ExpenseResult, OperatingReportResult } from "../expenses/contracts";
@@ -37,6 +40,11 @@ export function validMonthlyRequest(operation: string, value: unknown): boolean 
 }
 export type MonthlyService = (operation: keyof ReportRequestMap, payload: ReportRequestMap[keyof ReportRequestMap]) => Promise<ReportResponse | ReportExportResult | JobOutcome | RequestError>;
 export type JobService = {status: () => OperationStatus; cancel: (request: {id: number}) => {status: "cancelling"} | {status: "idle"}};
+export type LiveService = (operation: string, payload: null | {enabled: boolean}) => Promise<LiveResult>;
+export const liveOperations = ["getLiveStatus", "configureLiveSource", "setLiveEnabled", "refreshLiveSource"];
+export function validLiveRequest(operation: string, payload: unknown): boolean {
+  return operation === "setLiveEnabled" ? exact(payload, ["enabled"]) && typeof payload.enabled === "boolean" : payload === null;
+}
 export type RecoveryService = (operation: string, payload: null | {backupId: string; pinned: boolean} | {token: string}) => Promise<import("../recovery/contracts").RecoveryResult>;
 function validRecoveryRequest(operation: string, payload: unknown): boolean {
   if (["getRecoveryStatus", "setupRecovery", "backupNow", "prepareRestore"].includes(operation)) return payload === null;
@@ -68,13 +76,28 @@ export async function handleRequest(
   monthly?: MonthlyService,
   jobs?: JobService,
   recovery?: RecoveryService,
-): Promise<ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  live?: LiveService,
+  sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
+  sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
+): Promise<SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
       code: "UNTRUSTED_SENDER",
       message: "Bu pencerenin işlem yapma izni yok.",
     };
+  if (operation === "querySourceWorkspace" && sourceWorkspace) {
+    if(!validSourceQuery(payload))return {status:"rejected",code:"INVALID_PAYLOAD",message:"İstek geçerli değil."};
+    return sourceWorkspace(payload);
+  }
+  if (operation === "readSourcePreview" && sourcePreview) {
+    if (!validSourcePreviewRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return sourcePreview(payload);
+  }
+  if (live && typeof operation === "string" && liveOperations.includes(operation)) {
+    if (!validLiveRequest(operation, payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return live(operation, payload as null | {enabled: boolean});
+  }
   if (recovery && typeof operation === "string" && recoveryOperations.includes(operation)) {
     if (!validRecoveryRequest(operation, payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
     return recovery(operation, payload as Parameters<RecoveryService>[1]);

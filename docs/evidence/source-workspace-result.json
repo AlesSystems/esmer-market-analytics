@@ -1,0 +1,43 @@
+{
+  "sourceBatch": "e2731e28-d5b8-418f-b1fe-b955b1c9de5b",
+  "headers": 5508,
+  "lines": 18858,
+  "products": 2356,
+  "visited": [
+    "Özet",
+    "Satışlar",
+    "Alışlar ve maliyet",
+    "Giderler",
+    "Raporlar"
+  ],
+  "period": "2025-10",
+  "firstSalesDocumentExact": true,
+  "hashGuard": true,
+  "offlineRestart": true,
+  "timing": [
+    {
+      "page": "Özet",
+      "elapsedMs": 25
+    },
+    {
+      "page": "Satışlar",
+      "elapsedMs": 195
+    },
+    {
+      "page": "Alışlar ve maliyet",
+      "elapsedMs": 19
+    },
+    {
+      "page": "Giderler",
+      "elapsedMs": 22
+    },
+    {
+      "page": "Raporlar",
+      "elapsedMs": 17
+    }
+  ],
+  "applicationCommit": "777d744",
+  "appAsarSha256": "b71d00c040e34870e4786eadbfa9cfba2a7d197617a90f6a84691593551a5627",
+  "environment": "macOS arm64, Electron 44.3.0",
+  "productGroupNavigation": true
+}

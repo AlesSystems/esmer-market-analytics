@@ -31,7 +31,9 @@ export class SalesReports {
   open(request: OpenSalesRequest): SalesReportResult {
     this.session = null;
     const snapshot = this.store.readSnapshot();
-    if (!snapshot.metadata || !snapshot.pin.datasetId) return failure("EMPTY_STORE", "Henüz veri içe aktarılmadı.");
+    if (!snapshot.metadata || !snapshot.pin.datasetId) return this.store.hasSourcePreview()
+      ? failure("UNSUPPORTED_MAPPING", "Yedek kayıtları yüklendi; mali rapor için doğrulanmış satış verisi henüz hazır değil.")
+      : failure("EMPTY_STORE", "Henüz veri içe aktarılmadı.");
     if (![SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION].includes(snapshot.metadata.mappingVersion)) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
     if (snapshot.app.some(row => row.kind === "adjustment" && row.applicability !== "reversed")) return failure("UNSUPPORTED_ADJUSTMENTS", "Satış düzeltmelerinin etkisi henüz desteklenmiyor. Düzeltilmiş toplam gösterilemiyor.");
     const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
