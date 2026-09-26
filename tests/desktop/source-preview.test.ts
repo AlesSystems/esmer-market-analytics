@@ -45,6 +45,6 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
     await app.close();
     app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();
     await expect(page.getByRole("heading",{name:"SQL yedeğinden gerçek kayıt örneği"})).toBeVisible();
-    await expect(page.getByText("Canlı bağlantı kapalı",{exact:true})).toBeVisible();
+    expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status:"live", live:{phase:"disabled"}});
   } finally {await app.close().catch(() => {}); await rm(userData,{recursive:true,force:true});}
 });
