@@ -1,3 +1,4 @@
+import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { LiveResult } from "../domain/contracts";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
@@ -77,13 +78,18 @@ export async function handleRequest(
   recovery?: RecoveryService,
   live?: LiveService,
   sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
-): Promise<SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
+): Promise<SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
       code: "UNTRUSTED_SENDER",
       message: "Bu pencerenin işlem yapma izni yok.",
     };
+  if (operation === "querySourceWorkspace" && sourceWorkspace) {
+    if(!validSourceQuery(payload))return {status:"rejected",code:"INVALID_PAYLOAD",message:"İstek geçerli değil."};
+    return sourceWorkspace(payload);
+  }
   if (operation === "readSourcePreview" && sourcePreview) {
     if (!validSourcePreviewRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
     return sourcePreview(payload);

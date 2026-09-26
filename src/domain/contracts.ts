@@ -1,3 +1,4 @@
+import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import type { LiveStatus } from "../source/live-contracts";
 import type { SqlServerConfig } from "../source/sql-server";
@@ -30,6 +31,7 @@ export type ImportOutcome =
 export type LiveResult = {status: "live"; configured: boolean; configurationError?: boolean; live: LiveStatus; cutoff: string | null} | {status: "live-failed"; code: "LIVE_CONFIG_UNAVAILABLE" | "LIVE_UNAVAILABLE"; message: string} | JobOutcome;
 export type LiveServiceRequest = {operation: "getLiveStatus" | "refreshLiveSource"} | {operation: "configureLiveSource"; payload: {config: SqlServerConfig; enabled: boolean}} | {operation: "setLiveEnabled"; payload: {enabled: boolean}};
 export interface DesktopApi {
+  querySourceWorkspace(request: SourceQuery): Promise<SourceWorkspaceResult | RequestError | {status:"unavailable";message:string}>;
   readSourcePreview(request: SourcePreviewRequest): Promise<SourcePreviewResult | RequestError | {status: "unavailable"; message: string}>;
   getLiveStatus(): Promise<LiveResult | RequestError>;
   configureLiveSource(): Promise<LiveResult | RequestError>;
@@ -69,7 +71,7 @@ export interface DesktopApi {
   importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({ operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
-export type ServiceResponse = { id: number; result: SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceResponse = { id: number; result: SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
 
 export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };

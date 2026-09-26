@@ -1,3 +1,4 @@
+import {validSourceQuery} from "../source/workspace";
 import { readPackage } from "../source/package";
 import { readRawPackage, validSourcePreviewRequest } from "../source/raw-package";
 import { readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, rmSync } from "node:fs";
@@ -149,7 +150,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
       parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
-    const known = ["readSourcePreview", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
+    const known = ["querySourceWorkspace", "readSourcePreview", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (monthlyOperations.includes(request.operation) && (!("payload" in request) || !validMonthlyRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
@@ -177,6 +178,10 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "getAvailability") {
       const available = store.availability();
       result = available.status === "ready" ? {...available, liveConnection: live?.status().phase !== "disabled" && liveConfig ? "enabled" : "disabled"} : available;
+    }
+    else if(request.operation === "querySourceWorkspace") {
+      if(!validSourceQuery(request.payload))throw Error("INVALID_PAYLOAD");
+      result=store.querySourceWorkspace(request.payload);
     }
     else if (request.operation === "readSourcePreview") {
       if (!validSourcePreviewRequest(request.payload)) throw new Error("INVALID_PAYLOAD");

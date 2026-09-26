@@ -35,6 +35,7 @@ const api: DesktopApi = {
   openSales: request => ipcRenderer.invoke("esmer:request", "openSales", request),
   querySales: request => ipcRenderer.invoke("esmer:request", "querySales", request),
   inspectSales: request => ipcRenderer.invoke("esmer:request", "inspectSales", request),
+  querySourceWorkspace: request => ipcRenderer.invoke("esmer:request", "querySourceWorkspace", request),
   readSourcePreview: request => ipcRenderer.invoke("esmer:request", "readSourcePreview", request),
   importPackage: () => ipcRenderer.invoke("esmer:request", "importPackage", null),
   getAvailability: () =>

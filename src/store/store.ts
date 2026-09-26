@@ -1,3 +1,4 @@
+import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
@@ -65,6 +66,14 @@ class AnalyticsStore {
         return {status: "preview-imported", hash: digest};
       });
     } catch (error) { return error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"} : {status: "failed", code: importErrorCode(error)}; }
+  }
+  querySourceWorkspace(request: SourceQuery): SourceWorkspaceResult {
+    if (!validSourceQuery(request)) throw new Error("INVALID_PAYLOAD");
+    const row=this.db.prepare("SELECT package_json,hash FROM source_preview WHERE singleton=1").get();
+    if(!row)return {status:"source-empty"};
+    const parsed=readRawPackage(Buffer.from(String(row.package_json)));
+    if(!parsed||createHash("sha256").update(String(row.package_json)).digest("hex")!==row.hash)throw Error("INVALID_PACKAGE");
+    return querySource(parsed,String(row.hash),request);
   }
   readSourcePreview(request: SourcePreviewRequest): SourcePreviewResult {
     if (!validSourcePreviewRequest(request)) throw new Error("INVALID_PAYLOAD");

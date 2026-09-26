@@ -1,3 +1,4 @@
+import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
 import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
@@ -48,6 +49,7 @@ function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
   pending.clear(); worker = undefined;
 }
+function requestService(request: {operation:"querySourceWorkspace";payload:SourceQuery}): Promise<SourceWorkspaceResult>;
 function requestService(request: {operation: "readSourcePreview"; payload: SourcePreviewRequest}): Promise<SourcePreviewResult>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
@@ -310,6 +312,7 @@ app.whenReady().then(async () => {
           finally { nativeLiveBusy = false; }
         },
         payload => requestService({operation: "readSourcePreview", payload}),
+        payload => requestService({operation:"querySourceWorkspace",payload}),
       );
     },
   );
