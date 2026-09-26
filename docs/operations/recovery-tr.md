@@ -40,4 +40,4 @@ Geri yükleme sırasında uygulama kapanırsa uygulamayı yeniden açın. Yerel 
 
 ## Kabul sınırı
 
-Bu kılavuz geliştirme aşamasındaki Phase 9 iş akışını açıklar. Temiz Windows kurulumunda, gerçek işletim sistemi anahtar korumasıyla ve bilgisayardan bağımsız saklanan dosyalarla kurtarma kabulü henüz tamamlanmamıştır. [Windows devam planı](windows-phase-9-handoff.md) bu kontrolleri listeler.
+Bu kılavuz uygulamadaki yedekleme ve kurtarma adımlarını anlatır. Temiz Windows kurulumunda, gerçek işletim sistemi anahtar korumasıyla ve bilgisayardan bağımsız saklanan dosyalarla kurtarma kabulü henüz tamamlanmamıştır. [Windows devam planı](windows-phase-9-handoff.md) bu kontrolleri listeler.

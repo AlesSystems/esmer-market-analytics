@@ -24,7 +24,7 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 
 - All dashboards read a local analytics store and remain usable offline.
 - The first release uses prepared analytics packages from authorized backup preparation. It must not require the owner to restore or administer the POS database.
-- Source access is permanently read-only; live access is disabled for the first release. Later live integration requires separate acceptance and authorization.
+- Source access is permanently read-only. The first release does not require a live connection. An isolated test connection can be configured, stays off until enabled, and cannot activate a real financial dataset. Completing live integration still requires separate acceptance and authorization.
 - Historical data must show its actual cutoff rather than appear to describe current activity.
 - Spreadsheet import is the primary expense-entry workflow. A reveal without expense data must still offer useful sales analysis.
 - Do not contact the owner, connect to production or install on his computer as a development side effect.
@@ -32,8 +32,8 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 ## Capabilities and Constraints
 
 - Turkish-only interface, Turkish presentation conventions, English internal identifiers and TRY only. Do not infer tax rules from another jurisdiction.
-- Phase 5 covers sales calculations and the first usable sales interface: period summary, category/product breakdown, transactions and source-line evidence, with previous-period/year comparisons.
-- Historical cost estimates, purchasing and supplier returns follow in Phase 6; expenses and corrections in Phase 7; the complete monthly overview, report-revision experience and Excel export in Phase 8.
+- The application includes sales calculations and the sales workspace. That workspace shows a period summary, a category and product breakdown, transactions and source-line evidence, with previous-period and previous-year comparisons.
+- It also includes historical cost estimates, purchasing, supplier returns, expense import and corrections, the monthly overview, report revisions and Excel export. These paths use synthetic mappings until a real source mapping is approved.
 - The first-release main surface is `Aylık Market Özeti`. Sales, costs, expenses and profitability share one consistent reporting path.
 - Keep customer returns distinct from supplier returns and pre-completion voids. Preserve quantity units; do not combine kilograms and pieces into a misleading physical-volume total.
 - Historical last-purchase cost is an explicitly labelled estimate, separate from current replacement cost. Missing or unresolved values remain unavailable rather than zero.
@@ -45,7 +45,7 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 
 ## Brand Commitments
 
-Esmer Market is the established product/store identity. Product language is Turkish. No additional visual direction is confirmed by this document; the existing shell is implementation evidence, not approval of the eventual sales-page design.
+Esmer Market is the established product/store identity. Product language is Turkish. Current screen visuals are recorded in [DESIGN.md](DESIGN.md). This product file does not replace that record or the foundation specification.
 
 ## Evidence on Hand
 
@@ -56,7 +56,7 @@ The following remain authoritative; this product record summarizes them and does
 - [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md).
 - [Phased implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md).
 
-The existing React shell provides startup, empty and local-service failure presentation. It does not yet establish the sales workspace. Use synthetic or approved reduced fixtures for design; label synthetic demonstrations clearly. Historical audit observations do not authorize renewed source inspection or resolve all source semantics.
+The application includes startup, empty and local-service failure states, plus sales, purchasing, expenses, reports, recovery and a raw source preview. Use synthetic or approved reduced fixtures for design. Label synthetic demonstrations clearly. Historical audit observations do not authorize renewed source inspection or resolve all source semantics.
 
 ## Product Principles
 
@@ -76,4 +76,4 @@ Support keyboard navigation, readable Turkish text, explicit unit labels and Tur
 
 ## Related Design Decisions
 
-The confirmed high-level Phase 5 view hierarchy and navigation are recorded in the [sales UI design brief](docs/superpowers/specs/2026-09-18-phase-5-sales-ui-design.md). Detailed visual styling remains future work.
+The Phase 5 view hierarchy is recorded in the [sales UI design brief](docs/superpowers/specs/2026-09-18-phase-5-sales-ui-design.md). Current visual styling is recorded in [DESIGN.md](DESIGN.md).

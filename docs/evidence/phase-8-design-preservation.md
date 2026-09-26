@@ -10,7 +10,7 @@ Outcome: preserved. This bounded Impeccable documenter substitute follows the [f
 
 ## Preexisting documentation drift
 
-`PRODUCT.md` still describes the sales workspace and detailed visual styling as future work; those statements already exist at `6e0a478`. The current direction and rendered implementation supply the extension reference. `git ls-tree` confirms neither `DESIGN.md` nor `.impeccable/design.json` existed at that baseline. Their absence is a preexisting documentation gap, not a Phase 8 regression. No system files were created or repaired.
+At `6e0a478`, `PRODUCT.md` described the sales workspace and detailed visual styling as future work. That wording predates this Phase 8 review. The direction and rendered implementation in this review supply the extension reference. `git ls-tree` confirms neither `DESIGN.md` nor `.impeccable/design.json` existed at that baseline. Their absence is a preexisting documentation gap, not a Phase 8 regression. No system files were created or repaired.
 
 ## Limits
 

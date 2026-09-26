@@ -18,6 +18,9 @@ The locked production packages below have the stated licences. Their complete pa
 | saxen | 11.1.1 | MIT |
 | tailwind-merge | 3.7.0 | MIT |
 | write-excel-file | 4.1.1 | MIT |
+| tedious | 20.0.0 | MIT |
+
+`tedious` 20.0.0 was added after this Phase 10 inventory, for the isolated SQL preview. Its declared licence is MIT. Packed transitive notices, including packages that `tedious` pulls in, remain the job of `scripts/verify-package.mjs`. This direct-package table does not list those transitive packages.
 
 Electron 44.3.0 supplies Chromium, Node, SQLite, and platform binaries. Its MIT notice and Chromium third-party notices are copied to `resources/licences`. Electron's distributed runtime notices also remain beside the executable. SQLite uses the embedded Node binding; no separately built SQLite addon or installed Node runtime is needed by the application. Packaging disables unnecessary native dependency rebuilding. Packaged startup, imports, and recovery exercise the actual Windows binding.
 

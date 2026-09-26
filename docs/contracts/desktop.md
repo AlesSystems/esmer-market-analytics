@@ -1,6 +1,8 @@
 # Desktop request contract
 
-The renderer has named capabilities for availability, native package import and sales reports: `getAvailability()`, `importPackage()`, `openSales()`, `querySales()` and `inspectSales()`. Their TypeScript contracts are in `src/domain/contracts.ts` and `src/reports/contracts.ts`. The local service owns the persistent SQLite store. No operation connects to the market system.
+The renderer reaches the local service only through named methods on `window.esmer`. [`src/desktop/preload.ts`](../../src/desktop/preload.ts) is the inventory. [`src/domain/contracts.ts`](../../src/domain/contracts.ts) types those methods. The local service owns the persistent SQLite store. No method connects to production or accepts SQL, a path, or a credential from the renderer.
+
+Availability, package import and sales reads are specified below. Expense, monthly report, recovery, isolated test connection and raw preview methods are listed under [Later named requests](#later-named-requests).
 
 ## Request validation
 
@@ -30,7 +32,7 @@ The main process reads only a regular file and enforces the package byte limit w
 
 The result distinguishes a newly active package, unchanged active content, previously imported historical content, cancellation and failure. Reimporting a historical package cannot silently roll back the selected dataset. The UI refreshes availability after an import attempt, while the last complete source dataset remains usable after failure. Native-dialog cancellation does not change the store.
 
-The Phase 4 screen offers selection and import status. Full preview/review screens and expense spreadsheet workflows remain later-phase work. No app-owned authoring or arbitrary query operation is exposed to the renderer.
+The Phase 4 screen offered selection and import status. Expense import, report review and raw preview now use the named requests below. The renderer still receives no database handle and no arbitrary query operation.
 
 ## Safe errors
 
@@ -71,3 +73,13 @@ Report results contain projected metrics and evidence only. They contain no data
 `queryPurchasing({ context })` reads costs, purchases, supplier returns, and supported inventory observations from the existing pinned sales session. It validates the trusted sender and exact context shape before service invocation. The renderer cannot submit paths, SQL, table names, credentials, or operational transactions. A stale or altered session context is rejected.
 
 The result carries the dataset/app revision, cutoff, mapping, separate cost and purchasing calculation versions, coverage, warnings, and source evidence for displayed contributions. All financial calculations remain in the service. Supplier/product controls filter display rows without recomputing amounts. Explicit refresh replaces the session; imports alone cannot change an open report's historical cost or replacement price.
+
+## Later named requests
+
+These methods use the same sender, payload and preload rules as the requests above.
+
+- Expenses use `saveExpenseTemplate`, `previewExpenses`, `confirmExpenses`, `queryExpenses`, `correctExpense`, `restoreExpense`, `confirmExpenseCompleteness` and `queryOperating`. See the [expense contract](expense-completeness.md).
+- Monthly reports use `openMonthly`, `queryMonthly`, `listReportVersions`, `readReportVersion`, `compareReportVersion`, `acceptReportVersion`, `exportReportVersion`, `readReportEvidence`, `readReportPurchasing`, `cancelOperation` and `getOperationStatus`. See the [report contract](reports.md).
+- Recovery uses `getRecoveryStatus`, `setupRecovery`, `backupNow`, `pinBackup`, `prepareRestore`, `confirmRestore` and `cancelRestore`. See the [recovery decision](../decisions/phase-9-recovery.md).
+- The isolated test connection uses `getLiveStatus`, `configureLiveSource`, `setLiveEnabled` and `refreshLiveSource`. Configuration defaults to disabled. See the [live-sync contract](live-sync.md).
+- Raw preview uses `querySourceWorkspace` and `readSourcePreview`. See the [source contract](source.md).

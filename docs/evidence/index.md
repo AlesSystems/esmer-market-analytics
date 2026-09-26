@@ -1,5 +1,19 @@
 # Acceptance evidence
 
+## Current status
+
+Recorded against `main` after [PR #30](https://github.com/AlesSystems/esmer-market-analytics/pull/30) merged at `a3c9dbe`.
+
+The local application implements synthetic sales, purchasing, expenses, monthly reports, Excel export and encrypted recovery. It can also show an isolated raw SQL preview. The isolated test connection stays disabled until an operator enables it, and a successful SQL read still cannot activate a real financial dataset. Issues [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14) and [#26](https://github.com/AlesSystems/esmer-market-analytics/issues/26) remain open. [Release acceptance](release-acceptance.md) still blocks the first real-data reveal.
+
+Sections below are point-in-time records. An older section can say a later phase had not started. Use this section, and the 26 September 2026 records, for the present state.
+
+- [Owner workspace follow-up](2026-09-26-owner-workspace.md)
+- [Financial readiness investigation](2026-09-26-financial-readiness.md)
+- [Page audit before that follow-up](2026-09-26-page-audit.md)
+- [Isolated connection evidence](live-acceptance.md) and [Windows continuation](live-windows-acceptance.md)
+- [Release acceptance and open gates](release-acceptance.md)
+
 ## Phase 1 status
 
 The user authorized application implementation for [issue #4](https://github.com/AlesSystems/esmer-market-analytics/issues/4) on 2026-09-15 and requested a stop at the Windows check. The Windows agent continues on `codex/phase-1-independent-foundation` using [this handoff prompt](../operations/windows-phase-1-handoff.md).

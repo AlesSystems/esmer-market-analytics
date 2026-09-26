@@ -2,7 +2,7 @@
 
 Private Turkish desktop analytics for Esmer Market, intended for one owner on one trusted Windows computer. The approved product uses Electron, TypeScript, React, a local Node service and SQLite.
 
-Phase 1 adds an offline desktop shell, a local SQLite availability probe, and a protected renderer boundary. The empty application has no login or source connection. Business features and durable analytics storage remain later work.
+`main` includes a local SQLite store and Turkish screens for sales, purchasing, expenses, monthly reports, Excel export and encrypted recovery. Financial reports activate only from synthetic mappings. An isolated SQL backup can be imported as a raw-record preview, and an optional isolated test connection stays off until an operator enables it. Neither path activates a real financial dataset. Real-source mapping, first-release acceptance and production rollout remain open.
 
 ## Develop and verify
 
@@ -18,7 +18,7 @@ npm run build
 
 `npm run test:desktop -- tests/desktop/startup.test.ts` builds and launches a packaged application for the current host. `npm run test:unit -- <file>` and `npm run test:integration -- <file>` run Vitest once with a file filter. `npm run package:local` creates an unpacked host application. On Windows, `npm run package:win` creates unsigned x64 installer and portable artifacts in `release/`.
 
-See [runtime decisions](docs/decisions/runtime.md), [the desktop contract](docs/contracts/desktop.md), [acceptance evidence](docs/evidence/index.md), and [the Windows agent handoff](docs/operations/windows-phase-1-handoff.md). Windows smoke validation remains pending.
+See [runtime decisions](docs/decisions/runtime.md), [the desktop contract](docs/contracts/desktop.md), [acceptance evidence](docs/evidence/index.md), and [known limitations](docs/operations/known-limitations-tr.md). Phase 1 Windows smoke passed. Later Windows checks and real-source acceptance remain open in the [release record](docs/evidence/release-acceptance.md).
 
 ## Reading order
 
@@ -33,11 +33,11 @@ The three foundation documents remain authoritative. The plan organizes their de
 
 ## Approval and current state
 
-The user approved the written foundation and phased plan, then authorized Phase 1 implementation and PR creation. The current handoff stops before Windows testing. The Phase 1 exit gate and the release acceptance gates remain open until their required evidence is recorded.
+Synthetic implementation for phases 1 to 10 is on `main`, together with the isolated live preview from [PR #30](https://github.com/AlesSystems/esmer-market-analytics/pull/30). Issues [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14) and [#26](https://github.com/AlesSystems/esmer-market-analytics/issues/26) stay open. First-release acceptance is blocked. The [evidence index](docs/evidence/index.md) separates that present status from older phase records.
 
-Later implementation phases require the user's direction. Renewed source inspection retains its separate authorization gate. Production integration requires Eralp's acceptance, explicit permission for the specific source, and separate rollout direction.
+Renewed source inspection keeps its separate authorization gate. Production integration requires Eralp's acceptance, explicit permission for the specific source, and separate rollout direction.
 
-Phase 1 establishes the verification commands above. The remaining plan paths describe future work. The evidence index distinguishes local verification from pending Windows acceptance.
+The commands above are the current verification set. The evidence index records which checks passed on which host. A passing local test does not close a Windows or real-source gate.
 
 ## Essential product boundaries
 
