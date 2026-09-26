@@ -33,3 +33,75 @@ test("rejects private columns, orphan IDs and financial type mismatches", () => 
   }
   expect(readRawPackage(Buffer.from("{}"))).toBeNull();
 });
+
+test("cancellation rolls back replacement, paging is bounded and recovery preserves private preview", async () => {
+  const {mkdtemp, mkdir, readFile, rm} = await import("node:fs/promises");
+  const {join} = await import("node:path");
+  const {tmpdir} = await import("node:os");
+  const {Recovery} = await import("../../src/recovery/backup");
+  const {generateRecoveryKey} = await import("../../src/recovery/keys");
+  const root = await mkdtemp(join(tmpdir(), "raw-recovery-"));
+  const destination = join(root,"backups"); await mkdir(destination);
+  const key = generateRecoveryKey();
+  let recovery = await Recovery.open(join(root,"original.sqlite"), {destination,key});
+  try {
+    const store = recovery.store!;
+    store.importPackage(sourcePackage("a"));
+    store.appendRevision({kind: "expense", entityId: "expense-1", value: {net: "50", date: "2025-01-15", reason: "Synthetic original", evidence: "fixture:expense"}});
+    const before = store.readSnapshot();
+    store.acceptReport({id: "report-1", pin: before.pin, calculationVersion: "synthetic-v1", evidence: ["fixture:a"], output: {net: "150"}});
+    const snapshot = rawSnapshot();
+    snapshot.lines = Array.from({length: 60}, (_, i) => ({...snapshot.lines[0], ID: String(i+2)}));
+    const bytes = writeRawPackage(snapshot,"fixture:raw","batch-1");
+    const generation = store.recoveryGeneration().changed;
+    expect(store.importSourcePreview(bytes).status).toBe("preview-imported");
+    expect(store.recoveryGeneration().changed).toBe(generation+1);
+    const expected = store.readSourcePreview({stream:"lines",offset:50});
+    expect(expected).toMatchObject({status:"source-preview",total:60,rows: expect.any(Array)});
+    if (expected.status !== "source-preview") throw Error("missing");
+    expect(expected.rows).toHaveLength(10);
+    expect(expected.rows[0].ID).toBe("52");
+    expect(() => store.readSourcePreview({stream:"lines",offset:-1})).toThrow("INVALID_PAYLOAD");
+    let checks = 0;
+    expect(store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:raw","batch-2"), {checkCancelled: () => {if (++checks === 3) throw Error("CANCELLED");}})).toEqual({status:"cancelled"});
+    expect(store.readSourcePreview({stream:"lines",offset:50})).toEqual(expected);
+    expect(store.readSnapshot()).toEqual(before);
+    const status = await recovery.backupNow();
+    expect(status.state).toBe("ready");
+    const artifact = join(destination,`${status.backups[0].id}.esmerbackup`);
+    expect((await readFile(artifact)).includes(Buffer.from("123.4567890123456789"))).toBe(false);
+    await recovery.close();
+    recovery = await Recovery.open(join(root,"restored.sqlite"));
+    const restore = await recovery.prepareRestore(artifact,key);
+    await recovery.confirmRestore(restore.token);
+    expect(recovery.store!.readSourcePreview({stream:"lines",offset:50})).toEqual(expected);
+    expect(recovery.store!.readSnapshot()).toEqual(before);
+    expect(recovery.store!.readReport("report-1").output).toEqual({net:"150"});
+  } finally {await recovery.close(); await rm(root,{recursive:true,force:true});}
+});
+
+test("strict preview boundary rejects corrupt hashes, invalid dates, duplicate IDs and numeric payloads", async () => {
+  const {canonical, MAX_BYTES} = await import("../../src/source/package");
+  const bytes = writeRawPackage(rawSnapshot(),"fixture:raw","batch-1");
+  const parsed = JSON.parse(bytes.toString());
+  parsed.sha256 = "0".repeat(64);
+  expect(readRawPackage(Buffer.from(canonical(parsed)))).toBeNull();
+  expect(readRawPackage(Buffer.alloc(MAX_BYTES+1))).toBeNull();
+  for (const mutate of [
+    (s: ReturnType<typeof rawSnapshot>) => {s.headers.push({...s.headers[0]});},
+    (s: ReturnType<typeof rawSnapshot>) => {s.headers[0].FIS_TARIHI = "2025-02-30T12:00:00.000";},
+    (s: ReturnType<typeof rawSnapshot>) => {s.headers[0].GENELTOPLAM = "customer@example.org";},
+    (s: ReturnType<typeof rawSnapshot>) => {s.engineVersion = "private name";},
+    (s: ReturnType<typeof rawSnapshot>) => {s.capturedAt = "2026-02-30T12:00:00.000Z";},
+  ]) {const snapshot=rawSnapshot(); mutate(snapshot); expect(() => writeRawPackage(snapshot,"fixture:raw","batch-1")).toThrow("INVALID_PACKAGE");}
+});
+
+test("preview requests enforce trusted sender, fixed stream and bounded offset", async () => {
+  const {handleRequest} = await import("../../src/desktop/requests");
+  const reader = async () => ({status:"source-preview-empty" as const});
+  const availability = async () => ({status:"ready" as const,store:"empty" as const,liveConnection:"disabled" as const});
+  const request = (trusted:boolean,payload:unknown) => handleRequest(trusted,"readSourcePreview",payload,availability,undefined,undefined,undefined,undefined,undefined,undefined,undefined,reader);
+  expect(await request(false,{stream:"headers",offset:0})).toMatchObject({code:"UNTRUSTED_SENDER"});
+  for (const payload of [{stream:"headers",offset:0,sql:"SELECT *"},{stream:"customers",offset:0},{stream:"lines",offset:-1},{stream:"headers",offset:100001}]) expect(await request(true,payload)).toMatchObject({code:"INVALID_PAYLOAD"});
+  expect(await request(true,{stream:"headers",offset:0})).toEqual({status:"source-preview-empty"});
+});
