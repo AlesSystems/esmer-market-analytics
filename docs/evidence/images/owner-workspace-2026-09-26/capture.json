@@ -1,0 +1,33 @@
+{
+  "fixture": "synthetic-owner-experience-2026-09-26",
+  "generated": true,
+  "headers": 345,
+  "lines": 345,
+  "states": [
+    {
+      "page": "Özet",
+      "mainLandmarks": 1,
+      "overflow": false
+    },
+    {
+      "page": "Satışlar",
+      "mainLandmarks": 1,
+      "overflow": false
+    },
+    {
+      "page": "Alışlar ve maliyet",
+      "mainLandmarks": 1,
+      "overflow": false
+    },
+    {
+      "page": "Giderler",
+      "mainLandmarks": 1,
+      "overflow": false
+    },
+    {
+      "page": "Raporlar",
+      "mainLandmarks": 1,
+      "overflow": false
+    }
+  ]
+}

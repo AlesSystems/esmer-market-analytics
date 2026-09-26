@@ -1,0 +1,9 @@
+ts	phase	decision	why	evidence	result
+2026-09-26T15:06:25.157328+00:00	frame	Reuse PR 30 checkout at 72996bc	Preserve existing branch and implementation	docs/evidence/2026-09-26-page-audit.md	clean tracked working tree
+2026-09-26T15:06:25.157328+00:00	design	Retain raw count model and existing reporting engine	Model the domain keeps nonfinancial records distinct from financial facts	src/source/raw-package.ts;docs/contracts/source.md	financial mapping unresolved
+2026-09-26T15:06:25.157328+00:00	routing	Split financial evidence and two disjoint UI slices	Follow user routing harness and serialize package runs	work/poteto/pr30-owner-experience/plan.md	workers running
+2026-09-26T15:06:25.157486+00:00	baseline	Record three expected packaged failures	Verify application behavior before runtime edits	tests/desktop/source-workspace.test.ts;tests/desktop/report-expense-states.test.ts	missing chart; missing retry; two main landmarks
+2026-09-26T15:19:12.618620+00:00	financial	Keep real financial activation blocked	Source identity and completion remain unresolved after fresh inspection	docs/evidence/2026-09-26-financial-readiness.md	30 extraction checks passed; financial mapping NOT COMPLETE
+2026-09-26T15:19:12.618741+00:00	verification	Fix review findings before handoff	Return focus and uncovered-period copy affect owner navigation	tests/desktop/report-expense-states.test.ts;tests/desktop/source-workspace.test.ts	focused packaged checks passed
+2026-09-26T15:19:12.618744+00:00	visual	Reuse existing muted chart token	Detector found the new literal outside the design palette	src/ui/style.css;docs/evidence/images/owner-workspace-2026-09-26/overview-1440.png	final package inspected
+2026-09-26T15:19:12.618745+00:00	handoff	Publish generated screenshots and explicit remaining gates	Private market records must stay out of PR artifacts	docs/evidence/2026-09-26-owner-workspace.md	34 distinct packaged checks verified; Windows open
