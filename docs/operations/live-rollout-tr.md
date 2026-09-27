@@ -1,6 +1,6 @@
 # İzole SQL bağlantısını deneme ve kapatma
 
-Bu sürüm yalnızca izole test bağlantısını dener. Gerçek mali eşleme henüz onaylanmadığından başarılı SQL okumasından sonra **“Bu kaynağın mali eşlemesi henüz onaylanmadı. Veriler içe aktarılmadı.”** görünür. Mevcut yerel raporlar kullanılmaya devam eder. #14, #26 ve L01 tamamlanmış değildir.
+Bu sürüm yalnızca izole test bağlantısını dener. Başarılı SQL okuması kaynak kayıtlarını yerel önizlemeye yazar. Mali rapor oluşturmaz. Satış ekranı bu kayıtlar için doğrulanmış satış verisinin hazır olmadığını söyler. Daha önce yüklenmiş mali raporlar durur. #14, #26 ve L01 tamamlanmış değildir.
 
 ## Hazırlık
 

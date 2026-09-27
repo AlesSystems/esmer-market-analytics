@@ -30,11 +30,16 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     await page.getByRole("button", {name: "Test bağlantısını aç", exact: true}).click();
     await page.getByRole("button", {name: "Kaynağı yeniden kontrol et", exact: true}).click();
-    const expected = process.env.ESMER_SQL_TEST_CONFIG ? "Bu kaynağın mali eşlemesi henüz onaylanmadı. Veriler içe aktarılmadı." : "Kaynağa ulaşılamadı.";
-    await expect(page.getByText(expected, {exact: true})).toBeVisible({timeout: 30_000});
-    await expect(page.getByRole("region", {name: "Aylık göstergeler"})).toContainText("200,00 ₺");
+    const configured = Boolean(process.env.ESMER_SQL_TEST_CONFIG);
+    if (configured) {
+      await expect(page.getByText("Kaynak kayıtlarının özeti", {exact: false})).toBeVisible({timeout: 30_000});
+      expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "idle", lastRecord: "preview"}});
+    } else {
+      await expect(page.getByText("Kaynağa ulaşılamadı.", {exact: true})).toBeVisible({timeout: 30_000});
+      await expect(page.getByRole("region", {name: "Aylık göstergeler"})).toContainText("200,00 ₺");
+      expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "stale", lastSuccessAt: null}});
+    }
     const status = await page.evaluate(() => window.esmer.getLiveStatus());
-    expect(status).toMatchObject({status: "live", configured: true, live: {phase: "stale", lastSuccessAt: null}});
     expect(JSON.stringify(status)).not.toContain(config.password);
     expect((await readFile(join(userData, "live-source.enc"))).includes(Buffer.from(config.password))).toBe(false);
     await page.screenshot({path: "test-results/live-fallback.png", fullPage: true});
@@ -46,6 +51,10 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await page.getByText("Bağlantı ayarları", {exact: true}).click();
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
+    if (configured) {
+      await page.getByText("İşlemler", {exact: true}).click();
+      await page.getByRole("button", {name: "Korunan mali veri görünümü", exact: true}).click();
+    }
     await expect(page.getByRole("region", {name: "Aylık göstergeler"})).toContainText("200,00 ₺");
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));

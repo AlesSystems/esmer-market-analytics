@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { ImportOutcome } from "../domain/contracts";
 import { canonical, readPackage, type Manifest } from "./package";
+import { readRawPackage } from "./raw-package";
 import { LIVE_ERROR_CODES, readLiveStatus, type LiveErrorCode, type LiveRefreshResult, type LiveStatus } from "./live-contracts";
 
 export const LIVE_POLL_MS = 5 * 60_000;
@@ -12,9 +13,11 @@ export function liveIdentity(manifest: Manifest): string {
 export function liveFingerprint(manifest: Manifest): string {
   return createHash("sha256").update(canonical({identity: liveIdentity(manifest), streams: manifest.streams})).digest("hex");
 }
+type PreviewImport = {status: "preview-imported"; hash: string} | {status: "failed"; code: string} | {status: "cancelled"};
 type Options = {
   extract: (signal: AbortSignal) => Promise<Uint8Array>;
   importCandidate: (bytes: Uint8Array) => ImportOutcome;
+  importPreview?: (bytes: Uint8Array) => PreviewImport;
   activeDataset: () => {datasetId: string; fingerprint: string; identity: string} | null;
   now?: () => number;
   persist?: (status: LiveStatus) => void;
@@ -26,7 +29,7 @@ export class LiveSynchronizer {
   private controller?: AbortController;
   private running?: Promise<LiveRefreshResult>;
   private sourceWork?: Promise<Uint8Array>;
-  private state: LiveStatus = {phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, persistenceError: false};
+  private state: LiveStatus = {phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, lastRecord: "none", persistenceError: false};
   private resumed = false;
   constructor(private readonly options: Options) {
     const previous = readLiveStatus(options.initialStatus);
@@ -35,8 +38,8 @@ export class LiveSynchronizer {
   isBusy(): boolean { return !!(this.running || this.sourceWork); }
   private now() { return this.options.now?.() ?? Date.now(); }
   status(): LiveStatus {
-    if (this.state.phase !== "disabled" && this.state.lastDatasetId && this.options.activeDataset()?.datasetId !== this.state.lastDatasetId) {
-      this.state = {...this.state, lastSuccessAt: null, lastDatasetId: null};
+    if (this.state.phase !== "disabled" && this.state.lastRecord !== "preview" && this.state.lastDatasetId && this.options.activeDataset()?.datasetId !== this.state.lastDatasetId) {
+      this.state = {...this.state, lastSuccessAt: null, lastDatasetId: null, lastRecord: "none"};
       if (this.state.phase !== "disabled" && this.state.phase !== "refreshing") this.state = {...this.state, phase: "stale", error: "SOURCE_CHANGED"};
     }
     if (this.state.phase === "idle" && this.state.lastSuccessAt && this.now() - Date.parse(this.state.lastSuccessAt) > LIVE_STALE_MS) return {...this.state, phase: "stale"};
@@ -91,6 +94,13 @@ export class LiveSynchronizer {
       void extraction.then(() => {if (this.sourceWork === extraction) this.sourceWork = undefined;}, () => {if (this.sourceWork === extraction) this.sourceWork = undefined;});
       const bytes = await Promise.race([extraction, interrupted]);
       if (signal.aborted || !this.enabled) return {status: "cancelled"};
+      if (readRawPackage(bytes)) {
+        const preview = this.options.importPreview?.(bytes);
+        if (!preview || preview.status === "failed") throw new Error(preview?.code === "STORAGE_FULL" ? "STORAGE_FULL" : "INVALID_CANDIDATE");
+        if (preview.status === "cancelled") return {status: "cancelled"};
+        this.state = {...this.state, phase: "idle", error: null, lastSuccessAt: new Date(this.now()).toISOString(), lastDatasetId: preview.hash, lastRecord: "preview"};
+        this.save(); return {status: "active", datasetId: preview.hash};
+      }
       const parsed = readPackage(bytes);
       if (!parsed.ok) throw new Error("INVALID_CANDIDATE");
       const active = this.options.activeDataset();
@@ -100,7 +110,7 @@ export class LiveSynchronizer {
         : this.options.importCandidate(bytes);
       if (result.status === "cancelled") return {status: "cancelled"};
       if (result.status !== "active" && result.status !== "unchanged") throw new Error(result.status === "failed" && result.code === "STORAGE_FULL" ? "STORAGE_FULL" : "INVALID_CANDIDATE");
-      this.state = {...this.state, phase: "idle", error: null, lastSuccessAt: new Date(this.now()).toISOString(), lastDatasetId: result.datasetId};
+      this.state = {...this.state, phase: "idle", error: null, lastSuccessAt: new Date(this.now()).toISOString(), lastDatasetId: result.datasetId, lastRecord: "dataset"};
       this.save(); return {status: result.status, datasetId: result.datasetId};
     } catch (error) {
       if (!this.enabled) return {status: "cancelled"};

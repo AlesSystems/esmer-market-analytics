@@ -151,7 +151,7 @@ test("saved success restarts stale and manual dataset replacement clears freshne
 test("invalid persisted status is ignored without importing untrusted fields", () => {
   const controller = new LiveSynchronizer({extract: async () => sourcePackage("a"), importCandidate: () => ({status: "cancelled"}), activeDataset: () => null, initialStatus: {phase: "stale", error: "password=private", lastSuccessAt: "invalid", lastDatasetId: "private", path: "/private"}});
   controllers.push(controller);
-  expect(controller.status()).toEqual({phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, persistenceError: false});
+  expect(controller.status()).toEqual({phase: "disabled", error: null, lastAttemptAt: null, lastSuccessAt: null, lastDatasetId: null, lastRecord: "none", persistenceError: false});
 });
 
 test("polling resumes after timeout cleanup outlasts the next scheduled poll", async () => {
