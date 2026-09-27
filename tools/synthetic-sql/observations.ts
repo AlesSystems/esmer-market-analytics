@@ -1,4 +1,5 @@
-import { isAbsolute, relative } from "node:path";
+import { realpath } from "node:fs/promises";
+import { basename, isAbsolute, relative, resolve } from "node:path";
 
 export const SYNTHETIC_DEV_DATABASE = "EsmerSyntheticDev";
 export const SYNTHETIC_DEV_READER = "EsmerSyntheticDevReader";
@@ -21,6 +22,18 @@ export type SyntheticObservation = {
 export function pathIsInsideRepo(candidate: string, root: string): boolean {
   const rel = relative(root, candidate);
   return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
+}
+
+export async function assertConfigOutsideRepo(path: string, repoRoot: string): Promise<void> {
+  const absolute = resolve(path);
+  const root = await realpath(repoRoot).catch(() => repoRoot);
+  let candidate = absolute;
+  try {candidate = await realpath(absolute);}
+  catch {
+    try {candidate = resolve(await realpath(resolve(absolute, "..")), basename(absolute));}
+    catch {throw new Error("UNSAFE_CONFIG_PATH");}
+  }
+  if (pathIsInsideRepo(candidate, root)) throw new Error("UNSAFE_CONFIG_PATH");
 }
 
 export function assertDropTarget(name: string, ephemeralCreated: ReadonlySet<string>): {kind: "ephemeral"} | {kind: "dev"} {
@@ -57,8 +70,8 @@ export function checkExpected(
     const actual = snapshotHeaders.find(row => row.ID === header.id);
     if (!actual) continue;
     if (actual.GENELTOPLAM !== header.genelToplam) mismatches.push(`GENELTOPLAM:${header.id}:${actual.GENELTOPLAM ?? "null"}!=${header.genelToplam}`);
-    if (actual.FIS_TURU != null && actual.FIS_TURU !== String(header.fisTuru)) mismatches.push(`FIS_TURU:${header.id}:${actual.FIS_TURU}!=${header.fisTuru}`);
-    if (actual.FIS_TARIHI != null && !actual.FIS_TARIHI.startsWith(header.date)) mismatches.push(`FIS_TARIHI:${header.id}:${actual.FIS_TARIHI}!=${header.date}`);
+    if (actual.FIS_TURU !== String(header.fisTuru)) mismatches.push(`FIS_TURU:${header.id}:${actual.FIS_TURU ?? "missing"}!=${header.fisTuru}`);
+    if (actual.FIS_TARIHI == null || !actual.FIS_TARIHI.startsWith(header.date)) mismatches.push(`FIS_TARIHI:${header.id}:${actual.FIS_TARIHI ?? "missing"}!=${header.date}`);
   }
   const lineIds = snapshotLines.map(row => row.ID ?? "");
   const expectedLineIds = expected.lines.map(row => row.id);

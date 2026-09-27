@@ -1,15 +1,21 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Connection, Request } from "tedious";
 import { extractSqlServer, parseSqlServerConfig, type SqlServerConfig } from "../../src/source/sql-server.ts";
 import {
+  assertConfigOutsideRepo,
   assertDropTarget,
   baselineExpected,
+  checkExpected,
   isScenarioName,
   scenarioExpected,
   SYNTHETIC_DEV_DATABASE,
   SYNTHETIC_DEV_READER,
 } from "../../tools/synthetic-sql/observations.ts";
+
+const repoRoot = resolve(fileURLToPath(new URL("../..", import.meta.url)));
 
 type Admin = {server: string; port: number; user: string; password: string; scope: "isolated-test-setup"};
 type Row = Record<string, unknown>;
@@ -65,6 +71,7 @@ function readerPassword(): string {
 async function writeReaderConfig(config: SqlServerConfig): Promise<void> {
   const path = process.env.ESMER_SQL_DEV_CONFIG;
   if (!path) return;
+  await assertConfigOutsideRepo(path, repoRoot);
   await writeFile(path, `${JSON.stringify(config)}\n`, {mode: 0o600});
 }
 
@@ -163,6 +170,9 @@ export async function seedSyntheticDev(adminPath: string): Promise<SqlServerConf
     ];
     await handle.execute(inserts.join("; "));
     const config = await readerConfigFor(admin, handle.password);
+    const snapshot = await extractSqlServer(config);
+    const verdict = checkExpected(snapshot.headers, snapshot.lines, baseline);
+    if (!verdict.ok) throw new Error(`OBSERVATION_MISMATCH ${verdict.mismatches.join(" ")}`);
     await writeReaderConfig(config);
     return config;
   } finally {await handle.close();}

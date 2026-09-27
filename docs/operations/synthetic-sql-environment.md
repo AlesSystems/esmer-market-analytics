@@ -18,11 +18,24 @@ npm run synthetic-sql -- scenario insert
 npm run synthetic-sql -- stop
 ```
 
-Success prints a line that includes `SYNTHETIC` and `EsmerSyntheticDev`. Passwords stay in the private reader JSON. Never commit that file.
+Success prints a line that includes `SYNTHETIC` and `EsmerSyntheticDev`. `seed` and `reset` read the rows back through the existing extractor and stop with `OBSERVATION_MISMATCH` when the view does not match the baseline. Passwords stay in the private reader JSON. Never commit that file.
 
-Closed scenarios: `insert`, `correct`, `delete`, `backdate`, `source-reset`, `incomplete`, `late-low-id`, `permission-loss`, `connection-loss`, `rejected-candidate`.
+## Reproduce a scenario
 
-`permission-loss`, `connection-loss`, and `rejected-candidate` also require `ESMER_SQL_DEV_CONFIG`. They call the existing extractor and expect `SOURCE_REJECTED`, `SOURCE_UNAVAILABLE`, and `SOURCE_CHANGED`. `late-low-id` commits both rows before the command returns. The open-transaction lock barrier stays in `tests/integration/live-sql-server.test.ts`.
+Run `seed` before a scenario. Run `seed` again between scenarios that change rows.
+
+- `insert` adds header `1003` and line `2003`.
+- `correct` sets header `1001` `GENELTOPLAM` to `50.00000000`.
+- `delete` removes header `1002` and line `2002`.
+- `backdate` sets header `1001` to `2025-08-01`.
+- `source-reset` deletes every header and line. The database GUID stays the same.
+- `incomplete` adds header `1004` with no line.
+- `late-low-id` commits header `1006`, then header `1005`. The command returns after both commits. The open-transaction lock barrier stays in `tests/integration/live-sql-server.test.ts`.
+- `permission-loss` denies line reads and expects `SOURCE_REJECTED`. Run `seed` again before you point the app at the reader. Seed restores the grant.
+- `connection-loss` reads port `1` and expects `SOURCE_UNAVAILABLE`.
+- `rejected-candidate` uses a wrong database GUID and expects `SOURCE_CHANGED`.
+
+`permission-loss`, `connection-loss`, and `rejected-candidate` also require `ESMER_SQL_DEV_CONFIG`.
 
 ## Point the packaged app at the reader
 
