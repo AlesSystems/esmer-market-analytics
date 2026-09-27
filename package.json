@@ -17,6 +17,7 @@
     "test:integration": "vitest run --dir tests/integration",
     "test:desktop": "node scripts/test-desktop.mjs",
     "test": "npm run test:unit && npm run test:integration && npm run test:desktop",
+    "synthetic-sql": "node tools/synthetic-sql.ts",
     "package:local": "npm run build && electron-builder --dir",
     "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar && node tools/release-inventory.ts release/win-unpacked release/release-inventory.json && node scripts/verify-distributions.mjs"
   },
