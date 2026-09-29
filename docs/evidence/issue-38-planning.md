@@ -67,3 +67,9 @@ An independent reviewer checked the issue, documents, calculation/report code, d
 Review used the same model family, not a cross-family panel. The reviewer checked the task-local trail against artifacts and supplied task context; a complete conversation transcript was unavailable. Application-comment review was not applicable because this change contains no application code or code-comment changes.
 
 P01 is complete as a documentation gate. P04 synthetic groundwork has its P01 prerequisite satisfied; P05 still requires the P04 contract, and P03 still requires P02. Further task authorization and all real-source, Windows and release gates remain unchanged. GitHub CLI is used per the repository tracker instructions.
+
+## Owner graph clarification — 2026-09-29
+
+The owner confirmed that the app will include graphs, capped at three. The diagram/page sketch now shows daily covered gross profit, product covered profit and cost coverage, all fed by the same monthly report. Table search does not change the graphs. Synthetic E03 values remain unchanged: daily +100/−40/zero, products A +40/B +20/C unavailable, cost coverage 350/390 (89.74%). Accessible numerical alternatives remain available.
+
+Verification: the diagram skill self-check, independent E01–E12 arithmetic, 36 local links/anchors and `git diff --check` passed. Installed Chrome rendered the revised sketch; visual inspection caught a long architecture-node label, which was shortened before the final render. This follow-up changes planning documents only; application implementation remains a separate task.
