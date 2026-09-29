@@ -13,6 +13,39 @@
 - For the isolated SQL live check and the prepared SQL backup import, follow [Show recorded SQL rows](https://github.com/AlesSystems/AlesSystems-Workstreams/blob/main/Esmer%20Market%20Analytics/plans/2026-09-26-live-and-backup-display.md) before editing those paths. The first priority is recorded source rows in the source workspace. Do not treat those rows as sales, cost, or profit. Do not add customer, employee, product-name, or supplier columns.
 - Check files and scripts on the current branch. Proposed paths, unchecked plan items and historical status paragraphs are not evidence of current implementation or acceptance. Honor authorization already given in the conversation without asking for it again.
 
+## Execution graphs
+
+- Before substantial work spanning multiple workstreams, agents, implementation areas or verification stages, the orchestrator must write an explicit directed acyclic graph (DAG) of work contracts. Nodes are work units; edges are required predecessors. Trivial, isolated changes may proceed without a graph.
+- Each node must have a unique ID, type (analysis, design, implementation, test, review, integration or documentation), objective, dependencies and acceptance criteria. Add relevant inputs, allowed files or areas, expected artifacts, verification commands or evidence, and risk level when applicable.
+- Run a node only after every predecessor succeeds. Identify independent nodes for parallel work, but check file and resource conflicts first; serialize overlapping writes to critical files or introduce a shared prerequisite. Agent availability alone does not justify parallel dispatch.
+- The orchestrator must decide decomposition, dependencies, risk, context and acceptance criteria. Once established, use deterministic harness logic where available for scheduling, dependency resolution, status tracking, dispatch, retries and completion; derive the next ready nodes from the graph instead of repeatedly replanning them.
+- Include test, review, integration and final acceptance nodes where appropriate, downstream of the work they verify. Implementation alone does not complete the graph. On failure, diagnose before retrying; add repair and re-test nodes when useful and preserve what failed and what must be revalidated.
+- Pass structured artifacts (such as decisions, contracts, changed files, test evidence and review findings) and only relevant repository context to downstream nodes. Keep graph state inspectable as `pending`, `ready`, `running`, `blocked`, `completed` or `failed`; a blocked node must name its unmet dependency.
+
+Example dependency graph:
+
+```text
+Requirements → API design → Backend → Tests ──────┐
+                         └→ Frontend → UI tests ────┤
+                                                   ↓
+                                          Integration → Final review
+```
+
+Example node contract:
+
+```yaml
+id: IMPORT-01
+type: implementation
+objective: Implement the approved import validation contract.
+dependencies: [IMPORT-DESIGN-01, STORE-01]
+inputs: [approved import contract]
+allowed_files: [src/import/**, tests/import/**]
+acceptance_criteria: [valid import succeeds, invalid import preserves the active dataset]
+outputs: [implementation, tests, changed_files, verification_evidence]
+verification: [focused import tests]
+risk: medium
+```
+
 ## Product and data boundaries
 
 - Build one offline desktop application for one owner and one store on Windows, using Electron, TypeScript, React, a local Node service and SQLite.
