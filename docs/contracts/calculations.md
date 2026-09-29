@@ -80,3 +80,7 @@ Replacement analysis uses the latest eligible purchasing price as of the pinned 
 Supplier physical return, requested recovery, recognized financial credit, and replacement settlement retain separate states. Recognized credit or confirmed replacement requires explicit settlement evidence. A physical dispatch or invoice label alone does not establish settlement. Document-level credit must not be multiplied by its number of lines.
 
 Inventory and recorded waste are evidenced observations, not reconstructed inventory valuation. Negative stock remains visible. Sparse, absent, or zero recorded waste cannot establish that no losses occurred. No operational purchase, stock, claim, or settlement mutation is offered.
+
+## Monthly product-profit planning delta
+
+The user confirmed gross product profit before operating expenses and return-month attribution on 2026-09-29. The [P01 contract](monthly-product-profit.md) defines the approved product/day/month reconciliation, exact Turkish states and independent synthetic examples. The user approved this planning contract on the same date; it releases no formula or real-source rule.

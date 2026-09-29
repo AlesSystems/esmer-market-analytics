@@ -59,3 +59,7 @@ The authorized preview may extract the following fields from the disposable rest
 The package includes opaque source lineage and extraction identity, database GUID, numeric engine version, capture timestamp and selected source-date bounds. It contains no server locator, account name, password, customer/product/supplier display text or source file path. Use opaque identifiers for lineage and extraction identity.
 
 Prepared real packages, source snapshots, exact-value oracles and real screenshots stay outside Git and release assets. Public UI evidence uses generated rows. Import does not make private source material suitable for publication.
+
+## Product-profit projection boundary
+
+The [P01 source-scope decision](monthly-product-profit.md#separate-financial-source-scope) keeps the existing preview allowlist unchanged. A separate financial projection can include product labels only after explicit review of minimal non-identifying fields. Customer, employee and supplier fields remain excluded from that slice. This planning change approves no new source reads.

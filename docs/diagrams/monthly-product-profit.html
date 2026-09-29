@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aylık ürün kârlılığı · veri ve ekran ilişkisi</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f5f5;color:#2d3142;font:16px/1.6 'Geist',system-ui,sans-serif}main{max-width:1040px;margin:auto;padding:40px}h1{font:400 40px/1.2 'Instrument Serif',Georgia,serif;margin:8px 0 16px}h2{font-size:24px;margin:40px 0 16px}h3{font-size:20px;margin:0 0 12px}p{margin:8px 0 16px}.eyebrow{font:12px 'Geist Mono',monospace;letter-spacing:.08em;color:#4f5d75}.muted{color:#4f5d75}.figure{overflow-x:auto}svg{display:block;width:100%;min-width:800px}svg text{font-family:'Geist',system-ui,sans-serif;fill:#2d3142}svg .name{font-size:16px;font-weight:600}svg .note{font-size:12px;fill:#4f5d75}svg .tag{font:12px 'Geist Mono',monospace;fill:#4f5d75}.page{border:1px solid #bfc0c0;background:white;border-radius:8px;padding:24px}.band{border-bottom:1px solid #bfc0c0;padding:24px 0}.band:first-child{padding-top:0}.band:last-child{border:0;padding-bottom:0}.number{font-size:40px;line-height:1.2;margin:12px 0}.warning{border-left:4px solid #eb6c36;padding:8px 16px;background:#fff8f4}.row{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}th,td{text-align:right;padding:12px 8px;border-bottom:1px solid #ececec;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{font-weight:500;color:#4f5d75}.selected{background:#fff3eb}.states{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}.state{border-top:1px solid #bfc0c0;padding-top:16px}footer{border-top:1px solid #bfc0c0;margin-top:40px;padding-top:16px;font-size:12px;color:#4f5d75}a{color:#2e5aa8}@media(max-width:640px){main{padding:20px}.states{grid-template-columns:1fr}h1{font-size:32px}}@media print{main{padding:0}.page{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body><main>
+<p class="eyebrow">P01 / #38 · ONAYLI PLAN · SENTETİK ÖRNEK</p>
+<h1>Veriden aylık ürün kârlılığına</h1>
+<p>29.09.2026 tarihinde onaylanan ilişki ve tek sayfa düzeni. Uygulama henüz bu taslağa göre değiştirilmedi. Brüt tahmin giderlerden önce hesaplanır; iadeler kaydedildikleri ayı etkiler.</p>
+<div class="figure">
+<svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="monthly-product-profit-title monthly-product-profit-desc">
+<title id="monthly-product-profit-title">Veri ve ürün kârlılığı ekranı</title>
+<desc id="monthly-product-profit-desc">Ayrı incelemeyle doğrulanan finansal veriler yerel depoya ve sabit rapora ulaşır; aynı rapor aylık özeti, ürün katkılarını ve satır kanıtlarını besler, ham önizleme kâr hesabına girmez.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+<marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+</defs>
+<rect width="960" height="600" fill="#f5f5f5"/>
+<text x="40" y="40" class="tag">PLANLANAN FİNANSAL AKIŞ</text>
+<g fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)">
+<path d="M280 128 H360"/>
+<path d="M600 128 H680"/>
+<path d="M800 176 V200 Q800 208 792 208 H488 Q480 208 480 216 V240"/>
+<path d="M160 176 V240"/>
+<path d="M400 336 V376 Q400 384 392 384 H168 Q160 384 160 392 V440"/>
+<path d="M480 336 V440"/>
+<path d="M560 336 V376 Q560 384 568 384 H792 Q800 384 800 392 V440"/>
+</g>
+<g>
+<rect x="40" y="80" width="240" height="96" rx="8" fill="#ececec" stroke="#4f5d75"/>
+<text x="64" y="116" class="name">İzole kaynak yedeği</text><text x="64" y="144" class="note">Ayrı erişim izni · salt okunur</text>
+<rect x="360" y="80" width="240" height="96" rx="8" fill="#fff3eb" stroke="#eb6c36"/>
+<text x="384" y="112" class="name">Finansal veri seçimi</text><text x="384" y="140" class="note">Kimlik · birim · satış · maliyet</text><text x="384" y="160" class="note">P02 kanıtı gerekli</text>
+<rect x="680" y="80" width="240" height="96" rx="8" fill="#ececec" stroke="#4f5d75"/>
+<text x="704" y="116" class="name">Yerel analitik depo</text><text x="704" y="144" class="note">Doğrulanmış sürüm · çevrimdışı</text>
+<rect x="40" y="240" width="240" height="96" rx="8" fill="#fff" stroke="#4f5d75"/>
+<text x="64" y="276" class="name">Ham kayıt önizlemesi</text><text x="64" y="304" class="note">Aynı sınırlar · kâr hesabı yok</text>
+<rect x="360" y="240" width="240" height="96" rx="8" fill="#fff3eb" stroke="#eb6c36"/>
+<text x="384" y="272" class="name">Tek sabit aylık rapor</text><text x="384" y="300" class="note">Aynı ay, veri ve hesap sürümü</text><text x="384" y="320" class="note">Kapsanan satış − tarihsel maliyet</text>
+<rect x="40" y="440" width="240" height="80" rx="8" fill="#fff" stroke="#2d3142"/>
+<text x="64" y="472" class="name">Aylık özet + günlük eğilim</text><text x="64" y="500" class="note">Daima tüm ürünler</text>
+<rect x="360" y="440" width="240" height="80" rx="8" fill="#fff" stroke="#2d3142"/>
+<text x="384" y="472" class="name">Ürün katkıları</text><text x="384" y="500" class="note">Arama ve sıralama yalnız listeyi etkiler</text>
+<rect x="680" y="440" width="240" height="80" rx="8" fill="#fff" stroke="#2d3142"/>
+<text x="704" y="472" class="name">Seçili ürünün kanıtı</text><text x="704" y="500" class="note">Satır, iade ve tarihsel maliyet</text>
+</g>
+<line x1="40" y1="552" x2="920" y2="552" stroke="#bfc0c0"/>
+<text x="40" y="580" class="note">Oklar: veri akışı</text><text x="240" y="580" class="note">Turuncu: inceleme ve ortak rapor</text><text x="600" y="580" class="note">Alt sıra: aynı sayfanın bölümleri</text>
+</svg></div>
+<h2>Tek sayfa taslağı</h2>
+<p class="muted">E03 örneği. A ve B ürünlerinin maliyeti biliniyor. C için maliyet yok. A seçildiğinde üstteki sonuç değişmiyor.</p>
+<div class="page">
+<section class="band"><div class="row"><h3>Aylık Ürün Kârlılığı</h3><span>Ay: Ocak 2025</span></div><p class="muted">Sentetik veri · Tam ay · Geçici · Veri sonu: 31.01.2025</p><p>Raporu kaydet · Excel'e aktar · Önceki raporlar</p></section>
+<section class="band"><p class="muted">Seçili ay · tüm ürünler</p><h3>Kapsanan tahmini brüt kâr</h3><p class="number">60,00 ₺</p><p>Kapsanan net satış 150,00 ₺ − tarihsel tahmini maliyet 90,00 ₺</p><p>Maliyet kapsamı <strong>%89,74</strong> · mutlak net tutar 350,00 / 390,00 ₺</p><p class="warning">Tüm market kârı belirlenemiyor. C ürününün 40,00 ₺ satışı için maliyet kanıtı yok. İşletme giderleri bu brüt tahmine dahil değil.</p></section>
+<section class="band"><h3>Günlük tahmini brüt kâr</h3><p class="muted">Kapsanan sonuç · tüm ürünler · bu taslakta grafik yerine veri tablosu</p><div class="table-wrap"><table><thead><tr><th scope="col">Gün</th><th scope="col">Tahmini katkı</th><th scope="col">Açıklama</th></tr></thead><tbody><tr><td>01.01</td><td>+100,00 ₺</td><td>A +80,00 · B +20,00</td></tr><tr><td>02.01</td><td>−40,00 ₺</td><td>A müşteri iadesi</td></tr><tr><td>Ay toplamı</td><td>60,00 ₺</td><td>Diğer tam günler 0,00</td></tr></tbody></table></div></section>
+<section class="band"><h3>Ürün katkıları</h3><div class="row"><p>Ürün ara: tüm ürünler gösteriliyor</p><p>Sıralama: kâr, azalan</p></div><div class="table-wrap"><table><thead><tr><th scope="col">Ürün</th><th scope="col">Satış / iade / net</th><th scope="col">Net satış</th><th scope="col">Kapsanan maliyet</th><th scope="col">Kapsanan kâr</th></tr></thead><tbody><tr class="selected"><td>A · seçili</td><td>2 / 1 / 1 adet</td><td>100,00 ₺</td><td>60,00 ₺</td><td>40,00 ₺</td></tr><tr><td>B</td><td>1 / 0 / 1 adet</td><td>50,00 ₺</td><td>30,00 ₺</td><td>20,00 ₺</td></tr><tr><td>C · maliyet eksik</td><td>1 / 0 / 1 adet</td><td>40,00 ₺</td><td>Hesaplanamıyor</td><td>Hesaplanamıyor</td></tr></tbody></table></div><p class="muted">Aramada yalnız A görünse de aylık sonuç 60,00 ₺ olarak kalır. C'nin bilinmeyen katkısı sıfır değildir.</p></section>
+<section class="band"><h3>Seçili ürün · A</h3><p>Satış katkısı: 200,00 − 120,00 = 80,00 ₺<br>İade katkısı: −100,00 − (−60,00) = −40,00 ₺<br>Ürün katkısı: <strong>40,00 ₺</strong></p><p class="muted">İade maliyeti asıl satışın kanıtından gelir. Bugünkü alış fiyatı kullanılmaz. Kaynak satırı ve rapor sürümü burada açılır.</p><p>Ürün listesine dön · Kaynak kayıtları</p></section>
+</div>
+<h2>Birbirinden ayrı durumlar</h2>
+<div class="states"><div class="state"><h3>Gerçek sıfır veya zarar</h3><p>Satış 100,00 ₺, maliyet 100,00 ₺ → kâr 0,00 ₺.<br>Maliyet 120,00 ₺ olursa tahmini brüt zarar −20,00 ₺.</p></div><div class="state"><h3>Maliyet yok veya kaynak desteklenmiyor</h3><p>“Kâr hesaplanamıyor” gösterilir. Boş değer sıfıra çevrilmez. Ham kayıtlar finansal sonuç üretmez.</p></div><div class="state"><h3>Boş ay</h3><p>Tam kapsanan ayda işlem yoksa “Bu ay satış veya iade yok” gösterilir. Kapsanmayan gün grafikte boşluk olur.</p></div><div class="state"><h3>Önceki sürüm</h3><p>“Daha yeni veri var · bu rapor önceki sürümü gösteriyor.” Yeni rapor açıkça açılana kadar aynı sürüm korunur.</p></div></div>
+<footer><p>Statik planlama belgesi · doc-inline 960 × 600 · varsayılan açık görünüm · hareket yok.<br>Kurulum, gider ayrıntıları ve kurtarma çizimden çıkarıldı; mevcut uygulamada erişilebilir kalır. Çevrimdışı görünüm sistem yazı tiplerini kullanabilir.</p><p><a href="../contracts/monthly-product-profit.md">Tam sözleşme ve uygulama sınırları</a></p></footer>
+</main></body></html>
