@@ -26,6 +26,8 @@ test("empty packaged app starts offline without login or renderer privileges", a
     await expect(
       page.getByRole("heading", { name: "Henüz mali rapor verisi yok" }),
     ).toBeVisible();
+    await expect(page.getByRole("button", { name: "SQL kaynağını içe aktar" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
     await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(page.locator("input[type=password]")).toHaveCount(0);
     expect(
