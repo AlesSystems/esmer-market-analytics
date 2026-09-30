@@ -63,3 +63,5 @@ Prepared real packages, source snapshots, exact-value oracles and real screensho
 ## Product-profit projection boundary
 
 The [P01 source-scope decision](monthly-product-profit.md#separate-financial-source-scope) keeps the existing preview allowlist unchanged. A separate financial projection can include product labels only after explicit review of minimal non-identifying fields. Customer, employee and supplier fields remain excluded from that slice. This planning change approves no new source reads.
+
+The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) lists the missing authorization and field review. No new projection or private evidence was inspected for that record.

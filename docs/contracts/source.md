@@ -8,6 +8,8 @@ Phase 2 did not access a source. The authorized [issue 26 OrbStack continuation]
 
 The executable registry is [src/source/contract.ts](../../src/source/contract.ts). It is declarative and has no source I/O. Its historical dictionary entries are observations, not a complete financial inclusion allowlist. Unknown types and missing essential identities require candidate rejection until explicitly classified.
 
+The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) lists the evidence still missing for a real monthly financial mapping. Its historical row counts do not release a financial rule.
+
 ## Identity and provenance
 
 A source record is identified by source lineage plus source document ID and, for a line, source line ID. IDs remain strings. Snapshot/import identity identifies a version of those records. Same-lineage corrections replace the current candidate representation once; a reset/new lineage never silently reuses another lineage's identities.
