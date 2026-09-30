@@ -138,3 +138,29 @@ test("deep validation rejects coherent v2 aggregate changes that leave pinned li
     expect(() => validateSnapshot(path)).toThrow();
   } finally { await rm(root,{recursive:true,force:true}); }
 });
+
+test("deep validation rejects a missing zero-value product identity", async () => {
+  const { businessPackage, businessRecords, historicalCost } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-v2-zero-product-")), path = join(root, "analytics.sqlite");
+  try {
+    const records = businessRecords(), line = records.lines[1];
+    line.sales = {...line.sales!,productId:"B",productName:"B",unitNet:"0",tax:"0",gross:"0"};
+    line.net = "0"; line.business!.historicalCost = {...historicalCost("0"),documentedZero:true};
+    records.documents[1].sales = {...records.documents[1].sales!,net:"0",tax:"0",gross:"0"};
+    const store = openStore(path); store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store,new SalesReports(store)), opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    expect(opened.report.productProfit.products.find(row=>row.productId==="B")).toMatchObject({netSales:"0",coveredCost:"0",coveredGrossProfit:"0"});
+    versions.accept({candidateId:opened.report.id,previousAcceptedId:null,reason:"Sentetik kontrol"}); store.close();
+    expect(validateSnapshot(path).reports).toBe(1);
+    const bytes = await readFile(path), start = bytes.indexOf(Buffer.from('"productProfit":')), products = bytes.indexOf(Buffer.from('"products":['),start), end = bytes.indexOf(Buffer.from('"sourceExclusions":'),products);
+    expect(products).toBeGreaterThan(start); expect(end).toBeGreaterThan(products);
+    const { canonical } = await import("../../src/source/package");
+    const target = Buffer.from(canonical(opened.report.productProfit.products.find(row=>row.productId==="B"))), index = bytes.indexOf(target,products);
+    expect(index).toBeGreaterThan(products); expect(index).toBeLessThan(end); expect(bytes[index+target.length]).toBe(44);
+    bytes.fill(32,index,index+target.length+1); await writeFile(path,bytes);
+    expect(() => validateSnapshot(path)).toThrow();
+  } finally { await rm(root,{recursive:true,force:true}); }
+});

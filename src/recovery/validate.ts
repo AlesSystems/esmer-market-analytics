@@ -68,8 +68,14 @@ function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, so
   requireValid(lineIds.size === monthly.salesEvidence.components.length && monthly.salesEvidence.components.every(row=>lineIds.has(row.lineId)));
   for (const row of profit.sourceExclusions) requireValid(validId(row.documentId) && /^\d{4}-\d{2}-\d{2}$/.test(row.date) && row.exposure === null && sourceDocuments.get(row.documentId)?.date===row.date);
   validateProfitScope(profit.summary,profit.lines,gross.status==="ready");
-  for (const row of profit.products) validateProfitScope(row,profit.lines.filter(line=>line.productId===row.productId),gross.status==="ready");
-  for (const row of profit.daily) validateProfitScope(row,profit.lines.filter(line=>line.date===row.date),gross.status==="ready");
+  const byProduct=new Map<string,ProductProfit["lines"]>(), byDay=new Map<string,ProductProfit["lines"]>();
+  for (const line of profit.lines) {
+    const products=byProduct.get(line.productId)??[]; products.push(line); byProduct.set(line.productId,products);
+    const days=byDay.get(line.date)??[]; days.push(line); byDay.set(line.date,days);
+  }
+  requireValid(profit.products.length===byProduct.size && profit.products.every(row=>byProduct.has(row.productId)));
+  for (const row of profit.products) validateProfitScope(row,byProduct.get(row.productId)??[],gross.status==="ready");
+  for (const row of profit.daily) validateProfitScope(row,byDay.get(row.date)??[],gross.status==="ready");
   for (const key of ["netSales","coveredSales","coveredCost","coveredGrossProfit"] as const) {
     const target=profit.summary[key];
     if (target !== null) requireValid(new Exact(sum(profit.products.map(row=>row[key] ?? "0"))).eq(target) && new Exact(sum(profit.daily.map(row=>row[key] ?? "0"))).eq(target));
