@@ -64,3 +64,53 @@ test("independent artifact and exported key recover financial history and every 
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("deep validation rejects a v2 accepted report whose pinned unit cost is altered", async () => {
+  const { businessPackage } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-v2-tamper-")), path = join(root, "analytics.sqlite");
+  try {
+    const store = openStore(path);
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store,new SalesReports(store));
+    const opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    versions.accept({candidateId:opened.report.id,previousAcceptedId:null,reason:"Sentetik kontrol"});
+    store.close();
+    expect(validateSnapshot(path).reports).toBe(1);
+    const bytes = await readFile(path), target = Buffer.from('"historicalUnitCost":"60"'), replacement = Buffer.from('"historicalUnitCost":"99"');
+    const index = bytes.indexOf(target);
+    expect(index).toBeGreaterThan(-1);
+    replacement.copy(bytes,index);
+    await writeFile(path,bytes);
+    expect(() => validateSnapshot(path)).toThrow();
+  } finally { await rm(root,{recursive:true,force:true}); }
+});
+
+test("accepted v1 and v2 artifacts remain independently readable and exportable", async () => {
+  const { businessPackage } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-versioned-reports-")), path = join(root, "analytics.sqlite");
+  let store = openStore(path);
+  try {
+    store.importPackage(businessPackage());
+    let versions = new ReportVersions(store,new SalesReports(store));
+    const opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    const base = {...structuredClone(opened.report)};
+    Reflect.deleteProperty(base,"productProfit");
+    const legacy: import("../../src/reports/contracts").MonthlyReportV1 = {...base,id:"legacy-v1-fixture",format:"monthly-report-v1",calculations:{...base.calculations,report:"monthly-calc-v1"},rules:{...base.rules,artifact:"esmer-market:monthly-v1"},review:{acceptedAt:"2025-10-01T00:00:00.000Z",reason:"Sentetik eski sürüm",previousAcceptedId:null}};
+    store.acceptReport({id:legacy.id,pin:{datasetId:legacy.context.datasetId,appRevision:legacy.context.appRevision},calculationVersion:legacy.calculations.report,evidence:[`package:${legacy.context.datasetId}`,legacy.rules.artifact],output:{report:legacy}});
+    versions.accept({candidateId:opened.report.id,previousAcceptedId:legacy.id,reason:"Yeni sentetik sürüm"});
+    expect(versions.compare({candidateId:opened.report.id,acceptedId:legacy.id}).changes).toEqual(expect.arrayContaining([expect.objectContaining({path:"format",before:"monthly-report-v1",after:"monthly-report-v2"})]));
+    store.close(); store = openStore(path); versions = new ReportVersions(store,new SalesReports(store));
+    expect(validateSnapshot(path).reports).toBe(2);
+    expect(versions.list({period:"2025-09"}).reports).toHaveLength(2);
+    expect(versions.selected(legacy.id)).toEqual(legacy);
+    expect(versions.display({reportId:legacy.id}).report).not.toHaveProperty("productProfit");
+    expect(() => versions.products({reportId:legacy.id,search:"",sort:"profit",direction:"desc",offset:0})).toThrow("PRODUCT_PROFIT_UNAVAILABLE");
+    expect(await readAll(await excelReport(legacy))).not.toEqual(await readAll(await excelReport(versions.selected(opened.report.id))));
+  } finally { store.close(); await rm(root,{recursive:true,force:true}); }
+});
