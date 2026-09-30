@@ -114,3 +114,27 @@ test("accepted v1 and v2 artifacts remain independently readable and exportable"
     expect(await readAll(await excelReport(legacy))).not.toEqual(await readAll(await excelReport(versions.selected(opened.report.id))));
   } finally { store.close(); await rm(root,{recursive:true,force:true}); }
 });
+
+test("deep validation rejects coherent v2 aggregate changes that leave pinned lines unchanged", async () => {
+  const { businessPackage } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-v2-aggregate-tamper-")), path = join(root, "analytics.sqlite");
+  try {
+    const store = openStore(path);
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store,new SalesReports(store)), opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    versions.accept({candidateId:opened.report.id,previousAcceptedId:null,reason:"Sentetik kontrol"});
+    store.close();
+    expect(validateSnapshot(path).reports).toBe(1);
+    const bytes = await readFile(path), start = bytes.indexOf(Buffer.from('"productProfit":')), end = bytes.indexOf(Buffer.from('"purchasing":'),start);
+    expect(start).toBeGreaterThan(-1); expect(end).toBeGreaterThan(start);
+    const target = Buffer.from('"coveredGrossProfit":"40"'), replacement = Buffer.from('"coveredGrossProfit":"90"');
+    let count = 0, cursor = start;
+    while ((cursor = bytes.indexOf(target,cursor)) >= 0 && cursor < end) { replacement.copy(bytes,cursor); count++; cursor += target.length; }
+    expect(count).toBeGreaterThanOrEqual(3);
+    await writeFile(path,bytes);
+    expect(() => validateSnapshot(path)).toThrow();
+  } finally { await rm(root,{recursive:true,force:true}); }
+});

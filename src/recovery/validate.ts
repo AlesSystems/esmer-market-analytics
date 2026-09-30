@@ -6,11 +6,33 @@ import { APPLICATION_ID, SCHEMA_VERSION } from "../store/schema";
 import { canonical, readPackage, type Records } from "../source/package";
 import { requireValid, validateChange, validId, type AcceptedReport, type AppChange } from "../store/revisions";
 import type { MonthlyReport } from "../reports/contracts";
-import { Exact, sum } from "../domain/money";
+import { Exact, rounded, sum } from "../domain/money";
 import type { ProductProfit } from "../analytics/product-profit";
 const decode = <T>(value: unknown): T => JSON.parse(String(value)) as T;
 export type SnapshotSummary = {generation:number;cutoff:string|null;revisions:number;reports:number};
 const decimal = (value: unknown): value is string => typeof value === "string" && /^-?(?:0|[1-9]\d*)(?:\.\d+)?$/.test(value);
+function validateProfitScope(row: ProductProfit["summary"] | ProductProfit["products"][number] | ProductProfit["daily"][number], lines: ProductProfit["lines"], supported: boolean) {
+  const covered = lines.filter(line=>line.costReason===null), excluded = lines.filter(line=>line.costReason!==null);
+  const equals = (actual: string | null, expected: string | null) => actual===null || expected===null ? actual===expected : new Exact(actual).eq(expected);
+  const sales=sum(lines.map(line=>line.net)), coveredSales=sum(covered.map(line=>line.net)), cost=covered.length ? sum(covered.map(line=>line.cost!)) : null;
+  const profit=cost===null ? null : new Exact(coveredSales).minus(cost).toFixed();
+  const abs=(rows: typeof lines)=>sum(rows.map(line=>new Exact(line.net).abs().toFixed()));
+  const denominator=new Exact(abs(lines));
+  const coverage=supported && denominator.gt(0) ? rounded(new Exact(abs(covered)).div(denominator).times(100).toFixed()) : null;
+  const margin=profit!==null && new Exact(coveredSales).gt(0) ? rounded(new Exact(profit).div(coveredSales).times(100).toFixed()) : null;
+  const emptyGap=!lines.length && "sourceCoverage" in row && row.status==="unavailable";
+  requireValid(emptyGap ? row.netSales===null && row.coveredSales===null && row.coveredCost===null && row.coveredGrossProfit===null && row.costCoveragePercent===null && row.coveredMarginPercent===null : equals(row.netSales,sales) && equals(row.coveredSales,coveredSales) && equals(row.coveredCost,cost) && equals(row.coveredGrossProfit,profit) && equals(row.costCoveragePercent,coverage) && equals(row.coveredMarginPercent,margin));
+  requireValid(row.coveredCount===covered.length && row.excludedCount===excluded.length && canonical(row.exclusionReasons.toSorted())===canonical([...new Set(excluded.map(line=>line.costReason!))].toSorted()));
+  const exposure=(rows: typeof lines, kind: "sale" | "customer-return")=>sum(rows.filter(line=>line.kind===kind).map(line=>line.net));
+  requireValid(equals(row.exposures.coveredSales,exposure(covered,"sale")) && equals(row.exposures.coveredReturns,exposure(covered,"customer-return")) && equals(row.exposures.excludedSales,exposure(excluded,"sale")) && equals(row.exposures.excludedReturns,exposure(excluded,"customer-return")));
+  for (const unit of ["piece","kg"] as const) {
+    const scoped=lines.filter(line=>line.unit===unit), quantity=row.quantities.find(q=>q.unit===unit);
+    if (!scoped.length) { requireValid(!quantity); continue; }
+    const sold=sum(scoped.filter(line=>line.kind==="sale").map(line=>new Exact(line.quantity).abs().toFixed()));
+    const returned=sum(scoped.filter(line=>line.kind==="customer-return").map(line=>new Exact(line.quantity).abs().toFixed()));
+    requireValid(quantity && equals(quantity.sold,sold) && equals(quantity.returned,returned) && equals(quantity.net,new Exact(sold).minus(returned).toFixed()));
+  }
+}
 function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, source: Records) {
   requireValid(profit && profit.version === "monthly-product-profit-v1" && profit.lineage === monthly.purchasing.lineage && profit.period === monthly.context.period);
   requireValid(profit.summary && ["ready","empty","unavailable"].includes(profit.summary.status) && ["market","covered"].includes(profit.summary.scope) && Array.isArray(profit.summary.warnings) && profit.summary.warnings.every(row=>typeof row === "string"));
@@ -32,15 +54,22 @@ function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, so
   const sourceLines = new Map(source.lines.map(row=>[row.id,row]));
   const sourceDocuments = new Map(source.documents.map(row=>[row.id,row]));
   const components = new Map(monthly.salesEvidence.components.map(row=>[row.lineId,row]));
+  const gross=monthly.purchasing.gross, costRows=new Map([...gross.covered,...gross.excluded].map(row=>[row.lineId,row]));
   const lineIds = new Set<string>();
   for (const line of profit.lines) {
     const pinned = sourceLines.get(line.lineId);
     const {cost,historicalUnitCost,originalSaleLineId,costReason,costEvidence,...component} = line;
-    requireValid(validId(line.lineId) && !lineIds.has(line.lineId) && pinned && pinned.documentId === line.documentId && line.productId === pinned.sales?.productId && line.unit === pinned.sales?.unit && line.date === sourceDocuments.get(line.documentId)?.date && line.kind === sourceDocuments.get(line.documentId)?.kind && canonical(component) === canonical(components.get(line.lineId)) && decimal(line.quantity) && decimal(line.net) && (cost === null || decimal(cost)) && (historicalUnitCost === null || decimal(historicalUnitCost)) && historicalUnitCost === (pinned.business?.historicalCost?.unitCost ?? null) && originalSaleLineId === (pinned.business?.historicalCost?.originalSaleLineId ?? null) && costEvidence === (pinned.business?.historicalCost?.evidence ?? null) && (costReason === null || ["MISSING_COST","UNVALIDATED_COST","UNKNOWN_UNIT","UNKNOWN_TAX","NEGATIVE_COST","UNDOCUMENTED_ZERO","RETURN_ATTRIBUTION","UNSUPPORTED_COST_MAPPING"].includes(costReason)) && (costReason !== null || cost !== null));
+    requireValid(validId(line.lineId) && !lineIds.has(line.lineId) && pinned && pinned.documentId === line.documentId && line.productId === pinned.sales?.productId && line.unit === pinned.sales?.unit && line.date === sourceDocuments.get(line.documentId)?.date && line.kind === sourceDocuments.get(line.documentId)?.kind && canonical(component) === canonical(components.get(line.lineId)) && decimal(line.quantity) && decimal(line.net) && (cost === null || decimal(cost)) && (historicalUnitCost === null || decimal(historicalUnitCost)) && historicalUnitCost === (pinned.business?.historicalCost?.unitCost ?? null) && originalSaleLineId === (pinned.business?.historicalCost?.originalSaleLineId ?? null) && (gross.status==="ready" ? costEvidence === (pinned.business?.historicalCost?.evidence ?? null) : costEvidence===null) && (costReason === null || ["MISSING_COST","UNVALIDATED_COST","UNKNOWN_UNIT","UNKNOWN_TAX","NEGATIVE_COST","UNDOCUMENTED_ZERO","RETURN_ATTRIBUTION","UNSUPPORTED_COST_MAPPING"].includes(costReason)) && (costReason !== null || cost !== null));
+    const costRow=costRows.get(line.lineId);
+    requireValid(gross.status==="ready" ? costRow && costRow.cost===cost && costRow.reason===costReason && costRow.evidence===costEvidence && costRow.net===line.net && costRow.quantity===line.quantity : !costRow && costReason==="UNSUPPORTED_COST_MAPPING");
+    if (costReason===null) requireValid(historicalUnitCost!==null && new Exact(line.quantity).times(historicalUnitCost).eq(cost!));
     lineIds.add(line.lineId);
   }
   requireValid(lineIds.size === monthly.salesEvidence.components.length && monthly.salesEvidence.components.every(row=>lineIds.has(row.lineId)));
   for (const row of profit.sourceExclusions) requireValid(validId(row.documentId) && /^\d{4}-\d{2}-\d{2}$/.test(row.date) && row.exposure === null && sourceDocuments.get(row.documentId)?.date===row.date);
+  validateProfitScope(profit.summary,profit.lines,gross.status==="ready");
+  for (const row of profit.products) validateProfitScope(row,profit.lines.filter(line=>line.productId===row.productId),gross.status==="ready");
+  for (const row of profit.daily) validateProfitScope(row,profit.lines.filter(line=>line.date===row.date),gross.status==="ready");
   for (const key of ["netSales","coveredSales","coveredCost","coveredGrossProfit"] as const) {
     const target=profit.summary[key];
     if (target !== null) requireValid(new Exact(sum(profit.products.map(row=>row[key] ?? "0"))).eq(target) && new Exact(sum(profit.daily.map(row=>row[key] ?? "0"))).eq(target));
