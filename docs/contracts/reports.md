@@ -35,3 +35,7 @@ Calculation reuse lives only inside the existing pinned sales session. Exact dat
 Background import and monthly report work expose phase/count progress. Cancellation uses shared memory so a busy service does not need to process a queued cancellation message. Imports check cancellation during staging and before atomic activation. Cancellation leaves the prior active dataset, expenses and accepted reports intact; completion wins after the commit. Monthly calculation checks cancellation between calculation sections. A single section or input parse can delay cancellation, so the Windows handoff measures latency and navigation responsiveness on representative data.
 
 See [local evidence](../evidence/phase-8-local.md) for verified cases, limits and remaining acceptance gates.
+
+## Planned monthly product-profit report version
+
+The [P01 report delta](monthly-product-profit.md#versioned-report-and-interface-delta) specifies a future `monthly-report-v2` with shared product/day/month contributions and report-pinned evidence. It retains v1 rendering, acceptance and export semantics. The user approved this planning contract on 2026-09-29. It is not a currently implemented report format.

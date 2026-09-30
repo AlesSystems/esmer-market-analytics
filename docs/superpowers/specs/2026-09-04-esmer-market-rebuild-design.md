@@ -69,6 +69,8 @@ A month can have source-reconciled sales and estimated or unavailable profit. Mo
 
 ### 4.1 Main surface: Aylık Market Özeti
 
+**P01 focus delta, 2026-09-29:** The user confirmed estimated gross product profit before operating expenses and returns in their recorded month. The [monthly product-profit contract](../../contracts/monthly-product-profit.md) records the approved primary product-profit page while retaining this overview, expenses and operating results as accessible existing functionality. The user approved its scope, interface and composition on the same date. This delta does not change D01–D20, existing saved reports or raw-preview permissions.
+
 The primary view is a monthly market overview, with drill-down rather than disconnected dashboards containing different formulas. It includes:
 
 - Net sales excluding recorded KDV, completed sales transaction count, average basket and interpretable quantity measures.
