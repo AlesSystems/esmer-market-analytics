@@ -8,7 +8,7 @@ import { date, decimal, money, percent } from "../format";
 import { PAGE_SIZE, PageControls } from "../PageControls";
 import { PurchasingWorkspace } from "../purchasing/PurchasingWorkspace";
 
-type Section = ReportEvidenceRequest["section"];
+type Section = Exclude<ReportEvidenceRequest["section"], "product-profit">;
 type Page<K extends Section> = Extract<ReportEvidencePage, { section: K }>;
 
 function useEvidence<K extends Section>(reportId: string, section: K, offset: number, search = "", range: ReportEvidenceRequest["range"] = "current", documentId: string | null = null) {

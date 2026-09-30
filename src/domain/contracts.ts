@@ -2,7 +2,7 @@ import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import type { LiveStatus } from "../source/live-contracts";
 import type { SqlServerConfig } from "../source/sql-server";
-import type { MonthlyDisplayResult, ReportEvidencePage } from "../reports/display";
+import type { MonthlyDisplayResult, ReportEvidencePage, ReportProductsPage } from "../reports/display";
 import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../expenses/contracts";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
@@ -52,6 +52,7 @@ export interface DesktopApi {
   acceptReportVersion(request: ReportRequestMap["acceptReportVersion"]): Promise<MonthlyDisplayResult | RequestError>;
   exportReportVersion(request: ReportRequestMap["exportReportVersion"]): Promise<ReportExportResult | RequestError>;
   readReportEvidence(request: ReportRequestMap["readReportEvidence"]): Promise<ReportEvidencePage | SalesFailure | RequestError>;
+  readReportProducts(request: ReportRequestMap["readReportProducts"]): Promise<ReportProductsPage | SalesFailure | RequestError>;
   readReportPurchasing(request: ReportRequestMap["readReportPurchasing"]): Promise<PurchasingReportResult | RequestError>;
   getOperationStatus(): Promise<OperationStatus | RequestError>;
   cancelOperation(request: {id: number}): Promise<{status: "cancelling"} | {status: "idle"} | RequestError>;

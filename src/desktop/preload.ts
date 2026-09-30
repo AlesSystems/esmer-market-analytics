@@ -21,6 +21,7 @@ const api: DesktopApi = {
   exportReportVersion: request => ipcRenderer.invoke("esmer:request", "exportReportVersion", request),
   cancelOperation: request => ipcRenderer.invoke("esmer:request", "cancelOperation", request),
   readReportEvidence: request => ipcRenderer.invoke("esmer:request", "readReportEvidence", request),
+  readReportProducts: request => ipcRenderer.invoke("esmer:request", "readReportProducts", request),
   readReportPurchasing: request => ipcRenderer.invoke("esmer:request", "readReportPurchasing", request),
   getOperationStatus: () => ipcRenderer.invoke("esmer:request", "getOperationStatus", null),
   saveExpenseTemplate: () => ipcRenderer.invoke("esmer:request", "saveExpenseTemplate", null),

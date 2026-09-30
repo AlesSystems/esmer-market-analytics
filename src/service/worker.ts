@@ -24,6 +24,7 @@ import { importOutcome } from "./operations";
 import { SalesReports } from "../reports/query";
 const reportErrors = {
   REPORT_NOT_FOUND: "Seçili rapor artık mevcut değil. Aylık özeti yeniden açın veya kayıtlı bir sürüm seçin.",
+  PRODUCT_PROFIT_UNAVAILABLE: "Bu rapor sürümünde ürün kârlılığı ayrıntısı yok.",
   INCOMPARABLE_REPORTS: "Bu raporların dönemi, kapsamı veya kaynak kökeni farklı. Aynı kapsamdaki bir kayıt seçin.",
   REVIEW_CONFLICT: "Bu rapor farklı bir inceleme bilgisiyle kaydedilmiş. Kayıt geçmişini yenileyin.",
   REPORT_TOO_LARGE: "Rapor saklama boyutu sınırını aşıyor. Mevcut kayıtlar korundu; daha küçük bir veri paketiyle yeniden deneyin.",
@@ -203,6 +204,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "listReportVersions") result = versions!.list(request.payload);
     else if (request.operation === "readReportVersion") result = versions!.display(request.payload);
     else if (request.operation === "readReportEvidence") result = versions!.evidence(request.payload);
+    else if (request.operation === "readReportProducts") result = versions!.products(request.payload);
     else if (request.operation === "readReportPurchasing") result = versions!.purchasing(request.payload);
     else if (request.operation === "compareReportVersion") result = versions!.compare(request.payload);
     else if (request.operation === "acceptReportVersion") result = displayResult(versions!.accept(request.payload));
