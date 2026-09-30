@@ -44,6 +44,20 @@ test("monthly display omits bulk evidence and pages the selected immutable repor
   } finally { store.close(); }
 });
 
+test("a synthetic monthly candidate stores exact product profit and calendar days", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const opened = new ReportVersions(store, new SalesReports(store)).open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly report");
+    expect(opened.report.format).toBe("monthly-report-v2");
+    expect(opened.report).toHaveProperty("productProfit.summary.coveredGrossProfit", "40");
+    expect(opened.report).toHaveProperty("productProfit.products.0.coveredGrossProfit", "40");
+    expect(opened.report).toHaveProperty("productProfit.daily.0.date", "2025-09-01");
+    expect(opened.report).toHaveProperty("productProfit.daily.29.date", "2025-09-30");
+  } finally { store.close(); }
+});
+
 test("evidence requests reject unbounded pages and arbitrary selectors", () => {
   const request = { reportId: "report", section: "components", offset: 0, search: "", range: "current", documentId: null };
   expect(validMonthlyRequest("readReportEvidence", request)).toBe(true);
