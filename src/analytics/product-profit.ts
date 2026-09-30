@@ -59,7 +59,7 @@ export function buildProductProfit(input: { sales: SalesResult; gross: GrossResu
     const group = lines.filter(line => line.date === date), values = scope(group, supported);
     const observed = date >= coverage.from && date <= coverage.to;
     const sourceCoverage = !observed ? "unavailable" : !coverage.complete || relevant(date) ? "partial" : "complete";
-    const status = !supported || sourceCoverage !== "complete" && !group.length || sourceCoverage === "unavailable" ? "unavailable" : group.length ? "ready" : "empty";
+    const status = !supported || sourceCoverage !== "complete" && !group.length || sourceCoverage === "unavailable" || group.length > 0 && values.coveredCount === 0 ? "unavailable" : group.length ? "ready" : "empty";
     daily.push({ ...values, ...(status === "unavailable" && !group.length ? { netSales: null, coveredSales: null, coveredCost: null, coveredGrossProfit: null, coveredMarginPercent: null, costCoveragePercent: null } : {}), date, status, sourceCoverage, trend: status === "unavailable" && !group.length ? null : values.coveredGrossProfit ?? (status === "empty" ? "0" : null) });
   }
   const summary = scope(lines, supported);

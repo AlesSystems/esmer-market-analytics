@@ -43,7 +43,7 @@ test("E04–E06 and E10–E12: returns, absent cost, zero, loss and denominators
   const missing = fixture([{id:"R",kind:"customer-return",quantity:"1",net:"-100",cost:null,reason:"RETURN_ATTRIBUTION"}]);
   expect(missing.summary).toMatchObject({netSales:"-100",coveredCost:null,coveredGrossProfit:null,coveredMarginPercent:null,costCoveragePercent:"0"});
   expect(missing.summary.status).toBe("unavailable");
-  expect(missing.daily[0]).toMatchObject({netSales:"-100",coveredGrossProfit:null});
+  expect(missing.daily[0]).toMatchObject({status:"unavailable",netSales:"-100",coveredGrossProfit:null});
   expect(fixture([{id:"Z",quantity:"1",net:"100",cost:"100"}]).summary).toMatchObject({coveredGrossProfit:"0",coveredMarginPercent:"0"});
   expect(fixture([{id:"L",quantity:"1",net:"100",cost:"120"}]).summary).toMatchObject({coveredGrossProfit:"-20",coveredMarginPercent:"-20"});
   expect(fixture([{id:"F",quantity:"1",net:"0",cost:"0"}]).summary).toMatchObject({coveredGrossProfit:"0",coveredMarginPercent:null,costCoveragePercent:null,coveredCount:1});
