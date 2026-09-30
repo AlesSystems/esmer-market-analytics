@@ -26,14 +26,14 @@ export function validReportRequest(operation: string, value: unknown): boolean {
 export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportProducts", "readReportPurchasing"];
 export function validMonthlyRequest(operation: string, value: unknown): boolean {
   if (operation === "readReportProducts") return exact(value, ["reportId", "search", "sort", "direction", "offset"])
-    && validId(value.reportId) && typeof value.search === "string" && value.search.trim().length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
+    && validId(value.reportId) && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
     && typeof value.sort === "string" && ["profit", "name", "netSales", "coverage"].includes(value.sort)
     && typeof value.direction === "string" && ["asc", "desc"].includes(value.direction)
     && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0;
   if (operation === "readReportEvidence") return (exact(value, ["reportId", "section", "offset", "search", "range", "documentId"]) || exact(value, ["reportId", "section", "offset", "search", "range", "documentId", "productId"]))
     && validId(value.reportId) && typeof value.section === "string" && ["components", "exclusions", "documents", "lines", "product-profit"].includes(value.section)
     && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0
-    && typeof value.search === "string" && value.search.trim().length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
+    && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
     && typeof value.range === "string" && ["current", "month", "year"].includes(value.range)
     && (value.section === "lines" ? validId(value.documentId) : value.section === "product-profit" ? value.documentId === null || validId(value.documentId) : value.documentId === null)
     && (value.section === "product-profit" ? (!("productId" in value) || value.productId === null || validId(value.productId)) && value.range === "current" : !("productId" in value));

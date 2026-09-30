@@ -145,10 +145,12 @@ test("v2 product pages search and sort without changing the selected market summ
     expect(versions.display({reportId}).report).not.toHaveProperty("productProfit.products");
     expect(versions.evidence({reportId,section:"product-profit",productId:"P100",offset:0,search:"",range:"current",documentId:null})).toMatchObject({status:"evidence",section:"product-profit",productId:"P100",total:1,rows:[{lineId:"L100",cost:"60",historicalUnitCost:"60"}]});
     expect(validMonthlyRequest("readReportProducts",base)).toBe(true);
-    for (const bad of [{...base,sort:"sql"},{...base,direction:"up"},{...base,offset:-1},{...base,offset:0.5},{...base,limit:1000},{...base,search:"x".repeat(161)}]) expect(validMonthlyRequest("readReportProducts",bad)).toBe(false);
+    for (const bad of [{...base,sort:"sql"},{...base,direction:"up"},{...base,offset:-1},{...base,offset:0.5},{...base,limit:1000},{...base,search:"x".repeat(161)},{...base,search:" ".repeat(161)},{...base,search:` ${"x".repeat(160)} `}]) expect(validMonthlyRequest("readReportProducts",bad)).toBe(false);
     const evidence = {reportId,section:"product-profit",offset:0,search:"",range:"current",documentId:null};
     expect(validMonthlyRequest("readReportEvidence",evidence)).toBe(true);
     expect(validMonthlyRequest("readReportEvidence",{...evidence,productId:"P100"})).toBe(true);
     expect(validMonthlyRequest("readReportEvidence",{...evidence,productId:" P100"})).toBe(false);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,search:" ".repeat(161)})).toBe(false);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,search:` ${"x".repeat(160)} `})).toBe(false);
   } finally { store.close(); }
 });
