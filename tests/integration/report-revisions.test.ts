@@ -135,6 +135,8 @@ test("two saved versions compare their retained values after a newer candidate i
     const current = versions.open({ period: "2025-09" }); if (current.status !== "monthly") throw new Error("Expected candidate");
     const comparison = versions.compare({ candidateId: second.report.id, acceptedId: first.report.id });
     expect(comparison.changes).toContainEqual({ path: "sales.metrics.netSales", before: "200", after: "100", delta: "-100" });
+    expect(comparison.changes.some(row => /^productProfit\.(products|lines|daily|sourceExclusions)/.test(row.path))).toBe(false);
+    expect(comparison.changes).toEqual(expect.arrayContaining([expect.objectContaining({path:"productProfit.summary.netSales",before:"200",after:"100"})]));
     expect(versions.selected(first.report.id).sales.metrics.netSales).toBe("200");
     expect(versions.selected(second.report.id).sales.metrics.netSales).toBe("100");
     expect(versions.selected(current.report.id).review).toBeNull();

@@ -108,8 +108,7 @@ export class ReportVersions {
       const decimal = (v: unknown): v is string => typeof v === "string" && /^-?\d+(?:\.\d+)?$/.test(v);
       changes.push({ path, before: old, after: next, delta: decimal(old) && decimal(next) ? new Exact(next).minus(old).toFixed() : null });
     };
-    const crossFormat = before.format !== after.format;
-    const comparable = (r: MonthlyReport) => ({ format: r.format, calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence, productProfit: r.format === "monthly-report-v2" ? crossFormat ? { version: r.productProfit.version, summary: r.productProfit.summary } : { version: r.productProfit.version, summary: r.productProfit.summary, products: r.productProfit.products, daily: r.productProfit.daily, lines: r.productProfit.lines, sourceExclusions: r.productProfit.sourceExclusions } : null });
+    const comparable = (r: MonthlyReport) => ({ format: r.format, calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence, productProfit: r.format === "monthly-report-v2" ? { version: r.productProfit.version, summary: r.productProfit.summary } : null });
     walk(comparable(before), comparable(after), "");
     return { status: "difference", candidateId, acceptedId, changes };
   }
