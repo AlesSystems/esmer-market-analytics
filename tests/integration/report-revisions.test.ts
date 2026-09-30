@@ -140,3 +140,25 @@ test("two saved versions compare their retained values after a newer candidate i
     expect(versions.selected(current.report.id).review).toBeNull();
   } finally { store.close(); }
 });
+
+test("v1 to v2 comparison summarizes composition without expanding every new line", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords(), document = records.documents[0], line = records.lines[0];
+    records.documents = Array.from({length:205},(_,index)=>({...structuredClone(document),id:`S${index}`}));
+    records.lines = records.documents.map((row,index)=>({...structuredClone(line),id:`L${index}`,documentId:row.id,sales:{...line.sales!,productId:`P${index}`,productName:`Ürün ${index}`}}));
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store,new SalesReports(store)), opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    const legacy = structuredClone(opened.report) as unknown as import("../../src/reports/contracts").MonthlyReportV1;
+    Reflect.deleteProperty(legacy,"productProfit");
+    legacy.id = "legacy-cross-format"; legacy.format = "monthly-report-v1"; legacy.calculations.report = "monthly-calc-v1"; legacy.rules.artifact = "esmer-market:monthly-v1";
+    legacy.review = {acceptedAt:"2025-10-01T00:00:00.000Z",reason:"Sentetik eski sürüm",previousAcceptedId:null};
+    store.acceptReport({id:legacy.id,pin:{datasetId:legacy.context.datasetId,appRevision:legacy.context.appRevision},calculationVersion:legacy.calculations.report,evidence:[legacy.rules.artifact],output:{report:legacy}});
+    const changes = versions.compare({candidateId:opened.report.id,acceptedId:legacy.id}).changes;
+    expect(changes).toEqual(expect.arrayContaining([expect.objectContaining({path:"format",before:"monthly-report-v1",after:"monthly-report-v2"}),expect.objectContaining({path:"productProfit.version",before:null,after:"monthly-product-profit-v1"})]));
+    expect(changes.length).toBeLessThan(100);
+    expect(changes.some(row=>/^productProfit\.(products|lines|sourceExclusions)/.test(row.path))).toBe(false);
+    expect(versions.accept({candidateId:opened.report.id,previousAcceptedId:legacy.id,reason:"Yeni sentetik sürüm"}).status).toBe("monthly");
+  } finally { store.close(); }
+});
