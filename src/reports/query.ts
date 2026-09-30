@@ -1,4 +1,5 @@
 import { calculateOperatingResult, OPERATING_CALCULATION_VERSION } from "../analytics/operating";
+import { buildProductProfit } from "../analytics/product-profit";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import type { OperatingReportResult } from "../expenses/contracts";
 import { estimateGrossResult, COST_CALCULATION_VERSION, type GrossResult } from "../analytics/costs";
@@ -65,12 +66,13 @@ export class SalesReports {
     const { snapshot } = session;
     step("evidence", 3);
     const components = this.sales(session, sales.view.from, sales.view.to).lines;
-    const report = { format: "monthly-report-v1" as const, id: randomUUID(), context: { ...context },
-      calculations: { report: "monthly-calc-v1", sales: SALES_CALCULATION_VERSION, costs: COST_CALCULATION_VERSION, purchasing: PURCHASING_CALCULATION_VERSION, operating: OPERATING_CALCULATION_VERSION },
-      rules: { artifact: "esmer-market:monthly-v1", decimalPrecision: 100, rounding: "ROUND_HALF_UP", conventions: ["Sales: signed customer returns; completed sale-document basket denominator", "Comparisons: matched covered days; positive denominators only", "Cost: covered historical last-purchase estimate, no replacement fallback", "Operating: incurred date, classified costs, reviewed completeness", "Percentages: 2 decimal places; source and calculation values retain precision"] },
+    const productProfit = buildProductProfit({ sales: this.sales(session, sales.view.from, sales.view.to), gross: this.gross(session, sales.view.from, sales.view.to), records: snapshot.records, lineage: snapshot.metadata!.lineage, period: context.period, coverage: snapshot.metadata!.coverage });
+    const report = { format: "monthly-report-v2" as const, id: randomUUID(), context: { ...context },
+      calculations: { report: "monthly-report-calc-v2", sales: SALES_CALCULATION_VERSION, costs: COST_CALCULATION_VERSION, purchasing: PURCHASING_CALCULATION_VERSION, operating: OPERATING_CALCULATION_VERSION },
+      rules: { artifact: "esmer-market:monthly-v2", decimalPrecision: 100, rounding: "ROUND_HALF_UP", conventions: ["Sales: signed customer returns; completed sale-document basket denominator", "Comparisons: matched covered days; positive denominators only", "Cost: covered historical last-purchase estimate, no replacement fallback", "Operating: incurred date, classified costs, reviewed completeness", "Percentages: 2 decimal places; source and calculation values retain precision"] },
       state: sales.view.coverage === "partial" ? "open" as const : "provisional" as const,
       sales: sales.view, salesEvidence: { documents: snapshot.records.documents, lines: snapshot.records.lines, components },
-      purchasing: purchasing.view, operating, appEvidence: [...snapshot.expenseHistory, ...snapshot.app.filter(row => row.kind !== "expense")], review: null };
+      purchasing: purchasing.view, operating, appEvidence: [...snapshot.expenseHistory, ...snapshot.app.filter(row => row.kind !== "expense")], review: null, productProfit };
     step("complete", 4);
     session.calculations.monthly = report;
     return { status: "monthly", report: this.monthlyResponse(session, report) };

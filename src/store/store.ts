@@ -250,7 +250,7 @@ class AnalyticsStore {
       json_extract(content_json,'$.output.report.sales.cutoff') AS cutoff,
       json_extract(content_json,'$.output.report.review.acceptedAt') AS acceptedAt,
       json_extract(content_json,'$.output.report.review.reason') AS reason
-      FROM report_versions WHERE json_extract(content_json,'$.output.report.format')='monthly-report-v1'
+      FROM report_versions WHERE json_extract(content_json,'$.output.report.format') IN ('monthly-report-v1','monthly-report-v2')
       AND json_extract(content_json,'$.output.report.context.period')=?
       AND json_extract(content_json,'$.output.report.review.acceptedAt') IS NOT NULL ORDER BY rowid DESC`).all(period) as ReportSummary[];
   }
