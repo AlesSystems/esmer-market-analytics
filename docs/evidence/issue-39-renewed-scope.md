@@ -10,11 +10,23 @@ PR [#46](https://github.com/AlesSystems/esmer-market-analytics/pull/46), reviewe
 
 The previous batch recorded 15,880 headers and 54,965 lines in raw `FIS_TARIHI` September 2025. It proved neither financial inclusion nor market-local dates. Its original backup hash and permanent lineage remain unknown. The existing restored schema includes legacy additions. No pristine restore or production compatibility is assumed.
 
-Before any authorized connection, the operator must provide a private identity receipt binding the exact existing isolated database to that batch's retained database GUID and file-hash manifest. Compare the GUID before every query. Keep hashes, paths, credentials, and source locators outside Git. Record whether the files are unchanged; do not expect hashes of an already running database to equal stopped-file hashes. A changed or missing copy fails this scope rather than permitting another source.
+Before any authorized connection, the operator must provide a private identity receipt binding the exact existing isolated database to that batch's retained database GUID and file-hash manifest. Compare the live GUID before and after M1. Keep hashes, paths, credentials, and source locators outside Git. Record whether the files are unchanged; do not expect hashes of an already running database to equal stopped-file hashes. A changed or missing copy fails this scope rather than permitting another source.
 
 This proposal authorizes no container inventory, start, stop, copy, restore, account creation, grant, configuration change, or private-evidence read. If the identity receipt, a running isolated read-only copy, and an existing suitable restricted reader are unavailable, stop and prepare a separate exact lifecycle request. Do not substitute production or the original development source.
 
 ## Stage M reads catalog metadata only
+
+PR #46 records that the owned copy was stopped during cleanup. Stage M is optional preparation and is currently blocked on that stopped-copy condition. It does not promise financial progress without independent proof. Restarting the copy needs separate exact lifecycle authorization.
+
+Run the fixed envelope in order, M0, M1, then M2. M0 and M2 use the same SQL below. The read-only guard comes from the [existing evidence collector](../../tools/collect-source-evidence.ts), and the GUID/engine projection comes from the [existing SQL reader](../../src/source/sql-server.ts). This envelope reads only database identity/state and catalog metadata, never user-table values.
+
+```sql
+IF ISNULL(CONVERT(nvarchar(60), DATABASEPROPERTYEX(DB_NAME(), 'Updateability')), '') <> 'READ_ONLY'
+ THROW 51000, 'EVIDENCE_READONLY_REQUIRED', 1;
+SELECT CONVERT(varchar(36),database_guid) AS databaseId, CONVERT(varchar(40),SERVERPROPERTY('ProductVersion')) AS engineVersion FROM sys.database_recovery_status WHERE database_id = DB_ID()
+```
+
+Each safety read must return exactly one non-null GUID matching the privately supplied expected GUID. M0 failure prevents M1. M2 failure prevents publication and deletes temporary catalog output. Do not retry or elevate privileges after either failure.
 
 The proposed metadata scope covers only these known candidate tables in `dbo`:
 
@@ -98,13 +110,13 @@ Propose dependencies only through reviewed exact source links, not amount/date s
 
 The proposed maximum outside-month closure is 200 headers, 1,000 lines, 2,000 relationship rows, 500 distinct product IDs, and 2 MiB. All are ceilings for the whole pass, not each query. Limit traversal to two relationship hops. No product dictionary value read is approved. Keep a visited-ID set and reject cycles, missing required endpoints, duplicate conflicting links, or excess before output. Do not return the first rows and pretend the closure is complete.
 
-For September originals and conversions, the proposed raw dependency window is `2005-01-20` inclusive through `2025-10-13` exclusive, matching the historical source bounds conservatively. This window restricts linked IDs only. It grants no all-time scan or all-time financial contribution. Fetch cumulative returns only for approved exact original-sale line IDs within that same fixed source cutoff; they are evidence, never extra September contributions. If a required original, purchase, or later return falls outside the window or cannot be linked within these ceilings, mark that rule unsupported. Enlarging the window or ceiling requires a new reviewed request.
+For September originals and conversions, the proposed raw dependency window is `2005-01-20` inclusive through `2025-10-13` exclusive, derived from the [recorded raw bounds](../contracts/source.md#observed-isolated-copy-on-2026-09-25) of `2005-01-20T18:02:44` through `2025-10-12T18:06:48`. These prior-batch observations do not prove the current copy's cutoff or intervening completeness. This window restricts linked IDs only. It grants no all-time scan or all-time financial contribution. Fetch cumulative returns only for approved exact original-sale line IDs within that same fixed source cutoff; they are evidence, never extra September contributions. If a required original, purchase, or later return falls outside the window or cannot be linked within these ceilings, mark that rule unsupported. Enlarging the window or ceiling requires a new reviewed request.
 
 ## Reader, execution, and output conditions
 
-Use an existing dedicated restricted reader. It may read only the approved catalog metadata for M1, and later only separately approved column projections. It must have no broad `db_datareader`, source writes, administration, arbitrary procedures, impersonation, or access to private columns. Review effective permissions through an operator-provided private receipt. Account provisioning and negative write probes need separate isolated lifecycle authorization; do not execute them under M1.
+Use an existing dedicated restricted reader. Stage M requires visibility of the current database row in `sys.database_recovery_status`, use of `DB_ID`, `DB_NAME`, `DATABASEPROPERTYEX`, and `SERVERPROPERTY`, and catalog visibility for the five named tables through the M1 system views. These are the only approved reads in M0/M1/M2. Later value projections remain separately gated. It must have no broad `db_datareader`, source writes, administration, arbitrary procedures, impersonation, or access to private columns. Review effective permissions through an operator-provided private receipt. Account provisioning and negative write probes need separate isolated lifecycle authorization; do not execute them under M1.
 
-The execution wrapper must bind the privately supplied expected GUID, verify read-only state before and after, and pin the reviewed query SHA-256. A mismatch closes the connection without values. No dirty-read hint, new source index, or isolation/configuration change is permitted. If the existing identity/state checks need privileges the reader lacks, stop rather than elevate.
+The execution wrapper must bind the privately supplied expected GUID, verify read-only state before and after, and pin the reviewed SHA-256 of each exact UTF-8 SQL block before execution, including its trailing newline. The fixed hashes are M0/M2 `76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339` and M1 `4cabf20b62aa33e9097fe05f74d8924168469212b86cdecca85e9dbb505a00d0`. Any wrapper-added SQL requires review and a new pinned hash before execution. A mismatch closes the connection without values. No dirty-read hint, new source index, or isolation/configuration change is permitted. If the existing identity/state checks need privileges the reader lacks, stop rather than elevate.
 
 Keep the existing 15-second request timeout and a 60-second total pass deadline. Cancel immediately on user cancellation or any bound failure, cancel the request, and close the connection in a finalizer. Measure cancellation latency, elapsed time, rows, and bytes in a safe receipt. No retries after a timeout or identity failure without diagnosis. SQL text may contain only approved identifiers and parameter placeholders; redact errors and parameters from public logs.
 
@@ -127,9 +139,9 @@ Only the existing backup is available, so these proof requirements are presently
 
 ## Exact next authorization request
 
-> Do you authorize Stage M only on the existing isolated copy associated with batch `3824ff83-6d2f-47b7-9b74-02d7334d6cd4`, after its operator-provided private GUID/hash identity and restricted-reader receipt match, to run only M1 catalog metadata for `dbo.FIS`, `dbo.FIS_DETAY`, `dbo.STOK_BIRIM`, `dbo.FIS_DETAY_BELGE_DETAY`, and `dbo.FIS_DETAY_MALIYET`, with a 1,024-row/1-MiB limit, 15-second request timeout, 60-second total deadline, and private output? This excludes all user-table values, container actions, restore/copy/start, account or grant changes, production access, and financial activation. If the existing copy is unavailable or stopped, the pass stops for a separate lifecycle scope. Stage V values require a later reviewed exact allowlist and separate authorization.
+> Do you authorize Stage M only on the existing isolated copy associated with batch `3824ff83-6d2f-47b7-9b74-02d7334d6cd4`, after its operator-provided private GUID/hash identity and restricted-reader receipt match, to run only the fixed M0/M1/M2 envelope, including the before/after database GUID, engine version, and read-only safety reads plus M1 catalog metadata for `dbo.FIS`, `dbo.FIS_DETAY`, `dbo.STOK_BIRIM`, `dbo.FIS_DETAY_BELGE_DETAY`, and `dbo.FIS_DETAY_MALIYET`, with exactly one identity row for each safety read, a 1,024-row/1-MiB catalog limit, 15-second request timeout, 60-second total deadline, and private output? This excludes all user-table values, container actions, restore/copy/start, account or grant changes, production access, and financial activation. If the existing copy is unavailable or stopped, the pass stops for a separate lifecycle scope. Stage V values require a later reviewed exact allowlist and separate authorization.
 
-This is a concrete pending request for coordinator review, not a permission question issued by this worker. Approval can unblock metadata preparation only. Missing independent semantics still block #39 completion and R40. Windows acceptance remains with the user.
+This is a concrete pending request for coordinator review, not a permission question issued by this worker. Approval permits optional metadata preparation only once the separately authorized lifecycle prerequisites exist. Missing independent semantics still block #39 completion and R40. Windows acceptance remains with the user.
 
 ## Preparation verification
 
