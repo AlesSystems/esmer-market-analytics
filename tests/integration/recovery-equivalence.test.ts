@@ -196,3 +196,31 @@ test("deep validation rejects altered v2 coverage, state and daily trend", async
     }
   } finally { await rm(root, { recursive: true, force: true }); }
 });
+
+test("v2 recovery retains valid empty, partial and unresolved report states", async () => {
+  const { businessPackage, businessRecords } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-v2-coverage-recovery-"));
+  const empty = businessRecords(); empty.documents = []; empty.lines = [];
+  const unresolved = businessRecords(); unresolved.lines[0].sales!.unit = "unknown";
+  try {
+    for (const [name, records, coverage] of [
+      ["empty", empty, { from: "2025-09-01", to: "2025-09-30", complete: true }],
+      ["partial", businessRecords(), { from: "2025-09-01", to: "2025-09-02", complete: false }],
+      ["unresolved", unresolved, { from: "2025-09-01", to: "2025-09-30", complete: true }],
+    ] as const) {
+      const path = join(root, `${name}.sqlite`), store = openStore(path);
+      try {
+        expect(store.importPackage(businessPackage(records, { coverage })).status).toBe("active");
+        const versions = new ReportVersions(store, new SalesReports(store)), opened = versions.open({ period: "2025-09" });
+        if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+        if (name === "empty") expect(opened.report.productProfit.summary.status).toBe("empty");
+        if (name === "partial") expect(opened.report.productProfit.daily[2]).toMatchObject({ sourceCoverage: "unavailable", status: "unavailable", trend: null });
+        if (name === "unresolved") expect(opened.report.productProfit.summary.salesCoverage).toMatchObject({ complete: false, unresolvedCount: 1, exposure: null });
+        versions.accept({ candidateId: opened.report.id, previousAcceptedId: null, reason: "Sentetik kapsam kontrolü" });
+      } finally { store.close(); }
+      expect(validateSnapshot(path).reports).toBe(1);
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
