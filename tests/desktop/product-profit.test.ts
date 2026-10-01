@@ -95,6 +95,10 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Seçili ürün · Çay" })).toBeFocused();
     await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toContainText("60,00 ₺");
+    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+    await expect(page.getByRole("button", { name: "Çay", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Çay", exact: true }).press("Enter");
+    await expect(page.getByRole("heading", { name: "Seçili ürün · Çay" })).toBeFocused();
     await page.getByLabel("Ürün ara", { exact: true }).fill("eşleşmeyen");
     await expect(page.getByText("Seçili ürün arama sonuçlarında yok", { exact: true })).toBeVisible();
     await expect(summary).toContainText("60,00 ₺");
