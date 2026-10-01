@@ -1,0 +1,162 @@
+{
+  "workload": {
+    "documents": 101,
+    "lines": 101,
+    "products": 101,
+    "condition": "fresh profile per process; cold startup then warm UI interactions; interleaved baseline/head",
+    "fixtureSha256": "081c42227d44925a4b6d5a5084f2dd572f7fa44fba561ae80330f79b7b956da4"
+  },
+  "samples": [
+    {
+      "pair": 0,
+      "name": "baseline",
+      "coldOpen": 407.4,
+      "firstPageRows": null,
+      "warmMonthly": 47.2,
+      "monthChange": 61.5,
+      "sharedEvidence": 18.9,
+      "importNavigation": 34.6
+    },
+    {
+      "pair": 0,
+      "name": "head",
+      "coldOpen": 402.8,
+      "firstPageRows": 100,
+      "warmMonthly": 33.2,
+      "monthChange": 68,
+      "sharedEvidence": 29.5,
+      "search": 13.8,
+      "sort": 18.5,
+      "page": 41.2,
+      "selection": 41.4,
+      "productRows": 1,
+      "domNodes": 540,
+      "importNavigation": 36
+    },
+    {
+      "pair": 1,
+      "name": "baseline",
+      "coldOpen": 407,
+      "firstPageRows": null,
+      "warmMonthly": 36.2,
+      "monthChange": 59.3,
+      "sharedEvidence": 14.7,
+      "importNavigation": 36.6
+    },
+    {
+      "pair": 1,
+      "name": "head",
+      "coldOpen": 398.9,
+      "firstPageRows": 100,
+      "warmMonthly": 33.5,
+      "monthChange": 65.3,
+      "sharedEvidence": 13.4,
+      "search": 8.8,
+      "sort": 31.7,
+      "page": 37.3,
+      "selection": 43,
+      "productRows": 1,
+      "domNodes": 540,
+      "importNavigation": 37.7
+    },
+    {
+      "pair": 2,
+      "name": "baseline",
+      "coldOpen": 400.1,
+      "firstPageRows": null,
+      "warmMonthly": 30.7,
+      "monthChange": 62.5,
+      "sharedEvidence": 14.7,
+      "importNavigation": 36.1
+    },
+    {
+      "pair": 2,
+      "name": "head",
+      "coldOpen": 408.9,
+      "firstPageRows": 100,
+      "warmMonthly": 33.2,
+      "monthChange": 65,
+      "sharedEvidence": 13.1,
+      "search": 8.1,
+      "sort": 14.1,
+      "page": 38.9,
+      "selection": 43.2,
+      "productRows": 1,
+      "domNodes": 540,
+      "importNavigation": 36.8
+    },
+    {
+      "pair": 3,
+      "name": "baseline",
+      "coldOpen": 407.4,
+      "firstPageRows": null,
+      "warmMonthly": 30.6,
+      "monthChange": 57.4,
+      "sharedEvidence": 13.9,
+      "importNavigation": 36.6
+    },
+    {
+      "pair": 3,
+      "name": "head",
+      "coldOpen": 408.5,
+      "firstPageRows": 100,
+      "warmMonthly": 34.1,
+      "monthChange": 65.6,
+      "sharedEvidence": 13.2,
+      "search": 30.8,
+      "sort": 14.7,
+      "page": 40.4,
+      "selection": 42.8,
+      "productRows": 1,
+      "domNodes": 540,
+      "importNavigation": 37
+    },
+    {
+      "pair": 4,
+      "name": "baseline",
+      "coldOpen": 405.5,
+      "firstPageRows": null,
+      "warmMonthly": 35.2,
+      "monthChange": 58.7,
+      "sharedEvidence": 14.3,
+      "importNavigation": 35.7
+    },
+    {
+      "pair": 4,
+      "name": "head",
+      "coldOpen": 412.2,
+      "firstPageRows": 100,
+      "warmMonthly": 34.7,
+      "monthChange": 64.4,
+      "sharedEvidence": 13.6,
+      "search": 30.8,
+      "sort": 14.2,
+      "page": 40.9,
+      "selection": 42.3,
+      "productRows": 1,
+      "domNodes": 540,
+      "importNavigation": 38.5
+    }
+  ],
+  "limits": [
+    "macOS ARM64 synthetic evidence; Windows scaling and two-second acceptance remain open.",
+    "Baseline has no product profit UI; added interactions recorded separately from shared opening/evidence."
+  ],
+  "packages": {
+    "baseline": {
+      "asar": "c7220ece53cea49594d264ce73e2368fef84ef8bffcb2b80e7c7daa73fb750fe",
+      "executable": "588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8"
+    },
+    "head": {
+      "asar": "9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492",
+      "executable": "588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8"
+    }
+  },
+  "genuineV1": {
+    "generatedBy": "1ed1824ec5ee448cf880d20e89d74d1d67d08486 original calculator",
+    "storedId": "d565ec9d-0a6d-4057-8750-f735f22f48c4",
+    "netSales": "200",
+    "coveredProfit": "40",
+    "allWorkbookSheetsEqual": true
+  }
+}
