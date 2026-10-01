@@ -54,3 +54,27 @@ test("packaged product-profit pages stay bounded and accepted values survive res
     expect(retained).toEqual(first);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+test("owner reads the monthly profit and selected historical cost on one page", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-profit-journey-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { expect(store.importPackage(businessPackage()).status).toBe("active"); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    const summary = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
+    await expect(summary).toContainText("40,00 ₺");
+    await expect(summary).toContainText("Tüm market kârı belirlenemiyor");
+    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
+    await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Seçili ürün · İçme suyu" })).toBeFocused();
+    await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toContainText("60,00 ₺");
+    await page.getByLabel("Ürün ara", { exact: true }).fill("eşleşmeyen");
+    await expect(page.getByText("Seçili ürün arama sonuçlarında yok", { exact: true })).toBeVisible();
+    await expect(summary).toContainText("40,00 ₺");
+    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+    await expect(page.getByRole("heading", { name: "Ürün katkıları", exact: true })).toBeFocused();
+    expect(await page.getByRole("main").count()).toBe(1);
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});

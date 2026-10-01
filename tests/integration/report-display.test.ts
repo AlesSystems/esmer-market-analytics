@@ -154,3 +154,21 @@ test("v2 product pages search and sort without changing the selected market summ
     expect(validMonthlyRequest("readReportEvidence",{...evidence,search:` ${"x".repeat(160)} `})).toBe(false);
   } finally { store.close(); }
 });
+
+test("profit display projects signed chart geometry without changing stored trend", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords();
+    records.lines[1].business!.historicalCost = { ...records.lines[0].business!.historicalCost!, unitCost: "120" };
+    records.documents[1].date = "2025-09-02";
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly");
+    const display = versions.display({ reportId: opened.report.id }).report;
+    expect(display).toHaveProperty("productProfit.daily.0", expect.objectContaining({ trend: "40", height: "100", negative: false }));
+    expect(display).toHaveProperty("productProfit.daily.1", expect.objectContaining({ trend: "-20", height: "50", negative: true }));
+    expect(display).toHaveProperty("productProfit.daily.2", expect.objectContaining({ trend: "0", height: "0", negative: false }));
+    expect(opened.report).not.toHaveProperty("productProfit.daily.0.height");
+  } finally { store.close(); }
+});
