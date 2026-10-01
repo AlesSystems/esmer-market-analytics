@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { migrate } from "../store/migrations";
 import { APPLICATION_ID, SCHEMA_VERSION } from "../store/schema";
-import { canonical, readPackage, type Records } from "../source/package";
+import { canonical, readPackage, type Records, type Metadata } from "../source/package";
 import { requireValid, validateChange, validId, type AcceptedReport, type AppChange } from "../store/revisions";
 import type { MonthlyReport } from "../reports/contracts";
 import { Exact, rounded, sum } from "../domain/money";
@@ -33,7 +33,7 @@ function validateProfitScope(row: ProductProfit["summary"] | ProductProfit["prod
     requireValid(quantity && equals(quantity.sold,sold) && equals(quantity.returned,returned) && equals(quantity.net,new Exact(sold).minus(returned).toFixed()));
   }
 }
-function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, source: Records) {
+function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, source: Records, coverage: Metadata["coverage"]) {
   requireValid(profit && profit.version === "monthly-product-profit-v1" && profit.lineage === monthly.purchasing.lineage && profit.period === monthly.context.period);
   requireValid(profit.summary && ["ready","empty","unavailable"].includes(profit.summary.status) && ["market","covered"].includes(profit.summary.scope) && Array.isArray(profit.summary.warnings) && profit.summary.warnings.every(row=>typeof row === "string"));
   requireValid(profit.summary.salesCoverage && typeof profit.summary.salesCoverage.complete === "boolean" && Number.isSafeInteger(profit.summary.salesCoverage.unresolvedCount) && (profit.summary.salesCoverage.exposure === null || decimal(profit.summary.salesCoverage.exposure)));
@@ -67,6 +67,15 @@ function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, so
   }
   requireValid(lineIds.size === monthly.salesEvidence.components.length && monthly.salesEvidence.components.every(row=>lineIds.has(row.lineId)));
   for (const row of profit.sourceExclusions) requireValid(validId(row.documentId) && /^\d{4}-\d{2}-\d{2}$/.test(row.date) && row.exposure === null && sourceDocuments.get(row.documentId)?.date===row.date);
+  requireValid(canonical(profit.sourceExclusions)===canonical(monthly.sales.exclusions.map(row=>({...row,date:sourceDocuments.get(row.documentId)?.date,exposure:null}))));
+  const unresolved = profit.sourceExclusions.filter(row=>["UNKNOWN_MEANING","CONVERSION_CONFLICT","NO_LINES"].includes(row.reason));
+  const unreconciled = monthly.sales.transactions.filter(row=>!row.reconciled);
+  const unresolvedCount = unresolved.length + unreconciled.length, supported = gross.status==="ready";
+  requireValid(canonical(profit.summary.salesCoverage)===canonical({complete:unresolvedCount===0,unresolvedCount,exposure:unresolvedCount?null:"0"}) && canonical(profit.summary.periodCoverage)===canonical(coverage));
+  const complete = supported && unresolvedCount===0 && coverage.complete && coverage.from<=`${profit.period}-01` && coverage.to>=`${profit.period}-${count}` && profit.summary.excludedCount===0;
+  const summaryStatus = complete && !profit.lines.length ? "empty" : !supported || !profit.summary.coveredCount ? "unavailable" : "ready";
+  requireValid(profit.summary.scope===(complete?"market":"covered") && profit.summary.status===summaryStatus);
+  requireValid(canonical(profit.summary.warnings)===canonical([...new Set([...gross.warnings,...(unresolvedCount?["INCOMPLETE_SALES"]:[])])]));
   validateProfitScope(profit.summary,profit.lines,gross.status==="ready");
   const byProduct=new Map<string,ProductProfit["lines"]>(), byDay=new Map<string,ProductProfit["lines"]>();
   for (const line of profit.lines) {
@@ -75,7 +84,14 @@ function validateProductProfit(profit: ProductProfit, monthly: MonthlyReport, so
   }
   requireValid(profit.products.length===byProduct.size && profit.products.every(row=>byProduct.has(row.productId)));
   for (const row of profit.products) validateProfitScope(row,byProduct.get(row.productId)??[],gross.status==="ready");
-  for (const row of profit.daily) validateProfitScope(row,byDay.get(row.date)??[],gross.status==="ready");
+  for (const row of profit.daily) {
+    const lines=byDay.get(row.date)??[];
+    const sourceCoverage=row.date<coverage.from || row.date>coverage.to ? "unavailable" : !coverage.complete || unresolved.some(exclusion=>exclusion.date===row.date) || unreconciled.some(document=>document.date===row.date) ? "partial" : "complete";
+    const status=!supported || sourceCoverage!=="complete" && !lines.length || sourceCoverage==="unavailable" || lines.length>0 && row.coveredCount===0 ? "unavailable" : lines.length ? "ready" : "empty";
+    const trend=status==="unavailable" && !lines.length ? null : row.coveredGrossProfit??(status==="empty"?"0":null);
+    requireValid(row.sourceCoverage===sourceCoverage && row.status===status && row.trend===trend);
+    validateProfitScope(row,lines,supported);
+  }
   for (const key of ["netSales","coveredSales","coveredCost","coveredGrossProfit"] as const) {
     const target=profit.summary[key];
     if (target !== null) requireValid(new Exact(sum(profit.products.map(row=>row[key] ?? "0"))).eq(target) && new Exact(sum(profit.daily.map(row=>row[key] ?? "0"))).eq(target));
@@ -98,6 +114,7 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
   const revisions=db.prepare("SELECT revision,kind,entity_id,value_json FROM app_revisions ORDER BY revision").all();
   for (const row of revisions) validateChange({kind:row.kind,entityId:row.entity_id,value:decode(row.value_json)} as AppChange);
   const facts=new Map<string,Records>();
+  const coverage=new Map<string,Metadata["coverage"]>();
   for (const dataset of db.prepare("SELECT id,lineage,manifest_json,warnings_json,summary_json FROM datasets").all()) {
     const expand=(rows:Record<string,unknown>[]) => rows.map(({sales_json,purchasing_json,business_json,...row}) => ({...row,...(sales_json ? {sales:decode(sales_json)}:{}),...(purchasing_json ? {purchasing:decode(purchasing_json)}:{}),...(business_json ? {business:decode(business_json)}:{})}));
     const records = {
@@ -109,6 +126,7 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
     const bytes=Buffer.from(canonical({manifest:decode(dataset.manifest_json),payload:records}));
     const parsed=readPackage(bytes);
     requireValid(parsed.ok && createHash("sha256").update(bytes).digest("hex")===dataset.id);
+    coverage.set(String(dataset.id),parsed.metadata.coverage);
     requireValid(parsed.metadata.lineage===dataset.lineage && canonical(parsed.warnings)===canonical(decode(dataset.warnings_json)));
     requireValid(canonical(decode(dataset.summary_json))===canonical({documents:records.documents.length,lines:records.lines.length,suppliers:records.suppliers.length,warnings:parsed.warnings}));
   }
@@ -125,7 +143,7 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
       requireValid(monthly.review && typeof monthly.review.acceptedAt==="string" && typeof monthly.review.reason==="string" && monthly.sales && monthly.purchasing && monthly.operating && Array.isArray(monthly.appEvidence) && Array.isArray(monthly.salesEvidence?.documents) && Array.isArray(monthly.salesEvidence?.lines));
       const source=facts.get(report.pin.datasetId!);
       requireValid(source && canonical(monthly.salesEvidence.documents)===canonical(source.documents) && canonical(monthly.salesEvidence.lines)===canonical(source.lines));
-      if (monthly.format === "monthly-report-v2") validateProductProfit(monthly.productProfit,monthly,source!);
+      if (monthly.format === "monthly-report-v2") validateProductProfit(monthly.productProfit,monthly,source!,coverage.get(report.pin.datasetId!)!);
       for (const evidence of monthly.appEvidence) {
         const revision=revisions.find(row=>row.revision===evidence.revision);
         requireValid(revision && Number(revision.revision)<=report.pin.appRevision && revision.kind===evidence.kind && revision.entity_id===evidence.entityId && canonical(decode(revision.value_json))===canonical(evidence.value));
