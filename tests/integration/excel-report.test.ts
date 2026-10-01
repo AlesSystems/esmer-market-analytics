@@ -106,3 +106,22 @@ test("an unavailable month exports blanks rather than invented zero sales or pro
     for (const title of ["Net satış", "KDV", "Tamamlanan satış işlemi", "Tahmini maliyet", "Kapsanan tahmini brüt kâr", "İşçilik"]) expect(summary.find(row => row[0] === title)?.[1]).toBeNull();
   } finally { store.close(); }
 });
+
+test("v2 Excel uses the complete selected product and daily artifact", async () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store,new SalesReports(store)), opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    versions.accept({candidateId:opened.report.id,previousAcceptedId:null,reason:"Sentetik ihracat"});
+    const report = versions.selected(opened.report.id);
+    store.importPackage(businessPackage(undefined,{extractionId:"later"}));
+    const bytes = await excelReport(report);
+    const products = await readSheet(bytes,"Ürün kârlılığı"), daily = await readSheet(bytes,"Günlük ürün kârlılığı"), evidence = await readSheet(bytes,"Ürün kâr kanıtları");
+    expect(products.flat()).toContain(40);
+    expect(daily.flat()).toContain("2025-09-30");
+    expect(evidence.flat()).toContain("L1");
+    expect(evidence.flat()).toContain("L2");
+    expect(evidence.flat()).not.toContain("later");
+  } finally { store.close(); }
+});

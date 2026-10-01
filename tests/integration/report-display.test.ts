@@ -44,6 +44,20 @@ test("monthly display omits bulk evidence and pages the selected immutable repor
   } finally { store.close(); }
 });
 
+test("a synthetic monthly candidate stores exact product profit and calendar days", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const opened = new ReportVersions(store, new SalesReports(store)).open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly report");
+    expect(opened.report.format).toBe("monthly-report-v2");
+    expect(opened.report).toHaveProperty("productProfit.summary.coveredGrossProfit", "40");
+    expect(opened.report).toHaveProperty("productProfit.products.0.coveredGrossProfit", "40");
+    expect(opened.report).toHaveProperty("productProfit.daily.0.date", "2025-09-01");
+    expect(opened.report).toHaveProperty("productProfit.daily.29.date", "2025-09-30");
+  } finally { store.close(); }
+});
+
 test("evidence requests reject unbounded pages and arbitrary selectors", () => {
   const request = { reportId: "report", section: "components", offset: 0, search: "", range: "current", documentId: null };
   expect(validMonthlyRequest("readReportEvidence", request)).toBe(true);
@@ -108,5 +122,35 @@ test.each(["expense", "source"])("an accepted pinned candidate signals a newer %
     expect(versions.selected(opened.report.id)).toEqual(accepted);
     const restarted = new ReportVersions(store, new SalesReports(store));
     expect(restarted.selected(opened.report.id)).toEqual(accepted);
+  } finally { store.close(); }
+});
+
+test("v2 product pages search and sort without changing the selected market summary", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords(), document = records.documents[0], line = records.lines[0];
+    records.documents = Array.from({length: 101}, (_, index) => ({...structuredClone(document),id:`S${index}`}));
+    records.lines = records.documents.map((row,index) => ({...structuredClone(line),id:`L${index}`,documentId:row.id,sales:{...line.sales!,productId:`P${String(index).padStart(3,"0")}`,productName:`Ürün ${index}`}}));
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store,new SalesReports(store)), opened = versions.open({period:"2025-09"});
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    const reportId = opened.report.id, summary = opened.report.productProfit.summary;
+    const base = {reportId,search:"",sort:"profit" as const,direction:"desc" as const,offset:0};
+    expect(versions.products(base)).toMatchObject({status:"products",total:101,offset:0});
+    expect(versions.products(base).rows).toHaveLength(100);
+    expect(versions.products({...base,offset:100}).rows).toHaveLength(1);
+    expect(versions.products({...base,search:"  ÜRÜN 100  "}).rows).toMatchObject([{productId:"P100"}]);
+    expect(versions.products({...base,sort:"name",direction:"asc"}).rows[0].displayName).toBe("Ürün 0");
+    expect(versions.display({reportId}).report).toMatchObject({productProfit:{productCount:101,summary}});
+    expect(versions.display({reportId}).report).not.toHaveProperty("productProfit.products");
+    expect(versions.evidence({reportId,section:"product-profit",productId:"P100",offset:0,search:"",range:"current",documentId:null})).toMatchObject({status:"evidence",section:"product-profit",productId:"P100",total:1,rows:[{lineId:"L100",cost:"60",historicalUnitCost:"60"}]});
+    expect(validMonthlyRequest("readReportProducts",base)).toBe(true);
+    for (const bad of [{...base,sort:"sql"},{...base,direction:"up"},{...base,offset:-1},{...base,offset:0.5},{...base,limit:1000},{...base,search:"x".repeat(161)},{...base,search:" ".repeat(161)},{...base,search:` ${"x".repeat(160)} `}]) expect(validMonthlyRequest("readReportProducts",bad)).toBe(false);
+    const evidence = {reportId,section:"product-profit",offset:0,search:"",range:"current",documentId:null};
+    expect(validMonthlyRequest("readReportEvidence",evidence)).toBe(true);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,productId:"P100"})).toBe(true);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,productId:" P100"})).toBe(false);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,search:" ".repeat(161)})).toBe(false);
+    expect(validMonthlyRequest("readReportEvidence",{...evidence,search:` ${"x".repeat(160)} `})).toBe(false);
   } finally { store.close(); }
 });

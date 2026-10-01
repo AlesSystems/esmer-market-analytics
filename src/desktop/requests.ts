@@ -23,14 +23,20 @@ export function validReportRequest(operation: string, value: unknown): boolean {
   return exact(c, ["sessionId", "datasetId", "appRevision", "calculationVersion", "period"]) && validId(c.sessionId) && validId(c.datasetId) && validId(c.calculationVersion) && period(c.period) && Number.isSafeInteger(c.appRevision) && Number(c.appRevision) >= 0
     && exact(f, ["categoryId", "productId", "search", "kind"]) && (f.categoryId === null || validId(f.categoryId)) && (f.productId === null || validId(f.productId)) && typeof f.search === "string" && f.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(f.search) && ["all", "sale", "customer-return"].includes(String(f.kind)) && typeof f.kind === "string";
 }
-export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportPurchasing"];
+export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportProducts", "readReportPurchasing"];
 export function validMonthlyRequest(operation: string, value: unknown): boolean {
-  if (operation === "readReportEvidence") return exact(value, ["reportId", "section", "offset", "search", "range", "documentId"])
-    && validId(value.reportId) && typeof value.section === "string" && ["components", "exclusions", "documents", "lines"].includes(value.section)
+  if (operation === "readReportProducts") return exact(value, ["reportId", "search", "sort", "direction", "offset"])
+    && validId(value.reportId) && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
+    && typeof value.sort === "string" && ["profit", "name", "netSales", "coverage"].includes(value.sort)
+    && typeof value.direction === "string" && ["asc", "desc"].includes(value.direction)
+    && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0;
+  if (operation === "readReportEvidence") return (exact(value, ["reportId", "section", "offset", "search", "range", "documentId"]) || exact(value, ["reportId", "section", "offset", "search", "range", "documentId", "productId"]))
+    && validId(value.reportId) && typeof value.section === "string" && ["components", "exclusions", "documents", "lines", "product-profit"].includes(value.section)
     && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0
     && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
     && typeof value.range === "string" && ["current", "month", "year"].includes(value.range)
-    && (value.section === "lines" ? validId(value.documentId) : value.documentId === null);
+    && (value.section === "lines" ? validId(value.documentId) : value.section === "product-profit" ? value.documentId === null || validId(value.documentId) : value.documentId === null)
+    && (value.section === "product-profit" ? (!("productId" in value) || value.productId === null || validId(value.productId)) && value.range === "current" : !("productId" in value));
   if (operation === "openMonthly" || operation === "queryMonthly") return validReportRequest(operation, value);
   if (operation === "listReportVersions") return exact(value, ["period"]) && period(value.period);
   if (operation === "readReportVersion" || operation === "exportReportVersion" || operation === "readReportPurchasing") return exact(value, ["reportId"]) && validId(value.reportId);

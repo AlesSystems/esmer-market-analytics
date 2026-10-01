@@ -3,10 +3,10 @@ import { Exact } from "../domain/money";
 import type { openStore } from "../store/store";
 import type { SalesReports } from "./query";
 import type { MonthlyReport, MonthlyResult, OperationControl, ReportContext, ReportDifference, ReportHistoryResult } from "./contracts";
-import { displayResult, monthlyDisplay, reportEvidence, type ReportEvidenceRequest } from "./display";
+import { displayResult, monthlyDisplay, reportEvidence, reportProducts, type ReportEvidenceRequest, type ReportProductsRequest } from "./display";
 
 function monthly(value: unknown): value is MonthlyReport {
-  return !!value && typeof value === "object" && "format" in value && value.format === "monthly-report-v1";
+  return !!value && typeof value === "object" && "format" in value && (value.format === "monthly-report-v1" || value.format === "monthly-report-v2");
 }
 export class ReportVersions {
   private candidate: MonthlyReport | null = null;
@@ -44,6 +44,9 @@ export class ReportVersions {
   }
   evidence(request: ReportEvidenceRequest) {
     return structuredClone(reportEvidence(this.resolve(request.reportId), request));
+  }
+  products(request: ReportProductsRequest) {
+    return structuredClone(reportProducts(this.resolve(request.reportId), request));
   }
   purchasing({ reportId }: { reportId: string }) {
     return { status: "purchasing" as const, view: structuredClone(this.resolve(reportId).purchasing) };
@@ -89,7 +92,7 @@ export class ReportVersions {
         const key = (value: unknown, index: number) => {
           if (!value || typeof value !== "object") return String(index);
           const row = value as Record<string, unknown>;
-          return String(row.lineId ?? row.id ?? (row.entityId ? `${row.entityId}:${row.revision}` : row.documentId ?? row.date ?? index));
+          return String(row.lineId ?? row.productId ?? row.id ?? (row.entityId ? `${row.entityId}:${row.revision}` : row.documentId ?? row.date ?? index));
         };
         const old = new Map((Array.isArray(a) ? a : []).map((value, index) => [key(value, index), value]));
         const next = new Map((Array.isArray(b) ? b : []).map((value, index) => [key(value, index), value]));
@@ -105,7 +108,7 @@ export class ReportVersions {
       const decimal = (v: unknown): v is string => typeof v === "string" && /^-?\d+(?:\.\d+)?$/.test(v);
       changes.push({ path, before: old, after: next, delta: decimal(old) && decimal(next) ? new Exact(next).minus(old).toFixed() : null });
     };
-    const comparable = (r: MonthlyReport) => ({ calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence });
+    const comparable = (r: MonthlyReport) => ({ format: r.format, calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence, productProfit: r.format === "monthly-report-v2" ? { version: r.productProfit.version, summary: r.productProfit.summary } : null });
     walk(comparable(before), comparable(after), "");
     return { status: "difference", candidateId, acceptedId, changes };
   }
