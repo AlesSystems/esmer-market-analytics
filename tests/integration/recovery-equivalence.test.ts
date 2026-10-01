@@ -164,3 +164,35 @@ test("deep validation rejects a missing zero-value product identity", async () =
     expect(() => validateSnapshot(path)).toThrow();
   } finally { await rm(root,{recursive:true,force:true}); }
 });
+
+test("deep validation rejects altered v2 coverage, state and daily trend", async () => {
+  const { businessPackage } = await import("../helpers/business-fixtures");
+  const { openStore } = await import("../../src/store/store");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "esmer-v2-state-tamper-")), path = join(root, "analytics.sqlite");
+  try {
+    const store = openStore(path);
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store, new SalesReports(store)), opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    versions.accept({ candidateId: opened.report.id, previousAcceptedId: null, reason: "Sentetik kontrol" });
+    store.close();
+    expect(validateSnapshot(path).reports).toBe(1);
+    const original = await readFile(path);
+    for (const [target, replacement] of [
+      ['"trend":"40"', '"trend":"99"'],
+      ['"scope":"covered"', '"scope":"market" '],
+      ['"status":"ready","trend":"40"', '"status":"empty","trend":"40"'],
+      ['"sourceCoverage":"complete"', '"sourceCoverage":"partial" '],
+      ['"salesCoverage":{"complete":true,"exposure":"0","unresolvedCount":0}', '"salesCoverage":{"complete":true,"exposure":"0","unresolvedCount":1}'],
+      ['"periodCoverage":{"complete":true,"from":"2025-09-01","to":"2025-09-30"}', '"periodCoverage":{"complete":true,"from":"2025-09-02","to":"2025-09-30"}'],
+    ]) {
+      const bytes = Buffer.from(original), index = bytes.indexOf(Buffer.from(target));
+      expect(index, target).toBeGreaterThan(-1);
+      expect(Buffer.byteLength(replacement)).toBe(Buffer.byteLength(target));
+      Buffer.from(replacement).copy(bytes, index);
+      await writeFile(path, bytes);
+      expect(() => validateSnapshot(path), target).toThrow();
+    }
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
