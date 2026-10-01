@@ -1212,14 +1212,18 @@
         "R39-SCOPE-MERGE",
         "WIN-HANDOFF",
         "WORKSTREAMS-CHECKPOINT-REPAIR",
-        "WORKSTREAMS-FINAL-REVIEW"
+        "WORKSTREAMS-FINAL-REVIEW",
+        "R42-MEDIA-REPAIR"
       ],
       "state": "pending",
       "inputs": [
         "Reviewed branch artifacts and exact GitHub identities"
       ],
       "allowed_files": [
-        "workstreams/**"
+        "workstreams/**",
+        "docs/evidence/r42/lane-08.png",
+        "docs/evidence/r42-monthly-profit-page.md",
+        "docs/evidence/r42/zoom-capture.json"
       ],
       "outputs": [
         "PR/merge identity and durable evidence"
@@ -1428,6 +1432,39 @@
         "Local links and independent documentary review"
       ],
       "risk": "medium"
+    },
+    {
+      "id": "R42-MEDIA-REPAIR",
+      "type": "documentation",
+      "objective": "Replace blank zoom evidence image with a visible capture of the already verified native zoom journey",
+      "dependencies": [
+        "R42-MERGE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Postmerge coordinator observed blank lane-08.png",
+        "Unchanged repaired package9feefe30"
+      ],
+      "allowed_files": [
+        "docs/evidence/r42/lane-08.png",
+        "docs/evidence/r42-monthly-profit-page.md",
+        "workstreams/execution/overview.md",
+        "docs/evidence/r42/zoom-capture.json"
+      ],
+      "outputs": [
+        "Corrected synthetic screenshot and capture receipt"
+      ],
+      "acceptance_criteria": [
+        "Image shows actual200percent native zoom content at680x720",
+        "Exact package unchanged; failed image disclosed and no app change implied"
+      ],
+      "verification": [
+        "Rerun bounded native zoom capture",
+        "Coordinator image inspection",
+        "Independent docs delta review"
+      ],
+      "risk": "low",
+      "evidence": "Same-package native capture104569bytes; nativezoom2,680x720 viewport, Tab/Enter and visible detail focus; coordinator inspected corrected pixels"
     }
   ]
 }

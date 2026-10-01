@@ -35,3 +35,5 @@ Focused regressions exposed omitted labour detail and a partial-month warning th
 ## Publication boundary
 
 This execution record is published separately from the application. Its independent final docs review and PR identify the final snapshot. The snapshot cannot include its own future merge SHA; confirm publication using that PR state. This bookkeeping boundary does not imply a ready real-profit release. Source, real reconciliation and Windows acceptance remain open.
+
+Post-merge image audit found the committed native-zoom screenshot blank. The keyboard/zoom test assertions remained passing. Same-package capture reproduced the blank Playwright image; Electron native capture produced a visible680×720 viewport at zoom2 with focused detail in view. Coordinator inspected it. The documentation PR replaces that image and records the unconfirmed screenshot-transport cause in `docs/evidence/r42/zoom-capture.json`; no application/test change or new Windows claim follows.

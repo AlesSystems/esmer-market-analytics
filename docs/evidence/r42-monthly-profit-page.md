@@ -65,3 +65,7 @@ Every head first page has100product rows; last page1; one graph;540DOM nodes in 
 ## Remaining handoff
 
 Review and coordinator integration are separate gates. Continue Windows on this branch with `npm run package:win`, packaged desktop checks at minimum/narrow/200percent scaling, keyboard visibility, signed/null chart alternatives,101products and201mixed-document lines, filtered saved export and secondary workflows. Record unsigned installer/portable launch and ordinary interactions below two seconds on documented Windows hardware. Do not admit real data or enable source access from this receipt.
+
+## Post-merge zoom capture correction
+
+Coordinator inspection found that the original lane-08 image was blank white, despite passing native zoom, keyboard and focus assertions. Recapture on unchanged archive `9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492` reproduced the blank Playwright screenshot after paint waits. Electron native `webContents.capturePage` produced the corrected visible [image](r42/lane-08.png): native zoom factor2,680×720 viewport, Tab/Enter navigation and detail focus in view. The [capture receipt](r42/zoom-capture.json) records these checks. The exact screenshot transport cause is unconfirmed. This documentation repair changes no application or test code; Windows acceptance stays open.
