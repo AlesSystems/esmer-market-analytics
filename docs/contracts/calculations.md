@@ -39,6 +39,8 @@ Source scale, intermediate precision, header/line rounding order, discount order
 
 The [issue 26 isolated inspection](../evidence/issue-26-source-validation.md) subsequently observed storage scales for selected raw columns. This resolves their schema metadata only. Intermediate precision, calculation order, unit meaning, tax basis and rounding policy remain unresolved. Exploratory header/line comparisons have exceptions and do not approve a financial formula or tolerance.
 
+The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) tracks these real-source calculation gaps and keeps financial activation blocked while evidence is insufficient.
+
 Kilograms and pieces remain separate measures. An unknown unit or multiplier cannot default to one. Missing historical cost, undocumented zero cost, negative cost and a documented genuine zero-cost item are distinct states. Only a documented zero-cost case can participate as zero. Unsupported returned-cost attribution remains excluded even when return sales are known.
 
 ## Dates and revisions
