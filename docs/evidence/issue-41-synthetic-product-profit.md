@@ -47,3 +47,80 @@ Continue on `codex/product-profit-reports` at the final PR head, with a clean ch
 4. Record owner acceptance against the actual installed build and approved product behavior. The new primary product-profit UI remains P05 work.
 
 Do not enable financial mapping merely because Windows or owner checks pass. Real activation additionally needs reviewed P02 semantics, P03 normalization and independent comparisons required by P04/P06.
+
+## R47 current-head verification, 2026-10-01
+
+R47-IMPL found no demonstrated gap in E01 through E12 or the existing calculation, paging, IPC, saved-report, export, and recovery paths. No application repair or new dependency was needed. The approved documentation-only base was integrated with a merge, preserving branch history.
+
+- Branch `codex/product-profit-reports`.
+- Tested code and integration merge `625661b29108e053cbfabc7f72613e88169c23d6`.
+- Baseline `origin/main` at `1ed1824ec5ee448cf880d20e89d74d1d67d08486`, containing the evidence-only #46 merge.
+- Environment macOS 27.0.0 ARM64, Apple M4 Pro, 12 logical CPUs, 24 GiB RAM, Node 24.15.0, npm 11.12.1.
+- Receipt identity `r47-synthetic-20261001`. Local receipts and exploratory probe source are under `/tmp/esmer-market-r47-evidence-20261001/`. They are task-local artifacts, not committed application tests.
+
+The tested executable is `release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`. Its SHA-256 is `588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8`. The tested `Contents/Resources/app.asar` SHA-256 is `e336ff347cc90d642d5f504a86cc721b3bf2c59597b144e20f390a77c15a4474`. The baseline archive SHA-256 is `ca192d91b3e030d926399581fadf0e1b2ba543dccb5ebb8145d4c95b7459f790`. The identical executable hash identifies the Electron launcher. The differing archive hashes identify application code. Hashes were read after `test:desktop` rebuilt the package. The later evidence commit changes documentation only.
+
+### Repository checks
+
+| Procedure | Actual result |
+| --- | --- |
+| Focused unit product-profit, cost-coverage, return-cost, decimal-boundaries | 17 passed |
+| Focused integration report-display, report-revisions, excel-report, cost-provenance, recovery-equivalence | 28 passed |
+| `npm run test:unit` | 44 passed |
+| `npm run test:integration` | 289 passed, 5 skipped |
+| `npm run typecheck`, `npm run lint`, `git diff --check` | Passed |
+| `ESMER_EXECUTABLE="$PWD/release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics" npm run test:desktop` | Build and local packaging passed, 34 desktop checks passed, 7 skipped |
+
+The five integration skips require separately configured isolated SQL access. The seven desktop skips comprise Windows full-dataset, lifecycle, pagination, three visual checks, and the private prepared SQL preview. No skipped check is a pass. The source was not accessed.
+
+### Packaged scenario receipts
+
+The task-local probes use the installed Playwright Electron controls, existing fixture helpers, and actual packaged IPC. Native dialog choices are stubbed as in repository tests. Screenshots show existing owner workflows; diagnostic product-profit requests supplement them. The primary one-page product-profit UI remains #42.
+
+| R47 lane | Expected and observed result | Receipt |
+| --- | --- | --- |
+| 1 | A genuine synthetic v1 artifact created by trunk reopens with its original meanings on trunk and head. Every exported workbook sheet matches. | `compatibility.json`, `lane-01-baseline.png`, `lane-01-head.png` |
+| 2 | E01, E02, E03 profits are 100, 60, 60. E03 retains missing-cost exposure and 89.74% coverage. | `live.json`, `lane-02.png` |
+| 3 | E04 leaves the original month at 80 and return month at -40. E05 retains negative sales with null covered cost and profit. | `live.json`, `lane-03.png` |
+| 4 | Exact zero, loss, zero-net cost, nonpositive margins, and zero-value exclusions match E06 and E10 through E12. | `live.json`, `lane-04.png` |
+| 5 | E07 keeps kg and pieces separate with profit 43.5. E08 uses both transaction costs. E09 keeps exact 0.015 contributions and total 0.03. | `live.json`, `lane-05.png` |
+| 6 | 101 products occupy 100 and 1 row pages. Search and sort leave the complete summary and daily population unchanged. | `live.json`, `lane-06.png` |
+| 7 | Source refresh and an app revision leave pinned values unchanged and mark the report stale. | `live.json`, `lane-07.png` |
+| 8 | Selected A contributes 200 while the full document contributes 250 and retains both product lines. The owner detail labels both scopes. | `live.json`, `lane-08.png` |
+| 9 | Accepted v1 and v2 survive restart and encrypted restore after removal of the original disposable profile. Every sheet matches the pre-restore exports. | `compatibility.json`, `lane-09.png` |
+| 10 | Unknown keys, invalid sort/direction, oversized search, negative/fractional offsets, invalid evidence range/product, and expired report ID fail at the protected boundary. | `live.json`, `lane-10.png` |
+
+The standalone compatibility probe additionally compares all workbook sheets. Recovery uses disposable same-host profiles and the repository's macOS `safeStorage` stub. The synthetic local credential wrapper is removed before restart because it is not real Keychain ciphertext. This does not prove OS credential encryption, Windows recovery, or independent-machine recovery. Production v1 artifacts remain unavailable.
+
+Initial exploratory probes failed on probe setup. Corrections used percentage discount `10`, opened the product subview before selecting A, avoided invalidating UI context with a diagnostic report open, reopened candidates after recovery setup rebuilt services, and selected the newest backup by recorded creation time rather than random filename order. These failures did not establish application defects.
+
+### Five baseline and head performance observations
+
+Fixture `phase-10-complete-synthetic` uses the unchanged construction from `tests/desktop/full-dataset.test.ts`, with 25,000 documents, 25,000 lines, and one product. Package size is 16,442,402 bytes. Package SHA-256 is `8966544a2aeb51bef3facad8716dc71d56602be5a7d3dda1e01d5aa900f2928b`. All inputs are synthetic.
+
+Each baseline/head pair runs on the same host with a fresh disposable profile and process. OS caches are not cleared. Cold timing includes launch to coherent visible monthly content. Fresh monthly-request timing starts after startup. Shared export and restore use accepted v1 artifacts on both branches. Head v2 export is separate. Added aggregation uses precomputed sales and cost inputs from the same fixture, outside IPC. Trunk has no product-profit aggregation or product page.
+
+| Operation | Baseline median / maximum ms | Head median / maximum ms |
+| --- | --- | --- |
+| Cold coherent monthly view | 1608.5 / 1831.6 | 1721.9 / 1807.9 |
+| Fresh monthly request, v1 versus v2 | 775.6 / 812.5 | 991.2 / 1051.7 |
+| Shared component evidence page | 144.0 / 148.8 | 127.5 / 133.6 |
+| Shared accepted v1 export | 2706.6 / 2807.0 | 2626.1 / 2743.5 |
+| Shared accepted v1 restore | 4468.0 / 4523.4 | 4495.4 / 4730.0 |
+| Added `buildProductProfit` | Unavailable | 239.2 / 250.1 |
+| Added product page | Unavailable | 1.8 / 2.2 |
+| Added v2 export | Unavailable | 3462.5 / 3504.0 |
+
+All five local samples satisfy the proposed R47 ceilings of 5000 ms aggregation, 60000 ms cold coherent monthly view, and 2000 ms product/evidence pages. Shared v1 operations show no median regression over 20%. The v2 monthly request median increases 27.8%, or 215.6 ms. The separately measured 239.2 ms aggregation is consistent with that additional work. The v2 workbook adds five product-profit sheets, so its export timing is not an unchanged-work regression. These are local synthetic results, not Windows or full-market capacity evidence.
+
+A separate packaged request on this 25,000-document fixture observed the active job, cancelled it in 414.9 ms, read operation status in 0.2 ms, preserved the loaded dataset, and successfully retried to profit 1000000. Raw samples, identity, conditions, and this check are in `performance.json` and `responsiveness.json`.
+
+Replay the task-local probes from the owned worktree with `node work/poteto/r47/probe.mjs`, `node work/poteto/r47/lane7-app.mjs`, `node work/poteto/r47/compatibility.mjs`, `node work/poteto/r47/perf.mjs`, and `node work/poteto/r47/responsive.mjs`. The restricted receipt directory retains source copies and build/replay instructions. The repository tests listed above remain the portable, committed regression checks.
+
+### Windows continuation and remaining gates
+
+The user runs Windows acceptance personally on the same branch at its final reviewed head. Run `npm ci`, `npm run typecheck`, `npm run lint`, `npm run test:unit`, `npm run test:integration`, and `npm run package:win`. Set PowerShell `$env:ESMER_EXECUTABLE = (Resolve-Path 'release/win-unpacked/Esmer Market Analytics.exe').Path`, then run `npm run test:desktop`. The wrapper rebuilds the package, so retain hashes after it completes. Record Windows version, CPU, RAM, Node/npm versions, full commit, package inventory, every skip, and actual executable/archive hashes.
+
+Then run `npm run test:desktop -- tests/desktop/full-dataset.test.ts tests/desktop/product-profit.test.ts tests/desktop/clean-install-restore.test.ts tests/desktop/report-version-comparison.test.ts tests/desktop/monthly-overview.test.ts`. Preserve screenshots and literal results. Recheck hashes after this rebuild. NSIS and portable installation/lifecycle, scaling, physical offline startup, OS-protected credentials, and independent-machine recovery remain owner acceptance checks.
+
+Expanded R47 E01 through E12 and five baseline/head aggregation/export/restore probes are currently task-local macOS scripts. A Windows adaptation of these probes and its recorded results remain open. Do not count the existing Windows-only full-dataset test alone as proof of added aggregation ceilings. Real financial mapping, approved real-population comparisons, #41 completion, Windows acceptance, and broader release gates remain open.
