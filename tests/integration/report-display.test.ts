@@ -61,7 +61,7 @@ test("a synthetic monthly candidate stores exact product profit and calendar day
 test("evidence requests reject unbounded pages and arbitrary selectors", () => {
   const request = { reportId: "report", section: "components", offset: 0, search: "", range: "current", documentId: null };
   expect(validMonthlyRequest("readReportEvidence", request)).toBe(true);
-  for (const invalid of [{ ...request, offset: -1 }, { ...request, offset: 0.5 }, { ...request, limit: 1000 }, { ...request, section: "sql" }, { ...request, range: "all" }, { ...request, search: "x".repeat(161) }, { ...request, section: "lines" }, { ...request, documentId: "S1" }]) {
+  for (const invalid of [{ ...request, offset: -1 }, { ...request, offset: 0.5 }, { ...request, limit: 1000 }, { ...request, section: "sql" }, { ...request, range: "all" }, { ...request, search: "x".repeat(161) }, { ...request, section: "lines" }, { ...request, documentId: "S1" }, { ...request, section: "documents", documentId: "" }, { ...request, section: "documents", productId: "A" }]) {
     expect(validMonthlyRequest("readReportEvidence", invalid)).toBe(false);
   }
 });
@@ -170,5 +170,42 @@ test("profit display projects signed chart geometry without changing stored tren
     expect(display).toHaveProperty("productProfit.daily.1", expect.objectContaining({ trend: "-20", height: "50", negative: true }));
     expect(display).toHaveProperty("productProfit.daily.2", expect.objectContaining({ trend: "0", height: "0", negative: false }));
     expect(opened.report).not.toHaveProperty("productProfit.daily.0.height");
+  } finally { store.close(); }
+});
+
+test("document evidence selects an exact pinned header beyond substring collisions", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords(), template = records.documents[0];
+    records.documents = Array.from({ length: 101 }, (_, index) => ({ ...structuredClone(template), id: `S1-${index}` }));
+    records.documents.push({ ...structuredClone(template), id: "S1" });
+    records.lines = records.documents.map((document, index) => ({ ...structuredClone(records.lines[0]), documentId: document.id, id: `L${index}` }));
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store, new SalesReports(store)), opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly");
+    const request = { reportId: opened.report.id, section: "documents" as const, offset: 0, search: "", range: "current" as const, documentId: "S1" };
+    expect(validMonthlyRequest("readReportEvidence", request)).toBe(true);
+    expect(versions.evidence(request)).toMatchObject({ total: 1, rows: [{ id: "S1", sales: { net: "100" } }] });
+    expect(versions.evidence({ ...request, range: "month" }).total).toBe(0);
+  } finally { store.close(); }
+});
+
+test("chart zero marker does not mistake a rounded tiny height for zero profit", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords();
+    for (const [index, net] of ["0.015", "10000000000000000000"].entries()) {
+      records.documents[index].date = `2025-09-0${index + 1}`;
+      records.documents[index].sales = { ...records.documents[index].sales!, net, tax: "0", gross: net };
+      records.lines[index].net = net;
+      records.lines[index].sales = { ...records.lines[index].sales!, unitNet: net, taxRate: "0", tax: "0", gross: net };
+      records.lines[index].business!.historicalCost = { ...records.lines[0].business!.historicalCost!, unitCost: "0", documentedZero: true };
+    }
+    store.importPackage(businessPackage(records));
+    const versions = new ReportVersions(store, new SalesReports(store)), opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected monthly");
+    const display = versions.display({ reportId: opened.report.id }).report;
+    expect(display).toHaveProperty("productProfit.daily.0", expect.objectContaining({ trend: "0.015", height: "0", zero: false }));
+    expect(display).toHaveProperty("productProfit.daily.2", expect.objectContaining({ trend: "0", zero: true }));
   } finally { store.close(); }
 });
