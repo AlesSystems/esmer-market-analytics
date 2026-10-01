@@ -1574,7 +1574,8 @@
       "type": "review",
       "objective": "Review current evidence and any contract change",
       "dependencies": [
-        "R39-RESUME-PROOF"
+        "R39-RESUME-PROOF",
+        "R39-NATIVE-WRITER-ASSESS"
       ],
       "state": "running",
       "acceptance_criteria": [
@@ -1945,6 +1946,65 @@
       ],
       "risk": "medium",
       "evidence": "execution/r39-value-receipt.json; final scalar-array pass37headers148lines2units0relations; M0/M2 andcleanupPASS"
+    },
+    {
+      "id": "R39-NATIVE-WRITER-DESIGN",
+      "type": "design",
+      "dependencies": [
+        "R39-NATIVE-METADATA-NARROW"
+      ],
+      "objective": "Bound metadata search to potential FIS_DETAY historical-cost writers before concluding remaining backup evidence is insufficient",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Only fixed metadata fields, at most64rows/1MiB",
+        "No definitions or businessvalues",
+        "Writerpattern hits remain hypotheses",
+        "Exactquery/lifecycle reviewed before execution"
+      ],
+      "allowed_files": [
+        "Private native writer query",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "Independent reviewer PASS: SQL b2bcac0e, operator a7dc2bc8; parser and cleanup checks PASS"
+    },
+    {
+      "id": "R39-NATIVE-WRITER-READ",
+      "type": "analysis",
+      "objective": "Execute the reviewed fixed metadata writer-candidate query and record its coverage limits",
+      "dependencies": [
+        "R39-NATIVE-WRITER-DESIGN"
+      ],
+      "state": "failed",
+      "acceptance_criteria": [
+        "Pinned copy identity and READ_ONLY verified before and after",
+        "At most 64 metadata rows and 1 MiB; no definition bodies or user table values",
+        "Stopped copy and removed temporary client/admin credential verified"
+      ],
+      "allowed_files": [
+        "Private metadata operator and receipt",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-native-writer-attempt.json; ETIMEOUT, no accepted catalog; cleanup PASS"
+    },
+    {
+      "id": "R39-NATIVE-WRITER-ASSESS",
+      "type": "analysis",
+      "objective": "Assess failed writer metadata attempt without promoting its timeout to financial evidence",
+      "dependencies": [
+        "R39-NATIVE-WRITER-DESIGN"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Failed R39-NATIVE-WRITER-READ receipt"
+      ],
+      "acceptance_criteria": [
+        "Failure and verified cleanup retained",
+        "No absence-of-writers or financial-rule claim from failed query"
+      ],
+      "evidence": "execution/r39-native-rule-design.md#final-bounded-writer-candidate-attempt",
+      "risk": "medium"
     }
   ]
 }

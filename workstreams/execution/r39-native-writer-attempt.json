@@ -1,0 +1,21 @@
+{
+  "ok": false,
+  "code": "OPERATOR_REJECTED",
+  "userTableValuesRead": false,
+  "securityStateModified": false,
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "temporaryCredentialRemoved": true,
+  "originalTargetAccessed": false,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "writer-metadata.sql": "b2bcac0eefca83e85b3b42c5ee6db583ba93c4328f6e94d85745f7a6548e01f1",
+    "admin-query.mjs": "4261c872960de4167b26bd0727692aba9991abdbcfaea00d1dcbb90eb219fff6"
+  },
+  "queryResult": {
+    "ok": false,
+    "code": "ETIMEOUT",
+    "number": null,
+    "numbers": []
+  }
+}
