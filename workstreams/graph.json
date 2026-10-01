@@ -112,7 +112,7 @@
       "dependencies": [
         "R39-SCOPE-RECHECK"
       ],
-      "state": "blocked",
+      "state": "completed",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R39-SCOPE"
@@ -132,7 +132,7 @@
         "Compare proposed scope with trusted user permission"
       ],
       "risk": "high",
-      "blocked_reason": "Reviewed metadata scope is PR48. Exact existing isolated source availability/lifecycle and renewed read authorization unresolved; only backup available, independent semantic proof absent."
+      "evidence": "2026-10-01 explicit user approval for bounded isolated-backup inspection; exact retained batch matched in R39-RESUME-PREFLIGHT. No production/Windows or expanded Stage V authorization inferred."
     },
     {
       "id": "R39-IMPL",
@@ -142,7 +142,7 @@
         "R39-AUTH",
         "E46"
       ],
-      "state": "pending",
+      "state": "blocked",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R39-AUTH",
@@ -164,7 +164,8 @@
         "R39 live scenarios and bounded extraction procedure",
         "Independent decimal expectations"
       ],
-      "risk": "high"
+      "risk": "high",
+      "blocked_reason": "Authorized isolated sample and permission/read-only checks completed. Completion, economic identity, tax/rounding policy, historical-cost basis and original-sale returns remain independently unproved; no meaningful financial population can be admitted."
     },
     {
       "id": "R39-TEST",
@@ -1216,7 +1217,7 @@
         "WORKSTREAMS-FINAL-REVIEW",
         "R42-MEDIA-REPAIR"
       ],
-      "state": "ready",
+      "state": "completed",
       "inputs": [
         "Reviewed branch artifacts and exact GitHub identities"
       ],
@@ -1239,7 +1240,9 @@
         "Current-head review",
         "Post-merge GitHub identity"
       ],
-      "risk": "medium"
+      "risk": "medium",
+      "merge_commit": "c5252e851ae41e21245036bc7961388cb078db1a",
+      "evidence": "PR50 reviewed head9fdf3b09; independent final message-only bindingPASS; merged patchb16986d5; docs-only final app/test/script trees identical to verified3219c0c"
     },
     {
       "id": "WORKSTREAMS-CHECKPOINT-REVIEW",
@@ -1467,6 +1470,481 @@
       ],
       "risk": "low",
       "evidence": "Same-package native capture104569bytes; nativezoom2,680x720 viewport, Tab/Enter and visible detail focus; coordinator inspected corrected pixels"
+    },
+    {
+      "id": "R39-RESUME-PREFLIGHT",
+      "type": "analysis",
+      "objective": "Bind renewed user approval to the retained isolated batch and inspect only safe identity/lifecycle metadata",
+      "dependencies": [],
+      "state": "completed",
+      "acceptance_criteria": [
+        "No production or original-source operations",
+        "Retained identity/access evidence located without exposing credentials or rows"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-resume.md; matched retained isolated container/volume/internal network and catalog receipt; no SQL yet"
+    },
+    {
+      "id": "R39-RESUME-SCOPE-REVIEW",
+      "type": "review",
+      "objective": "Independently review exact bounded source procedure and field scope",
+      "dependencies": [
+        "R39-RESUME-PREFLIGHT"
+      ],
+      "state": "completed",
+      "acceptance_criteria": [
+        "Exact copy, SQL, permissions, bounds, cleanup and authorization fit confirmed"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high",
+      "evidence": "Independent reviewer PASS on pinned suitability-only SQL/client/operator scripts after cleanup repair; no M1 or value reads."
+    },
+    {
+      "id": "R39-RESUME-INSPECT",
+      "type": "analysis",
+      "objective": "Run the reviewed identity/read-only/reader-suitability attempt against the exact isolated copy",
+      "dependencies": [
+        "R39-RESUME-SCOPE-REVIEW"
+      ],
+      "state": "completed",
+      "acceptance_criteria": [
+        "Actual outcome recorded without treating failure as a permission or financial pass",
+        "Owned copy/client/temporary credentials cleaned up and state checked"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-resume-receipt.json: actual M0 succeeded; permission guard51014; no M1/M2 or value reads; cleanup verified. Completed attempt is not a permission pass."
+    },
+    {
+      "id": "R39-RESUME-PROOF",
+      "type": "test",
+      "objective": "Assess each financial rule against independent expectations",
+      "dependencies": [
+        "R39-VALUE-TRANSPORT-REPAIR",
+        "R39-NATIVE-METADATA-NARROW"
+      ],
+      "state": "completed",
+      "acceptance_criteria": [
+        "No inference from names or raw sums promoted to verified financial meaning",
+        "Supported and unresolved rules explicitly recorded"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high",
+      "evidence": "docs/evidence/issue-39-source-profit.md; independent recomputation matches accepted artifact; financial evidence INSUFFICIENT"
+    },
+    {
+      "id": "R39-RESUME-REVIEW",
+      "type": "review",
+      "objective": "Review current evidence and any contract change",
+      "dependencies": [
+        "R39-RESUME-PROOF"
+      ],
+      "state": "running",
+      "acceptance_criteria": [
+        "Independent current-head verification and privacy review pass"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R39-RESUME-PUBLISH",
+      "type": "integration",
+      "objective": "Publish reviewed evidence and integrate only proven financial rules",
+      "dependencies": [
+        "R39-RESUME-REVIEW"
+      ],
+      "state": "pending",
+      "acceptance_criteria": [
+        "PR and merge identities recorded",
+        "Dependent implementation remains blocked for unsupported meanings"
+      ],
+      "allowed_files": [
+        "Owned continuation worktree",
+        "Private isolated-batch evidence outside Git"
+      ],
+      "outputs": [
+        "Safe evidence receipt and rule matrix"
+      ],
+      "verification": [
+        "Pinned artifacts and exact procedural results"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R39-METADATA-EXCEPTION-REVIEW",
+      "type": "review",
+      "dependencies": [
+        "R39-RESUME-INSPECT"
+      ],
+      "objective": "Review a fixed metadata-only administrator pass without changing source permissions",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Exact M0/M1/M2, bounded private output and fail-closed identity/read-only controls reviewed",
+        "No DML/DDL/grants/mode changes or value reads"
+      ],
+      "inputs": [
+        "execution/r39-metadata-access-request.md"
+      ],
+      "allowed_files": [
+        "Private task-local scripts without embedded credentials",
+        "workstreams/execution/**"
+      ],
+      "outputs": [
+        "Immutable review and permission receipt"
+      ],
+      "verification": [
+        "Independent fixed-script review"
+      ],
+      "risk": "high",
+      "evidence": "Independent readiness PASS: metadata-admin2b68f50f2958e0314de6bcb2923d05f806fdc2ef5ac574be5064002a44cbdd11; operator3ada8ea99fe97874cff1bd0068ea07c6fc14cd3758a0e43333e36caf8b2293ad. Approval to present request only, not execution."
+    },
+    {
+      "id": "R39-METADATA-EXCEPTION-APPROVAL",
+      "type": "review",
+      "dependencies": [
+        "R39-METADATA-EXCEPTION-REVIEW"
+      ],
+      "objective": "Obtain explicit approval for administrator metadata-only exception",
+      "state": "completed",
+      "acceptance_criteria": [
+        "User explicitly approves exact exception; earlier inspection authorization is not requested again"
+      ],
+      "inputs": [
+        "execution/r39-metadata-access-request.md"
+      ],
+      "allowed_files": [
+        "Private task-local scripts without embedded credentials",
+        "workstreams/execution/**"
+      ],
+      "outputs": [
+        "Immutable review and permission receipt"
+      ],
+      "verification": [
+        "Independent fixed-script review"
+      ],
+      "risk": "high",
+      "evidence": "2026-10-01 user: full permission to complete gates and make internal system production-ready, following exact metadata exception request. Covers prepared administrator metadata inspection and necessary bounded isolated development setup; no repeated routine approval needed. Windows remains user-run; production POS/owner rollout separate."
+    },
+    {
+      "id": "R39-METADATA-EXECUTE",
+      "type": "analysis",
+      "dependencies": [
+        "R39-METADATA-EXCEPTION-APPROVAL"
+      ],
+      "objective": "Run reviewed fixed metadata envelope on exact isolated copy",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Record actual catalog and identity/read-only results",
+        "Verify copy/client/temporary credential cleanup"
+      ],
+      "allowed_files": [
+        "Private batch receipts outside Git"
+      ],
+      "outputs": [
+        "Sanitized metadata receipt and private catalog"
+      ],
+      "verification": [
+        "Pinned M0/M1/M2 and cleanup booleans"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-metadata-receipt.json:233catalogrows,40191transportbytes,118ms, M0/M2pass and clean cleanup"
+    },
+    {
+      "id": "R39-VALUE-DESIGN",
+      "type": "design",
+      "dependencies": [
+        "R39-METADATA-EXECUTE"
+      ],
+      "objective": "Define exact private value/relationship sample and falsifiable financial hypotheses",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Exact scope and privacy preserved",
+        "No name/correlation/transport equality promoted to financial proof",
+        "Results and limits recorded with immutable artifacts"
+      ],
+      "allowed_files": [
+        "Private bounded source artifacts",
+        "workstreams/execution/**",
+        "docs/evidence/**"
+      ],
+      "outputs": [
+        "Reviewed query/evidence matrix"
+      ],
+      "verification": [
+        "Independent scope review",
+        "Pinned query hashes",
+        "Bounded actual receipts and independent decimal checks"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-design.md; exactfivequerydrafts,57columnallowlist; pinned37header148lineprivate sample"
+    },
+    {
+      "id": "R39-VALUE-REVIEW",
+      "type": "review",
+      "dependencies": [
+        "R39-VALUE-DESIGN"
+      ],
+      "objective": "Review fixed SQL, grants, bounds and independent expectation design",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Exact scope and privacy preserved",
+        "No name/correlation/transport equality promoted to financial proof",
+        "Results and limits recorded with immutable artifacts"
+      ],
+      "allowed_files": [
+        "Private bounded source artifacts",
+        "workstreams/execution/**",
+        "docs/evidence/**"
+      ],
+      "outputs": [
+        "Reviewed query/evidence matrix"
+      ],
+      "verification": [
+        "Independent scope review",
+        "Pinned query hashes",
+        "Bounded actual receipts and independent decimal checks"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-review.md; 12 executable/query artifacts pinned; synthetic checks PASS"
+    },
+    {
+      "id": "R39-VALUE-EXECUTE",
+      "type": "analysis",
+      "dependencies": [
+        "R39-VALUE-REVIEW"
+      ],
+      "objective": "Provision minimal dedicated reader on isolated copy, prove permission limits while writable, freeze, run reviewed sample and validate cleanup",
+      "state": "failed",
+      "acceptance_criteria": [
+        "Exact scope and privacy preserved",
+        "No name/correlation/transport equality promoted to financial proof",
+        "Results and limits recorded with immutable artifacts"
+      ],
+      "allowed_files": [
+        "Private bounded source artifacts",
+        "workstreams/execution/**",
+        "docs/evidence/**"
+      ],
+      "outputs": [
+        "Reviewed query/evidence matrix"
+      ],
+      "verification": [
+        "Independent scope review",
+        "Pinned query hashes",
+        "Bounded actual receipts and independent decimal checks"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-attempt-1.json; effective-permissions 51020; zero value queries; cleanup all verified"
+    },
+    {
+      "id": "R39-VALUE-DIAGNOSE",
+      "type": "analysis",
+      "dependencies": [
+        "R39-VALUE-REVIEW"
+      ],
+      "objective": "Diagnose exact failed permission predicate using bounded system metadata",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Diagnosed cause documented",
+        "Reviewed exact query/code bindings",
+        "No business values before permission/read-only checks",
+        "Verified final cleanup"
+      ],
+      "allowed_files": [
+        "Private inspection artifacts",
+        "workstreams/execution/**"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-permission-diagnostic-receipt.json; onlypredicate19failed; sevenpublicnativeEXECUTEgrants and systemmetadata visibility"
+    },
+    {
+      "id": "R39-VALUE-REPAIR",
+      "type": "implementation",
+      "dependencies": [
+        "R39-VALUE-DIAGNOSE"
+      ],
+      "objective": "Correct demonstrated permission-audit or reader setup cause without expanding business access",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Diagnosed cause documented",
+        "Reviewed exact query/code bindings",
+        "No business values before permission/read-only checks",
+        "Verified final cleanup"
+      ],
+      "allowed_files": [
+        "Private inspection artifacts",
+        "workstreams/execution/**"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-review.md; exactbaseline attested/compared; targetedretry reviewed06ae2f44 audit15cf90d8; syntheticchecksPASS"
+    },
+    {
+      "id": "R39-VALUE-RETEST",
+      "type": "test",
+      "dependencies": [
+        "R39-VALUE-REPAIR"
+      ],
+      "objective": "Review repair and rerun permission probes and bounded value pass",
+      "state": "failed",
+      "acceptance_criteria": [
+        "Diagnosed cause documented",
+        "Reviewed exact query/code bindings",
+        "No business values before permission/read-only checks",
+        "Verified final cleanup"
+      ],
+      "allowed_files": [
+        "Private inspection artifacts",
+        "workstreams/execution/**"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-attempt-2.json; SQL468 crosscatalogcollation beforesecurityrepair; novalues"
+    },
+    {
+      "id": "R39-NATIVE-METADATA-DESIGN",
+      "type": "design",
+      "dependencies": [
+        "R39-METADATA-EXECUTE"
+      ],
+      "objective": "Bound source-native routine metadata discovery to potential historical-cost and completion evidence",
+      "state": "completed",
+      "acceptance_criteria": [
+        "No definitions or business values selected",
+        "At most64catalog rows and1MiB",
+        "Exact query and lifecycle reviewed before execution"
+      ],
+      "allowed_files": [
+        "Private metadata query",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-native-rule-design.md; independent pre-execution review PASS"
+    },
+    {
+      "id": "R39-NATIVE-METADATA-EXECUTE",
+      "type": "analysis",
+      "dependencies": [
+        "R39-NATIVE-METADATA-DESIGN"
+      ],
+      "objective": "Read only reviewed native-module metadata and validate private receipt and cleanup",
+      "state": "failed",
+      "acceptance_criteria": [
+        "Pinned identity/read-only before and after",
+        "At most64 metadata rows, exact fields, 1MiB",
+        "Copy stopped, temporary client and credential absent"
+      ],
+      "allowed_files": [
+        "Private native metadata evidence",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "SQL identity/read-only guards passed; 65-row sentinel rejected; no accepted catalog; verified cleanup"
+    },
+    {
+      "id": "R39-NATIVE-METADATA-NARROW",
+      "type": "analysis",
+      "dependencies": [
+        "R39-NATIVE-METADATA-DESIGN"
+      ],
+      "objective": "Narrow oversized discovery to exact two known native names and document triggers; review before retry",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Retain65sentinel and64rowceiling",
+        "No truncated catalog accepted",
+        "Identity/read-only/cleanup verified"
+      ],
+      "allowed_files": [
+        "Private native metadata query and receipt",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-native-metadata-receipt.json; twoobjects, oneattachedtrigger, zero historicalcostmentions; cleanupallverified"
+    },
+    {
+      "id": "R39-VALUE-COLLATION-REPAIR",
+      "type": "test",
+      "dependencies": [
+        "R39-VALUE-REPAIR"
+      ],
+      "objective": "Review exact binary reader-name comparison and retry fixed scope; preserve failed attempt2",
+      "state": "completed",
+      "acceptance_criteria": [
+        "SID and exact bounded name identity retained",
+        "Permission probes and READ_ONLY pass before values",
+        "Actual cleanup verified"
+      ],
+      "allowed_files": [
+        "Private operator/identity query",
+        "workstreams/execution/**"
+      ],
+      "risk": "high",
+      "evidence": "execution/r39-value-attempt-3.json; identityrepair and allpermissionsPASS; separately valueJSONfailed"
+    },
+    {
+      "id": "R39-VALUE-TRANSPORT-REPAIR",
+      "type": "test",
+      "dependencies": [
+        "R39-VALUE-COLLATION-REPAIR"
+      ],
+      "objective": "Diagnose conversion JSON response under proven restricted reader and repair serialization only",
+      "state": "completed",
+      "acceptance_criteria": [
+        "Sameapproved projection andfixedsample",
+        "No newgrants/adminsetup",
+        "Missingorinvalidoutput staysrejected",
+        "Complete sample onlypublished afterM2 andcleanup"
+      ],
+      "allowed_files": [
+        "Private client/serialization queries",
+        "workstreams/execution/**"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-value-receipt.json; final scalar-array pass37headers148lines2units0relations; M0/M2 andcleanupPASS"
     }
   ]
 }

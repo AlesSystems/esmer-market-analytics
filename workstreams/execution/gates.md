@@ -2,10 +2,11 @@
 
 ## R39-AUTH
 
-- Status: open
+- Status: resolved
 - Question: Approve exact renewed isolated source scope after proposal review
 - Options: Approve named scope; defer source reads
 - Default: No source access until explicit authorization
+- Answer: User authorized bounded isolated-backup inspection and necessary setup; full permission to complete non-Windows gates. Exact scope review and evidence still required.
 
 ## R39-PROOF
 

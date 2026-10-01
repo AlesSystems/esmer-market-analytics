@@ -1,0 +1,26 @@
+{
+  "ok": false,
+  "code": "OPERATOR_REJECTED",
+  "acceptedOutput": false,
+  "transportReadsAttempted": false,
+  "sourceWrites": false,
+  "securityStateModified": false,
+  "temporaryCredentialsCreated": false,
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "retainedReaderConfigPreserved": true,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "client.mjs": "a7f3af7e4c4c2881820b6faffa794f02b7c61628279f3582ee8cfaeb426a3ac5",
+    "empty-scalar-probe.mjs": "685cf4ccefcfa66fe8dd9d83088ae0149a4be2ff3ee32a5b3856bccdab8babf2",
+    "empty-json-scalar.sql": "2fb30c2d25030c1366757a69b0d92b4af76cf88e8636a07deaeca55c4cc65c71",
+    "sql/M0.sql": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+    "sql-scalar/manifest.json": "fb811f2c9789f622f07eae00b1068a7fecb4b19f79abd46ee8bb55a777ed9849",
+    "sql-scalar/M0.sql": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+    "sql-scalar/headers.sql": "914ce07428e03f95015a51f2f392eb5047b50f9129c86bfcaf09d44ce3151d95",
+    "sql-scalar/lines.sql": "b178a46f4d3a1f57931efafc4e584a769a4cb927d76d1a95d249b0f5859527dc",
+    "sql-scalar/units.sql": "8a2c757bf71ac3df8a3b77d7e101d8b1ba46984dfa234e75468f8173162e6907",
+    "sql-scalar/conversions.sql": "5321a352a774c854666c74e73183e69f26eda45a0648285facada22b8e74a309",
+    "sql-scalar/costs.sql": "0518cfc14657686a000cb20e8748d845193aa0596d2bcecf2140a86a9c203c70"
+  }
+}

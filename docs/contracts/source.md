@@ -8,7 +8,7 @@ Phase 2 did not access a source. The authorized [issue 26 OrbStack continuation]
 
 The executable registry is [src/source/contract.ts](../../src/source/contract.ts). It is declarative and has no source I/O. Its historical dictionary entries are observations, not a complete financial inclusion allowlist. Unknown types and missing essential identities require candidate rejection until explicitly classified.
 
-The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) lists the evidence still missing for a real monthly financial mapping. Its renewed September 2025 raw-row checks establish transport and reader boundaries; they do not release a financial rule.
+The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) lists the evidence still missing for a real monthly financial mapping. Its renewed September 2025 raw-row checks and the 2026-10-01 bounded unit/relationship sample establish transport and reader boundaries; they do not release a financial rule.
 
 ## Identity and provenance
 

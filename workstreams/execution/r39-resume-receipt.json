@@ -1,0 +1,38 @@
+{
+  "batch": "3824ff83-6d2f-47b7-9b74-02d7334d6cd4",
+  "date": "2026-10-01",
+  "attempt": "restricted-reader-suitability-only",
+  "result": {
+    "ok": false,
+    "stage": "permissions",
+    "code": "QUERY_REJECTED",
+    "sqlNumber": 51014,
+    "bytes": 86,
+    "elapsedMs": 48,
+    "queryHashes": {
+      "M0": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+      "M1": "4cabf20b62aa33e9097fe05f74d8924168469212b86cdecca85e9dbb505a00d0"
+    },
+    "guardSha256": "c92ae849bc3bbd266231953da55a5b833566606605cb7cc44f73c38d0db1c32a"
+  },
+  "cleanup": {
+    "ownedCopyStopped": true,
+    "temporaryClientAbsent": true,
+    "temporaryCredentialRemoved": true,
+    "originalTargetAccessed": false,
+    "adminSqlExecuted": false,
+    "userTableValuesRead": false,
+    "cleanupErrors": []
+  },
+  "M0IdentityAndReadOnlyPassed": true,
+  "M1Executed": false,
+  "M2Executed": false,
+  "financialRulesEnabled": 0,
+  "retainedCatalogVerified": true,
+  "retainedCatalogCounts": {
+    "FIS": 113,
+    "FIS_DETAY": 88,
+    "FIS_DETAY_BELGE_DETAY": 12
+  },
+  "limitation": "M1 hash is loaded/pinned but M1 was not executed; admin metadata proposal is unexecuted pending explicit exception approval."
+}

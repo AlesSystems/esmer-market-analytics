@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "stage": "M2",
+  "results": [
+    {
+      "query": "synthetic-empty",
+      "chunks": 0,
+      "columnCounts": {},
+      "types": {},
+      "bytes": 0,
+      "json": "invalid-json",
+      "arrayLength": null
+    },
+    {
+      "query": "conversions",
+      "chunks": 0,
+      "columnCounts": {},
+      "types": {},
+      "bytes": 0,
+      "json": "invalid-json",
+      "arrayLength": null
+    }
+  ],
+  "elapsedMs": 791,
+  "acceptedOutput": false,
+  "transportReadsAttempted": true
+}

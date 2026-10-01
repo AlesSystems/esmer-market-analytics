@@ -1,0 +1,16 @@
+{
+  "phase": "prepared",
+  "valuesRead": false,
+  "failure": "AssertionError",
+  "readOnlyVerified": false,
+  "ownedCopyStopped": true,
+  "temporaryClientsAbsent": true,
+  "temporaryCredentialsRemoved": true,
+  "retainedRestrictedReader": false,
+  "permissions": {},
+  "cleanupErrors": [],
+  "businessDataMutations": false,
+  "securityRepair": "existing-reader-password-reset-and-execute-deny",
+  "originalAccessed": false,
+  "manifestHash": "e818010a4c8984d3d4e1ef001537e6bf3836e89bca0d8d40eab03bfe5303c6e0"
+}
