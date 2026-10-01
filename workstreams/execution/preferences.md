@@ -11,3 +11,4 @@
 11. User will run Windows checks personally. Prepare exact handoff; do not delegate or run remote Windows work.
 12. Only existing isolated backup is available; no independent POS documentation or receipts supplied. Keep source semantics unproven unless actual evidence establishes them.
 13. Synthetic-only test runs must clear inherited ESMER_SQL_TEST_ADMIN, ESMER_SQL_TEST_CONFIG, ESMER_SQL_PREVIEW_PACKAGE and ESMER_SQL_DEV_CONFIG in the test process, plus lifecycle overrides for default disposable runs. Never print their values. Explicit source workflows need their separate authorization.
+14. Keep decision rows at the six-column TSV schema. Use repository-relative paths for bundled briefs/review artifacts in orchestration records; retain absolute paths only when identifying historical build environments or host-local external resources.

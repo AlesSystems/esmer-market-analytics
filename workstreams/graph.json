@@ -1202,7 +1202,8 @@
       "dependencies": [
         "R42-MERGE",
         "R39-SCOPE-MERGE",
-        "WIN-HANDOFF"
+        "WIN-HANDOFF",
+        "WORKSTREAMS-CHECKPOINT-REPAIR"
       ],
       "state": "pending",
       "inputs": [
@@ -1225,6 +1226,69 @@
         "Post-merge GitHub identity"
       ],
       "risk": "medium"
+    },
+    {
+      "id": "WORKSTREAMS-CHECKPOINT-REVIEW",
+      "type": "review",
+      "objective": "Check immutable documentation snapshot while UI implementation proceeds",
+      "dependencies": [
+        "R47-MERGE",
+        "R39-SCOPE-MERGE"
+      ],
+      "state": "failed",
+      "inputs": [
+        "Docs commit01f48c0 on codex/profit-release-workstreams"
+      ],
+      "allowed_files": [
+        "workstreams/execution/workstreams-checkpoint-review.md"
+      ],
+      "outputs": [
+        "Independent documentary findings"
+      ],
+      "acceptance_criteria": [
+        "No unsupported readiness or privacy claims",
+        "Plan, DAG, ledger and handoff agree with actual merged and blocked state"
+      ],
+      "verification": [
+        "Independent docs review",
+        "Plan checker and local paths"
+      ],
+      "risk": "medium",
+      "evidence": "execution/workstreams-checkpoint-review.md",
+      "failure": "P3 decision TSV rows missing columns; bundled references author-local. Both repaired before final publication review."
+    },
+    {
+      "id": "WORKSTREAMS-CHECKPOINT-REPAIR",
+      "type": "documentation",
+      "objective": "Repair decision schema and portable bundled evidence references",
+      "dependencies": [
+        "R47-MERGE",
+        "R39-SCOPE-MERGE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/workstreams-checkpoint-review.md"
+      ],
+      "allowed_files": [
+        "workstreams/decisions.tsv",
+        "workstreams/execution/units.tsv",
+        "workstreams/execution/ledger.tsv",
+        "workstreams/execution/status.md",
+        "workstreams/execution/preferences.md"
+      ],
+      "outputs": [
+        "Conformant TSV and regenerated status"
+      ],
+      "acceptance_criteria": [
+        "Every decision has six fields",
+        "Bundled evidence references resolve relative to repository; historical timestamps preserved"
+      ],
+      "verification": [
+        "CSV field counts",
+        "Relative evidence target checks",
+        "Existing helper status regeneration"
+      ],
+      "risk": "low"
     }
   ]
 }
