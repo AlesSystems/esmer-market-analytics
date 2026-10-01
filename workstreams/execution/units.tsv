@@ -1,0 +1,22 @@
+id	track	state	branch	pr	sha	brief
+E46	source	done		46	85d4645555cdac4fc0a244152837cf8904d5a39e	workstreams/execution/e46-review.md
+R47-IMPL	reports	done				workstreams/execution/r47-brief.md
+R39-SCOPE	source	done	codex/profit-source-scope		fadcd06701d8a5ebfe28abbd6536a3f786391524	workstreams/execution/r39-scope-brief.md
+R47-TEST	reports	done		47	625661b29108e053cbfabc7f72613e88169c23d6	workstreams/execution/r47-brief.md
+R39-SCOPE-REVIEW	source	failed				workstreams/execution/r39-scope-review.md
+R42-DESIGN	ui	done				workstreams/execution/r42-design-grounding.md
+R47-COMMENTS	reports	done				workstreams/execution/r47-comments.md
+R39-SCOPE-REPAIR	source	done			1eac844e288695a35d70304506eae5fd1efa2e8d	workstreams/execution/r39-scope-review.md
+R39-SCOPE-RECHECK	source	done		48	1eac844e288695a35d70304506eae5fd1efa2e8d	workstreams/execution/r39-scope-review.md
+R47-REVIEW	reports	failed		47	9ba93b37f3346d912aca792224979a259938dc0d	workstreams/execution/r47-spec-brief.md
+R47-REPAIR	reports	done	codex/product-profit-reports	47	ad4bc3d	workstreams/execution/r47-standards-review.md
+R47-RETEST	reports	done	codex/product-profit-reports	47	328453e1dafc0a5fc8aba72ccc62ffbcafef72e1	workstreams/execution/r47-brief.md
+R47-RECHECK	reports	done		47	328453e1dafc0a5fc8aba72ccc62ffbcafef72e1	workstreams/execution/r47-spec-recheck.md
+R42-IMPL	ui	done	codex/monthly-profit-page		98f129d1c89d34de9a006d782593e5dbe4092c29	workstreams/execution/r42-brief.md
+R42-TEST	ui	done	codex/monthly-profit-page	49	3219c0cbbb77b10a9af8991fa081d5b2b86dd44b	workstreams/execution/r42-brief.md
+R42-REVIEW	ui	failed	codex/monthly-profit-page		98f129d1c89d34de9a006d782593e5dbe4092c29	workstreams/execution/r42-spec-brief.md
+R42-REPAIR	ui	done	codex/monthly-profit-page		d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51	workstreams/execution/r42-standards-brief.md
+R42-RETEST	ui	done	codex/monthly-profit-page		d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51	workstreams/execution/r42-brief.md
+R42-RECHECK	ui	done	codex/monthly-profit-page	49	3219c0cbbb77b10a9af8991fa081d5b2b86dd44b	workstreams/execution/r42-brief.md
+R42-MEDIA-REPAIR	ui	done			e06e377aa71f48c9fe09298e9527e94d88dd6f9f	workstreams/execution/r42-brief.md
+WORKSTREAMS-FINAL-REVIEW	docs	done			56821261caf761313b9add702b33e68adf12dc96	workstreams/execution/workstreams-final-review-brief.md

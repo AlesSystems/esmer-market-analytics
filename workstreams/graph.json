@@ -1,0 +1,1472 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-01",
+  "phase": "execution",
+  "plan": "esmer-market-release-plan.md",
+  "scheduling": "Recompute ready nodes from completed predecessors. Blocked external requirements never count as completed. Coordinate through the existing Poteto helper; do not add an application scheduler.",
+  "nodes": [
+    {
+      "id": "BASE",
+      "type": "analysis",
+      "objective": "Refresh repository and tracker state; reserve isolated worktrees without disturbing user changes",
+      "dependencies": [],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents"
+      ],
+      "allowed_files": [
+        "Read-only repository/GitHub",
+        "Task-local orchestration records"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Exact main/PR heads and dirty files recorded",
+        "Writer scopes and existing worktrees reconciled"
+      ],
+      "verification": [
+        "git status --short --branch",
+        "git worktree list",
+        "gh issue view <number> --comments",
+        "gh pr view <number> --json headRefOid,baseRefName,state,files,reviews,statusCheckRollup"
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "E46",
+      "type": "integration",
+      "objective": "Independently review and merge the existing source-observation PR without closing #39",
+      "dependencies": [
+        "BASE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "BASE"
+      ],
+      "allowed_files": [
+        "PR #46 four documentation files",
+        "Task-local review evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Current-head documentation/privacy verdict passes",
+        "Local links pass",
+        "Merge SHA recorded; no source semantics promoted"
+      ],
+      "verification": [
+        "gh pr diff 46",
+        "git diff --check",
+        "Local link check",
+        "Independent documentation review"
+      ],
+      "risk": "medium",
+      "merge_commit": "1ed1824ec5ee448cf880d20e89d74d1d67d08486",
+      "evidence": "execution/e46-review.md"
+    },
+    {
+      "id": "R39-SCOPE",
+      "type": "design",
+      "objective": "Prepare exact minimal renewed source-inspection proposal",
+      "dependencies": [
+        "BASE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "BASE",
+        "Read-only PR #46 evidence at current head; merge not required to prepare scope"
+      ],
+      "allowed_files": [
+        "docs/contracts/source.md",
+        "docs/contracts/privacy.md",
+        "docs/evidence/issue-39-source-profit.md",
+        "Private evidence inventory",
+        "docs/evidence/issue-39-renewed-scope.md",
+        "execution/r39-scope-review.md"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Columns, joins, bounded month/dependencies, source identity, permission scope and independent proof specified",
+        "No SQL connection during proposal preparation"
+      ],
+      "verification": [
+        "Read-only comparison with PR #46 scope",
+        "git diff --check and two local links passed; independent review is separate R39-SCOPE-REVIEW node"
+      ],
+      "risk": "high",
+      "evidence": "codex/profit-source-scope@fadcd067; independent review pending"
+    },
+    {
+      "id": "R39-AUTH",
+      "type": "review",
+      "objective": "Match the concrete query proposal to explicit source authorization",
+      "dependencies": [
+        "R39-SCOPE-RECHECK"
+      ],
+      "state": "blocked",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-SCOPE"
+      ],
+      "allowed_files": [
+        "Task-local permission record"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Explicit authorization identifies isolated source and exact expanded scope",
+        "Prior approved scope reused where applicable without requesting it again"
+      ],
+      "verification": [
+        "Compare proposed scope with trusted user permission"
+      ],
+      "risk": "high",
+      "blocked_reason": "Reviewed metadata scope is PR48. Exact existing isolated source availability/lifecycle and renewed read authorization unresolved; only backup available, independent semantic proof absent."
+    },
+    {
+      "id": "R39-IMPL",
+      "type": "analysis",
+      "objective": "Collect authorized evidence and prove only supported rules",
+      "dependencies": [
+        "R39-AUTH",
+        "E46"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-AUTH",
+        "E46"
+      ],
+      "allowed_files": [
+        "R39 allowed areas in the release plan",
+        "Private source receipts outside Git"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Independent semantics support a meaningful financial population",
+        "Per-rule matrix retains unresolved exclusions and null unknown exposure"
+      ],
+      "verification": [
+        "R39 live scenarios and bounded extraction procedure",
+        "Independent decimal expectations"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R39-TEST",
+      "type": "test",
+      "objective": "Verify source contracts and reader boundaries",
+      "dependencies": [
+        "R39-IMPL"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-IMPL"
+      ],
+      "allowed_files": [
+        "R39 focused tests",
+        "docs/evidence/"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Approved projections fail closed",
+        "Required source permissions, privacy, joins and literal expected values proven"
+      ],
+      "verification": [
+        "R39 unit/live/performance checklist"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R39-REVIEW",
+      "type": "review",
+      "objective": "Independently judge financial semantics and privacy evidence",
+      "dependencies": [
+        "R39-TEST"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-TEST"
+      ],
+      "allowed_files": [
+        "Read-only R39 diff and receipts"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Every enabled rule has independent evidence",
+        "No source truth inferred from transport equality"
+      ],
+      "verification": [
+        "Independent reviewer current-head verdict"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R39-MERGE",
+      "type": "integration",
+      "objective": "Merge the proven source contract",
+      "dependencies": [
+        "R39-REVIEW"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R39 branch and PR"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Verified merge SHA recorded",
+        "R40 capabilities supported; observation-only evidence cannot complete this node"
+      ],
+      "verification": [
+        "Current head/base/patch ID and required checks",
+        "Post-merge source capability review"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R47-IMPL",
+      "type": "implementation",
+      "objective": "Continue current synthetic PR #47, preserving v1 and implementing only proven gaps",
+      "dependencies": [
+        "BASE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "BASE"
+      ],
+      "allowed_files": [
+        "R47 allowed areas in the release plan"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Focused missing behavioral contract fails for the expected reason before changes",
+        "Smallest change meets R47 Build and You see checklists"
+      ],
+      "verification": [
+        "R47 focused red/green commands",
+        "npm run typecheck",
+        "npm run lint",
+        "npm run build"
+      ],
+      "risk": "high",
+      "evidence": "Existing code audit; focused 17 unit and28 integration checks passed, worker report. No new behavior."
+    },
+    {
+      "id": "R47-TEST",
+      "type": "test",
+      "objective": "Verify R47 behavior, real execution and performance",
+      "dependencies": [
+        "R47-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R47-IMPL"
+      ],
+      "allowed_files": [
+        "R47 tests and evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "R47 unit/live/performance checklists pass",
+        "No skipped required gate is claimed complete",
+        "On phase-10-complete-synthetic, added aggregation <=5000ms, cold coherent report <=60000ms, and ordinary pages <2000ms on all five recorded samples; local results never substitute for Windows acceptance"
+      ],
+      "verification": [
+        "R47 Verify commands and ten scenarios"
+      ],
+      "risk": "high",
+      "evidence": "/tmp/esmer-market-r47-evidence-20261001; code625661b; full suites+10live lanes+five paired performance observations; local Mac only"
+    },
+    {
+      "id": "R47-REVIEW",
+      "type": "review",
+      "objective": "Independently review R47 at its current head",
+      "dependencies": [
+        "R47-TEST",
+        "R47-COMMENTS"
+      ],
+      "state": "failed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R47-TEST"
+      ],
+      "allowed_files": [
+        "Read-only R47 diff, receipts, screenshots and private opaque attestations"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Independent verdict passes at current head",
+        "Material review findings resolved",
+        "Required interaction evidence presented"
+      ],
+      "verification": [
+        "Review diff, current artifact and receipts",
+        "Compare head/base/patch ID"
+      ],
+      "risk": "high",
+      "evidence": "execution/r47-standards-review.md; execution/r47-spec-review.md",
+      "failure": "Both independent reviewers reproduced accepted v2 snapshots with inconsistent daily trend; Standards also false market scope. Historical test pass did not cover mutation."
+    },
+    {
+      "id": "R47-MERGE",
+      "type": "integration",
+      "objective": "Merge verified R47 without prematurely closing real/platform obligations",
+      "dependencies": [
+        "R47-RETEST",
+        "R47-RECHECK"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R47-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R47 branch and PR"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Merge SHA confirmed on main",
+        "Affected post-integration checks pass",
+        "Unperformed real/Windows gates stay open"
+      ],
+      "verification": [
+        "Current-head required checks",
+        "Post-merge packaged smoke where applicable"
+      ],
+      "risk": "high",
+      "merge_commit": "df7387dab8a7c1e9b0caea215cc216e513a57fe9",
+      "evidence": "PR47 reviewed head328453e1 patch659c4e02 merged without code delta"
+    },
+    {
+      "id": "R40-IMPL",
+      "type": "implementation",
+      "objective": "Import the separately validated financial projection using existing staging and activation",
+      "dependencies": [
+        "R39-MERGE"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R39-MERGE"
+      ],
+      "allowed_files": [
+        "R40 allowed areas in the release plan"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Focused missing behavioral contract fails for the expected reason before changes",
+        "Smallest change meets R40 Build and You see checklists"
+      ],
+      "verification": [
+        "R40 focused red/green commands",
+        "npm run typecheck",
+        "npm run lint",
+        "npm run build"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R40-TEST",
+      "type": "test",
+      "objective": "Verify R40 behavior, real execution and performance",
+      "dependencies": [
+        "R40-IMPL"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R40-IMPL"
+      ],
+      "allowed_files": [
+        "R40 tests and evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "R40 unit/live/performance checklists pass",
+        "No skipped required gate is claimed complete"
+      ],
+      "verification": [
+        "R40 Verify commands and ten scenarios"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R40-REVIEW",
+      "type": "review",
+      "objective": "Independently review R40 at its current head",
+      "dependencies": [
+        "R40-TEST"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R40-TEST"
+      ],
+      "allowed_files": [
+        "Read-only R40 diff, receipts, screenshots and private opaque attestations"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Independent verdict passes at current head",
+        "Material review findings resolved",
+        "Required interaction evidence presented"
+      ],
+      "verification": [
+        "Review diff, current artifact and receipts",
+        "Compare head/base/patch ID"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R40-MERGE",
+      "type": "integration",
+      "objective": "Merge verified R40 without prematurely closing real/platform obligations",
+      "dependencies": [
+        "R40-REVIEW"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R40-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R40 branch and PR"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Merge SHA confirmed on main",
+        "Affected post-integration checks pass",
+        "Unperformed real/Windows gates stay open"
+      ],
+      "verification": [
+        "Current-head required checks",
+        "Post-merge packaged smoke where applicable"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R41-IMPL",
+      "type": "implementation",
+      "objective": "Reconcile the admitted real population against independent line/product/day/month expectations",
+      "dependencies": [
+        "R40-MERGE",
+        "R47-MERGE"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R40-MERGE",
+        "R47-MERGE"
+      ],
+      "allowed_files": [
+        "R41 allowed areas in the release plan"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Focused missing behavioral contract fails for the expected reason before changes",
+        "Smallest change meets R41 Build and You see checklists"
+      ],
+      "verification": [
+        "R41 focused red/green commands",
+        "npm run typecheck",
+        "npm run lint",
+        "npm run build"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R41-TEST",
+      "type": "test",
+      "objective": "Verify R41 behavior, real execution and performance",
+      "dependencies": [
+        "R41-IMPL"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R41-IMPL"
+      ],
+      "allowed_files": [
+        "R41 tests and evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "R41 unit/live/performance checklists pass",
+        "No skipped required gate is claimed complete"
+      ],
+      "verification": [
+        "R41 Verify commands and ten scenarios"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R41-REVIEW",
+      "type": "review",
+      "objective": "Independently review R41 at its current head",
+      "dependencies": [
+        "R41-TEST"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R41-TEST"
+      ],
+      "allowed_files": [
+        "Read-only R41 diff, receipts, screenshots and private opaque attestations"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Independent verdict passes at current head",
+        "Material review findings resolved",
+        "Required interaction evidence presented"
+      ],
+      "verification": [
+        "Review diff, current artifact and receipts",
+        "Compare head/base/patch ID"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R41-MERGE",
+      "type": "integration",
+      "objective": "Merge verified R41 without prematurely closing real/platform obligations",
+      "dependencies": [
+        "R41-REVIEW"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R41-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R41 branch and PR"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Merge SHA confirmed on main",
+        "Affected post-integration checks pass",
+        "Unperformed real/Windows gates stay open"
+      ],
+      "verification": [
+        "Current-head required checks",
+        "Post-merge packaged smoke where applicable"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R42-IMPL",
+      "type": "implementation",
+      "objective": "Compose the approved one-page profit UI over the pinned report contract",
+      "dependencies": [
+        "R47-MERGE",
+        "R42-DESIGN"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R47-MERGE"
+      ],
+      "allowed_files": [
+        "R42 allowed areas in the release plan"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Focused missing behavioral contract fails for the expected reason before changes",
+        "Smallest change meets R42 Build and You see checklists"
+      ],
+      "verification": [
+        "R42 focused red/green commands",
+        "npm run typecheck",
+        "npm run lint",
+        "npm run build"
+      ],
+      "risk": "medium",
+      "branch": "codex/monthly-profit-page",
+      "base_commit": "c2f8ee050911f17d704f203269285a19d7375f36",
+      "worktree": "/Users/altanesmer/.codex/worktrees/monthly-profit-page/esmer-market-analytics",
+      "evidence": "98f129d1c89d34de9a006d782593e5dbe4092c29; focused red/green;44unit294integration47packagedMac full tests,5+7skips; static checks pass"
+    },
+    {
+      "id": "R42-TEST",
+      "type": "test",
+      "objective": "Verify R42 behavior, real execution and performance",
+      "dependencies": [
+        "R42-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R42-IMPL"
+      ],
+      "allowed_files": [
+        "R42 tests and evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "R42 unit/live/performance checklists pass",
+        "No skipped required gate is claimed complete"
+      ],
+      "verification": [
+        "R42 Verify commands and ten scenarios"
+      ],
+      "risk": "high",
+      "evidence": "PR49@3219c0c; code d7df4c9;44unit294integration47packagedMac with5+7skips,10synthetic lanes,5paired measurements, genuinev1 and201line document"
+    },
+    {
+      "id": "R42-REVIEW",
+      "type": "review",
+      "objective": "Independently review R42 at its current head",
+      "dependencies": [
+        "R42-IMPL"
+      ],
+      "state": "failed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R42-TEST"
+      ],
+      "allowed_files": [
+        "Read-only R42 diff, receipts, screenshots and private opaque attestations"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Independent verdict passes at current head",
+        "Material review findings resolved",
+        "Required interaction evidence presented"
+      ],
+      "verification": [
+        "Review diff, current artifact and receipts",
+        "Compare head/base/patch ID"
+      ],
+      "risk": "high",
+      "failure": "Both independent reviewers identified repeated same-product activation leaving focus on opener; packaged regression reproduced at98f129d. Repair/rechecks retain separate identity.",
+      "evidence": "execution/r42-standards-review.md; /tmp/esmer-market-r42-evidence-20261001/reselect-red.log"
+    },
+    {
+      "id": "R42-MERGE",
+      "type": "integration",
+      "objective": "Merge verified R42 without prematurely closing real/platform obligations",
+      "dependencies": [
+        "R42-TEST",
+        "R42-RETEST",
+        "R42-RECHECK"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R42-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R42 branch and PR"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Merge SHA confirmed on main",
+        "Affected post-integration checks pass",
+        "Unperformed real/Windows gates stay open"
+      ],
+      "verification": [
+        "Current-head required checks",
+        "Post-merge packaged smoke where applicable"
+      ],
+      "risk": "high",
+      "merge_commit": "5a91017728c027732aac5912aab8c4681ba16215",
+      "evidence": "PR49 final3219c0c, patch347f87a1, both independent reviewsPASS; merged app/test trees identical;2packaged postmerge smoke checks passed"
+    },
+    {
+      "id": "WIN",
+      "type": "analysis",
+      "objective": "Prepare independent Windows acceptance and recovery environments",
+      "dependencies": [
+        "BASE"
+      ],
+      "state": "blocked",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "BASE"
+      ],
+      "allowed_files": [
+        "Test-host environment records",
+        "Disposable profiles/VMs and approved recovery media"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Windows/hardware/version and clean execution access established",
+        "Independent recovery key/media arrangement exists",
+        "No access or installation on owner computer"
+      ],
+      "verification": [
+        "Read-only environment inventory and documented clean-host boot recipe"
+      ],
+      "risk": "medium",
+      "blocked_reason": "User will run Windows acceptance personally. Await user execution evidence after integrated handoff."
+    },
+    {
+      "id": "R43-TEST",
+      "type": "test",
+      "objective": "Execute integrated real-data Windows acceptance",
+      "dependencies": [
+        "R40-MERGE",
+        "R41-MERGE",
+        "R42-MERGE",
+        "WIN"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R40-MERGE",
+        "R41-MERGE",
+        "R42-MERGE",
+        "WIN"
+      ],
+      "allowed_files": [
+        "R43 tests and private/public evidence",
+        "Disposable acceptance environment"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "All applicable A01 through A07 items have current-build evidence",
+        "Real reconciliation, independent recovery, offline workflow, privacy and performance pass"
+      ],
+      "verification": [
+        "R43 full suite, package:win and manual/native checks",
+        "Record exact installed and portable hashes"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R43-REVIEW",
+      "type": "review",
+      "objective": "Independently audit release evidence and remaining tracker gates",
+      "dependencies": [
+        "R43-TEST"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R43-TEST"
+      ],
+      "allowed_files": [
+        "Read-only release diff and evidence"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "No unresolved release-blocking finding",
+        "Synthetic and real evidence distinguished",
+        "Build/dataset/OS and exact artifact identity consistent"
+      ],
+      "verification": [
+        "Independent financial/security/recovery/release evidence review"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R43-MERGE",
+      "type": "integration",
+      "objective": "Merge verified acceptance changes and recheck final artifacts",
+      "dependencies": [
+        "R43-REVIEW"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R43-REVIEW"
+      ],
+      "allowed_files": [
+        "Owned R43 branch and PR",
+        "Release artifact manifest"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Merge SHA recorded",
+        "Final rebuilt artifact equivalence and packaged smoke pass",
+        "Changed artifacts receive relevant renewed verification"
+      ],
+      "verification": [
+        "gh merge confirmation",
+        "Final build hashes and runtime checks"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "RELEASE",
+      "type": "documentation",
+      "objective": "Hand over the verified Windows candidate and reconcile #3/#36/#39-#43",
+      "dependencies": [
+        "R43-MERGE"
+      ],
+      "state": "pending",
+      "inputs": [
+        "Current AGENTS.md and applicable foundation/contract documents",
+        "R43-MERGE"
+      ],
+      "allowed_files": [
+        "docs/evidence/release-acceptance.md",
+        "docs/operations/",
+        "GitHub issue/PR records",
+        "workstreams/"
+      ],
+      "outputs": [
+        "Changed-file or read-only findings record",
+        "Verification evidence bound to commit/artifact identity"
+      ],
+      "acceptance_criteria": [
+        "Branch, commits, PRs, tests, evidence, hashes and limitations reported",
+        "Only evidenced first-release gates marked complete",
+        "Production live/owner installation remain separately gated"
+      ],
+      "verification": [
+        "Acceptance matrix audit",
+        "Distribution/privacy inventory",
+        "Turkish operating/recovery instructions review"
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "R42-DESIGN",
+      "type": "design",
+      "objective": "Choose smallest module composition and pinned request state for approved one-page UI",
+      "dependencies": [
+        "R47-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Approved #38 layout and #47 contracts",
+        "planning-evidence.md"
+      ],
+      "allowed_files": [
+        "execution/r42-design-*.md"
+      ],
+      "outputs": [
+        "Two independent bounded design alternatives and coordinator selection"
+      ],
+      "acceptance_criteria": [
+        "Same pinned report and bounded requests",
+        "Preserve v1/secondary operations",
+        "No financial formulas in renderer"
+      ],
+      "verification": [
+        "Code-path trace",
+        "Compare alternatives and review red flags"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r42-design-selected.md; execution/r42-design-review.md"
+    },
+    {
+      "id": "R39-SCOPE-REVIEW",
+      "type": "review",
+      "objective": "Independently validate bounded source proposal before publication",
+      "dependencies": [
+        "R39-SCOPE"
+      ],
+      "state": "failed",
+      "inputs": [
+        "codex/profit-source-scope@fadcd06701d8a5ebfe28abbd6536a3f786391524"
+      ],
+      "allowed_files": [
+        "execution/r39-scope-review.md"
+      ],
+      "outputs": [
+        "Standards and spec verdict"
+      ],
+      "acceptance_criteria": [
+        "Exact factual field/identity/permission limits",
+        "No new financial meaning or source access implied"
+      ],
+      "verification": [
+        "git diff --check",
+        "Local link check",
+        "Independent documentary review"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-scope-review.md",
+      "failure": "P2 exact metadata authorization omits mandatory live safety queries; source-doc worker repairing"
+    },
+    {
+      "id": "R47-COMMENTS",
+      "type": "analysis",
+      "objective": "Check newly added source/test comments and suppressions before correctness review",
+      "dependencies": [
+        "R47-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "1ed1824...625661b source/test diff"
+      ],
+      "allowed_files": [
+        "execution/r47-comments.md"
+      ],
+      "outputs": [
+        "No-comments report"
+      ],
+      "acceptance_criteria": [
+        "No unnecessary new comments or unsafe suppressions"
+      ],
+      "verification": [
+        "20 files and586added lines inspected;0new comments/suppressions"
+      ],
+      "risk": "low"
+    },
+    {
+      "id": "R39-SCOPE-REPAIR",
+      "type": "documentation",
+      "objective": "Add exact mandatory identity/read-only query envelope to metadata proposal",
+      "dependencies": [
+        "R39-SCOPE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/r39-scope-review.md"
+      ],
+      "allowed_files": [
+        "docs/evidence/issue-39-renewed-scope.md"
+      ],
+      "outputs": [
+        "Corrected coherent docs commit"
+      ],
+      "acceptance_criteria": [
+        "All required live safety reads are in exact proposed scope; no execution"
+      ],
+      "verification": [
+        "Local links",
+        "git diff --check"
+      ],
+      "risk": "medium",
+      "evidence": "codex/profit-source-scope@1eac844; fix835bb632"
+    },
+    {
+      "id": "R39-SCOPE-RECHECK",
+      "type": "review",
+      "objective": "Recheck repaired immutable scope proposal",
+      "dependencies": [
+        "R39-SCOPE-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Corrected scope proposal"
+      ],
+      "allowed_files": [
+        "execution/r39-scope-review.md"
+      ],
+      "outputs": [
+        "Independent final verdict"
+      ],
+      "acceptance_criteria": [
+        "P2 resolved, all permission and semantic limits retained"
+      ],
+      "verification": [
+        "Independent diff and docs check"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r39-scope-review.md; PR48@1eac844"
+    },
+    {
+      "id": "R47-REPAIR",
+      "type": "implementation",
+      "objective": "Reject inconsistent persisted v2 scope, daily trend and coverage at recovery boundary",
+      "dependencies": [
+        "R47-TEST"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/r47-standards-review.md",
+        "execution/r47-spec-review.md"
+      ],
+      "allowed_files": [
+        "src/recovery/**",
+        "tests/integration/**",
+        "docs/evidence/issue-41-synthetic-product-profit.md"
+      ],
+      "outputs": [
+        "Changed files, test evidence and exact commit identity"
+      ],
+      "acceptance_criteria": [
+        "Valid v1/v2 still restore; inconsistent v2 financial presentation rejected before activation",
+        "Tests and immutable independent review match final application build"
+      ],
+      "verification": [
+        "Focused failing mutation regressions then green",
+        "Relevant full suites, typecheck, lint, packaged recovery",
+        "Independent Standards and Spec review"
+      ],
+      "risk": "high",
+      "evidence": "a37d272 observed mutation red; d5f74c7 validator fix; ad4bc3d valid-state boundaries; focused7 passed"
+    },
+    {
+      "id": "R47-RETEST",
+      "type": "test",
+      "objective": "Revalidate repaired report and packaged recovery with regressions",
+      "dependencies": [
+        "R47-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/r47-standards-review.md",
+        "execution/r47-spec-review.md"
+      ],
+      "allowed_files": [
+        "R47 focused/full checks and evidence"
+      ],
+      "outputs": [
+        "Changed files, test evidence and exact commit identity"
+      ],
+      "acceptance_criteria": [
+        "Valid v1/v2 still restore; inconsistent v2 financial presentation rejected before activation",
+        "Tests and immutable independent review match final application build"
+      ],
+      "verification": [
+        "Focused failing mutation regressions then green",
+        "Relevant full suites, typecheck, lint, packaged recovery",
+        "Independent Standards and Spec review"
+      ],
+      "risk": "high",
+      "evidence": "Code ad4bc3da26e398773e9eb86d8700fc72cfb7ed90; final docs328453e1;44unit291integration34packaged Mac passed,5+7skips; current v1/v2 restore/workbook equality and5v2 restore samples passed"
+    },
+    {
+      "id": "R47-RECHECK",
+      "type": "review",
+      "objective": "Independently review immutable repaired v2 validation and evidence",
+      "dependencies": [
+        "R47-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/r47-standards-review.md",
+        "execution/r47-spec-review.md",
+        "Full44unit/291integration/34desktop and packaged v1/v2 recovery already passed at ad4bc3d; repeated restore latency finishes independently"
+      ],
+      "allowed_files": [
+        "R47 focused/full checks and evidence"
+      ],
+      "outputs": [
+        "Changed files, test evidence and exact commit identity"
+      ],
+      "acceptance_criteria": [
+        "Valid v1/v2 still restore; inconsistent v2 financial presentation rejected before activation",
+        "Tests and immutable independent review match final application build"
+      ],
+      "verification": [
+        "Focused failing mutation regressions then green",
+        "Relevant full suites, typecheck, lint, packaged recovery",
+        "Independent Standards and Spec review"
+      ],
+      "risk": "high",
+      "evidence": "execution/r47-standards-recheck.md; execution/r47-spec-recheck.md; PASS328453e1"
+    },
+    {
+      "id": "WIN-HANDOFF",
+      "type": "documentation",
+      "objective": "Prepare and fact-check user-run Windows continuation without claiming platform acceptance",
+      "dependencies": [
+        "BASE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "User will run Windows checks personally",
+        "Repository scripts and Windows acceptance"
+      ],
+      "allowed_files": [
+        "workstreams/windows-handoff.md",
+        "workstreams/execution/windows-handoff-review.md"
+      ],
+      "outputs": [
+        "Runnable commands, native checks and evidence template"
+      ],
+      "acceptance_criteria": [
+        "Commands match current scripts; disposable profiles and artifact hashes explicit",
+        "Final candidate identity set after integration; source and Windows gates remain open"
+      ],
+      "verification": [
+        "Local links",
+        "Independent factual documentation check"
+      ],
+      "risk": "medium",
+      "evidence": "workstreams/windows-handoff.md; independent final docs reviewer confirmed exact remote3219c0c candidate, script commands and source/lifecycle environment isolation; user execution stays blocked inWIN"
+    },
+    {
+      "id": "R39-SCOPE-MERGE",
+      "type": "integration",
+      "objective": "Merge reviewed metadata proposal PR48 without executing or promoting source semantics",
+      "dependencies": [
+        "R39-SCOPE-RECHECK",
+        "R47-MERGE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Reviewed branch artifacts and exact GitHub identities"
+      ],
+      "allowed_files": [
+        "Owned PR48"
+      ],
+      "outputs": [
+        "PR/merge identity and durable evidence"
+      ],
+      "acceptance_criteria": [
+        "Current reviewed patch and head match; merge SHA recorded",
+        "R39 authorization and semantics remain blocked"
+      ],
+      "verification": [
+        "git diff --check",
+        "Current-head review",
+        "Post-merge GitHub identity"
+      ],
+      "risk": "medium",
+      "merge_commit": "c2f8ee050911f17d704f203269285a19d7375f36",
+      "evidence": "PR48 head1eac844 stablepatch1c586634, docs-only reviewed PASS"
+    },
+    {
+      "id": "WORKSTREAMS-PUBLISH",
+      "type": "documentation",
+      "objective": "Publish current plan, execution decisions and evidence through a reviewed documentation PR",
+      "dependencies": [
+        "R42-MERGE",
+        "R39-SCOPE-MERGE",
+        "WIN-HANDOFF",
+        "WORKSTREAMS-CHECKPOINT-REPAIR",
+        "WORKSTREAMS-FINAL-REVIEW",
+        "R42-MEDIA-REPAIR"
+      ],
+      "state": "ready",
+      "inputs": [
+        "Reviewed branch artifacts and exact GitHub identities"
+      ],
+      "allowed_files": [
+        "workstreams/**",
+        "docs/evidence/r42/lane-08.png",
+        "docs/evidence/r42-monthly-profit-page.md",
+        "docs/evidence/r42/zoom-capture.json"
+      ],
+      "outputs": [
+        "PR/merge identity and durable evidence"
+      ],
+      "acceptance_criteria": [
+        "Plan and DAG accurately distinguish merged synthetic work from real/Windows blockers",
+        "No private inputs, credentials or source values; local links and DAG checks pass",
+        "Current-head independent docs review and merge recorded"
+      ],
+      "verification": [
+        "git diff --check",
+        "Current-head review",
+        "Post-merge GitHub identity"
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "WORKSTREAMS-CHECKPOINT-REVIEW",
+      "type": "review",
+      "objective": "Check immutable documentation snapshot while UI implementation proceeds",
+      "dependencies": [
+        "R47-MERGE",
+        "R39-SCOPE-MERGE"
+      ],
+      "state": "failed",
+      "inputs": [
+        "Docs commit01f48c0 on codex/profit-release-workstreams"
+      ],
+      "allowed_files": [
+        "workstreams/execution/workstreams-checkpoint-review.md"
+      ],
+      "outputs": [
+        "Independent documentary findings"
+      ],
+      "acceptance_criteria": [
+        "No unsupported readiness or privacy claims",
+        "Plan, DAG, ledger and handoff agree with actual merged and blocked state"
+      ],
+      "verification": [
+        "Independent docs review",
+        "Plan checker and local paths"
+      ],
+      "risk": "medium",
+      "evidence": "execution/workstreams-checkpoint-review.md",
+      "failure": "P3 decision TSV rows missing columns; bundled references author-local. Both repaired before final publication review."
+    },
+    {
+      "id": "WORKSTREAMS-CHECKPOINT-REPAIR",
+      "type": "documentation",
+      "objective": "Repair decision schema and portable bundled evidence references",
+      "dependencies": [
+        "R47-MERGE",
+        "R39-SCOPE-MERGE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "execution/workstreams-checkpoint-review.md"
+      ],
+      "allowed_files": [
+        "workstreams/decisions.tsv",
+        "workstreams/execution/units.tsv",
+        "workstreams/execution/ledger.tsv",
+        "workstreams/execution/status.md",
+        "workstreams/execution/preferences.md"
+      ],
+      "outputs": [
+        "Conformant TSV and regenerated status"
+      ],
+      "acceptance_criteria": [
+        "Every decision has six fields",
+        "Bundled evidence references resolve relative to repository; historical timestamps preserved"
+      ],
+      "verification": [
+        "CSV field counts",
+        "Relative evidence target checks",
+        "Existing helper status regeneration"
+      ],
+      "risk": "low"
+    },
+    {
+      "id": "R42-REPAIR",
+      "type": "implementation",
+      "objective": "Restore native focus and scrolling when reopening the same selected product",
+      "dependencies": [
+        "R42-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "test90174ad observed packaged red; fixd7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51; exact asar9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492"
+    },
+    {
+      "id": "R42-RETEST",
+      "type": "test",
+      "objective": "Verify repaired packaged keyboard journey and current artifact evidence",
+      "dependencies": [
+        "R42-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "Code d7df4c9; repaired archive9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492; full44unit/294integration+5skips/47packagedMac+7skips passed, plus typecheck/lint/build/package and14focused product-profit checks."
+    },
+    {
+      "id": "R42-RECHECK",
+      "type": "review",
+      "objective": "Independently recheck the repaired immutable UI head and final receipts",
+      "dependencies": [
+        "R42-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r42-standards-recheck.md; execution/r42-spec-recheck.md; bothPASS3219c0c"
+    },
+    {
+      "id": "WORKSTREAMS-FINAL-REVIEW",
+      "type": "review",
+      "objective": "Independently review final execution record and exact user-run Windows handoff",
+      "dependencies": [
+        "R42-MERGE",
+        "WORKSTREAMS-CHECKPOINT-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Final workstreams snapshot",
+        "PR46/47/48/49 merge and immutable reviews"
+      ],
+      "allowed_files": [
+        "workstreams/execution/workstreams-final-review.md"
+      ],
+      "outputs": [
+        "Immutable documentation verdict"
+      ],
+      "acceptance_criteria": [
+        "Accurate merged and blocked states",
+        "DAG, TSV, references and exact Windows candidate consistent",
+        "No unsupported release claims or private inputs"
+      ],
+      "verification": [
+        "Plan checker",
+        "DAG and TSV validation",
+        "Local links and independent documentary review"
+      ],
+      "risk": "medium",
+      "evidence": "execution/workstreams-final-review.md; independentPASS56821261 with6section0problem checker,47acyclic contracts, TSV and47relative targets"
+    },
+    {
+      "id": "R42-MEDIA-REPAIR",
+      "type": "documentation",
+      "objective": "Replace blank zoom evidence image with a visible capture of the already verified native zoom journey",
+      "dependencies": [
+        "R42-MERGE"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Postmerge coordinator observed blank lane-08.png",
+        "Unchanged repaired package9feefe30"
+      ],
+      "allowed_files": [
+        "docs/evidence/r42/lane-08.png",
+        "docs/evidence/r42-monthly-profit-page.md",
+        "workstreams/execution/overview.md",
+        "docs/evidence/r42/zoom-capture.json"
+      ],
+      "outputs": [
+        "Corrected synthetic screenshot and capture receipt"
+      ],
+      "acceptance_criteria": [
+        "Image shows actual200percent native zoom content at680x720",
+        "Exact package unchanged; failed image disclosed and no app change implied"
+      ],
+      "verification": [
+        "Rerun bounded native zoom capture",
+        "Coordinator image inspection",
+        "Independent docs delta review"
+      ],
+      "risk": "low",
+      "evidence": "Same-package native capture104569bytes; nativezoom2,680x720 viewport, Tab/Enter and visible detail focus; coordinator inspected corrected pixels"
+    }
+  ]
+}

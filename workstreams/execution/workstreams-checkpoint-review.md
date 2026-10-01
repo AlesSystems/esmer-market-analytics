@@ -1,0 +1,17 @@
+# Workstreams documentation checkpoint review
+
+ISSUES. Two bounded documentation fixes are recommended before publication. This is an execution snapshot review. R42 implementation and the final Windows candidate are intentionally pending; no application or release verdict is given.
+
+## Findings
+
+1. **P3. Keep decision rows conformant to the declared TSV schema.** `workstreams/decisions.tsv:19` through line 22 contain three fields under the six-column header `ts, phase, decision, why, evidence, result`. A `csv.DictReader` therefore returns missing rationale, evidence, and result fields for the review failure, repair recheck, merge, and R42 start. These are the decisions most important to resume the cycle safely. Fill the three missing columns with their existing reason, local report/commit reference, and resulting state. Keep date-only timestamps explicitly date-only rather than inventing times.
+
+2. **P3. Make bundled execution references portable.** `workstreams/execution/ledger.tsv:2` through line 5, `units.tsv:3` onward, and the generated `status.md` refer to bundled briefs/reviews through `/Users/altanesmer/Desktop/Ales/esmer-market-analytics/workstreams/execution/...`. Those files are present in this commit, but the recorded paths resolve only on the author's Mac. A cloned Windows checkout cannot follow the ledger to its evidence using those references. Normalize bundled evidence/brief paths to repository-relative paths and regenerate the status snapshot. Preserve historical machine/build locations inside the evidence reports where they identify the measured environment. External skill paths and restricted temporary receipts should remain explicitly host-local.
+
+## Checked scope and evidence
+
+- Head `01f48c04278cfa9ddaf3b290d709f28f7bf64517`; base `c2f8ee050911f17d704f203269285a19d7375f36`; branch `codex/profit-release-workstreams`; observed clean. Diff adds only 39 `workstreams` files. Stable patch ID `b9b5308847ef361ba5855f1fc4d2f8784607718f`.
+- Read the full release plan, planning evidence, graph contracts/state, decision and verdict ledgers, status/overview/checklist/gates, and Windows handoff with its earlier repair report. Compared Windows commands with `package.json`, desktop wrapper, and source/lifecycle environment switches. Environment isolation, packaged-rebuild hashing, separate installer proof, synthetic-only inputs, native/independent recovery, and open Windows/source obligations are stated accurately.
+- Actually ran `git diff --check`, Python DAG/schema/state validation, TSV shape validation, and relative Markdown file-target validation. All 40 DAG contracts are acyclic and have valid predecessor states; all 16 relative Markdown file targets exist. Both execution TSVs have uniform rows; the four decision rows fail column-count consistency.
+- Local Git merge parents confirm #46, #47 and #48 identities. The failed #47 review and repaired pass remain separate. R42 is running; source authorization/proof, real #40/#41/#43 and Windows remain open. Pending Windows candidate identity is appropriate at this checkpoint.
+- Root's reported plan-checker result of six PR sections and zero problems was not rerun. No private source rows, credentials, original backup, or release-readiness claim was found in reviewed documentation. No Windows, application, SQL, source, lifecycle, nested-agent or GitHub operation ran. Only this assigned report was written. Final post-R42 delta review remains required.

@@ -1,0 +1,19 @@
+{
+  "packageAsar": "9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492",
+  "viewport": {
+    "width": 680,
+    "height": 720
+  },
+  "nativeZoomFactor": 2,
+  "tabReachable": true,
+  "detailFocused": true,
+  "headingBounds": {
+    "x": 35,
+    "y": 315.984375,
+    "width": 270,
+    "height": 24.296875
+  },
+  "screenshotBytes": 104569,
+  "cause": "Playwright page.screenshot reproduces blank white pixels after native Electron zoom despite visible DOM/focus assertions and paint waits. Native webContents.capturePage used for corrected artifact. Exact screenshot transport root cause is not established.",
+  "scope": "Evidence correction only; application and committed tests unchanged."
+}

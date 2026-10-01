@@ -1,0 +1,30 @@
+{
+  "generation": 6,
+  "prs": [
+    {
+      "pr": 46,
+      "branches": "codex/issue-39-profit-evidence",
+      "sha": "85d4645555cdac4fc0a244152837cf8904d5a39e",
+      "state": "MERGED"
+    },
+    {
+      "pr": 47,
+      "branches": "codex/product-profit-reports",
+      "sha": "328453e1dafc0a5fc8aba72ccc62ffbcafef72e1",
+      "state": "MERGED"
+    },
+    {
+      "pr": 48,
+      "branches": "codex/profit-source-scope",
+      "sha": "1eac844e288695a35d70304506eae5fd1efa2e8d",
+      "state": "MERGED"
+    },
+    {
+      "pr": 49,
+      "branches": "codex/monthly-profit-page",
+      "sha": "3219c0cbbb77b10a9af8991fa081d5b2b86dd44b",
+      "state": "MERGED"
+    }
+  ],
+  "lowestUnmerged": null
+}
