@@ -48,9 +48,9 @@ Continue on `codex/product-profit-reports` at the final PR head, with a clean ch
 
 Do not enable financial mapping merely because Windows or owner checks pass. Real activation additionally needs reviewed P02 semantics, P03 normalization and independent comparisons required by P04/P06.
 
-## R47 current-head verification, 2026-10-01
+## R47 pre-review verification, 2026-10-01
 
-R47-IMPL found no demonstrated gap in E01 through E12 or the existing calculation, paging, IPC, saved-report, export, and recovery paths. No application repair or new dependency was needed. The approved documentation-only base was integrated with a merge, preserving branch history.
+The initial R47-IMPL audit found no demonstrated gap in E01 through E12. Independent review subsequently exposed the recovery semantic-validation gap recorded below; this section is historical evidence for the pre-repair build. The approved documentation-only base was integrated with a merge, preserving branch history.
 
 - Branch `codex/product-profit-reports`.
 - Tested code and integration merge `625661b29108e053cbfabc7f72613e88169c23d6`.
@@ -124,3 +124,21 @@ The user runs Windows acceptance personally on the same branch at its final revi
 Then run `npm run test:desktop -- tests/desktop/full-dataset.test.ts tests/desktop/product-profit.test.ts tests/desktop/clean-install-restore.test.ts tests/desktop/report-version-comparison.test.ts tests/desktop/monthly-overview.test.ts`. Preserve screenshots and literal results. Recheck hashes after this rebuild. NSIS and portable installation/lifecycle, scaling, physical offline startup, OS-protected credentials, and independent-machine recovery remain owner acceptance checks.
 
 Expanded R47 E01 through E12 and five baseline/head aggregation/export/restore probes are currently task-local macOS scripts. A Windows adaptation of these probes and its recorded results remain open. Do not count the existing Windows-only full-dataset test alone as proof of added aggregation ceilings. Real financial mapping, approved real-population comparisons, #41 completion, Windows acceptance, and broader release gates remain open.
+
+## R47 review repair, 2026-10-01
+
+Independent Standards and Spec review found that same-length raw snapshot mutations of v2 daily trend and summary scope passed recovery validation. SQL updates remain blocked by immutable-report triggers; the defect was incomplete semantic validation of persisted JSON.
+
+- `a37d272` exposes six mutations: daily trend, daily state, scope, daily source coverage, summary unresolved count, and summary period coverage. The focused red run failed because the first corrupted snapshot was accepted.
+- `d5f74c7` validates saved v2 scope, coverage, daily state/trend, warnings, and source exclusions against pinned lines, saved document evidence, and pinned metadata. It does not recalculate saved reports with the newest calculator. The v1 validation path remains unchanged.
+- `ad4bc3da26e398773e9eb86d8700fc72cfb7ed90` adds valid empty, partial-period/gap, and unresolved-document recovery boundaries. Focused recovery checks passed 7 tests.
+
+At that code head, `npm run test:unit` passed 44; `npm run test:integration` passed 291 with 5 skips; `npm run typecheck` and `npm run lint` passed. Packaged `test:desktop` rebuilt successfully and passed 34 checks with 7 skips. The same skip and platform limitations above apply. Logs use the `repaired-` prefix in the restricted receipt directory; the behavioral red/green receipts are `review-red.log`, `review-green.log`, and `review-boundaries.log`.
+
+The repaired `app.asar` SHA-256 is `c7220ece53cea49594d264ce73e2368fef84ef8bffcb2b80e7c7daa73fb750fe`; the Electron executable SHA-256 remains `588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8`. Baseline and environment identities remain those recorded above. Subsequent documentation changes do not alter executable or application archive bytes.
+
+`repaired-compatibility.json` records current packaged lanes 1 and 9 passing: genuine synthetic trunk v1 compatibility, accepted v1/v2 restart, loss of the original disposable profile, encrypted restore of both reports, and exact complete workbook equality. The first task-local rerun selected the setup checkpoint by UUID filename and observed one report instead of two; correcting the probe to use the first catalogue entry returned by `backupNow` selected its newly published checkpoint. A follow-up probe typo used a nonexistent path field and returned `recovery-failed`; the corrected path is `<destination>/<entry.id>.esmerbackup`. Neither harness error was an application regression. The successful preview asserted two reports before restore confirmation. Native dialogs and credential wrapping remain stubbed as described above.
+
+Unchanged calculator, paging, IPC, and responsiveness lanes retain their pre-review exact-build evidence; their receipts are not relabelled as current-package measurements. Current repository checks and packaged compatibility exercise the repaired recovery code. Replay current recovery probes with `node work/poteto/r47/compatibility.mjs` and `node work/poteto/r47/restore-perf.mjs`; source copies and build instructions remain task-local. Windows, owner, real-source and independent-machine gates remain open.
+
+Five fresh repaired-package v2 recovery samples on the same 25,000-document fixture passed with saved sales and product-profit values unchanged. `repaired-v2-recovery-performance.json` records restore median 6025.2 ms / maximum 6188.0 ms, cold coherent monthly view 1447.4 / 1885.2 ms, evidence page 124.8 / 144.9 ms, product page 1.6 / 1.7 ms, and v2 export 3249.1 / 3365.4 ms. These current v2 restores include the larger saved artifact and additional validation; the pre-review shared v1 timings are not an equivalent-work baseline. No v2 before/after latency comparison or Windows capacity claim is made. All five local aggregation/startup/page samples remained within the proposed ceilings.
