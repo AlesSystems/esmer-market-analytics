@@ -18,5 +18,5 @@ R42-REVIEW	ui	failed	codex/monthly-profit-page		98f129d1c89d34de9a006d782593e5db
 R42-REPAIR	ui	done	codex/monthly-profit-page		d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51	workstreams/execution/r42-standards-brief.md
 R42-RETEST	ui	done	codex/monthly-profit-page		d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51	workstreams/execution/r42-brief.md
 R42-RECHECK	ui	done	codex/monthly-profit-page	49	3219c0cbbb77b10a9af8991fa081d5b2b86dd44b	workstreams/execution/r42-brief.md
-R42-MEDIA-REPAIR	ui	running				workstreams/execution/r42-brief.md
+R42-MEDIA-REPAIR	ui	done			e06e377aa71f48c9fe09298e9527e94d88dd6f9f	workstreams/execution/r42-brief.md
 WORKSTREAMS-FINAL-REVIEW	docs	running				workstreams/execution/workstreams-final-review-brief.md

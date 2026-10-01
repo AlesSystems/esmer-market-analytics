@@ -194,7 +194,7 @@ flowchart TD
 
 ## Verify and land the existing synthetic reports (R47)
 
-Completed synthetic work: PR #47 merged at `df7387dab8a7c1e9b0caea215cc216e513a57fe9`, reviewed head `328453e1dafc0a5fc8aba72ccc62ffbcafef72e1`. See [execution checkpoint](execution/overview.md), [Standards recheck](execution/r47-standards-recheck.md), [Spec recheck](execution/r47-spec-recheck.md), and [committed verification record](../docs/evidence/issue-41-synthetic-product-profit.md#r47-review-repair-2026-10-01). The verification record distinguishes original measurements from the repaired package; unchanged receipts are not relabelled. Checked boxes here cover local synthetic implementation and evidence only. Windows and real-data obligations remain open.
+Completed synthetic work. PR #47 merged at `df7387dab8a7c1e9b0caea215cc216e513a57fe9`, reviewed head `328453e1dafc0a5fc8aba72ccc62ffbcafef72e1`. See [execution checkpoint](execution/overview.md), [Standards recheck](execution/r47-standards-recheck.md), [Spec recheck](execution/r47-spec-recheck.md), and [committed verification record](../docs/evidence/issue-41-synthetic-product-profit.md#r47-review-repair-2026-10-01). The verification record distinguishes original measurements from the repaired package; unchanged receipts are not relabelled. Checked boxes here cover local synthetic implementation and evidence only. Windows and real-data obligations remain open.
 
 **Depends on.** BASE and approved #38. Existing PR #47 implements the synthetic part of issue #41 / P04. It does not depend on PR #46. Risk is high.
 

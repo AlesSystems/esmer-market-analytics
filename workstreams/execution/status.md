@@ -1,10 +1,10 @@
 # Orchestrate status
 
-Generated: 2026-10-01T13:59:06.765Z
+Generated: 2026-10-01T14:05:03.459Z
 
 ## Units
 
-States: done=16, failed=3
+States: done=17, failed=3, running=1
 
 | ID | Track | State | Branch | PR | SHA | Brief |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -27,6 +27,8 @@ States: done=16, failed=3
 | R42-REPAIR | ui | done | codex/monthly-profit-page |  | d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51 | workstreams/execution/r42-standards-brief.md |
 | R42-RETEST | ui | done | codex/monthly-profit-page |  | d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51 | workstreams/execution/r42-brief.md |
 | R42-RECHECK | ui | done | codex/monthly-profit-page | 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | workstreams/execution/r42-brief.md |
+| R42-MEDIA-REPAIR | ui | done |  |  | e06e377aa71f48c9fe09298e9527e94d88dd6f9f | workstreams/execution/r42-brief.md |
+| WORKSTREAMS-FINAL-REVIEW | docs | running |  |  |  | workstreams/execution/workstreams-final-review-brief.md |
 
 ## Verification ledger
 
@@ -61,4 +63,4 @@ Lowest unmerged: none
 | R39-PROOF | open | Establish independent real financial semantics | Evidence proves a bounded population; preserve unsupported mapping | Only isolated backup available; do not infer meanings |  |
 | WINDOWS | open | User-run Windows acceptance receipts after integrated handoff | User supplies evidence; gate remains open | User performs checks; no Mac substitution |  |
 
-<!-- orch-summary {"unitStates":{"done":16,"failed":3},"ledgerVerdicts":{"live-ui-verified":2,"type-check-only":2,"verifier-failed":2},"frontierGeneration":6,"openGateIds":["R39-AUTH","R39-PROOF","WINDOWS"]} -->
+<!-- orch-summary {"unitStates":{"done":17,"failed":3,"running":1},"ledgerVerdicts":{"live-ui-verified":2,"type-check-only":2,"verifier-failed":2},"frontierGeneration":6,"openGateIds":["R39-AUTH","R39-PROOF","WINDOWS"]} -->

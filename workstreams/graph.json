@@ -1150,7 +1150,7 @@
       "dependencies": [
         "BASE"
       ],
-      "state": "running",
+      "state": "completed",
       "inputs": [
         "User will run Windows checks personally",
         "Repository scripts and Windows acceptance"
@@ -1170,7 +1170,8 @@
         "Local links",
         "Independent factual documentation check"
       ],
-      "risk": "medium"
+      "risk": "medium",
+      "evidence": "workstreams/windows-handoff.md; independent final docs reviewer confirmed exact remote3219c0c candidate, script commands and source/lifecycle environment isolation; user execution stays blocked inWIN"
     },
     {
       "id": "R39-SCOPE-MERGE",
