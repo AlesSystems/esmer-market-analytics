@@ -32,7 +32,7 @@ test("monthly loading, failure retry and missing period preserve useful navigati
     await expect(page.getByText("Aylık rapor hesaplanıyor…", { exact: true })).toHaveCount(0);
     await page.screenshot({ path: "test-results/shadcn-monthly-error.png", fullPage: true });
     await page.getByRole("button", { name: "Aylık raporu yeniden yükle" }).click();
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await expect(page.locator(".notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
     await expect(page.getByText("Açık", { exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/shadcn-monthly-partial.png", fullPage: true });
@@ -57,7 +57,7 @@ test("real background import exposes progress, cancels and leaves previous data 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     const records = businessRecords(), document = records.documents[0], line = records.lines[0];
     records.documents = Array.from({ length: 25_000 }, (_, index) => ({ ...document, id: `bulk-${index}` }));
     records.lines = Array.from({ length: 25_000 }, (_, index) => ({ ...line, id: `bulk-line-${index}`, documentId: `bulk-${index}` }));

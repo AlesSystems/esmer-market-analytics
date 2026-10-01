@@ -14,7 +14,7 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     const overview = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(overview).toContainText("200,00 ₺");
     await expect(overview).toContainText("60,00 ₺");
@@ -26,7 +26,7 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
     await page.getByRole("button", { name: "Satışlar", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Özet", exact: true }).press("Enter");
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/phase-8-monthly-overview.png", fullPage: true });
     await page.setViewportSize({ width: 680, height: 720 });
     await expect(page.getByRole("button", { name: "Raporlar", exact: true })).toBeVisible();
@@ -45,7 +45,7 @@ test("reviewed monthly values and source explanations survive refresh and export
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, paths) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [paths.packagePath] }); dialog.showSaveDialog = async () => ({ canceled: false, filePath: paths.exportPath }); }, { packagePath, exportPath });
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Raporlar", exact: true }).press("Enter");
     await page.getByLabel("Rapor inceleme açıklaması").fill("Eylül sentetik kontrolü");
     await page.getByRole("button", { name: "İncelenen raporu kaydet" }).click();

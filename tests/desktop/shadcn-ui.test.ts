@@ -84,7 +84,7 @@ async function checkContrast(page: Page) {
   return ratios;
 }
 
-test("a representative month exposes the trend, gaps, cost exposure and evidence in the first desktop view", async ({}, testInfo) => {
+test("a representative month exposes profit, gaps, cost exposure and evidence on one scrolling page", async ({}, testInfo) => {
   test.skip(process.platform !== "win32", "Packaged Windows layout contract");
   const { app, userData, packagePath } = await importedApp();
   try {
@@ -92,33 +92,34 @@ test("a representative month exposes the trend, gaps, cost exposure and evidence
     await page.setViewportSize({ width: 1440, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
     await expect(page.locator(".data-status")).toContainText("30.09.2025");
     const overview = page.getByRole("region", { name: "Aylık göstergeler" });
     await expect(overview).toContainText(monthlyUiExpected.netSales);
     await expect(overview).toContainText(monthlyUiExpected.coveredCost);
     await expect(overview).toContainText(monthlyUiExpected.coveredGross);
-    await expect(overview.getByText("Karşılaştırılamıyor", { exact: true })).toBeVisible();
-    await expect(overview.getByText(/Dönem veya uzlaşma kanıtı karşılaştırma için eksik/)).toBeVisible();
+    await expect(overview).toContainText("Tüm market kârı belirlenemiyor");
+    await page.getByText("Giderler ve faaliyet sonucu", { exact: true }).click();
     await expect(overview.getByRole("heading", { name: /Faaliyet kârı hesaplanamıyor.*gider verileri eksik/ })).toBeVisible();
     await expect(overview.getByRole("button", { name: "Giderleri incele", exact: true })).toBeVisible();
     await expect(overview.getByText(monthlyUiExpected.coveredCost, { exact: true }).first()).toBeVisible();
     await expect(overview.getByText("1.500,00 ₺", { exact: false }).filter({ visible: true }).first(), "covered sales exposure stays visible").toBeVisible();
     await expect(overview.getByText("1.400,00 ₺", { exact: false }).filter({ visible: true }).first(), "excluded sale exposure stays visible").toBeVisible();
     await expect(overview.getByText("-25,00 ₺", { exact: false }).filter({ visible: true }).first(), "excluded return exposure stays visible").toBeVisible();
-    const trend = overview.getByRole("img", { name: "Günlük net satış grafiği" });
+    const trend = page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" });
+    await trend.scrollIntoViewIfNeeded();
     await expect(trend).toBeVisible();
     const bounds = await trend.boundingBox();
     expect(bounds, "daily trend has a rendered box").not.toBeNull();
-    expect(bounds!.y + bounds!.height, "daily trend fits in the first 900 CSS pixels").toBeLessThanOrEqual(900);
-    await expect(trend.getByText("15.09.2025: -25,00 ₺")).toHaveCount(1);
-    await expect(trend.getByText(/30\.09\.2025: 100,00 ₺/)).toHaveCount(1);
+    expect(bounds!.y + bounds!.height, "daily trend fits after scrolling").toBeLessThanOrEqual(900);
+    await expect(trend.getByText("15.09.2025: Hesaplanamıyor")).toHaveCount(1);
+    await expect(trend.getByText(/30\.09\.2025: 60,00 ₺/)).toHaveCount(1);
     await capture(page, testInfo.outputPath("representative-month-1440.png"));
-    const evidence = overview.getByText("Günlük tutarlar", { exact: true });
+    const evidence = page.getByText("Günlük tutarlar", { exact: true });
     await evidence.focus();
     await evidence.press("Enter");
-    await expect(overview.getByText("15.09.2025: -25,00 ₺").last()).toBeVisible();
+    await expect(page.locator(".monthly-trend tbody tr").filter({ hasText: "15.09.2025" })).toContainText("Hesaplanamıyor");
     await evidence.press("Enter");
     await expect(evidence).toBeFocused();
     await overview.getByRole("button", { name: "Giderleri incele", exact: true }).click();
@@ -273,7 +274,7 @@ test("packaged visual journey retains every destination and important desktop st
     await page.route(/^https?:\/\//, route => { externalRequests.push(route.request().url()); return route.abort(); });
     await page.context().setOffline(true);
     await page.reload();
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
     expect(externalRequests).toEqual([]);
     await capture(page, testInfo.outputPath("offline-reload.png"), true);

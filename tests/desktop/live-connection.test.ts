@@ -22,7 +22,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
   let app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
+    await expect(page.getByRole("heading", {name: "Aylık Ürün Kârlılığı", exact: true})).toBeVisible();
     await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toBeHidden();
     await page.getByText("Bağlantı ayarları", {exact: true}).click();
     await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);

@@ -35,7 +35,7 @@ export function validMonthlyRequest(operation: string, value: unknown): boolean 
     && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0
     && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
     && typeof value.range === "string" && ["current", "month", "year"].includes(value.range)
-    && (value.section === "lines" ? validId(value.documentId) : value.section === "product-profit" ? value.documentId === null || validId(value.documentId) : value.documentId === null)
+    && (value.section === "lines" ? validId(value.documentId) : (value.section === "product-profit" || value.section === "documents") ? value.documentId === null || validId(value.documentId) : value.documentId === null)
     && (value.section === "product-profit" ? (!("productId" in value) || value.productId === null || validId(value.productId)) && value.range === "current" : !("productId" in value));
   if (operation === "openMonthly" || operation === "queryMonthly") return validReportRequest(operation, value);
   if (operation === "listReportVersions") return exact(value, ["period"]) && period(value.period);

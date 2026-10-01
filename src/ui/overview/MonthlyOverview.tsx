@@ -6,12 +6,19 @@ import { date, money, percent, quantity } from "../format";
 import { OperatingSummary } from "../OperatingSummary";
 import { purchasingWarningLabels } from "../purchasing/PurchasingWorkspace";
 import { ReportEvidence } from "./ReportEvidence";
+import { MonthlyProfitPage } from "./MonthlyProfitPage";
 
 function FigureStatus({ label, children }: { label: string; children: ReactNode }) {
   return <details className="figure-status"><summary>{label}</summary><div className="metric-evidence"><strong>Bu sayı nasıl oluştu?</strong>{children}</div></details>;
 }
 
-export function MonthlyOverview({ report, refresh, onSales, onExpenses, onPurchasing, embedded = false }: { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean }) {
+type Props = { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean };
+
+export function MonthlyOverview(props: Props) {
+  return props.report.format === "monthly-report-v2" ? <MonthlyProfitPage key={props.report.id} {...props} report={props.report} /> : <LegacyMonthlyOverview {...props} />;
+}
+
+function LegacyMonthlyOverview({ report, refresh, onSales, onExpenses, onPurchasing, embedded = false }: Props) {
   const [evidence, setEvidence] = useState(false);
   const s = report.sales, g = report.purchasing.gross, operating = report.operating.result, comparison = s.comparisons.month;
   const chartBaseline = s.daily.some(day => day.negative) ? 55 : 100;
