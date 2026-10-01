@@ -1,0 +1,18 @@
+{
+  "generation": 5,
+  "prs": [
+    {
+      "pr": 47,
+      "branches": "codex/product-profit-reports",
+      "sha": "328453e1dafc0a5fc8aba72ccc62ffbcafef72e1",
+      "state": "MERGED"
+    },
+    {
+      "pr": 48,
+      "branches": "codex/profit-source-scope",
+      "sha": "1eac844e288695a35d70304506eae5fd1efa2e8d",
+      "state": "MERGED"
+    }
+  ],
+  "lowestUnmerged": null
+}
