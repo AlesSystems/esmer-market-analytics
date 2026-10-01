@@ -1216,7 +1216,7 @@
         "WORKSTREAMS-FINAL-REVIEW",
         "R42-MEDIA-REPAIR"
       ],
-      "state": "pending",
+      "state": "ready",
       "inputs": [
         "Reviewed branch artifacts and exact GitHub identities"
       ],
@@ -1411,7 +1411,7 @@
         "R42-MERGE",
         "WORKSTREAMS-CHECKPOINT-REPAIR"
       ],
-      "state": "running",
+      "state": "completed",
       "inputs": [
         "Final workstreams snapshot",
         "PR46/47/48/49 merge and immutable reviews"
@@ -1432,7 +1432,8 @@
         "DAG and TSV validation",
         "Local links and independent documentary review"
       ],
-      "risk": "medium"
+      "risk": "medium",
+      "evidence": "execution/workstreams-final-review.md; independentPASS56821261 with6section0problem checker,47acyclic contracts, TSV and47relative targets"
     },
     {
       "id": "R42-MEDIA-REPAIR",

@@ -18,6 +18,6 @@
 - [x] Scale. Source-scope proposal, synthetic report and UI slices executed with isolated ownership. Dependent real-source/Windows nodes remain blocked.
 - [x] Drain. Implementation and independent review artifacts recorded; final docs review is the publication boundary.
 - [x] Land. PR46/47/48/49 merged only after current-head independent review; docs publication follows its own verdict.
-- [ ] Close. Audit receipts and leave unsupported gates open.
+- [x] Close the bounded synthetic execution checkpoint. Independent final documentation audit passed; publication identity is recorded by its PR/task handoff. The original real-profit release predicate remains unmet, with source/real-data/Windows gates open.
 
 No new native goal or automation was requested. Cloud workers are adapted to local exclusive scopes; reviewers share one model family.
