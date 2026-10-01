@@ -13,7 +13,7 @@ One box is one unit of work. Every box names the evidence that checks it. Check 
 
 The program runs `pstack/skills/poteto-mode/playbooks/orchestrate.md` through the [Codex adapter](/Users/altanesmer/agent-library/skills/also/poteto-mode/references/codex.md). Use Feature for implementation, Babysit in drive mode for merge readiness, and Shipping for independently verified merges. Use the pinned bundle, never a project-local imitation of pstack.
 
-The user has authorized implementation, testing, PR creation, and merging. The coordinator may merge qualifying PRs without asking for that permission again. The user has now directed execution of this plan. Renewed SQL inspection requires the separately scoped permission described in R39. Owner contact, installation on Eralp's computer, public distribution, and production rollout require separate direction.
+The user has authorized implementation, testing, PR creation, and merging. The coordinator may merge qualifying PRs without asking for that permission again. The user has now directed execution of this plan. The user subsequently authorized bounded inspection of the retained isolated backup and gave full permission to complete the non-Windows gates. The reviewed R39 scope and private evidence boundaries still apply; routine inspection setup needs no repeated permission. Windows checks remain assigned to the user. Owner contact, installation on Eralp's computer, public distribution, and production rollout require separate direction.
 
 Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 

@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "code": "DIAGNOSTIC_COMPLETE",
+  "acceptedOutput": false,
+  "transportReadsAttempted": true,
+  "sourceWrites": false,
+  "securityStateModified": false,
+  "temporaryCredentialsCreated": false,
+  "guardBeforeAfterVerified": true,
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "retainedReaderConfigPreserved": true,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "transport-diagnostic.mjs": "8fcb6dd5ac75a498dda3989180f947f3e59b87d5664e572ace22c518549c7346",
+    "client.mjs": "a7f3af7e4c4c2881820b6faffa794f02b7c61628279f3582ee8cfaeb426a3ac5",
+    "empty-json.sql": "84acf0c463c6712813ce0d3edfea7fe9c7a2fe0d7e0ac5ef68ddbbe37b785017",
+    "sql/M0.sql": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+    "sql/conversions.sql": "c28d0ab5af4ee73b42c8e72944d727e06c488ddd793a98a2dacf8a4c8197caa7"
+  }
+}

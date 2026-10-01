@@ -1,0 +1,22 @@
+{
+  "phase": "reader-created",
+  "valuesRead": false,
+  "failure": "AssertionError",
+  "readOnlyVerified": true,
+  "ownedCopyStopped": true,
+  "temporaryClientsAbsent": true,
+  "temporaryCredentialsRemoved": true,
+  "retainedRestrictedReader": false,
+  "permissions": {
+    "effective-permissions": {
+      "passed": false,
+      "numbers": [
+        51020
+      ]
+    }
+  },
+  "cleanupErrors": [],
+  "businessDataMutations": false,
+  "originalAccessed": false,
+  "manifestHash": "e818010a4c8984d3d4e1ef001537e6bf3836e89bca0d8d40eab03bfe5303c6e0"
+}

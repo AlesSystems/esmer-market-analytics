@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "stage": "M2",
+  "results": [
+    {
+      "query": "synthetic-empty",
+      "chunks": 1,
+      "columnCounts": {
+        "1": 1
+      },
+      "types": {
+        "string": 1
+      },
+      "bytes": 2,
+      "json": "array",
+      "arrayLength": 0
+    }
+  ],
+  "elapsedMs": 184,
+  "acceptedOutput": false,
+  "transportReadsAttempted": false
+}

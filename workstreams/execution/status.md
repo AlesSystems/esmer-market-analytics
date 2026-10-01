@@ -1,10 +1,10 @@
 # Orchestrate status
 
-Generated: 2026-10-01T14:08:10.093Z
+Generated: 2026-10-01T16:57:23.711Z
 
 ## Units
 
-States: done=18, failed=3
+States: done=19, failed=3
 
 | ID | Track | State | Branch | PR | SHA | Brief |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -29,6 +29,7 @@ States: done=18, failed=3
 | R42-RECHECK | ui | done | codex/monthly-profit-page | 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | workstreams/execution/r42-brief.md |
 | R42-MEDIA-REPAIR | ui | done |  |  | e06e377aa71f48c9fe09298e9527e94d88dd6f9f | workstreams/execution/r42-brief.md |
 | WORKSTREAMS-FINAL-REVIEW | docs | done |  |  | 56821261caf761313b9add702b33e68adf12dc96 | workstreams/execution/workstreams-final-review-brief.md |
+| R39-RESUME | source | done | codex/source-inspection-resume |  |  | workstreams/execution/r39-resume.md |
 
 ## Verification ledger
 
@@ -59,8 +60,8 @@ Lowest unmerged: none
 
 | ID | Status | Question | Options | Default | Answer |
 | --- | --- | --- | --- | --- | --- |
-| R39-AUTH | open | Approve exact renewed isolated source scope after proposal review | Approve named scope; defer source reads | No source access until explicit authorization |  |
+| R39-AUTH | resolved | Approve exact renewed isolated source scope after proposal review | Approve named scope; defer source reads | No source access until explicit authorization | User authorized bounded isolated-backup inspection and necessary setup; full permission to complete non-Windows gates. Exact scope review and evidence still required. |
 | R39-PROOF | open | Establish independent real financial semantics | Evidence proves a bounded population; preserve unsupported mapping | Only isolated backup available; do not infer meanings |  |
 | WINDOWS | open | User-run Windows acceptance receipts after integrated handoff | User supplies evidence; gate remains open | User performs checks; no Mac substitution |  |
 
-<!-- orch-summary {"unitStates":{"done":18,"failed":3},"ledgerVerdicts":{"live-ui-verified":2,"type-check-only":2,"verifier-failed":2},"frontierGeneration":6,"openGateIds":["R39-AUTH","R39-PROOF","WINDOWS"]} -->
+<!-- orch-summary {"unitStates":{"done":19,"failed":3},"ledgerVerdicts":{"live-ui-verified":2,"type-check-only":2,"verifier-failed":2},"frontierGeneration":6,"openGateIds":["R39-PROOF","WINDOWS"]} -->

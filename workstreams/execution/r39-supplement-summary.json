@@ -1,0 +1,49 @@
+{
+  "headerRawTypeCounts": {
+    "11": 20,
+    "12": 9,
+    "35": 8
+  },
+  "lineRawTypeCounts": {
+    "11": 84,
+    "12": 17,
+    "35": 47
+  },
+  "currencyCounts": {
+    "TRY": 37
+  },
+  "rawStatusGroups": [
+    {
+      "rawType": "11",
+      "DURUM": "1",
+      "AKTIF": "1",
+      "headers": 20
+    },
+    {
+      "rawType": "12",
+      "DURUM": "1",
+      "AKTIF": "1",
+      "headers": 9
+    },
+    {
+      "rawType": "35",
+      "DURUM": "1",
+      "AKTIF": "1",
+      "headers": 8
+    }
+  ],
+  "directionHypotheses": {
+    "11": {
+      "MIKTAR_GIRIS:mismatch": 84,
+      "MIKTAR_CIKIS:match": 84
+    },
+    "12": {
+      "MIKTAR_GIRIS:match": 17,
+      "MIKTAR_CIKIS:mismatch": 17
+    },
+    "35": {
+      "MIKTAR_GIRIS:mismatch": 47,
+      "MIKTAR_CIKIS:match": 47
+    }
+  }
+}

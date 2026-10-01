@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "code": "OPERATOR_REJECTED",
+  "userTableValuesRead": false,
+  "securityStateModified": false,
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "temporaryCredentialRemoved": true,
+  "originalTargetAccessed": false,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "system-baseline.sql": "842ebc0c76b2aa6183c041ef62037fcbafb240795ba8099e7ada1bed0574ac8c",
+    "admin-query.mjs": "4261c872960de4167b26bd0727692aba9991abdbcfaea00d1dcbb90eb219fff6"
+  }
+}

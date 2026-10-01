@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "code": "METADATA_COMPLETE",
+  "userTableValuesRead": false,
+  "securityStateModified": false,
+  "guardBeforeAfterVerified": true,
+  "rowCount": 2,
+  "artifactSha256": "0444ff4dbf7974b83c977e8693b6466bd8b4d93ec789df4494cd12fd9d5f9546",
+  "historicalCostMentions": 0,
+  "attachedTriggers": 1,
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "temporaryCredentialRemoved": true,
+  "originalTargetAccessed": false,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "native-metadata-exact.sql": "7529a898e9ce514057b595f917a870e5745da2d74e770a60982e227cd83317ad",
+    "admin-query.mjs": "4261c872960de4167b26bd0727692aba9991abdbcfaea00d1dcbb90eb219fff6"
+  }
+}

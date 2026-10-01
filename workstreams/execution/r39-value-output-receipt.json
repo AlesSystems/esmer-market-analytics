@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "stage": "M2",
+  "rows": [
+    37,
+    148,
+    2,
+    0,
+    0
+  ],
+  "bytes": 101810,
+  "sha256": "7bfc9d1c59a3f46f6716dade50d569f6ceb4dc65421b2a7eb2204bad2acd319f",
+  "elapsedMs": 705
+}

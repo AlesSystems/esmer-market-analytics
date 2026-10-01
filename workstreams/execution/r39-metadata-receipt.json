@@ -1,0 +1,28 @@
+{
+  "batch": "3824ff83-6d2f-47b7-9b74-02d7334d6cd4",
+  "receipt": {
+    "ok": true,
+    "stage": "M2",
+    "rows": 233,
+    "bytes": 40191,
+    "metadataOnly": true,
+    "readerPrivilegesNotChanged": true,
+    "catalogSha256": "36fa412f30fa778fecc3f15499fe4eafad2ae08c168c47ca6182998c99f54d9a",
+    "elapsedMs": 118,
+    "queryHashes": {
+      "M0": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+      "M1": "4cabf20b62aa33e9097fe05f74d8924168469212b86cdecca85e9dbb505a00d0"
+    },
+    "accessMode": "isolated-admin-metadata-only"
+  },
+  "cleanup": {
+    "ownedCopyStopped": true,
+    "temporaryClientAbsent": true,
+    "temporaryCredentialRemoved": true,
+    "originalTargetAccessed": false,
+    "accessMode": "isolated-admin-metadata-only",
+    "userTableValuesRead": false,
+    "cleanupErrors": []
+  },
+  "meaning": "Schema observation only; no financial semantics inferred"
+}

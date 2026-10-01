@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "code": "VALUE_PASS_COMPLETE",
+  "acceptedOutput": true,
+  "transportReadsAttempted": true,
+  "sourceWrites": false,
+  "securityStateModified": false,
+  "temporaryCredentialsCreated": false,
+  "syntheticEmptyScalarVerified": true,
+  "guardBeforeAfterVerified": true,
+  "manifestHash": "a4143d6bc1c88f2740bf47708578c16fec790faa8eebb7b218c82bc018c9da1e",
+  "ownedCopyStopped": true,
+  "temporaryClientAbsent": true,
+  "retainedReaderConfigPreserved": true,
+  "cleanupErrors": [],
+  "queryHashes": {
+    "client.mjs": "a7f3af7e4c4c2881820b6faffa794f02b7c61628279f3582ee8cfaeb426a3ac5",
+    "empty-array-probe.mjs": "9df6f5b5bcb4b74bc8e09f98423f7dc1b8c0b4fc1eb995253ffe855f9ba019ec",
+    "empty-json-array.sql": "b211094261435fecd0e532f4220a339fc13958a890048818d4013934379f8c60",
+    "sql/M0.sql": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+    "sql-array/manifest.json": "a4143d6bc1c88f2740bf47708578c16fec790faa8eebb7b218c82bc018c9da1e",
+    "sql-array/units.sql": "cb075963012745c77d8be687d6efb4c8e9d94ffacd26268f04995266646b88c5",
+    "sql-array/conversions.sql": "a1b006ae52676f1a9893778ecee6ceff76c96c299cf12feb5760426608a27bf9",
+    "sql-array/headers.sql": "893bb975e0e85563eb50d1019bc79214fe0f0201b215a1b3be79acffccce3f48",
+    "sql-array/M0.sql": "76c79aeb2a8a22cccb3cd3925666d756eeb594c6423494f5ae33132f67d49339",
+    "sql-array/lines.sql": "e49e6e105e9735c961b9d51d51c0f05c0245b5fe471487a54af4c18722409239",
+    "sql-array/costs.sql": "9656db34c7a47a90f6a39b68db168c710baa3229d469afdbad08ffede228b28c"
+  }
+}
