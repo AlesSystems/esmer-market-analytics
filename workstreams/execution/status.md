@@ -1,10 +1,10 @@
 # Orchestrate status
 
-Generated: 2026-10-01T13:09:03.384Z
+Generated: 2026-10-01T13:59:06.765Z
 
 ## Units
 
-States: done=11, failed=2, running=1
+States: done=16, failed=3
 
 | ID | Track | State | Branch | PR | SHA | Brief |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -21,11 +21,16 @@ States: done=11, failed=2, running=1
 | R47-REPAIR | reports | done | codex/product-profit-reports | 47 | ad4bc3d | workstreams/execution/r47-standards-review.md |
 | R47-RETEST | reports | done | codex/product-profit-reports | 47 | 328453e1dafc0a5fc8aba72ccc62ffbcafef72e1 | workstreams/execution/r47-brief.md |
 | R47-RECHECK | reports | done |  | 47 | 328453e1dafc0a5fc8aba72ccc62ffbcafef72e1 | workstreams/execution/r47-spec-recheck.md |
-| R42-IMPL | ui | running | codex/monthly-profit-page |  | c2f8ee050911f17d704f203269285a19d7375f36 | workstreams/execution/r42-brief.md |
+| R42-IMPL | ui | done | codex/monthly-profit-page |  | 98f129d1c89d34de9a006d782593e5dbe4092c29 | workstreams/execution/r42-brief.md |
+| R42-TEST | ui | done | codex/monthly-profit-page | 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | workstreams/execution/r42-brief.md |
+| R42-REVIEW | ui | failed | codex/monthly-profit-page |  | 98f129d1c89d34de9a006d782593e5dbe4092c29 | workstreams/execution/r42-spec-brief.md |
+| R42-REPAIR | ui | done | codex/monthly-profit-page |  | d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51 | workstreams/execution/r42-standards-brief.md |
+| R42-RETEST | ui | done | codex/monthly-profit-page |  | d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51 | workstreams/execution/r42-brief.md |
+| R42-RECHECK | ui | done | codex/monthly-profit-page | 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | workstreams/execution/r42-brief.md |
 
 ## Verification ledger
 
-Verdicts: live-ui-verified=1, type-check-only=2, verifier-failed=1
+Verdicts: live-ui-verified=2, type-check-only=2, verifier-failed=2
 
 | PR | SHA | Verdict | Evidence | Verifier | Timestamp |
 | --- | --- | --- | --- | --- | --- |
@@ -33,16 +38,20 @@ Verdicts: live-ui-verified=1, type-check-only=2, verifier-failed=1
 | 47 | 9ba93b37f3346d912aca792224979a259938dc0d | verifier-failed | workstreams/execution/r47-standards-review.md | Independent Standards and Spec review; reproduced contradictory restored v2 fields | 2026-10-01T12:47:27.113Z |
 | 47 | 328453e1dafc0a5fc8aba72ccc62ffbcafef72e1 | live-ui-verified | workstreams/execution/r47-spec-recheck.md | Independent Standards and Spec PASS; synthetic Mac current recovery and full suites | 2026-10-01T13:00:12.833Z |
 | 48 | 1eac844e288695a35d70304506eae5fd1efa2e8d | type-check-only | workstreams/execution/r39-scope-review.md | Docs-only independent review; query hashes and local links; no TypeScript or SQL execution | 2026-10-01T13:02:22.154Z |
+| 49 | 98f129d1c89d34de9a006d782593e5dbe4092c29 | verifier-failed | workstreams/execution/r42-standards-review.md | independent-standards-and-spec | 2026-10-01T13:57:15.794Z |
+| 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | live-ui-verified | workstreams/execution/r42-spec-recheck.md | independent-standards-and-spec | 2026-10-01T13:57:15.921Z |
 
 ## Frontier
 
-Generation: 5
+Generation: 6
 Lowest unmerged: none
 
 | Branch | PR | SHA | State |
 | --- | --- | --- | --- |
+| codex/issue-39-profit-evidence | 46 | 85d4645555cdac4fc0a244152837cf8904d5a39e | MERGED |
 | codex/product-profit-reports | 47 | 328453e1dafc0a5fc8aba72ccc62ffbcafef72e1 | MERGED |
 | codex/profit-source-scope | 48 | 1eac844e288695a35d70304506eae5fd1efa2e8d | MERGED |
+| codex/monthly-profit-page | 49 | 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b | MERGED |
 
 ## Gates
 
@@ -52,4 +61,4 @@ Lowest unmerged: none
 | R39-PROOF | open | Establish independent real financial semantics | Evidence proves a bounded population; preserve unsupported mapping | Only isolated backup available; do not infer meanings |  |
 | WINDOWS | open | User-run Windows acceptance receipts after integrated handoff | User supplies evidence; gate remains open | User performs checks; no Mac substitution |  |
 
-<!-- orch-summary {"unitStates":{"done":11,"failed":2,"running":1},"ledgerVerdicts":{"live-ui-verified":1,"type-check-only":2,"verifier-failed":1},"frontierGeneration":5,"openGateIds":["R39-AUTH","R39-PROOF","WINDOWS"]} -->
+<!-- orch-summary {"unitStates":{"done":16,"failed":3},"ledgerVerdicts":{"live-ui-verified":2,"type-check-only":2,"verifier-failed":2},"frontierGeneration":6,"openGateIds":["R39-AUTH","R39-PROOF","WINDOWS"]} -->

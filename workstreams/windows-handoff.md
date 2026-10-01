@@ -1,17 +1,22 @@
 # User-run Windows acceptance
 
-The user will run these checks personally. This is a continuation checklist, not evidence of a Windows pass. Freeze the integrated synthetic candidate after #47 and #42 review and merge; record its full commit here before execution. #39/#40 and real financial reconciliation remain separate prerequisites for a real-profit release.
+The user will run these checks personally. This is a continuation checklist, not evidence of a Windows pass. Candidate branch: `codex/monthly-profit-page`, full reviewed head `3219c0cbbb77b10a9af8991fa081d5b2b86dd44b` (application code `d7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51`). Merged to main as `5a91017728c027732aac5912aab8c4681ba16215`; application/test trees are identical to the reviewed head and two post-merge packaged smoke checks passed. #39/#40 and real financial reconciliation remain separate prerequisites for a real-profit release. This handoff supersedes older phase-specific branch checkout instructions; their evidence and unresolved checks remain relevant.
 
 Use a disposable Windows test installation. Do not connect to production, install on Eralp's computer, or point tests at a working business profile. Only synthetic inputs are authorized by this checklist. Keep recovery keys, databases and private inputs outside Git and screenshots.
 
 ## Build and automated checks
 
-Use Node 24.15.0 or a compatible locked Node 24 release. Start from a clean checkout of the final integrated candidate and record `git rev-parse HEAD`, Windows edition/build, CPU, RAM, display scaling, Node/npm and Electron versions. Preserve any existing work before switching branches.
+Use Node 24.15.0 or a compatible locked Node 24 release. Continue on the same candidate branch in a clean test checkout and record `git rev-parse HEAD`, Windows edition/build, CPU, RAM, display scaling, Node/npm and Electron versions. Preserve any existing work before switching branches.
 
 Run each command separately in PowerShell and stop on a failure:
 
 ```powershell
 git status --short --branch
+if (git status --porcelain) { throw 'Preserve existing changes and use a clean test checkout.' }
+git fetch origin
+git switch codex/monthly-profit-page
+git merge --ff-only 3219c0cbbb77b10a9af8991fa081d5b2b86dd44b
+if ((git rev-parse HEAD) -ne '3219c0cbbb77b10a9af8991fa081d5b2b86dd44b') { throw 'Candidate differs; stop and confirm the intended commit.' }
 git rev-parse HEAD
 node --version
 npm --version

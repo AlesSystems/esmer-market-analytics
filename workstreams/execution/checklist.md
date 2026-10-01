@@ -15,9 +15,9 @@
 - [x] Frame. Five delivery issues, six behavioral PR units, documentation pilot. No completion date promise because SQL proof and Windows acceptance need external evidence.
 - [x] Install the runtime. Local store initialized. Independent #46 and #47 queues remain separate.
 - [x] Pilot. Reviewed #46 independently and merged at `1ed1824`. Forty local links and whitespace passed; private SQL proof was not revalidated.
-- [ ] Scale. R39 scope and R47 verification, then R42.
-- [ ] Drain. Record all worker artifacts.
-- [ ] Land. Merge only independently verified current heads.
+- [x] Scale. Source-scope proposal, synthetic report and UI slices executed with isolated ownership. Dependent real-source/Windows nodes remain blocked.
+- [x] Drain. Implementation and independent review artifacts recorded; final docs review is the publication boundary.
+- [x] Land. PR46/47/48/49 merged only after current-head independent review; docs publication follows its own verdict.
 - [ ] Close. Audit receipts and leave unsupported gates open.
 
 No new native goal or automation was requested. Cloud workers are adapted to local exclusive scopes; reviewers share one model family.

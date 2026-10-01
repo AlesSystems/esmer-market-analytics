@@ -194,53 +194,55 @@ flowchart TD
 
 ## Verify and land the existing synthetic reports (R47)
 
+Completed synthetic work: PR #47 merged at `df7387dab8a7c1e9b0caea215cc216e513a57fe9`, reviewed head `328453e1dafc0a5fc8aba72ccc62ffbcafef72e1`. See [execution checkpoint](execution/overview.md), [Standards recheck](execution/r47-standards-recheck.md), [Spec recheck](execution/r47-spec-recheck.md), and [committed verification record](../docs/evidence/issue-41-synthetic-product-profit.md#r47-review-repair-2026-10-01). The verification record distinguishes original measurements from the repaired package; unchanged receipts are not relabelled. Checked boxes here cover local synthetic implementation and evidence only. Windows and real-data obligations remain open.
+
 **Depends on.** BASE and approved #38. Existing PR #47 implements the synthetic part of issue #41 / P04. It does not depend on PR #46. Risk is high.
 
 **Files.**
 
-- [ ] Continue PR #47 in its owned worktree. Review `src/analytics/product-profit.ts`, `src/reports/**`, shared desktop contracts, `src/service/worker.ts`, and stored/recovery validation.
-- [ ] Reuse `tests/unit/product-profit.test.ts`, `tests/desktop/product-profit.test.ts`, report display/revision, Excel, cost-provenance, and recovery-equivalence tests already present on that branch.
+- [x] Continue PR #47 in its owned worktree. Review `src/analytics/product-profit.ts`, `src/reports/**`, shared desktop contracts, `src/service/worker.ts`, and stored/recovery validation.
+- [x] Reuse `tests/unit/product-profit.test.ts`, `tests/desktop/product-profit.test.ts`, report display/revision, Excel, cost-provenance, and recovery-equivalence tests already present on that branch.
 
 **Build.**
 
-- [ ] Audit current PR head against `monthly-product-profit-v1` and E01 through E12. Reuse `buildProductProfit`, `monthlyCandidate`, `reportProducts`, and saved v1/v2 output. Fix only demonstrated contract gaps.
-- [ ] Preserve exact product/day/month sums, nullable unavailable values, known-unit quantities, full-population summary, fixed product paging, pinned evidence, complete exports, and original v1 meanings.
-- [ ] Rerun current-head verification. The recorded 44 unit, 289 integration, and 34 packaged macOS results are tied to earlier 9d9d356, not a fresh proof of d2a83cb.
+- [x] Audit current PR head against `monthly-product-profit-v1` and E01 through E12. Reuse `buildProductProfit`, `monthlyCandidate`, `reportProducts`, and saved v1/v2 output. Fix only demonstrated contract gaps.
+- [x] Preserve exact product/day/month sums, nullable unavailable values, known-unit quantities, full-population summary, fixed product paging, pinned evidence, complete exports, and original v1 meanings.
+- [x] Rerun current-head verification. The recorded 44 unit, 289 integration, and 34 packaged macOS results are tied to earlier 9d9d356, not a fresh proof of d2a83cb.
 
 **You see.**
 
-- [ ] Synthetic product and day totals match the monthly artifact, and saved v1/v2 reports reopen and export without active-data reconstruction.
+- [x] Synthetic product and day totals match the monthly artifact, and saved v1/v2 reports reopen and export without active-data reconstruction.
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Run `npm run test:unit -- tests/unit/product-profit.test.ts tests/unit/cost-coverage.test.ts tests/unit/return-cost.test.ts tests/unit/decimal-boundaries.test.ts`, relevant report/export/recovery integration files, and `npm run test:desktop -- tests/desktop/product-profit.test.ts`. Run the full unit/integration suites for this cross-module change.
+- [x] Run `npm run test:unit -- tests/unit/product-profit.test.ts tests/unit/cost-coverage.test.ts tests/unit/return-cost.test.ts tests/unit/decimal-boundaries.test.ts`, relevant report/export/recovery integration files, and `npm run test:desktop -- tests/desktop/product-profit.test.ts`. Run the full unit/integration suites for this cross-module change.
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on the configured Codex worker model at the PR head, per the boot recipe.
 
-- [ ] Lane 1. Regression lane against trunk. Open and export the same accepted v1 report at trunk and head. Save `R47/lane-01.png`. Pass when stored values and meanings remain unchanged.
-- [ ] Lane 2. Exercise E01 through E03 in the packaged report path. Save `R47/lane-02.png`. Pass when full, return, and partial-cost results equal the independent contract examples.
-- [ ] Lane 3. Exercise E04 and E05 across month boundaries. Save `R47/lane-03.png`. Pass when returns stay in the return month and unsupported return cost remains excluded.
-- [ ] Lane 4. Exercise zero, loss, and nonpositive-denominator examples. Save `R47/lane-04.png`. Pass when null, exact zero, and negative values remain distinct.
-- [ ] Lane 5. Exercise fractional units, changed historical prices, and tiny nonzero amounts. Save `R47/lane-05.png`. Pass when precision is preserved and units are never added together.
-- [ ] Lane 6. Search, sort, and page more than 100 synthetic products. Save `R47/lane-06.png`. Pass when table rows change while full summary and daily values remain fixed.
-- [ ] Lane 7. Refresh source/app data during a pinned report session. Save `R47/lane-07.png`. Pass when the report stays coherent and indicates a newer revision.
-- [ ] Lane 8. Read selected-product evidence and a full document with other products. Save `R47/lane-08.png`. Pass when selected scope and document totals remain separately labelled.
-- [ ] Lane 9. Save, restart, export, and restore v1/v2 artifacts. Save `R47/lane-09.png`. Pass when the same pinned totals, warnings, and complete rows survive.
-- [ ] Lane 10. Send invalid product/evidence requests through the protected boundary. Save `R47/lane-10.png`. Pass when unknown keys, invalid sorts, oversize search, bad offsets, and expired identities are rejected.
+- [x] Lane 1. Regression lane against trunk. Open and export the same accepted v1 report at trunk and head. Save `R47/lane-01.png`. Pass when stored values and meanings remain unchanged.
+- [x] Lane 2. Exercise E01 through E03 in the packaged report path. Save `R47/lane-02.png`. Pass when full, return, and partial-cost results equal the independent contract examples.
+- [x] Lane 3. Exercise E04 and E05 across month boundaries. Save `R47/lane-03.png`. Pass when returns stay in the return month and unsupported return cost remains excluded.
+- [x] Lane 4. Exercise zero, loss, and nonpositive-denominator examples. Save `R47/lane-04.png`. Pass when null, exact zero, and negative values remain distinct.
+- [x] Lane 5. Exercise fractional units, changed historical prices, and tiny nonzero amounts. Save `R47/lane-05.png`. Pass when precision is preserved and units are never added together.
+- [x] Lane 6. Search, sort, and page more than 100 synthetic products. Save `R47/lane-06.png`. Pass when table rows change while full summary and daily values remain fixed.
+- [x] Lane 7. Refresh source/app data during a pinned report session. Save `R47/lane-07.png`. Pass when the report stays coherent and indicates a newer revision.
+- [x] Lane 8. Read selected-product evidence and a full document with other products. Save `R47/lane-08.png`. Pass when selected scope and document totals remain separately labelled.
+- [x] Lane 9. Save, restart, export, and restore v1/v2 artifacts. Save `R47/lane-09.png`. Pass when the same pinned totals, warnings, and complete rows survive.
+- [x] Lane 10. Send invalid product/evidence requests through the protected boundary. Save `R47/lane-10.png`. Pass when unknown keys, invalid sorts, oversize search, bad offsets, and expired identities are rejected.
 
 **Verify, perf.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Metric. Measure shared monthly-report open, evidence page, export, and restore time at trunk/head; separately measure added aggregation and product paging.
-- [ ] Probe. Use the `phase-10-complete-synthetic` fixture construction in `tests/desktop/full-dataset.test.ts`, with 25,000 documents and 25,000 lines. On Windows run that test; on macOS reuse its fixture and packaged controls in a scoped measurement probe because that test skips there. Measure added `buildProductProfit` work separately from the whole monthly request and graph serialization. Use five observations per condition.
-- [ ] Baseline. Capture trunk v1 timings first. State that trunk has no product-profit report, then record head aggregation and full visible report time separately.
-- [ ] Rule. For the named 25,000-document fixture, fail R47 merge if any added aggregation sample exceeds 5,000 ms, a cold monthly request exceeds 60,000 ms to a coherent report, or an ordinary product/evidence page reaches 2,000 ms. These are proposed engineering ceilings to verify, not measured results. Keep progress and cancellation responsive during background calculation. Record local macOS results separately and rerun on Windows before platform acceptance. If a ceiling fails, diagnose and repair or record a reviewed budget change before continuing; never mark an unmeasured value passed.
+- [x] Metric. Measure shared monthly-report open, evidence page, export, and restore time at trunk/head; separately measure added aggregation and product paging.
+- [x] Probe. Use the `phase-10-complete-synthetic` fixture construction in `tests/desktop/full-dataset.test.ts`, with 25,000 documents and 25,000 lines. On Windows run that test; on macOS reuse its fixture and packaged controls in a scoped measurement probe because that test skips there. Measure added `buildProductProfit` work separately from the whole monthly request and graph serialization. Use five observations per condition.
+- [x] Baseline. Capture trunk v1 timings first. State that trunk has no product-profit report, then record head aggregation and full visible report time separately.
+- [x] Rule. For the named 25,000-document fixture, fail R47 merge if any added aggregation sample exceeds 5,000 ms, a cold monthly request exceeds 60,000 ms to a coherent report, or an ordinary product/evidence page reaches 2,000 ms. These are proposed engineering ceilings to verify, not measured results. Keep progress and cancellation responsive during background calculation. Record local macOS results separately and rerun on Windows before platform acceptance. If a ceiling fails, diagnose and repair or record a reviewed budget change before continuing; never mark an unmeasured value passed.
 
 **Review gate.** None. R47 is not review-gated for a new owner interaction. Independent technical and evidence review still applies.
 
 **Merge.**
 
-- [ ] Record an independent passing verdict for the current head and complete review-comment triage.
-- [ ] Revalidate and independently review #47 at its current head before merge. Keep #41 open for R41 and Windows evidence. This PR alone does not implement the owner-facing one-page UI.
+- [x] Record an independent passing verdict for the current head and complete review-comment triage.
+- [x] Revalidate and independently review #47 at its current head before merge. Keep #41 open for R41 and Windows evidence. This PR alone does not implement the owner-facing one-page UI.
 
 ## Reconcile product reports with the real financial import (R41)
 
@@ -295,57 +297,59 @@ flowchart TD
 
 ## Compose the one-page monthly profit experience (R42)
 
+Synthetic implementation merged as PR #49 at `5a91017728c027732aac5912aab8c4681ba16215`, reviewed head `3219c0cbbb77b10a9af8991fa081d5b2b86dd44b`. [Exact evidence](../docs/evidence/r42-monthly-profit-page.md) and [final review](execution/r42-spec-recheck.md) cover local synthetic verification. The Windows performance box and admitted-real-data rerun remain open; this limited synthetic merge is explicitly allowed by the Merge contract below and does not complete #42 or release acceptance.
+
 **Depends on.** R47-MERGE and the approved #38 composition. Synthetic work can precede R39/R40. Real completion waits for R41 and R43. This is issue #42 / P05. Risk is medium.
 
 **Files.**
 
-- [ ] Compose within `src/ui/overview/MonthlyWorkspace.tsx`, `MonthlyOverview.tsx`, `ReportEvidence.tsx`, `src/ui/SalesWorkspace.tsx`, and existing `AppShell` navigation. Add a focused product section only where it reduces duplication.
-- [ ] Extend the packaged monthly-overview, product-profit, unavailable-states, report-pagination, source-workspace, report-version-comparison, and workspace-subviews tests. Touch `App.tsx` only in an isolated worktree after reconciling the existing user edits.
+- [x] Compose within `src/ui/overview/MonthlyWorkspace.tsx`, `MonthlyOverview.tsx`, `ReportEvidence.tsx`, `src/ui/SalesWorkspace.tsx`, and existing `AppShell` navigation. Add a focused product section only where it reduces duplication.
+- [x] Extend the packaged monthly-overview, product-profit, unavailable-states, report-pagination, source-workspace, report-version-comparison, and workspace-subviews tests. Touch `App.tsx` only in an isolated worktree after reconciling the existing user edits.
 
 **Build.**
 
-- [ ] Use one existing month selector and one scrolling monthly page. Show scope/cutoff/version, monthly covered result, daily trend, product table, selected-product detail, and evidence in the approved order.
-- [ ] Show at most three graphs using the same pinned monthly report. Provide numerical/table alternatives, signed loss values, true gaps, Turkish formatting, and visible coverage/exclusions. Reuse existing styling and chart patterns without adding a chart package by default.
-- [ ] Keep search/sort/page/selection as table state. Preserve the market-wide summary and charts. Match responses by month/report/product, reject stale results, preserve scroll, and restore keyboard focus.
-- [ ] Retain raw records, expenses, purchasing, import, saved v1/v2 reports, export, and recovery through existing navigation. Preserve empty, unsupported, partial, no-cost, zero, loss, stale, loading, and retry states.
+- [x] Use one existing month selector and one scrolling monthly page. Show scope/cutoff/version, monthly covered result, daily trend, product table, selected-product detail, and evidence in the approved order.
+- [x] Show at most three graphs using the same pinned monthly report. Provide numerical/table alternatives, signed loss values, true gaps, Turkish formatting, and visible coverage/exclusions. Reuse existing styling and chart patterns without adding a chart package by default.
+- [x] Keep search/sort/page/selection as table state. Preserve the market-wide summary and charts. Match responses by month/report/product, reject stale results, preserve scroll, and restore keyboard focus.
+- [x] Retain raw records, expenses, purchasing, import, saved v1/v2 reports, export, and recovery through existing navigation. Preserve empty, unsupported, partial, no-cost, zero, loss, stale, loading, and retry states.
 
 **You see.**
 
-- [ ] Eralp can read the monthly result, find a product, and inspect its evidence on one page without losing warnings or changing report scope.
+- [x] Eralp can read the monthly result, find a product, and inspect its evidence on one page without losing warnings or changing report scope.
 
 **Verify, unit.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] First expose the owner journey in `tests/desktop/product-profit.test.ts`. Run it with monthly-overview, unavailable-states, source-workspace, report-pagination, report-version-comparison, and workspace-subviews through `npm run test:desktop -- <files>`. Include Turkish search/sort and late-response behavior.
+- [x] First expose the owner journey in `tests/desktop/product-profit.test.ts`. Run it with monthly-overview, unavailable-states, source-workspace, report-pagination, report-version-comparison, and workspace-subviews through `npm run test:desktop -- <files>`. Include Turkish search/sort and late-response behavior.
 
 **Verify, live.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked. Ten lanes on the configured Codex worker model at the PR head, per the boot recipe.
 
-- [ ] Lane 1. Regression lane against trunk. Open the same old monthly and accepted v1 reports on both builds. Save `R42/lane-01.png`. Pass when existing values, navigation, and export remain available.
-- [ ] Lane 2. Open the full synthetic month and follow summary to product to document. Save `R42/lane-02.png`. Pass when the journey stays on one scrolling page and evidence matches the pinned report.
-- [ ] Lane 3. Search Turkish text, sort positive/zero/negative/unavailable values, and page 101 or more rows. Save `R42/lane-03.png`. Pass when global ordering is correct and summary/charts remain all products.
-- [ ] Lane 4. Select a product, hide it with search, then return to the table. Save `R42/lane-04.png`. Pass when the selected product identity, hidden-selection explanation, scroll, and focus behave as specified.
-- [ ] Lane 5. Change months and product selections with delayed responses. Save `R42/lane-05.png`. Pass when old results never overwrite the new selection.
-- [ ] Lane 6. Exercise partial, unknown-cost, unsupported, and stale inputs. Save `R42/lane-06.png`. Pass when nearby labels explain the missing population and no invented zero appears.
-- [ ] Lane 7. Exercise empty, genuine zero, loss, return-only, and unknown-day states. Save `R42/lane-07.png`. Pass when the correct amount or unavailable label and graph gaps appear.
-- [ ] Lane 8. Use keyboard only, 200 percent zoom, and narrow windows. Save `R42/lane-08.png`. Pass when focus stays visible, chart alternatives work, and no essential action is inaccessible.
-- [ ] Lane 9. Save/export the complete report after table filtering. Save `R42/lane-09.png`. Pass when the stored/exported population remains complete with warnings and version metadata.
-- [ ] Lane 10. Reach import, expenses, purchasing, raw records, saved reports, and recovery. Save `R42/lane-10.png`. Pass when every existing secondary workflow remains reachable.
+- [x] Lane 1. Regression lane against trunk. Open the same old monthly and accepted v1 reports on both builds. Save `R42/lane-01.png`. Pass when existing values, navigation, and export remain available.
+- [x] Lane 2. Open the full synthetic month and follow summary to product to document. Save `R42/lane-02.png`. Pass when the journey stays on one scrolling page and evidence matches the pinned report.
+- [x] Lane 3. Search Turkish text, sort positive/zero/negative/unavailable values, and page 101 or more rows. Save `R42/lane-03.png`. Pass when global ordering is correct and summary/charts remain all products.
+- [x] Lane 4. Select a product, hide it with search, then return to the table. Save `R42/lane-04.png`. Pass when the selected product identity, hidden-selection explanation, scroll, and focus behave as specified.
+- [x] Lane 5. Change months and product selections with delayed responses. Save `R42/lane-05.png`. Pass when old results never overwrite the new selection.
+- [x] Lane 6. Exercise partial, unknown-cost, unsupported, and stale inputs. Save `R42/lane-06.png`. Pass when nearby labels explain the missing population and no invented zero appears.
+- [x] Lane 7. Exercise empty, genuine zero, loss, return-only, and unknown-day states. Save `R42/lane-07.png`. Pass when the correct amount or unavailable label and graph gaps appear.
+- [x] Lane 8. Use keyboard only, 200 percent zoom, and narrow windows. Save `R42/lane-08.png`. Pass when focus stays visible, chart alternatives work, and no essential action is inaccessible.
+- [x] Lane 9. Save/export the complete report after table filtering. Save `R42/lane-09.png`. Pass when the stored/exported population remains complete with warnings and version metadata.
+- [x] Lane 10. Reach import, expenses, purchasing, raw records, saved reports, and recovery. Save `R42/lane-10.png`. Pass when every existing secondary workflow remains reachable.
 
 **Verify, perf.** Tests alone are not sufficient verification. A PR is verified only when its unit, live, and perf boxes are all checked.
 
-- [ ] Metric. Measure same-month opening, search/sort/page, selection-to-detail, DOM size, and response during import at trunk/head.
-- [ ] Probe. Use existing packaged Playwright and performance tools with the same fixed synthetic workload and later the admitted real dataset. Capture five interleaved observations and screenshots at required states.
-- [ ] Baseline. Measure trunk monthly navigation and evidence first. For the new product composition, also record time from month change to a coherent visible report.
+- [x] Metric. Measure same-month opening, search/sort/page, selection-to-detail, DOM size, and response during import at trunk/head.
+- [x] Probe. Use existing packaged Playwright and performance tools with the same fixed synthetic workload and later the admitted real dataset. Capture five interleaved observations and screenshots at required states.
+- [x] Baseline. Measure trunk monthly navigation and evidence first. For the new product composition, also record time from month change to a coherent visible report.
 - [ ] Rule. Require each ordinary interaction below two seconds on documented Windows hardware. Bound product rendering to 100 rows, keep graphs to three, and fail on stale results or blocked navigation. Avoid timing the entire imported graph transfer as if it were service calculation.
 
 **Review gate.** Present working interactions for review. Existing merge authorization remains valid.
 
-- [ ] Save representative screenshot artifacts and a 30 to 60 second synthetic video under `R42/review/`.
-- [ ] Present screenshot and video evidence to the operator in chat before merge. Resolve contract conflicts with the developer; preserve any subsequent hold or correction.
+- [x] Save representative screenshot artifacts and a 30 to 60 second synthetic video under `R42/review/`.
+- [x] Present screenshot and video evidence to the operator in chat before merge. Resolve contract conflicts with the developer; preserve any subsequent hold or correction.
 
 **Merge.**
 
-- [ ] Record an independent passing verdict for the current head and complete review-comment triage.
-- [ ] Merge the independently tested synthetic UI after presenting screenshots/video. Keep #42 real-data/platform completion open until the integrated journey passes R43. Cosmetic preferences do not justify changing the approved financial contract.
+- [x] Record an independent passing verdict for the current head and complete review-comment triage.
+- [x] Merge the independently tested synthetic UI after presenting screenshots/video. Keep #42 real-data/platform completion open until the integrated journey passes R43. Cosmetic preferences do not justify changing the approved financial contract.
 
 ## Accept the integrated Windows release candidate (R43)
 

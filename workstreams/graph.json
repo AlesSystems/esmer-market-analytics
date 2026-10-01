@@ -628,7 +628,7 @@
         "R47-MERGE",
         "R42-DESIGN"
       ],
-      "state": "running",
+      "state": "completed",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R47-MERGE"
@@ -653,7 +653,8 @@
       "risk": "medium",
       "branch": "codex/monthly-profit-page",
       "base_commit": "c2f8ee050911f17d704f203269285a19d7375f36",
-      "worktree": "/Users/altanesmer/.codex/worktrees/monthly-profit-page/esmer-market-analytics"
+      "worktree": "/Users/altanesmer/.codex/worktrees/monthly-profit-page/esmer-market-analytics",
+      "evidence": "98f129d1c89d34de9a006d782593e5dbe4092c29; focused red/green;44unit294integration47packagedMac full tests,5+7skips; static checks pass"
     },
     {
       "id": "R42-TEST",
@@ -662,7 +663,7 @@
       "dependencies": [
         "R42-IMPL"
       ],
-      "state": "pending",
+      "state": "completed",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R42-IMPL"
@@ -681,16 +682,17 @@
       "verification": [
         "R42 Verify commands and ten scenarios"
       ],
-      "risk": "high"
+      "risk": "high",
+      "evidence": "PR49@3219c0c; code d7df4c9;44unit294integration47packagedMac with5+7skips,10synthetic lanes,5paired measurements, genuinev1 and201line document"
     },
     {
       "id": "R42-REVIEW",
       "type": "review",
       "objective": "Independently review R42 at its current head",
       "dependencies": [
-        "R42-TEST"
+        "R42-IMPL"
       ],
-      "state": "pending",
+      "state": "failed",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R42-TEST"
@@ -711,16 +713,20 @@
         "Review diff, current artifact and receipts",
         "Compare head/base/patch ID"
       ],
-      "risk": "high"
+      "risk": "high",
+      "failure": "Both independent reviewers identified repeated same-product activation leaving focus on opener; packaged regression reproduced at98f129d. Repair/rechecks retain separate identity.",
+      "evidence": "execution/r42-standards-review.md; /tmp/esmer-market-r42-evidence-20261001/reselect-red.log"
     },
     {
       "id": "R42-MERGE",
       "type": "integration",
       "objective": "Merge verified R42 without prematurely closing real/platform obligations",
       "dependencies": [
-        "R42-REVIEW"
+        "R42-TEST",
+        "R42-RETEST",
+        "R42-RECHECK"
       ],
-      "state": "pending",
+      "state": "completed",
       "inputs": [
         "Current AGENTS.md and applicable foundation/contract documents",
         "R42-REVIEW"
@@ -741,7 +747,9 @@
         "Current-head required checks",
         "Post-merge packaged smoke where applicable"
       ],
-      "risk": "high"
+      "risk": "high",
+      "merge_commit": "5a91017728c027732aac5912aab8c4681ba16215",
+      "evidence": "PR49 final3219c0c, patch347f87a1, both independent reviewsPASS; merged app/test trees identical;2packaged postmerge smoke checks passed"
     },
     {
       "id": "WIN",
@@ -1203,7 +1211,8 @@
         "R42-MERGE",
         "R39-SCOPE-MERGE",
         "WIN-HANDOFF",
-        "WORKSTREAMS-CHECKPOINT-REPAIR"
+        "WORKSTREAMS-CHECKPOINT-REPAIR",
+        "WORKSTREAMS-FINAL-REVIEW"
       ],
       "state": "pending",
       "inputs": [
@@ -1289,6 +1298,136 @@
         "Existing helper status regeneration"
       ],
       "risk": "low"
+    },
+    {
+      "id": "R42-REPAIR",
+      "type": "implementation",
+      "objective": "Restore native focus and scrolling when reopening the same selected product",
+      "dependencies": [
+        "R42-IMPL"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "test90174ad observed packaged red; fixd7df4c9a7ba7b8cb08f61dc5dd79f1255be89e51; exact asar9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492"
+    },
+    {
+      "id": "R42-RETEST",
+      "type": "test",
+      "objective": "Verify repaired packaged keyboard journey and current artifact evidence",
+      "dependencies": [
+        "R42-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "Code d7df4c9; repaired archive9feefe30dca562f7d972b44fd8b95d399802563fabfcad482591a38d417fa492; full44unit/294integration+5skips/47packagedMac+7skips passed, plus typecheck/lint/build/package and14focused product-profit checks."
+    },
+    {
+      "id": "R42-RECHECK",
+      "type": "review",
+      "objective": "Independently recheck the repaired immutable UI head and final receipts",
+      "dependencies": [
+        "R42-REPAIR"
+      ],
+      "state": "completed",
+      "inputs": [
+        "Initial review at 98f129d",
+        "Packaged same-product reselect red"
+      ],
+      "allowed_files": [
+        "src/ui/overview/MonthlyProfitPage.tsx",
+        "tests/desktop/product-profit.test.ts",
+        "R42 evidence and independent review records"
+      ],
+      "outputs": [
+        "Exact code/package identity and verification evidence"
+      ],
+      "acceptance_criteria": [
+        "Same selected product can be reopened by keyboard with detail focus and scrolling",
+        "No unnecessary refetch; financial identity and bounded requests preserved",
+        "Final current-head review passes"
+      ],
+      "verification": [
+        "Focused packaged red/green",
+        "Relevant renewed checks and artifact hashes",
+        "Independent Standards and Spec delta reviews"
+      ],
+      "risk": "medium",
+      "evidence": "execution/r42-standards-recheck.md; execution/r42-spec-recheck.md; bothPASS3219c0c"
+    },
+    {
+      "id": "WORKSTREAMS-FINAL-REVIEW",
+      "type": "review",
+      "objective": "Independently review final execution record and exact user-run Windows handoff",
+      "dependencies": [
+        "R42-MERGE",
+        "WORKSTREAMS-CHECKPOINT-REPAIR"
+      ],
+      "state": "running",
+      "inputs": [
+        "Final workstreams snapshot",
+        "PR46/47/48/49 merge and immutable reviews"
+      ],
+      "allowed_files": [
+        "workstreams/execution/workstreams-final-review.md"
+      ],
+      "outputs": [
+        "Immutable documentation verdict"
+      ],
+      "acceptance_criteria": [
+        "Accurate merged and blocked states",
+        "DAG, TSV, references and exact Windows candidate consistent",
+        "No unsupported release claims or private inputs"
+      ],
+      "verification": [
+        "Plan checker",
+        "DAG and TSV validation",
+        "Local links and independent documentary review"
+      ],
+      "risk": "medium"
     }
   ]
 }
