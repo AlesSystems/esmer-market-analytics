@@ -53,7 +53,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   const hiddenBySearch = selected && term && !selected.displayName.toLocaleLowerCase("tr-TR").includes(term) && !selected.productId.toLocaleLowerCase("tr-TR").includes(term);
   const offPage = selected && productPage && !productPage.rows.some(row => row.productId === selected.productId);
   const Container = embedded ? "section" : "main";
-  function select(product: Product, button: HTMLButtonElement) { opener.current = button; tableScroll.current = window.scrollY; focusPending.current = true; setSelected(product); setEvidenceOffset(0); setDocumentId(null); }
+  function select(product: Product, button: HTMLButtonElement) { opener.current = button; tableScroll.current = window.scrollY; if (selected?.productId === product.productId) { detailHeading.current?.focus(); return; } focusPending.current = true; setSelected(product); setEvidenceOffset(0); setDocumentId(null); }
   function returnToTable() {
     if (opener.current?.isConnected) { window.scrollTo(0, tableScroll.current); opener.current.focus({ preventScroll: true }); }
     else tableHeading.current?.focus();
