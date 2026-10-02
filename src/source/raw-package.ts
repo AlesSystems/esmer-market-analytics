@@ -6,7 +6,7 @@ export const rawColumns = {
   headers: ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "FIS_TARIHI", "CURRENCY"],
   lines: ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"],
 } as const;
-export type RawPackage = { schemaVersion: "sql-backup-preview-v1"; provenance: "isolated-sql-backup"; sourceReconciled: false; lineage: string; extractionId: string; snapshot: SqlSnapshot; sha256: string };
+export type RawPackage = { schemaVersion: "sql-backup-preview-v1" | "sql-backup-estimate-v1"; provenance: "isolated-sql-backup"; sourceReconciled: false; lineage: string; extractionId: string; snapshot: SqlSnapshot; sha256: string };
 export type SourcePreviewRequest = {stream: "headers" | "lines"; offset: number};
 export type SourcePreviewResult = {status: "source-preview-empty"} | {status: "source-preview"; hash: string; metadata: Omit<RawPackage, "snapshot" | "sha256"> & Omit<SqlSnapshot, "headers" | "lines">; counts: {headers: number; lines: number; emptyHeaders: number}; stream: "headers" | "lines"; offset: number; total: number; rows: SqlRow[]};
 export function validSourcePreviewRequest(value: unknown): value is SourcePreviewRequest {
@@ -24,7 +24,7 @@ const sourceId = (value: unknown) => typeof value === "string" && /^-?(?:0|[1-9]
 const date = (value: unknown) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= "1900-01-01" && value <= "9998-12-31" && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0,10) === value;
 function validate(value: unknown): asserts value is RawPackage {
   keys(value, ["schemaVersion", "provenance", "sourceReconciled", "lineage", "extractionId", "snapshot", "sha256"]);
-  check(value.schemaVersion === "sql-backup-preview-v1" && value.provenance === "isolated-sql-backup" && value.sourceReconciled === false && identity(value.lineage) && identity(value.extractionId));
+  check((value.schemaVersion === "sql-backup-preview-v1" || value.schemaVersion === "sql-backup-estimate-v1") && value.provenance === "isolated-sql-backup" && value.sourceReconciled === false && identity(value.lineage) && identity(value.extractionId));
   const s = value.snapshot;
   keys(s, ["databaseId", "engineVersion", "capturedAt", "from", "to", "headers", "lines"]);
   check(typeof s.databaseId === "string" && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(s.databaseId));
@@ -36,7 +36,7 @@ function validate(value: unknown): asserts value is RawPackage {
   for (const stream of ["headers", "lines"] as const) {
     const ids = new Set<string>();
     for (const row of s[stream] as unknown[]) {
-      keys(row, rawColumns[stream]);
+      keys(row, stream === "lines" && value.schemaVersion === "sql-backup-estimate-v1" ? [...rawColumns.lines, "BELGE_TARIHINDEKI_SON_ALIS_FIYATI"] : rawColumns[stream]);
       check(sourceId(row.ID) && !ids.has(String(row.ID)) && sourceId(row.FIS_TURU)); ids.add(String(row.ID));
       for (const [column, v] of Object.entries(row)) {
         if (column === "FIS_TARIHI") {
@@ -50,8 +50,8 @@ function validate(value: unknown): asserts value is RawPackage {
   }
   check(value.sha256 === hash({lineage: value.lineage, extractionId: value.extractionId, snapshot: s}));
 }
-export function writeRawPackage(snapshot: SqlSnapshot, lineage: string, extractionId: string): Buffer {
-  const value = {schemaVersion: "sql-backup-preview-v1", provenance: "isolated-sql-backup", sourceReconciled: false, lineage, extractionId, snapshot, sha256: hash({lineage, extractionId, snapshot})};
+function write(snapshot: SqlSnapshot, lineage: string, extractionId: string, schemaVersion: RawPackage["schemaVersion"]): Buffer {
+  const value = {schemaVersion, provenance: "isolated-sql-backup", sourceReconciled: false, lineage, extractionId, snapshot, sha256: hash({lineage, extractionId, snapshot})};
   validate(value);
   const bytes = Buffer.from(canonical(value)); check(bytes.length <= MAX_BYTES); return bytes;
 }
@@ -62,3 +62,6 @@ export function readRawPackage(bytes: Uint8Array): RawPackage | null {
     const value: unknown = JSON.parse(text); validate(value); check(canonical(value) === text); return value;
   } catch { return null; }
 }
+
+export function writeRawPackage(snapshot: SqlSnapshot, lineage: string, extractionId: string): Buffer { return write(snapshot,lineage,extractionId,"sql-backup-preview-v1"); }
+export function writeRawEstimatePackage(snapshot: SqlSnapshot, lineage: string, extractionId: string): Buffer { return write(snapshot,lineage,extractionId,"sql-backup-estimate-v1"); }

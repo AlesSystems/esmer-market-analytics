@@ -10,6 +10,10 @@ The executable registry is [src/source/contract.ts](../../src/source/contract.ts
 
 The [issue 39 source-profit record](../evidence/issue-39-source-profit.md) lists the evidence still missing for a real monthly financial mapping. Its renewed September 2025 raw-row checks and the 2026-10-01 bounded unit/relationship sample establish transport and reader boundaries; they do not release a financial rule.
 
+## Estimate-first V1 extension
+
+The user authorized assumption-based V1 values on 2026-10-02. The separate [recorded-source estimate contract](recorded-estimates.md) defines a narrow cost-candidate package and declared formulas over recorded rows. It preserves the unsupported status of real financial rules above. Reconciliation of those formulas proves arithmetic, not POS completion, unit, tax, historical-cost or return meanings.
+
 ## Identity and provenance
 
 A source record is identified by source lineage plus source document ID and, for a line, source line ID. IDs remain strings. Snapshot/import identity identifies a version of those records. Same-lineage corrections replace the current candidate representation once; a reset/new lineage never silently reuses another lineage's identities.

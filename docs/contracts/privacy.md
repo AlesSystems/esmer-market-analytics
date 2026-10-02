@@ -69,3 +69,9 @@ The user authorized renewed isolated inspection on 2026-09-30. For private evide
 Catalog-only inspection covered column names, types, precision, scale, length and nullability for `FIS`, `FIS_DETAY`, `STOK`, `DOVIZ_AD`, `FIS_DETAY_BELGE_DETAY`, `FIS_ARSIV` and `FIS_POS_IPTAL`. It did not read archive, cancellation, conversion-link or product display values. Query review pinned the exact SQL hashes, copied database identity and catalog artifact before bounded value reads. The private runner imposed a 100,000-row limit, 32 MiB transport cap and deadlines, checked the isolated container/network, and required complete JSON results. Restricted-reader probes passed before the copied database was frozen read-only.
 
 Private rows, decimal expectations and prepared packages remain outside Git and release assets. Only counts, opaque identities and digests are recorded in the [issue 39 evidence](../evidence/issue-39-source-profit.md). This evidence-only grant does not add historical cost to the raw preview or approve a financial mapping. The existing preview projection and runtime registry remain unchanged.
+
+## Recorded-estimate package allowance
+
+The 2026-10-02 [estimate contract](recorded-estimates.md) adds exactly `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI`, as numeric text or null, to the separate `sql-backup-estimate-v1` package. It uses the retained authorized isolated evidence. This is an application-input allowance for a cost candidate, not a verified financial mapping or permission to broaden runtime SQL queries. Old `sql-backup-preview-v1` keeps its exact existing projection.
+
+Source identities and exact amounts may enter the owner's private local estimate and export. They remain excluded from Git, logs, synthetic screenshots and public release assets. The field does not carry product names or other free text. Unknown columns remain rejected.

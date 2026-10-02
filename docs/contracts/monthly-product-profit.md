@@ -11,6 +11,10 @@ The primary monthly experience becomes **Aylık Ürün Kârlılığı**. It answ
 
 Expenses, labour, operating results, purchasing, raw records, import, recovery and saved reports remain reachable through existing navigation or secondary actions. Missing expenses do not prevent gross estimates. The existing operating result retains its expense-completeness gate and saved meaning. No existing feature, data, accepted report or preview allowlist is removed or broadened by this decision.
 
+## Separate estimate-first V1
+
+On 2026-10-02 the user authorized useful estimates while source semantics remain unresolved. The [recorded-source estimate contract](recorded-estimates.md) governs that distinct capability and its transient product/day/month view and export. It does not cast raw rows into this contract's recognized population, change accepted financial reports or claim that assumption-based contribution is whole-market profit.
+
 ## Period, identity and evidence
 
 The selected calendar month uses validated market-local business dates, with both boundaries inclusive. Sales belong to their completed event's business date. Returns belong to their recorded return business date, including returns of earlier-month sales. The daily trend uses these same dates. A return does not rewrite the original sale month. A later source correction creates a candidate report and never mutates accepted output.

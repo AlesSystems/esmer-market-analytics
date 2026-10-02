@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "EV1-INPUT",
+      "type": "analysis",
+      "objective": "Trace source packages, raw transport and atomic activation.",
+      "dependencies": [],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Trace source packages, raw transport and atomic activation.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-REPORT",
+      "type": "analysis",
+      "objective": "Trace report aggregation, UI, export and recovery.",
+      "dependencies": [],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Trace report aggregation, UI, export and recovery.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-DESIGN-A",
+      "type": "design",
+      "objective": "Design a small distinct estimate model using existing raw records.",
+      "dependencies": [
+        "EV1-INPUT",
+        "EV1-REPORT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Design a small distinct estimate model using existing raw records.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-DESIGN-B",
+      "type": "design",
+      "objective": "Design a distinct model using existing financial package infrastructure.",
+      "dependencies": [
+        "EV1-INPUT",
+        "EV1-REPORT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Design a distinct model using existing financial package infrastructure.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-CONTRACT",
+      "type": "design",
+      "objective": "Choose a reviewed estimate contract and record the user-authorized foundation delta.",
+      "dependencies": [
+        "EV1-DESIGN-A",
+        "EV1-DESIGN-B"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Choose a reviewed estimate contract and record the user-authorized foundation delta.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium",
+      "outputs": [
+        "docs/contracts/recorded-estimates.md",
+        "workstreams/estimated-v1/design.md",
+        "workstreams/estimated-v1/design-review.md"
+      ]
+    },
+    {
+      "id": "EV1-IMPLEMENT",
+      "type": "implementation",
+      "objective": "Implement estimates with explicit assumptions and exclusions, without promoting source semantics to verified.",
+      "dependencies": [
+        "EV1-CONTRACT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Implement estimates with explicit assumptions and exclusions, without promoting source semantics to verified.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high",
+      "evidence": [
+        "5a78976",
+        "aa069d5",
+        "a9edb9b",
+        "5 focused unit tests; 30 focused integration tests; typecheck/lint passed"
+      ]
+    },
+    {
+      "id": "EV1-ORACLE",
+      "type": "test",
+      "objective": "Prepare independent Decimal expectations over exact retained inputs before application comparison.",
+      "dependencies": [
+        "EV1-CONTRACT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Exact retained input field/ID match; independent golden self-check; private exact totals only."
+      ],
+      "risk": "high",
+      "evidence": [
+        "workstreams/estimated-v1/reconcile.py",
+        "private expected digest 1c63c19986198c37959f68d7db7680a895a1ef0757e31fe6a516fa3568436b41"
+      ]
+    },
+    {
+      "id": "EV1-REAL",
+      "type": "test",
+      "objective": "Prepare a private bounded real package and independently reconcile reported estimates.",
+      "dependencies": [
+        "EV1-IMPLEMENT",
+        "EV1-ORACLE"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Prepare a private bounded real package and independently reconcile reported estimates.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high",
+      "evidence": [
+        "evidence.md",
+        "54965 lines /3529 products /30 days exact independent match",
+        "Packaged import/export/restart with scripted dialog choices and encrypted restore passed"
+      ]
+    },
+    {
+      "id": "EV1-VERIFY",
+      "type": "test",
+      "objective": "Run relevant unit/integration checks and packaged desktop import, estimates, export and reopening.",
+      "dependencies": [
+        "EV1-IMPLEMENT"
+      ],
+      "status": "failed",
+      "acceptance_criteria": [
+        "Run relevant unit/integration checks and packaged desktop import, estimates, export and reopening.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high",
+      "failure": "49 unit /299 integration passed; desktop42 passed8 skipped6 failed:4 Windows-default launchpaths onMac,2 stale expectedIPC lists."
+    },
+    {
+      "id": "EV1-REVIEW",
+      "type": "review",
+      "objective": "Independent exact-head correctness, privacy and contract review.",
+      "dependencies": [
+        "EV1-REAL",
+        "EV1-RETEST"
+      ],
+      "status": "failed",
+      "acceptance_criteria": [
+        "Independent exact-head correctness, privacy and contract review.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium",
+      "failure": "Independent packaged review found 13px document overflow at minimum width /125% with method source hash expanded. Standards passed; fix and re-review required."
+    },
+    {
+      "id": "EV1-PUBLISH",
+      "type": "integration",
+      "objective": "Create and merge a reviewed PR, sync owned workstreams and prepare Windows handoff.",
+      "dependencies": [
+        "EV1-REVIEW-RETEST"
+      ],
+      "status": "pending",
+      "acceptance_criteria": [
+        "Create and merge a reviewed PR, sync owned workstreams and prepare Windows handoff.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-REPAIR",
+      "type": "test",
+      "objective": "Update exact expected API lists for the two authorized estimate IPC methods; use explicit packaged Mac executable.",
+      "dependencies": [
+        "EV1-IMPLEMENT"
+      ],
+      "inputs": [
+        "Failed EV1-VERIFY receipt"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Two focused startup contracts pass; no app logic change."
+      ],
+      "risk": "low",
+      "evidence": [
+        "273ff1e",
+        "2 focused packaged startup tests passed"
+      ]
+    },
+    {
+      "id": "EV1-RETEST",
+      "type": "test",
+      "objective": "Rerun packaged desktop matrix after diagnosed harness repairs.",
+      "dependencies": [
+        "EV1-REPAIR"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "All applicable packaged Mac tests pass; Windows/private skips retained."
+      ],
+      "risk": "medium",
+      "evidence": [
+        "Packaged Mac executable explicitly selected; 48 passed /8 skipped."
+      ]
+    },
+    {
+      "id": "EV1-LAYOUT-REPAIR",
+      "type": "implementation",
+      "objective": "Reuse existing hash wrapping class and expose narrow expanded-method overflow with a packaged assertion.",
+      "dependencies": [
+        "EV1-REAL",
+        "EV1-RETEST"
+      ],
+      "inputs": [
+        "EV1-REVIEW failure"
+      ],
+      "status": "completed",
+      "allowed_files": [
+        "src/ui/SourceEstimate.tsx",
+        "tests/desktop/source-estimate.test.ts"
+      ],
+      "acceptance_criteria": [
+        "Expanded method stays inside document width at minimum window and zoom; existing estimate workflow remains usable."
+      ],
+      "risk": "low",
+      "evidence": [
+        "6a64159 failing packaged regression",
+        "c7f7a64 existing wrapping utility",
+        "125/200 percent packaged retest passed"
+      ]
+    },
+    {
+      "id": "EV1-REVIEW-RETEST",
+      "type": "review",
+      "objective": "Rebuild packaged application, recheck affected flow and independently re-review the repaired head.",
+      "dependencies": [
+        "EV1-LAYOUT-REPAIR"
+      ],
+      "status": "ready",
+      "acceptance_criteria": [
+        "Focused packaged workflow and layout pass; exact-head Standards and Spec pass; final artifacts describe actual checks."
+      ],
+      "risk": "medium"
+    }
+  ]
+}

@@ -6,6 +6,10 @@ This contract records the approved calculation meanings for [issue #5](https://g
 
 The [golden oracle record](../evidence/golden-oracles.md) maps calculations to independent expected values. Future financial implementations must consume validated records and pass those oracles. Fixture validation alone is not a financial implementation test.
 
+## Separate recorded-source estimates
+
+The user-authorized [V1 estimate contract](recorded-estimates.md) defines a separate assumption-based capability. It uses recorded amount and cost candidates, precision 200 and explicit exclusions. It does not change the validated population or financial meanings below, and it cannot enable operating results.
+
 ## Population and meaning
 
 | Calculation | Contract |
