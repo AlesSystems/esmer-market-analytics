@@ -1,3 +1,5 @@
+import {validEstimateRequest} from "../source/estimate";
+import {excelSourceEstimate} from "../source/estimate-export";
 import {validSourceQuery} from "../source/workspace";
 import { readPackage } from "../source/package";
 import { readRawPackage, validSourcePreviewRequest } from "../source/raw-package";
@@ -158,7 +160,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
       parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
-    const known = ["querySourceWorkspace", "readSourcePreview", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
+    const known = ["querySourceEstimate", "exportSourceEstimate", "querySourceWorkspace", "readSourcePreview", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (monthlyOperations.includes(request.operation) && (!("payload" in request) || !validMonthlyRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
@@ -186,6 +188,14 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "getAvailability") {
       const available = store.availability();
       result = available.status === "ready" ? {...available, liveConnection: live?.status().phase !== "disabled" && liveConfig ? "enabled" : "disabled"} : available;
+    }
+    else if(request.operation === "querySourceEstimate") {
+      if(!validEstimateRequest(request.payload))throw Error("INVALID_PAYLOAD");
+      result=store.querySourceEstimate(request.payload);
+    }
+    else if(request.operation === "exportSourceEstimate") {
+      if(!validEstimateRequest(request.payload,true))throw Error("INVALID_PAYLOAD");
+      result={status:"export",bytes:await excelSourceEstimate(store.sourceEstimateForExport(request.payload))};
     }
     else if(request.operation === "querySourceWorkspace") {
       if(!validSourceQuery(request.payload))throw Error("INVALID_PAYLOAD");
@@ -220,7 +230,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
     } else throw new Error("UNKNOWN_OPERATION");
   } catch (error) {
-    result = recoveryOperations.includes(request.operation) ? recoveryFailure(error instanceof Error && ["RESTORE_STALE","RECOVERY_BUSY","RECOVERY_SETUP_REQUIRED","INVALID_RESTORE_TOKEN","RESTORE_RECOVERY_REQUIRED","RESTORE_COMMITTED_RESTART_REQUIRED","AUDIT_UNAVAILABLE","RECOVERY_CONFIG_UNAVAILABLE"].includes(error.message)?error.message:"RECOVERY_FAILED") : error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"}
+    result = error instanceof Error && ["SOURCE_CHANGED","ESTIMATE_UNAVAILABLE"].includes(error.message) ? {status:"source-unavailable",code:error.message as "SOURCE_CHANGED"|"ESTIMATE_UNAVAILABLE",message:error.message==="SOURCE_CHANGED"?"Kaynak sürümü değişti. Yeni sürümü açın.":"Tahmin kaynağı kullanılamıyor."} : recoveryOperations.includes(request.operation) ? recoveryFailure(error instanceof Error && ["RESTORE_STALE","RECOVERY_BUSY","RECOVERY_SETUP_REQUIRED","INVALID_RESTORE_TOKEN","RESTORE_RECOVERY_REQUIRED","RESTORE_COMMITTED_RESTART_REQUIRED","AUDIT_UNAVAILABLE","RECOVERY_CONFIG_UNAVAILABLE"].includes(error.message)?error.message:"RECOVERY_FAILED") : error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"}
       : error instanceof Error && (error.message === "UNKNOWN_OPERATION" || error.message === "INVALID_PAYLOAD") ? {status: "rejected", code: error.message, message: "İstek geçerli değil."}
       : error instanceof Error && Object.hasOwn(reportErrors, error.message) ? {status: "unavailable", code: error.message as keyof typeof reportErrors, message: reportErrors[error.message as keyof typeof reportErrors]}
       : ["previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"].includes(request.operation) ? { status: "failed", code: "EXPENSE_REQUEST_FAILED", message: "İşlem tamamlanamadı. Kayıt değişmiş veya istek geçersiz olabilir; giderleri yenileyip yeniden inceleyin." } : request.operation !== "importPackage"

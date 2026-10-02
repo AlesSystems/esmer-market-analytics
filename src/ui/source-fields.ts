@@ -9,10 +9,11 @@ const headerLabels: Record<string, string> = {
   GENELTOPLAM: "Kaynak belge tutarı · doğrulanmadı", FIS_TARIHI: "Kaynak tarihi", CURRENCY: "Para birimi",
 };
 const lineLabels: Record<string, string> = {
+  BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "Tarihsel alış maliyeti adayı · doğrulanmadı",
   ID: "Satır kayıt ID'si", STOK: "Ürün kayıt ID'si", FIS_TURU: "Belge türü", CARPAN: "Çarpan", MIKTAR_FIS: "Kaynak miktar",
   TOPLAM_KDV_MATRAHI: "KDV matrahı · doğrulanmadı", TOPLAM_KDV: "KDV · doğrulanmadı", TOPLAM_OTV: "ÖTV · doğrulanmadı", TOPLAM_TEVKIF: "Tevkifat · doğrulanmadı",
 };
-const amounts = new Set(["SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"]);
+const amounts = new Set(["BELGE_TARIHINDEKI_SON_ALIS_FIYATI","SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"]);
 export const sourceLineColumns = ["ID", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"] as const;
 
 export function sourceFieldLabel(kind: "header" | "line", name: string) {

@@ -1,3 +1,4 @@
+import {querySourceEstimate,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
@@ -69,11 +70,28 @@ class AnalyticsStore {
   }
   querySourceWorkspace(request: SourceQuery): SourceWorkspaceResult {
     if (!validSourceQuery(request)) throw new Error("INVALID_PAYLOAD");
+    const source=this.sourcePackage();
+    if(!source)return {status:"source-empty"};
+    return querySource(source.pkg,source.hash,request);
+  }
+  private sourcePackage() {
     const row=this.db.prepare("SELECT package_json,hash FROM source_preview WHERE singleton=1").get();
-    if(!row)return {status:"source-empty"};
-    const parsed=readRawPackage(Buffer.from(String(row.package_json)));
-    if(!parsed||createHash("sha256").update(String(row.package_json)).digest("hex")!==row.hash)throw Error("INVALID_PACKAGE");
-    return querySource(parsed,String(row.hash),request);
+    if(!row)return null;
+    const pkg=readRawPackage(Buffer.from(String(row.package_json)));
+    if(!pkg||createHash("sha256").update(String(row.package_json)).digest("hex")!==row.hash)throw Error("INVALID_PACKAGE");
+    return {pkg,hash:String(row.hash)};
+  }
+  querySourceEstimate(request:EstimateRequest) {
+    if(!validEstimateRequest(request))throw Error("INVALID_PAYLOAD");
+    const source=this.sourcePackage();
+    return source?querySourceEstimate(source.pkg,source.hash,request):{status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Tahmin kaynağı bulunamadı."} as const;
+  }
+  sourceEstimateForExport(request:EstimateExportRequest) {
+    if(!validEstimateRequest(request,true))throw Error("INVALID_PAYLOAD");
+    const source=this.sourcePackage();
+    if(!source)throw Error("ESTIMATE_UNAVAILABLE");
+    if(source.hash!==request.hash)throw Error("SOURCE_CHANGED");
+    return calculateSourceEstimate(source.pkg,request.period,source.hash);
   }
   hasSourcePreview(): boolean {
     return !!this.db.prepare("SELECT 1 FROM source_preview WHERE singleton=1").get();

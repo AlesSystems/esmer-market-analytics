@@ -1,3 +1,4 @@
+import type {EstimateRequest,EstimateExportRequest,EstimateResult} from "../source/estimate";
 import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
@@ -49,6 +50,8 @@ function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
   pending.clear(); worker = undefined;
 }
+function requestService(request:{operation:"querySourceEstimate";payload:EstimateRequest}):Promise<EstimateResult>;
+function requestService(request:{operation:"exportSourceEstimate";payload:EstimateExportRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request: {operation:"querySourceWorkspace";payload:SourceQuery}): Promise<SourceWorkspaceResult>;
 function requestService(request: {operation: "readSourcePreview"; payload: SourcePreviewRequest}): Promise<SourcePreviewResult>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
@@ -313,6 +316,11 @@ app.whenReady().then(async () => {
         },
         payload => requestService({operation: "readSourcePreview", payload}),
         payload => requestService({operation:"querySourceWorkspace",payload}),
+        {query:payload=>requestService({operation:"querySourceEstimate",payload}),export:payload=>saveReportExport(
+          ()=>requestService({operation:"exportSourceEstimate",payload}),
+          ()=>dialog.showSaveDialog(window,{title:"Doğrulanmamış tahmini Excel olarak kaydet",defaultPath:"Esmer-tahmini-katki.xlsx",filters:[{name:"Excel çalışma kitabı",extensions:["xlsx"]}]}),
+          atomicWriteFile,
+        )},
       );
     },
   );
