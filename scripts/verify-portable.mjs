@@ -85,7 +85,7 @@ for (let launch = 1; launch <= 2; launch++) {
     }
     const page = browser.contexts()[0].pages()[0];
     await expect(page.getByRole('button', { name: 'Raporlar', exact: true })).toBeVisible();
-    await page.getByText('İşlemler', { exact: true }).click();
+    await page.getByRole('button', { name: 'Ayarlar', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Veri paketi içe aktar', exact: true })).toBeVisible();
     const session = await browser.newBrowserCDPSession();
     const processes = (await session.send('SystemInfo.getProcessInfo')).processInfo;
@@ -98,7 +98,7 @@ for (let launch = 1; launch <= 2; launch++) {
     await page.context().setOffline(true);
     await page.reload();
     await expect(page.getByRole('button', { name: 'Raporlar', exact: true })).toBeVisible();
-    await page.getByText('İşlemler', { exact: true }).click();
+    await page.getByRole('button', { name: 'Ayarlar', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Veri paketi içe aktar', exact: true })).toBeVisible();
     const report = await page.evaluate(id => window.esmer.readReportVersion({ reportId: id }), acceptedId);
     assert.equal(report.status, 'monthly');

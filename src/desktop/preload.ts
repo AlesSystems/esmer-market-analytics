@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { DesktopApi } from "../domain/contracts";
 const api: DesktopApi = {
+  getPreferences: () => ipcRenderer.invoke("esmer:request", "getPreferences", null),
+  setPreferences: request => ipcRenderer.invoke("esmer:request", "setPreferences", request),
   getLiveStatus: () => ipcRenderer.invoke("esmer:request", "getLiveStatus", null),
   configureLiveSource: () => ipcRenderer.invoke("esmer:request", "configureLiveSource", null),
   setLiveEnabled: request => ipcRenderer.invoke("esmer:request", "setLiveEnabled", request),

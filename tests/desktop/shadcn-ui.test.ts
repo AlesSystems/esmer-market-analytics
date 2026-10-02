@@ -3,7 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
-import { importPackage } from "../helpers/desktop-navigation";
+import { importPackage, openSettings } from "../helpers/desktop-navigation";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } from "../helpers/shadcn-fixtures";
 
@@ -241,9 +241,10 @@ test("packaged visual journey retains every destination and important desktop st
     await expect(page.getByRole("region", { name: "Seçili rapor" })).toBeVisible();
     await capture(page, testInfo.outputPath("reports-candidate.png"));
 
-    await page.getByText("İşlemler", { exact: true }).click();
+    await openSettings(page);
+    await capture(page, testInfo.outputPath("settings.png"));
     await page.getByText("İçe aktarma geçmişi", { exact: true }).click();
-    await capture(page, testInfo.outputPath("operations-history.png"));
+    await capture(page, testInfo.outputPath("settings-history.png"));
     await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await capture(page, testInfo.outputPath("recovery.png"));

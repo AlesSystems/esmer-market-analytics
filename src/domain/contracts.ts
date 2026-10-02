@@ -31,7 +31,13 @@ export type ImportOutcome =
   | { status: "failed"; code: ImportErrorCode | "SERVICE_UNAVAILABLE"; message: string };
 export type LiveResult = {status: "live"; configured: boolean; configurationError?: boolean; live: LiveStatus; cutoff: string | null} | {status: "live-failed"; code: "LIVE_CONFIG_UNAVAILABLE" | "LIVE_UNAVAILABLE"; message: string} | JobOutcome;
 export type LiveServiceRequest = {operation: "getLiveStatus" | "refreshLiveSource"} | {operation: "configureLiveSource"; payload: {config: SqlServerConfig; enabled: boolean}} | {operation: "setLiveEnabled"; payload: {enabled: boolean}};
+export const textSizes = {normal: 1, large: 1.15, larger: 1.3} as const;
+export type TextSize = keyof typeof textSizes;
+export type Preferences = {textSize: TextSize};
+export type PreferencesResult = {status: "preferences"; preferences: Preferences} | {status: "preferences-failed"; code: "PREFERENCES_UNAVAILABLE"; message: string};
 export interface DesktopApi {
+  getPreferences(): Promise<PreferencesResult | RequestError>;
+  setPreferences(request: Preferences): Promise<PreferencesResult | RequestError>;
   querySourceEstimate(request:EstimateRequest):Promise<EstimateResult|RequestError|{status:"unavailable";message:string}>;
   exportSourceEstimate(request:EstimateExportRequest):Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>|RequestError>;
   querySourceWorkspace(request: SourceQuery): Promise<SourceWorkspaceResult | RequestError | {status:"unavailable";message:string}>;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T14:21:14.1895446Z",
+  "generatedAt": "2026-10-02T14:30:00.000Z",
   "title": "Design System: Esmer Market",
   "extensions": {
     "colorMeta": {
@@ -12,7 +12,24 @@
       "negative": { "role": "secondary", "displayName": "Negative Red", "canonical": "#b42318", "tonalRamp": ["#4d100c", "#741710", "#982017", "#b42318", "#d0554c", "#e69089", "#f5c6c1", "#fff1f0"] },
       "accent-border": { "role": "secondary", "displayName": "Teal Selection Border", "canonical": "#bddbd2" },
       "positive-chart": { "role": "secondary", "displayName": "Positive Chart Bar", "canonical": "#3a8a7a" },
-      "selection-background": { "role": "secondary", "displayName": "Selection Wash", "canonical": "#cae7df" }
+      "selection-background": { "role": "secondary", "displayName": "Selection Wash", "canonical": "#cae7df" },
+      "settings-glaze": { "role": "neutral", "scope": "settings", "displayName": "Glaze White", "canonical": "#fbfaf6", "tonalRamp": ["#2b2820", "#4a463b", "#6e6857", "#948d79", "#bab29f", "#ddd6c6", "#efeae0", "#fbfaf6"] },
+      "settings-grout": { "role": "neutral", "scope": "settings", "displayName": "Warm Grout", "canonical": "#e4ddce", "tonalRamp": ["#3a342a", "#5a5243", "#7d7461", "#a39a85", "#c6bda9", "#e4ddce", "#efeae0", "#f8f5ee"] },
+      "settings-grout-light": { "role": "neutral", "scope": "settings", "displayName": "Light Grout", "canonical": "#efeae0" },
+      "settings-ink": { "role": "primary", "scope": "settings", "displayName": "Deep Ink", "canonical": "#18233f", "tonalRamp": ["#0c1222", "#18233f", "#26365f", "#3a4c7d", "#5f6f9a", "#8e9aba", "#c9d6f2", "#eef2fa"] },
+      "settings-ink-hover": { "role": "primary", "scope": "settings", "displayName": "Deep Ink Hover", "canonical": "#26365f" },
+      "settings-ink-soft": { "role": "neutral", "scope": "settings", "displayName": "Soft Ink", "canonical": "#4a5470" },
+      "settings-cobalt": { "role": "tertiary", "scope": "settings", "displayName": "Cobalt Glaze", "canonical": "#1f3f9a", "tonalRamp": ["#0f1f4d", "#1f3f9a", "#2c52bd", "#4a6fd3", "#7590e0", "#a3b5eb", "#d1dbf5", "#eef2fc"] },
+      "settings-turquoise": { "role": "tertiary", "scope": "settings", "displayName": "Turquoise Glaze", "canonical": "#0a665e", "tonalRamp": ["#04332f", "#0a665e", "#0f8076", "#2a9c91", "#5bb8ae", "#94d3cc", "#c9ebe7", "#eef9f8"] },
+      "settings-coral": { "role": "tertiary", "scope": "settings", "displayName": "Coral Glaze", "canonical": "#b03a25", "tonalRamp": ["#4a170e", "#7a2617", "#b03a25", "#cc5640", "#de826f", "#eaad9f", "#f5d6ce", "#fbe9e4"] },
+      "settings-saffron": { "role": "tertiary", "scope": "settings", "displayName": "Saffron Glaze", "canonical": "#d99a1b", "tonalRamp": ["#4a3306", "#5c3d00", "#9a6a0f", "#d99a1b", "#f2b84b", "#f7d083", "#fbe6bd", "#fff3d6"] },
+      "settings-amber-wash": { "role": "secondary", "scope": "settings", "displayName": "Stale Amber Wash", "canonical": "#fff3d6" },
+      "settings-amber-ink": { "role": "secondary", "scope": "settings", "displayName": "Stale Amber Ink", "canonical": "#5c3d00" },
+      "settings-amber-seal": { "role": "secondary", "scope": "settings", "displayName": "Stale Seal Amber", "canonical": "#f2b84b" },
+      "settings-error-wash": { "role": "secondary", "scope": "settings", "displayName": "Alert Wash", "canonical": "#fbe9e4" },
+      "settings-error-ink": { "role": "secondary", "scope": "settings", "displayName": "Alert Ink", "canonical": "#8a2614" },
+      "settings-choice-line": { "role": "neutral", "scope": "settings", "displayName": "Choice Line", "canonical": "#cfc7b6" },
+      "settings-selection": { "role": "neutral", "scope": "settings", "displayName": "Ink Selection", "canonical": "#c9d6f2" }
     },
     "typographyMeta": {
       "chart-label": { "displayName": "Chart Label", "purpose": "The compact daily trend tick." },
@@ -29,19 +46,41 @@
       "panel-title": { "displayName": "Panel Title", "purpose": "The evidence detail-panel heading." },
       "total": { "displayName": "Total", "purpose": "Expense-total disclosure." },
       "operating-total": { "displayName": "Operating Total", "purpose": "Operating summary emphasis." },
-      "metric": { "displayName": "Metric", "purpose": "Supporting dashboard metric values." }
+      "metric": { "displayName": "Metric", "purpose": "Supporting dashboard metric values." },
+      "settings-display": { "displayName": "Settings Display", "purpose": "The Ayarlar page title." },
+      "settings-intro": { "displayName": "Settings Intro", "purpose": "The one-sentence soft-ink intro under the Ayarlar title." },
+      "settings-tile-title": { "displayName": "Tile Title", "purpose": "The tile name in each glaze band." },
+      "settings-band-line": { "displayName": "Band Line", "purpose": "The one plain line under each tile name, capped at 60ch." },
+      "settings-status": { "displayName": "Status Pill", "purpose": "Condition text in the band's trailing pill." },
+      "settings-subhead": { "displayName": "Tile Subhead", "purpose": "A named group inside a tile body." },
+      "settings-body": { "displayName": "Tile Body", "purpose": "Soft-ink tile copy." },
+      "settings-fact-label": { "displayName": "Fact Label", "purpose": "Soft-ink labels in tile fact lists." },
+      "settings-fact-value": { "displayName": "Fact Value", "purpose": "Tabular values in tile fact lists." },
+      "settings-coverage-lead": { "displayName": "Coverage Lead", "purpose": "The day count from the last record to today; the only large figure on the page." },
+      "settings-action": { "displayName": "Tile Action", "purpose": "Label text on every pressable control in the panel." }
     },
     "shadows": [
       { "name": "sidebar-overlay", "value": "0 8px 28px #20212426", "purpose": "Data and operations popovers overlapping the sidebar context." },
-      { "name": "detail-overlay", "value": "0 10px 32px #20212426", "purpose": "The fixed compact-width evidence panel." }
+      { "name": "detail-overlay", "value": "0 10px 32px #20212426", "purpose": "The fixed compact-width evidence panel." },
+      { "name": "settings-glaze-sheen", "value": "linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0) 55%); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .16)", "purpose": "Settings scope. The glaze band's top-down sheen and hairline lower edge; the only depth on a tile." },
+      { "name": "settings-cutoff-ring", "value": "0 0 0 2px #fbfaf6", "purpose": "Settings scope. Keeps the cobalt cutoff marker legible where it crosses the ink coverage bar." }
     ],
-    "motion": [],
+    "motion": [
+      { "name": "settings-gap-reveal", "value": "clip-path inset(0 100% 0 0) → none, 900ms cubic-bezier(.16, 1, .3, 1), 160ms delay, fill backwards", "purpose": "Settings scope. The single entrance movement: the hatched coverage gap reveals left to right. Removed under reduced motion." },
+      { "name": "settings-seal-turn", "value": "rotate 360deg, 2.4s linear infinite", "purpose": "Settings scope. The seal turns while checking or running. Removed under reduced motion." },
+      { "name": "settings-state", "value": "160–240ms ease-out (controls 160ms, switch/choices/chevron 180ms, seal fill 240ms)", "purpose": "Settings scope. Background, border, and colour feedback on state change." },
+      { "name": "settings-press", "value": "translateY(1px), 120ms ease-out", "purpose": "Settings scope. Press feedback on tile actions." }
+    ],
     "breakpoints": [
       { "name": "detail-overlay", "value": "1250px" },
       { "name": "monthly-stack", "value": "1050px" },
       { "name": "compact-sidebar", "value": "800px" },
       { "name": "compact-summary", "value": "650px" },
-      { "name": "narrow-ledger", "value": "500px" }
+      { "name": "narrow-ledger", "value": "500px" },
+      { "name": "settings-panel-stack", "value": "1050px", "purpose": "Import and live go full width; backup and display share a course; the last tile spans the full width." },
+      { "name": "settings-sidebar-footer", "value": "800px", "purpose": "The sidebar footer wraps into a row; the live badge shrinks to its content." },
+      { "name": "settings-single-column", "value": "650px", "purpose": "Every tile spans the full width; band and body padding drop to 16px." },
+      { "name": "settings-band-container", "value": "400px (container, inline-size)", "purpose": "The status pill drops under the band line." }
     ]
   },
   "components": [
@@ -68,6 +107,87 @@
       "description": "A compact written marker for incomplete or cautionary evidence.",
       "html": "<span class=\"ds-badge-warning\">Eksik veri</span>",
       "css": ".ds-badge-warning { display: inline-flex; width: fit-content; gap: 4px; padding: 4px 8px; border: 1px solid #e4cea4; border-radius: 6px; background: #fff8e9; color: #80580b; font: 500 12px/1.5 Segoe UI, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Settings Glazed Tile",
+      "kind": "card",
+      "refersTo": "settings-tile",
+      "scope": "settings",
+      "description": "One settings job: a glaze band with seal, name, line and status pill above a glaze-white body with facts and its next action.",
+      "html": "<div class=\"ds-st-ground\"><section class=\"ds-st-tile ds-st-turquoise\"><header class=\"ds-st-band\"><span class=\"ds-st-seal ds-st-seal-on\"></span><div><h2>Canlı bağlantı</h2><p>İzole SQL kopyasını yalnızca okur. Mali veri setini etkinleştirmez.</p></div><span class=\"ds-st-pill\">Bağlantı açık</span></header><div class=\"ds-st-body\"><dl class=\"ds-st-facts\"><div><dt>Son başarılı kontrol</dt><dd>02.10.2026 14:05</dd></div><div><dt>Yerel kesim tarihi</dt><dd>30.09.2026</dd></div></dl></div></section></div>",
+      "css": ".ds-st-ground { padding: 6px; background: #e4ddce; font-family: Segoe UI, system-ui, sans-serif; } .ds-st-tile { overflow: hidden; border-radius: 6px; background: #fbfaf6; color: #18233f; } .ds-st-band { --band: #0a665e; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; padding: 18px 20px 16px; color: #ffffff; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 55%), var(--band); box-shadow: inset 0 -1px 0 rgba(0,0,0,.16); } .ds-st-band > div { display: contents; } .ds-st-band h2 { grid-column: 2; grid-row: 1; margin: 0; font-size: 20px; font-weight: 650; line-height: 1.3; letter-spacing: -.012em; } .ds-st-band p { grid-column: 2 / -1; grid-row: 2; margin: 0; font-size: 13.5px; line-height: 1.45; max-width: 60ch; } .ds-st-band .ds-st-seal { grid-column: 1; grid-row: 1; margin-top: 2px; } .ds-st-pill { grid-column: 3; grid-row: 1; justify-self: end; white-space: nowrap; padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; line-height: 1.5; background: rgba(0,0,0,.22); } .ds-st-body { display: flex; flex-direction: column; gap: 16px; padding: 18px 20px 20px; } .ds-st-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 14px 24px; margin: 0; } .ds-st-facts dt { font-size: 13px; color: #4a5470; } .ds-st-facts dd { margin: 3px 0 0; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-st-seal { position: relative; display: inline-block; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; } .ds-st-seal::before, .ds-st-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 8px; height: 8px; border-radius: 1px; background: currentColor; } .ds-st-seal::after { transform: rotate(45deg); } .ds-st-seal-on { background: currentColor; } .ds-st-seal-on::before, .ds-st-seal-on::after { background: var(--band); }"
+    },
+    {
+      "name": "Settings Seal States",
+      "kind": "custom",
+      "refersTo": "settings-seal",
+      "scope": "settings",
+      "description": "The round eight-point-star seal: open (off/empty), filled (on/ready), rotating (checking), amber (stale/failed), dashed (unknown).",
+      "html": "<div class=\"ds-seal-row\"><span class=\"ds-seal\"></span><span class=\"ds-seal ds-seal-on\"></span><span class=\"ds-seal ds-seal-checking\"></span><span class=\"ds-seal ds-seal-stale\"></span><span class=\"ds-seal ds-seal-unknown\"></span></div>",
+      "css": ".ds-seal-row { --band: #1f3f9a; display: flex; gap: 14px; padding: 16px 20px; background: #1f3f9a; color: #ffffff; } .ds-seal { --seal-disc: transparent; --seal-star: currentColor; position: relative; display: inline-block; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; background: var(--seal-disc); transition: background-color 240ms ease-out, border-color 240ms ease-out; } .ds-seal::before, .ds-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 8px; height: 8px; border-radius: 1px; background: var(--seal-star); } .ds-seal::after { transform: rotate(45deg); } .ds-seal-on { --seal-disc: currentColor; --seal-star: var(--band); } .ds-seal-checking { animation: ds-seal-turn 2.4s linear infinite; } .ds-seal-stale { --seal-disc: #f2b84b; --seal-star: #5c3d00; border-color: #f2b84b; } .ds-seal-unknown { border-style: dashed; } @keyframes ds-seal-turn { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-seal { animation: none; } }"
+    },
+    {
+      "name": "Settings Primary Action",
+      "kind": "button",
+      "refersTo": "settings-action-primary",
+      "scope": "settings",
+      "description": "The ink-filled next action at the foot of a tile; one per tile.",
+      "html": "<button class=\"ds-st-primary\">Veri paketi içe aktar</button>",
+      "css": ".ds-st-primary { min-height: 42px; padding: 9px 16px; border: 1.5px solid #18233f; border-radius: 6px; background: #18233f; color: #ffffff; font: 600 14.5px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease-out, color 160ms ease-out, transform 120ms ease-out; } .ds-st-primary:hover:not(:disabled) { background: #26365f; } .ds-st-primary:active:not(:disabled) { transform: translateY(1px); } .ds-st-primary:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-primary:disabled { opacity: .45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Settings Outline Action",
+      "kind": "button",
+      "refersTo": "settings-action-outline",
+      "scope": "settings",
+      "description": "A secondary ink-outlined action; also the heading's close action.",
+      "html": "<button class=\"ds-st-outline\">Bağlantıyı kapat</button>",
+      "css": ".ds-st-outline { min-height: 42px; padding: 9px 16px; border: 1.5px solid #18233f; border-radius: 6px; background: transparent; color: #18233f; font: 600 14.5px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease-out, transform 120ms ease-out; } .ds-st-outline:hover:not(:disabled) { background: rgba(24, 35, 63, .07); } .ds-st-outline:active:not(:disabled) { transform: translateY(1px); } .ds-st-outline:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-outline:disabled { opacity: .45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Settings Quiet Action",
+      "kind": "button",
+      "refersTo": "settings-action-quiet",
+      "scope": "settings",
+      "description": "An underlined ink action for secondary configuration.",
+      "html": "<button class=\"ds-st-quiet\">Test bağlantısını ayarla</button>",
+      "css": ".ds-st-quiet { min-height: 42px; padding: 9px 4px; border: 1.5px solid transparent; border-radius: 6px; background: transparent; color: #18233f; font: 500 14.5px/1.2 Segoe UI, system-ui, sans-serif; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; } .ds-st-quiet:hover:not(:disabled) { text-decoration-thickness: 2px; } .ds-st-quiet:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-quiet:disabled { opacity: .45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Settings Coverage Strip",
+      "kind": "custom",
+      "refersTo": "settings-coverage-track",
+      "scope": "settings",
+      "description": "Data coverage drawn to exact date proportion up to today: ink source span, cobalt cutoff marker, hatched coral gap, and a day-count lead.",
+      "html": "<figure class=\"ds-cov\"><p class=\"ds-cov-lead\"><strong>18 gün</strong> son kayıttan bugüne</p><div class=\"ds-cov-track\"><span class=\"ds-cov-source\" style=\"left:0;width:82%\"></span><span class=\"ds-cov-cutoff\" style=\"left:76%\"></span><span class=\"ds-cov-gap\" style=\"left:82%;right:0\"></span></div><figcaption><span>01.01.2026</span><span>Bugün</span></figcaption></figure>",
+      "css": ".ds-cov { display: grid; gap: 10px; margin: 0; padding: 18px 20px; background: #fbfaf6; color: #18233f; font-family: Segoe UI, system-ui, sans-serif; } .ds-cov-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font-size: 14px; color: #4a5470; } .ds-cov-lead strong { font-size: 28px; font-weight: 650; line-height: 1.1; letter-spacing: -.02em; color: #18233f; font-variant-numeric: tabular-nums; } .ds-cov-track { position: relative; height: 16px; border-radius: 4px; background: #efeae0; overflow: hidden; } .ds-cov-source { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: #18233f; } .ds-cov-cutoff { position: absolute; top: -2px; bottom: -2px; width: 4px; margin-left: -2px; border-radius: 2px; background: #1f3f9a; box-shadow: 0 0 0 2px #fbfaf6; } .ds-cov-gap { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, rgba(176, 58, 37, .38) 0 2px, transparent 2px 7px); animation: ds-gap-reveal 900ms cubic-bezier(.16, 1, .3, 1) 160ms backwards; } @keyframes ds-gap-reveal { from { clip-path: inset(0 100% 0 0); } } .ds-cov figcaption { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: #4a5470; font-variant-numeric: tabular-nums; } @media (prefers-reduced-motion: reduce) { .ds-cov-gap { animation: none; } }"
+    },
+    {
+      "name": "Settings View Switch",
+      "kind": "nav",
+      "refersTo": "settings-view-switch",
+      "scope": "settings",
+      "description": "A segmented pair in a light-grout well; the pressed segment fills with ink.",
+      "html": "<div class=\"ds-vs\" role=\"group\"><button aria-pressed=\"true\">Gerçek yedek görünümü</button><button aria-pressed=\"false\">Korunan mali veri görünümü</button></div>",
+      "css": ".ds-vs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 6px; background: #efeae0; } .ds-vs button { min-height: 38px; padding: 7px 14px; border: 0; border-radius: 4px; background: transparent; color: #18233f; font: 600 14px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; } .ds-vs button:hover { background: rgba(24, 35, 63, .07); } .ds-vs button[aria-pressed=\"true\"] { background: #18233f; color: #ffffff; } .ds-vs button:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Settings Text-Size Choice",
+      "kind": "input",
+      "refersTo": "settings-size-choice",
+      "scope": "settings",
+      "description": "Radio tiles previewing Aa at each text size; the checked tile fills with ink.",
+      "html": "<fieldset class=\"ds-size\"><legend>Yazı boyutu</legend><label><input type=\"radio\" name=\"ds-size\" checked /><span>Aa</span>Normal</label><label data-size=\"large\"><input type=\"radio\" name=\"ds-size\" /><span>Aa</span>Büyük</label><label data-size=\"larger\"><input type=\"radio\" name=\"ds-size\" /><span>Aa</span>Çok büyük</label></fieldset>",
+      "css": ".ds-size { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin: 0; padding: 18px 20px; border: 0; background: #fbfaf6; font-family: Segoe UI, system-ui, sans-serif; } .ds-size legend { margin-bottom: 10px; font-size: 14px; font-weight: 600; color: #18233f; } .ds-size label { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 84px; padding: 10px 6px; border: 1.5px solid #cfc7b6; border-radius: 6px; background: #ffffff; font-size: 13px; font-weight: 600; color: #18233f; white-space: nowrap; cursor: pointer; transition: background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out; } .ds-size label span { font-size: 17px; font-weight: 650; line-height: 1.1; } .ds-size label[data-size=\"large\"] span { font-size: 21px; } .ds-size label[data-size=\"larger\"] span { font-size: 26px; } .ds-size input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; } .ds-size label:hover { border-color: #18233f; } .ds-size label:has(input:checked) { border-color: #18233f; background: #18233f; color: #ffffff; } .ds-size label:has(input:focus-visible) { outline: 2px solid #18233f; outline-offset: 3px; }"
+    },
+    {
+      "name": "Sidebar Live Badge",
+      "kind": "button",
+      "refersTo": "settings-live-badge",
+      "scope": "settings",
+      "description": "The sidebar-footer status button that opens Ayarlar; text colour and seal carry the live state.",
+      "html": "<div class=\"ds-lb-col\"><button class=\"ds-lb\"><span class=\"ds-lb-seal\"></span>Canlı bağlantı kapalı</button><button class=\"ds-lb ds-lb-on\"><span class=\"ds-lb-seal\"></span>Canlı bağlantı açık</button><button class=\"ds-lb ds-lb-stale\"><span class=\"ds-lb-seal\"></span>Canlı kaynak doğrulanamadı</button></div>",
+      "css": ".ds-lb-col { display: grid; gap: 6px; width: 208px; padding: 8px; background: #fafafa; } .ds-lb { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 34px; padding: 4px 10px; border: 0; border-radius: 6px; background: transparent; font: 400 13px/1.4 Segoe UI, system-ui, sans-serif; text-align: left; color: #62626b; cursor: pointer; transition: background-color 160ms ease-out; } .ds-lb:hover { background: rgba(24, 35, 63, .06); } .ds-lb:focus-visible { outline: 2px solid #18233f; outline-offset: 2px; } .ds-lb-seal { position: relative; display: inline-block; flex: none; width: 14px; height: 14px; border: 1.25px solid currentColor; border-radius: 50%; } .ds-lb-seal::before, .ds-lb-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 5px; height: 5px; border-radius: 1px; background: currentColor; } .ds-lb-seal::after { transform: rotate(45deg); } .ds-lb-on { color: #0a665e; } .ds-lb-on .ds-lb-seal { background: currentColor; } .ds-lb-on .ds-lb-seal::before, .ds-lb-on .ds-lb-seal::after { background: #ffffff; } .ds-lb-stale { color: #80580b; } .ds-lb-stale .ds-lb-seal { background: #c88a12; border-color: #c88a12; } .ds-lb-stale .ds-lb-seal::before, .ds-lb-stale .ds-lb-seal::after { background: #5c3d00; }"
     }
   ],
   "narrative": {
@@ -77,7 +197,24 @@
     "rules": [
       { "name": "The Accent Is Location Rule", "body": "Teal marks focus, selection, and progress. It does not certify profit or a favourable financial result.", "section": "colors" },
       { "name": "The Comparable Figures Rule", "body": "Amounts, totals, and tables use tabular numerals; numeric table columns align right and retain their units and signs.", "section": "typography" },
-      { "name": "The Overlap-Only Depth Rule", "body": "Shadows explain an overlay. Standard cards, rows, and figures stay flat.", "section": "elevation" }
+      { "name": "The Overlap-Only Depth Rule", "body": "Shadows explain an overlay. Standard cards, rows, and figures stay flat.", "section": "elevation" },
+      { "name": "The One Glaze Per Job Rule", "scope": "settings", "body": "Each tile has exactly one glaze, and the glaze identifies the job. Ink is used for the active-data and about tiles; cobalt, turquoise, coral, and saffron are used only for import, live connection, backup, and display.", "section": "colors" },
+      { "name": "The Ink-Only Controls Rule", "scope": "settings", "body": "Pressable controls inside the panel are deep ink: filled, outlined, or underlined. Glaze colours never fill or outline a button, switch, or choice.", "section": "colors" },
+      { "name": "The Amber Is Stale Rule", "scope": "settings", "body": "Stale and failed state replaces the band's status pill and seal with amber and always arrives with a written line. Coral identifies the backup tile and the coverage gap; it never signals failure on its own.", "section": "colors" },
+      { "name": "The Counted Days Rule", "scope": "settings", "body": "The coverage lead is the only large figure on the page. It counts days, not money, and it stays tabular.", "section": "typography" },
+      { "name": "The Aligned Courses Rule", "scope": "settings", "body": "Tiles in one course share subgrid rows. A longer band line pushes down every body in that course, never just its own.", "section": "layout" },
+      { "name": "The Glaze Is The Depth Rule", "scope": "settings", "body": "Depth belongs to the band's glaze sheen. Tiles never take a drop shadow.", "section": "elevation" }
+    ],
+    "scopedWorlds": [
+      {
+        "scope": "settings",
+        "appliesTo": "The Ayarlar settings page and the sidebar-footer live badge.",
+        "northStar": "The Glazed Tile Panel",
+        "overview": "Ayarlar is an approved second visual world, deliberately not consistent with the ledger. It is a panel of glaze-white çini tiles set in warm grout. Each tile is one job: a saturated glaze band names it, a round eight-point seal carries its condition, and its body holds only the facts and the next action. Colour is louder here than in the ledger, but it stays on the bands and seals; every pressable control in the panel is deep ink. The world is scoped. Its tokens carry the `settings-` prefix and apply inside the settings page, plus the live badge in the sidebar footer. The Quiet Market Ledger remains the system for every other surface.",
+        "keyCharacteristics": ["Glaze tiles separated by a 6px warm-grout gap on a grout page ground.", "Five glaze bands (ink, cobalt, turquoise, coral, saffron), one per job, with a seal and an optional status pill.", "Deep ink as the only colour on pressable controls; primary, outline, and quiet underlined variants.", "A coverage strip drawn to exact date proportion up to today, with a hatched coral gap.", "Segoe UI and tabular figures, inherited from the ledger."],
+        "dos": ["Do give each settings job its own tile, glaze, seal, one plain band line, and only its next action.", "Do keep every pressable control deep ink: primary fill, 1.5px outline, or quiet underline.", "Do pair every stale, failed, or unknown seal with written state in the status pill or a note.", "Do draw the coverage strip to true date proportion up to today and state the gap in days.", "Do align tiles within a course on shared subgrid rows and keep the 6px grout gap at every width."],
+        "donts": ["Don't fill or outline a button, switch, or choice with cobalt, turquoise, coral, or saffron.", "Don't carry glaze tokens, the grout ground, or tile bands onto ledger workspaces; only the sidebar live badge leaves the settings page.", "Don't give tiles a drop shadow; the grout gap and the band's glaze carry the depth.", "Don't imply financial meaning for source rows on a tile or the coverage strip; source coverage stays labelled as record counts."]
+      }
     ],
     "dos": ["Do keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.", "Do use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.", "Do use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.", "Do preserve native table scrolling and disclosure behavior when extending an existing workflow."],
     "donts": ["Don't restore the superseded navy rail, electric-blue action system, or dark component variants.", "Don't use teal, green, or red alone to assert financial meaning.", "Don't replace missing evidence with a zero or hide it to make a compact view cleaner.", "Don't add a generated control framework where the native table, select, disclosure, or chart already owns the task."]

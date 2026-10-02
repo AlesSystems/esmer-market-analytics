@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import { importPackage, openSettings } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -22,7 +22,7 @@ test("sidebar keeps the reporting period through analysis and recovery", async (
     await page.getByLabel("Dönem", { exact: true }).fill("2025-08");
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await expect(nav.getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
-    await page.getByText("İşlemler", { exact: true }).click();
+    await openSettings(page);
     await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
@@ -58,10 +58,10 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
       await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
       await page.screenshot({ path: `${directory}/${destination === "Satışlar" ? "sales" : destination === "Alışlar ve maliyet" ? "purchasing" : destination === "Giderler" ? "expenses" : "reports"}.png` });
     }
-    await page.getByText("İşlemler", { exact: true }).click();
+    await openSettings(page);
     await page.getByText("İçe aktarma geçmişi", { exact: true }).click();
     await expect(page.locator(".import-history")).toContainText("İçe aktarıldı");
-    await page.screenshot({ path: `${directory}/operations.png` });
+    await page.screenshot({ path: `${directory}/settings.png` });
     await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByText("Yedekleme henüz kurulmadı.", { exact: true })).toBeVisible();
     await page.screenshot({ path: `${directory}/recovery.png` });
