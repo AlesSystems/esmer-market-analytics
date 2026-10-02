@@ -3,10 +3,10 @@
 ## Workflow checklist
 
 - [x] Read the Principles section of the poteto-mode skill.
-- [ ] Phase A: Frame
-- [ ] Phase B: Design the workflow
-- [ ] Phase C: Run the loop
-- [ ] Phase D: Keep the audit trail
+- [x] Phase A: Frame
+- [x] Phase B: Design the workflow
+- [x] Phase C: Run the loop
+- [x] Phase D: Keep the audit trail
 - [ ] Phase E: Verify and hand back
 
 Feature execution uses how, architect, a throughput checkpoint, delegated implementation, packaged verification, coherent commits, independent review and Opening a PR. Architect phases are Ground, Sketch, Agree, Implement, Scrap. Arena phases are Frame, Fan out, Cross-judge, Pick, Graft, Verify. Agree has no human checkpoint because implementation is authorized. Scrap only applies if the selected design fails.

@@ -82,26 +82,55 @@
       "dependencies": [
         "EV1-CONTRACT"
       ],
-      "status": "running",
+      "status": "completed",
       "acceptance_criteria": [
         "Implement estimates with explicit assumptions and exclusions, without promoting source semantics to verified.",
         "Evidence states remaining limits truthfully."
       ],
-      "risk": "high"
+      "risk": "high",
+      "evidence": [
+        "5a78976",
+        "aa069d5",
+        "a9edb9b",
+        "5 focused unit tests; 30 focused integration tests; typecheck/lint passed"
+      ]
+    },
+    {
+      "id": "EV1-ORACLE",
+      "type": "test",
+      "objective": "Prepare independent Decimal expectations over exact retained inputs before application comparison.",
+      "dependencies": [
+        "EV1-CONTRACT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Exact retained input field/ID match; independent golden self-check; private exact totals only."
+      ],
+      "risk": "high",
+      "evidence": [
+        "workstreams/estimated-v1/reconcile.py",
+        "private expected digest 1c63c19986198c37959f68d7db7680a895a1ef0757e31fe6a516fa3568436b41"
+      ]
     },
     {
       "id": "EV1-REAL",
       "type": "test",
       "objective": "Prepare a private bounded real package and independently reconcile reported estimates.",
       "dependencies": [
-        "EV1-IMPLEMENT"
+        "EV1-IMPLEMENT",
+        "EV1-ORACLE"
       ],
-      "status": "pending",
+      "status": "completed",
       "acceptance_criteria": [
         "Prepare a private bounded real package and independently reconcile reported estimates.",
         "Evidence states remaining limits truthfully."
       ],
-      "risk": "high"
+      "risk": "high",
+      "evidence": [
+        "evidence.md",
+        "54965 lines /3529 products /30 days exact independent match",
+        "Native packaged import/export/restart and encrypted restore passed"
+      ]
     },
     {
       "id": "EV1-VERIFY",
@@ -110,12 +139,13 @@
       "dependencies": [
         "EV1-IMPLEMENT"
       ],
-      "status": "pending",
+      "status": "failed",
       "acceptance_criteria": [
         "Run relevant unit/integration checks and packaged desktop import, estimates, export and reopening.",
         "Evidence states remaining limits truthfully."
       ],
-      "risk": "high"
+      "risk": "high",
+      "failure": "49 unit /299 integration passed; desktop42 passed8 skipped6 failed:4 Windows-default launchpaths onMac,2 stale expectedIPC lists."
     },
     {
       "id": "EV1-REVIEW",
@@ -123,9 +153,9 @@
       "objective": "Independent exact-head correctness, privacy and contract review.",
       "dependencies": [
         "EV1-REAL",
-        "EV1-VERIFY"
+        "EV1-RETEST"
       ],
-      "status": "pending",
+      "status": "ready",
       "acceptance_criteria": [
         "Independent exact-head correctness, privacy and contract review.",
         "Evidence states remaining limits truthfully."
@@ -145,6 +175,42 @@
         "Evidence states remaining limits truthfully."
       ],
       "risk": "medium"
+    },
+    {
+      "id": "EV1-REPAIR",
+      "type": "test",
+      "objective": "Update exact expected API lists for the two authorized estimate IPC methods; use explicit packaged Mac executable.",
+      "dependencies": [
+        "EV1-IMPLEMENT"
+      ],
+      "inputs": [
+        "Failed EV1-VERIFY receipt"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Two focused startup contracts pass; no app logic change."
+      ],
+      "risk": "low",
+      "evidence": [
+        "273ff1e",
+        "2 focused packaged startup tests passed"
+      ]
+    },
+    {
+      "id": "EV1-RETEST",
+      "type": "test",
+      "objective": "Rerun packaged desktop matrix after diagnosed harness repairs.",
+      "dependencies": [
+        "EV1-REPAIR"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "All applicable packaged Mac tests pass; Windows/private skips retained."
+      ],
+      "risk": "medium",
+      "evidence": [
+        "Packaged Mac executable explicitly selected; 48 passed /8 skipped."
+      ]
     }
   ]
 }
