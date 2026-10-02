@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./settings/settings.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);
@@ -90,7 +91,6 @@
   .sidebar nav button { justify-content: flex-start; text-align: left; gap: 10px; width: 100%; font-size: 14px; }
   .sidebar nav button[aria-current="page"] { background: var(--accent); color: var(--accent-foreground); }
   .sidebar svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
-  .sidebar-note { margin-top: auto; padding: 8px; }
   .app-body, .workspace, main, section { min-width: 0; }
   .workspace { max-width: 1660px; margin: auto; padding: 28px 32px 48px; }
   main { margin: 0; padding: 0; flex: 1; }
@@ -102,12 +102,11 @@
   .section-heading > span, .section-heading label { color: var(--muted); font-size: 13px; }
   .section-heading label { display: flex; align-items: center; gap: 8px; }
   .search-label { display: grid; gap: 6px; font-size: 14px; min-width: 200px; }
-  .data-status, .operations-menu { position: relative; margin: 0; padding: 0; border: 0; }
-  .data-status > summary, .operations-menu > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; margin: 0; font-weight: 400; }
+  .data-status { position: relative; margin: 0; padding: 0; border: 0; }
+  .data-status > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; margin: 0; font-weight: 400; }
   .data-status > summary { border-color: transparent; padding-left: 0; font-size: 13px; }
-  .data-status > summary::after, .operations-menu > summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1px 1px 0; transform: rotate(45deg); margin: 0 3px 4px auto; }
-  .data-popover, .operations-hub { position: absolute; top: 0; left: calc(100% + 20px); z-index: 10; width: min(380px, calc(100vw - 40px)); max-height: 75vh; overflow: auto; background: white; color: var(--ink); padding: 22px; border-radius: 10px; box-shadow: 0 8px 28px #20212426; }
-  .operations-hub { display: grid; gap: 14px; width: min(340px, calc(100vw - 40px)); }
+  .data-status > summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1px 1px 0; transform: rotate(45deg); margin: 0 3px 4px auto; }
+  .data-popover { position: absolute; top: 0; left: calc(100% + 20px); z-index: 10; width: min(380px, calc(100vw - 40px)); max-height: 75vh; overflow: auto; background: white; color: var(--ink); padding: 22px; border-radius: 10px; box-shadow: 0 8px 28px #20212426; }
   .synthetic-label, .period-state, .report-marker, .status { display: inline-flex; align-items: center; width: fit-content; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; line-height: 1.5; background: var(--secondary); color: var(--secondary-foreground); }
   .synthetic-label, .period-state { background: #fff8e9; color: #80580b; border-color: #e4cea4; }
   .notice { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 14px 0; background: var(--muted-surface); color: var(--secondary-foreground); font-size: 14px; }
@@ -242,10 +241,6 @@
   .recovery-backups li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
   .recovery-preview { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
   .import-outcome { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
-  .import-history { list-style: none; padding: 0; max-height: 40vh; overflow: auto; }
-  .import-history li { padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .import-history span { display: block; margin-top: 6px; }
-  .import-messages p { font-size: 14px; }
   progress { accent-color: var(--ring); max-width: 100%; }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   @media (max-width: 1250px) {
@@ -268,8 +263,8 @@
     .sidebar .period-label input { width: auto; }
     .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
     .sidebar nav button { width: auto; padding: 8px 10px; }
-    .sidebar svg, .sidebar-note { display: none; }
-    .data-popover, .operations-hub { top: 48px; left: 0; }
+    .sidebar svg { display: none; }
+    .data-popover { top: 48px; left: 0; }
     .workspace { padding: 22px 20px 40px; }
     .monthly-values { grid-template-columns: minmax(0,1fr); }
   }
@@ -285,7 +280,7 @@
     .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
     .block, .recovery-section { padding: 18px; }
     .recovery-backups li { flex-direction: column; }
-    .sidebar-controls .data-popover, .sidebar-controls .operations-hub { position: fixed; top: 120px; left: 20px; right: 20px; width: auto; }
+    .sidebar-controls .data-popover { position: fixed; top: 120px; left: 20px; right: 20px; width: auto; }
   }
   @media (max-width: 500px) {
     .workspace { padding-inline: 16px; }

@@ -2,6 +2,7 @@ import { build } from "esbuild";
 import { rm, mkdir, copyFile, readFile, writeFile } from "node:fs/promises";
 import postcss from "postcss";
 import tailwindcss from "@tailwindcss/postcss";
+const { version } = JSON.parse(await readFile("package.json", "utf8"));
 await rm("dist", { recursive: true, force: true });
 await mkdir("dist/ui", { recursive: true });
 await build({
@@ -25,7 +26,7 @@ await build({
   bundle: true,
   platform: "browser",
   minify: true,
-  define: { "process.env.NODE_ENV": '"production"' },
+  define: { "process.env.NODE_ENV": '"production"', "process.env.APP_VERSION": JSON.stringify(version) },
 });
 await copyFile("src/ui/index.html", "dist/ui/index.html");
 const stylesheet = await postcss([tailwindcss()]).process(await readFile("src/ui/style.css", "utf8"), {

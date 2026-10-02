@@ -1,20 +1,18 @@
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { emptySalesFilters, type Breakdown, type SalesDetail, type SalesFilters, type SalesView } from "../reports/contracts";
 
 import { decimal, money, date, quantity, percent } from "./format";
 import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { MonthlyWorkspace } from "./overview/MonthlyWorkspace";
-import type { ImportHistoryEntry } from "../domain/contracts";
 import { AppShell, type Destination } from "./AppShell";
-import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
 import { PurchasingWorkspace } from "./purchasing/PurchasingWorkspace";
 import { salesReasonLabels } from "./report-labels";
 import { PageControls, pageRows } from "./PageControls";
 const kind = (value: string) => ({ sale: "Satış", "customer-return": "Müşteri iadesi", purchase: "Alış", "supplier-return": "Tedarikçi iadesi" })[value] ?? "Türü bilinmiyor";
 
-export function SalesWorkspace({ view, setView, importing, importPackage, openRecovery, recoveryOpen, closeRecovery, onRestored, stale, messages, recentImports }: { view: SalesView; setView: (view: SalesView) => void; importing: boolean; importPackage: () => Promise<void>; openRecovery: () => void; recoveryOpen: boolean; closeRecovery: () => void; onRestored: () => void; stale: boolean; messages: ReactNode; recentImports?: ImportHistoryEntry[] }) {
+export function SalesWorkspace({ view, setView, stale }: { view: SalesView; setView: (view: SalesView) => void; stale: boolean }) {
   const [screen, setScreen] = useState<"monthly" | "versions" | "overview" | "products" | "transactions" | "purchasing" | "expenses">("monthly");
   const [expenseRevision, setExpenseRevision] = useState(0);
   const [comparisonWindow, setComparisonWindow] = useState<"month" | "year">("month");
@@ -93,26 +91,17 @@ export function SalesWorkspace({ view, setView, importing, importPackage, openRe
   const destination: Destination = screen === "products" || screen === "transactions" ? "overview" : screen;
   function navigate(next: Destination) {
     if (opening.current) return;
-    closeRecovery();
     ++request.current; setBusy(false); setError(""); setDetail(undefined); setLineId(undefined);
     if (next === "overview") reset(); else setScreen(next);
   }
-  return <AppShell destination={recoveryOpen ? undefined : destination} navigate={navigate} controls={<>
+  return <AppShell destination={destination} navigate={navigate} controls={<>
     <label className="period-label">Dönem <Input type="month" lang="tr" disabled={opening.current} value={view.context.period} onChange={event => { if (event.target.value) void open(event.target.value); }} /></label>
     <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Raporlar yerel veri sürümünden okunur.</p></div></details>
     {view.warnings.includes("SYNTHETIC_ONLY") && <span className="synthetic-label" title="Gerçek market verisi değildir.">Sentetik veri</span>}
-  </>} operations={<>
-    <h2>Veri ve bakım</h2><p>Etkin raporun veri sonu: {date(view.cutoff)}</p>
-    <Button variant="outline" disabled={importing} onClick={event => { event.currentTarget.closest("details")?.removeAttribute("open"); void importPackage(); }}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</Button>
-    <Button variant="outline" onClick={event => { event.currentTarget.closest("details")?.removeAttribute("open"); openRecovery(); }}>Yedekleme ve kurtarma</Button>
-    <details><summary>İçe aktarma geçmişi</summary><p>Son 10 kayıtlı deneme. Açık rapor ayrıca yenilenene kadar sabit kalır.</p><ul className="import-history">{recentImports?.map(item => <li key={item.id}><strong>{date(item.createdAt)}</strong> · {item.state === "active" ? "İçe aktarıldı" : item.state === "failed" ? "Tamamlanamadı" : item.state === "cancelled" ? "Etkin veri değiştirilmedi / iptal edildi" : "Hazırlanıyor"}{item.cutoff && <span>Veri: {date(item.cutoff)}</span>}{item.errorCode && <span>{item.errorCode === "INTERRUPTED" ? "İşlem yarıda kaldı." : item.errorCode === "STORAGE_FULL" ? "Disk alanı yetersiz." : "Paket içe aktarılamadı."}</span>}</li>)}</ul></details>
   </>}>
-      <div className="import-messages">{messages}</div>
       {(stale || view.stale) && <div className="notice"><strong>Yeni veri sürümü hazır</strong><span>Bu rapor ve kaynak detayları açık sürümde sabit tutuluyor.</span><Button variant="outline" onClick={() => void open(view.context.period)}>Raporu yenile</Button></div>}
       {error && <div className="notice warning" role="alert"><span>{error}</span><Button variant="outline" onClick={() => retry.current()}>Yeniden dene</Button></div>}
       {busy && <p role="status">Rapor yükleniyor…</p>}
-      {recoveryOpen && <RecoveryWorkspace embedded onClose={() => { closeRecovery(); requestAnimationFrame(() => document.querySelector<HTMLElement>(".operations-menu > summary")?.focus()); }} onRestored={onRestored} />}
-      <div hidden={recoveryOpen}>
       {(screen === "monthly" || screen === "versions") ? <MonthlyWorkspace onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} key={`${view.context.sessionId}:${screen}`} context={view.context} versions={screen === "versions"} revision={expenseRevision} refresh={() => void open(view.context.period)} onSales={(categoryId?: string) => { void query({ ...emptySalesFilters, categoryId: categoryId ?? null }, categoryId ? "products" : "overview"); }} /> : screen === "expenses" ? <ExpensesWorkspace key={view.context.period} period={view.context.period} onChange={() => setExpenseRevision(value => value + 1)} /> : screen === "purchasing" ? <PurchasingWorkspace key={view.context.sessionId} context={view.context} /> : <div className="work-grid"><main aria-busy={busy}>
         <div className="page-heading"><div><h1>{screen === "overview" ? "Satış Özeti" : screen === "products" ? "Kategori / Ürün Detayı" : "İşlemler"}</h1><p>{scope}</p></div><label className="search-label">Ürün ara<Input type="search" disabled={opening.current} value={search} placeholder="Ürün adı" onChange={event => { setSearch(event.target.value); void query({ ...emptySalesFilters, search: event.target.value }, event.target.value ? "products" : "overview"); }} /></label></div>
         {(!view.complete || view.coverage !== "complete") && <div className="notice warning"><strong>{view.coverage === "unavailable" ? "Dönem verisi yok" : view.coverage === "partial" ? "Kısmi dönem" : "Kanıt eksik"}</strong><span>{date(view.from)} – {date(view.to)}. Çözümlenmemiş katkılar sıfır kabul edilmez.</span></div>}
@@ -154,6 +143,5 @@ export function SalesWorkspace({ view, setView, importing, importPackage, openRe
         </> : line ? <><h3>{line.productName}</h3><p className="explanation">Bu {kind(line.kind).toLocaleLowerCase("tr-TR")} satırının net katkısı <strong>{money(line.net)}</strong>. Kaydedilen {money(line.tax)} KDV net satışa dahil değildir.</p>{!line.matchesScope && <p className="notice">Bu satır açık belgeye aittir; seçili kapsama dahil değildir.</p>}<p className="notice">{line.reconciled && detail.reconciled ? "Sentetik kaynak kaydıyla uzlaşıyor. Gerçek market kayıtlarının eksiksiz olduğunu kanıtlamaz." : "Eksik · satır veya belge farkı çözülmedi."}</p><details><summary>Kaynak ve yöntem</summary><dl className="evidence"><dt>Belge / satır</dt><dd>{detail.documentId} / {line.lineId}</dd><dt>Kaynak kimliği</dt><dd>{detail.lineage}</dd><dt>Aktarım paketi</dt><dd>{detail.extractionId}</dd><dt>Bu veri sürümünün içe aktarımı</dt><dd>{detail.importedAt ? date(detail.importedAt) : "Kayıt yok"}</dd><dt>Veri sonu</dt><dd>{date(detail.cutoff)}</dd><dt>Veri sürümü</dt><dd>{detail.context.datasetId}</dd><dt>Hesaplama yöntemi</dt><dd>Miktar × birim net × (1 − indirim oranı); iade eksi işaretli. Kaydedilen KDV ayrıca gösterilir.</dd><dt>Yöntem sürümü</dt><dd>{detail.context.calculationVersion}</dd></dl></details><details><summary>Teknik ayrıntılar</summary><dl className="evidence"><dt>Eşleme sürümü</dt><dd>{detail.mappingVersion}</dd><dt>Uygulama revizyonu</dt><dd>{detail.context.appRevision}</dd><dt>Kaydedilen miktar / birim</dt><dd>{decimal(line.recorded.quantity)} / {line.unit === "kg" ? "kg" : "adet"}</dd><dt>Ürün / kategori kimliği</dt><dd>{line.productId} / {line.categoryId}</dd><dt>Kaydedilen net / KDV / brüt</dt><dd>{money(line.recorded.net)} / {money(line.recorded.tax)} / {money(line.recorded.gross)}</dd><dt>Beklenen KDV</dt><dd>{money(line.expectedTax)}</dd><dt>Birim net / indirim / KDV oranı</dt><dd>{money(line.input.unitNet)} / {percent(line.input.discountRate)} / {percent(line.input.taxRate)}</dd><dt>Kapsam</dt><dd>{view.context.period} · {scope}</dd></dl></details></> : <><dl className="document-totals"><div><dt>Belge net toplamı</dt><dd>{detail.exclusion ? "Hesaplama dışında" : money(detail.totals.net)}</dd></div><div><dt>Kaydedilen KDV</dt><dd>{detail.recorded ? money(detail.recorded.tax) : "Bilinmiyor"}</dd></div><div><dt>Hesaplanan brüt toplam</dt><dd>{detail.exclusion ? "Hesaplama dışında" : money(detail.totals.gross)}</dd></div></dl><p className="selected-total">Seçili kapsam: <strong>{detail.exclusion ? "Hesaplama dışında" : money(detail.scopeNet)}</strong><br /><span>{scope} · tüm belge toplamından ayrıdır.</span></p>{!detail.reconciled && detail.recorded && <p className="notice warning">Kaydedilen başlık neti: {money(detail.recorded.net)} · hesaplanan satır neti: {detail.exclusion ? "Bilinmiyor" : money(detail.totals.net)} · kaydedilen brüt: {money(detail.recorded.gross)}</p>}<h3>Belge satırları</h3>{detail.lines.map(item => <article className={`receipt-line ${item.matchesScope ? "matched" : ""}`} key={item.lineId}><div className="line-heading"><h4>{item.productName}</h4><strong>{money(item.net)}</strong></div><p>{decimal(item.quantity)} {item.unit === "kg" ? "kg" : "adet"} · İndirim: {percent(item.input.discountRate)}</p><p>KDV: {money(item.tax)} · Brüt: {money(item.gross)}</p><small>{item.matchesScope ? "Seçili kapsamla eşleşiyor" : "Seçili kapsam dışında"}{!item.reconciled && " · Satır farkı var"}</small><Button variant="outline" className="source-link" onClick={() => setLineId(item.lineId)}>Kaynak detayını göster</Button></article>)}{detail.excludedLines.map(item => <article className="receipt-line" key={item.lineId}><h4>{item.productName}</h4><p>{item.lineId} · {salesReasonLabels[item.reason] ?? item.reason}</p><p>Kaydedilen net: {money(item.net)}. Net satış katkısı bilinmiyor; sıfır sayılmaz.</p><Button variant="outline" className="source-link" onClick={() => setLineId(item.lineId)}>Kaynak detayını göster</Button></article>)}<p className="caption">Tüm belge satırları gösterilir. Kaynak kimliği: {detail.documentId} · Paket: {detail.extractionId}</p></>}
       </aside>}
       </div>}<footer><span>Esmer Market · Çevrimdışı analiz</span><span>Tutarlar Türk lirası (TRY)</span></footer>
-    </div>
   </AppShell>;
 }

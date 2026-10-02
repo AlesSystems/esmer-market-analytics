@@ -38,7 +38,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
       })).toBe(true);
     }
     const page = await app.firstWindow();
-    await page.getByText("İşlemler", { exact: true }).click();
+    await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
     await page.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
     await page.getByRole("button", {name: "Yedeklemeyi kur"}).click();
     await expect(page.getByText("Kurtarma anahtarı doğrulandı ve yedekleme kuruldu.")).toBeVisible();

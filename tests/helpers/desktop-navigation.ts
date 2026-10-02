@@ -1,7 +1,12 @@
 import type { Page } from "@playwright/test";
 
+export async function openSettings(page: Page) {
+  await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
+  await page.getByRole("heading", { name: "Ayarlar", exact: true, level: 1 }).waitFor();
+}
+
 export async function importPackage(page: Page) {
-  const menu = page.locator(".operations-menu");
-  if (await menu.count() && await menu.getAttribute("open") === null) await menu.locator(":scope > summary").click();
-  await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
+  const button = page.getByRole("button", { name: "Veri paketi içe aktar", exact: true });
+  if (!await button.isVisible()) await openSettings(page);
+  await button.click();
 }
