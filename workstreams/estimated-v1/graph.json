@@ -129,7 +129,7 @@
       "evidence": [
         "evidence.md",
         "54965 lines /3529 products /30 days exact independent match",
-        "Native packaged import/export/restart and encrypted restore passed"
+        "Packaged import/export/restart with scripted dialog choices and encrypted restore passed"
       ]
     },
     {
@@ -155,19 +155,20 @@
         "EV1-REAL",
         "EV1-RETEST"
       ],
-      "status": "ready",
+      "status": "failed",
       "acceptance_criteria": [
         "Independent exact-head correctness, privacy and contract review.",
         "Evidence states remaining limits truthfully."
       ],
-      "risk": "medium"
+      "risk": "medium",
+      "failure": "Independent packaged review found 13px document overflow at minimum width /125% with method source hash expanded. Standards passed; fix and re-review required."
     },
     {
       "id": "EV1-PUBLISH",
       "type": "integration",
       "objective": "Create and merge a reviewed PR, sync owned workstreams and prepare Windows handoff.",
       "dependencies": [
-        "EV1-REVIEW"
+        "EV1-REVIEW-RETEST"
       ],
       "status": "pending",
       "acceptance_criteria": [
@@ -211,6 +212,45 @@
       "evidence": [
         "Packaged Mac executable explicitly selected; 48 passed /8 skipped."
       ]
+    },
+    {
+      "id": "EV1-LAYOUT-REPAIR",
+      "type": "implementation",
+      "objective": "Reuse existing hash wrapping class and expose narrow expanded-method overflow with a packaged assertion.",
+      "dependencies": [
+        "EV1-REAL",
+        "EV1-RETEST"
+      ],
+      "inputs": [
+        "EV1-REVIEW failure"
+      ],
+      "status": "completed",
+      "allowed_files": [
+        "src/ui/SourceEstimate.tsx",
+        "tests/desktop/source-estimate.test.ts"
+      ],
+      "acceptance_criteria": [
+        "Expanded method stays inside document width at minimum window and zoom; existing estimate workflow remains usable."
+      ],
+      "risk": "low",
+      "evidence": [
+        "6a64159 failing packaged regression",
+        "c7f7a64 existing wrapping utility",
+        "125/200 percent packaged retest passed"
+      ]
+    },
+    {
+      "id": "EV1-REVIEW-RETEST",
+      "type": "review",
+      "objective": "Rebuild packaged application, recheck affected flow and independently re-review the repaired head.",
+      "dependencies": [
+        "EV1-LAYOUT-REPAIR"
+      ],
+      "status": "ready",
+      "acceptance_criteria": [
+        "Focused packaged workflow and layout pass; exact-head Standards and Spec pass; final artifacts describe actual checks."
+      ],
+      "risk": "medium"
     }
   ]
 }
