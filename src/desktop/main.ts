@@ -6,6 +6,8 @@ import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
 import { OperationJobs } from "./jobs";
 import { saveReportExport } from "./report-export";
 import { atomicWriteFile } from "./atomic-file";
+import { loadPreferences, preferencesService } from "./preferences";
+import { textSizes } from "../domain/contracts";
 import type { ReportServiceRequest, JobOutcome, RequestError, ServiceProgress } from "../domain/contracts";
 import type { ReportResponse } from "../reports/contracts";
 import { expenseTemplate } from "../expenses/template";
@@ -119,6 +121,7 @@ app.whenReady().then(async () => {
   try { recoveryConfig = await loadRecoveryConfig(app.getPath("userData")) ?? undefined; }
   catch { recoveryConfigError = true; }
   try { savedLive = await loadLiveConfig(app.getPath("userData")); } catch { liveConfigError = true; }
+  let textSize = (await loadPreferences(app.getPath("userData"))).textSize;
   worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite"), recoveryConfig, recoveryConfigUnavailable: recoveryConfigError, liveConfig: savedLive?.config, liveEnabled: savedLive?.enabled === true } });
   worker.on("message", (message: ServiceResponse | ServiceProgress) => {
     if ("jobId" in message) { jobs.progress(message.jobId, message.phase, message.completed, message.total); return; }
@@ -140,6 +143,7 @@ app.whenReady().then(async () => {
       sandbox: true,
       nodeIntegration: false,
       webviewTag: false,
+      zoomFactor: textSizes[textSize],
     },
   });
   window.removeMenu();
@@ -148,13 +152,18 @@ app.whenReady().then(async () => {
   window.webContents.on("will-attach-webview", (event) =>
     event.preventDefault(),
   );
+  window.webContents.on("did-finish-load", () => window.webContents.setZoomFactor(textSizes[textSize]));
+  const preferences = preferencesService(app.getPath("userData"), {textSize}, saved => {
+    textSize = saved.textSize;
+    window.webContents.setZoomFactor(textSizes[textSize]);
+  });
   ipcMain.handle(
     "esmer:request",
     (event, operation: unknown, payload: unknown) => {
       const trusted = event.sender === window.webContents &&
           event.senderFrame === window.webContents.mainFrame &&
           event.senderFrame?.url === APP_URL;
-      if (trusted && restoring && operation !== "confirmRestore" && operation !== "cancelRestore" && operation !== "getOperationStatus")
+      if (trusted && restoring && !["confirmRestore", "cancelRestore", "getOperationStatus", "getPreferences", "setPreferences"].includes(operation as string))
         return {status: "recovery-failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."};
       return handleRequest(
         trusted,
@@ -321,6 +330,7 @@ app.whenReady().then(async () => {
           ()=>dialog.showSaveDialog(window,{title:"Doğrulanmamış tahmini Excel olarak kaydet",defaultPath:"Esmer-tahmini-katki.xlsx",filters:[{name:"Excel çalışma kitabı",extensions:["xlsx"]}]}),
           atomicWriteFile,
         )},
+        preferences,
       );
     },
   );

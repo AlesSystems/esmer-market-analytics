@@ -1,7 +1,8 @@
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
-import type { LiveResult } from "../domain/contracts";
+import type { LiveResult, Preferences, PreferencesResult } from "../domain/contracts";
+import { validPreferences } from "./preferences";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
 import type { ExpenseRequests, ExpenseResult, OperatingReportResult } from "../expenses/contracts";
@@ -87,13 +88,19 @@ export async function handleRequest(
   sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
   sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
-): Promise<EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  preferences?: {get: () => Promise<PreferencesResult>; set: (request: Preferences) => Promise<PreferencesResult>},
+): Promise<PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
       code: "UNTRUSTED_SENDER",
       message: "Bu pencerenin işlem yapma izni yok.",
     };
+  if (preferences && (operation === "getPreferences" || operation === "setPreferences")) {
+    if (operation === "getPreferences" && payload === null) return preferences.get();
+    if (operation === "setPreferences" && validPreferences(payload)) return preferences.set(payload);
+    return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+  }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {
     if(!validEstimateRequest(payload,operation === "exportSourceEstimate"))return {status:"rejected",code:"INVALID_PAYLOAD",message:"İstek geçerli değil."};
     return operation === "querySourceEstimate" ? sourceEstimate.query(payload) : sourceEstimate.export(payload);
