@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-const privatePreview = Boolean(process.env.ESMER_SQL_PREVIEW_PACKAGE);
+const privatePreview = Boolean(process.env.ESMER_SQL_PREVIEW_PACKAGE || process.env.ESMER_ESTIMATE_PACKAGE);
 if (privatePreview) process.env.PLAYWRIGHT_NO_COPY_PROMPT = "1";
 export default defineConfig({
   testDir: "./tests/desktop",
