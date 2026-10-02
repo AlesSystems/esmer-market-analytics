@@ -1,0 +1,5 @@
+ts	phase	decision	why	evidence	result
+2026-10-02	frame	Allow a separately identified estimate capability	The user authorized useful estimated V1 values despite unresolved source meanings	plan.md	open
+2026-10-02	baseline	Verify the unchanged raw import boundary	Preserve compatibility before adding the estimate capability	f705ec1; raw-report-readiness and raw-preview	7 tests passed; typecheck passed
+2026-10-02	source	Reuse retained September operands without another SQL read	Exact preview digest matches its prior receipt and cost operands already exist privately	docs/evidence/issue-39-source-profit.md	15880 headers; 54965 lines; prior preview digest matched
+2026-10-02	design	Choose raw estimate capability and keep existing financial meaning intact	A meets V1 without dataset/history migrations; judge agrees after null/count corrections	design.md; design-review.md; ../../docs/contracts/recorded-estimates.md	contract settled

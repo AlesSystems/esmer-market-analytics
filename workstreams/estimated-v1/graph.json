@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "EV1-INPUT",
+      "type": "analysis",
+      "objective": "Trace source packages, raw transport and atomic activation.",
+      "dependencies": [],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Trace source packages, raw transport and atomic activation.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-REPORT",
+      "type": "analysis",
+      "objective": "Trace report aggregation, UI, export and recovery.",
+      "dependencies": [],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Trace report aggregation, UI, export and recovery.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-DESIGN-A",
+      "type": "design",
+      "objective": "Design a small distinct estimate model using existing raw records.",
+      "dependencies": [
+        "EV1-INPUT",
+        "EV1-REPORT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Design a small distinct estimate model using existing raw records.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-DESIGN-B",
+      "type": "design",
+      "objective": "Design a distinct model using existing financial package infrastructure.",
+      "dependencies": [
+        "EV1-INPUT",
+        "EV1-REPORT"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Design a distinct model using existing financial package infrastructure.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-CONTRACT",
+      "type": "design",
+      "objective": "Choose a reviewed estimate contract and record the user-authorized foundation delta.",
+      "dependencies": [
+        "EV1-DESIGN-A",
+        "EV1-DESIGN-B"
+      ],
+      "status": "completed",
+      "acceptance_criteria": [
+        "Choose a reviewed estimate contract and record the user-authorized foundation delta.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium",
+      "outputs": [
+        "docs/contracts/recorded-estimates.md",
+        "workstreams/estimated-v1/design.md",
+        "workstreams/estimated-v1/design-review.md"
+      ]
+    },
+    {
+      "id": "EV1-IMPLEMENT",
+      "type": "implementation",
+      "objective": "Implement estimates with explicit assumptions and exclusions, without promoting source semantics to verified.",
+      "dependencies": [
+        "EV1-CONTRACT"
+      ],
+      "status": "running",
+      "acceptance_criteria": [
+        "Implement estimates with explicit assumptions and exclusions, without promoting source semantics to verified.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "EV1-REAL",
+      "type": "test",
+      "objective": "Prepare a private bounded real package and independently reconcile reported estimates.",
+      "dependencies": [
+        "EV1-IMPLEMENT"
+      ],
+      "status": "pending",
+      "acceptance_criteria": [
+        "Prepare a private bounded real package and independently reconcile reported estimates.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "EV1-VERIFY",
+      "type": "test",
+      "objective": "Run relevant unit/integration checks and packaged desktop import, estimates, export and reopening.",
+      "dependencies": [
+        "EV1-IMPLEMENT"
+      ],
+      "status": "pending",
+      "acceptance_criteria": [
+        "Run relevant unit/integration checks and packaged desktop import, estimates, export and reopening.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "high"
+    },
+    {
+      "id": "EV1-REVIEW",
+      "type": "review",
+      "objective": "Independent exact-head correctness, privacy and contract review.",
+      "dependencies": [
+        "EV1-REAL",
+        "EV1-VERIFY"
+      ],
+      "status": "pending",
+      "acceptance_criteria": [
+        "Independent exact-head correctness, privacy and contract review.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    },
+    {
+      "id": "EV1-PUBLISH",
+      "type": "integration",
+      "objective": "Create and merge a reviewed PR, sync owned workstreams and prepare Windows handoff.",
+      "dependencies": [
+        "EV1-REVIEW"
+      ],
+      "status": "pending",
+      "acceptance_criteria": [
+        "Create and merge a reviewed PR, sync owned workstreams and prepare Windows handoff.",
+        "Evidence states remaining limits truthfully."
+      ],
+      "risk": "medium"
+    }
+  ]
+}
