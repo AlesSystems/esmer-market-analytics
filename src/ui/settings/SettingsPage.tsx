@@ -83,17 +83,18 @@ function ImportHistory({ entries, unread }: { entries?: ImportHistoryEntry[]; un
   </details>;
 }
 
-function LiveTile({ live, sqlImporting, onImportSql }: { live: LiveConnection; sqlImporting: boolean; onImportSql: () => void }) {
+function LiveTile({ live, sourceCutoff, sqlImporting, onImportSql }: { live: LiveConnection; sourceCutoff?: string; sqlImporting: boolean; onImportSql: () => void }) {
   const state = live.status;
+  const cutoff = sourceCutoff ?? state?.cutoff;
   const busy = live.busy || sqlImporting || live.state === "checking";
   const enabled = live.state === "on" || live.state === "stale" || live.state === "checking";
   const outcome = live.outcome;
   return <Tile glaze="turquoise" name="Canlı bağlantı" line="İzole SQL kopyasını yalnızca okur. Mali veri setini etkinleştirmez." seal={live.state} status={<span role="status">{liveTitles[live.state]}</span>}>
     <dl className="tile-facts">
       <div><dt>Son başarılı kontrol</dt><dd>{state?.live.lastSuccessAt ? moment(state.live.lastSuccessAt) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
-      <div><dt>Yerel kesim tarihi</dt><dd>{state?.cutoff ? date(state.cutoff) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
+      <div><dt>Yerel kesim tarihi</dt><dd>{cutoff ? date(cutoff) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
     </dl>
-    {live.state === "stale" && <p className="tile-warning">{state?.cutoff ? "Son geçerli yerel veriler kullanılıyor." : "Henüz geçerli yerel veri yok."}</p>}
+    {live.state === "stale" && <p className="tile-warning">{cutoff ? "Son geçerli yerel veriler kullanılıyor." : "Henüz geçerli yerel veri yok."}</p>}
     {state?.live.phase === "stale" && state.live.error && <p role="alert">{liveErrors[state.live.error]}</p>}
     {state?.configurationError && <p role="alert">Bağlantı ayarı kaydedilemedi veya açılamadı. Bağlantı dosyasını yeniden seçin.</p>}
     {state?.live.persistenceError && <p role="alert">Kontrol geçmişi kaydedilemedi. Yeniden açılışta kaynak tekrar doğrulanmalıdır.</p>}
@@ -182,7 +183,7 @@ export function SettingsPage({ availability, source, view, onView, live, importi
         <ImportHistory entries={ready?.recentImports} unread={unread} />
         <div className="tile-actions"><button type="button" className="tile-action primary" disabled={importing || sqlImporting} onClick={onImportPackage}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button></div>
       </Tile>
-      <LiveTile live={live} sqlImporting={sqlImporting} onImportSql={onImportSql} />
+      <LiveTile live={live} sourceCutoff={source?.to} sqlImporting={sqlImporting} onImportSql={onImportSql} />
       <BackupTile onRecovery={onRecovery} />
       <DisplayTile />
       <Tile glaze="ink" name="Hakkında" line="Tek mağaza, tek bilgisayar için çevrimdışı analiz." seal="ready">
