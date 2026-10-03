@@ -14,7 +14,7 @@ Data shape is the existing discriminated MonthlyDisplay union. Its v1/v2 results
 | C4 | implementation | AppShell logo, local asset packaging and notices | C1 | Website logo works offline; licences retained | completed |
 | C5 | integration | Package and verify actual Electron app | C3,C4 | Focused and full suites, static checks, desktop/narrow evidence | completed |
 | C6 | review | Independent standards and spec reviews | C5 | Material findings resolved and retested | completed |
-| C7 | documentation | DESIGN.md, evidence, PR | C6 | Commits, screenshots, exact checks and limitations; attached PR | running |
+| C7 | documentation | DESIGN.md, evidence, PR | C6 | Commits, screenshots, exact checks and limitations; attached PR | completed |
 
 ## Feature checklist
 1. `how` over the affected subsystem.
@@ -40,3 +40,5 @@ C2 ran `npm run test:desktop -- tests/desktop/ozet-control-desk.test.ts` against
 
 ## Final implementation record
 Production feature commit b0b8f6c follows the missing-contract commit da7767b. Mesh interaction coverage is f5ffa56. C5 passed 49 unit, 305 integration and 53 executed desktop cases; see EVIDENCE.md for skips and the platform-path correction. Independent Standards and Spec reviewers found zero actionable issues against 39cbee4...b0b8f6c. Both inspected the implementation and screenshot evidence; neither claimed an independent test rerun. Comment review also reported zero findings.
+
+PR [#54](https://github.com/AlesSystems/esmer-market-analytics/pull/54) contains the implementation and evidence. The PR was created after verification and independent review. No merge or deployment was performed.

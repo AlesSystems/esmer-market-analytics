@@ -51,3 +51,5 @@ The eight skipped desktop cases were existing opt-ins or platform gates: Windows
 ## Revision record
 
 Branch `codex/ozet-ui-prototypes`. Contract commit `da7767b`, implementation `b0b8f6c`, mesh-selection regression `f5ffa56`. The packaged runtime tested by the full suite contains the implementation in `b0b8f6c`; `f5ffa56` adds test assertions only. The PR also includes the original three prototype commits `0f454eb` and `39cbee4` as the design record.
+
+PR [#54](https://github.com/AlesSystems/esmer-market-analytics/pull/54) targets main. Design and acceptance evidence commit is `c4c000e`.
