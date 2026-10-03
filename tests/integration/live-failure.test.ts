@@ -173,3 +173,27 @@ test("polling resumes after timeout cleanup outlasts the next scheduled poll", a
     expect(controller.status()).toMatchObject({phase: "idle", lastSuccessAt: expect.any(String)});
   } finally {await controller.close(); store.close();}
 });
+
+test.each([
+  ["SOURCE_REJECTED", "SOURCE_REJECTED"],
+  ["SOURCE_TIMEOUT", "REFRESH_TIMEOUT"],
+  ["CANCELLED", "INTERRUPTED"],
+  ["password=private server=private", "SOURCE_UNAVAILABLE"],
+])("SQL extraction error %s reports %s while retaining the last successful capture", async (sourceCode, expectedCode) => {
+  let fail = false;
+  const {store, controller, snapshot} = fixture(async () => {
+    if (fail) throw new Error(sourceCode);
+    return sourcePackage("a", undefined, "successful-capture");
+  });
+  try {
+    controller.enable();
+    expect(await controller.refresh()).toMatchObject({status: "unchanged"});
+    const successful = controller.status();
+    fail = true;
+    expect(await controller.refresh()).toEqual({status: "failed", code: expectedCode});
+    expect(controller.status()).toMatchObject({phase: "stale", error: expectedCode, lastSuccessAt: successful.lastSuccessAt, lastDatasetId: successful.lastDatasetId, lastRecord: "dataset"});
+    expect(store.readSnapshot()).toEqual(snapshot);
+    expect(store.readReport("accepted").output).toEqual({net: "150"});
+    expect(JSON.stringify(controller.status())).not.toContain("private");
+  } finally {await controller.close(); store.close();}
+});
