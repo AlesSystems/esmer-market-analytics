@@ -127,6 +127,26 @@ test("packaged disposable SQL tracks captures without losing inspection and reta
   } finally {await app.close().catch(() => {}); await fixture.close(); await rm(userData, {recursive: true, force: true});}
 });
 
+test("packaged background SQL capture preserves focused unapplied filter draft", async () => {
+  test.skip(!process.env.ESMER_SQL_TEST_ADMIN, "Requires explicitly configured isolated synthetic SQL admin");
+  test.setTimeout(60_000);
+  const {fixture, app, page, userData} = await setup();
+  try {
+    await page.getByText("Gelişmiş filtreler", {exact: true}).click();
+    const draft = page.getByLabel("Ürün kayıt ID’si", {exact: true});
+    await draft.fill("900719925474099");
+    await expect(draft).toBeFocused();
+    const before = await page.locator(".data-status").textContent();
+    await backgroundRefresh(page);
+    await expect.poll(() => page.locator(".data-status").textContent(), {timeout: 15_000}).not.toBe(before);
+    await expect(draft).toBeVisible();
+    await expect(draft).toBeFocused();
+    await expect(draft).toHaveValue("900719925474099");
+    await draft.pressSequentially("7");
+    await expect(draft).toHaveValue("9007199254740997");
+  } finally {await app.close().catch(() => {}); await fixture.close(); await rm(userData, {recursive: true, force: true});}
+});
+
 test("packaged disposable SQL discovers an insert on the actual five-minute service schedule", async ({}, testInfo) => {
   test.skip(!process.env.ESMER_SQL_TEST_ADMIN || process.env.ESMER_SQL_POLL_PROOF !== "1", "Opt-in proof uses the unchanged production five-minute cadence");
   test.setTimeout(390_000);
