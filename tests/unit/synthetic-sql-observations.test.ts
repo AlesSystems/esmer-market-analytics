@@ -69,7 +69,7 @@ test("a reader config path inside the repository throws", async () => {
   await expect(assertConfigOutsideRepo("/Users/altanesmer/repo/tools/reader.json", "/Users/altanesmer/repo")).rejects.toThrow(/^UNSAFE_CONFIG_PATH$/);
 });
 
- test("checkExpected rejects a line linked to the wrong parent", () => {
+test("checkExpected rejects a line linked to the wrong parent", () => {
   const lines = baselineSnapshot.lines.map(line => line.ID === "2001" ? {...line, FIS: "1002"} : line);
   expect(checkExpected(baselineSnapshot.headers, lines, baselineExpected())).toEqual({ok: false, mismatches: ["FIS:2001:1002!=1001"]});
 });
