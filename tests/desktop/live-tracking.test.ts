@@ -36,6 +36,31 @@ test("packaged tracking retains selected period, filters and document across sou
   await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("3");
+  async function importCapture(bytes:Uint8Array,name:string){
+   const file=join(userData,`${name}.json`);await writeFile(file,bytes);
+   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
+   await openSettings(page);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  }
+  await page.getByRole("button",{name:"1",exact:true}).click();
+  const corrected={...snapshot,headers:[{...snapshot.headers[0],GENELTOPLAM:"456.00"}]};
+  await importCapture(writeRawPackage(corrected,"fixture:tracking","capture-3"),"capture-3");
+  await expect(page.getByText("fixture:tracking · Paket: capture-3",{exact:false})).toHaveCount(1);
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
+  await expect(page.getByText("456,00 · 456.00",{exact:true})).toBeVisible();
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
+  await importCapture(writeRawPackage({...snapshot,headers:[],lines:[]},"fixture:tracking","capture-4"),"capture-4");
+  await expect(page.getByRole("alert")).toContainText("Belge seçili kaynak kapsamında bulunamadı.");
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
+  await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
+  await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("3");
+  await importCapture(writeRawPackage({...snapshot,databaseId:"00000000-0000-4000-8000-000000000002"},"fixture:tracking","capture-5"),"capture-5");
+  await expect(page.getByText("fixture:tracking · Paket: capture-5",{exact:false})).toHaveCount(1);
+  await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-11");
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-10");
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();
+  await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
@@ -54,5 +79,6 @@ test("packaged stale status acknowledges retained raw-only source records",async
   await page.getByRole("button",{name:"SQL kaynağını içe aktar",exact:true}).click();
   await expect(page.getByText("Kaynağa ulaşılamadı.",{exact:true})).toBeVisible({timeout:15000});
   await expect(page.getByText("Son geçerli yerel veriler kullanılıyor.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Canlı bağlantı",exact:true}).getByText("12.10.2025",{exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
