@@ -16,4 +16,6 @@
 .purchasing-control-desk .detail-panel { overflow-wrap:anywhere; }
 @media(max-width:900px) { .purchasing-inspection-body { grid-template-columns:minmax(0,1fr); } .cost-inspection-scene .page-scene-stage { height:230px; } .purchasing-control-desk .metrics { grid-template-columns:minmax(0,1fr); } }
 
-.source-purchasing-main { min-width:0; overflow-wrap:anywhere; }
+.source-purchasing-main { min-width:0; }
+.source-purchasing-main > .data-status { overflow-wrap:anywhere; }
+.source-purchasing-desk .table-scroll table { min-width:720px; }

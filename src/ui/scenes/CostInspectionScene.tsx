@@ -8,7 +8,7 @@ function InspectionRenderEvidence() {
  return null;
 }
 export type CostSelection = "exceptions" | "evidence" | "history";
-export function CostInspectionScene({ selection, onExceptions, onEvidence, source = false, hasEvidence = true, onHistory }: { selection: CostSelection; onExceptions: () => void; onEvidence: () => void; source?: boolean; hasEvidence?: boolean; onHistory?: () => void }) {
+export function CostInspectionScene({ selection, onExceptions, onEvidence, source = false, hasEvidence = true, onHistory }: { selection: CostSelection | null; onExceptions: () => void; onEvidence: () => void; source?: boolean; hasEvidence?: boolean; onHistory?: () => void }) {
  return <div data-scene="cost-inspection" className="cost-inspection-scene">
   <div role="img" aria-label="Çapraz inceleme merceği ve açık kanıt tepsisi; tutarları temsil etmez">
    <SceneFrame camera={{ position: [3, 3, 5], zoom: 66 }}>
