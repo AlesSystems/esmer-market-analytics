@@ -59,3 +59,29 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     await expect(page.getByText("Günlük kayıtlar bu dönem için gösterilemiyor; dönem yedek kapsamında değil.", {exact: true})).toBeVisible();
   } finally { await app.close(); await rm(userData, {recursive: true, force: true}); }
 });
+
+test("source desk discloses truncated type counts and an empty month within the backup", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "source-control-desk-types-"));
+  const snapshot = rawSnapshot();
+  snapshot.from = "2025-09-01";
+  snapshot.headers = Array.from({length: 51}, (_, index) => ({...snapshot.headers[0], ID: String(index + 1), FIS_TURU: String(100 + index)}));
+  snapshot.lines = [];
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { expect(store.importSourcePreview(writeRawPackage(snapshot, "fixture:source-control-desk-types", "source-desk-types-1")).status).toBe("preview-imported"); } finally { store.close(); }
+  const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
+  try {
+    const page = await app.firstWindow();
+    const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
+    await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("51");
+    await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("51");
+    await expect(page.getByText("50 / 51 tür kodu gösteriliyor", {exact: false})).toBeVisible();
+    await expect(page.getByText("diğer türler grafikte ve tabloda yok.", {exact: false})).toBeVisible();
+    await page.getByText("Belge türlerinin tam sayılarını göster", {exact: true}).click();
+    await expect(page.getByRole("table", {name: "Kaynak belge türleri tablosu"}).getByRole("row")).toHaveCount(51);
+    await page.getByLabel("Dönem", {exact: true}).fill("2025-09");
+    await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("0");
+    await expect(page.getByText("Bu dönem için günlük belge kaydı yok.", {exact: true})).toBeVisible();
+    await expect(page.getByText("Bu dönem için belge türü kaydı yok.", {exact: true})).toBeVisible();
+    await expect(page.getByText("Seçili dönem yedek kapsamı dışında. Eksik veri sıfır sayılmaz.", {exact: true})).toHaveCount(0);
+  } finally { await app.close(); await rm(userData, {recursive: true, force: true}); }
+});
