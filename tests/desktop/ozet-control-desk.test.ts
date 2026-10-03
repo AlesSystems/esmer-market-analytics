@@ -101,6 +101,11 @@ test("large monthly figures fit the desk and 3D context loss preserves selection
     const rail = page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" });
     await rail.getByRole("button", { name: "Maliyet katmanı", exact: true }).click();
     await expect(rail.getByRole("button", { name: "Maliyet katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
+    const canvas = rail.locator("canvas");
+    await canvas.screenshot({ path: testInfo.outputPath("selected-cost-object.png") });
+    const bounds = await canvas.boundingBox();
+    await canvas.click({ position: { x: bounds!.width / 2, y: bounds!.height * .4 } });
+    await expect(rail.getByRole("button", { name: "Satış katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await rail.locator("canvas").evaluate(canvas => canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
     await expect(rail.getByText("Görünüm kullanılamıyor", { exact: true })).toBeVisible();
