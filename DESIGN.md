@@ -23,6 +23,10 @@ colors:
   warning-foreground: "#80580b"
   warning-border: "#e4cea4"
   selection-background: "#cae7df"
+  overview-blue: "#2459d5"
+  overview-ink: "#182644"
+  overview-muted: "#5c6980"
+  overview-line: "#dce3ee"
   # Settings surface (Glazed Tile Panel): scoped to the Ayarlar page and the sidebar live badge.
   settings-glaze: "#fbfaf6"
   settings-grout: "#e4ddce"
@@ -309,6 +313,18 @@ components:
 
 # Design System: Esmer Market
 
+## Selected Özet surface · Kontrol masası
+
+The owner selected prototype C and its blue palette on 2026-10-03. This direction governs the monthly overview and its active shell. Other workspaces and the settings panel retain their existing rules below. The website logo replaces the text brand across the shared shell, using a packaged local image.
+
+The first reading level is a four-column matrix of net sales, covered historical estimated cost, covered estimated gross profit, and the eligible operating result. The daily net-sales chart and category ranking occupy the main column. A narrow evidence column carries the blue 3D stack, cost coverage, source status, and method. Existing detailed reports remain below the overview.
+
+Use cobalt `#2459d5`, ink `#182644`, muted ink `#5c6980`, separators `#dce3ee`, and white. Manrope Variable is packaged locally for this surface, including Turkish characters, with Segoe UI and system fallbacks. Amounts use tabular numerals. Blue indicates actions and selection; financial signs and evidence text retain their meanings.
+
+The fixed-camera 3D stack selects sales, cost, or expense explanations. It never represents proportional amounts. Equivalent HTML buttons remain available during initialization failure or context loss. Render on demand at a bounded pixel ratio, with no automatic motion. Narrow windows stack the evidence column below the chart and use a two-column metric matrix.
+
+The `MonthlyDisplay` report remains the authority for every amount, comparison, coverage state, chart height, and category share. Prototype fixtures and their comparison controls are excluded from the production entry. See [the implementation contract](workstreams/ozet-control-desk/CONTRACT.md).
+
 ## Overview
 
 **Creative North Star: "The Quiet Market Ledger"**
@@ -537,14 +553,14 @@ The panel has one entrance movement: the coverage gap reveals left to right with
 
 ### Don't:
 
-- **Don't** restore the superseded navy rail, electric-blue action system, or dark component variants.
+- **Don't** restore the superseded navy rail or dark component variants. Cobalt actions are authorized within the selected Özet surface.
 - **Don't** use teal, green, or red alone to assert financial meaning.
 - **Don't** replace missing evidence with a zero or hide it to make a compact view cleaner.
 - **Don't** add a generated control framework where the native table, select, disclosure, or chart already owns the task.
 
 ### Settings surface — Glazed Tile Panel
 
-The ledger Do's and Don'ts above govern every surface outside settings. The deep ink and cobalt here are scoped to the settings panel; they do not restore the superseded navy rail or blue action system elsewhere. Inside the panel, the ink focus outline replaces the teal ring.
+The ledger Do's and Don'ts above govern surfaces outside settings and the selected Özet control desk. The deep ink and cobalt here are scoped to the settings panel; they do not restore the superseded navy rail or blue action system elsewhere. Inside the panel, the ink focus outline replaces the teal ring.
 
 #### Do:
 

@@ -91,6 +91,9 @@ app.whenReady().then(async () => {
     ["/index.html", ["index.html", "text/html; charset=utf-8"]],
     ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
     ["/style.css", ["style.css", "text/css; charset=utf-8"]],
+    ["/assets/esmer-market-logo.png", ["assets/esmer-market-logo.png", "image/png"]],
+    ["/assets/manrope-latin-wght-normal.woff2", ["assets/manrope-latin-wght-normal.woff2", "font/woff2"]],
+    ["/assets/manrope-latin-ext-wght-normal.woff2", ["assets/manrope-latin-ext-wght-normal.woff2", "font/woff2"]],
   ]);
   localSession.webRequest.onBeforeRequest((details, callback) => {
     const url = new URL(details.url);
@@ -113,7 +116,7 @@ app.whenReady().then(async () => {
       headers: {
         "Content-Type": asset[1],
         "Content-Security-Policy":
-          "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'",
+          "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'",
       },
     });
   });
