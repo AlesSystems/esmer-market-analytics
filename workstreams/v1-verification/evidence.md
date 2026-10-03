@@ -81,4 +81,4 @@ Before/after images use synthetic data. [Overview before](screenshots/overview-b
 | `8b22392` | Repair local packaged executable defaults |
 | `219cfac` | Share repaired executable policy |
 
-[Execution graph](plan.md) and [decision trail](decisions.tsv) preserve the work and failure/repair sequence. PR publication follows verified documentation and review. No merge or deployment is included.
+[Execution graph](plan.md) and [decision trail](decisions.tsv) preserve the work and failure/repair sequence. [PR #63](https://github.com/AlesSystems/esmer-market-analytics/pull/63) publishes the verified work from `codex/live-mock-tracking` to `main` and is attached to the chat. Evidence/design commit is `622cdf5`; application code ends at `219cfac`. No merge or deployment is included. Unrelated local `outputs/` remains untracked and preserved.

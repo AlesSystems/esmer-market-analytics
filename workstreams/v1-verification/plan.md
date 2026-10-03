@@ -13,8 +13,8 @@
 - [x] Run unit, integration, packaged desktop, typecheck, lint, and build.
 - [x] Review the complete diff independently and resolve actionable findings.
 - [x] Phase D: Keep the audit trail.
-- [ ] Phase E: Verify and hand back.
-- [ ] Create a PR with evidence and unresolved acceptance gates.
+- [x] Phase E: Verify and hand back.
+- [x] Create a PR with evidence and unresolved acceptance gates.
 
 ## Scope and done predicate
 
@@ -53,7 +53,7 @@ financial safeguards, navigation, and accessibility. The user selected removal o
 | REV-FIX-01 | implementation | Consolidate the duplicated packaged executable policy | V1-04 | Four changed desktop files and one test helper | Same platform paths and overrides; six packaged checks pass | low | completed |
 | REV-02 | review | Confirm the narrow review repair | REV-01, REV-FIX-01 | Read-only resolver delta | Both axes accept the changed helper/callers without new findings | low | completed |
 | DOC-01 | documentation | Record acceptance and decision evidence | REV-02 | workstreams/v1-verification | Commands, environment, fixture identities, expected/actual, paths and limitations | low | completed |
-| PR-01 | integration | Commit and publish reviewable PR | DOC-01 | Current branch codex/live-mock-tracking | Verified remote, coherent Conventional Commits, PR attached | medium | ready |
+| PR-01 | integration | Commit and publish reviewable PR | DOC-01 | Current branch codex/live-mock-tracking | Verified remote, coherent Conventional Commits, PR attached | medium | completed |
 
 ```mermaid
 graph TD
@@ -95,3 +95,7 @@ or later-phase feature is needed. Scale effort to observed failures.
 V1-03 failed on four test-launch defaults pointing to a Windows executable on macOS. Its other results were 50 unit, 324 integration, and 72 packaged desktop passes, including actual five-minute SQL polling; eight Windows/private opt-ins were skipped. FAIL-03 diagnosed these as harness-path failures before FIX-03. V1-04 will reuse those successful results and re-run the four affected checks after the repair; no application behavior changed for FIX-03.
 
 REV-FIX-01 responds to the Standards reviewer’s nonblocking duplicated-resolver finding. It consolidates only the four already changed desktop files. Wider baseline test migration is outside this patch.
+
+## Published handoff
+
+[PR #63](https://github.com/AlesSystems/esmer-market-analytics/pull/63) targets `main` from `codex/live-mock-tracking` and is attached to the chat. Application checks, documentation links and screenshot hashes pass. The original failed suite receipt remains recorded. V1-03 retains its failed state; V1-04 is the successful repair acceptance. All required downstream nodes are complete. Windows/private-source exclusions and owner/production gates remain open.
