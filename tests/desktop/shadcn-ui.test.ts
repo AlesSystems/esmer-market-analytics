@@ -1,13 +1,13 @@
+import { executablePath } from "../helpers/desktop-executable";
 import { createHash } from "node:crypto";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { importPackage, openSettings } from "../helpers/desktop-navigation";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } from "../helpers/shadcn-fixtures";
 
-const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("forced colors keeps a keyboard focus outline on actions and period input", async ({}, testInfo) => {
   const { app, userData, packagePath } = await importedApp();

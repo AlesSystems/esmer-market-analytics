@@ -1,13 +1,13 @@
+import { executablePath } from "../helpers/desktop-executable";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { openStore } from "../../src/store/store";
 import { businessPackage } from "../helpers/business-fixtures";
 import { writeRawPackage } from "../../src/source/raw-package";
 import { rawSnapshot } from "../helpers/raw-fixture";
 
-const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 for (const mode of ["financial", "source"] as const) {
   test(`v1 ${mode} workspaces keep tasks and evidence without decorative renderers`, async ({}, testInfo) => {

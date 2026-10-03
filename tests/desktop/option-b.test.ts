@@ -1,11 +1,11 @@
+import { executablePath } from "../helpers/desktop-executable";
 import { importPackage, openSettings } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
 
-const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("sidebar keeps the reporting period through analysis and recovery", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-option-b-"));
