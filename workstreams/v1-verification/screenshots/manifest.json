@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-03",
+  "before_commit": "f7f3ae5",
+  "after_code_commit": "577e54f",
+  "command": "ESMER_UI_EVIDENCE_DIR=<directory> npx playwright test tests/desktop/v1-simplicity.test.ts",
+  "images": [
+    {
+      "path": "workstreams/v1-verification/screenshots/expenses-after.png",
+      "sha256": "51997131c8f1ca6a9909b29b23296c5563701b314558fc2cb27b59bae6e703f7",
+      "width": 1440,
+      "height": 1000,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/expenses-before.png",
+      "sha256": "1fdf90db713d68506ebf22a222166ec1fbecc8729463a4fda138df10e9db17de",
+      "width": 1440,
+      "height": 1028,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/expenses-narrow.png",
+      "sha256": "edd299c0eb17df1ae474dd83e74e3af6f349a8071d0f4543968a7b41d2b925e9",
+      "width": 390,
+      "height": 1114,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/overview-after.png",
+      "sha256": "b0aed667b35c26118e112fd55c2e1a157129fc0c05ddf0deb50174daa3364292",
+      "width": 1440,
+      "height": 2665,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/overview-before.png",
+      "sha256": "e2d12001390e903b6027e318f77ccd87eb88b385841955b2f61a11040e2073b0",
+      "width": 1440,
+      "height": 3052,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/source-sales-after.png",
+      "sha256": "6f2b5763c36d796f85590c74f5560c320dfbc7299c7f7a2c8df795f12ee19679",
+      "width": 1440,
+      "height": 1119,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    },
+    {
+      "path": "workstreams/v1-verification/screenshots/source-sales-before.png",
+      "sha256": "4e43f4679b4d75f8668cd286cd8accce105d9ba4091155d357358594720cd053",
+      "width": 1440,
+      "height": 1156,
+      "data": "Synthetic businessPackage or rawSnapshot; no private source rows"
+    }
+  ]
+}

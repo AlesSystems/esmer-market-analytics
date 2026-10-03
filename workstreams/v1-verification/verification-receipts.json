@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-03",
+  "baseline": "f7f3ae5a84ee880b77ac2b5b15e71e8fc62f042b",
+  "application_code_commit": "577e54f",
+  "final_code_commit": "219cfac",
+  "environment": {
+    "platform": "macOS 27.0 (26A428), arm64",
+    "node": "24.15.0",
+    "npm": "11.12.1",
+    "electron": "44.3.0",
+    "signing": "unsigned local package"
+  },
+  "full_suite": {
+    "unit_passed": 50,
+    "integration_passed": 324,
+    "integration_skipped": 0,
+    "desktop_passed": 72,
+    "desktop_failed_launches": 4,
+    "desktop_skipped": 8,
+    "exit_code": 1
+  },
+  "launch_repair_retest": {
+    "passed": 4,
+    "windows_skipped": 3,
+    "exit_code": 0
+  },
+  "focused_final_fixes": {
+    "passed": 14,
+    "files": 2,
+    "exit_code": 0,
+    "additional_new_inventory_tests": 2
+  },
+  "distinct_current_test_evidence": {
+    "unit": 50,
+    "integration": 326,
+    "packaged_desktop": 76,
+    "desktop_exclusions": 8
+  },
+  "package": {
+    "asar_sha256": "37dd314c762e7171b23d55fdc51544a7ca0210e02b5cde28577ff49b6d2784a3",
+    "app_js_bytes_before": 1463588,
+    "app_js_bytes_after": 514173,
+    "dependency_notices_verified": 80
+  },
+  "logs": [
+    {
+      "path": "/tmp/esmer-v1-verification/full-suite.log",
+      "bytes": 22847,
+      "sha256": "3958c988a165d9041267b871f5487ec2f0777638a1b348f7349b00d391be9064"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/desktop-harness-retest.log",
+      "bytes": 1128,
+      "sha256": "2638e4f8c0709a50a2489635afffa88ddc15288c3c61cfaa9270c297db41a513"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/fixes-handoff.log",
+      "bytes": 215,
+      "sha256": "666e16ae1474f5c21cdc236f62368264705eaf9b787d8cf34af52ba1a6e54c42"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/typecheck-handoff.log",
+      "bytes": 58,
+      "sha256": "47a4fc125a1978631dd2b956404c649f17ab25e1e666317b7442c8e06a281fdf"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/lint-handoff.log",
+      "bytes": 49,
+      "sha256": "17bc714d8256aa9bbdf4bde7fea75ec28d7a9afc549b24d0f6cb4b43ebcc93d8"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/package-notices.log",
+      "bytes": 35,
+      "sha256": "d02144bd188234dd1e6d03a0536bc3fac5e74efce72dd660071a14af9d9b7162"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/simplicity-before.log",
+      "bytes": 3373,
+      "sha256": "20ad93ea55f31e6df8f3dc3557b95e7365b666d572e076bb500ff410addbd689"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/focused-desktop.log",
+      "bytes": 5375,
+      "sha256": "797bfcc8d72b558acb92a983669ffd07d8910d2be643265a1266302cafc49a81"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/simplicity-final.log",
+      "bytes": 488,
+      "sha256": "88e72d1ada5f48eb29b26258d1214b0899e0b9e33f44e68749613fec950aa125"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/integration-sql.log",
+      "bytes": 669,
+      "sha256": "7a1e25ee1943d39aa9a62bafd62cf4999960ae2fca948b205a7139bd815f9808"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/integration-reader.log",
+      "bytes": 447,
+      "sha256": "4df2195fecd562de2ca9081f14970b4f4efa8deae3964f6e5613b9f89dddc4ac"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/sql-teardown.json",
+      "bytes": 468,
+      "sha256": "fb444b82f90e8c206f78954846bde2f94c8f76387c8e31a6e7048180d4411e0d"
+    },
+    {
+      "path": "/tmp/esmer-v1-verification/desktop-resolver-retest.log",
+      "bytes": 1403,
+      "sha256": "35001f1150f044d5d767457d98583f76cb39eac370a6641780db5efe8e87e2b3"
+    }
+  ],
+  "resolver_extraction_retest": {
+    "passed": 6,
+    "windows_skipped": 3,
+    "exit_code": 0
+  },
+  "final_static_checks": {
+    "typecheck": 0,
+    "lint": 0,
+    "diff_check": 0
+  }
+}
