@@ -29,3 +29,17 @@ Normal captures: [financial 1440](financial-1440.png), [financial 390](financial
 ## Limits
 
 Windows packaging/scaling, A07 Windows acceptance, real source semantics and full-volume performance remain open. No acceptance claim extends beyond these synthetic local macOS checks. Root owns full unit/integration verification, independent review, integration commits, PR and merge. No commits, pushes or spawned agents were made here.
+
+## PR60 bounded review repair
+
+Date: 2026-10-03. Starting pinned head: `0f0855629ebf4e1745a865d0d9f9f27487073943`, base `9683a80249efb5b30bbc463ca8ad95ec9230a29e`. Reviewed `work/page-implementation/reports/standards-review.md`. Repair is uncommitted for root integration.
+
+Four packaged regressions were added before application edits and run against the reviewer's existing pinned binary. **4 failed**: an accepted unavailable August period showed `0,00 ₺` rather than `Hesaplanamıyor`; accepted partial September lacked `Kısmi dönem`; accepted unreconciled September lacked `Kanıt eksik`; UI accept → inspect older ID → open newest/current row displayed the older full-report ID. Fixtures used actual `ReportVersions.open/accept` outputs and the application's UI acceptance flow, with no fabricated report DTOs.
+
+The inspector now uses the existing MonthlyOverview coverage boundary: unavailable sales are withheld, partial/incomplete contributions carry the existing Turkish explanations, and the service-provided from/to range is explicit. No financial values are recalculated. The candidate-ID full-open shortcut sets the requested candidate before opening details. Three redundant test comments were removed. Normal captures now reset window scroll to zero and wait for two animation frames after viewport changes.
+
+Fresh `npm run typecheck`, `npm run lint`, `npm run build` and offline `npx electron-builder --dir --config.electronDist=/Users/altanesmer/Desktop/Ales/esmer-market-analytics/node_modules/electron/dist` **passed**. Existing dependency-discovery/default-icon/unsigned macOS warnings are unchanged.
+
+The packaged command above, with explicit `ESMER_CAPTURE_EVIDENCE=1`, then ran **13 passed in 15.3 seconds**: all eight Reports control-desk tests (including the four red regressions), existing saved-pair versus candidate review/focus, two report states, and two source-workspace checks. The existing source typing race did not occur in this run; no claim that it was fixed. `git diff --check` passed.
+
+Normal financial/source 1440/390 captures and separate fallback captures were refreshed once after the repair. Visual inspection confirms the desktop sidebar begins at the page top, the full scene remains visible in full-page normal captures, and coverage status/range appear with the selected saved report. Financial/source measurements remain 6 draw calls / 72 triangles per resize frame and zero idle draw calls. Windows A07, real-source, full-volume and long-running renderer gates remain open.
