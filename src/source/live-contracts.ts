@@ -1,4 +1,4 @@
-export const LIVE_ERROR_CODES = ["SOURCE_UNAVAILABLE", "PERMISSION_DENIED", "SOURCE_CHANGED", "UNSUPPORTED_MAPPING", "INVALID_CANDIDATE", "STORAGE_FULL", "INTERRUPTED", "REFRESH_TIMEOUT"] as const;
+export const LIVE_ERROR_CODES = ["SOURCE_UNAVAILABLE", "SOURCE_REJECTED", "PERMISSION_DENIED", "SOURCE_CHANGED", "UNSUPPORTED_MAPPING", "INVALID_CANDIDATE", "STORAGE_FULL", "INTERRUPTED", "REFRESH_TIMEOUT"] as const;
 export type LiveErrorCode = typeof LIVE_ERROR_CODES[number];
 export type LiveRecordKind = "none" | "preview" | "dataset";
 type LiveHistory = {lastAttemptAt: string | null; lastSuccessAt: string | null; lastDatasetId: string | null; lastRecord: LiveRecordKind; persistenceError: boolean};

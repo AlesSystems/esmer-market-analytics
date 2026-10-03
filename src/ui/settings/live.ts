@@ -3,6 +3,7 @@ import type { LiveResult, RequestError } from "../../domain/contracts";
 
 export const liveErrors: Record<string, string> = {
   SOURCE_UNAVAILABLE: "Kaynağa ulaşılamadı.",
+  SOURCE_REJECTED: "Kaynak okuması reddedildi. Erişim izinlerini ve kaynak yapısını kontrol edin.",
   PERMISSION_DENIED: "Kaynağı okuma izni doğrulanamadı.",
   SOURCE_CHANGED: "Kaynak kimliği değişti. Bağlantı ayarını yeniden inceleyin.",
   INVALID_CANDIDATE: "Kaynak verileri doğrulanamadı.",

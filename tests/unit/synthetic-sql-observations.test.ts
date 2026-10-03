@@ -21,7 +21,7 @@ const baselineSnapshot = {
     {ID: "1001", GENELTOPLAM: "123.12345678", FIS_TURU: "11", FIS_TARIHI: "2025-09-10T00:00:00.000"},
     {ID: "1002", GENELTOPLAM: "40.00000000", FIS_TURU: "12", FIS_TARIHI: "2025-09-11T00:00:00.000"},
   ],
-  lines: [{ID: "2001"}, {ID: "2002"}],
+  lines: [{ID: "2001", FIS: "1001"}, {ID: "2002", FIS: "1002"}],
 };
 
 test("checkExpected requires the raw type 12 observation and literal totals", () => {
@@ -46,7 +46,7 @@ test("checkExpected requires the raw type 12 observation and literal totals", ()
 test("scenario observations describe the row changes a refresh must see", () => {
   const afterDelete = {
     headers: [{ID: "1001", GENELTOPLAM: "123.12345678", FIS_TURU: "11", FIS_TARIHI: "2025-09-10T00:00:00.000"}],
-    lines: [{ID: "2001"}],
+    lines: [{ID: "2001", FIS: "1001"}],
   };
   expect(checkExpected(afterDelete.headers, afterDelete.lines, scenarioExpected("delete"))).toEqual({ok: true});
   expect(checkExpected(baselineSnapshot.headers, baselineSnapshot.lines, scenarioExpected("delete"))).toEqual({
@@ -67,4 +67,9 @@ test("scenario observations describe the row changes a refresh must see", () => 
 test("a reader config path inside the repository throws", async () => {
   await expect(assertConfigOutsideRepo("/tmp/esmer-reader.json", "/Users/altanesmer/repo")).resolves.toBeUndefined();
   await expect(assertConfigOutsideRepo("/Users/altanesmer/repo/tools/reader.json", "/Users/altanesmer/repo")).rejects.toThrow(/^UNSAFE_CONFIG_PATH$/);
+});
+
+test("checkExpected rejects a line linked to the wrong parent", () => {
+  const lines = baselineSnapshot.lines.map(line => line.ID === "2001" ? {...line, FIS: "1002"} : line);
+  expect(checkExpected(baselineSnapshot.headers, lines, baselineExpected())).toEqual({ok: false, mismatches: ["FIS:2001:1002!=1001"]});
 });

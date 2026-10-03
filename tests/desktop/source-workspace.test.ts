@@ -42,6 +42,8 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await expect(page.getByRole("button",{name:"1",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Filtreleri temizle",exact:true}).click();
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
+  await expect(page.locator("main")).toHaveAttribute("aria-busy","false");
+  if(!await page.locator(".source-advanced").evaluate(node=>node.hasAttribute("open")))await page.getByText("Gelişmiş filtreler",{exact:true}).click();
   await page.getByLabel("Ürün kayıt ID’si",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
   await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
   await expect(page.getByText("KDV toplamı · doğrulanmadı",{exact:true})).toBeVisible();

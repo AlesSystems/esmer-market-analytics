@@ -114,7 +114,8 @@ export class LiveSynchronizer {
       this.save(); return {status: result.status, datasetId: result.datasetId};
     } catch (error) {
       if (!this.enabled) return {status: "cancelled"};
-      const code = error instanceof Error && LIVE_ERROR_CODES.includes(error.message as LiveErrorCode) ? error.message as LiveErrorCode : "SOURCE_UNAVAILABLE";
+      const sourceCode = error instanceof Error ? error.message : "";
+      const code: LiveErrorCode = sourceCode === "SOURCE_TIMEOUT" ? "REFRESH_TIMEOUT" : sourceCode === "CANCELLED" ? "INTERRUPTED" : LIVE_ERROR_CODES.includes(sourceCode as LiveErrorCode) ? sourceCode as LiveErrorCode : "SOURCE_UNAVAILABLE";
       this.state = {...this.state, phase: "stale", error: code};
       this.save(); return {status: "failed", code};
     } finally {

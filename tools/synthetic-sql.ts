@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { applyScenario, openSyntheticDev, resetSyntheticDev, seedSyntheticDev, stopSyntheticDev } from "../tests/helpers/live-sql-fixture.ts";
+import { appendSyntheticDev, checkSyntheticDev, applyScenario, startSyntheticDev, resetSyntheticDev, seedSyntheticDev, stopSyntheticDev } from "../tests/helpers/live-sql-fixture.ts";
 import { assertConfigOutsideRepo, isScenarioName, SYNTHETIC_DEV_DATABASE } from "./synthetic-sql/observations.ts";
 
 const repoRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -27,7 +27,17 @@ try {
   if (extra.length) throw new Error("INVALID_ARGUMENTS");
   switch (command) {
     case "start":
-      await (await openSyntheticDev(adminPath())).close();
+      await requireDevConfigPath();
+      await startSyntheticDev(adminPath());
+      announce();
+      break;
+    case "append":
+      await appendSyntheticDev(adminPath());
+      announce();
+      break;
+    case "check":
+      await requireDevConfigPath();
+      await checkSyntheticDev(adminPath(), scenario ?? "baseline");
       announce();
       break;
     case "seed":
@@ -54,7 +64,7 @@ try {
       throw new Error("INVALID_ARGUMENTS");
   }
 } catch (error) {
-  const message = error instanceof Error ? error.message : "SYNTHETIC_SQL_FAILED";
+  const message = error instanceof Error && /^[A-Z_]+$/.test(error.message) ? error.message : "SYNTHETIC_SQL_FAILED";
   process.stderr.write(`${message}\n`);
   process.exitCode = 1;
 }
