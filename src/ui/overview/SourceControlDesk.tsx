@@ -1,3 +1,5 @@
+import {useState} from "react";
+import {MonthObject, type MonthLayers} from "./MonthObject";
 import type {SourceView} from "../SourceWorkspace";
 import {date} from "../format";
 import {typeLabel} from "../source-fields";
@@ -6,6 +8,8 @@ import "./source-control-desk.css";
 
 const count = (value: number) => value.toLocaleString("tr-TR");
 const sourceDate = (value: string) => date(value.slice(0, 10));
+
+type SourceLayer = "coverage" | "records" | "method";
 
 type Props = {
   view: SourceView;
@@ -17,6 +21,12 @@ type Props = {
 };
 
 export function SourceControlDesk({view, period, outside, onDocuments, onProducts, onDocumentType}: Props) {
+  const [selected, setSelected] = useState<SourceLayer>("coverage");
+  const layers: MonthLayers<SourceLayer> = [
+    {id: "coverage", label: "Kapsam", detail: outside ? `${period} kaynak kapsamı dışında. Eksik veri sıfır sayılmaz.` : `${period} kaynak kapsamı içinde. Kaynak tarihleri ${sourceDate(view.from)}–${sourceDate(view.to)}.`},
+    {id: "records", label: "Kayıtlar", detail: outside ? "Bu dönem için kayıt sayıları gösterilemiyor; dönem kaynak kapsamında değil." : `${count(view.counts.documents)} belge, ${count(view.counts.lines)} satır, ${count(view.counts.products)} ürün kayıt ID’si. Tüm durumları içerir; doğrulanmış satış değildir.`},
+    {id: "method", label: "Yöntem", detail: "Ham kaynak kayıtları. Tür kodları tamamlanmış işlem veya tanınmış tutar anlamına gelmez. Mali sonuçlar doğrulanmadı; eksik maliyet sıfır değildir."},
+  ];
   const indicators = [
     {label: "Belge kaydı", value: view.counts.documents, detail: "Tüm durum ve türler", action: onDocuments},
     {label: "Satır kaydı", value: view.counts.lines, detail: "Kaynak belge satırları", action: onDocuments},
@@ -56,7 +66,8 @@ export function SourceControlDesk({view, period, outside, onDocuments, onProduct
         </section>
       </div>
       <aside className="c-evidence" aria-label="Kaynak kapsamı ve yöntem">
-        <h2>Kaynak kapsamı ve yöntem</h2><p className="c-evidence-intro">Mali sonuçlar doğrulanmadı</p>
+        <h2>Sonucun dayanağı</h2><p className="c-evidence-intro">Mali sonuçlar doğrulanmadı</p>
+        <MonthObject<SourceLayer> selected={selected} onSelect={setSelected} layers={layers} sceneLabel="Kaynak kapsamı, kayıtlar ve yöntem katmanları. Tutarları veya doğrulanmış mali sonuçları temsil etmeyen 3D gezinme nesnesi." controlsLabel="Kaynak kanıt katmanı"/>
         <div className="c-proof-list">
           <div><span>Yedek kapsamı</span><strong>{sourceDate(view.from)}–{sourceDate(view.to)}</strong><p>Kayıt sayıları tüm durumları içerir.</p></div>
           <div><span>Kaynak</span><strong>{view.lineage}</strong><p>Paket: {view.extractionId}</p></div>
