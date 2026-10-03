@@ -123,3 +123,7 @@ A06 remains open for actual Windows key protection, file-system behavior, indepe
 - [Synthetic capacity evidence and open source gates](issue-26-import-capacity.md), [profile receipts](issue-26-import-profiles.json), and [decision trail](issue-26-decisions.tsv).
 - [Capacity decision](../decisions/issue-26-import-capacity.md) and [repeatable profiling procedure](../operations/profile-import.md).
 - [Isolated source validation](issue-26-source-validation.md), [OrbStack verification receipt](issue-26-orbstack-verification.json), and [repeatable evidence collection](../operations/collect-source-evidence.md).
+
+## Default source overview
+
+[Issue #56 evidence](issue-56-source-overview.md) records the 3D object and source evidence panel in the default Özet, synthetic backup/live capture checks, accessible fallback and the remaining Windows acceptance.
