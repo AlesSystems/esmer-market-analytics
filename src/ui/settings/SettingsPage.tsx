@@ -160,7 +160,7 @@ export function SettingsPage({ availability, source, view, onView, live, importi
   const unread = !availability ? "Yükleniyor…" : !ready ? "Okunamadı" : undefined;
   return <main className="settings-page" aria-busy={importing || sqlImporting}>
     <div className="settings-heading">
-      <div><h1 ref={heading} tabIndex={-1}>Ayarlar</h1><p>Veri içe aktarma, canlı bağlantı ve uygulama tercihleri.</p></div>
+      <div><h1 ref={heading} tabIndex={-1}>Ayarlar</h1></div>
       <button type="button" className="tile-action" onClick={onClose}>Ayarları kapat</button>
     </div>
     <div className="tile-panel">
@@ -175,10 +175,9 @@ export function SettingsPage({ availability, source, view, onView, live, importi
           <button type="button" aria-pressed={view === "financial"} onClick={() => onView("financial")}>Korunan mali veri görünümü</button>
         </div>}
       </Tile>
-      <Tile glaze="cobalt" name="Veri içe aktarma" line="Hazırlanmış analiz paketini seçin. Başarısız bir içe aktarma son geçerli verileri değiştirmez." seal={importing ? "checking" : dataset ? "ready" : "empty"}>
+      <Tile glaze="cobalt" name="Veri içe aktarma" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : dataset ? "ready" : "empty"}>
         <div className="import-choice">
-          <h3>Analiz veri paketi</h3>
-          <p>Doğrulanmış .json paketi mali raporları etkinleştirir; ham kaynak paketi yalnızca kayıtları gösterir.</p>
+          <p>.json analiz paketi mali raporları, ham kaynak paketi kayıtları gösterir.</p>
         </div>
         <ImportHistory entries={ready?.recentImports} unread={unread} />
         <div className="tile-actions"><button type="button" className="tile-action primary" disabled={importing || sqlImporting} onClick={onImportPackage}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button></div>

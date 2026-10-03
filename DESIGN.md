@@ -317,11 +317,11 @@ components:
 
 The owner selected prototype C and its blue palette on 2026-10-03. This direction governs the monthly overview and its active shell. Other workspaces and the settings panel retain their existing rules below. The website logo replaces the text brand across the shared shell, using a packaged local image.
 
-The first reading level is a four-column matrix of net sales, covered historical estimated cost, covered estimated gross profit, and the eligible operating result. The daily net-sales chart and category ranking occupy the main column. A narrow evidence column carries the blue 3D stack, cost coverage, source status, and method. Existing detailed reports remain below the overview.
+The first reading level is a four-column matrix of net sales, covered historical estimated cost, covered estimated gross profit, and the eligible operating result. The daily net-sales chart and category ranking occupy the main column. A narrow evidence column carries cost coverage, source status, and a native method disclosure. Existing detailed reports remain below the overview.
 
 Use cobalt `#2459d5`, ink `#182644`, muted ink `#5c6980`, separators `#dce3ee`, and white. Manrope Variable is packaged locally for this surface, including Turkish characters, with Segoe UI and system fallbacks. Amounts use tabular numerals. Blue indicates actions and selection; financial signs and evidence text retain their meanings.
 
-The fixed-camera 3D stack selects sales, cost, or expense explanations. It never represents proportional amounts. Equivalent HTML buttons remain available during initialization failure or context loss. Render on demand at a bounded pixel ratio, with no automatic motion. Narrow windows stack the evidence column below the chart and use a two-column metric matrix.
+The user requested removal of decorative 3D elements on 2026-10-03. The metric matrix and native disclosures expose the financial tasks directly. Narrow windows stack the evidence column below the chart and use a two-column metric matrix.
 
 The `MonthlyDisplay` report remains the authority for every amount, comparison, coverage state, chart height, and category share. Prototype fixtures and their comparison controls are excluded from the production entry. See [the implementation contract](workstreams/ozet-control-desk/CONTRACT.md).
 
@@ -579,4 +579,4 @@ The ledger Do's and Don'ts above govern surfaces outside settings and the select
 
 ## Sales, purchasing, expenses and reports extension
 
-The user approved the overview visual system for all four workspaces on 2026-10-03. These pages inherit its white ground, cobalt actions, Manrope Variable typography, fine separators and evidence rail. The selected structures and data boundaries are recorded in [the workspace contract](docs/contracts/page-control-desks.md). Each page owns a distinct procedural 3D object and accessible task controls. Geometry never encodes financial values. Settings keeps the Glazed Tile Panel and the overview keeps its existing object.
+The user approved the overview visual system for all four workspaces on 2026-10-03. These pages inherit its white ground, cobalt actions, Manrope Variable typography and fine separators. The selected structures and data boundaries are recorded in [the workspace contract](docs/contracts/page-control-desks.md). The later simplicity request removes production 3D objects and duplicate panels. Native controls retain task navigation, draft state and source evidence. Settings keeps the Glazed Tile Panel with shorter supporting copy.

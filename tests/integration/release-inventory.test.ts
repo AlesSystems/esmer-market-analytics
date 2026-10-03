@@ -8,13 +8,23 @@ import { inspectRelease } from "../../tools/release-inventory";
 const roots: string[] = [];
 afterEach(async () => { for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true }); });
 
-async function fixture(extraPath?: string, content = "synthetic") {
+async function fixture(extraPath?: string, content = "synthetic", currentBuild = false) {
   const root = await mkdtemp(join(tmpdir(), "esmer-release-")); roots.push(root);
   const app = join(root, "app"), release = join(root, "release");
   await mkdir(join(app, "dist", "desktop"), { recursive: true });
   await mkdir(join(release, "resources"), { recursive: true });
   await writeFile(join(app, "package.json"), JSON.stringify({ name: "esmer-market-analytics", version: "0.1.0" }));
   await writeFile(join(app, "dist", "desktop", "main.cjs"), "console.log('synthetic');");
+  if (currentBuild) {
+    for (const path of ["dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/manrope-latin-ext-wght-normal.woff2", "dist/ui/assets/manrope-latin-wght-normal.woff2"]) {
+      await mkdir(join(app, path, ".."), { recursive: true });
+      await writeFile(join(app, path), "synthetic build asset");
+    }
+    await mkdir(join(release, "resources", "licences"), { recursive: true });
+    for (const name of ["LICENSE", "LICENSES.chromium.html", "shadcn-LICENSE", "tailwindcss-LICENSE", "three-LICENSE", "react-three-fiber-LICENSE", "manrope-LICENSE", "its-fine-LICENSE", "react-use-measure-LICENSE", "suspend-react-LICENSE", "zustand-LICENSE", "use-sync-external-store-LICENSE", "scheduler-LICENSE", "react-LICENSE"]) {
+      await writeFile(join(release, "resources", "licences", name), "synthetic dependency notice");
+    }
+  }
   if (extraPath) {
     await mkdir(join(app, extraPath, ".."), { recursive: true });
     await writeFile(join(app, extraPath), content);
@@ -56,4 +66,27 @@ test("reviewed SQL library credential modules remain scanned for secrets and can
   for (const path of ["node_modules/@azure/identity/dist/commonjs/credentials.json", "node_modules/@azure/identity/dist/commonjs/.env", "node_modules/@azure/identity/dist/commonjs/data.bak", "node_modules/@azure/identity/dist/commonjs/credentials.js", "node_modules/unreviewed-driver/credentials.js"]) {
     expect((await inspectRelease(await fixture(path))).violations).toContain(`archive:${path}`);
   }
+});
+
+
+test("release inspection admits the current build assets and notices while inventorying their content", async () => {
+  const result = await inspectRelease(await fixture(undefined, "synthetic", true));
+  expect(result.archiveFiles.map(file => file.path)).toEqual([
+    "dist/desktop/main.cjs", "dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/manrope-latin-ext-wght-normal.woff2", "dist/ui/assets/manrope-latin-wght-normal.woff2", "package.json",
+  ]);
+  expect(result.files).toHaveLength(15);
+  expect(result.violations).toEqual([]);
+});
+
+test("build asset and notice admission stays exact and scans allowed files for secrets", async () => {
+  const counterfeit = await fixture("dist/ui/assets/unreviewed-logo.png", "synthetic", true);
+  await writeFile(join(counterfeit, "resources", "licences", "unreviewed-LICENSE"), "synthetic");
+  expect((await inspectRelease(counterfeit)).violations).toEqual([
+    "distribution:resources/licences/unreviewed-LICENSE", "archive:dist/ui/assets/unreviewed-logo.png",
+  ]);
+  const secret = await fixture("dist/ui/assets/esmer-market-logo.png", "-----BEGIN PRIVATE KEY-----", true);
+  await writeFile(join(secret, "resources", "licences", "manrope-LICENSE"), "-----BEGIN PRIVATE KEY-----");
+  expect((await inspectRelease(secret)).violations).toEqual([
+    "content:resources/licences/manrope-LICENSE", "content:dist/ui/assets/esmer-market-logo.png",
+  ]);
 });

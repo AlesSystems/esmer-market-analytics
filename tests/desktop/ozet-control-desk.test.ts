@@ -45,25 +45,19 @@ test("Kontrol masası presents the pinned month with real navigation and offline
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-test("Kontrol masası keeps financial evidence usable without WebGL", async ({}, testInfo) => {
+test("Kontrol masası keeps financial evidence accessible with keyboard disclosure", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-control-desk-fallback-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { expect(store.importPackage(businessPackage()).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
-    await page.addInitScript(() => {
-      const getContext = HTMLCanvasElement.prototype.getContext;
-      Object.defineProperty(HTMLCanvasElement.prototype, "getContext", { value: function (type: string, ...args: unknown[]) {
-        return type.startsWith("webgl") ? null : Reflect.apply(getContext, this, [type, ...args]);
-      } });
-    });
-    await page.reload();
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     const rail = page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" });
-    await expect(rail.getByText("Görünüm kullanılamıyor", { exact: true })).toBeVisible();
-    await rail.getByRole("button", { name: "Maliyet katmanı", exact: true }).press("Enter");
-    await expect(rail.getByRole("button", { name: "Maliyet katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await rail.locator("details summary").press("Enter");
+    await expect(rail.locator("details")).toHaveAttribute("open", "");
+    await expect(rail.locator("details")).toContainText("Paket:");
+    await expect(rail.locator("canvas")).toHaveCount(0);
     await expect(rail).toContainText("%50");
     await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("40,00 ₺");
     await page.screenshot({ path: testInfo.outputPath("control-desk-no-webgl.png"), fullPage: true });
@@ -71,7 +65,7 @@ test("Kontrol masası keeps financial evidence usable without WebGL", async ({},
 });
 
 
-test("large monthly figures fit the desk and 3D context loss preserves selection", async ({}, testInfo) => {
+test("large monthly figures fit the desk and preserve report evidence", async ({}, testInfo) => {
   const records = businessRecords(), fixtureDocument = records.documents[0], line = records.lines[0];
   const categories = ["Süt ve kahvaltılık", "Temel gıda", "İçecekler", "Temizlik ve bakım", "Diğer"];
   records.documents = Array.from({ length: 30 }, (_, index) => {
@@ -99,22 +93,7 @@ test("large monthly figures fit the desk and 3D context loss preserves selection
     }
     await page.setViewportSize({ width: 1440, height: 1100 });
     const rail = page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" });
-    await rail.getByRole("button", { name: "Maliyet katmanı", exact: true }).click();
-    await expect(rail.getByRole("button", { name: "Maliyet katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
-    const canvas = rail.locator("canvas");
-    await canvas.screenshot({ path: testInfo.outputPath("selected-cost-object.png") });
-    const bounds = await canvas.boundingBox();
-    await canvas.click({ position: { x: bounds!.width / 2, y: bounds!.height * .4 } });
-    await expect(rail.getByRole("button", { name: "Satış katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await rail.locator("canvas").evaluate(canvas => canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
-    await expect(rail.getByText("Görünüm kullanılamıyor", { exact: true })).toBeVisible();
-    await rail.getByRole("button", { name: "Gider katmanı", exact: true }).press("Enter");
-    await expect(rail.getByRole("button", { name: "Gider katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await rail.getByRole("button", { name: "3D’yi yeniden dene", exact: true }).click();
-    await expect(rail.locator("canvas")).toBeVisible();
-    await expect(rail.getByRole("button", { name: "Gider katmanı", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("button", { name: "Veri ve yöntemi incele →", exact: true }).click();
+    await rail.locator("details summary").press("Enter");
     await expect(rail.locator("details")).toHaveAttribute("open", "");
     await expect(rail.locator("details summary")).toBeFocused();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

@@ -1,15 +1,17 @@
+import { executablePath } from "../helpers/desktop-executable";
 import { importPackage, openSettings } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
+
 
 test("sidebar keeps the reporting period through analysis and recovery", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-option-b-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage());
-  const app = await electron.launch({ executablePath: process.env.ESMER_EXECUTABLE ?? resolve("release/win-unpacked/Esmer Market Analytics.exe"), args: [`--user-data-dir=${userData}`] });
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
@@ -38,7 +40,7 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
   const userData = await mkdtemp(join(tmpdir(), "esmer-option-b-visual-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage());
-  const app = await electron.launch({ executablePath: process.env.ESMER_EXECUTABLE ?? resolve("release/win-unpacked/Esmer Market Analytics.exe"), args: [`--user-data-dir=${userData}`] });
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   const directory = "test-results/option-b-evidence";
   await mkdir(directory, { recursive: true });
   try {

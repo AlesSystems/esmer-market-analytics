@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { openStore } from "../../src/store/store";
 import { SalesReports } from "../../src/reports/query";
 import { ReportVersions } from "../../src/reports/versions";
-import { businessPackage, businessRecords } from "../helpers/business-fixtures";
+import { addPurchase, businessPackage, businessRecords } from "../helpers/business-fixtures";
 
 test("accepted monthly output preserves deleted source facts, app revisions and version explanations", () => {
   const store = openStore(":memory:");
@@ -162,5 +162,50 @@ test("v1 to v2 comparison summarizes composition without expanding every new lin
     expect(changes.length).toBeLessThan(100);
     expect(changes.some(row=>/^productProfit\.(products|lines|sourceExclusions)/.test(row.path))).toBe(false);
     expect(versions.accept({candidateId:opened.report.id,previousAcceptedId:legacy.id,reason:"Yeni sentetik sürüm"}).status).toBe("monthly");
+  } finally { store.close(); }
+});
+
+
+test("replacement comparisons retain each unit for the same product without reorder differences", () => {
+  const store = openStore(":memory:");
+  try {
+    const records = businessRecords();
+    for (const [index, unit] of ["kg", "piece"].entries()) {
+      const line = records.lines[index];
+      line.sales = { ...line.sales!, productId: "water", unit: unit as "kg" | "piece" };
+      line.business = { historicalCost: { unitCost: "20", unit: unit as "kg" | "piece", taxBasis: "net", evidence: "synthetic-cost", documentedZero: false, originalSaleLineId: null }, inventory: null };
+      addPurchase(records, `purchase-${unit}`, unit === "kg" ? "30" : "25");
+      records.lines.at(-1)!.sales = { ...records.lines.at(-1)!.sales!, unit: unit as "kg" | "piece" };
+    }
+    expect(store.importPackage(businessPackage(records)).status).toBe("active");
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const first = versions.open({ period: "2025-09" });
+    if (first.status !== "monthly") throw new Error("Expected monthly report");
+    expect(first.report.purchasing.purchasing.replacements.map(row => [row.productId, row.unit, row.latestUnitCost])).toEqual([["water", "kg", "30"], ["water", "piece", "25"]]);
+    versions.accept({ candidateId: first.report.id, previousAcceptedId: null, reason: "Sentetik birim incelemesi" });
+    const reordered = versions.selected(first.report.id);
+    reordered.id = "reordered-replacements";
+    reordered.purchasing.purchasing.replacements.reverse();
+    store.acceptReport({ id: reordered.id, pin: { datasetId: reordered.context.datasetId, appRevision: reordered.context.appRevision }, calculationVersion: reordered.calculations.report, evidence: [reordered.rules.artifact], output: { report: reordered } });
+    expect(versions.compare({ candidateId: first.report.id, acceptedId: first.report.id }).changes).toEqual([]);
+    for (const unit of ["kg", "piece"] as const) {
+      const corrected = structuredClone(records);
+      const document = corrected.documents.find(row => row.id === `purchase-${unit}`)!;
+      const line = corrected.lines.find(row => row.documentId === document.id)!;
+      const cost = unit === "kg" ? "31" : "26";
+      document.sales = { ...document.sales!, net: cost, gross: cost };
+      line.net = cost; line.sales = { ...line.sales!, unitNet: cost, gross: cost };
+      expect(store.importPackage(businessPackage(corrected, { extractionId: `corrected-${unit}` })).status).toBe("active");
+      const candidate = versions.open({ period: "2025-09" });
+      if (candidate.status !== "monthly") throw new Error("Expected monthly candidate");
+      expect(candidate.report.purchasing.purchasing.replacements.find(row => row.unit === unit)?.latestUnitCost).toBe(cost);
+      const changes = versions.compare({ candidateId: candidate.report.id, acceptedId: first.report.id }).changes;
+      expect(changes.filter(row => row.path.startsWith("purchasing.purchasing.replacements") && row.path.endsWith(".latestUnitCost"))).toEqual([
+        { path: `purchasing.purchasing.replacements[water:${unit}].latestUnitCost`, before: unit === "kg" ? "30" : "25", after: cost, delta: "1" },
+      ]);
+      expect(changes.filter(row => row.path.includes(`replacements[water:${unit === "kg" ? "piece" : "kg"}]`))).toEqual([]);
+      expect(changes).toContainEqual({ path: `purchasing.purchasing.history[purchase-${unit}-line].unitCost`, before: unit === "kg" ? "30" : "25", after: cost, delta: "1" });
+    }
+    expect(versions.compare({ candidateId: reordered.id, acceptedId: first.report.id }).changes).toEqual([]);
   } finally { store.close(); }
 });
