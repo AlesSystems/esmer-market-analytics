@@ -26,6 +26,8 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     await expect(matrix.getByRole("button", {name: /Ürün kayıt ID’si/})).toContainText("2");
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("1");
     const evidence = page.getByRole("complementary", {name: "Kaynak kapsamı ve yöntem", exact: true});
+    await expect(evidence.getByRole("heading", {name: "Sonucun dayanağı", exact: true})).toBeVisible();
+    await expect(evidence.getByRole("button", {name: "Kapsam katmanı", exact: true})).toHaveAttribute("aria-pressed", "true");
     await expect(evidence).toContainText("Mali sonuçlar doğrulanmadı");
     await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toContainText("Bu paket maliyet adayı içermiyor; tahmin hazırlanamadı.");
     await expect(page.getByRole("img", {name: "Günlük kaynak belge kayıtları"})).toBeVisible();
