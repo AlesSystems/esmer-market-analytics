@@ -92,7 +92,7 @@ export class ReportVersions {
         const key = (value: unknown, index: number) => {
           if (!value || typeof value !== "object") return String(index);
           const row = value as Record<string, unknown>;
-          return String(row.lineId ?? row.productId ?? row.id ?? (row.entityId ? `${row.entityId}:${row.revision}` : row.documentId ?? row.date ?? index));
+          return String(row.lineId ?? (row.productId && row.unit ? `${row.productId}:${row.unit}` : row.productId) ?? row.id ?? (row.entityId ? `${row.entityId}:${row.revision}` : row.documentId ?? row.date ?? index));
         };
         const old = new Map((Array.isArray(a) ? a : []).map((value, index) => [key(value, index), value]));
         const next = new Map((Array.isArray(b) ? b : []).map((value, index) => [key(value, index), value]));
