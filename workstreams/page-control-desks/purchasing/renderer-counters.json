@@ -1,0 +1,7 @@
+{
+  "fixture": "purchasingJourney/business-1",
+  "calls": 9,
+  "triangles": 608,
+  "frames": 1,
+  "idleMilliseconds": 300
+}

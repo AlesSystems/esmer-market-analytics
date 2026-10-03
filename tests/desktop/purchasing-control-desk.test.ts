@@ -1,0 +1,98 @@
+import { test, expect, _electron as electron } from "@playwright/test";
+import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { importPackage } from "../helpers/desktop-navigation";
+import { businessPackage } from "../helpers/business-fixtures";
+import { purchasingJourney } from "../helpers/purchasing-journey";
+const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics");
+test("purchasing inspection selects actual excluded cost evidence and survives renderer loss", async ({}, testInfo) => {
+ const dir = await mkdtemp(join(tmpdir(), "esmer-cost-desk-"));
+ const path = join(dir, "synthetic.json"); await writeFile(path, businessPackage(purchasingJourney()));
+ const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
+ try {
+  const page = await app.firstWindow();
+  await app.evaluate(({ dialog }, file) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] }); }, path);
+  await importPackage(page); await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  const inspector = page.getByRole("region", { name: "Maliyet kapsamı incelemesi" });
+  await expect(inspector).toBeVisible();
+  await expect(page.locator('[data-scene="cost-inspection"] canvas')).toBeVisible();
+  await mkdir("workstreams/page-control-desks/purchasing", { recursive: true });
+  const canvas = page.locator('[data-scene="cost-inspection"] canvas');
+  await page.waitForTimeout(300);
+  const stats = await canvas.evaluate(element => ({ calls: Number(element.dataset.drawCalls), triangles: Number(element.dataset.triangles), frames: Number(element.dataset.frames) }));
+  if (process.env.ESMER_CAPTURE_EVIDENCE) await writeFile("workstreams/page-control-desks/purchasing/renderer-counters.json", JSON.stringify({ fixture: "purchasingJourney/business-1", ...stats, idleMilliseconds: 300 }, null, 2));
+  await testInfo.attach("renderer-counters", { body: JSON.stringify(stats), contentType: "application/json" });
+  expect(stats.calls).toBeGreaterThan(0); expect(stats.triangles).toBeGreaterThan(0);
+  expect(stats.calls).toBeLessThanOrEqual(24); expect(stats.triangles).toBeLessThanOrEqual(4000);
+  await page.waitForTimeout(300); expect(await canvas.evaluate(element => Number(element.dataset.frames))).toBe(stats.frames);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/desktop.png" : testInfo.outputPath("desktop.png"), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/narrow.png" : testInfo.outputPath("narrow.png"), fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await inspector.getByRole("button", { name: /Satırı incele/ }).first().press("Enter");
+  await expect(page.getByRole("region", { name: "Seçilen maliyet kanıtı" })).toContainText("Maliyet kanıtı eksik");
+  await page.getByRole("button", { name: "Kapsam kanıtını incele", exact: true }).click();
+  const bounds = await canvas.boundingBox(); if (!bounds) throw Error("missing inspection canvas");
+  await canvas.click({ position: { x: bounds.width * .5, y: bounds.height * .66 } });
+  await expect(page.getByRole("button", { name: "Dışlanan satırları incele", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Dışlanan satırları incele", exact: true }).press("Enter");
+  await expect(page.getByRole("region", { name: "Seçilen maliyet kanıtı" })).toContainText("L2");
+  await page.getByRole("button", { name: "Alış geçmişini incele", exact: true }).click();
+  await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Alış geçmişini incele", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.locator('[data-scene="cost-inspection"] canvas').evaluate(canvas => canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
+  await expect(page.getByRole("button", { name: "3D’yi yeniden dene" })).toBeVisible();
+  await page.getByRole("button", { name: "Kapsam kanıtını incele", exact: true }).click();
+  await expect(page.getByText("1 kapsanan / 1 dışlanan satır", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "3D’yi yeniden dene" }).click();
+  await expect(page.locator('[data-scene="cost-inspection"] canvas')).toBeVisible();
+ } finally { await app.close(); await rm(dir, { recursive: true, force: true }); }
+});
+
+test("source purchasing remains raw evidence with keyboard controls when WebGL is unavailable", async ({}, testInfo) => {
+ const { openStore } = await import("../../src/store/store");
+ const { writeRawPackage } = await import("../../src/source/raw-package");
+ const { rawSnapshot } = await import("../helpers/raw-fixture");
+ const dir = await mkdtemp(join(tmpdir(), "esmer-source-cost-"));
+ const store = openStore(join(dir, "analytics.sqlite"));
+ const snapshot = rawSnapshot(); snapshot.headers[0].FIS_TURU = "1"; snapshot.lines[0].FIS_TURU = "1";
+ store.importSourcePreview(writeRawPackage(snapshot, "fixture:cost-desk", "cost-source-1")); store.close();
+ const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
+ try {
+  const page = await app.firstWindow();
+  await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await expect(page.locator('[data-scene="cost-inspection"] canvas')).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-desktop.png" : testInfo.outputPath("source-desktop.png"), fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-narrow.png" : testInfo.outputPath("source-narrow.png"), fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const tableScroll = page.getByLabel("Alış kaynak kayıtları", { exact: true });
+  const dateCell = tableScroll.getByRole("cell", { name: "01.10.2025", exact: true });
+  expect(await dateCell.evaluate(element => { const range = document.createRange(); range.selectNodeContents(element); return range.getClientRects().length; })).toBe(1);
+  await tableScroll.focus(); await expect(tableScroll).toBeFocused();
+  await tableScroll.press("ArrowRight");
+  expect(await tableScroll.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  await page.getByRole("button", { name: "Özet", exact: true }).click();
+  await page.evaluate(() => {
+   const original = HTMLCanvasElement.prototype.getContext;
+   HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, kind: string, ...args: unknown[]) {
+    if (kind.includes("webgl")) return null;
+    return Reflect.apply(original, this, [kind, ...args]);
+   } as typeof original;
+  });
+  await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await expect(page.getByRole("button", { name: "3D’yi yeniden dene" })).toBeVisible();
+  await page.getByRole("button", { name: "Kaynak kayıtlarını incele", exact: true }).press("Enter");
+  await expect(page.getByRole("columnheader", { name: "Kaynak belge tutarı · doğrulanmadı" })).toBeVisible();
+  await page.getByRole("button", { name: "Kapsam kanıtını incele", exact: true }).press("Enter");
+  await expect(page.getByText("Kaynak ve kapsam ayrıntıları", { exact: true })).toBeFocused();
+  await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-no-webgl.png" : testInfo.outputPath("source-no-webgl.png"), fullPage: true });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.locator("main").count()).toBe(1);
+ } finally { await app.close(); await rm(dir, { recursive: true, force: true }); }
+});
