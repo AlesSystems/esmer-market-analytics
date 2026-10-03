@@ -1,0 +1,17 @@
+.source-control-desk{padding-bottom:36px}
+.source-control-desk .source-type-chart{display:grid;gap:0;color:var(--c-blue)}
+.source-control-desk .source-type-bar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(40px,.8fr) 64px;gap:16px;align-items:center;padding:14px 0;border-top:1px solid var(--c-line);font-size:12px}
+.source-control-desk .source-type-bar>span{color:var(--c-ink);overflow-wrap:anywhere}
+.source-control-desk .source-type-bar svg{width:100%;height:12px;background:#edf1f7}
+.source-control-desk .source-type-bar strong{text-align:right;color:var(--c-ink)}
+.source-control-desk .source-count-details{margin-top:16px;font-size:11px}
+.source-control-desk .source-count-details table{font-size:12px;width:100%}
+.source-control-desk .source-type-action{white-space:normal;text-align:left;justify-content:start}
+.source-control-desk .c-evidence-intro{margin-top:8px;color:#755026}
+.source-control-desk .c-matrix small{min-height:32px}
+@media(max-width:480px){
+.source-control-desk .source-type-bar{grid-template-columns:minmax(0,1fr) 40px;gap:10px;font-size:11px}
+.source-control-desk .source-type-bar svg{display:none}
+.source-control-desk .source-count-details table{font-size:10px}
+.source-control-desk .source-count-details th,.source-control-desk .source-count-details td{padding:8px 5px}
+}
