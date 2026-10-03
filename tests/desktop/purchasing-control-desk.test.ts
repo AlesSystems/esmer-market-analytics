@@ -39,6 +39,9 @@ test("purchasing inspection selects actual excluded cost evidence and survives r
   await expect(page.getByRole("button", { name: "Dışlanan satırları incele", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "Dışlanan satırları incele", exact: true }).press("Enter");
   await expect(page.getByRole("region", { name: "Seçilen maliyet kanıtı" })).toContainText("L2");
+  await page.getByRole("button", { name: "Alış geçmişini incele", exact: true }).click();
+  await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Alış geçmişini incele", exact: true })).toHaveAttribute("aria-pressed", "false");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.locator('[data-scene="cost-inspection"] canvas').evaluate(canvas => canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true })));
   await expect(page.getByRole("button", { name: "3D’yi yeniden dene" })).toBeVisible();
@@ -69,6 +72,8 @@ test("source purchasing remains raw evidence with keyboard controls when WebGL i
   await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-narrow.png" : testInfo.outputPath("source-narrow.png"), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const tableScroll = page.getByLabel("Alış kaynak kayıtları", { exact: true });
+  const dateCell = tableScroll.getByRole("cell", { name: "01.10.2025", exact: true });
+  expect(await dateCell.evaluate(element => { const range = document.createRange(); range.selectNodeContents(element); return range.getClientRects().length; })).toBe(1);
   await tableScroll.focus(); await expect(tableScroll).toBeFocused();
   await tableScroll.press("ArrowRight");
   expect(await tableScroll.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
