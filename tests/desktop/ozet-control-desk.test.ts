@@ -22,6 +22,8 @@ test("Kontrol masası presents the pinned month with real navigation and offline
     await expect(matrix).toContainText("Hesaplanamıyor");
     await expect(matrix).toContainText("Karşılaştırılamıyor");
     await expect(page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" })).toContainText("%50");
+    await expect(page.getByRole("group", {name: "Satış, maliyet ve gider katmanları. Tutarları temsil etmeyen 3D gezinme nesnesi.", exact: true})).toBeVisible();
+    await expect(page.getByRole("group", {name: "Finansal katman", exact: true})).toBeVisible();
     const logo = page.getByRole("img", { name: "Esmer Market", exact: true });
     await expect(logo).toBeVisible();
     await expect.poll(() => logo.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(459);
