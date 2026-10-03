@@ -14,7 +14,7 @@ export function AppShell({ destination, navigate, controls, children }: {
 }) {
   const frame = useContext(AppFrame);
   const away = !!frame && frame.view !== "workspace";
-  return <div className={`sales-app app-shell${destination === "monthly" && !away ? " monthly-shell" : ""}`}>
+  return <div className={`sales-app app-shell${destination === "monthly" && !away ? " monthly-shell" : destination && destination !== "monthly" && !away ? ` page-desk-shell${destination === "overview" ? " sales-desk-shell" : ""}` : ""}`}>
     <div className="sidebar">
       <div className="brand"><img src="/assets/esmer-market-logo.png" alt="Esmer Market" width="459" height="110" /></div>
       <div className="sidebar-controls">{controls}</div>
