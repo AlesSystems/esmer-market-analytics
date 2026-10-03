@@ -30,7 +30,7 @@ export function SourceControlDesk({view, period, outside, onDocuments, onProduct
 
   return <div className="control-desk source-control-desk">
     <header className="c-heading">
-      <div><h1>Aylık Market Özeti</h1><p>Ay bir bakışta</p><p>Kaynak kayıtlarının özeti · {period}</p></div>
+      <div><h1>Aylık Market Özeti</h1><p>Kaynak kayıtlarının özeti · {period}</p></div>
       <button className="c-text-action" onClick={onDocuments}>Tüm kaynak belgeleri <span aria-hidden="true">↗</span></button>
     </header>
     <section className="c-matrix" aria-label="Kaynak kayıt göstergeleri">

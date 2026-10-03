@@ -1,18 +1,2 @@
 .expenses-workspace { min-width: 0; }
-.expense-completion-desk { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 48px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 28px 0; margin-bottom: 28px; }
-.expense-kicker { font-size: 12px; color: var(--muted); letter-spacing: .04em; margin: 0 0 12px; }
-.expense-month-checklist h2 { font-size: 27px; letter-spacing: -.04em; margin: 0 0 12px; }
-.expense-month-checklist > p:not(.expense-kicker) { color: var(--muted); max-width: 580px; }
-.expense-month-checklist > ol { padding-left: 24px; margin: 24px 0 0; display: grid; gap: 18px; }
-.expense-month-checklist > ol > li { padding-left: 9px; }
-.expense-month-checklist li::marker { color: #2b55ba; font-weight: 600; }
-.expense-month-checklist li strong, .expense-month-checklist li span { display: block; }
-.expense-month-checklist li span, .expense-month-checklist li ul { color: var(--muted); font-size: 13px; margin-top: 5px; }
-.expense-folio { min-width: 0; align-self: center; }
-.expense-folio .page-scene-stage { height: 240px; }
-.expense-folio-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
-.expense-folio-tabs button { flex: 1; padding: 10px 3px; font-size: 12px; color: var(--muted); border-bottom: 2px solid transparent; }
-.expense-folio-tabs button[aria-pressed="true"] { color: #2b55ba; border-color: #2b55ba; }
-.expense-folio-tabs button:focus-visible { outline: 2px solid #2b55ba; outline-offset: 2px; }
-.expense-folio > p { font-size: 11px; margin-top: 12px; }
-@media (max-width: 720px) { .expense-completion-desk { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px 0; } .expense-folio .page-scene-stage { height: 175px; } .expense-folio { max-width: 360px; width: 100%; justify-self: center; } .expense-actions { flex-wrap: wrap; } .expense-month-checklist h2 { font-size: 24px; } }
+.expenses-workspace > nav { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }

@@ -34,10 +34,6 @@
 .control-desk .c-categories>button>span:nth-last-child(2){text-align:right;color:var(--c-muted);font-size:11px}
 .control-desk .category-track{height:4px;background:#edf1f7;display:block}
 .control-desk .category-track i{height:100%;display:block;background:var(--c-blue)}
-.control-desk .c-status-note{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-top:1px solid var(--c-line);margin-top:24px}
-.control-desk .c-status-note strong{font-size:13px;font-weight:650}
-.control-desk .c-status-note p{font-size:11px;margin-top:5px}
-.control-desk .c-status-note button{border:0;background:none;font-size:11px;white-space:nowrap;display:flex;gap:7px;align-items:center;color:var(--c-blue)}
 .control-desk .c-evidence{border-left:1px solid var(--c-line);padding-left:24px}
 .control-desk .c-evidence h2{font-size:16px}
 .control-desk .c-evidence-intro{font-size:11px;margin-top:6px}
@@ -47,8 +43,6 @@
 .control-desk .c-proof-list strong{display:block;font-size:14px;font-weight:650;line-height:1.4}
 .control-desk .c-proof-list strong small{font-size:10px;font-weight:500}
 .control-desk .c-proof-list p{font-size:11px;margin-top:7px;line-height:1.6}
-.control-desk .c-method-button{display:flex;align-items:center;justify-content:space-between;gap:7px;width:100%;background:#2459d5;color:#fff;border:0;border-radius:8px;padding:12px;font-size:11px;font-weight:650;margin-top:6px}
-.control-desk .c-method-button:hover{background:#194ab8}
 @media(min-width:1500px){
 .control-desk .c-matrix strong{font-size:34px}
 }
@@ -66,8 +60,6 @@
 .control-desk .c-body{grid-template-columns:1fr}
 .control-desk .c-evidence{border-left:0;border-top:1px solid var(--c-line);padding:24px 0 0}
 .control-desk .c-proof-list{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.control-desk .c-evidence .month-object{max-width:300px}
-.control-desk .c-method-button{max-width:260px}
 .control-desk .c-matrix{grid-template-columns:1fr 1fr}
 .control-desk .c-matrix>button{padding:18px 16px}
 .control-desk .c-matrix>button:nth-child(2){border-right:0}
@@ -92,8 +84,6 @@
 .control-desk .c-chart-foot>span:last-child{margin-left:0}
 .control-desk .c-categories>button{grid-template-columns:minmax(0,1fr) 85px 27px 16px;font-size:11px}
 .control-desk .c-proof-list{grid-template-columns:1fr;gap:0}
-.control-desk .c-status-note{display:block}
-.control-desk .c-status-note button{margin-top:12px}
 }
 .control-desk{font-family:"Manrope Variable",sans-serif;min-width:0;padding:0 0 64px}
 .control-desk .c-matrix strong{font-size:clamp(18px,2.2vw,29px);white-space:normal;overflow-wrap:anywhere}
@@ -111,15 +101,6 @@
 .control-desk .c-method{font-size:11px;margin-top:18px;overflow-wrap:anywhere}
 .control-desk .c-method p{font-size:11px;margin-top:8px}
 .control-desk .c-notice{padding:16px;background:#f3f6fc;margin-bottom:24px;font-size:13px}
-.control-desk .month-object{margin:15px 0 22px}
-.control-desk .scene-stage{height:200px;min-width:0}
-.control-desk .scene-stage canvas{touch-action:pan-y}
-.control-desk .scene-tabs{display:flex;gap:5px}
-.control-desk .scene-tabs button{flex:1;border:1px solid var(--c-line);background:#fff;border-radius:6px;padding:7px 3px;font-size:10px}
-.control-desk .scene-tabs button[aria-pressed=true]{color:#fff;background:var(--c-blue);border-color:var(--c-blue)}
-.control-desk .scene-caption{font-size:10px;margin-top:10px;min-height:54px}
-.control-desk .scene-fallback{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;background:#f3f6fc;font-size:11px}
-.control-desk .scene-fallback button{background:#fff;border:1px solid var(--c-line);padding:8px;border-radius:5px}
 .control-desk .c-proof-list>div{overflow-wrap:anywhere}
 .control-desk summary{cursor:pointer}
 .control-desk :focus-visible{outline:3px solid var(--c-blue);outline-offset:4px}
@@ -140,4 +121,5 @@
 .control-desk .c-matrix em{flex-wrap:wrap}
 .control-desk .c-categories>button{font-family:inherit;color:inherit;cursor:pointer}
 .control-desk .c-daily-chart>div{grid-row:1}
-.control-desk .c-method-button,.control-desk .c-text-action,.control-desk .scene-tabs button,.control-desk .scene-fallback button{font-family:inherit;cursor:pointer}
+
+.control-desk .c-text-action{font-family:inherit;cursor:pointer}
