@@ -20,3 +20,7 @@ Screenshots: expenses-desktop.png (1440 px), expenses-narrow.png (390 px), expen
 ## Remaining gates
 
 Windows A07 packaging/scaling/performance acceptance remains open. Independent parent review, integration and final repository-wide checks are owned by root. No claim of Windows acceptance, contrast measurement, long-run GPU memory testing or full suite completion. No commits or PR created by worker.
+
+## Independent review and keyboard repair
+
+Integrated onto main8b4e3c1. Independent standards build/package and10 focused desktop tests passed; independent specification/finish review scored ship. Reviewer observed return from a folio-opened task lacked a focus opener. Added a packaged assertion after mesh→Excel→Kayıtlara dön and observed it fail on the unchanged reviewed build. Folio task buttons now have stable IDs and task selection retains the equivalent HTML button as opener. Fresh typecheck/lint/build/offline package and all10 focused tests pass. Appearance and mutation semantics are unchanged; prior visual captures remain applicable.

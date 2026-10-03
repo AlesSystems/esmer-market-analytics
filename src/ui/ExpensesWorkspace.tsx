@@ -56,6 +56,7 @@ export function ExpensesWorkspace({ period, onChange, embedded = false }: { peri
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
   function selectTask(next: ExpenseTask) {
     if (busy || selected) return;
+    if (next !== "records") opener.current = () => document.getElementById(`expense-folio-${next}`)?.focus();
     setTask(next);
   }
   const Container = embedded ? "section" : "main";

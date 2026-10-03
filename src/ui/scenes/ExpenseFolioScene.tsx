@@ -16,7 +16,7 @@ export function ExpenseFolioScene({ task, complete, disabled, onTaskChange }: { 
         </group>
       </SceneFrame>
     </div>
-    <div className="expense-folio-tabs" aria-label="Ay dosyası görevleri">{tabs.map(tab => <button type="button" key={tab.id} disabled={disabled} aria-pressed={task === tab.id} onClick={() => onTaskChange(tab.id)}>{tab.label}</button>)}</div>
+    <div className="expense-folio-tabs" aria-label="Ay dosyası görevleri">{tabs.map(tab => <button type="button" id={`expense-folio-${tab.id}`} key={tab.id} disabled={disabled} aria-pressed={task === tab.id} onClick={() => onTaskChange(tab.id)}>{tab.label}</button>)}</div>
     <p className="caption">Dosya yalnızca görevi seçer. Tamlık işareti kayıtlı onayı gösterir.</p>
   </div>;
 }
