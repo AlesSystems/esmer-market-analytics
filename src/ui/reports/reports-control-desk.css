@@ -19,7 +19,6 @@
 .report-sleeve-actions button { border:1px solid var(--line);background:white;padding:7px 9px;border-radius:7px;font-size:11px;max-width:100%;overflow-wrap:anywhere; }
 .report-sleeve-actions button[aria-pressed=true] { background:#e8efff;border-color:#2b55ba;color:#2b55ba; }
 .report-sleeve-actions button:focus-visible { outline:2px solid #2b55ba;outline-offset:3px; }
-.report-candidate { border-left:3px solid #2b55ba; }
 .report-workspace .report-id { overflow-wrap:anywhere; }
 .report-workspace .report-actions { flex-wrap:wrap; }
 .report-workspace .report-actions label { min-width:0;max-width:100%; }
@@ -28,7 +27,7 @@
 .report-workspace .block { border:0;border-radius:0;box-shadow:none;background:transparent;padding:22px 0;border-bottom:1px solid var(--line); }
 .report-workspace h1 { font-size:32px;letter-spacing:-.035em; }
 .report-workspace h2 { font-size:17px;letter-spacing:-.02em; }
-.report-workspace .report-candidate { border-left:3px solid #2b55ba;padding-left:18px; }
+.report-workspace .report-candidate { padding-left:18px; }
 .report-archive-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:24px 0; }
 .report-archive-summary > div { padding:20px;border-right:1px solid var(--line); }
 .report-archive-summary > div:last-child { border:0; }
