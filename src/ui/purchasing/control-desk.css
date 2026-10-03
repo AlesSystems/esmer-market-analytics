@@ -1,0 +1,19 @@
+.purchasing-control-desk { min-width:0; }
+.purchasing-control-desk > main { min-width:0; }
+.purchasing-control-desk .metrics { width:100%; }
+.purchasing-inspection-body { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:32px; margin:28px 0; align-items:start; }
+.purchasing-inspection-body > * { min-width:0; }
+.purchasing-inspection-rail { padding:22px; border:1px solid #dbe3ef; background:#f8faff; border-radius:16px; overflow-wrap:anywhere; }
+.purchasing-inspection-rail h2 { font-size:20px; margin:0 0 12px; }
+.cost-inspection-scene .page-scene-stage { height:250px; position:relative; }
+.cost-scene-actions { display:grid; gap:8px; }
+.cost-scene-actions button { border:1px solid #ccd8ec; background:white; color:#244d9b; border-radius:8px; padding:10px; text-align:left; font:inherit; cursor:pointer; }
+.cost-scene-actions button[aria-pressed=true] { background:#e6edfc; border-color:#5277c3; }
+.cost-scene-actions button:focus-visible { outline:3px solid #2856bf; outline-offset:3px; }
+.selected-cost-evidence { border-top:1px solid #dbe3ef; margin-top:18px; padding-top:18px; overflow-wrap:anywhere; }
+.cost-inspection-table tr[aria-selected=true] { background:#eef3ff; }
+.purchasing-control-desk .table-scroll { max-width:100%; }
+.purchasing-control-desk .detail-panel { overflow-wrap:anywhere; }
+@media(max-width:900px) { .purchasing-inspection-body { grid-template-columns:minmax(0,1fr); } .cost-inspection-scene .page-scene-stage { height:230px; } .purchasing-control-desk .metrics { grid-template-columns:minmax(0,1fr); } }
+
+.source-purchasing-main { min-width:0; overflow-wrap:anywhere; }
