@@ -1,0 +1,178 @@
+{
+  "checks": [
+    {
+      "name": "A desktop fits",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "scroll": 1440,
+        "canvas": true
+      }
+    },
+    {
+      "name": "A narrow fits",
+      "pass": true,
+      "detail": {
+        "width": 680,
+        "scroll": 680,
+        "canvas": true
+      }
+    },
+    {
+      "name": "A mobile fits",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390,
+        "canvas": true
+      }
+    },
+    {
+      "name": "A HTML selects cost",
+      "pass": true
+    },
+    {
+      "name": "A expense feedback",
+      "pass": true
+    },
+    {
+      "name": "A details open",
+      "pass": true
+    },
+    {
+      "name": "A escape restores focus",
+      "pass": true
+    },
+    {
+      "name": "B desktop fits",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "scroll": 1440,
+        "canvas": true
+      }
+    },
+    {
+      "name": "B narrow fits",
+      "pass": true,
+      "detail": {
+        "width": 680,
+        "scroll": 680,
+        "canvas": true
+      }
+    },
+    {
+      "name": "B mobile fits",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390,
+        "canvas": true
+      }
+    },
+    {
+      "name": "B HTML selects cost",
+      "pass": true
+    },
+    {
+      "name": "B expense feedback",
+      "pass": true
+    },
+    {
+      "name": "B details open",
+      "pass": true
+    },
+    {
+      "name": "B escape restores focus",
+      "pass": true
+    },
+    {
+      "name": "C desktop fits",
+      "pass": true,
+      "detail": {
+        "width": 1440,
+        "scroll": 1440,
+        "canvas": true
+      }
+    },
+    {
+      "name": "C narrow fits",
+      "pass": true,
+      "detail": {
+        "width": 680,
+        "scroll": 680,
+        "canvas": true
+      }
+    },
+    {
+      "name": "C mobile fits",
+      "pass": true,
+      "detail": {
+        "width": 390,
+        "scroll": 390,
+        "canvas": true
+      }
+    },
+    {
+      "name": "C HTML selects cost",
+      "pass": true
+    },
+    {
+      "name": "C expense feedback",
+      "pass": true
+    },
+    {
+      "name": "C details open",
+      "pass": true
+    },
+    {
+      "name": "C escape restores focus",
+      "pass": true
+    },
+    {
+      "name": "keyboard switch to B",
+      "pass": true
+    },
+    {
+      "name": "reload preserves B",
+      "pass": true
+    },
+    {
+      "name": "button switches C",
+      "pass": true
+    },
+    {
+      "name": "wraps to A",
+      "pass": true
+    },
+    {
+      "name": "3D object click selects sales",
+      "pass": true
+    },
+    {
+      "name": "no idle rendering",
+      "pass": true,
+      "detail": {
+        "draws": 24,
+        "idleDraws": 24
+      }
+    },
+    {
+      "name": "live reduced motion retains selection",
+      "pass": true
+    },
+    {
+      "name": "context loss preserves HTML",
+      "pass": true
+    },
+    {
+      "name": "context retry restores canvas",
+      "pass": true
+    },
+    {
+      "name": "renderer unavailable remains usable",
+      "pass": true
+    }
+  ],
+  "errors": []
+}
