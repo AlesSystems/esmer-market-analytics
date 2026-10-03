@@ -1,0 +1,46 @@
+{
+  "base": "22387f5",
+  "head": "9671cad",
+  "fixture": "fixture:source-control-desk/source-desk-1",
+  "results": [
+    {
+      "version": "base-before",
+      "executablePath": "/Users/altanesmer/Desktop/Ales/esmer-market-analytics/release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics",
+      "loadedMs": 700,
+      "navigationMs": 41,
+      "counts": {
+        "documents": 3,
+        "lines": 2,
+        "products": 2,
+        "emptyDocuments": 1
+      },
+      "rendererErrors": []
+    },
+    {
+      "version": "head",
+      "executablePath": "/Users/altanesmer/.codex/worktrees/source-control-desk/esmer-market-analytics/release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics",
+      "loadedMs": 442,
+      "navigationMs": 24,
+      "counts": {
+        "documents": 3,
+        "lines": 2,
+        "products": 2,
+        "emptyDocuments": 1
+      },
+      "rendererErrors": []
+    },
+    {
+      "version": "base-after",
+      "executablePath": "/Users/altanesmer/Desktop/Ales/esmer-market-analytics/release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics",
+      "loadedMs": 409,
+      "navigationMs": 29,
+      "counts": {
+        "documents": 3,
+        "lines": 2,
+        "products": 2,
+        "emptyDocuments": 1
+      },
+      "rendererErrors": []
+    }
+  ]
+}
