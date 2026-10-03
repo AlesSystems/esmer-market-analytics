@@ -1,9 +1,13 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-02T14:30:00.000Z",
+  "generatedAt": "2026-10-03T00:00:00.000Z",
   "title": "Design System: Esmer Market",
   "extensions": {
     "colorMeta": {
+      "overview-blue": {"role": "primary", "scope": "overview", "displayName": "Cobalt Action", "canonical": "#2459d5"},
+      "overview-ink": {"role": "neutral", "scope": "overview", "displayName": "Overview Ink", "canonical": "#182644"},
+      "overview-muted": {"role": "neutral", "scope": "overview", "displayName": "Overview Muted", "canonical": "#5c6980"},
+      "overview-line": {"role": "neutral", "scope": "overview", "displayName": "Overview Rule", "canonical": "#dce3ee"},
       "primary": { "role": "primary", "displayName": "Charcoal Action", "canonical": "#27272a", "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#fafafa"] },
       "background": { "role": "neutral", "displayName": "Paper Canvas", "canonical": "#ffffff", "tonalRamp": ["#202124", "#3f3f46", "#62626b", "#a1a1aa", "#d4d4d8", "#e1e1e5", "#f4f4f5", "#ffffff"] },
       "accent": { "role": "secondary", "displayName": "Teal Selection", "canonical": "#e6f2ef", "tonalRamp": ["#123a34", "#164b40", "#215e54", "#236c59", "#28796b", "#4a9d90", "#8ac8bd", "#e6f2ef"] },
@@ -206,17 +210,18 @@
       { "name": "The Glaze Is The Depth Rule", "scope": "settings", "body": "Depth belongs to the band's glaze sheen. Tiles never take a drop shadow.", "section": "elevation" }
     ],
     "scopedWorlds": [
+      {"scope": "overview", "appliesTo": "The non-embedded Özet monthly workspace and its active shell.", "northStar": "Kontrol masası", "overview": "The owner selected prototype C on 2026-10-03. White, cobalt, Manrope Variable, four monthly figures, daily sales, category ranking and a narrow evidence column define the monthly surface. The website logo ships locally. Existing financial details and saved report semantics remain available.", "keyCharacteristics": ["Blue #2459d5 actions and selection, ink #182644, fine separators.", "Local Manrope Latin and Latin Extended fonts, tabular amounts.", "Fixed-camera three-layer object selects evidence explanations with equivalent HTML controls.", "MonthlyDisplay remains the authority for all figures and evidence states."], "dos": ["Keep missing cost and incomplete expenses explicit.", "Keep 3D fallback usable and motion inactive by default."], "donts": ["Do not map the object proportions to financial amounts.", "Do not ship prototype fixtures or selection controls in production."]},
       {
         "scope": "settings",
         "appliesTo": "The Ayarlar settings page and the sidebar-footer live badge.",
         "northStar": "The Glazed Tile Panel",
-        "overview": "Ayarlar is an approved second visual world, deliberately not consistent with the ledger. It is a panel of glaze-white çini tiles set in warm grout. Each tile is one job: a saturated glaze band names it, a round eight-point seal carries its condition, and its body holds only the facts and the next action. Colour is louder here than in the ledger, but it stays on the bands and seals; every pressable control in the panel is deep ink. The world is scoped. Its tokens carry the `settings-` prefix and apply inside the settings page, plus the live badge in the sidebar footer. The Quiet Market Ledger remains the system for every other surface.",
+        "overview": "Ayarlar is an approved second visual world, deliberately not consistent with the ledger. It is a panel of glaze-white çini tiles set in warm grout. Each tile is one job: a saturated glaze band names it, a round eight-point seal carries its condition, and its body holds only the facts and the next action. Colour is louder here than in the ledger, but it stays on the bands and seals; every pressable control in the panel is deep ink. The world is scoped. Its tokens carry the `settings-` prefix and apply inside the settings page, plus the live badge in the sidebar footer. The Quiet Market Ledger remains the system for other surfaces except the selected Özet control desk.",
         "keyCharacteristics": ["Glaze tiles separated by a 6px warm-grout gap on a grout page ground.", "Five glaze bands (ink, cobalt, turquoise, coral, saffron), one per job, with a seal and an optional status pill.", "Deep ink as the only colour on pressable controls; primary, outline, and quiet underlined variants.", "A coverage strip drawn to exact date proportion up to today, with a hatched coral gap.", "Segoe UI and tabular figures, inherited from the ledger."],
         "dos": ["Do give each settings job its own tile, glaze, seal, one plain band line, and only its next action.", "Do keep every pressable control deep ink: primary fill, 1.5px outline, or quiet underline.", "Do pair every stale, failed, or unknown seal with written state in the status pill or a note.", "Do draw the coverage strip to true date proportion up to today and state the gap in days.", "Do align tiles within a course on shared subgrid rows and keep the 6px grout gap at every width."],
         "donts": ["Don't fill or outline a button, switch, or choice with cobalt, turquoise, coral, or saffron.", "Don't carry glaze tokens, the grout ground, or tile bands onto ledger workspaces; only the sidebar live badge leaves the settings page.", "Don't give tiles a drop shadow; the grout gap and the band's glaze carry the depth.", "Don't imply financial meaning for source rows on a tile or the coverage strip; source coverage stays labelled as record counts."]
       }
     ],
     "dos": ["Do keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.", "Do use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.", "Do use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.", "Do preserve native table scrolling and disclosure behavior when extending an existing workflow."],
-    "donts": ["Don't restore the superseded navy rail, electric-blue action system, or dark component variants.", "Don't use teal, green, or red alone to assert financial meaning.", "Don't replace missing evidence with a zero or hide it to make a compact view cleaner.", "Don't add a generated control framework where the native table, select, disclosure, or chart already owns the task."]
+    "donts": ["Don't restore the superseded navy rail or dark component variants. Cobalt actions are authorized within the selected Özet surface.", "Don't use teal, green, or red alone to assert financial meaning.", "Don't replace missing evidence with a zero or hide it to make a compact view cleaner.", "Don't add a generated control framework where the native table, select, disclosure, or chart already owns the task."]
   }
 }

@@ -10,11 +10,11 @@ Data shape is the existing discriminated MonthlyDisplay union. Its v1/v2 results
 | C0 | analysis | Trace MonthlyWorkspace, MonthlyDisplay, current details and prototype C | none | Grounded mapping and boundaries | completed |
 | C1 | design | Record integration choice and test contract | C0 | Actual monthly data, C layout, honest missing states | completed |
 | C2 | test | tests/desktop/ozet-control-desk.test.ts | C1 | Observed failure on incumbent packaged app | completed |
-| C3 | implementation | src/ui/overview and scoped CSS | C2 | Blue four-metric matrix, daily sales, categories, evidence rail and 3D; existing details survive | running |
-| C4 | implementation | AppShell logo, local asset packaging and notices | C1 | Website logo works offline; licences retained | running |
-| C5 | integration | Package and verify actual Electron app | C3,C4 | Focused and full suites, static checks, desktop/narrow evidence | pending |
-| C6 | review | Independent standards and spec reviews | C5 | Material findings resolved and retested | pending |
-| C7 | documentation | DESIGN.md, evidence, PR | C6 | Commits, screenshots, exact checks and limitations; attached PR | pending |
+| C3 | implementation | src/ui/overview and scoped CSS | C2 | Blue four-metric matrix, daily sales, categories, evidence rail and 3D; existing details survive | completed |
+| C4 | implementation | AppShell logo, local asset packaging and notices | C1 | Website logo works offline; licences retained | completed |
+| C5 | integration | Package and verify actual Electron app | C3,C4 | Focused and full suites, static checks, desktop/narrow evidence | completed |
+| C6 | review | Independent standards and spec reviews | C5 | Material findings resolved and retested | completed |
+| C7 | documentation | DESIGN.md, evidence, PR | C6 | Commits, screenshots, exact checks and limitations; attached PR | running |
 
 ## Feature checklist
 1. `how` over the affected subsystem.
@@ -37,3 +37,6 @@ Review production changes against 39cbee4, the completed prototype handoff. PR c
 MonthlyWorkspace owns report loading, cancellation, retries and version selection. MonthlyOverview dispatches v1/v2. Compose a new ControlDesk directly over MonthlyDisplay; retain existing report details below and leave embedded saved-version rendering intact. A separate presentation model would duplicate existing availability and financial shapes. v2 uses productProfit.summary; v1 uses purchasing.gross. Sales trend heights and category shares already come from the report. HTML and scene share a sales/cost/expenses selection.
 
 C2 ran `npm run test:desktop -- tests/desktop/ozet-control-desk.test.ts` against the existing macOS arm64 package. Application launch succeeded. The test failed at the missing “Ay bir bakışta” heading, as intended. No tooling failure. This establishes the missing user-facing contract before C3.
+
+## Final implementation record
+Production feature commit b0b8f6c follows the missing-contract commit da7767b. Mesh interaction coverage is f5ffa56. C5 passed 49 unit, 305 integration and 53 executed desktop cases; see EVIDENCE.md for skips and the platform-path correction. Independent Standards and Spec reviewers found zero actionable issues against 39cbee4...b0b8f6c. Both inspected the implementation and screenshot evidence; neither claimed an independent test rerun. Comment review also reported zero findings.
