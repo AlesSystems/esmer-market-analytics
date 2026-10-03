@@ -37,6 +37,9 @@ test("month folio selects existing tasks and preserves the review draft", async 
     await page.mouse.click(tabBounds.x + (tab.x + 1) * tabBounds.width / 2, tabBounds.y + (1 - tab.y) * tabBounds.height / 2);
     await expect(page.getByRole("button", { name: "Excel hazırlığı", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Excel hazırlığı", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).press("Enter");
     await page.getByRole("button", { name: "Tamlık incelemesi", exact: true }).click();
     await page.getByLabel("İnceleme açıklaması").fill("Ay sonu incelemesi");
     await page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum").check();
