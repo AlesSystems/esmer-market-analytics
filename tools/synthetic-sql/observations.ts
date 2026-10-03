@@ -6,7 +6,7 @@ export const SYNTHETIC_DEV_READER = "EsmerSyntheticDevReader";
 
 const EPHEMERAL_NAME = /^EsmerLiveFixture_[0-9a-f]{16}$/;
 const MISSING = ["cost", "customer", "employee", "product-name", "supplier", "finance"] as const;
-const SCENARIOS = ["insert", "correct", "delete", "backdate", "source-reset", "incomplete", "late-low-id", "permission-loss", "connection-loss", "rejected-candidate"] as const;
+const SCENARIOS = ["insert", "correct", "delete", "backdate", "source-reset", "incomplete", "late-low-id", "permission-loss", "connection-loss", "rejected-candidate", "recover"] as const;
 
 export type ScenarioName = (typeof SCENARIOS)[number];
 export type SyntheticHeader = {id: string; fisTuru: 11 | 12; date: string; genelToplam: string};
@@ -76,6 +76,10 @@ export function checkExpected(
   const lineIds = snapshotLines.map(row => row.ID ?? "");
   const expectedLineIds = expected.lines.map(row => row.id);
   if (lineIds.join(",") !== expectedLineIds.join(",")) mismatches.push(`lines:${lineIds.join(",") || "none"}!=${expectedLineIds.join(",") || "none"}`);
+  for (const line of expected.lines) {
+    const actual = snapshotLines.find(row => row.ID === line.id);
+    if (actual && actual.FIS !== line.header) mismatches.push(`FIS:${line.id}:${actual.FIS ?? "missing"}!=${line.header}`);
+  }
   return mismatches.length ? {ok: false, mismatches} : {ok: true};
 }
 
@@ -133,6 +137,8 @@ export function scenarioExpected(name: ScenarioName): SyntheticObservation {
           {id: "2006", header: "1006"},
         ],
       };
+    case "recover":
+      return baseline;
     case "permission-loss":
       return {...baseline, error: "SOURCE_REJECTED"};
     case "connection-loss":

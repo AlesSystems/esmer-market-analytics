@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, rm } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -88,16 +88,30 @@ async function setReaderLogin(master: SqlTestConnection, password: string): Prom
 ELSE ALTER LOGIN [${SYNTHETIC_DEV_READER}] WITH PASSWORD=N'${password}', CHECK_POLICY=OFF, DEFAULT_DATABASE=[${SYNTHETIC_DEV_DATABASE}]`);
 }
 
-async function ensureSyntheticDatabase(admin: Admin, password: string, rotatePassword: boolean): Promise<void> {
+type CreatedResources = {database: boolean; login: boolean};
+async function cleanupCreatedResources(admin: Admin, created: CreatedResources): Promise<void> {
   const master = await connect(admin, "master");
   try {
+    if (created.database) await master.query(`ALTER DATABASE [${SYNTHETIC_DEV_DATABASE}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [${SYNTHETIC_DEV_DATABASE}]`);
+    if (created.login) await master.query(`DROP LOGIN [${SYNTHETIC_DEV_READER}]`);
+  } finally {await master.close();}
+}
+
+async function ensureSyntheticDatabase(admin: Admin, password: string, rotatePassword: boolean): Promise<CreatedResources> {
+  const master = await connect(admin, "master");
+  const created = {database: false, login: false};
+  try {
     const existing = await master.query(`SELECT name FROM sys.databases WHERE name=N'${SYNTHETIC_DEV_DATABASE}'`);
-    if (!existing.length) await master.query(`CREATE DATABASE [${SYNTHETIC_DEV_DATABASE}]`);
+    if (!existing.length) {await master.query(`CREATE DATABASE [${SYNTHETIC_DEV_DATABASE}]`); created.database = true;}
     const login = await master.query(`SELECT name FROM sys.server_principals WHERE name=N'${SYNTHETIC_DEV_READER}'`);
-    if (!login.length || rotatePassword) await setReaderLogin(master, password);
+    if (!login.length || rotatePassword) {await setReaderLogin(master, password); created.login = !login.length;}
     const writer = await connect(admin, SYNTHETIC_DEV_DATABASE);
-    try {await writer.query(provisionSql(SYNTHETIC_DEV_READER));}
+    try {if (!existing.length || rotatePassword) await writer.query(provisionSql(SYNTHETIC_DEV_READER));}
     finally {await writer.close();}
+    return created;
+  } catch (error) {
+    await cleanupCreatedResources(admin, created);
+    throw error;
   } finally {await master.close();}
 }
 
@@ -142,11 +156,14 @@ export async function createLiveSqlFixture(path: string) {
 export async function openSyntheticDev(adminPath: string, rotatePassword = false) {
   const admin = await loadAdmin(adminPath);
   const password = readerPassword();
-  await ensureSyntheticDatabase(admin, password, rotatePassword);
+  const created = await ensureSyntheticDatabase(admin, password, rotatePassword);
   const connections = new Set<SqlTestConnection>();
   const open = async () => {const result = await connect(admin, SYNTHETIC_DEV_DATABASE); connections.add(result); return result;};
-  const writer = await open();
+  let writer: SqlTestConnection;
+  try {writer = await open();}
+  catch (error) {await cleanupCreatedResources(admin, created); throw error;}
   return {
+    created,
     password: rotatePassword ? password : undefined,
     execute: writer.query,
     connectWriter: () => open(),
@@ -158,29 +175,49 @@ export async function openSyntheticDev(adminPath: string, rotatePassword = false
 }
 
 export async function seedSyntheticDev(adminPath: string): Promise<SqlServerConfig> {
-  const handle = await openSyntheticDev(adminPath, true);
+  const admin = await loadAdmin(adminPath);
+  if (!process.env.ESMER_SQL_DEV_CONFIG) throw new Error("MISSING_DEV_CONFIG");
+  const saved = await validateSavedConfig(admin);
+  const master = await connect(admin, "master");
   try {
-    if (!handle.password) throw new Error("MISSING_READER_PASSWORD");
-    const admin = await loadAdmin(adminPath);
-    await handle.execute("DELETE dbo.FIS_DETAY; DELETE dbo.FIS");
+    const exists = (await master.query(`SELECT name FROM sys.databases WHERE name=N'${SYNTHETIC_DEV_DATABASE}'`)).length > 0;
+    const loginExists = (await master.query(`SELECT name FROM sys.server_principals WHERE name=N'${SYNTHETIC_DEV_READER}'`)).length > 0;
+    if (!saved && (exists || loginExists)) throw new Error("MISSING_DEV_CONFIG");
+    if (saved && !exists) throw new Error("SOURCE_CHANGED");
+  } finally {await master.close();}
+  const handle = await openSyntheticDev(adminPath, !saved);
+  try {
+    const config = await readerConfigFor(admin, saved?.password ?? handle.password!);
+    if (saved && saved.expectedDatabaseId !== config.expectedDatabaseId) throw new Error("SOURCE_CHANGED");
+    await applyScenario(adminPath, "recover");
+    if (saved) await extractSqlServer(saved);
     const baseline = baselineExpected();
     const inserts = [
       ...baseline.headers.map(header => syntheticHeader(header.id, header.date, header.fisTuru, header.genelToplam)),
       ...baseline.lines.map(line => syntheticLine(line.id, line.header, baseline.headers.find(header => header.id === line.header)?.fisTuru ?? 11)),
     ];
-    await handle.execute(inserts.join("; "));
-    const config = await readerConfigFor(admin, handle.password);
+    await handle.execute("SET XACT_ABORT ON; BEGIN TRANSACTION; DELETE dbo.FIS_DETAY; DELETE dbo.FIS; " + inserts.join("; ") + "; COMMIT TRANSACTION");
     const snapshot = await extractSqlServer(config);
     const verdict = checkExpected(snapshot.headers, snapshot.lines, baseline);
-    if (!verdict.ok) throw new Error(`OBSERVATION_MISMATCH ${verdict.mismatches.join(" ")}`);
+    if (!verdict.ok) throw new Error("OBSERVATION_MISMATCH");
     await writeReaderConfig(config);
     return config;
+  } catch (error) {
+    await handle.close();
+    await cleanupCreatedResources(admin, handle.created);
+    if (!saved) await rm(process.env.ESMER_SQL_DEV_CONFIG!, {force: true});
+    throw error;
   } finally {await handle.close();}
 }
 
 export async function resetSyntheticDev(adminPath: string): Promise<SqlServerConfig> {
   assertDropTarget(SYNTHETIC_DEV_DATABASE, new Set());
   const admin = await loadAdmin(adminPath);
+  const saved = await validateSavedConfig(admin);
+  if (saved) {
+    await applyScenario(adminPath, "recover");
+    await extractSqlServer(saved);
+  }
   const master = await connect(admin, "master");
   try {
     const existing = await master.query(`SELECT name FROM sys.databases WHERE name=N'${SYNTHETIC_DEV_DATABASE}'`);
@@ -188,19 +225,38 @@ export async function resetSyntheticDev(adminPath: string): Promise<SqlServerCon
       await master.query(`ALTER DATABASE [${SYNTHETIC_DEV_DATABASE}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [${SYNTHETIC_DEV_DATABASE}]`);
     }
   } finally {await master.close();}
+  const configPath = process.env.ESMER_SQL_DEV_CONFIG;
+  if (configPath) {await assertConfigOutsideRepo(configPath, repoRoot); await rm(configPath, {force: true});}
+  const handle = await openSyntheticDev(adminPath, !saved);
+  try {const config = await readerConfigFor(admin, saved?.password ?? handle.password!); await writeReaderConfig(config);}
+  finally {await handle.close();}
   return seedSyntheticDev(adminPath);
 }
 
 export async function stopSyntheticDev(adminPath: string): Promise<void> {
   assertDropTarget(SYNTHETIC_DEV_DATABASE, new Set());
   const admin = await loadAdmin(adminPath);
+  await validateSavedConfig(admin);
   const master = await connect(admin, "master");
   try {
     const existing = await master.query(`SELECT name FROM sys.databases WHERE name=N'${SYNTHETIC_DEV_DATABASE}'`);
     if (existing.length) await master.query(`ALTER DATABASE [${SYNTHETIC_DEV_DATABASE}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [${SYNTHETIC_DEV_DATABASE}]`);
     const login = await master.query(`SELECT name FROM sys.server_principals WHERE name=N'${SYNTHETIC_DEV_READER}'`);
     if (login.length) await master.query(`DROP LOGIN [${SYNTHETIC_DEV_READER}]`);
+    const configPath = process.env.ESMER_SQL_DEV_CONFIG;
+    if (configPath) {await assertConfigOutsideRepo(configPath, repoRoot); await rm(configPath, {force: true});}
   } finally {await master.close();}
+}
+
+async function validateSavedConfig(admin: Admin): Promise<SqlServerConfig | undefined> {
+  const path = process.env.ESMER_SQL_DEV_CONFIG;
+  if (!path) return;
+  await assertConfigOutsideRepo(path, repoRoot);
+  let config: SqlServerConfig;
+  try {config = await readReaderConfig();}
+  catch (error) {if ((error as {code?: string}).code === "ENOENT") return; throw new Error("INVALID_DEV_CONFIG");}
+  if (config.server !== admin.server || config.port !== admin.port || config.database !== SYNTHETIC_DEV_DATABASE || config.user !== SYNTHETIC_DEV_READER || config.lineage !== SYNTHETIC_DEV_DATABASE) throw new Error("UNSAFE_FIXTURE_TARGET");
+  return config;
 }
 
 async function readReaderConfig(): Promise<SqlServerConfig> {
@@ -222,38 +278,51 @@ export async function applyScenario(adminPath: string, name: string): Promise<vo
   if (!isScenarioName(name)) throw new Error("UNKNOWN_SCENARIO");
   const scenario = name;
   if (scenario === "connection-loss") {
-    const config = await readReaderConfig();
-    await expectExtract({...config, port: 1}, "SOURCE_UNAVAILABLE");
+    const admin = await loadAdmin(adminPath);
+    const config = await validateSavedConfig(admin);
+    if (!config) throw new Error("MISSING_DEV_CONFIG");
+    const master = await connect(admin, "master");
+    try {await master.query(`ALTER LOGIN [${SYNTHETIC_DEV_READER}] DISABLE`);} finally {await master.close();}
+    await expectExtract(config, "SOURCE_UNAVAILABLE");
     return;
   }
   if (scenario === "rejected-candidate") {
-    const config = await readReaderConfig();
+    const config = await validateSavedConfig(await loadAdmin(adminPath));
+    if (!config) throw new Error("MISSING_DEV_CONFIG");
     await expectExtract({...config, expectedDatabaseId: "00000000-0000-0000-0000-000000000000"}, "SOURCE_CHANGED");
     return;
   }
   const handle = await openSyntheticDev(adminPath);
   try {
+    const mutate = (sql: string) => handle.execute(`SET XACT_ABORT ON; BEGIN TRANSACTION; ${sql}; COMMIT TRANSACTION`);
     switch (scenario) {
+      case "recover": {
+        const admin = await loadAdmin(adminPath);
+        const master = await connect(admin, "master");
+        try {await master.query(`ALTER LOGIN [${SYNTHETIC_DEV_READER}] ENABLE`);} finally {await master.close();}
+        await handle.execute(provisionSql(SYNTHETIC_DEV_READER));
+        return;
+      }
       case "insert": {
         const expected = scenarioExpected("insert");
         const added = expected.headers.find(header => header.id === "1003")!;
-        await handle.execute(`${syntheticHeader(added.id, added.date, added.fisTuru, added.genelToplam)}; ${syntheticLine("2003", "1003")}`);
+        await mutate(`${syntheticHeader(added.id, added.date, added.fisTuru, added.genelToplam)}; ${syntheticLine("2003", "1003")}`);
         return;
       }
       case "correct":
-        await handle.execute("UPDATE dbo.FIS SET SATIR_TOPLAM=50.00000000,GENELTOPLAM=50.00000000 WHERE ID=1001");
+        await mutate("UPDATE dbo.FIS SET SATIR_TOPLAM=50.00000000,GENELTOPLAM=50.00000000 WHERE ID=1001");
         return;
       case "delete":
-        await handle.execute("DELETE dbo.FIS_DETAY WHERE ID=2002; DELETE dbo.FIS WHERE ID=1002");
+        await mutate("DELETE dbo.FIS_DETAY WHERE ID=2002; DELETE dbo.FIS WHERE ID=1002");
         return;
       case "backdate":
-        await handle.execute("UPDATE dbo.FIS SET FIS_TARIHI='2025-08-01' WHERE ID=1001");
+        await mutate("UPDATE dbo.FIS SET FIS_TARIHI='2025-08-01' WHERE ID=1001");
         return;
       case "source-reset":
-        await handle.execute("DELETE dbo.FIS_DETAY; DELETE dbo.FIS");
+        await mutate("DELETE dbo.FIS_DETAY; DELETE dbo.FIS");
         return;
       case "incomplete":
-        await handle.execute(syntheticHeader("1004"));
+        await mutate(syntheticHeader("1004"));
         return;
       case "late-low-id": {
         const later = await handle.connectWriter();
@@ -264,10 +333,43 @@ export async function applyScenario(adminPath: string, name: string): Promise<vo
       }
       case "permission-loss":
         await handle.execute(`REVOKE SELECT ON dbo.FIS_DETAY FROM [${SYNTHETIC_DEV_READER}]; DENY SELECT ON dbo.FIS_DETAY TO [${SYNTHETIC_DEV_READER}]`);
-        await expectExtract(await readReaderConfig(), "SOURCE_REJECTED");
+        const config = await validateSavedConfig(await loadAdmin(adminPath));
+        if (!config) throw new Error("MISSING_DEV_CONFIG");
+        await expectExtract(config, "SOURCE_REJECTED");
         return;
     }
   } finally {await handle.close();}
+}
+
+export async function startSyntheticDev(adminPath: string): Promise<void> {
+  const admin = await loadAdmin(adminPath);
+  if (!process.env.ESMER_SQL_DEV_CONFIG) throw new Error("MISSING_DEV_CONFIG");
+  const saved = await validateSavedConfig(admin);
+  if (!saved) {await seedSyntheticDev(adminPath); return;}
+  const actual = await readerConfigFor(admin, saved.password);
+  if (actual.expectedDatabaseId !== saved.expectedDatabaseId) throw new Error("SOURCE_CHANGED");
+}
+
+export async function appendSyntheticDev(adminPath: string): Promise<void> {
+  const handle = await openSyntheticDev(adminPath);
+  try {
+    await handle.execute(`SET XACT_ABORT ON; BEGIN TRANSACTION;
+DECLARE @id bigint=NEXT VALUE FOR dbo.FixtureIds;
+SET @id=@id+100000;
+INSERT dbo.FIS VALUES(@id,11,1,1,1,10,0,0,0,0,0,10,'2025-09-10',N'SYNTHETIC_PRIVATE_SENTINEL');
+INSERT dbo.FIS_DETAY VALUES(@id,@id,9007199254740997,11,1,2,10,0,0,0);
+COMMIT TRANSACTION`);
+  } finally {await handle.close();}
+}
+
+export async function checkSyntheticDev(adminPath: string, name: string): Promise<void> {
+  const expected = name === "baseline" ? baselineExpected() : isScenarioName(name) ? scenarioExpected(name) : undefined;
+  if (!expected) throw new Error("UNKNOWN_SCENARIO");
+  const config = await validateSavedConfig(await loadAdmin(adminPath));
+  if (!config) throw new Error("MISSING_DEV_CONFIG");
+  if (expected.error) {await expectExtract(config, expected.error); return;}
+  const snapshot = await extractSqlServer(config);
+  if (!checkExpected(snapshot.headers, snapshot.lines, expected).ok) throw new Error("OBSERVATION_MISMATCH");
 }
 
 export function syntheticHeader(id: string, date = "2025-09-10", fisTuru: 11 | 12 = 11, genelToplam = "123.12345678") {
