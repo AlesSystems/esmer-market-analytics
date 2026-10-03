@@ -29,3 +29,9 @@ Mac checks do not close Windows A07. Full-volume Windows performance/scaling and
 ## Root visual repair batch
 
 Root's final screenshot inspection found narrow comparison labels overlapping and a blank/cropped receipt after resize. Wrapped comparison values within their minimum-width-zero columns, removed unnecessary visibility/IntersectionObserver frame switching, retained demand rendering without an animation loop, and kept the stage at230px at narrow widths for full receipt framing. The focused packaged Sales suite passed **3 tests** (6.6seconds); default/recovery/unavailable screenshots were recaptured at the same paths. Log: `work/page-implementation/sales/visual-repair-test.log`. This supersedes the earlier frame visibility description: SceneFrame always uses demand rendering. No other polishing or scope changes were performed.
+
+## Independent review repairs
+
+Independent standards and spec reviews found that the new negative tabindex removed native disclosure controls from keyboard navigation. Both summaries now retain native focus behavior. A source-navigation regression also kept the receipt's product button pressed after the document view opened; selection now follows the real query view. Added packaged contracts cover Tab/Enter on source overview provenance and product-to-document selection continuity. All three focused packaged tests, typecheck, lint and diff checks passed after repair.
+
+The upstream Electron download returned HTTP 503 during repackaging. The verified installed Electron 44.3.0 distribution was reused with `electron-builder --dir --config.electronDist=/Users/altanesmer/Desktop/Ales/esmer-market-analytics/node_modules/electron/dist`. This still exercises the packaged app. Screenshot tests now use Playwright output directories by default; `ESMER_CAPTURE_EVIDENCE=1` explicitly refreshes the tracked evidence.
