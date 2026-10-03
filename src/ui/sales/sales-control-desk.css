@@ -1,0 +1,63 @@
+.page-desk-shell{--primary:#2b55ba;--ring:#2b55ba;--background:#fff;--card:#fff;--foreground:#182644;--muted:#526078;--line:#dce3ee;font-family:"Manrope Variable",sans-serif;background:#fff;color:#182644}
+.page-desk-shell .sidebar,.page-desk-shell .app-body,.page-desk-shell .workspace{background:#fff}
+.page-desk-shell .sidebar button[aria-current="page"]{background:#eef3ff;color:#2b55ba}
+.sales-desk-shell ::selection{background:#d7e3ff;color:#182644}
+.sales-desk-shell input{caret-color:#2b55ba}
+.sales-desk-shell :focus-visible{outline:3px solid #2b55ba;outline-offset:3px}
+.sales-desk-shell ::-webkit-scrollbar{width:8px;height:8px}
+.sales-desk-shell ::-webkit-scrollbar-thumb{background:#a4b4ce;border-radius:5px}
+.sales-control-desk{display:block;font-variant-numeric:tabular-nums;align-items:start}
+.sales-control-desk>main,.source-sales-main{min-width:0}
+.sales-desk-body{display:grid;grid-template-columns:minmax(0,1fr) 258px;gap:30px;align-items:start}.has-detail .sales-desk-body{grid-template-columns:minmax(0,1fr) 360px}.sales-ledger{min-width:0}
+.sales-control-desk h1{font-size:32px;letter-spacing:-.035em;font-weight:650}
+.sales-control-desk h2{font-size:17px;font-weight:650;letter-spacing:-.02em}
+.sales-control-desk .page-heading{margin-bottom:28px;gap:18px}
+.sales-control-desk .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:2px solid #182644;border-bottom:1px solid #dce3ee;gap:0;margin:24px 0 30px}
+.sales-control-desk .metric{border:0;border-right:1px solid #dce3ee;border-radius:0;background:transparent;padding:20px 16px;box-shadow:none;min-width:0}
+.sales-control-desk .metric:first-child{padding-left:0}
+.sales-control-desk .metric:last-child{border-right:0}
+.sales-control-desk .metric h2{font-size:12px;line-height:1.5}
+.sales-control-desk .metric strong{font-size:clamp(20px,2.2vw,30px);letter-spacing:-.035em;overflow-wrap:anywhere}
+.sales-control-desk .metric p,.sales-control-desk .metric small{font-size:11px;color:#526078}
+.sales-control-desk .block{border:0;border-radius:0;background:none;box-shadow:none;padding:0 0 26px;border-bottom:1px solid #dce3ee}
+.sales-control-desk .overview-grid{display:flex;flex-direction:column;gap:30px}
+.sales-control-desk .section-heading{margin-bottom:18px}
+.sales-control-desk .positive-bar{fill:#2b55ba}
+.sales-control-desk .negative-bar{fill:#935247}
+.sales-control-desk .row-link{color:#2b55ba;font-weight:600}
+.sales-control-desk .metric-evidence{font-size:12px;border-color:#dce3ee}
+.sales-evidence-rail{border-left:1px solid #dce3ee;padding-left:24px;min-width:0;font-size:12px;color:#182644;position:sticky;top:20px}
+.sales-evidence-rail h2{margin:0 0 10px}
+.sales-evidence-rail p{line-height:1.65;color:#526078;margin:8px 0 18px;overflow-wrap:anywhere}
+.sales-evidence-rail dl{border-top:1px solid #dce3ee;padding-top:18px;margin:20px 0}
+.sales-evidence-rail dt{font-size:11px;color:#526078;margin-top:14px}
+.sales-evidence-rail dd{margin:5px 0 0;font-weight:600;overflow-wrap:anywhere}
+.sales-evidence-rail details{font-size:11px;padding-top:14px;border-top:1px solid #dce3ee}
+.page-scene-stage{height:230px;position:relative;touch-action:pan-y}
+.page-scene-fallback{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;background:#f5f7fb;color:#526078;font-size:12px}
+.page-scene-fallback button{color:#2b55ba;text-decoration:underline;text-underline-offset:4px}
+.sales-scene-actions{display:flex;flex-direction:column;gap:6px}
+.sales-scene-actions button{font:inherit;font-size:11px;text-align:left;padding:9px 10px;background:#f4f6fa;border:1px solid transparent;border-radius:4px;color:#526078}
+.sales-scene-actions button[aria-pressed="true"]{color:#2b55ba;border-color:#bbcceb;background:#edf3ff}
+.sales-scene-actions button:disabled{opacity:.5;cursor:wait}
+.sales-evidence-rail .sales-scene-caption{font-size:10px;margin:10px 0 0}
+.source-sales-desk .report-actions{align-items:end;gap:12px;margin:24px 0;flex-wrap:wrap}
+.source-sales-desk .report-actions label{font-size:11px;min-width:0}
+.source-sales-desk .report-actions input{max-width:180px}
+.source-sales-desk .table-scroll{max-width:100%}
+.sales-source-days{padding-bottom:24px;border-bottom:1px solid #dce3ee}
+.sales-source-days p{font-size:11px;color:#526078;margin-top:12px}
+.source-day-chart{display:flex;align-items:end;gap:7px;height:125px;padding-top:15px}
+.source-day-chart>div{display:flex;flex:1;max-width:32px;flex-direction:column;justify-content:end;align-items:center;gap:7px;font-size:10px}
+.source-day-chart>div>span:first-child{display:block;width:80%;background:#2b55ba;min-height:3px}
+@media(max-width:1050px){.sales-desk-body,.has-detail .sales-desk-body{grid-template-columns:minmax(0,1fr) 220px;gap:20px}.sales-evidence-rail{padding-left:17px}.sales-control-desk .page-heading{align-items:start;flex-direction:column}.sales-control-desk .metric{padding:16px 9px}}
+@media(max-width:760px){.sales-desk-body,.has-detail .sales-desk-body{display:flex;flex-direction:column;gap:24px}.sales-ledger{width:100%}.sales-control-desk>main,.source-sales-main,.sales-evidence-rail{width:100%}.sales-evidence-rail{position:static;border-left:0;border-top:1px solid #dce3ee;padding:22px 0 0}.page-scene-stage{height:230px}.sales-receipt-scene{max-width:390px}.sales-scene-actions{flex-direction:row;flex-wrap:wrap}.sales-scene-actions button{flex:1;min-width:100px}.sales-control-desk .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.sales-control-desk .metric strong{font-size:19px}.sales-control-desk h1{font-size:28px}.sales-control-desk .table-scroll{overflow:auto}.sales-control-desk .search-label{width:100%}.sales-control-desk .search-label input{width:100%}}
+@media(prefers-reduced-motion:reduce){.sales-desk-shell *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.page-scene-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#526078;pointer-events:none}.page-scene-stage:has(.page-scene-fallback)>.page-scene-loading{display:none}
+.sales-desk-shell .data-status{overflow-wrap:anywhere}
+.sales-desk-shell .workspace-content>main{min-width:0}
+.source-sales-main .table-scroll{width:100%;max-width:100%;overflow-x:auto}
+.source-sales-main .report-actions>label,.source-sales-main .source-advanced{max-width:100%}
+
+.sales-control-desk .comparisons,.sales-control-desk .comparisons>span,.sales-control-desk .comparisons b{min-width:0;max-width:100%;overflow-wrap:anywhere}
