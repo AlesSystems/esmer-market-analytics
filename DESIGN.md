@@ -576,3 +576,7 @@ The ledger Do's and Don'ts above govern surfaces outside settings and the select
 - **Don't** carry glaze tokens, the grout ground, or tile bands onto ledger workspaces; only the sidebar live badge leaves the settings page.
 - **Don't** give tiles a drop shadow; the grout gap and the band's glaze carry the depth.
 - **Don't** imply financial meaning for source rows on a tile or the coverage strip; source coverage stays labelled as record counts.
+
+## Sales, purchasing, expenses and reports extension
+
+The user approved the overview visual system for all four workspaces on 2026-10-03. These pages inherit its white ground, cobalt actions, Manrope Variable typography, fine separators and evidence rail. The selected structures and data boundaries are recorded in [the workspace contract](docs/contracts/page-control-desks.md). Each page owns a distinct procedural 3D object and accessible task controls. Geometry never encodes financial values. Settings keeps the Glazed Tile Panel and the overview keeps its existing object.
