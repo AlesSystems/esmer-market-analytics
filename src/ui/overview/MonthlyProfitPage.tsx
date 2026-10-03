@@ -53,13 +53,14 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   const hiddenBySearch = selected && term && !selected.displayName.toLocaleLowerCase("tr-TR").includes(term) && !selected.productId.toLocaleLowerCase("tr-TR").includes(term);
   const offPage = selected && productPage && !productPage.rows.some(row => row.productId === selected.productId);
   const Container = embedded ? "section" : "main";
+  const Heading = embedded ? "h2" : "h1";
   function select(product: Product, button: HTMLButtonElement) { opener.current = button; tableScroll.current = window.scrollY; if (selected?.productId === product.productId) { detailHeading.current?.focus(); return; } focusPending.current = true; setSelected(product); setEvidenceOffset(0); setDocumentId(null); }
   function returnToTable() {
     if (opener.current?.isConnected) { window.scrollTo(0, tableScroll.current); opener.current.focus({ preventScroll: true }); }
     else tableHeading.current?.focus();
   }
   return <Container className="monthly-overview monthly-profit-page">
-    <div className="page-heading"><div><h1>Aylık Ürün Kârlılığı</h1><Badge variant="warning">{report.state === "open" ? "Açık" : "Geçici"}</Badge></div><Badge variant="outline">{report.review ? "İncelenmiş sürüm" : "Aday rapor"}</Badge></div>
+    <div className="page-heading"><div><Heading>Aylık Ürün Kârlılığı</Heading><Badge variant="warning">{report.state === "open" ? "Açık" : "Geçici"}</Badge></div><Badge variant="outline">{report.review ? "İncelenmiş sürüm" : "Aday rapor"}</Badge></div>
     <p>Seçili ay · tüm ürünler · {report.context.period} · Veri sonu: {date(report.sales.cutoff)}</p>
     <p>Geçmiş kaynak verisi · Kapsanan dönem: {date(summary.periodCoverage.from)} – {date(summary.periodCoverage.to)}</p>
     {report.sales.warnings.includes("SYNTHETIC_ONLY") && <p>Sentetik gösterim verisi; gerçek market verisi değildir.</p>}

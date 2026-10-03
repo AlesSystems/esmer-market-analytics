@@ -43,3 +43,16 @@ for (const notice of ["LICENSE", "LICENSES.chromium.html"]) {
 }
 await copyFile("third-party/shadcn-LICENSE", "dist/licences/shadcn-LICENSE");
 await copyFile("node_modules/tailwindcss/LICENSE", "dist/licences/tailwindcss-LICENSE");
+
+await mkdir("dist/ui/assets", { recursive: true });
+await copyFile("src/ui/assets/esmer-market-logo.png", "dist/ui/assets/esmer-market-logo.png");
+for (const subset of ["latin", "latin-ext"]) {
+  const filename = `manrope-${subset}-wght-normal.woff2`;
+  await copyFile(`node_modules/@fontsource-variable/manrope/files/${filename}`, `dist/ui/assets/${filename}`);
+}
+await copyFile("node_modules/three/LICENSE", "dist/licences/three-LICENSE");
+await copyFile("third-party/react-three-fiber-LICENSE", "dist/licences/react-three-fiber-LICENSE");
+await copyFile("node_modules/@fontsource-variable/manrope/LICENSE", "dist/licences/manrope-LICENSE");
+for (const dependency of ["its-fine", "react-use-measure", "suspend-react", "zustand", "use-sync-external-store", "scheduler", "react"]) {
+  await copyFile(`node_modules/${dependency}/LICENSE`, `dist/licences/${dependency}-LICENSE`);
+}

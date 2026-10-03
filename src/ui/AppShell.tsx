@@ -14,9 +14,9 @@ export function AppShell({ destination, navigate, controls, children }: {
 }) {
   const frame = useContext(AppFrame);
   const away = !!frame && frame.view !== "workspace";
-  return <div className="sales-app app-shell">
+  return <div className={`sales-app app-shell${destination === "monthly" && !away ? " monthly-shell" : ""}`}>
     <div className="sidebar">
-      <div className="brand">ESMER <span>MARKET</span></div>
+      <div className="brand"><img src="/assets/esmer-market-logo.png" alt="Esmer Market" width="459" height="110" /></div>
       <div className="sidebar-controls">{controls}</div>
       {navigate && <nav aria-label="Ana gezinme">{destinations.map(([id, label], index) => <Button type="button" variant="ghost" className="justify-start" key={id} aria-current={!away && destination === id ? "page" : undefined} onClick={() => { frame?.show("workspace"); if (!away || destination !== id) navigate(id); }}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d={[
