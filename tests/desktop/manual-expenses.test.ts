@@ -127,3 +127,26 @@ test("an in-flight save loses its renderer reply and resolves through the retain
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ rows: [expect.objectContaining({ revision: 1 })] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+test("an absent pending receipt requires current-record review before another manual submission", async ({}, testInfo) => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-manual-absent-receipt-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow(); await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
+    await page.evaluate(() => localStorage.setItem("esmer.pending-manual-expense", "absent-after-older-backup"));
+    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
+    await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
+    expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBe("absent-after-older-backup");
+    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).click(); await page.getByRole("button", { name: "Elle giriş", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
+    await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
+    await page.screenshot({ path: testInfo.outputPath("manual-review-required.png"), fullPage: true });
+    await page.getByRole("button", { name: "Kayıtları incele", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Bu dönemde gider kaydı yok.", exact: true })).toBeVisible();
+    expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBeNull();
+    await page.locator("#expense-manual").click(); await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeEnabled();
+    await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
