@@ -191,3 +191,19 @@ test("receipt-only changes schedule encrypted backup and restore original Excel 
     expect(new Expenses(recovery.store!).query({ period: "2026-01" }).rows[0].value).toMatchObject({ voided: true });
   } finally { await recovery.close(); await rm(root, { recursive: true, force: true }); }
 });
+test("malformed enum arrays are rejected at IPC and canonical persistence boundaries", async () => {
+  const { validExpenseRequest } = await import("../../src/desktop/requests"), { validFields } = await import("../../src/expenses/validation");
+  const store = openStore(":memory:"), service = new Expenses(store);
+  try {
+    for (const malformed of [{ ...fields, taxEvidence: "synthetic-tax", taxTreatment: ["unknown"] }, { ...fields, classification: "inventory-loss", loss: { evidence: "synthetic-loss", recognition: ["already-in-cost"] } }]) {
+      const request = { action: "save", requestId: "enum-array", fields: malformed, duplicateReview: null };
+      expect(validExpenseRequest("createExpense", request)).toBe(false);
+      expect(validFields({ ...malformed, net: "1250.5", gross: "1250.5" })).toBe(false);
+      expect(() => service.create(request as unknown as Parameters<Expenses["create"]>[0])).toThrow();
+      expect(() => store.appendRevision({ kind: "expense", entityId: "malformed-enum", value: { ...malformed, net: "1250.5", gross: "1250.5", format: "expense-v1", origin: { kind: "manual", requestId: "enum-array" }, reason: "Synthetic", evidence: "synthetic", replacesRevision: null, voided: false } } as unknown as Parameters<typeof store.appendRevision>[0])).toThrow();
+      expect(service.create({ action: "resolve", requestId: "enum-array" }).status).toBe("not-saved"); expect(store.readPin().appRevision).toBe(0);
+    }
+    service.create({ action: "save", requestId: "strict-unknown", fields: { ...fields, taxEvidence: "synthetic-tax" }, duplicateReview: null });
+    expect(service.query({ period: "2026-01" }).summary).toMatchObject({ expenses: null, coverage: "incomplete", reasons: ["UNKNOWN_TAX"] });
+  } finally { store.close(); }
+});
