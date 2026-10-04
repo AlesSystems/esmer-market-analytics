@@ -98,7 +98,7 @@ export function SalesWorkspace({ view, setView, stale }: { view: SalesView; setV
     ++request.current; setBusy(false); setError(""); setDetail(undefined); setLineId(undefined);
     if (next === "overview") reset(); else setScreen(next);
   }
-  return <AppShell destination={destination} navigate={next => expenseNavigation.leave(() => navigate(next))} controls={<>
+  return <AppShell destination={destination} navigate={next => { if (next !== destination) expenseNavigation.leave(() => navigate(next)); }} controls={<>
     <label className="period-label">Dönem <Input type="month" lang="tr" disabled={opening.current} value={view.context.period} onChange={event => { if (event.target.value) { const next = event.target.value; expenseNavigation.leave(() => void open(next)); } }} /></label>
     <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Raporlar yerel veri sürümünden okunur.</p></div></details>
     {view.warnings.includes("SYNTHETIC_ONLY") && <span className="synthetic-label" title="Gerçek market verisi değildir.">Sentetik veri</span>}

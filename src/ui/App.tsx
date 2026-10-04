@@ -46,7 +46,9 @@ function App() {
   const current = useRef<FrameView>("workspace");
   const opener = useRef<HTMLElement | null>(null);
   const focusPending = useRef(false);
-  const show = useCallback((next: FrameView) => expenseNavigation.leave(() => {
+  const show = useCallback((next: FrameView) => {
+    if (current.current === next) return;
+    expenseNavigation.leave(() => {
     const previous = current.current;
     if (previous === next) return;
     if (previous === "workspace") opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -56,7 +58,8 @@ function App() {
       (opener.current?.isConnected ? opener.current : document.querySelector<HTMLElement>(".settings-entry"))?.focus();
     });
     current.current = next; setFrameView(next);
-  }), [expenseNavigation.leave]);
+  });
+  }, [expenseNavigation.leave]);
   const claimFocus = useCallback(() => { const pending = focusPending.current; focusPending.current = false; return pending; }, []);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [expensePeriod, setExpensePeriod] = useState(new Date().toISOString().slice(0, 7));

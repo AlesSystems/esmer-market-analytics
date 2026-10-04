@@ -60,7 +60,7 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
   }
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
   function selectTask(next: ExpenseTask) {
-    if (busy || selected) return;
+    if (busy || selected || next === task) return;
     if (next !== "records") opener.current = () => document.getElementById(`expense-folio-${next}`)?.focus();
     navigation.leave(() => setTask(next));
   }

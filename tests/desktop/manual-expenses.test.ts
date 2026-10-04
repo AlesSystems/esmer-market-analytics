@@ -19,7 +19,15 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
     await expect(page.getByLabel("Gider tarihi", { exact: true })).toHaveValue("");
     await expect(page.getByLabel("KDV tutarı (TRY)", { exact: true })).toHaveValue("");
     await page.getByLabel("Kategori", { exact: true }).fill("Sentetik elektrik");
+    await page.getByRole("button", { name: "Elle giriş", exact: true }).click();
+    await expect(page.getByRole("alertdialog")).toHaveCount(0);
+    if (host !== "empty") { await page.getByRole("button", { name: "Giderler", exact: true }).click(); await expect(page.getByRole("alertdialog")).toHaveCount(0); }
     const period = page.getByLabel("Dönem", { exact: true }), previous = await period.inputValue();
+    if (host === "sales") {
+      await period.fill("9999-01"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+      await expect(page.getByRole("alert")).toContainText("İstek geçerli değil."); await expect(period).toHaveValue(previous);
+      await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
+    }
     await period.fill("2026-01");
     await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
     await expect(period).toHaveValue(previous);
