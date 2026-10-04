@@ -30,3 +30,46 @@ test("invalid amounts never become zero, and similar records need explicit revie
     expect(store.readPin().appRevision).toBe(2);
   } finally { store.close(); }
 });
+test("reference receipts replay original outcomes after correction and void without invalidating completeness", () => {
+  const store = openStore(":memory:"), service = new Expenses(store);
+  try {
+    const input = { ...fields, sourceReference: "bill-1" }, request = { action: "save" as const, requestId: "origin", fields: input, duplicateReview: null };
+    const saved = service.create(request);
+    if (saved.status !== "saved") throw Error("save missing");
+    store.confirmExpensesComplete({ period: "2026-01", reviewedRevision: saved.revision, complete: true, reason: "Synthetic review" });
+    const before = store.recoveryGeneration().changed, pin = store.readPin();
+    expect(service.create({ ...request, requestId: "identified" })).toMatchObject({ status: "already-present", revision: 1 });
+    expect(store.readPin()).toEqual(pin);
+    expect(service.query({ period: "2026-01" }).complete).toBe(true);
+    expect(store.recoveryGeneration().changed).toBe(before + 1);
+    store.changeExpense({ entityId: saved.entityId, expectedRevision: 1, reason: "Synthetic void", restoreRevision: null });
+    expect(service.create({ ...request, requestId: "identified" })).toMatchObject({ status: "already-saved", revision: 1 });
+    expect(service.create({ ...request, requestId: "new-id" }).status).toBe("reference-conflict");
+    expect(service.create({ action: "resolve", requestId: "new-id" }).status).toBe("not-saved");
+  } finally { store.close(); }
+});
+test("full duplicate set invalidates consent when a hidden match changes", () => {
+  const store = openStore(":memory:"), service = new Expenses(store);
+  try {
+    for (let i = 0; i < 7; i++) {
+      const request = { action: "save" as const, requestId: `match-${i}`, fields, duplicateReview: null }, review = service.create(request);
+      if (review.status === "duplicate-review") service.create({ ...request, duplicateReview: { fingerprint: review.fingerprint, keepSeparate: true } });
+    }
+    const request = { action: "save" as const, requestId: "eighth", fields, duplicateReview: null }, review = service.create(request);
+    if (review.status !== "duplicate-review") throw Error("review missing");
+    expect(review.totalCount).toBe(7); expect(review.candidates).toHaveLength(5);
+    const hidden = service.query({ period: "2026-01" }).rows.find(row => !review.candidates.some(candidate => candidate.entityId === row.entityId))!;
+    store.changeExpense({ entityId: hidden.entityId, expectedRevision: hidden.revision, reason: "Synthetic change", restoreRevision: null });
+    const refreshed = service.create({ ...request, duplicateReview: { fingerprint: review.fingerprint, keepSeparate: true } });
+    expect(refreshed).toMatchObject({ status: "duplicate-review", totalCount: 6 });
+    expect(service.create({ action: "resolve", requestId: "eighth" }).status).toBe("not-saved");
+  } finally { store.close(); }
+});
+test("a persistence failure rolls back both receipt and expense", () => {
+  const store = openStore(":memory:", { fault: boundary => { if (boundary === "expense-row") throw Error("Synthetic disk fault"); } }), service = new Expenses(store);
+  try {
+    expect(() => service.create({ action: "save", requestId: "rollback", fields, duplicateReview: null })).toThrow("Synthetic disk fault");
+    expect(store.readPin().appRevision).toBe(0);
+    expect(service.create({ action: "resolve", requestId: "rollback" }).status).toBe("not-saved");
+  } finally { store.close(); }
+});

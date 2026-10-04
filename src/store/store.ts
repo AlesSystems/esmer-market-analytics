@@ -4,9 +4,10 @@ import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, t
 import type { OperationControl, ReportSummary } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
-import type { ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
+import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
 import { createHash, randomUUID } from "node:crypto";
 import { backup, DatabaseSync } from "node:sqlite";
+import { Exact } from "../domain/money";
 import { canonical, readPackage, type Manifest, type Records } from "../source/package";
 import { migrate } from "./migrations";
 import type { Availability, ImportErrorCode, ImportHistoryEntry } from "../domain/contracts";
@@ -219,6 +220,37 @@ class AnalyticsStore {
       }
       this.db.prepare("INSERT INTO expense_batches VALUES(?,?,?,?,?)").run(batchId, new Date().toISOString(), changes.length, changes.length ? first : expectedRevision, this.currentPin().appRevision);
       return true;
+    });
+  }
+  resolveExpenseCommand(requestId: string): CreateExpenseResult {
+    const receipt = this.db.prepare("SELECT entity_id,revision FROM expense_commands WHERE request_id=?").get(requestId);
+    if (!receipt) return { status: "not-saved" };
+    const original = this.db.prepare("SELECT value_json FROM app_revisions WHERE revision=?").get(receipt.revision)!;
+    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: decode<ExpenseValue>(original.value_json).date.slice(0, 7) };
+  }
+  createExpenseCommand(requestId: string, fields: ExpenseFields, duplicateReview: {fingerprint: string; keepSeparate: true} | null): CreateExpenseResult {
+    return this.transaction(() => {
+      const digest = hash(fields), receipt = this.db.prepare("SELECT digest FROM expense_commands WHERE request_id=?").get(requestId);
+      if (receipt) { requireValid(receipt.digest === digest); return this.resolveExpenseCommand(requestId); }
+      const current = this.snapshot(this.currentPin()).app.filter(row => row.kind === "expense" && isExpense(row.value));
+      const entityId = fields.sourceReference ? `expense-ref:${createHash("sha256").update(fields.sourceReference).digest("hex")}` : `expense-manual:${requestId}`;
+      const existing = current.find(row => row.entityId === entityId);
+      const equalFields = (value: ExpenseValue) => hash(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]]))) === digest;
+      if (existing && existing.kind === "expense" && isExpense(existing.value)) {
+        if (existing.value.voided || !equalFields(existing.value)) return { status: "reference-conflict", entityId };
+        this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(requestId, digest, entityId, existing.revision, "identified");
+        return { status: "already-present", entityId, revision: existing.revision, incurredPeriod: fields.date.slice(0, 7) };
+      }
+      const active = current.filter(row => row.kind === "expense" && isExpense(row.value) && !row.value.voided);
+      if (fields.loss && active.some(row => row.kind === "expense" && isExpense(row.value) && row.value.loss?.evidence === fields.loss!.evidence)) return { status: "invalid", fieldErrors: { loss: "Kayıp kanıtı başka bir kayıtta kullanılmış." } };
+      const matches = active.filter(row => row.kind === "expense" && isExpense(row.value) && row.value.date === fields.date && new Exact(row.value.gross).eq(fields.gross)).toSorted((a, b) => a.entityId.localeCompare(b.entityId));
+      const fingerprint = hash({ fields, matches: matches.map(row => ({ entityId: row.entityId, revision: row.revision })) });
+      if (matches.length && duplicateReview?.fingerprint !== fingerprint) return { status: "duplicate-review", fingerprint, totalCount: matches.length, candidates: matches.slice(0, 5).map(row => ({ entityId: row.entityId, revision: row.revision, date: isExpense(row.value) ? row.value.date : "", category: isExpense(row.value) ? row.value.category : "", gross: isExpense(row.value) ? row.value.gross : "" })) };
+      const value: ExpenseValue = { ...fields, format: "expense-v1", origin: { kind: "manual", requestId }, reason: "Elle kayıt oluşturuldu", evidence: requestId, replacesRevision: null, voided: false };
+      const revision = this.insertRevision({ kind: "expense", entityId, value });
+      this.options.fault?.("expense-row");
+      this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(requestId, digest, entityId, revision, "created");
+      return { status: "saved", entityId, revision, incurredPeriod: fields.date.slice(0, 7) };
     });
   }
   changeExpense(request: CorrectExpenseRequest | RestoreExpenseRequest): number {

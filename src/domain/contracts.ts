@@ -65,6 +65,7 @@ export interface DesktopApi {
   readReportPurchasing(request: ReportRequestMap["readReportPurchasing"]): Promise<PurchasingReportResult | RequestError>;
   getOperationStatus(): Promise<OperationStatus | RequestError>;
   cancelOperation(request: {id: number}): Promise<{status: "cancelling"} | {status: "idle"} | RequestError>;
+  createExpense(request: ExpenseRequests["createExpense"]): Promise<import("../expenses/contracts").CreateExpenseResult | RequestError>;
   saveExpenseTemplate(): Promise<ExpenseResult | RequestError>;
   previewExpenses(): Promise<ExpenseResult | RequestError>;
   confirmExpenses(request: ExpenseRequests["confirmExpenses"]): Promise<ExpenseResult | RequestError>;
