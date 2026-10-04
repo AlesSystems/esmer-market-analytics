@@ -1,5 +1,5 @@
 import { test, expect, _electron as electron } from "@playwright/test";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openStore } from "../../src/store/store";
@@ -24,23 +24,29 @@ test("source filters keep fields stable and actions grouped when expanded at des
     for (const destination of ["Satışlar", "Alışlar ve maliyet"]) {
       await page.getByRole("button", { name: destination, exact: true }).click();
       await expect(page.getByRole("heading", { name: destination, exact: true })).toBeVisible();
-      for (const width of [1440, 1120, 680, 390]) {
-        await page.setViewportSize({ width, height: 1000 });
+      for (const { width, zoom } of [{ width: 1440, zoom: 1 }, { width: 1120, zoom: 1 }, { width: 680, zoom: 1 }, { width: 390, zoom: 1 }, { width: 680, zoom: 1.3 }]) {
+        await app.evaluate(({ BrowserWindow }, size) => {
+          const window = BrowserWindow.getAllWindows()[0];
+          window.setMinimumSize(390, 520);
+          window.setContentSize(size.width, 1000);
+          window.webContents.setZoomFactor(size.zoom);
+        }, { width, zoom });
+        await expect.poll(() => page.evaluate(() => window.innerWidth)).toBe(Math.round(width / zoom));
+        const disclosure = page.getByText("Gelişmiş filtreler", { exact: true });
+        const product = page.getByLabel("Ürün kayıt ID’si", { exact: true });
+        if (await product.isVisible()) await disclosure.press("Enter");
         const scope = page.getByLabel("Kayıt kapsamı");
         const type = page.getByLabel("Belge türü (kaynak kodu)");
-        const collapsedScope = await scope.boundingBox();
-        const collapsedType = await type.boundingBox();
-        await page.getByText("Gelişmiş filtreler", { exact: true }).click();
-        const product = page.getByLabel("Ürün kayıt ID’si", { exact: true });
+        const collapsedScope = await scope.evaluate(node => ({ top: node.getBoundingClientRect().top + window.scrollY, width: node.getBoundingClientRect().width }));
+        const collapsedType = await type.evaluate(node => ({ top: node.getBoundingClientRect().top + window.scrollY, width: node.getBoundingClientRect().width }));
+        await disclosure.focus();
+        await disclosure.press("Enter");
+        await expect(disclosure).toBeFocused();
         await expect(product).toBeVisible();
+        await expect(product).toHaveAccessibleDescription("Bu yedekte ürün adı yok.");
         await scope.scrollIntoViewIfNeeded();
-        await page.screenshot({ path: join(captureDir, `${destination === "Satışlar" ? "sales" : "purchasing"}-${width}.png`), fullPage: true });
-        const expandedScope = await scope.boundingBox();
-        const expandedType = await type.boundingBox();
-        expect(collapsedScope).not.toBeNull();
-        expect(collapsedType).not.toBeNull();
-        expect(expandedScope).not.toBeNull();
-        expect(expandedType).not.toBeNull();
+        const expandedScope = await scope.evaluate(node => ({ top: node.getBoundingClientRect().top + window.scrollY, width: node.getBoundingClientRect().width }));
+        const expandedType = await type.evaluate(node => ({ top: node.getBoundingClientRect().top + window.scrollY, width: node.getBoundingClientRect().width }));
         const positions = await page.evaluate(() => {
           const labels = Array.from(document.querySelectorAll("label"));
           const bounds = (text: string) => labels.find(label => label.textContent?.startsWith(text))!.getBoundingClientRect();
@@ -53,16 +59,28 @@ test("source filters keep fields stable and actions grouped when expanded at des
         expect(positions.summaryTop, "advanced filters follow both main fields").toBeGreaterThanOrEqual(positions.fieldsBottom);
         expect(positions.actionTop, "actions follow the expanded field and hint").toBeGreaterThanOrEqual(positions.helperBottom);
         expect(positions.overflow, "filter layout does not widen the page").toBe(false);
-        expect(expandedScope!.width).toBeCloseTo(collapsedScope!.width, 0);
-        expect(expandedType!.width).toBeCloseTo(collapsedType!.width, 0);
+        expect(expandedScope.width).toBeCloseTo(collapsedScope.width, 0);
+        expect(expandedType.width).toBeCloseTo(collapsedType.width, 0);
+        expect(expandedScope.top, "opening advanced filters keeps the scope field in place").toBeCloseTo(collapsedScope.top, 0);
+        expect(expandedType.top, "opening advanced filters keeps the type field in place").toBeCloseTo(collapsedType.top, 0);
+        const capturePath = join(captureDir, `${destination === "Satışlar" ? "sales" : "purchasing"}-${width}-${zoom}.png`);
+        if (zoom === 1) await page.screenshot({ path: capturePath, fullPage: true });
+        else {
+          const capture = await app.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));
+          await writeFile(capturePath, Buffer.from(capture, "base64"));
+        }
         await page.getByText("Gelişmiş filtreler", { exact: true }).click();
       }
-      await page.setViewportSize({ width: 1440, height: 1000 });
+      await app.evaluate(({ BrowserWindow }) => {
+        const window = BrowserWindow.getAllWindows()[0];
+        window.webContents.setZoomFactor(1);
+        window.setContentSize(1440, 1000);
+      });
       await page.getByText("Gelişmiş filtreler", { exact: true }).click();
       const product = page.getByLabel("Ürün kayıt ID’si", { exact: true });
       await product.fill("invalid");
       await expect(page.getByRole("button", { name: "Filtreleri uygula", exact: true })).toBeDisabled();
-      await product.fill("999");
+      await product.fill("-9999999999999999999");
       await page.getByRole("button", { name: "Filtreleri uygula", exact: true }).click();
       await expect(page.getByRole("status").filter({ hasText: "Eşleşen kayıt yok" }).first()).toBeVisible();
       await page.getByRole("button", { name: "Filtreleri temizle", exact: true }).click();
