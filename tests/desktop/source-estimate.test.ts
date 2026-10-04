@@ -3,6 +3,8 @@ import {mkdtemp,rm,writeFile,readFile,mkdir} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join,resolve} from "node:path";
 import {estimateSnapshot,estimatePackage} from "../helpers/estimate-fixture";
+import {rawSnapshot} from "../helpers/raw-fixture";
+import {writeRawPackage,writeRawEstimatePackage} from "../../src/source/raw-package";
 import {money} from "../../src/ui/format";
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 test("packaged estimated import shows loss, returns, exact scope, product drilldown and export offline",async({},testInfo)=>{
@@ -56,5 +58,54 @@ test("private prepared estimate imports exports and restarts offline without rev
   await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();
   let exported=false;try{exported=(await readFile(exportPath!)).byteLength>1000;}catch{exported=false;}expect(exported).toBe(true);
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect.poll(matches).toBe(true);
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
+
+
+test("preview estimate recovery opens settings and restores a prepared estimate",async({},testInfo)=>{
+ const userData=await mkdtemp(join(tmpdir(),"estimate-recovery-"));
+ const preview=rawSnapshot();preview.from="2025-09-01";preview.to="2025-10-12";
+ preview.headers[0].FIS_TARIHI="2025-09-01T12:00:00.000";
+ const prepared=structuredClone(preview);prepared.lines[0].BELGE_TARIHINDEKI_SON_ALIS_FIYATI="70";
+ const missing=structuredClone(prepared);missing.lines[0].BELGE_TARIHINDEKI_SON_ALIS_FIYATI=null;
+ const previewFile=join(userData,"preview.json"),preparedFile=join(userData,"prepared.json"),missingFile=join(userData,"missing.json"),invalidFile=join(userData,"invalid.json");
+ await writeFile(previewFile,writeRawPackage(preview,"fixture:recovery","preview"));
+ await writeFile(preparedFile,writeRawEstimatePackage(prepared,"fixture:recovery","prepared"));
+ await writeFile(missingFile,writeRawEstimatePackage(missing,"fixture:recovery","missing"));
+ await writeFile(invalidFile,"{}");
+ let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  let page=await app.firstWindow();
+  const choose=async(path:string|null)=>app.evaluate(({dialog},file)=>{dialog.showOpenDialog=async()=>file?{canceled:false,filePaths:[file]}:{canceled:true,filePaths:[]};},path);
+  const region=()=>page.getByRole("region",{name:"Kaynak tahmini"});
+  const recovery=()=>region().getByRole("button",{name:"Veri paketi içe aktarmaya git",exact:true});
+  const openRecovery=async()=>{await recovery().focus();await page.keyboard.press("Enter");await expect(page.getByRole("heading",{name:"Ayarlar",exact:true})).toBeFocused();};
+  const importChosen=async()=>page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  await choose(previewFile);await importChosen();await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
+  await expect(recovery()).toBeVisible();
+  await expect(region().getByText("Tahmini satış katkısını görmek için maliyet adayı içeren hazırlanmış bir veri paketi gerekir. Ayarlar’dan Veri paketi içe aktar ile bu paketi seçin.",{exact:true})).toBeVisible();
+  await recovery().scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("estimate-recovery.png")});
+  await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(680,800);window.webContents.setZoomFactor(2);});
+  await recovery().scrollIntoViewIfNeeded();await expect(recovery()).toBeInViewport();
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
+  await page.screenshot({path:testInfo.outputPath("estimate-recovery-compact200.png")});
+  await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(1180,1000);window.webContents.setZoomFactor(1);});
+  await openRecovery();await choose(null);await importChosen();
+  await expect(page.getByRole("button",{name:"Veri paketi içe aktar",exact:true})).toBeEnabled();
+  await page.getByRole("button",{name:"Ayarları kapat",exact:true}).click();await expect(recovery()).toBeFocused();
+  await openRecovery();await choose(invalidFile);await importChosen();
+  await expect(page.getByRole("button",{name:"Veri paketi içe aktar",exact:true})).toBeEnabled();
+  await page.getByRole("button",{name:"Ayarları kapat",exact:true}).click();await expect(recovery()).toBeVisible();
+  await openRecovery();await choose(preparedFile);await importChosen();
+  await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");await expect(recovery()).toHaveCount(0);
+  await expect(region().getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await choose(previewFile);await importChosen();
+  await expect(recovery()).toBeVisible();await expect(region().getByText("-20,00 ₺",{exact:true})).toHaveCount(0);
+  await openRecovery();await choose(missingFile);await importChosen();
+  await expect(region().getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();
+  await expect(region().getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();await expect(region().getByText("Maliyet eksik: 1",{exact:true})).toBeVisible();await expect(recovery()).toHaveCount(0);
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
