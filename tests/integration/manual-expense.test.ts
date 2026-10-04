@@ -73,3 +73,22 @@ test("a persistence failure rolls back both receipt and expense", () => {
     expect(service.create({ action: "resolve", requestId: "rollback" }).status).toBe("not-saved");
   } finally { store.close(); }
 });
+test("receipts survive database restart and snapshot recovery validates their historical links", async () => {
+  const { mkdtemp, rm } = await import("node:fs/promises"), { tmpdir } = await import("node:os"), { join } = await import("node:path");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "manual-expense-")), path = join(root, "analytics.sqlite"), backup = join(root, "backup.sqlite");
+  let store = openStore(path);
+  try {
+    const service = new Expenses(store), request = { action: "save" as const, requestId: "restart", fields: { ...fields, sourceReference: "restart-bill" }, duplicateReview: null };
+    const saved = service.create(request); if (saved.status !== "saved") throw Error("save missing");
+    service.create({ ...request, requestId: "identified-restart" });
+    store.changeExpense({ entityId: saved.entityId, expectedRevision: saved.revision, reason: "Synthetic void", restoreRevision: null });
+    await store.backupTo(backup);
+    expect(validateSnapshot(backup).revisions).toBe(2);
+    store.close(); store = openStore(path);
+    expect(new Expenses(store).create(request)).toMatchObject({ status: "already-saved", revision: 1 });
+    const oldPath = join(root, "old.sqlite"); const old = openStore(oldPath, { schemaVersion: 7 }); old.close();
+    expect(validateSnapshot(oldPath, true).revisions).toBe(0);
+    const upgraded = openStore(oldPath); expect(new Expenses(upgraded).create({ action: "resolve", requestId: "absent" })).toEqual({ status: "not-saved" }); upgraded.close();
+  } finally { store.close(); await rm(root, { recursive: true, force: true }); }
+});

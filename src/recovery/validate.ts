@@ -1,3 +1,5 @@
+import { isExpense, fieldKeys } from "../expenses/validation";
+import type { ExpenseValue } from "../expenses/contracts";
 import { readRawPackage } from "../source/raw-package";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
@@ -113,6 +115,27 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
   }
   const revisions=db.prepare("SELECT revision,kind,entity_id,value_json FROM app_revisions ORDER BY revision").all();
   for (const row of revisions) validateChange({kind:row.kind,entityId:row.entity_id,value:decode(row.value_json)} as AppChange);
+  if (version >= 8) {
+    const receipts = db.prepare("SELECT * FROM expense_commands").all();
+    const digest = (value: ExpenseValue) => createHash("sha256").update(canonical(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]])))).digest("hex");
+    for (const receipt of receipts) {
+      const original = revisions.find(row => row.revision === receipt.revision);
+      requireValid(validId(receipt.request_id) && /^[a-f0-9]{64}$/.test(String(receipt.digest)) && original?.kind === "expense" && original.entity_id === receipt.entity_id);
+      const value = decode<ExpenseValue>(original!.value_json);
+      requireValid(isExpense(value) && !value.voided && digest(value) === receipt.digest);
+      if (receipt.outcome === "created") requireValid("kind" in value.origin && value.origin.requestId === receipt.request_id && value.replacesRevision === null && !revisions.some(row => row.kind === "expense" && row.entity_id === receipt.entity_id && Number(row.revision) < Number(receipt.revision)));
+    }
+    for (const original of revisions) {
+      if (original.kind !== "expense") continue;
+      const value = decode<ExpenseValue>(original.value_json);
+      if (isExpense(value) && "kind" in value.origin) {
+        const requestId = value.origin.requestId;
+        const receipt = receipts.find(row => row.request_id === requestId && row.outcome === "created");
+        requireValid(receipt && receipt.entity_id === original.entity_id && Number(receipt.revision) <= Number(original.revision));
+        if (value.replacesRevision === null) requireValid(receipt!.revision === original.revision);
+      }
+    }
+  }
   const facts=new Map<string,Records>();
   const coverage=new Map<string,Metadata["coverage"]>();
   for (const dataset of db.prepare("SELECT id,lineage,manifest_json,warnings_json,summary_json FROM datasets").all()) {
