@@ -164,3 +164,22 @@ test("a payment outside the displayed incurred month offers the payment month wi
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-02" }))).toMatchObject({ incurred: "0", payments: "75" });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+for (const host of ["source", "sales"] as const) test(`host error recovery retains a manual draft until confirmed in ${host}`, async () => {
+  const userData = await mkdtemp(join(tmpdir(), `esmer-manual-error-${host}-`)), store = openStore(join(userData, "analytics.sqlite"));
+  if (host === "source") store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:manual-error", "manual-error-host")); else store.importPackage(businessPackage()); store.close();
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill(host === "source" ? "1800-01" : "9999-01");
+    const retry = page.getByRole("button", { name: host === "source" ? "Kaynağı yeniden aç" : "Yeniden dene", exact: true }); await expect(retry).toBeVisible();
+    await page.locator("#expense-manual").click(); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik korunacak taslak");
+    await retry.click(); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
+    await retry.click(); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    if (host === "source") await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    else {
+      await expect(retry).toBeVisible(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
+      await page.getByRole("button", { name: "Vazgeç", exact: true }).click(); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    }
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
