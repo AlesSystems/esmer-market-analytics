@@ -233,7 +233,7 @@ class AnalyticsStore {
       const digest = hash(fields), receipt = this.db.prepare("SELECT digest FROM expense_commands WHERE request_id=?").get(requestId);
       if (receipt) { requireValid(receipt.digest === digest); return this.resolveExpenseCommand(requestId); }
       const current = this.snapshot(this.currentPin()).app.filter(row => row.kind === "expense" && isExpense(row.value));
-      const entityId = fields.sourceReference ? `expense-ref:${createHash("sha256").update(fields.sourceReference).digest("hex")}` : `expense-manual:${requestId}`;
+      const entityId = fields.sourceReference ? `expense-ref:${createHash("sha256").update(fields.sourceReference).digest("hex")}` : `expense-manual:${createHash("sha256").update(requestId).digest("hex")}`;
       const existing = current.find(row => row.entityId === entityId);
       const equalFields = (value: ExpenseValue) => hash(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]]))) === digest;
       if (existing && existing.kind === "expense" && isExpense(existing.value)) {
@@ -245,7 +245,7 @@ class AnalyticsStore {
       if (fields.loss && active.some(row => row.kind === "expense" && isExpense(row.value) && row.value.loss?.evidence === fields.loss!.evidence)) return { status: "invalid", fieldErrors: { loss: "Kayıp kanıtı başka bir kayıtta kullanılmış." } };
       const matches = active.filter(row => row.kind === "expense" && isExpense(row.value) && row.value.date === fields.date && new Exact(row.value.gross).eq(fields.gross)).toSorted((a, b) => a.entityId.localeCompare(b.entityId));
       const fingerprint = hash({ fields, matches: matches.map(row => ({ entityId: row.entityId, revision: row.revision })) });
-      if (matches.length && duplicateReview?.fingerprint !== fingerprint) return { status: "duplicate-review", fingerprint, totalCount: matches.length, candidates: matches.slice(0, 5).map(row => ({ entityId: row.entityId, revision: row.revision, date: isExpense(row.value) ? row.value.date : "", category: isExpense(row.value) ? row.value.category : "", gross: isExpense(row.value) ? row.value.gross : "" })) };
+      if ((matches.length || duplicateReview) && duplicateReview?.fingerprint !== fingerprint) return { status: "duplicate-review", fingerprint, totalCount: matches.length, candidates: matches.slice(0, 5).map(row => ({ entityId: row.entityId, revision: row.revision, date: isExpense(row.value) ? row.value.date : "", category: isExpense(row.value) ? row.value.category : "", gross: isExpense(row.value) ? row.value.gross : "" })) };
       const value: ExpenseValue = { ...fields, format: "expense-v1", origin: { kind: "manual", requestId }, reason: "Elle kayıt oluşturuldu", evidence: requestId, replacesRevision: null, voided: false };
       const revision = this.insertRevision({ kind: "expense", entityId, value });
       this.options.fault?.("expense-row");
