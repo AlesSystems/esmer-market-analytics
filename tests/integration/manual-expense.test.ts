@@ -7,8 +7,8 @@ test("manual creation is exact, app-owned and survives a lost reply without anot
   try {
     const request = { action: "save" as const, requestId: "manual-1", fields, duplicateReview: null };
     const saved = service.create(request);
-    expect(saved).toMatchObject({ status: "saved", revision: 1, incurredPeriod: "2026-01" });
-    expect(new Expenses(store).create({ action: "resolve", requestId: "manual-1" })).toMatchObject({ status: "already-saved", revision: 1 });
+    expect(saved).toMatchObject({ status: "saved", revision: 1, incurredPeriod: "2026-01", paymentPeriod: "2026-02" });
+    expect(new Expenses(store).create({ action: "resolve", requestId: "manual-1" })).toMatchObject({ status: "already-saved", revision: 1, paymentPeriod: "2026-02" });
     expect(service.create(request)).toMatchObject({ status: "already-saved", revision: 1 });
     expect(service.query({ period: "2026-01" }).rows[0].value).toMatchObject({ net: "1250.5", gross: "1250.5", origin: { kind: "manual", requestId: "manual-1" } });
     expect(service.query({ period: "2026-02" }).payments).toBe("1250.5");

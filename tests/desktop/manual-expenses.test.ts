@@ -150,3 +150,17 @@ test("an absent pending receipt requires current-record review before another ma
     await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+test("a payment outside the displayed incurred month offers the payment month without changing selection", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-manual-payment-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await page.locator("#expense-manual").click();
+    await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Ödeme tarihi (isteğe bağlı)", { exact: true }).fill("2026-02-01"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik ayrı ödeme ayı");
+    for (const label of ["Net tutar (TRY)", "KDV tutarı (TRY)", "Brüt tutar (TRY)"]) await page.getByLabel(label, { exact: true }).fill(label === "KDV tutarı (TRY)" ? "0" : "75");
+    await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
+    await expect(page.getByRole("button", { name: "İlgili aya git", exact: true })).toBeVisible();
+    await expect(page.getByText("Giderin oluşma dönemi: 2026-01", { exact: false })).toContainText("Ödeme dönemi: 2026-02");
+    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2026-01");
+    await page.getByRole("button", { name: "İlgili aya git", exact: true }).click(); await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2026-02");
+    expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-02" }))).toMatchObject({ incurred: "0", payments: "75" });
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});

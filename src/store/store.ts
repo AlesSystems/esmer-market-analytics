@@ -226,7 +226,8 @@ class AnalyticsStore {
     const receipt = this.db.prepare("SELECT entity_id,revision FROM expense_commands WHERE request_id=?").get(requestId);
     if (!receipt) return { status: "not-saved" };
     const original = this.db.prepare("SELECT value_json FROM app_revisions WHERE revision=?").get(receipt.revision)!;
-    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: decode<ExpenseValue>(original.value_json).date.slice(0, 7) };
+    const value = decode<ExpenseValue>(original.value_json);
+    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: value.date.slice(0, 7), paymentPeriod: value.paymentDate?.slice(0, 7) ?? null };
   }
   createExpenseCommand(requestId: string, fields: ExpenseFields, duplicateReview: {fingerprint: string; keepSeparate: true} | null): CreateExpenseResult {
     return this.transaction(() => {
@@ -239,7 +240,7 @@ class AnalyticsStore {
       if (existing && existing.kind === "expense" && isExpense(existing.value)) {
         if (existing.value.voided || !equalFields(existing.value)) return { status: "reference-conflict", entityId };
         this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(requestId, digest, entityId, existing.revision, "identified");
-        return { status: "already-present", entityId, revision: existing.revision, incurredPeriod: fields.date.slice(0, 7) };
+        return { status: "already-present", entityId, revision: existing.revision, incurredPeriod: fields.date.slice(0, 7), paymentPeriod: fields.paymentDate?.slice(0, 7) ?? null };
       }
       const active = current.filter(row => row.kind === "expense" && isExpense(row.value) && !row.value.voided);
       if (fields.loss && active.some(row => row.kind === "expense" && isExpense(row.value) && row.value.loss?.evidence === fields.loss!.evidence)) return { status: "invalid", fieldErrors: { loss: "Kayıp kanıtı başka bir kayıtta kullanılmış." } };
@@ -250,7 +251,7 @@ class AnalyticsStore {
       const revision = this.insertRevision({ kind: "expense", entityId, value });
       this.options.fault?.("expense-row");
       this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(requestId, digest, entityId, revision, "created");
-      return { status: "saved", entityId, revision, incurredPeriod: fields.date.slice(0, 7) };
+      return { status: "saved", entityId, revision, incurredPeriod: fields.date.slice(0, 7), paymentPeriod: fields.paymentDate?.slice(0, 7) ?? null };
     });
   }
   changeExpense(request: CorrectExpenseRequest | RestoreExpenseRequest): number {
