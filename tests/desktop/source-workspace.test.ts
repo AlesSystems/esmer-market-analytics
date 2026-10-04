@@ -47,9 +47,10 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await page.getByLabel("Ürün kayıt ID’si",{exact:true}).pressSequentially("333");await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("333");await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();
   await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Belge satırları",exact:true})).toBeVisible();
   await expect(page.getByText("KDV toplamı · doğrulanmadı",{exact:true})).toBeVisible();
-  await expect(page.getByText("3,4567890123456789 · 3.4567890123456789",{exact:true})).toHaveCount(2);
+  await page.getByRole("checkbox",{name:"Tam kaynak değerlerini göster",exact:true}).check();
+  await expect(page.getByText("3.4567890123456789",{exact:true})).toHaveCount(2);
   await expect(page.getByRole("columnheader",{name:"Kaynak miktar",exact:true})).toBeVisible();
-  await expect(page.getByRole("cell",{name:"2,000 · 2.000",exact:true})).toBeVisible();
+  await expect(page.getByRole("cell",{name:"2 2.000",exact:true})).toBeVisible();
   await expect(page.getByRole("columnheader",{name:"FIS",exact:true})).toHaveCount(0);
   await page.getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("button",{name:"2",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
   await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await expect(page.getByRole("cell",{name:"Kira Faaliyet gideri",exact:true})).toBeVisible();

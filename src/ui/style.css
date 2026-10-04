@@ -6,6 +6,7 @@
 @import "./sales/sales-control-desk.css";
 @import "./expenses-control-desk.css";
 @import "./reports/reports-control-desk.css";
+@import "./source-document-detail.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);
