@@ -43,6 +43,8 @@ The following SHA-256 hashes use UTF-16LE definition text, matching SQL NVARCHAR
 
 ## Remaining acceptance dependency
 
+The [gate resumption](issue-67-gate-resumption.md) adds a later bounded investigation of POS lifecycle definitions and a concrete resolution plan. G01 remains open.
+
 G01 needs independently reconciled evidence for the exact approved product/month and complete reporting population:
 
 - Completed, void, and converted document identity; business dates, timezone, and final-day completeness.
