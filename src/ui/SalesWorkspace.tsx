@@ -1,3 +1,4 @@
+import { useExpenseNavigation } from "./expense-navigation";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +14,7 @@ import { PageControls, pageRows } from "./PageControls";
 const kind = (value: string) => ({ sale: "Satış", "customer-return": "Müşteri iadesi", purchase: "Alış", "supplier-return": "Tedarikçi iadesi" })[value] ?? "Türü bilinmiyor";
 
 export function SalesWorkspace({ view, setView, stale }: { view: SalesView; setView: (view: SalesView) => void; stale: boolean }) {
+  const expenseNavigation = useExpenseNavigation();
   const evidenceSummary = useRef<HTMLElement>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [screen, setScreen] = useState<"monthly" | "versions" | "overview" | "products" | "transactions" | "purchasing" | "expenses">("monthly");
@@ -96,15 +98,15 @@ export function SalesWorkspace({ view, setView, stale }: { view: SalesView; setV
     ++request.current; setBusy(false); setError(""); setDetail(undefined); setLineId(undefined);
     if (next === "overview") reset(); else setScreen(next);
   }
-  return <AppShell destination={destination} navigate={navigate} controls={<>
-    <label className="period-label">Dönem <Input type="month" lang="tr" disabled={opening.current} value={view.context.period} onChange={event => { if (event.target.value) void open(event.target.value); }} /></label>
+  return <AppShell destination={destination} navigate={next => expenseNavigation.leave(() => navigate(next))} controls={<>
+    <label className="period-label">Dönem <Input type="month" lang="tr" disabled={opening.current} value={view.context.period} onChange={event => { if (event.target.value) { const next = event.target.value; expenseNavigation.leave(() => void open(next)); } }} /></label>
     <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Raporlar yerel veri sürümünden okunur.</p></div></details>
     {view.warnings.includes("SYNTHETIC_ONLY") && <span className="synthetic-label" title="Gerçek market verisi değildir.">Sentetik veri</span>}
   </>}>
-      {(stale || view.stale) && <div className="notice"><strong>Yeni veri sürümü hazır</strong><span>Bu rapor ve kaynak detayları açık sürümde sabit tutuluyor.</span><Button variant="outline" onClick={() => void open(view.context.period)}>Raporu yenile</Button></div>}
+      {(stale || view.stale) && <div className="notice"><strong>Yeni veri sürümü hazır</strong><span>Bu rapor ve kaynak detayları açık sürümde sabit tutuluyor.</span><Button variant="outline" onClick={() => expenseNavigation.leave(() => void open(view.context.period))}>Raporu yenile</Button></div>}
       {error && <div className="notice warning" role="alert"><span>{error}</span><Button variant="outline" onClick={() => retry.current()}>Yeniden dene</Button></div>}
       {busy && <p role="status">Rapor yükleniyor…</p>}
-      {(screen === "monthly" || screen === "versions") ? <MonthlyWorkspace onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} key={`${view.context.sessionId}:${screen}`} context={view.context} versions={screen === "versions"} revision={expenseRevision} refresh={() => void open(view.context.period)} onSales={(categoryId?: string) => { void query({ ...emptySalesFilters, categoryId: categoryId ?? null }, categoryId ? "products" : "overview"); }} /> : screen === "expenses" ? <ExpensesWorkspace key={view.context.period} period={view.context.period} onChange={() => setExpenseRevision(value => value + 1)} /> : screen === "purchasing" ? <PurchasingWorkspace key={view.context.sessionId} context={view.context} /> : <div className={`work-grid sales-control-desk${detail ? " has-detail" : ""}`}><main aria-busy={busy}>
+      {(screen === "monthly" || screen === "versions") ? <MonthlyWorkspace onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} key={`${view.context.sessionId}:${screen}`} context={view.context} versions={screen === "versions"} revision={expenseRevision} refresh={() => void open(view.context.period)} onSales={(categoryId?: string) => { void query({ ...emptySalesFilters, categoryId: categoryId ?? null }, categoryId ? "products" : "overview"); }} /> : screen === "expenses" ? <ExpensesWorkspace key={view.context.period} period={view.context.period} onPeriod={next => void open(next)} onChange={() => setExpenseRevision(value => value + 1)} /> : screen === "purchasing" ? <PurchasingWorkspace key={view.context.sessionId} context={view.context} /> : <div className={`work-grid sales-control-desk${detail ? " has-detail" : ""}`}><main aria-busy={busy}>
         <div className="page-heading"><div><h1>{screen === "overview" ? "Satış Özeti" : screen === "products" ? "Kategori / Ürün Detayı" : "İşlemler"}</h1><p>{scope}</p></div><label className="search-label">Ürün ara<Input type="search" disabled={opening.current} value={search} placeholder="Ürün adı" onChange={event => { setSearch(event.target.value); void query({ ...emptySalesFilters, search: event.target.value }, event.target.value ? "products" : "overview"); }} /></label></div>
         {(!view.complete || view.coverage !== "complete") && <div className="notice warning"><strong>{view.coverage === "unavailable" ? "Dönem verisi yok" : view.coverage === "partial" ? "Kısmi dönem" : "Kanıt eksik"}</strong><span>{date(view.from)} – {date(view.to)}. Çözümlenmemiş katkılar sıfır kabul edilmez.</span></div>}
         {screen !== "overview" && <nav className="subview-nav" aria-label="Satış ayrıntıları"><Button variant="outline" onClick={reset}>Satış özetine dön</Button><Button variant="outline" onClick={() => void query({ ...view.filters, productId: null }, "products")}>Kategori / Ürün Detayı</Button><span>{scope}</span></nav>}

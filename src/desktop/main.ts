@@ -82,7 +82,7 @@ if (!app.requestSingleInstanceLock()) app.quit();
 else
 
 app.whenReady().then(async () => {
-  const localSession = session.fromPartition("esmer");
+  const localSession = session.fromPartition("persist:esmer");
   localSession.setPermissionRequestHandler(
     (_webContents, _permission, callback) => callback(false),
   );
