@@ -4,9 +4,9 @@ import { canonical } from "../source/package";
 import { calculateExpenseComponents } from "../analytics/operating";
 import { Exact, sum } from "../domain/money";
 import { requireValid } from "../store/revisions";
-import { classificationLabels, classifications, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
+import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
 import { readExpenseWorkbook, decimalCell, dateCell, type Cell } from "./workbook";
-import { isExpense, validExpense, fieldKeys, validPeriod } from "./validation";
+import { isExpense, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
 import { relevantExpenseRevision } from "./adjustments";
 const hash = (s: string | Uint8Array) => createHash("sha256").update(s).digest("hex");
 const nullable = (cells: Cell[], index: number) => cells[index]?.value || null;
@@ -34,6 +34,23 @@ const same = (a: ExpenseValue, b: ExpenseValue) => canonical(Object.fromEntries(
 export class Expenses {
   private pending: ExpensePreview | null = null;
   constructor(private readonly store: ReturnType<typeof openStore>) {}
+  create(request: CreateExpenseRequest): CreateExpenseResult {
+    requireValid(validCreateExpenseRequest(request));
+    if (request.action === "resolve") return this.store.resolveExpenseCommand(request.requestId);
+    const fields = { ...request.fields }, fieldErrors: Partial<Record<keyof ExpenseFields, string>> = {};
+    for (const key of ["net", "tax", "gross"] as const) {
+      try { fields[key] = decimalCell({ value: fields[key], numeric: false }); }
+      catch { fieldErrors[key] = "Geçerli bir TRY tutarı girin (ör. 1.250,50)."; }
+    }
+    if (!validDate(fields.date)) fieldErrors.date = "Geçerli bir gider tarihi girin.";
+    if (fields.paymentDate !== null && !validDate(fields.paymentDate)) fieldErrors.paymentDate = "Geçerli bir ödeme tarihi girin.";
+    if (!fields.category.trim()) fieldErrors.category = "Kategori zorunlu.";
+    if (!fieldErrors.net && !fieldErrors.tax && !fieldErrors.gross && !new Exact(fields.net).plus(fields.tax).eq(fields.gross)) fieldErrors.gross = "Brüt tutar, net tutar ile KDV toplamına eşit olmalı.";
+    if (fields.taxTreatment !== "unknown" && !fields.taxEvidence) fieldErrors.taxEvidence = "Bilinen KDV işlemi için kanıt kodu zorunlu.";
+    if (!Object.keys(fieldErrors).length && !validFields(fields)) fieldErrors.classification = "Sınıflandırma ve kanıt alanlarını inceleyin.";
+    if (Object.keys(fieldErrors).length) return { status: "invalid", fieldErrors };
+    return this.store.createExpenseCommand(request.requestId, fields, request.duplicateReview);
+  }
   preview(bytes: Uint8Array): ExpensePreview {
     this.pending = null;
     const snapshot = this.store.readSnapshot(), batchId = hash(bytes);

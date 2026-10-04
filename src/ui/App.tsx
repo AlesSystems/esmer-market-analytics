@@ -1,3 +1,4 @@
+import { ExpenseNavigationProvider, useExpenseNavigation } from "./expense-navigation";
 import {SourceWorkspace, initialSourceQuery, type SourceView} from "./SourceWorkspace";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -36,6 +37,7 @@ function previousImportMessage(availability: Extract<Availability, { status: "re
   return `Önceki içe aktarma tamamlanamadı. ${preserved} Geçerli bir paketle yeniden deneyin.`;
 }
 function App() {
+  const expenseNavigation = useExpenseNavigation();
   const [source,setSource]=useState<SourceView>();
   const [sourceError,setSourceError]=useState("");
   const [sourceResolved,setSourceResolved]=useState(false);
@@ -45,6 +47,8 @@ function App() {
   const opener = useRef<HTMLElement | null>(null);
   const focusPending = useRef(false);
   const show = useCallback((next: FrameView) => {
+    if (current.current === next) return;
+    expenseNavigation.leave(() => {
     const previous = current.current;
     if (previous === next) return;
     if (previous === "workspace") opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -54,7 +58,8 @@ function App() {
       (opener.current?.isConnected ? opener.current : document.querySelector<HTMLElement>(".settings-entry"))?.focus();
     });
     current.current = next; setFrameView(next);
-  }, []);
+  });
+  }, [expenseNavigation.leave]);
   const claimFocus = useCallback(() => { const pending = focusPending.current; focusPending.current = false; return pending; }, []);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [expensePeriod, setExpensePeriod] = useState(new Date().toISOString().slice(0, 7));
@@ -122,7 +127,7 @@ function App() {
   let content: ReactNode;
   if (source && mode === "source") content = <SourceWorkspace source={source} />;
   else if ((!sales || sourceError && mode === "source") && expensesOpen) content = <AppShell destination="expenses" controls={<span>Yerel veriler</span>}>
-    <Button variant="outline" onClick={() => setExpensesOpen(false)}>Ana sayfaya dön</Button><label className="period-label">Dönem<Input type="month" value={expensePeriod} onChange={event => { if (event.target.value) setExpensePeriod(event.target.value); }} /></label><ExpensesWorkspace key={expensePeriod} period={expensePeriod} />
+    <Button variant="outline" onClick={() => expenseNavigation.leave(() => setExpensesOpen(false))}>Ana sayfaya dön</Button><label className="period-label">Dönem<Input type="month" value={expensePeriod} onChange={event => { if (event.target.value) { const next = event.target.value; expenseNavigation.leave(() => setExpensePeriod(next)); } }} /></label><ExpensesWorkspace key={expensePeriod} period={expensePeriod} onPeriod={setExpensePeriod} />
   </AppShell>;
   else if (sourceError && mode === "source") content = <AppShell><h1>Kaynak kayıtları açılamadı</h1><p role="alert">{sourceError}</p><Button variant="default" disabled={importing} onClick={() => void importPackage()}>Veri paketi içe aktar</Button><Button variant="outline" onClick={() => setExpensesOpen(true)}>Giderler</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button><Button variant="outline" onClick={refreshAvailability}>Kaynağı yeniden aç</Button>{loaded && <Button variant="outline" onClick={() => setMode("financial")}>Korunan mali veri görünümü</Button>}</AppShell>;
   else if (sales) content = <SalesWorkspace view={sales} setView={setSales} stale={loaded && ready.dataset.datasetId !== sales.context.datasetId} />;
@@ -153,4 +158,4 @@ function App() {
   </main></AppShell>;
   return <AppFrame.Provider value={{ view: frameView, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>{content}</AppFrame.Provider>;
 }
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(<ExpenseNavigationProvider><App /></ExpenseNavigationProvider>);

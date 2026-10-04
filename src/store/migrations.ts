@@ -1,11 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
-import { APPLICATION_ID, SCHEMA_VERSION, schema, salesMigration, businessMigration, expenseMigration, recoveryMigration, sourcePreviewMigration } from "./schema";
+import { APPLICATION_ID, SCHEMA_VERSION, schema, salesMigration, businessMigration, expenseMigration, recoveryMigration, sourcePreviewMigration, manualExpenseMigration } from "./schema";
 
 export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
   const version = Number(db.prepare("PRAGMA user_version").get()!.user_version);
   const applicationId = Number(db.prepare("PRAGMA application_id").get()!.application_id);
   const empty = !db.prepare("SELECT name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' LIMIT 1").get();
-  if (![1, 2, 3, 4, 5, 6, 7].includes(target) || version > target || (version === 0 ? !empty || applicationId !== 0 : applicationId !== APPLICATION_ID)) throw new Error("UNSUPPORTED_STORE");
+  if (![1, 2, 3, 4, 5, 6, 7, 8].includes(target) || version > target || (version === 0 ? !empty || applicationId !== 0 : applicationId !== APPLICATION_ID)) throw new Error("UNSUPPORTED_STORE");
   if (version !== 0) {
     const expected = new DatabaseSync(":memory:");
     try {
@@ -15,6 +15,7 @@ export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
       if (version >= 5) expected.exec(expenseMigration);
       if (version >= 6) expected.exec(recoveryMigration);
       if (version >= 7) expected.exec(sourcePreviewMigration);
+      if (version >= 8) expected.exec(manualExpenseMigration);
       const tables = expected.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
       for (const { name } of tables) {
         const actual = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(String(name));
@@ -38,6 +39,7 @@ export function migrate(db: DatabaseSync, target = SCHEMA_VERSION) {
     if (version < 5 && target >= 5) db.exec(expenseMigration);
     if (version < 6 && target >= 6) db.exec(recoveryMigration);
     if (version < 7 && target >= 7) db.exec(sourcePreviewMigration);
+    if (version < 8 && target >= 8) db.exec(manualExpenseMigration);
     db.exec(`PRAGMA application_id=${APPLICATION_ID}; PRAGMA user_version=${target}; COMMIT`);
   } catch (error) { if (db.isTransaction) db.exec("ROLLBACK"); throw error; }
 }

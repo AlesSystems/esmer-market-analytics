@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -74,3 +74,11 @@ export const sourcePreviewMigration = `CREATE TABLE source_preview (
 ) STRICT;
 CREATE TRIGGER backup_preview_insert AFTER INSERT ON source_preview BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;
 CREATE TRIGGER backup_preview_update AFTER UPDATE ON source_preview BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;
+
+export const manualExpenseMigration = `CREATE TABLE expense_commands (
+  request_id TEXT PRIMARY KEY, digest TEXT NOT NULL, entity_id TEXT NOT NULL,
+  revision INTEGER NOT NULL REFERENCES app_revisions(revision), outcome TEXT NOT NULL CHECK(outcome IN ('created','identified'))
+) STRICT;
+CREATE TRIGGER immutable_expense_command_update BEFORE UPDATE ON expense_commands BEGIN SELECT RAISE(ABORT,'IMMUTABLE_COMMAND'); END;
+CREATE TRIGGER immutable_expense_command_delete BEFORE DELETE ON expense_commands BEGIN SELECT RAISE(ABORT,'IMMUTABLE_COMMAND'); END;
+CREATE TRIGGER backup_expense_command AFTER INSERT ON expense_commands BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;

@@ -14,7 +14,7 @@ import { populateRecoveryStore } from "../helpers/recovery-fixtures";
 function financialRecords(path: string) {
   const db = new DatabaseSync(path, { readOnly: true });
   try {
-    const names = ["datasets", "source_documents", "source_lines", "source_suppliers", "active_dataset", "rollback_dataset", "package_history", "app_revisions", "adjustment_targets", "expense_batches", "report_versions", "evidence_references", "import_batches"];
+    const names = ["datasets", "source_documents", "source_lines", "source_suppliers", "active_dataset", "rollback_dataset", "package_history", "app_revisions", "adjustment_targets", "expense_batches", "expense_commands", "report_versions", "evidence_references", "import_batches"];
     return Object.fromEntries(names.map(name => [name, db.prepare(`SELECT * FROM ${name} ORDER BY rowid`).all()]));
   } finally { db.close(); }
 }

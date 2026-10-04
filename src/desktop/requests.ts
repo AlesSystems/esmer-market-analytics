@@ -6,7 +6,7 @@ import { validPreferences } from "./preferences";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
 import type { ExpenseRequests, ExpenseResult, OperatingReportResult } from "../expenses/contracts";
-import { validFields, validPeriod } from "../expenses/validation";
+import { validCreateExpenseRequest, validFields, validPeriod } from "../expenses/validation";
 import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { validId } from "../store/revisions";
 import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
@@ -59,8 +59,9 @@ function validRecoveryRequest(operation: string, payload: unknown): boolean {
   if (operation === "pinBackup") return exact(payload, ["backupId", "pinned"]) && validId(payload.backupId) && typeof payload.pinned === "boolean";
   return exact(payload, ["token"]) && validId(payload.token);
 }
-const expenseOperations = ["saveExpenseTemplate", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating"];
+const expenseOperations = ["createExpense", "saveExpenseTemplate", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating"];
 export function validExpenseRequest(operation: string, payload: unknown): boolean {
+  if (operation === "createExpense") return validCreateExpenseRequest(payload);
   const revision = (v: unknown) => Number.isSafeInteger(v) && Number(v) >= 0;
   const reason = (v: unknown) => typeof v === "string" && !!v.trim() && v.length <= 1000 && !/[\u0000-\u001f\u007f]/.test(v);
   if (operation === "saveExpenseTemplate" || operation === "previewExpenses") return payload === null;
