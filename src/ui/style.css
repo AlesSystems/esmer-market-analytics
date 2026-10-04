@@ -151,10 +151,18 @@
   .source-count-details { margin-top: 16px; }
   .source-count-details > summary { cursor: pointer; color: var(--accent-foreground); font-weight: 500; }
   .source-count-details table { margin-top: 12px; }
-  .source-advanced { flex: 1 1 200px; }
+  .source-filters { display: grid; gap: 12px; margin: 24px 0; }
+  .source-filter-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px; max-width: 640px; }
+  .source-filter-fields label, .source-product-filter label { display: grid; gap: 6px; min-width: 0; font-size: 13px; }
+  .source-filter-fields input, .source-filter-fields select, .source-product-filter input { width: 100%; min-width: 0; }
+  .source-advanced { margin: 0; padding: 0; border: 0; }
   .source-advanced > summary { min-height: 40px; padding: 9px 0; cursor: pointer; }
-  .source-advanced label { margin-top: 8px; }
-  .source-advanced p { font-size: 13px; margin: 8px 0 0; }
+  .source-advanced[open] > summary { margin-bottom: 8px; }
+  .source-product-filter { max-width: 312px; }
+  .source-product-filter p { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+  .source-filter-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .source-results-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; }
+  .source-results-toolbar p { margin: 0; }
   .positive-bar { fill: #3a8a7a; }
   .negative-bar { fill: var(--red); }
   .caption, .explanation, .panel-subtitle { font-size: 13px; margin-top: 12px; }
