@@ -77,7 +77,10 @@ test("packaged disposable SQL tracks captures without losing inspection and reta
     await expect(page.getByRole("heading", {name: "Kaynak belge 1001", exact: true})).toBeVisible();
     await fixture.execute("UPDATE dbo.FIS SET SATIR_TOPLAM=50.00000000,GENELTOPLAM=50.00000000 WHERE ID=1001");
     await backgroundRefresh(page);
-    await expect(page.locator("dl.evidence")).toContainText("50,00000000", {timeout: 15_000});
+    const recordedAmount = page.locator(".source-document-summary dl>div").filter({has: page.getByText("Kaynak belge tutarı · doğrulanmadı", {exact: true})}).locator("dd");
+    await expect(recordedAmount.getByText("50", {exact: true})).toBeVisible({timeout: 15_000});
+    await page.getByRole("checkbox", {name: "Tam kaynak değerlerini göster", exact: true}).check();
+    await expect(recordedAmount.getByText("50.00000000", {exact: true})).toBeVisible();
     await expect(page.getByRole("heading", {name: "Kaynak belge 1001", exact: true})).toBeVisible();
     await expect(page.getByLabel("Dönem", {exact: true})).toHaveValue("2025-09");
     await page.getByRole("button", {name: "Belgelere dön", exact: true}).click();

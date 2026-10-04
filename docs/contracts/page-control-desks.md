@@ -14,3 +14,11 @@ Each workspace inherits the overview's white background, cobalt actions, Manrope
 The financial path consumes existing SalesView, PurchasingView, ExpensePeriod and MonthlyDisplay/ReportSummary outputs without recalculating financial values. The source-data path keeps recorded row counts and source fields separate from validated sales/cost/profit. It cannot synthesize product names, suppliers or financial totals. Source Reports can read and export saved versions but cannot create a financial report from unverified source rows.
 
 Acceptance requires packaged desktop checks for current workflows, wide/narrow screenshots, keyboard navigation, draft preservation and financial/source evidence. No production workspace requires WebGL. Local macOS evidence does not close Windows A07 acceptance. No new dependencies, source connections, schema changes or financial calculation changes are required. Historical prototype tooling remains separate from the shipped application.
+
+## Source document reading layout
+
+The October 4, 2026 document-detail refinement groups identity and date, currency and status, and recorded amounts above a full-width line table. It applies to the shared sales and purchasing source detail. The summary reflows into fewer columns in small windows. The page owns vertical scrolling; a keyboard-focusable table region owns horizontal scrolling.
+
+The primary display retains every nonzero decimal digit and uses Turkish grouping. It removes only trailing decimal zeros. The native "Tam kaynak değerlerini göster" checkbox reveals each exact source string beneath its corresponding value, including source timestamps and quantity precision. Null remains distinct from zero. Every projected header field, existing line column and conditional cost-candidate column remains available. Recorded amounts retain their unverified labels. This presentation does not change source queries, source access, calculations, stored records or report versions.
+
+[Packaged verification and synthetic screenshots](../evidence/source-document-layout.md) record the local evidence. Windows acceptance remains open.

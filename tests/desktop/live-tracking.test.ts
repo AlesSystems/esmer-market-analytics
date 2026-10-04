@@ -46,7 +46,10 @@ test("packaged tracking retains selected period, filters and document across sou
   await importCapture(writeRawPackage(corrected,"fixture:tracking","capture-3"),"capture-3");
   await expect(page.getByText("fixture:tracking · Paket: capture-3",{exact:false})).toHaveCount(1);
   await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
-  await expect(page.getByText("456,00 · 456.00",{exact:true})).toBeVisible();
+  const recordedAmount=page.locator(".source-document-summary dl>div").filter({has:page.getByText("Kaynak belge tutarı · doğrulanmadı",{exact:true})}).locator("dd");
+  await expect(recordedAmount.getByText("456",{exact:true})).toBeVisible();
+  await page.getByRole("checkbox",{name:"Tam kaynak değerlerini göster",exact:true}).check();
+  await expect(recordedAmount.getByText("456.00",{exact:true})).toBeVisible();
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
   await importCapture(writeRawPackage({...snapshot,headers:[],lines:[]},"fixture:tracking","capture-4"),"capture-4");
   await expect(page.getByRole("alert")).toContainText("Belge seçili kaynak kapsamında bulunamadı.");

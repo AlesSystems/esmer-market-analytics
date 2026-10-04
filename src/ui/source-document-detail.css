@@ -1,0 +1,23 @@
+.source-document-detail{min-width:0;font-variant-numeric:tabular-nums}
+.source-document-detail h2{margin:20px 0 10px}
+.source-document-detail .source-document-note{font-size:12px;line-height:1.6;max-width:90ch;color:var(--muted);margin:0 0 12px}
+.source-document-toggle{display:flex;align-items:center;gap:8px;font-size:12px;width:fit-content;margin-bottom:20px;cursor:pointer}
+.source-document-toggle input{width:16px;height:16px;accent-color:var(--primary)}
+.source-document-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.4fr);gap:24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0}
+.source-document-summary section{min-width:0}
+.source-document-summary h3{font-size:13px;font-weight:650;margin:0 0 12px}
+.source-document-summary dl{margin:0}
+.source-document-summary dl>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:5px 0;font-size:14px;line-height:1.5}
+.source-document-summary dt{color:var(--muted)}
+.source-document-summary dd{margin:0;overflow-wrap:anywhere}
+.source-document-raw{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
+.source-document-number{text-align:right}
+.source-document-scroll{max-width:100%;width:100%;overflow-x:auto}
+.source-document-scroll:focus-visible,.source-document-toggle input:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+.source-document-scroll table{width:100%;min-width:1100px;border-collapse:collapse;font-size:14px}
+.source-document-scroll caption{text-align:left;color:var(--muted);font-size:13px;padding:0 0 12px}
+.source-document-scroll th{white-space:normal;max-width:150px;font-size:13px;vertical-align:bottom}
+.source-document-scroll td{vertical-align:top;white-space:nowrap;padding-top:14px;padding-bottom:14px}
+.source-document-scroll .source-document-raw{white-space:nowrap}
+@media(max-width:1200px){.source-document-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.source-document-summary section:nth-child(3){grid-column:1/-1}.source-document-summary section:nth-child(3) dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}}
+@media(max-width:600px){.source-document-summary{grid-template-columns:minmax(0,1fr);gap:20px}.source-document-summary section:nth-child(3) dl{display:block}.source-document-detail .source-document-note{overflow-wrap:anywhere}}
