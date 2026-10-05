@@ -26,7 +26,7 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 - The first release uses prepared analytics packages from authorized backup preparation. It must not require the owner to restore or administer the POS database.
 - Source access is permanently read-only. The first release does not require a live connection. An isolated test connection can be configured, stays off until enabled, and cannot activate a real financial dataset. Completing live integration still requires separate acceptance and authorization.
 - Historical data must show its actual cutoff rather than appear to describe current activity.
-- Spreadsheet import is the primary expense-entry workflow. A reveal without expense data must still offer useful sales analysis.
+- Spreadsheet import remains the primary expense-entry workflow. Manual entry uses the same validation, provenance and history rules. A reveal without expense data must still offer useful sales analysis.
 - Do not contact the owner, connect to production or install on his computer as a development side effect.
 
 ## Capabilities and Constraints
@@ -34,10 +34,11 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 - Turkish-only interface, Turkish presentation conventions, English internal identifiers and TRY only. Do not infer tax rules from another jurisdiction.
 - The application includes sales calculations and the sales workspace. That workspace shows a period summary, a category and product breakdown, transactions and source-line evidence, with previous-period and previous-year comparisons.
 - It also includes historical cost estimates, purchasing, supplier returns, expense import and corrections, the monthly overview, report revisions and Excel export. These paths use synthetic mappings until a real source mapping is approved.
-- The first-release main surface is `Aylık Market Özeti`. Sales, costs, expenses and profitability share one consistent reporting path.
+- The approved primary financial workspace is monthly product gross profit before operating expenses, as defined in [monthly product profit](docs/contracts/monthly-product-profit.md). `Aylık Market Özeti` and other existing workflows remain accessible.
+- Prepared `sql-backup-estimate-v1` inputs provide a separate unverified contribution view under [recorded-source estimates](docs/contracts/recorded-estimates.md). Return contribution is excluded visibly. These transient estimates do not become accepted financial-report versions.
 - Keep customer returns distinct from supplier returns and pre-completion voids. Preserve quantity units; do not combine kilograms and pieces into a misleading physical-volume total.
 - Historical last-purchase cost is an explicitly labelled estimate, separate from current replacement cost. Missing or unresolved values remain unavailable rather than zero.
-- Profitability requires the prescribed cost and expense coverage. Without sufficient expense evidence, show `Faaliyet kârı hesaplanamıyor — gider verileri eksik.`
+- Product gross profit requires supported sales and historical costs from the same covered population. Missing expenses do not block that gross result. Management operating profit additionally requires sufficient expense evidence and explicit completeness review. Otherwise show `Faaliyet kârı hesaplanamıyor — gider verileri eksik.`
 - Every released metric needs traceable source identities, import batch, cutoff, calculation version, coverage, confidence and applicable adjustments. Drill-down must preserve its report context during refresh.
 - Source refreshes preserve app-owned records and accepted reports. Failed imports retain the last valid dataset; accepted report versions cannot change silently.
 - Excel export and encrypted recoverable local backups are first-release requirements. PDF export, forecasts/AI, multi-store, multi-currency and customer analytics are excluded.
@@ -54,7 +55,8 @@ The following remain authoritative; this product record summarizes them and does
 - [Foundation specification](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-design.md).
 - [Historical source audit and limitations](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md).
 - [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md).
-- [Phased implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md).
+- [Original phased implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md).
+- [Current capabilities and evidence](docs/evidence/index.md).
 
 The application includes startup, empty and local-service failure states, plus sales, purchasing, expenses, reports, recovery and a raw source preview. Use synthetic or approved reduced fixtures for design. Label synthetic demonstrations clearly. Historical audit observations do not authorize renewed source inspection or resolve all source semantics.
 

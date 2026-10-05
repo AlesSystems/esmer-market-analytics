@@ -3,7 +3,7 @@
 - Date: 2026-09-04.
 - Status: Written specification approved by the user; application acceptance remains pending.
 - Owner and sole intended user: Eralp Esmer.
-- Scope of this change: Approved planning documents transferred into the user-authorized independent repository. Application implementation, database access, deployment and live connection remain outside this documentation change.
+- Record scope: Original approved foundation transferred into this independent repository. Later implementation status is recorded in [the evidence index](../../evidence/index.md). This specification grants no source access, deployment or production connection permission.
 
 ## 1. Purpose and reading order
 
@@ -16,7 +16,7 @@ Read this specification first, followed by:
 
 This specification governs the independent rebuild. Historical documents in the separate legacy repository are not authoritative for this product. Their claims of implemented or trustworthy calculations must not be copied into the new product without evidence.
 
-The user approved the written foundation, requested the phased implementation plan and authorized creation of this independent repository. The [implementation plan](../plans/esmer-market-implementation-plan.md) organizes the remaining work. Application implementation has not begun.
+The user approved the written foundation, requested the phased implementation plan and authorized creation of this independent repository. The [implementation plan](../plans/esmer-market-implementation-plan.md) organizes the remaining work. Application implementation subsequently proceeded under separate direction. Use [the evidence index](../../evidence/index.md) for present capabilities and open gates.
 
 ## 2. Approved constraints
 
@@ -233,13 +233,13 @@ The reveal is a functioning local application using the newest available prepare
 
 Target free/open-source dependencies and no required subscription or paid cloud infrastructure. Validate dependency licences and packaging support during implementation. An unsigned Windows installer/portable executable may show publisher warnings; do not promise a signed release or an absence of warnings at zero cost.
 
-The [phased implementation plan](../plans/esmer-market-implementation-plan.md) covers verified source contract/test data, reliable import and persistence, calculation/confidence, the Turkish desktop experience/expense workflow, and packaging/recovery/acceptance. These are planning areas, not independently deployable services or authorization to start implementation.
+The [phased implementation plan](../plans/esmer-market-implementation-plan.md) covers verified source contract/test data, reliable import and persistence, calculation/confidence, the Turkish desktop experience/expense workflow, and packaging/recovery/acceptance. These phase boundaries do not independently authorize implementation or source access.
 
-The independent repository was created with the user's direction. Preserve the separate legacy repository as reference; only approved planning documents are transferred here. Do not copy legacy runtime code or migrations, original backups, credentials, customer/employee data, legacy local databases or unreviewed generated code. A sanitized reduced fixture is required, but creating it is implementation/audit work still to be done.
+The independent repository was created with the user's direction. Preserve the separate legacy repository as reference; only approved planning documents are transferred here. Do not copy legacy runtime code or migrations, original backups, credentials, customer/employee data, legacy local databases or unreviewed generated code. A source-backed reduced fixture requires its own authorization and privacy review. Synthetic fixtures and later source evidence are identified in the evidence index.
 
 ## 10. Evidence obligations before implementation/release
 
-The following are explicit unresolved evidence obligations, not assumed successes:
+The following table records evidence obligations at foundation approval. Later build-specific outcomes are in [the evidence index](../../evidence/index.md); historical observations do not become current proof:
 
 | Evidence obligation | Current state | Required consequence |
 | --- | --- | --- |
@@ -261,4 +261,4 @@ See the linked acceptance checklist for the required proof. No item above author
 
 The user approved this written specification and its two supporting documents, then requested the phased implementation plan. This repository records that approved foundation. Approval of the documents does not pass any application acceptance gate.
 
-The current change adds documentation only. Application implementation requires subsequent direction; renewed source access and later live integration retain their explicit gates.
+The original transfer added documentation only. Subsequent implementation does not pass acceptance by itself. Renewed source access and production live integration retain their explicit gates. Later bounded estimates follow [the recorded-source estimate contract](../../contracts/recorded-estimates.md) and cannot certify unknown source meanings.

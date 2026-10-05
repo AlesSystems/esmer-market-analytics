@@ -2,6 +2,12 @@
 
 Phase 7, issue [#10](https://github.com/AlesSystems/esmer-market-analytics/issues/10), plan tasks 7.1–7.2. Synthetic evidence only. The first release reads no live source. Windows acceptance is separate.
 
+## Manual entry
+
+The owner can also create an expense through **Elle gider ekle**. It uses the same financial fields, exact amount validation, classification, provenance, correction history and completeness rules as Excel entry. Saving invalidates the affected incurred-period review; it never confirms completeness. Stable references remain shared with Excel import.
+
+The service records an idempotent request receipt with the expense revision. A lost reply is resolved by its original request ID. After restoring an older backup, an absent receipt requires current-record review before re-entry. The renderer guards an unsaved draft during page, task and period changes. [The approved manual-entry plan](../superpowers/plans/2026-10-04-manual-expense-entry.md) and [packaged evidence](../evidence/2026-10-04-manual-expense-entry.md) record the detailed flow and open Windows checks.
+
 ## Canonical workbook
 
 The native save action writes one `Giderler` sheet with fourteen Turkish columns. Use opaque references without customer or employee identities. The importer accepts no additional columns, employee payroll columns, extra worksheets, formulas (including cached/shared/array forms), macros or external relationships. It never retains the original workbook, path or filename. Invalid headers are rejected before any row contents are returned. Row validation errors name the column and rule without echoing rejected values. A rejected row blocks the entire workbook.
