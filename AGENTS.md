@@ -2,83 +2,56 @@
 
 ## Start here
 
-- Check the current branch, worktree and existing changes before editing. Preserve unrelated work.
-- Read the requested issue and its comments with `gh issue view <number> --comments`; inspect its labels and dependencies. Work within the authorized phase and stop at the user's stated handoff boundary.
-- Read the foundation documents before implementation decisions:
-  1. [Specification](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-design.md): product scope, architecture and D01–D20 constraints.
-  2. [Database audit](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md): historical observations and unresolved source semantics.
-  3. [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md): required evidence for A01–A07 and L01.
-  4. [Implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md): phase dependencies, tasks and verification.
-- The three foundation documents govern requirements; the plan organizes delivery. Surface conflicts rather than silently changing the product contract.
-- For the isolated SQL live check and the prepared SQL backup import, follow [Show recorded SQL rows](https://github.com/AlesSystems/AlesSystems-Workstreams/blob/main/Esmer%20Market%20Analytics/plans/2026-09-26-live-and-backup-display.md) before editing those paths. The first priority is recorded source rows in the source workspace. Do not treat those rows as sales, cost, or profit. Do not add customer, employee, product-name, or supplier columns.
-- Check files and scripts on the current branch. Proposed paths, unchecked plan items and historical status paragraphs are not evidence of current implementation or acceptance. Honor authorization already given in the conversation without asking for it again.
+1. Check the branch, worktrees, changes and Git remote. Preserve unrelated work and verify the remote before commits, pushes or PRs.
+2. For an assigned issue, read `gh issue view <number> --comments`, its labels and dependencies. Work within the authorized scope and handoff boundary.
+3. Read [README.md](README.md) and [the evidence index](docs/evidence/index.md) for current capabilities and open gates. Read these foundation documents before implementation decisions:
+   - [Specification](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-design.md) governs scope, architecture and D01–D20.
+   - [Database audit](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md) preserves historical observations and unresolved semantics.
+   - [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md) defines A01–A07 and L01 proof.
+   - [Implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md) records phase dependencies and verification. Its proposed paths, checkboxes and historical stop instructions are not current implementation or authorization evidence.
+4. Read the affected [contracts](docs/contracts), [decision records](docs/decisions) and [domain glossary](CONTEXT.md). For UI work, also read [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md). Surface conflicts with the foundation rather than changing the product contract silently.
+
+For SQL live-check or backup-preparation changes, read [Show recorded SQL rows](https://github.com/AlesSystems/AlesSystems-Workstreams/blob/main/Esmer%20Market%20Analytics/plans/2026-09-26-live-and-backup-display.md). Raw previews preserve recorded rows without sales, cost or profit claims. The separately approved [recorded-source estimate contract](docs/contracts/recorded-estimates.md) permits only its declared unverified contribution calculation. Read [monthly product profit](docs/contracts/monthly-product-profit.md) for financial reporting. None authorizes customer, employee, product-name or supplier columns by implication.
+
+Use `gh` for GitHub issues and PRs. Check actual labels with `gh label list`. Store current work status in issues, PRs and evidence records. Historical issue closure does not pass an acceptance gate or authorize source access. Honor authorization already given in the conversation.
 
 ## Execution graphs
 
-- Before substantial work spanning multiple workstreams, agents, implementation areas or verification stages, the orchestrator must write an explicit directed acyclic graph (DAG) of work contracts. Nodes are work units; edges are required predecessors. Trivial, isolated changes may proceed without a graph.
-- Each node must have a unique ID, type (analysis, design, implementation, test, review, integration or documentation), objective, dependencies and acceptance criteria. Add relevant inputs, allowed files or areas, expected artifacts, verification commands or evidence, and risk level when applicable.
-- Run a node only after every predecessor succeeds. Identify independent nodes for parallel work, but check file and resource conflicts first; serialize overlapping writes to critical files or introduce a shared prerequisite. Agent availability alone does not justify parallel dispatch.
-- The orchestrator must decide decomposition, dependencies, risk, context and acceptance criteria. Once established, use deterministic harness logic where available for scheduling, dependency resolution, status tracking, dispatch, retries and completion; derive the next ready nodes from the graph instead of repeatedly replanning them.
-- Include test, review, integration and final acceptance nodes where appropriate, downstream of the work they verify. Implementation alone does not complete the graph. On failure, diagnose before retrying; add repair and re-test nodes when useful and preserve what failed and what must be revalidated.
-- Pass structured artifacts (such as decisions, contracts, changed files, test evidence and review findings) and only relevant repository context to downstream nodes. Keep graph state inspectable as `pending`, `ready`, `running`, `blocked`, `completed` or `failed`; a blocked node must name its unmet dependency.
+Before substantial work across workstreams, agents, implementation areas or verification stages, write an explicit directed acyclic graph of work contracts. Trivial isolated edits need no graph.
 
-Example dependency graph:
+Each node has a unique ID, type, objective, dependencies and acceptance criteria. Include inputs, allowed areas, artifacts, verification and risk where relevant. Use analysis, design, implementation, test, review, integration or documentation types.
 
-```text
-Requirements → API design → Backend → Tests ──────┐
-                         └→ Frontend → UI tests ────┤
-                                                   ↓
-                                          Integration → Final review
-```
+Run a node only after every predecessor succeeds. Check file and resource conflicts before parallel work. Serialize overlapping critical writes or add a shared prerequisite. Agent availability alone does not justify delegation.
 
-Example node contract:
-
-```yaml
-id: IMPORT-01
-type: implementation
-objective: Implement the approved import validation contract.
-dependencies: [IMPORT-DESIGN-01, STORE-01]
-inputs: [approved import contract]
-allowed_files: [src/import/**, tests/import/**]
-acceptance_criteria: [valid import succeeds, invalid import preserves the active dataset]
-outputs: [implementation, tests, changed_files, verification_evidence]
-verification: [focused import tests]
-risk: medium
-```
+Keep graph states inspectable as `pending`, `ready`, `running`, `blocked`, `completed` or `failed`. A blocked node names its unmet dependency. Derive ready nodes from the graph and use an existing deterministic scheduler where available. Pass decisions, changed files, evidence and findings to downstream nodes. Diagnose failures before repair and re-test. Include downstream verification, review, integration and final acceptance where appropriate; implementation alone does not complete the graph.
 
 ## Product and data boundaries
 
-- Build one offline desktop application for one owner and one store on Windows, using Electron, TypeScript, React, a local Node service and SQLite.
-- Use Turkish UI text and presentation conventions, English internal identifiers and TRY only. The business is in the TRNC/KKTC; do not assume another jurisdiction's tax rules.
-- Dashboards read the local analytics store. Source access is permanently read-only; the first release has live access disabled. Do not add login, PIN, roles, multi-user features or required paid cloud services.
-- Renewed source inspection requires separate authorization and an isolated restored backup. A historical audit is not permission to access a source or proof of its current semantics. Continue independent synthetic work when source evidence is unavailable.
-- Do not contact Eralp, install on his computer or connect to production as a side effect of development. Live integration requires his acceptance, explicit permission for the source and separate rollout direction.
-- Do not copy legacy application code, migrations or Git history, or depend on the legacy application at runtime.
-- Keep original backups, credentials, identifiable customer records and employee-level payroll out of Git, logs, screenshots, fixtures and release artifacts. Use synthetic or approved reduced fixtures; keep private evidence outside Git and reference it by opaque identity.
+- One offline Windows application serves one owner and store. Use Electron, TypeScript, React, a local Node service and SQLite.
+- Use Turkish UI and presentation, English internal identifiers and TRY only. The business is in the TRNC/KKTC; infer no other jurisdiction's tax rules.
+- Dashboards read the local analytics store. Source access stays permanently read-only. Production live access remains separately gated; optional isolated test access starts disabled. Add no login, PIN, roles, multi-user features or required paid cloud services.
+- Renewed source inspection requires separate authorization and an isolated restored backup. Historical audits confer no access permission or current semantic proof. Continue independent synthetic work when source evidence is unavailable.
+- Owner contact, installation on Eralp's computer and production access require separate direction. Live rollout also requires his acceptance and explicit permission for the specific source.
+- Keep the legacy application separate. Copy no legacy runtime code, migrations or Git history, and add no legacy runtime dependency.
+- Keep original backups, credentials, identifying customer records and employee-level payroll out of Git, logs, screenshots, fixtures and releases. Use synthetic or approved reduced fixtures. Keep private evidence outside Git and reference it by opaque identity.
 
 ## Implementation rules
 
-- Build only the authorized slice. Reuse existing code and platform capabilities before adding dependencies; do not scaffold later phases or introduce independently deployed services or a public HTTP API.
-- Keep privileged operations behind narrow, named IPC operations. Validate the sender, operation and payload before invoking the service. The renderer must not receive Node powers, database access, credentials or arbitrary SQL execution.
-- Keep financial calculations out of the UI. Use deterministic decimal arithmetic, preserve source precision and define rounding explicitly. Verify expected results independently of the implementation.
-- Missing cost, incomplete expenses and unknown tax treatment remain explicit. Never convert them to zero, silently invent source mappings or label an estimate as verified profit.
-- Source refreshes must preserve app-owned expenses, adjustments, settings, audit history and accepted reports. Failed imports must retain the last valid active dataset; accepted report versions must remain reproducible.
-- Keep dependency versions locked and review licence and Windows packaging compatibility when changing them.
+- Build the authorized slice with existing modules and platform capabilities. Avoid later-phase scaffolding, independently deployed services and public HTTP APIs.
+- Expose privileged work through narrow named IPC operations. Validate sender, operation and payload before service execution. The renderer receives no Node powers, database access, credentials or arbitrary SQL capability.
+- Calculate finances in the service/domain layer with deterministic decimal arithmetic, preserved source precision and explicit rounding. Independently verify expected results.
+- Preserve missing cost, incomplete expenses and unknown tax treatment explicitly. They never become zero, guessed mappings or verified profit. Keep recorded-source estimates distinct from validated financial reports.
+- Source refreshes preserve expenses, adjustments, settings, audit history and accepted reports. Failed imports retain the last valid dataset. Accepted report versions remain reproducible.
+- Lock dependency versions and review licences and Windows packaging compatibility when dependencies change.
 
 ## Verification and handoff
 
-- For behavioral changes, first expose the missing contract with a focused test. Record the observed failure accurately: a broken toolchain or missing executable is different from incorrect application behavior.
-- Inspect `package.json` before choosing commands. Once present, use the relevant `test:unit`, `test:integration` and `test:desktop` scripts, plus `typecheck`, `lint` and `build` for application changes. Desktop checks must exercise the packaged application. For documentation-only changes, check the diff and local links.
-- Windows packaging uses `npm run package:win` once established. macOS/Linux checks do not satisfy Windows acceptance. Follow any requested Windows handoff and leave unperformed checks open.
-- Work in small, coherent Conventional Commits: `test:` for the contract, `feat:`/`fix:` for implementation, separate boundary tests and `docs:` for evidence when needed. Keep unrelated cleanup out of behavior commits.
-- Record acceptance evidence with task/gate ID, commit/build, fixture or source-batch identity, environment, command/procedure, expected and actual results, evidence path and limitations. Never mark a gate complete solely because code exists or tests on another platform pass.
-- PRs must link the issue and relevant plan task/decision, explain the change and risk, list verification, include UI screenshots when relevant, and identify schema, security, privacy and deployment impacts.
-- Handoffs must include branch, commit hashes, PR link if present, tests run, evidence and unresolved gates. When handing off to another platform, give exact remaining checks and instructions to continue on the same branch.
+- For behavioral changes, first expose the missing contract with a focused test. Distinguish application failure from missing executables or broken tooling.
+- Inspect `package.json` before selecting commands. For application changes, run relevant unit, integration and actual packaged desktop tests, plus typecheck, lint and build. For documentation-only changes, check the diff, local links and references to removed paths.
+- Build Windows artifacts with `npm run package:win`. macOS/Linux checks do not satisfy Windows acceptance. Follow the requested platform handoff and leave unperformed checks open.
+- Use small coherent Conventional Commits. Separate the contract test, implementation, extra boundary coverage and higher-risk evidence. Keep unrelated cleanup out of behavior commits.
+- Record task/gate ID, commit/build, fixture or opaque source batch, environment, command/procedure, expected and actual result, evidence location and limitations. Code existence, issue closure and another platform's tests cannot pass a gate.
+- PRs link the relevant issue and plan task/decision, explain risk and verification, include UI evidence when relevant, and identify schema, security, privacy and deployment impacts.
+- Handoffs include branch, commit hashes, PR, verification, evidence and unresolved gates. For another platform, give exact remaining checks and the intended branch/build.
 
-## Workflow references
-
-- [Issue tracker](docs/agents/issue-tracker.md): GitHub Issues and PRDs; use `gh` for tracker operations.
-- [Triage labels](docs/agents/triage-labels.md): the five-role label vocabulary.
-- [Domain docs](docs/agents/domain.md): single-context layout, glossary and ADR conventions. Read applicable records when they exist; do not create placeholders merely to satisfy the layout.
-
-Keep this file focused on durable repository rules. Store current phase status and detailed evidence in the issue, PR and evidence documents; keep machine-specific skill installation instructions in the user's agent configuration.
+Keep these instructions durable. Keep detailed phase status and receipts in the evidence records, and machine-specific skill installation instructions in the user's agent configuration.

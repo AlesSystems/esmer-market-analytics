@@ -1,125 +1,54 @@
 # Acceptance evidence
 
-## Current status
+## Current capabilities and open gates
 
-Recorded against `main` after [PR #30](https://github.com/AlesSystems/esmer-market-analytics/pull/30) merged at `a3c9dbe`.
+Reviewed on 2026-10-05 against `main` at `ff21492`, after [PR #68](https://github.com/AlesSystems/esmer-market-analytics/pull/68). This index points to existing receipts; the documentation review ran no application, Windows or source tests.
 
-The local application implements synthetic sales, purchasing, expenses, monthly reports, Excel export and encrypted recovery. It can also show an isolated raw SQL preview. The isolated test connection stays disabled until an operator enables it, and a successful SQL read still cannot activate a real financial dataset. Issues [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14) and [#26](https://github.com/AlesSystems/esmer-market-analytics/issues/26) remain open. [Release acceptance](release-acceptance.md) still blocks the first real-data reveal.
+The application includes synthetic financial reporting, isolated raw-record browsing, separately labelled recorded-source contribution estimates, Excel and manual expense entry, Excel export and encrypted recovery. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
 
-Sections below are point-in-time records. An older section can say a later phase had not started. Use this section, and the 26 September 2026 records, for the present state.
+[Recorded-source estimates](../contracts/recorded-estimates.md) have real arithmetic reconciliation over retained authorized September 2025 operands. The source meanings remain assumptions. Return contribution, unsupported costs and unknown amounts stay explicit. Estimates are transient and cannot become accepted financial-report versions.
 
-- [Owner workspace follow-up](2026-09-26-owner-workspace.md)
-- [Financial readiness investigation](2026-09-26-financial-readiness.md)
-- [Page audit before that follow-up](2026-09-26-page-audit.md)
-- [Isolated connection evidence](live-acceptance.md) and [Windows continuation](live-windows-acceptance.md)
-- [Release acceptance and open gates](release-acceptance.md)
+[Issue #67](https://github.com/AlesSystems/esmer-market-analytics/issues/67) tracks the remaining real-data product gross-profit and margin path. Historical delivery issues, including #14, #26 and #39–#43, are closed. Their closure does not establish source semantics, current-build Windows acceptance or production rollout. [PR #69](https://github.com/AlesSystems/esmer-market-analytics/pull/69) is separate synthetic groundwork and is not included in this baseline.
 
-## Phase 1 status
+The original A01–A07 and L01 proof requirements remain in [the acceptance checklist](../superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md). The [Phase 10 release matrix](release-acceptance.md) records an older synthetic build. Later receipts below describe bounded extensions, not blanket release acceptance. Current-build Windows/distribution checks, independent recovery, real-source financial proof and full admitted-volume performance require their specified evidence. Production access and owner installation remain separately authorized.
 
-The user authorized application implementation for [issue #4](https://github.com/AlesSystems/esmer-market-analytics/issues/4) on 2026-09-15 and requested a stop at the Windows check. The Windows agent continues on `codex/phase-1-independent-foundation` using [this handoff prompt](../operations/windows-phase-1-handoff.md).
+## Later implementation evidence
 
-The Phase 1 exit gate is **complete**. Windows checks passed, and the user reported successful manual startup with networking disconnected. This phase supplies part of A01, A05, and A07. It does not complete those release acceptance gates.
+| Work | Evidence and continuation |
+| --- | --- |
+| Prepared-package recovery | [PR #68 receipt](2026-10-04-estimate-package-recovery.md) |
+| Manual expense entry | [Plan](../superpowers/plans/2026-10-04-manual-expense-entry.md), [local packaged evidence and open Windows checks](2026-10-04-manual-expense-entry.md) |
+| Synthetic SQL update tracking | [Packaged verification](live-mock-tracking.md), [disposable SQL procedure](../operations/synthetic-sql-environment.md) |
+| Recorded-source estimates | [Contract](../contracts/recorded-estimates.md), [real arithmetic and packaged evidence](../../workstreams/estimated-v1/evidence.md), [Windows continuation](../../workstreams/estimated-v1/windows-handoff.md) |
+| Monthly product-profit UI | [Contract](../contracts/monthly-product-profit.md), [synthetic packaged evidence](r42-monthly-profit-page.md), [historical Windows checklist](../../workstreams/windows-handoff.md) |
+| Synthetic product-profit reports | [Independent oracle/report evidence](issue-41-synthetic-product-profit.md) |
+| Source-profit scope | [Observation evidence](issue-39-source-profit.md), [renewed scope](issue-39-renewed-scope.md) |
+| UI workspaces | [Workspace contract](../contracts/page-control-desks.md), [overview](../../workstreams/ozet-control-desk/EVIDENCE.md), [source](../../workstreams/source-control-desk/EVIDENCE.md), [settings](../../workstreams/settings-page/evidence.md) |
+| Source layouts | [Document layout](source-document-layout.md), [filter layout](../../workstreams/source-filter-layout/evidence.md) |
 
-The fixture is `synthetic-empty-v1`. It contains no imported transactions, business schema, source connection, customer records, or employee records. The local SQLite connection is an in-memory empty-store probe. Later phases add persistence and business features.
+## Original phase evidence
 
-## Entry and dependency evidence
+These are point-in-time records. Their branches, issue states, test counts and stop instructions describe the recorded phase. Use their tested build identities and limitations; use the current assigned task for authorization.
 
-| Check | Procedure | Outcome | Limit |
+| Phase | Local evidence | Windows evidence | Retained procedure or contract |
 | --- | --- | --- | --- |
-| Implementation authority | Current user instruction authorizes Phase 1 and PR creation | Authorized | No source access, installation on Eralp's computer, or production rollout |
-| Independent repository | `git status --short`, `git ls-files`, and baseline history at `7c0dfee` | Clean documentation-only checkout; isolated branch created | Legacy checkout was not accessed |
-| Initial release inputs | Inspected all tracked input paths before implementation | Only instructions, README, and approved planning documents | Final [packaged inventory](phase-1-package-inventory.json) also inspected |
-| Exact dependency selections | Public upstream documentation, `npm view`, and installed package manifests | Direct versions and licences recorded in [runtime decision](../decisions/runtime.md) | Windows packaged runtime compatibility passed; manual offline startup is user-reported |
-| Dependency vulnerability metadata | `npm audit --json` on the locked graph | Zero reported advisories on 2026-09-15 | An audit is a point-in-time registry check, not a security guarantee |
+| 1. Desktop foundation | [Local receipt](phase-1-local.md) | [Windows receipt](windows-phase-1.md) | [Handoff](../operations/windows-phase-1-handoff.md), [runtime](../decisions/runtime.md), [desktop boundary](../contracts/desktop.md) |
+| 2. Source and fixtures | [Local receipt](phase-2-local.md) | [Windows receipt](windows-phase-2.md) | [Handoff](../operations/windows-phase-2-handoff.md), [source](../contracts/source.md), [oracles](golden-oracles.md), [privacy](../contracts/privacy.md) |
+| 3. Extraction and packages | [Local receipt](phase-3-local.md) | [Windows receipt](windows-phase-3.md) | [Handoff](../operations/windows-phase-3-handoff.md), [package contract](../contracts/analytics-package.md), [preparation](../operations/prepare-package.md) |
+| 4. Durable imports | [Local receipt](phase-4-local.md) | [Windows receipt](windows-phase-4.md) | [Handoff](../operations/windows-phase-4-handoff.md), [persistence](../contracts/persistence.md) |
+| 5. Sales | [Local receipt](phase-5-local.md) | [Windows receipt](windows-phase-5.md) | [Handoff](../operations/windows-phase-5-handoff.md), [decision](../decisions/phase-5-sales.md) |
+| 6. Costs and purchasing | [Local receipt](phase-6-local.md) | [Windows receipt and follow-up](windows-phase-6.md) | [Handoff](../operations/windows-phase-6-handoff.md) |
+| 7. Expenses | [Local receipt](phase-7-local.md) | [Windows receipt](windows-phase-7.md) | [Handoff](../operations/windows-phase-7-handoff.md), [expense contract](../contracts/expense-completeness.md) |
+| 8. Reports and export | [Local receipt](phase-8-local.md) | [Windows receipt](windows-phase-8.md), [performance follow-up](windows-phase-8-performance.md) | [Handoff](../operations/windows-phase-8-handoff.md), [report contract](../contracts/reports.md) |
+| 9. Recovery | [Local receipt](phase-9-local.md) | Later [Phase 10 recovery boundary](phase-10-windows-recovery-files.md) | [Handoff](../operations/windows-phase-9-handoff.md), [decision](../decisions/phase-9-recovery.md), [Turkish procedure](../operations/recovery-tr.md) |
+| 10. Release preview | [Release matrix](release-acceptance.md) | [Windows receipt](windows-acceptance.md), [command proof](phase-10-proof.json), [performance samples](phase-10-performance.json) | [Licences](licences.md), [install procedure](../operations/install-tr.md) |
 
-## Local verification
+## Source and capacity evidence
 
-The development host is macOS 26.4.1, build 25E253, ARM64. Development Node is 24.15.0 and npm is 11.12.1. The [local verification record](phase-1-local.md) contains the tested commit, packaged runtime versions, commands, outcomes, archive hash, screenshot, independent review, and remaining limitations.
+- [Synthetic import capacity and limits](issue-26-import-capacity.md), [profile receipts](issue-26-import-profiles.json), [capacity decision](../decisions/issue-26-import-capacity.md), and [profiling procedure](../operations/profile-import.md).
+- [Isolated source validation](issue-26-source-validation.md), [verification receipt](issue-26-orbstack-verification.json), and [evidence collection procedure](../operations/collect-source-evidence.md).
+- [Raw SQL preview](real-sql-preview.md), [source workspace](source-workspace.md), and [preview preparation](../operations/prepare-sql-preview.md).
+- [Isolated connection evidence](live-acceptance.md) and [Windows continuation](live-windows-acceptance.md).
+- Historical [owner-workspace follow-up](2026-09-26-owner-workspace.md), [financial-readiness investigation](2026-09-26-financial-readiness.md), and [page audit](2026-09-26-page-audit.md).
 
-## Windows evidence
-
-The [Windows verification record](windows-phase-1.md) contains the fetched commit, host characteristics, Node/npm versions, passing build and integration results, unsigned artifact hashes, package inventory, and remaining checks. Windows packaging and shipped dependency notices passed after excluding the unused Excel reader with an unresolved transitive notice. The user confirmed the HP development test host. The packaged desktop and full suite passed, including worker SQLite and same-profile restart checks. Native portable launch and an NSIS install/launch/uninstall cycle passed. Windows screenshots and bundled runtime measurements are recorded. The user reported the expected empty/offline state with networking disconnected and no failures or warnings. That manual report is separate from the automated results. Final test-installation removal passed. The unattended offline runner timed out and supplies no offline evidence. The [approved plan](../superpowers/plans/esmer-market-implementation-plan.md#execution-and-evidence-rules) defines the evidence fields.
-
-## Phase 2 status
-
-The user authorized [issue #5](https://github.com/AlesSystems/esmer-market-analytics/issues/5) implementation and a PR, then authorized Windows continuation on the same branch, `codex/phase-2-source-contract`. Phase 1 is complete and issue #4 is closed. The existing PR is [#16](https://github.com/AlesSystems/esmer-market-analytics/pull/16).
-
-The Phase 2 contribution is a declarative source contract, synthetic golden/edge fixtures and paired snapshots with independent expected outputs. See [source](../contracts/source.md), [calculations](../contracts/calculations.md), [privacy](../contracts/privacy.md), [golden oracles](golden-oracles.md), and [local verification](phase-2-local.md). No source was accessed and no source-backed financial mapping was validated.
-
-The [Phase 2 Windows record](windows-phase-2.md) contains passing fixture, timezone, typecheck, lint, build, packaging and full-suite checks, packaged runtime measurements, archive/distribution inventory, hashes, native screenshots and successful portable/NSIS lifecycle checks. On 2026-09-17, the user reported successful physical-disconnect testing. That manual report is separate from the connected-host automated checks.
-
-The Phase 2 exit gate remains **open** for source-dependent evidence. Synthetic checks do not pass extraction, financial-runtime, import-activation or full Windows release acceptance. No source rules were promoted, no Phase 3 work began, and issue #5 remains open. The original [Windows handoff](../operations/windows-phase-2-handoff.md) is retained as the procedure; the Windows record above governs actual outcomes and remaining checks.
-
-## Phase 3 status
-
-The user authorized [issue #6](https://github.com/AlesSystems/esmer-market-analytics/issues/6), a PR and a stop before Windows testing. Issue #5 was closed when this work began; its source-dependent evidence remains open. This supersedes the older issue-status sentence above without changing its evidence limitations.
-
-Phase 3 implements synthetic SQLite extraction, a bounded validated analytics package and developer-side preparation. See the [package contract](../contracts/analytics-package.md), [preparation procedure](../operations/prepare-package.md), [local evidence](phase-3-local.md), and [archive inventory](phase-3-package-inventory.json). Real raw-column mapping and SQL Server permissions remain unvalidated. The desktop retains its empty/offline behavior.
-
-The [Phase 3 Windows record](windows-phase-3.md) contains passing synthetic extraction/privacy/package tests, typecheck, lint, build, Windows packaging and the full suite against the actual packaged executable. It records a fixture-only transaction fix for Windows setup timeouts, deterministic CLI output, worker/file cleanup, archive/distribution inventories, runtime versions, native screenshots and portable/NSIS lifecycle checks. On 2026-09-17, the user reported successful physical-disconnect testing. That manual report is separate from the connected-host automated checks.
-
-The source-dependent Phase 3 exit gate remains **open**. Real-source mapping, SQL Server permissions, reconciliation, real-data privacy and full-volume performance are unvalidated. The original [Windows prompt](../operations/windows-phase-3-handoff.md) remains as the procedure; the Windows record governs actual results. Package validation does not establish Phase 4 activation or app-owned preservation. No merge, issue closure or Phase 4 work follows from this evidence.
-
-## Phase 4 status
-
-The user authorized [issue #7](https://github.com/AlesSystems/esmer-market-analytics/issues/7), PR creation and a stop before Windows-specific implementation/testing. Issues #4, #5 and #6 were closed at entry; their unresolved source gates remain open.
-
-Phase 4 adds one durable app-owned SQLite store, immutable source datasets, append-only app revisions, accepted-report pins, atomic package activation, retention and a minimal Turkish native-file import flow. The [persistence contract](../contracts/persistence.md), [desktop boundary](../contracts/desktop.md), [local verification](phase-4-local.md), [runtime record](phase-4-runtime.json) and [archive inventory](phase-4-package-inventory.json) describe the implementation and proof.
-
-Local verification passed 2 unit, 110 integration and 4 actual packaged macOS desktop tests, plus typecheck and lint. Build and macOS directory packaging passed within the desktop run. Review exposed and corrected package-order, damaged-schema and missing restart-warning regressions. Final independent Standards and Spec follow-ups have no remaining findings. No dependency changed.
-
-The [Phase 4 Windows record](windows-phase-4.md) now records passing Windows typecheck, lint, build, packaging, 2 unit tests, 119 integration tests and 5 actual packaged desktop tests. Windows continuation fixed lost interruption markers during staging and warnings hidden by cancelled/historical imports. Native picker success/cancellation/failure, portable and NSIS restart, an in-place same-version code upgrade, immutable state preservation and uninstall checks passed on isolated synthetic profiles. The record includes hashes, inventory, runtime measurements and screenshots.
-
-The authorized synthetic Phase 4 exit gate is **complete**. On 2026-09-18, the user reported that the physical tests all passed, closing the pending physical-disconnect cold-launch and restart check. This human report is recorded separately from automated results in the Windows evidence. Full A04 expense-import/recovery obligations and the real-source, financial, recovery, full-volume and live-integration gates remain open. Physical disk exhaustion, power loss and versioned/failed installer upgrades are not established by this report. The [Windows-agent prompt](../operations/windows-phase-4-handoff.md) remains the procedure; the Windows record governs actual results. Continue on `codex/phase-4-durable-imports` and existing PR #18. No merge, issue closure or Phase 5 work is authorized by this evidence.
-
-## Phase 5 status
-
-Phase 4 is merged in `4452fd9` and issue #7 is closed. The user authorized [issue #8](https://github.com/AlesSystems/esmer-market-analytics/issues/8) with the selected Option A and requested a stop before Windows validation. Work continues on `codex/phase-5-sales-analytics` in [PR #19](https://github.com/AlesSystems/esmer-market-analytics/pull/19).
-
-Phase 5 implements synthetic-supported decimal sales, immutable browsing sessions and the monthly overview → category/product → transaction → source-evidence journey. See the [design decision](../decisions/phase-5-sales.md), [local evidence](phase-5-local.md), [decision trail](phase-5-decisions.tsv) and [Windows continuation prompt](../operations/windows-phase-5-handoff.md). Legacy sparse packages remain importable and show unavailable analytics.
-
-The user subsequently authorized Windows continuation on the same branch and PR. The [Phase 5 Windows record](windows-phase-5.md) records a source-evidence precision fix and passing 12 unit, 133 integration and 7 actual packaged Windows desktop tests, plus typecheck, lint, build, packaging, real native picker, isolated portable/NSIS lifecycle, schema2 upgrade preservation, inventory and bounded timing checks. Independent Standards and Spec review found no remaining code findings.
-
-On 2026-09-20, the user reported that physical-offline testing passed and authorized merging PR #19 when ready. This human report is separate from automation. The archive and distribution hashes still match the tested build. A fresh independent packaged smoke test passed, with no outstanding code findings.
-
-The Phase 5 exit gate remains **open** for source-dependent acceptance and remaining Windows checks. Actual Windows scaling changes and interactive unsigned-publisher warning review remain unverified. Automated browser-offline and forced Chromium scaling probes are recorded separately. Synthetic checks do not establish real-source semantics, full imported-data performance or all A02/A03/A07 requirements. The authorized implementation merge does not complete these gates; issue #8 remains open, and no Phase 6 work or deployment is included.
-
-## Phase 6 implementation
-
-- [Costs, purchasing, supplier returns and local verification](phase-6-local.md).
-- [Windows continuation prompt](../operations/windows-phase-6-handoff.md).
-- [Windows verification](windows-phase-6.md) records two provenance-navigation fixes, 22 unit, 148 integration and 11 packaged Windows desktop tests, real native picker checks, isolated portable/NSIS migration and uninstall, hashes, screenshots and bounded performance observations. The same branch and PR #20 remain the review target.
-
-Tasks 6.1/6.2 have supported synthetic implementation evidence. The Phase 6 exit gate remains open for real-source semantics and acceptance. The [2026-09-21 follow-up](windows-phase-6.md#remaining-windows-checks-on-2026-09-21) records the user's physical-disconnect pass, passing actual Windows 100%/125%/150% scaling and horizontal table-wheel checks, and local interactive installer observations. No publisher warning appeared for the local artifact; downloaded-installer SmartScreen behavior remains unverified. Full imported-dataset performance and owner acceptance remain open. Synthetic accepted-report records do not represent owner acceptance. No merge, issue closure, Phase 7 or deployment follows from this record.
-
-## Phase 7 local implementation
-
-Issue [#10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) adds canonical Excel expense imports, reversible history, explicit completeness review and conditional estimated operating results. See the [local evidence](phase-7-local.md), [expense contract](../contracts/expense-completeness.md), and [Windows-agent prompt](../operations/windows-phase-7-prompt.md).
-
-The user requested a stop before Windows implementation/testing. Tasks 7.1/7.2 have synthetic local evidence; source-dependent A02–A05, Windows A07, full-volume performance and owner acceptance remain open. No merge, rollout or later phase is authorized.
-
-The user subsequently authorized Windows continuation on PR #21. The [Windows record](windows-phase-7.md) adds passing 29 unit, 159 integration and 16 packaged desktop tests, native Excel open/save and native picker checks, actual Windows 100%/125%/150% scaling, the 200 minus 50 equals 150 oracle, and isolated NSIS/portable upgrade and uninstall/reinstall preservation. No application change was required. Physical disconnection on this build, interactive publisher warnings, full-volume performance and source/owner acceptance remain open. The original handoff remains the procedure; the Windows record governs performed checks. No merge or issue closure follows from this evidence.
-
-## Phase 8 reporting and Excel
-
-The user authorized Windows continuation of [issue #11](https://github.com/AlesSystems/esmer-market-analytics/issues/11) on [PR #22](https://github.com/AlesSystems/esmer-market-analytics/pull/22). The [Windows record](windows-phase-8.md) supplements [local evidence](phase-8-local.md) with packaged reporting/revision checks, native save and Excel round-trip, actual Windows scaling, cancellation/retry measurements, artifact hashes and repeatable verification tools. The application source and schema are unchanged by this continuation.
-
-The 25,000-document synthetic monthly calculation took 49–59 seconds, so D18/A07 performance remains unmet. Physical disconnection on this build, publisher/downloaded SmartScreen behavior, full imported-data/source acceptance and the broader release gates remain open. The [Windows handoff](../operations/windows-phase-8-handoff.md) remains the procedure. No merge, issue closure, later phase or owner rollout follows from this evidence.
-
-## Phase 9 encrypted recovery
-
-[Issue #12](https://github.com/AlesSystems/esmer-market-analytics/issues/12) is implemented locally on `codex/phase-9-recovery` through the macOS verification boundary. See [local evidence](phase-9-local.md), the [recovery decision](../decisions/phase-9-recovery.md), [Turkish instructions](../operations/recovery-tr.md), and [Windows-agent prompt](../operations/windows-phase-9-prompt.md).
-
-A06 remains open for actual Windows key protection, file-system behavior, independent-media clean recovery and the remaining checks in the [Windows handoff](../operations/windows-phase-9-handoff.md). No merge, issue closure, owner installation or later-phase work is included.
-
-## Phase 10
-
-- [Windows verification](windows-acceptance.md), [release acceptance and open gates](release-acceptance.md), [licences](licences.md).
-- [Build and command proof](phase-10-proof.json), [performance samples](phase-10-performance.json), [decision trail](phase-10-decisions.tsv).
-- [Windows recovery filesystem boundary](phase-10-windows-recovery-files.md).
-
-## Issue 26 import prerequisites
-
-- [Synthetic capacity evidence and open source gates](issue-26-import-capacity.md), [profile receipts](issue-26-import-profiles.json), and [decision trail](issue-26-decisions.tsv).
-- [Capacity decision](../decisions/issue-26-import-capacity.md) and [repeatable profiling procedure](../operations/profile-import.md).
-- [Isolated source validation](issue-26-source-validation.md), [OrbStack verification receipt](issue-26-orbstack-verification.json), and [repeatable evidence collection](../operations/collect-source-evidence.md).
+Private packages, source values and recovery material stay outside Git. A passing calculation proves its declared formula, not the financial meaning of its source fields. A local or historical receipt cannot substitute for current-build Windows or production evidence.

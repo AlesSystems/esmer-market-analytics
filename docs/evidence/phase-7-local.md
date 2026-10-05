@@ -61,4 +61,4 @@ Synthetic checks can establish the implemented expense/import rules relevant to 
 
 A07 Windows packaging, native dialogs, OS scaling, lifecycle and physical-offline checks remain unperformed in this run. Full-volume performance remains unmeasured. Recovery, complete Phase 8 reporting, installation on Eralp's computer, production rollout and L01 remain outside this work.
 
-Continue using the [Windows handoff](../operations/windows-phase-7-handoff.md) and [copyable Windows-agent prompt](../operations/windows-phase-7-prompt.md) on the same branch and PR.
+Continue using the [Windows handoff](../operations/windows-phase-7-handoff.md) on the same branch and PR.

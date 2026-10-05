@@ -1,7 +1,7 @@
 # Esmer Market rebuild — release acceptance and proof checklist
 
 - Date: 2026-09-04.
-- Status: Written release gates approved by the user. All application checks below are pending implementation and evidence.
+- Status: Approved release proof requirements. Checkboxes retain the original checklist; current build-specific results and open gates are in [the evidence index](../../evidence/index.md).
 - Related: [Foundation specification](2026-09-04-esmer-market-rebuild-design.md) · [Source audit](2026-09-04-esmer-market-rebuild-audit.md).
 
 ## 1. Release rule
@@ -10,7 +10,7 @@ The surprise release is ready only when each applicable first-release gate has r
 
 Historical profit may remain honestly estimated. It may not be displayed as verified or conceal excluded costs/expenses. Later live integration has its own additional gate and is not needed for the reveal.
 
-Use small coherent test/implementation/documentation changes in this independent repository. Tests precede financial implementation, and higher-risk changes retain their acceptance evidence. No application test suite is being introduced or executed as part of this planning-only change.
+Use small coherent test/implementation/documentation changes in this independent repository. Tests precede financial implementation, and higher-risk changes retain their acceptance evidence. The original planning transfer introduced no test suite. Later implementation evidence is recorded separately.
 
 For every gate, retain the tested build/commit, fixture or private source-batch identity, environment, command or manual procedure, expected result, actual result and evidence location. Do not put private source backups, credentials or customer records in the evidence repository.
 
@@ -147,6 +147,6 @@ Evidence: permission and load reports, concurrency/reconciliation tests, measure
 
 ## 10. Present status and next boundary
 
-All A01–A07 application gates and L01 live gates are unexecuted. The earlier source audit passed the recorded database-integrity diagnostics only; its limitations are preserved in the linked audit document.
+The original planning transfer passed no application gate. Later synthetic, isolated-source and packaged checks are recorded in [the evidence index](../../evidence/index.md). Consult each receipt for its exact build, platform, population and limitations. Closed tracker issues do not establish that A01–A07 or L01 passed.
 
-The user approved this planning foundation, requested the [phased implementation plan](../plans/esmer-market-implementation-plan.md) and authorized the independent repository and documentation PR. Repository setup and document transfer do not pass any application gate. Fixture extraction, application code, external deployment and live connection remain unperformed and outside this documentation change.
+[Recorded-source estimates](../../contracts/recorded-estimates.md) have independent arithmetic evidence for their declared assumptions. They do not validate source semantics or close the original verified-financial requirements. Current Windows, independent recovery, real-source financial acceptance and production rollout require their specified evidence and authorization.
