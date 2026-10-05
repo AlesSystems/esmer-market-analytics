@@ -1,6 +1,6 @@
 # Phase 7 Windows verification
 
-On 2026-09-21 the user authorized the Windows continuation of [issue #10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) and [PR #21](https://github.com/AlesSystems/esmer-market-analytics/pull/21), following the [agent prompt](../operations/windows-phase-7-prompt.md). This supersedes the previous stop before Windows testing. Work remains on `codex/phase-7-expenses-operating`. No merge, issue closure, later phase or rollout is authorized.
+On 2026-09-21 the user authorized the Windows continuation of [issue #10](https://github.com/AlesSystems/esmer-market-analytics/issues/10) and [PR #21](https://github.com/AlesSystems/esmer-market-analytics/pull/21), following the [Windows handoff](../operations/windows-phase-7-handoff.md). This supersedes the previous stop before Windows testing. Work remains on `codex/phase-7-expenses-operating`. No merge, issue closure, later phase or rollout is authorized.
 
 The Windows checks passed without an application change. This continuation adds verification procedures, synthetic evidence and screenshots. It changes no schema, IPC operation, calculation, dependency, lockfile or product UI. Real-source acceptance remains open.
 

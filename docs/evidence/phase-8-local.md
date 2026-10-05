@@ -62,4 +62,4 @@ Synthetic verification can establish the implemented report preservation and exp
 
 Windows packaging, native dialogs, spreadsheet application compatibility, OS scaling, lifecycle and physical-offline checks require the [Windows continuation](../operations/windows-phase-8-handoff.md). Full-volume Windows performance remains unmeasured. Phase 9 recovery, Phase 10 reveal, installation on Eralp's computer, production rollout and L01 are outside this work.
 
-The [copyable Windows-agent prompt](../operations/windows-phase-8-prompt.md) continues on the same branch and PR.
+The [Windows handoff](../operations/windows-phase-8-handoff.md) continues on the same branch and PR.
