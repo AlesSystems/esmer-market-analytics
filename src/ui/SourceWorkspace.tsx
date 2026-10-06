@@ -1,9 +1,10 @@
+import {AppFrame} from "./frame";
 import {validSelectedMonth} from "../domain/month";
 import {captureReturn,restoreReturn,type ReturnReceipt} from "./navigation-receipt";
 import {useExpenseNavigation} from "./expense-navigation";
 import {SourceControlDesk} from "./overview/SourceControlDesk";
 import {SourceEstimate} from "./SourceEstimate";
-import {useCallback,useEffect,useRef,useState} from "react";
+import {useCallback,useContext,useEffect,useRef,useState} from "react";
 import type {SourceQuery,SourceWorkspaceResult} from "../source/workspace";
 import {AppShell,type Destination} from "./AppShell";
 import {Button} from "./components/ui/button";
@@ -20,6 +21,7 @@ const sourceDate=(value:string)=>date(value.slice(0,10));
 export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceView;selectedMonth:string;onMonth:(month:string)=>void}) {
  const [savedPeriod,setSavedPeriod]=useState<string|null>(null);
  const detailPeriod=useCallback((period:string|null)=>setSavedPeriod(period),[]);
+ const frame=useContext(AppFrame),workspaceActive=!frame||frame.view==="workspace";
  const expenseNavigation=useExpenseNavigation();
  const evidenceSummary=useRef<HTMLElement>(null);
  const [sourceEvidenceOpen,setSourceEvidenceOpen]=useState(false);
@@ -48,7 +50,7 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
   else{savedFilters.current={};setView(source);setQuery({...initialSourceQuery,hash:source.hash,period:source.period});setScreen("monthly");}
   setError("");setChanged(false);setDocumentMissing(false);
  },[source.hash]);
- useEffect(()=>{const id=++sequence.current;setBusy(true);setError("");setDocumentMissing(false);window.esmer.querySourceWorkspace(query).then(value=>{if(id!==sequence.current)return;if(value.status==="source-workspace"){setLoadedQuery(JSON.stringify(query));setView(value);setChanged(false);if(query.hash===null||query.period===null)setQuery(q=>({...q,hash:value.hash,period:value.period}));}else{setError(value.status==="source-empty"?"Kaynak örneği bulunamadı.":value.message);setChanged(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED");setDocumentMissing(value.status==="source-unavailable"&&value.code==="NOT_FOUND"&&query.view==="detail");}}).catch(()=>{if(id===sequence.current)setError("Kaynak kayıtları okunamadı.");}).finally(()=>{if(id===sequence.current)setBusy(false);});return()=>{++sequence.current;};},[query]);
+ useEffect(()=>{if(!workspaceActive||screen==="expenses"||screen==="versions")return;const id=++sequence.current;setBusy(true);setError("");setDocumentMissing(false);window.esmer.querySourceWorkspace(query).then(value=>{if(id!==sequence.current)return;if(value.status==="source-workspace"){setLoadedQuery(JSON.stringify(query));setView(value);setChanged(false);if(query.hash===null||query.period===null)setQuery(q=>({...q,hash:value.hash,period:value.period}));}else{setError(value.status==="source-empty"?"Kaynak örneği bulunamadı.":value.message);setChanged(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED");setDocumentMissing(value.status==="source-unavailable"&&value.code==="NOT_FOUND"&&query.view==="detail");}}).catch(()=>{if(id===sequence.current)setError("Kaynak kayıtları okunamadı.");}).finally(()=>{if(id===sequence.current)setBusy(false);});return()=>{++sequence.current;};},[query,screen,workspaceActive]);
  function navigate(next:Destination){visited.current.add(next);if(screen==="overview"||screen==="purchasing")savedFilters.current[screen]={...query,...(query.view==="detail"?originQuery.current??query:query),documentId:null};setScreen(next);if(next==="monthly")setQuery(q=>({...q,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0}));else if(next==="overview"||next==="purchasing")setQuery(q=>({...q,view:"documents",scope:next==="overview"?"sales":"purchasing",documentType:null,productId:null,documentId:null,offset:0,...savedFilters.current[next],hash:q.hash,period:q.period}));}
  function filter(patch:Partial<SourceQuery>){setQuery(q=>({...q,...patch,documentId:null,offset:0,view:patch.view??(q.view==="detail"?"documents":q.view)}));}
  useEffect(()=>{if(query.period!==selectedMonth)filter({period:selectedMonth});},[selectedMonth]);
@@ -60,8 +62,8 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
  const header=<><p className="notice">Kaynak kapsamı: {sourceDate(view.from)}–{sourceDate(view.to)}. Kayıt sayıları tüm durumları içerir; mali sonuçlar için kaynak anlamları henüz doğrulanmadı.</p><details className="data-status" open={sourceEvidenceOpen} onToggle={event=>setSourceEvidenceOpen(event.currentTarget.open)}><summary ref={evidenceSummary}>Veri ve hesaplama ayrıntıları</summary><p>{view.lineage} · Paket: {view.extractionId}<br/>Veritabanı: {view.databaseId}<br/>Hazırlanma: {view.extractedAt}<br/>Sürüm: {view.hash}</p><p>Ürün adı, kategori ve tedarikçi bu örnekte yok. Maliyet adayı içeren paketler ayrı doğrulanmamış tahmin gösterir. Tür adları tarihsel denetimdeki sözlük açıklamalarıdır; bu yedekte yeniden doğrulanmış mali anlam değildir. Kod grupları yalnızca kayıtları filtreler; tamamlanmış işlem veya tanınmış tutar anlamına gelmez.</p></details>{outside&&<p className="notice warning">Seçili dönem yedek kapsamı dışında. Eksik veri sıfır sayılmaz.</p>}</>;
  return <AppShell destination={screen} navigate={next=>{if(next===screen&&query.view==="detail")returnToList();else if(next!==screen)expenseNavigation.leave(()=>navigate(next));}} controls={<>{screen==="versions"&&savedPeriod?<span>Rapor dönemi {savedPeriod} · Kaydedilmiş sürüm</span>:<label className="period-label">Dönem<Input type="month" value={period} onChange={event=>{if(validSelectedMonth(event.target.value)){const next=event.target.value;expenseNavigation.leave(()=>onMonth(next));}}}/></label>}{!(screen==="versions"&&savedPeriod)&&<span>Yedek · {sourceDate(view.to)}</span>}</>}>
  <main className={screen==="purchasing"?"source-purchasing-main":undefined} aria-busy={busy}>{sourceChangedNotice&&<p role="status">Kaynak sürümü değişti. Eski belge detayı kapatıldı; kayıt kimlikleri yeni kaynakta yeniden seçilmelidir.</p>}{screen!=="versions"&&header}{error&&<p role="alert">{error} {documentMissing?<Button variant="outline" onClick={returnToList}>Belgelere dön</Button>:<Button variant="outline" onClick={()=>expenseNavigation.leave(()=>{savedFilters.current={};setQuery({...initialSourceQuery,period:selectedMonth});setScreen("monthly");setChanged(false);})}>Kaynağı yeniden aç</Button>}</p>}{busy&&<p role="status">Kaynak kayıtları yükleniyor…</p>}
- {visited.current.has("expenses")&&<div hidden={screen!=="expenses"}><ExpensesWorkspace active={screen==="expenses"} period={period} onPeriod={next=>expenseNavigation.leave(()=>onMonth(next))} embedded/></div>}
- {visited.current.has("versions")&&<div hidden={screen!=="versions"}><SavedReports onDetailPeriod={detailPeriod} period={period} onSourceSummary={()=>navigate("monthly")}/></div>}
+ {visited.current.has("expenses")&&<div hidden={screen!=="expenses"}><ExpensesWorkspace visible={workspaceActive&&screen==="expenses"} active={screen==="expenses"} period={period} onPeriod={next=>expenseNavigation.leave(()=>onMonth(next))} embedded/></div>}
+ {visited.current.has("versions")&&<div hidden={screen!=="versions"}><SavedReports active={workspaceActive&&screen==="versions"} onDetailPeriod={detailPeriod} period={period} onSourceSummary={()=>navigate("monthly")}/></div>}
  {screen!=="expenses"&&screen!=="versions"&&!busy&&loadedQuery===JSON.stringify(query)&&view.hash===query.hash&&view.period===period&&!error&&!changed&&<>
  {screen==="monthly"?<><SourceControlDesk view={view} period={period} outside={outside} onDocuments={()=>{setScreen("overview");setQuery(q=>({...q,view:"documents",scope:"all",documentType:null,productId:null,documentId:null,offset:0}));}} onProducts={()=>{setScreen("overview");setQuery(q=>({...q,view:"products",scope:"all",documentType:null,productId:null,documentId:null,offset:0}));}} onDocumentType={code=>{setScreen("overview");setQuery(q=>({...q,view:"documents",scope:"all",documentType:code,productId:null,documentId:null,offset:0}));}}/></>:<>
  <div className={screen==="overview"?"sales-control-desk source-sales-desk":"purchasing-control-desk source-purchasing-desk"}><div className="page-heading"><h1 ref={heading} tabIndex={-1}>{screen==="purchasing"?"Alışlar ve maliyet":"Satışlar"}</h1><span>{screen==="purchasing"?"Alışla ilişkili kaynak kayıtları":"Satışla ilişkili kaynak kayıtları"}</span></div>{screen==="purchasing"&&query.view!=="detail"&&<Button variant="outline" onClick={()=>filter({view:"documents",scope:"purchasing",documentType:"1",productId:null})}>Faturalar</Button>}{screen==="purchasing"&&<p>Maliyet analizi henüz hazır değil. Fatura ve irsaliye kayıtları birlikte bulunabilir; tutarları birleştirilmez.</p>}
@@ -72,7 +74,7 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
  </div></div></div>
  </>}
  </>}
- <div hidden={screen!=="monthly"||busy||!!error}><SourceEstimate active={screen==="monthly"&&!busy&&!error} key={`${view.hash}:${period}`} hash={view.hash} period={period} onProduct={id=>{setScreen("overview");setQuery(q=>({...q,view:"documents",scope:"all",productId:id,documentId:null,offset:0}));}}/></div>
+ <div hidden={screen!=="monthly"||busy||!!error}><SourceEstimate active={workspaceActive&&screen==="monthly"&&!busy&&!error} key={`${view.hash}:${period}`} hash={view.hash} period={period} onProduct={id=>{setScreen("overview");setQuery(q=>({...q,view:"documents",scope:"all",productId:id,documentId:null,offset:0}));}}/></div>
  </main>
  </AppShell>;
 }

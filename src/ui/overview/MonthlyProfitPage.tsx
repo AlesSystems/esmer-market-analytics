@@ -33,6 +33,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   const productKey = JSON.stringify([report.id, query, attempt]), evidenceKey = JSON.stringify([report.id, selected?.productId, evidenceOffset, evidenceAttempt]);
   const productPage = products?.key === productKey ? products.page : undefined, evidencePage = evidence?.key === evidenceKey ? evidence.page : undefined;
   useEffect(() => {
+    if(!active)return;
     let current = true; setProducts(undefined); setProductError("");
     window.esmer.readReportProducts({ reportId: report.id, ...query }).then(result => {
       if (!current) return;
@@ -40,8 +41,9 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
       else setProductError("Ürün listesi yüklenemedi. Yeniden deneyin.");
     }).catch(() => { if (current) setProductError("Ürün listesi yüklenemedi. Yeniden deneyin."); });
     return () => { current = false; };
-  }, [report.id, query, attempt, productKey]);
+  }, [report.id, query, attempt, productKey,active]);
   useEffect(() => {
+    if(!active)return;
     let current = true; setEvidence(undefined); setEvidenceError("");
     if (!selected) return;
     window.esmer.readReportEvidence({ reportId: report.id, section: "product-profit", productId: selected.productId, offset: evidenceOffset, search: "", range: "current", documentId: null }).then(result => {
@@ -50,7 +52,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
       else setEvidenceError("Ürün kanıtı yüklenemedi. Yeniden deneyin.");
     }).catch(() => { if (current) setEvidenceError("Ürün kanıtı yüklenemedi. Yeniden deneyin."); });
     return () => { current = false; };
-  }, [report.id, selected, evidenceOffset, evidenceAttempt, evidenceKey]);
+  }, [report.id, selected, evidenceOffset, evidenceAttempt, evidenceKey,active]);
   useEffect(() => { if (selected && active && focusPending.current) { detailHeading.current?.focus(); focusPending.current = false; } }, [selected,active]);
   useEffect(()=>{if(active)onParentBack?.(selected?returnToTable:null);return()=>{if(active)onParentBack?.(null);};},[active,selected,onParentBack]);
   const summary = report.productProfit.summary, partial = summary.scope === "covered", loss = summary.coveredGrossProfit?.startsWith("-");
@@ -108,23 +110,24 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
     </section>
     </div>
     {selected && <section className="block" aria-label="Seçili ürün kanıtı"><h2 ref={detailHeading} tabIndex={-1}>Seçili ürün · {selected.displayName}</h2>{hiddenBySearch ? <p>Seçili ürün arama sonuçlarında yok</p> : offPage ? <p>Seçili ürün bu sayfada değil</p> : null}<Button variant="outline" onClick={returnToTable}>Ürün listesine dön</Button><p>Seçili ürünün kapsanan kârı: {amount(selected.coveredGrossProfit)} · {selected.coveredCount} kapsanan / {selected.excludedCount} dışlanan satır.</p>
-      <div hidden={!!documentId || !!returnLineId}><SelectedProduct key={`${report.id}:${selected.productId}`} reportId={report.id} productId={selected.productId} />
+      <div hidden={!!documentId || !!returnLineId}><SelectedProduct active={active} key={`${report.id}:${selected.productId}`} reportId={report.id} productId={selected.productId} />
       {evidenceError ? <div role="alert" className="notice warning">{evidenceError}<Button variant="outline" onClick={() => setEvidenceAttempt(value => value + 1)}>Ürün kanıtını yeniden yükle</Button></div> : !evidencePage ? <p role="status">Ürün kanıtı yükleniyor…</p> : <>{evidencePage.rows.map(line => <article className="receipt-line" key={line.lineId}><h3>{line.kind === "customer-return" ? "Müşteri iadesi" : "Satış"} · {date(line.date)}</h3><p>{decimal(line.quantity)} {line.unit === "piece" ? "adet" : "kg"} · Net satış: {money(line.net)} · Tarihsel birim maliyeti: {amount(line.historicalUnitCost)} · Kapsanan maliyet: {amount(line.cost)}</p>{line.costReason && <p className="notice warning">{reason(line.costReason)}. Eksik maliyet sıfır değildir.</p>}{line.originalSaleLineId && <Button variant="outline" onClick={event => { dependencyReceipt.current=captureReturn(event.currentTarget); setReturnLineId(line.lineId); setDocumentId(null); }}>Asıl satışı aç · {line.originalSaleLineId}</Button>}<details><summary>Kaynak ve yöntem</summary><p>Belge / satır: {line.documentId} / {line.lineId} · Ürün: {line.productId}</p><p>Maliyet kanıtı: {line.costEvidence ?? "Mevcut değil"} · Kayıtlı net / KDV / brüt: {money(line.recorded.net)} / {money(line.recorded.tax)} / {money(line.recorded.gross)}</p><p>Birim net / indirim: {money(line.input.unitNet)} / {percent(line.input.discountRate)}</p></details><Button variant="outline" onClick={event => { documentReceipt.current=captureReturn(event.currentTarget); setDocumentId(line.documentId); setReturnLineId(null); }}>Belgeyi aç · {line.documentId}</Button></article>)}<PageControls page={evidenceOffset / PAGE_SIZE} total={evidencePage.total} label="Ürün kanıtı" itemLabel="satır" onPage={page => setEvidenceOffset(page * PAGE_SIZE)} /></>}
       </div>
-      {returnLineId && <ProductDependency key={`${report.id}:${selected.productId}:${returnLineId}`} reportId={report.id} productId={selected.productId} returnLineId={returnLineId} onClose={() => { setReturnLineId(null); restoreReturn(dependencyReceipt.current,detailHeading.current); }} />}
-      {documentId && <PinnedDocument key={`${report.id}:${selected.productId}:${documentId}`} reportId={report.id} productId={selected.productId} documentId={documentId} onClose={() => { setDocumentId(null); restoreReturn(documentReceipt.current,detailHeading.current); }} />}
+      {returnLineId && <ProductDependency active={active} key={`${report.id}:${selected.productId}:${returnLineId}`} reportId={report.id} productId={selected.productId} returnLineId={returnLineId} onClose={() => { setReturnLineId(null); restoreReturn(dependencyReceipt.current,detailHeading.current); }} />}
+      {documentId && <PinnedDocument active={active} key={`${report.id}:${selected.productId}:${documentId}`} reportId={report.id} productId={selected.productId} documentId={documentId} onClose={() => { setDocumentId(null); restoreReturn(documentReceipt.current,detailHeading.current); }} />}
     </section>}
     <details hidden={!!selected} className="block report-proof"><summary>Veri ve hesaplama ayrıntıları</summary><p>{report.review ? "İncelenmiş sürüm kaydedildi." : "Aday rapor henüz kaydedilmedi."} Kaydetmek tahmini maliyeti güvenilir kâra dönüştürmez.</p><details><summary>Kaynak ve yöntem</summary><p>Rapor: {report.id} · Kaynak / paket: {report.purchasing.lineage} / {report.purchasing.extractionId} · {Object.values(report.calculations).join(" · ")}</p></details><Button variant="outline" onClick={() => setProof(value => !value)} aria-expanded={proof}>Sabit rapor kanıtlarını {proof ? "gizle" : "göster"}</Button>{proof && <ReportEvidence report={report} />}</details>
   </Container>;
 }
 
-function PinnedDocument({ reportId, productId, documentId, onClose }: { reportId: string; productId: string; documentId: string; onClose: () => void }) {
+function PinnedDocument({ reportId, productId, documentId, onClose, active=true }: {active?:boolean; reportId: string; productId: string; documentId: string; onClose: () => void }) {
   const [offset, setOffset] = useState(0), [attempt, setAttempt] = useState(0);
   const [loaded, setLoaded] = useState<{ key: string; documents: DocumentPage; lines: LinePage }>(), [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   const key = JSON.stringify([reportId, productId, documentId, offset, attempt]);
   const page = loaded?.key === key ? loaded : undefined;
   useEffect(() => {
+    if(!active)return;
     let current = true; setLoaded(undefined); setError("");
     const base = { reportId, search: "", range: "current" as const, documentId: null };
     Promise.all([window.esmer.readReportEvidence({ ...base, section: "documents", documentId, offset: 0 }), window.esmer.readReportEvidence({ ...base, section: "lines", documentId, offset })]).then(([documents, lines]) => {
@@ -133,8 +136,8 @@ function PinnedDocument({ reportId, productId, documentId, onClose }: { reportId
       else setError("Belge kanıtı yüklenemedi. Yeniden deneyin.");
     }).catch(() => { if (current) setError("Belge kanıtı yüklenemedi. Yeniden deneyin."); });
     return () => { current = false; };
-  }, [reportId, productId, documentId, offset, attempt, key]);
-  useEffect(() => { if (page) heading.current?.focus(); }, [page]);
+  }, [reportId, productId, documentId, offset, attempt, key,active]);
+  useEffect(() => { if (page && active && heading.current?.getClientRects().length) heading.current.focus(); }, [page,active]);
   const header = page?.documents.rows.find(row => row.id === documentId);
   return <section className="block" aria-label="Sabit belge kanıtı"><h3 ref={heading} tabIndex={-1}>Belge kanıtı · {documentId}</h3><Button variant="outline" onClick={onClose}>Ürüne dön</Button><p>Tüm belge satırları. Diğer ürünler seçili ürün katkısına dahil değildir. Belge toplamı, seçili ürünün kapsanan tutarından ayrıdır.</p>{error ? <div role="alert">{error}<Button onClick={() => setAttempt(value => value + 1)}>Belge kanıtını yeniden yükle</Button></div> : !page ? <p role="status">Belge kanıtı yükleniyor…</p> : <>{header?.sales ? <p>Kaydedilen tam belge neti: {money(header.sales.net)} · KDV: {money(header.sales.tax)} · brüt: {money(header.sales.gross)}</p> : <p>Bu sayfada tam belge başlığı yok; belge toplamı hesaplanmadı.</p>}{page.lines.rows.map(line => <article className="receipt-line" key={line.id}><h4>{line.sales?.productName ?? "Ürün anlamı bilinmiyor"}</h4><p>{line.sales?.productId === productId ? "Seçili ürünle eşleşiyor" : "Seçili ürün kapsamı dışında"} · Kaydedilen miktar: {decimal(line.quantity)} · net: {money(line.net)}</p><details><summary>Kaynak satırı</summary><p>{line.documentId} / {line.id} · ürün: {line.sales?.productId ?? "Bilinmiyor"}</p></details></article>)}<PageControls page={offset / PAGE_SIZE} total={page.lines.total} label="Belge satırları" itemLabel="satır" onPage={value => setOffset(value * PAGE_SIZE)} /></>}</section>;
 }

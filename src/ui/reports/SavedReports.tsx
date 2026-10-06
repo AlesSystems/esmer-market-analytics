@@ -7,7 +7,7 @@ import {Button} from "../components/ui/button";
 import {ReportArchive} from "./ReportArchive";
 import {MonthlyOverview} from "../overview/MonthlyOverview";
 
-export function SavedReports({period, onSourceSummary, onDetailPeriod}:{onDetailPeriod?:(period:string|null)=>void;period:string; onSourceSummary?:()=>void}) {
+export function SavedReports({period, onSourceSummary, onDetailPeriod, active=true}:{active?:boolean;onDetailPeriod?:(period:string|null)=>void;period:string; onSourceSummary?:()=>void}) {
  const alive=useRef(true);
  const receipt=useRef<ReturnReceipt|null>(null);
  const heading=useRef<HTMLHeadingElement>(null);
@@ -21,17 +21,18 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod}:{onDetail
  useEffect(()=>{onDetailPeriod?.(reportOpen&&report?report.context.period:null);return()=>onDetailPeriod?.(null);},[reportOpen,report,onDetailPeriod]);
  const [message,setMessage]=useState("");
  const [busy,setBusy]=useState(false);
- useEffect(()=>{if(reportOpen)heading.current?.focus();},[reportOpen]);
+ useEffect(()=>{if(reportOpen&&active)heading.current?.focus();},[reportOpen,active]);
  useEffect(()=>{
-  let active=true;
+  if(!active)return;
+  let current=true;
   setReport(undefined);setReportOpen(false);setHistory([]);setMessage("");setHistoryState("loading");
   window.esmer.listReportVersions({period}).then(value=>{
-   if(!active)return;
+   if(!current)return;
    if(value.status==="history"){setHistory(value.reports);setHistoryState("ready");}
    else {setMessage(value.message);setHistoryState("failed");}
-  }).catch(()=>{if(active){setMessage("Kaydedilmiş raporlar okunamadı.");setHistoryState("failed");}});
-  return()=>{active=false;};
- },[period,attempt]);
+  }).catch(()=>{if(current){setMessage("Kaydedilmiş raporlar okunamadı.");setHistoryState("failed");}});
+  return()=>{current=false;};
+ },[period,attempt,active]);
  async function read(reportId:string,button?:HTMLButtonElement){if(button)receipt.current=captureReturn(button);setBusy(true);setMessage("");try{const value=await window.esmer.readReportVersion({reportId});if(!alive.current)return;if(value.status==="monthly"){setReport(value.report);if(button)setReportOpen(true);}else setMessage(value.message);}catch{if(alive.current)setMessage("Rapor açılamadı.");}finally{if(alive.current)setBusy(false);}}
  async function exportReport(){if(!report)return;setBusy(true);try{const value=await window.esmer.exportReportVersion({reportId:report.id});if(!alive.current)return;setMessage(value.status==="saved"?"Kaydedilmiş rapor Excel dosyasına aktarıldı.":value.status==="cancelled"?"Dışa aktarma iptal edildi.":value.message);}catch{if(alive.current)setMessage("Rapor dışa aktarılamadı.");}finally{if(alive.current)setBusy(false);}}
  return <section className="report-workspace" aria-busy={busy||historyState==="loading"}><div className="page-heading"><div><h1 ref={heading} tabIndex={-1}>Raporlar</h1><p>Kaydedilmiş rapor arşivi · {period}</p></div></div>
@@ -46,7 +47,7 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod}:{onDetail
    {report.sales.warnings.includes("SYNTHETIC_ONLY")&&<p role="status" className="notice warning">Sentetik gösterim raporu — gerçek market sonuçları değildir.</p>}
    <div className="report-actions"><Button variant="outline" disabled={busy} onClick={()=>{setReportOpen(false);restoreReturn(receipt.current,heading.current);}}>Rapor listesine dön</Button><Button variant="outline" disabled={busy} onClick={()=>void exportReport()}>Kaydedilmiş raporu dışa aktar</Button></div>
    <p>Kaydedilmiş rapor · Kaynak: {report.purchasing.lineage} · Veri sürümü: {report.context.datasetId} · Yöntem: {report.sales.mappingVersion} · Veri sonu: {date(report.sales.cutoff)}</p>
-   <MonthlyOverview report={report} refresh={()=>void read(report.id)} embedded/>
+   <MonthlyOverview active={active} report={report} refresh={()=>void read(report.id)} embedded/>
   </>}
  </section>;
 }

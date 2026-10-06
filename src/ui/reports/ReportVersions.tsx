@@ -14,8 +14,9 @@ const fieldLabels: Record<string, string> = { net: "Net tutar", netSales: "Net s
 const valueLabels: Record<string, string> = { estimated: "Tahmini", unavailable: "Kullanılamıyor", incomplete: "Eksik", missing: "Henüz sağlanmadı", available: "Mevcut", complete: "Tam", partial: "Kısmi", ready: "Hazır", unknown: "Bilinmiyor", sale: "Satış", "customer-return": "Müşteri iadesi", purchase: "Alış", "supplier-return": "Tedarikçi iadesi", labour: "İşçilik", "operating-expense": "Faaliyet gideri", "inventory-loss": "Stok kaybı", recoverable: "İndirilebilir", "non-recoverable": "İndirilemez", piece: "adet", kg: "kg", true: "Evet", false: "Hayır" };
 function changeLabel(path: string) { if (changeLabels[path]) return changeLabels[path]; const parts = path.split("."); const section = parts[0] === "salesEvidence" ? "Satış kaynak kanıtı" : parts[0] === "appEvidence" || parts[0].startsWith("appEvidence[") ? "Gider ve düzeltme kanıtı" : parts[0] === "calculations" ? "Hesaplama yöntemi" : fieldLabels[parts[0]] ?? "Rapor kanıtı"; const last = parts.at(-1)!.replace(/\[.*$/, ""); return `${section} · ${fieldLabels[last] ?? "Kaynak kaydı"}`; }
 function changeValue(path: string, value: string | number | boolean | null) { if (value === null) return "Yok / hesaplanamıyor"; if (typeof value === "boolean") return value ? "Evet" : "Hayır"; if (typeof value === "number") return value.toLocaleString("tr-TR"); const field = path.split(".").at(-1)!; if (/^-?\d+(?:\.\d+)?$/.test(value)) { if (["net", "netSales", "gross", "tax", "unitNet", "unitCost", "cost", "coveredCost", "coveredSales", "coveredGrossProfit", "value", "amount", "expenses", "payments", "operatingExpense", "labour", "separateLoss", "averageBasket", "basketNumerator"].includes(field)) return money(value); if (/Percent$|Change$|Rate$/.test(field)) return percent(value); if (["quantity", "piece", "kg"].includes(field)) return decimal(value); } return valueLabels[value] ?? salesReasonLabels[value] ?? purchasingWarningLabels[value] ?? value; }
-export function ReportVersions({ candidate, onAccepted, onDetailPeriod, refresh }: {refresh:()=>void;onDetailPeriod?: (period:string|null)=>void; candidate: MonthlyDisplay; onAccepted: (report: MonthlyDisplay) => void }) {
+export function ReportVersions({ candidate, onAccepted, onDetailPeriod, refresh, active=true }: {active?:boolean;refresh:()=>void;onDetailPeriod?: (period:string|null)=>void; candidate: MonthlyDisplay; onAccepted: (report: MonthlyDisplay) => void }) {
   const [history, setHistory] = useState<ReportSummary[]>([]), [selected, setSelected] = useState<MonthlyDisplay>(candidate);
+  useEffect(()=>{if(!selected.review&&selected.id===candidate.id)setSelected(candidate);},[candidate]);
   const [reportOpen, setReportOpen] = useState(true);
   const [difference, setDifference] = useState<ReportDifference>();
   const [differencePage, setDifferencePage] = useState(0);
@@ -28,15 +29,16 @@ export function ReportVersions({ candidate, onAccepted, onDetailPeriod, refresh 
   useEffect(()=>{onDetailPeriod?.(reportOpen&&selected.review?selected.context.period:null);return()=>onDetailPeriod?.(null);},[reportOpen,selected,onDetailPeriod]);
   const reviewedPredecessor = candidateReview?.candidateId === candidate.id && candidateReview.previousAcceptedId === history[0]?.id ? candidateReview.previousAcceptedId : null;
   useEffect(() => {
-    if (busy) return;
+    if (busy || !active) return;
     if (pendingFocus.current === "detail" && reportOpen) { detailHeading.current?.focus(); pendingFocus.current = null; }
     if (pendingFocus.current === "opener" && !reportOpen) { restoreReturn(receipt.current,candidateOpener.current); pendingFocus.current = null; }
-  }, [busy, reportOpen, selected.id]);
+  }, [busy, reportOpen, selected.id,active]);
   useEffect(() => {
+    if(!active)return;
     let current = true; setLoaded(false); setLoadingHistory(true);
     window.esmer.listReportVersions({ period: candidate.context.period }).then(result => { if (!current) return; if (result.status === "history") { setHistory(result.reports); setLoaded(true); } else setMessage("message" in result ? result.message : "Sürüm geçmişi yüklenemedi."); }).catch(() => { if (current) setMessage("Sürüm geçmişi yüklenemedi. Yeniden deneyin."); }).finally(() => { if (current) setLoadingHistory(false); });
     return () => { current = false; };
-  }, [candidate.context.period, candidate.id, attempt]);
+  }, [candidate.context.period, candidate.id, attempt,active]);
   async function read(id: string, button?: HTMLButtonElement) {
     if (button) { opener.current = button;receipt.current=captureReturn(button); pendingFocus.current = "detail"; } setBusy(true); setMessage("");
     try { const result = await window.esmer.readReportVersion({ reportId: id }); if (result.status === "monthly") { setSelected(result.report); if(button) setReportOpen(true); } else setMessage("message" in result ? result.message : "Sürüm açılamadı."); }
@@ -71,6 +73,6 @@ export function ReportVersions({ candidate, onAccepted, onDetailPeriod, refresh 
     </div>
     {reportOpen && <><Button variant="outline" className="back-action" disabled={busy} onClick={() => { pendingFocus.current = "opener"; setReportOpen(false); }}>Sürüm listesine dön</Button>
     <section className="block" aria-label="Seçili rapor"><h2 ref={detailHeading} tabIndex={-1}>Seçili rapor</h2><p>{selected.review ? "Kaydedilmiş sürüm" : "Aday sürüm"}</p><p>Seçili veri sonu: <strong>{date(selected.sales.cutoff)}</strong> · Seçili dönem: {selected.context.period}</p><details><summary>Veri ve hesaplama ayrıntıları</summary><p>Rapor {selected.id} · Veri sürümü {selected.context.datasetId} · Gider/uygulama revizyonu {selected.context.appRevision} · Kaynak {selected.purchasing.lineage} · Paket {selected.purchasing.extractionId} · {Object.values(selected.calculations).join(" · ")}</p></details>{selected.review && <p>İnceleme: {selected.review.reason}</p>}<div className="report-actions"><Button variant="outline" disabled={busy} onClick={() => setSelected(candidate)}>Aday raporu göster</Button><Button variant="default" disabled={busy} onClick={() => void exportSelected()}>Seçili aylık raporu Excel'e aktar</Button></div><p>Excel, burada seçili sürümün tüm ürünler kapsamındaki değerlerini ve kanıtlarını içerir.</p></section>
-    <MonthlyOverview embedded key={selected.id} report={selected} refresh={selected.review?()=>setSelected(candidate):refresh} /></> }
+    <MonthlyOverview active={active} embedded key={selected.id} report={selected} refresh={selected.review?()=>setSelected(candidate):refresh} /></> }
   </main>;
 }

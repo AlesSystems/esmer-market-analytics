@@ -11,12 +11,13 @@ const amount = (value: string | null) => value === null ? "Hesaplanamıyor" : mo
 const ratio = (value: string | null) => value === null ? "Hesaplanamıyor" : percent(value);
 const unit = (value: "piece" | "kg" | "unknown" | undefined) => value === "piece" ? "adet" : value === "kg" ? "kg" : "birim bilinmiyor";
 
-export function SelectedProduct({ reportId, productId }: { reportId: string; productId: string }) {
+export function SelectedProduct({ reportId, productId, active=true }: {active?:boolean; reportId: string; productId: string }) {
   const [detail, setDetail] = useState<Detail>(), [error, setError] = useState(""), [attempt, setAttempt] = useState(0);
   const [exporting, setExporting] = useState(false), [exportMessage, setExportMessage] = useState("");
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
+    if(!active)return;
     let current = true;
     setDetail(undefined); setError("");
     window.esmer.readReportProduct({ reportId, productId }).then(result => {
@@ -25,7 +26,7 @@ export function SelectedProduct({ reportId, productId }: { reportId: string; pro
       else setError("message" in result ? result.message : "Seçili ürün özeti yüklenemedi.");
     }).catch(() => { if (current) setError("Seçili ürün özeti yüklenemedi."); });
     return () => { current = false; };
-  }, [reportId, productId, attempt]);
+  }, [reportId, productId, attempt,active]);
   async function exportProduct() {
     setExporting(true); setExportMessage("");
     try {
@@ -62,11 +63,12 @@ export function SelectedProduct({ reportId, productId }: { reportId: string; pro
   </section>;
 }
 
-export function ProductDependency({ reportId, productId, returnLineId, onClose }: { reportId: string; productId: string; returnLineId: string; onClose: () => void }) {
+export function ProductDependency({ reportId, productId, returnLineId, onClose, active=true }: {active?:boolean; reportId: string; productId: string; returnLineId: string; onClose: () => void }) {
   const [offset, setOffset] = useState(0), [attempt, setAttempt] = useState(0);
   const [page, setPage] = useState<Dependency>(), [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
+    if(!active)return;
     let current = true; setPage(undefined); setError("");
     window.esmer.readReportProductDependency({ reportId, productId, returnLineId, offset }).then(result => {
       if (!current) return;
@@ -74,8 +76,8 @@ export function ProductDependency({ reportId, productId, returnLineId, onClose }
       else setError("message" in result ? result.message : "Asıl satış kanıtı bu raporda mevcut değil.");
     }).catch(() => { if (current) setError("Asıl satış kanıtı yüklenemedi."); });
     return () => { current = false; };
-  }, [reportId, productId, returnLineId, offset, attempt]);
-  useEffect(() => { if (page || error) heading.current?.focus(); }, [page, error]);
+  }, [reportId, productId, returnLineId, offset, attempt,active]);
+  useEffect(() => { if (active && (page || error) && heading.current?.getClientRects().length) heading.current.focus(); }, [page, error,active]);
   const originalCost = page?.original.business?.historicalCost;
   return <section className="block" aria-label="Asıl satış kanıtı"><h3 ref={heading} tabIndex={-1}>Asıl satış kanıtı</h3><Button variant="outline" onClick={onClose}>İadeye dön</Button>
     <p>Seçili ayın toplamına eklenmez. Bu kayıtlar raporun saklanan kanıtıdır; yeniden hesaplanmış satış sonucu değildir.</p>

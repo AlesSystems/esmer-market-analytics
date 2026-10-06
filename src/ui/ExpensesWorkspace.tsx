@@ -10,7 +10,7 @@ import { date, money } from "./format";
 const failed = "Yerel hizmete ulaşılamadı. Yeniden deneyin.";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
 
-export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod, active = true }: {active?: boolean; period: string; onPeriod?: (period: string) => void; onChange?: () => void; embedded?: boolean }) {
+export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod, active = true, visible = true }: {visible?:boolean;active?: boolean; period: string; onPeriod?: (period: string) => void; onChange?: () => void; embedded?: boolean }) {
   const navigation = useExpenseNavigation();
   const [savedPeriod, setSavedPeriod] = useState<{ incurred: string; payment: string | null; related: string }>();
   const [savedEntity, setSavedEntity] = useState<string>();
@@ -33,8 +33,8 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
   const [reviewReason, setReviewReason] = useState("");
   const generation = useRef(0);
   function returnToRecords() { setTask("records"); setSelected(undefined); restoreFocus.current = true; }
-  useEffect(() => { if (restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading]);
-  useEffect(() => { if (task !== "records") taskTitle.current?.focus(); }, [task]);
+  useEffect(() => { if (visible && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading,visible]);
+  useEffect(() => { if (visible && task !== "records") taskTitle.current?.focus(); }, [task,visible]);
   async function load(): Promise<boolean> {
     const id = ++generation.current;
     setLoading(true); setLoadError("");
@@ -47,7 +47,7 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
     finally { if (id === generation.current) setLoading(false); }
     return false;
   }
-  useEffect(() => { if(!active){if(task==="manual"&&!busy&&!localStorage.getItem(pendingExpenseKey))setTask("records");return;} if(view?.period===period)return; restoreFocus.current = false; setSummaryOpen(false); setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period,active]);
+  useEffect(() => { if(!active){if(task==="manual"&&!busy&&!localStorage.getItem(pendingExpenseKey))setTask("records");return;} if(!visible)return; if(view?.period===period)return; restoreFocus.current = false; setSummaryOpen(false); setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period,active,visible]);
   async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false) {
     navigation.protect({dirty:false,locked:true});
     setBusy(true); setError(""); setMessage("");

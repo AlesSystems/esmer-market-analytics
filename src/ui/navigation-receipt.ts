@@ -6,7 +6,9 @@ export function captureReturn(opener: HTMLElement): ReturnReceipt {
 export function restoreReturn(receipt: ReturnReceipt | null, fallback: HTMLElement | null) {
   requestAnimationFrame(() => {
     const replacement = receipt?.focusKey ? [...document.querySelectorAll<HTMLElement>("[data-focus-key]")].find(element => element.getAttribute("data-focus-key") === receipt.focusKey && element.getClientRects().length > 0) : null;
-    (receipt?.opener.isConnected && (!receipt.focusKey || receipt.opener.getAttribute("data-focus-key")===receipt.focusKey) ? receipt.opener : replacement ?? fallback)?.focus({preventScroll: true});
+    const target=receipt?.opener.isConnected && receipt.opener.getClientRects().length > 0 && (!receipt.focusKey || receipt.opener.getAttribute("data-focus-key")===receipt.focusKey) ? receipt.opener : replacement ?? fallback;
+    if(!target?.getClientRects().length)return;
+    target.focus({preventScroll:true});
     const visibleTables = [...document.querySelectorAll<HTMLElement>(".table-scroll")].filter(element => element.getClientRects().length > 0);
     for (const [index, table] of (receipt?.tables ?? []).entries()) {const element = table.element.isConnected ? table.element : visibleTables[index]; if(element){element.scrollLeft=table.x;element.scrollTop=table.y;}}
     if (receipt) window.scrollTo(receipt.windowX, receipt.windowY);
