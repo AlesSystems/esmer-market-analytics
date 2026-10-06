@@ -144,7 +144,7 @@ export async function excelProductReport(report: MonthlyReport, productId: strin
   const summary: Row[] = [[heading("Gösterge"), heading("Değer"), heading("Kesin ondalık değer"), heading("Duyarlılık açıklaması")],
     ...metrics.map(([title, key]) => [text(title), ...numeric(detail.summary[key])]),
     [text("Kapsanan satır sayısı"), text(detail.summary.coveredCount)], [text("Maliyeti dışlanan satır sayısı"), text(detail.summary.excludedCount)],
-    ...Object.entries(detail.summary.exposures).map(([key, value]) => [text(({ coveredSales: "Kapsanan satış tutarı", coveredReturns: "Kapsanan iade tutarı", excludedSales: "Dışlanan satış tutarı", excludedReturns: "Dışlanan iade tutarı" } as Record<string, string>)[key]), ...numeric(value)]),
+    ...(["coveredSales", "coveredReturns", "excludedSales", "excludedReturns"] as const).map(key => [text(({ coveredSales: "Kapsanan satış tutarı", coveredReturns: "Kapsanan iade tutarı", excludedSales: "Dışlanan satış tutarı", excludedReturns: "Dışlanan iade tutarı" } as Record<string, string>)[key]), ...numeric(detail.summary.exposures[key])]),
     ...detail.summary.quantities.flatMap(row => [[text(`Satılan miktar (${label(row.unit)})`), ...numeric(row.sold)], [text(`İade miktarı (${label(row.unit)})`), ...numeric(row.returned)], [text(`Net miktar (${label(row.unit)})`), ...numeric(row.net)]]),
     ...detail.summary.exclusionReasons.map(reason => [text("Maliyet dışlama nedeni"), text(label(reason)), text(reason)]),
   ];
