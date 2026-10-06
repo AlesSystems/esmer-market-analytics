@@ -9,6 +9,7 @@ type Detail = Extract<Awaited<ReturnType<DesktopApi["readReportProduct"]>>, { st
 type Dependency = Extract<Awaited<ReturnType<DesktopApi["readReportProductDependency"]>>, { status: "product-dependency" }>;
 const amount = (value: string | null) => value === null ? "Hesaplanamıyor" : money(value);
 const ratio = (value: string | null) => value === null ? "Hesaplanamıyor" : percent(value);
+const unit = (value: "piece" | "kg" | "unknown" | undefined) => value === "piece" ? "adet" : value === "kg" ? "kg" : "birim bilinmiyor";
 
 export function SelectedProduct({ reportId, productId }: { reportId: string; productId: string }) {
   const [detail, setDetail] = useState<Detail>(), [error, setError] = useState(""), [attempt, setAttempt] = useState(0);
@@ -75,14 +76,15 @@ export function ProductDependency({ reportId, productId, returnLineId, onClose }
     return () => { current = false; };
   }, [reportId, productId, returnLineId, offset, attempt]);
   useEffect(() => { if (page || error) heading.current?.focus(); }, [page, error]);
+  const originalCost = page?.original.business?.historicalCost;
   return <section className="block" aria-label="Asıl satış kanıtı"><h3 ref={heading} tabIndex={-1}>Asıl satış kanıtı</h3><Button variant="outline" onClick={onClose}>İadeye dön</Button>
     <p>Seçili ayın toplamına eklenmez. Bu kayıtlar raporun saklanan kanıtıdır; yeniden hesaplanmış satış sonucu değildir.</p>
     {error ? <div role="alert" className="notice warning">{error}<Button variant="outline" onClick={() => setAttempt(value => value + 1)}>Asıl satış kanıtını yeniden yükle</Button></div> : !page ? <p role="status">Asıl satış kanıtı yükleniyor…</p> : <>
       <p>Asıl belge: {page.document.id} · {date(page.document.date)} · Asıl satır: {page.original.id}</p>
-      <p>Kaydedilen asıl miktar: {decimal(page.original.quantity)} · Kaydedilen net tutar: {money(page.original.net)} · Kaydedilen tarihsel birim maliyet: {amount(page.original.business?.historicalCost?.unitCost ?? null)}</p>
+      <p>Kaydedilen asıl miktar: {decimal(page.original.quantity)} {unit(page.original.sales?.unit)} · Kaydedilen net tutar: {money(page.original.net)} · Kaydedilen tarihsel birim maliyet: {amount(originalCost?.unitCost ?? null)} / {unit(originalCost?.unit)} · {originalCost?.taxBasis === "net" ? "KDV hariç" : "KDV temeli bilinmiyor"}</p>
       <p>Maliyet kanıtı: {page.original.business?.historicalCost?.evidence ?? "Mevcut değil"} · Bu kaydın varlığı tek başına iade maliyetini doğrulamaz.</p>
       <p>Tüm belge satırları. Diğer ürünler seçili ürün katkısına dahil değildir.</p>
-      {page.rows.map(line => <article className="receipt-line" key={line.id}><h4>{line.sales?.productName || `Ürün #${line.sales?.productId ?? "Bilinmiyor"}`}</h4><p>{line.id === page.original.id ? "Asıl satışla eşleşiyor" : "Belgenin diğer satırı"} · {line.sales?.productId === productId ? "Seçili ürünle eşleşiyor" : "Seçili ürün kapsamı dışında"} · Kaydedilen miktar: {decimal(line.quantity)} · net: {money(line.net)}</p></article>)}
+      {page.rows.map(line => <article className="receipt-line" key={line.id}><h4>{line.sales?.productName || `Ürün #${line.sales?.productId ?? "Bilinmiyor"}`}</h4><p>{line.id === page.original.id ? "Asıl satışla eşleşiyor" : "Belgenin diğer satırı"} · {line.sales?.productId === productId ? "Seçili ürünle eşleşiyor" : "Seçili ürün kapsamı dışında"} · Kaydedilen miktar: {decimal(line.quantity)} {unit(line.sales?.unit)} · net: {money(line.net)}</p></article>)}
       <PageControls page={offset / PAGE_SIZE} total={page.total} label="Asıl belge satırları" itemLabel="satır" onPage={value => setOffset(value * PAGE_SIZE)} />
     </>}
   </section>;
