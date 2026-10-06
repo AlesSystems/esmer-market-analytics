@@ -45,7 +45,7 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod, active=tr
   {message&&historyState!=="failed"&&<p role={reportOpen?"status":"alert"} className="notice warning">{message}</p>}
   <div hidden={reportOpen}>
    {historyState==="loading"&&<p role="status">Raporlar yükleniyor…</p>}{historyState==="failed"&&<div className="notice warning" role="alert"><p>{message}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Raporları yeniden yükle</Button></div>}
-   <div hidden={historyPeriod.current!==period}><ReportArchive active={active&&!reportOpen} history={history} report={report} busy={busy} onSelect={id=>void read(id)} onOpen={(id,button)=>void read(id,button)} onExport={()=>void exportReport()}/></div>
+   {historyPeriod.current!==null&&<div hidden={historyPeriod.current!==period||historyState!=="ready"&&history.length===0}><ReportArchive active={active&&!reportOpen} history={history} report={report} busy={busy} onSelect={id=>void read(id)} onOpen={(id,button)=>void read(id,button)} onExport={()=>void exportReport()}/></div>}
    {historyState==="ready"&&history.length===0&&onSourceSummary&&<Button variant="outline" onClick={onSourceSummary}>Kaynak kayıtlarının özetine dön</Button>}
   </div>
   {reportOpen&&report&&<>
