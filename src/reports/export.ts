@@ -39,8 +39,13 @@ function technical(value: unknown, prefix = ""): Row[] {
       else target[path] = Array.isArray(item) ? canonical(item) : item;
       return target;
     };
-    const records = value.map(item => flatten(item)), keys = [...new Set(records.flatMap(row => Object.keys(row)))].sort();
-    return [[text(prefix)], ...table(records, keys.map(key => ({ title: key, value: row => row[key] })))];
+    const fields = new Set<string>();
+    for (const item of value) for (const key of Object.keys(flatten(item))) fields.add(key);
+    const keys = [...fields].sort();
+    return [[text(prefix)], keys.map(heading), ...value.map(item => {
+      const row = flatten(item);
+      return keys.map(key => text(typeof row[key] === "boolean" ? row[key] ? "Evet" : "Hayır" : row[key]));
+    })];
   }
   if (value !== null && typeof value === "object") return Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).flatMap(([key, v]) => technical(v, prefix ? `${prefix}.${key}` : key));
   return [[text(prefix), text(value)]];
