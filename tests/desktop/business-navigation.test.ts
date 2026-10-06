@@ -32,3 +32,50 @@ test("overview opens the report as a destination without inline duplication", as
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Ay bir bakışta",exact:true})).toBeVisible();await expect(page.getByRole("heading",{name:"Aylık Ürün Kârlılığı",exact:true})).toHaveCount(0);await page.getByRole("button",{name:/Ayın raporunu aç/}).click();await expect(page.getByRole("button",{name:"Raporlar",exact:true})).toHaveAttribute("aria-current","page");}finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
+
+test("delayed and failed month responses cannot relabel old totals or disable local expense records", async () => {
+ const userData=await mkdtemp(join(tmpdir(),"esmer-month-response-"));
+ const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Ay bir bakışta",exact:true})).toBeVisible();
+  await app.evaluate(({ipcMain})=>{
+   const registry=ipcMain as unknown as {_invokeHandlers:Map<string,(event:unknown,operation:string,payload:unknown)=>unknown>},original=registry._invokeHandlers.get("esmer:request")!;
+   ipcMain.removeHandler("esmer:request");ipcMain.handle("esmer:request",async(event,operation,payload)=>{
+    const period=(payload as {period?:string})?.period;
+    if(operation==="openSales"&&period==="2025-11")return {status:"unavailable",code:"SERVICE_UNAVAILABLE",message:"Sentetik dönem okuma hatası"};
+    const result=await original(event,operation,payload);
+    if(operation==="openSales"&&period==="2025-08")await new Promise(resolve=>setTimeout(resolve,500));
+    return result;
+   });
+  });
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-08");await expect(page.getByRole("region",{name:"Aylık performans",exact:true})).toHaveCount(0);
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("region",{name:"Aylık performans",exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Aylık performans",exact:true})).not.toContainText("200,00 ₺");
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("alert")).toContainText("Sentetik dönem okuma hatası");
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Giderler",exact:true}).click();
+  await page.getByRole("button",{name:"Gider ekle",exact:true}).click();await page.getByLabel("Kategori",{exact:true}).fill("Sentetik kira");
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-12");await expect(page.getByRole("alertdialog")).toBeVisible();await page.getByRole("button",{name:"Düzenlemeye devam et",exact:true}).click();
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-11");
+  expect(await page.evaluate(()=>window.esmer.getPreferences())).toMatchObject({status:"preferences",preferences:{selectedMonth:"2025-11"}});
+ } finally {await app.close();await rm(userData,{recursive:true,force:true});}
+});
+
+test("recorded invoice return restores its second page and the working month survives data-view changes", async () => {
+ const {rawSnapshot}=await import("../helpers/raw-fixture"),{writeRawPackage}=await import("../../src/source/raw-package");
+ const userData=await mkdtemp(join(tmpdir(),"esmer-source-return-")),snapshot=rawSnapshot();
+ snapshot.headers=Array.from({length:60},(_,index)=>({...snapshot.headers[0],ID:String(index+1),FIS_TURU:"1"}));snapshot.lines=[];
+ const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());store.importSourcePreview(writeRawPackage(snapshot,"fixture:raw","batch-1"));}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  await page.getByRole("button",{name:"Faturalar",exact:true}).click();await page.getByRole("button",{name:"Sonraki kaynak kayıtları",exact:true}).first().click();
+  const row=page.getByRole("button",{name:"51",exact:true});await row.click();await expect(page.getByText("Fatura numarası mevcut değil",{exact:false})).toBeVisible();
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  await expect(row).toBeFocused();await expect(page.getByRole("status").filter({hasText:"51–60 / 60"}).first()).toBeVisible();
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Ayarlar",exact:true}).click();
+  await page.getByRole("button",{name:"Korunan mali veri görünümü",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await page.getByRole("button",{name:"Gerçek yedek görünümü",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
+ } finally {await app.close();await rm(userData,{recursive:true,force:true});}
+});

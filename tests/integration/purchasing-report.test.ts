@@ -117,3 +117,16 @@ test("purchase document browser retains empty invoices and pinned linked dispatc
   expect(reports.purchaseDocuments({context: {...context, sessionId: "wrong"}, search: "", offset: 0})).toMatchObject({code: "STALE_CONTEXT"});
  } finally {store.close();}
 });
+
+test("invoice IPC permits only exact bounded requests from trusted senders", async () => {
+ const {handleRequest}=await import("../../src/desktop/requests"),{vi}=await import("vitest");
+ const context={sessionId:"session",datasetId:"dataset",appRevision:0,calculationVersion:"sales-v1",period:"2025-09"};
+ const response={status:"unavailable",code:"NOT_FOUND",message:"Yok"} as const;
+ const service={open:vi.fn(),query:vi.fn(),inspect:vi.fn(),purchaseDocuments:vi.fn().mockResolvedValue(response),purchaseDocument:vi.fn().mockResolvedValue(response)};
+ const list={context,search:"",offset:0},detail={context,documentId:"P1",offset:0};
+ expect(await handleRequest(false,"queryPurchaseDocuments",list,vi.fn(),undefined,service)).toMatchObject({code:"UNTRUSTED_SENDER"});
+ for(const payload of [null,{...list,offset:1},{...list,offset:-50},{...list,offset:100050},{...list,sql:"SELECT"},{...list,search:"\u0000"},{...list,context:{...context,sessionId:""}}])expect(await handleRequest(true,"queryPurchaseDocuments",payload,vi.fn(),undefined,service)).toMatchObject({code:"INVALID_PAYLOAD"});
+ expect(service.purchaseDocuments).not.toHaveBeenCalled();
+ expect(await handleRequest(true,"queryPurchaseDocuments",list,vi.fn(),undefined,service)).toEqual(response);
+ expect(await handleRequest(true,"inspectPurchaseDocument",detail,vi.fn(),undefined,service)).toEqual(response);
+});
