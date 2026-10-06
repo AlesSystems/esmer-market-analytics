@@ -6,7 +6,7 @@ The user authorized Phase 1 implementation, a PR, and handoff to a Windows agent
 
 Read these files first:
 
-- `AGENTS.md` and `docs/agents/issue-tracker.md`.
+- `AGENTS.md`.
 - The global constraints, shared decisions, execution rules, and Phase 1 tasks in `docs/superpowers/plans/esmer-market-implementation-plan.md`.
 - The three linked foundation specifications and acceptance checklist.
 - `docs/decisions/runtime.md`, `docs/contracts/desktop.md`, and `docs/evidence/index.md`.

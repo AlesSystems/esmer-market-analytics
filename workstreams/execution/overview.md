@@ -1,5 +1,7 @@
 # Execution checkpoint
 
+Historical execution record from 2026-10-01. Branch pins, tracker states and instructions below describe that run. Use [the current evidence index](../../docs/evidence/index.md) and the assigned task for present scope and acceptance.
+
 The real-data profit release remains blocked by source semantics and user-run Windows acceptance. Only the existing isolated backup is available. No renewed source read, container action or production access occurred.
 
 | Work | Result | Evidence |

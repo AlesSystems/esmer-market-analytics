@@ -4,7 +4,7 @@ These separate reports were returned by two read-only reviewers using GPT-6 Astr
 
 ## Standards
 
-Reviewed `git diff 4452fd9...HEAD` with initial HEAD `838061f`, branch `codex/phase-5-sales-analytics`. Read AGENTS.md, docs/agents/*, PRODUCT.md, the foundation specification/audit/acceptance documents, Phase 5 plan/design/contracts, issue #8 and comments. Applied all twelve Fowler baseline heuristics as judgment calls; repository requirements override them.
+Reviewed `git diff 4452fd9...HEAD` with initial HEAD `838061f`, branch `codex/phase-5-sales-analytics`. Read AGENTS.md, the then-current repository workflow guidance, PRODUCT.md, the foundation specification/audit/acceptance documents, Phase 5 plan/design/contracts, issue #8 and comments. Applied all twelve Fowler baseline heuristics as judgment calls; repository requirements override them.
 
 ### Documented-standard finding
 

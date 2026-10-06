@@ -59,6 +59,8 @@ Final rebuilt archive SHA-256: `1965247871e0d33f4d81b7bb5f55e4b786f6a8cf9b9eafc3
 
 See [independent review](review.md). GitHub is the repository's required forge; the installed Origin CLI could not resolve this repository, so publication uses `gh`. Detailed commits are preserved by merge commit as required by this repository.
 
-## Remaining acceptance
+## Remaining acceptance at this recorded boundary
+
+Later tracker closure does not supply new source or Windows proof. Use [the current evidence index](../../docs/evidence/index.md) and issue #67 for the continuing real-financial work.
 
 [Windows handoff](windows-handoff.md) remains user-run. Original #39 source semantics and #40 validated financial import are not declared complete; #41 has real estimate arithmetic evidence, not validated whole-market profit. #43 remains open for integrated Windows/distribution/recovery/performance acceptance. No production rollout occurred. Return economic effects and unsupported costs are excluded visibly. Estimates are transient and change with the source package; exported workbooks preserve an external copy. Existing accepted financial reports remain governed by their prior contract.

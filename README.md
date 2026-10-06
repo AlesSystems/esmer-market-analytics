@@ -1,8 +1,10 @@
 # Esmer Market Analytics
 
-Private Turkish desktop analytics for Esmer Market, intended for one owner on one trusted Windows computer. The approved product uses Electron, TypeScript, React, a local Node service and SQLite.
+Private Turkish desktop analytics for one owner and one Esmer Market store in the TRNC/KKTC. The application uses Electron, TypeScript, React, a local Node service and SQLite on Windows.
 
-`main` includes a local SQLite store and Turkish screens for sales, purchasing, expenses, monthly reports, Excel export and encrypted recovery. Financial reports activate only from synthetic mappings. An isolated SQL backup can be imported as a raw-record preview, and an optional isolated test connection stays off until an operator enables it. Neither path activates a real financial dataset. Real-source mapping, first-release acceptance and production rollout remain open.
+The local application includes sales, purchasing, Excel and manual expense entry, monthly reports, Excel export and encrypted recovery. Financial datasets still use synthetic mappings. Separately, an authorized prepared SQL package can supply raw-record browsing or unverified product/day/month contribution estimates. These estimates disclose assumed source meanings, excluded returns and unsupported costs. They do not activate validated financial reports or establish whole-market profit.
+
+The optional isolated SQL test connection starts disabled. Imported records remain usable offline. Production rollout, validated real-source financial mapping and current-build Windows/recovery acceptance require separate evidence and direction. [The evidence index](docs/evidence/index.md) identifies current work and preserved historical receipts.
 
 ## Develop and verify
 
@@ -16,47 +18,37 @@ npm test
 npm run build
 ```
 
-`npm run test:desktop -- tests/desktop/startup.test.ts` builds and launches a packaged application for the current host. `npm run test:unit -- <file>` and `npm run test:integration -- <file>` run Vitest once with a file filter. `npm run package:local` creates an unpacked host application. On Windows, `npm run package:win` creates unsigned x64 installer and portable artifacts in `release/`.
+`npm run test:desktop -- tests/desktop/startup.test.ts` builds and launches the packaged application for the current host. Unit and integration scripts accept file filters. `npm run package:local` creates an unpacked host application. On Windows, `npm run package:win` creates unsigned x64 installer and portable artifacts in `release/`.
 
-See [runtime decisions](docs/decisions/runtime.md), [the desktop contract](docs/contracts/desktop.md), [acceptance evidence](docs/evidence/index.md), and [known limitations](docs/operations/known-limitations-tr.md). Phase 1 Windows smoke passed. Later Windows checks and real-source acceptance remain open in the [release record](docs/evidence/release-acceptance.md).
+Inspect `package.json` for the current commands and locked dependencies. Optional SQL, private-package, performance and Windows tests require their documented environments; report skips separately. Local tests cannot pass another platform's acceptance gates.
 
-## Reading order
+## Read the applicable contract
 
 | Document | Purpose |
 | --- | --- |
-| [Foundation specification](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-design.md) | Approved product scope, architecture and D01–D20 constraints |
-| [Database audit](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md) | Historical source observations, uncertainty and required revalidation |
-| [Release acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md) | Required evidence for A01–A07 and the later L01 live gate |
-| [Phased implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md) | Eleven phases with dependencies, tasks, verification and completion criteria; no delivery schedule or effort estimates |
+| [Agent instructions](AGENTS.md) | Scope, source safety, implementation and handoff rules |
+| [Foundation specification](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-design.md) | Approved architecture and D01–D20 constraints |
+| [Historical database audit](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md) | Original source observations and their limits |
+| [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md) | A01–A07 and later L01 proof requirements |
+| [Original implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md) | Phase dependencies and verification contracts |
+| [Recorded-source estimates](docs/contracts/recorded-estimates.md) | Current unverified contribution capability and exclusions |
+| [Monthly product profit](docs/contracts/monthly-product-profit.md) | Covered financial gross-profit reporting contract |
+| [Expense contract](docs/contracts/expense-completeness.md) | Import, manual entry, provenance and completeness |
+| [Runtime decisions](docs/decisions/runtime.md) | Runtime and packaging choices |
+| [Known limitations](docs/operations/known-limitations-tr.md) | Turkish explanation of current limits |
 
-The three foundation documents remain authoritative. The plan organizes their delivery. Phases 1–10 cover the first release; Phase 11 is conditional live integration.
+The foundation documents govern requirements. Later approved contracts describe bounded extensions. Original planning status and phase stop instructions are historical; use current source, tracker records and build-specific evidence for present work.
 
-## Approval and current state
+## Product boundaries
 
-Synthetic implementation for phases 1 to 10 is on `main`, together with the isolated live preview from [PR #30](https://github.com/AlesSystems/esmer-market-analytics/pull/30). Issues [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14) and [#26](https://github.com/AlesSystems/esmer-market-analytics/issues/26) stay open. First-release acceptance is blocked. The [evidence index](docs/evidence/index.md) separates that present status from older phase records.
+- Turkish UI, English internal identifiers and TRY only. One store and one owner, with no login or required paid cloud service.
+- Source access is permanently read-only. Dashboards read the local analytics store.
+- Historical last-purchase cost is an estimate. Missing costs, incomplete expenses and unknown tax treatment stay explicit. Source assumptions cannot become verified profit through arithmetic reconciliation or owner acknowledgement.
+- Source refreshes preserve expenses, settings, adjustments and accepted reports. Failed imports preserve the last valid dataset.
+- Keep source backups, credentials, identifying customer records, employee-level payroll and legacy runtime code out of Git and release artifacts.
 
-Renewed source inspection keeps its separate authorization gate. Production integration requires Eralp's acceptance, explicit permission for the specific source, and separate rollout direction.
-
-The commands above are the current verification set. The evidence index records which checks passed on which host. A passing local test does not close a Windows or real-source gate.
-
-## Essential product boundaries
-
-- Turkish UI, English internal identifiers and TRY only; one store and one owner.
-- Source access is permanently read-only. The offline first release imports prepared data and reads its local analytics store.
-- Historical last-purchase cost is an estimate after source semantics are validated. Missing costs and incomplete expenses remain explicit; they never become zero or verified profit.
-- Expense imports, corrections and accepted reports survive source refreshes. Excel export and independently recoverable encrypted backups are required.
-- Do not commit identifiable customer records, employee-level payroll, source backups, credentials, legacy databases, or copied legacy runtime code and migrations.
-
-Read the full specification and acceptance checklist before making implementation decisions.
+Renewed source inspection requires authorization for an isolated copy. Owner contact, installation and production integration keep their separate boundaries.
 
 ## Document provenance
 
-The three specification filenames retain their original record date. They were transferred from the separate `EsmerMarketAccounting` legacy repository. The implementation plan was transferred from the approved planning task's deliverable. Only approval status, repository context and links were updated; audit observations and application requirements were retained.
-
-The original documents and legacy checkout remain separate. The audit is a historical summary, not a new database inspection or evidence that application acceptance passed. No legacy Git history was imported.
-
-## Contribution and evidence
-
-Use small, coherent Conventional Commits and link each implementation PR to its plan task and relevant acceptance gate or decision. Test financial behaviour against independently checked expectations before implementation, then record focused verification and unresolved limitations. Higher-risk changes require the evidence defined in the acceptance checklist.
-
-Keep private source evidence outside Git and reference it by an opaque identity. PRs must explain the change and risk, list verification, include UI evidence when relevant, and state schema, security, privacy and deployment impacts. Do not mark a gate complete without its required evidence.
+The three foundation filenames retain their original dates. Their approved requirements and historical audit observations were transferred from the separate legacy repository. No legacy Git history or runtime code was imported. Later evidence records identify the tested commits and remaining gates; they do not retroactively validate the original audit.
