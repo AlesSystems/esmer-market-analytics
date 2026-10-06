@@ -14,7 +14,9 @@ test("selected return month shows pinned daily amounts, original cost and comple
   records.documents.find(row => row.id === "A1")!.date = "2025-08-31";
   const store = openStore(join(root, "analytics.sqlite"));
   try { expect(store.importPackage(businessPackage(records, { coverage: { from: "2025-08-31", to: "2025-09-30", complete: true } })).status).toBe("active"); } finally { store.close(); }
-  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
+  const reviewDirectory = process.env.ESMER_S02_REVIEW;
+  if (reviewDirectory) test.setTimeout(90_000);
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`], ...(reviewDirectory ? { recordVideo: { dir: reviewDirectory } } : {}) });
   try {
     const page = await app.firstWindow();
     await page.getByRole("button", { name: "Çay", exact: true }).click();
@@ -23,14 +25,19 @@ test("selected return month shows pinned daily amounts, original cost and comple
     await expect(detail).toContainText("-60,00 ₺");
     await expect(detail).toContainText("-40,00 ₺");
     await expect(detail).toContainText("Hesaplanamıyor");
+    if (reviewDirectory) { await detail.scrollIntoViewIfNeeded(); await page.screenshot({ path: `${reviewDirectory}/selected-summary.png` }); await page.waitForTimeout(6000); }
     await page.getByText("Seçili ürünün günlük tutarları", { exact: true }).click();
     await expect(page.getByRole("table", { name: "Seçili ürünün günlük tutarları", exact: true }).locator("tbody tr")).toHaveCount(30);
+    if (reviewDirectory) { await page.getByRole("table", { name: "Seçili ürünün günlük tutarları", exact: true }).screenshot({ path: `${reviewDirectory}/daily.png` }); await page.waitForTimeout(6000); }
+    await page.getByText("Seçili ürünün günlük tutarları", { exact: true }).click();
     await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click();
     const original = page.getByRole("region", { name: "Asıl satış kanıtı", exact: true });
     await expect(original).toContainText("31.08.2025");
     await expect(original).toContainText("60,00 ₺");
     await expect(original).toContainText("Seçili ayın toplamına eklenmez");
+    await original.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath("original-sale.png") });
+    if (reviewDirectory) { await page.screenshot({ path: `${reviewDirectory}/original-sale.png` }); await page.waitForTimeout(6000); }
     await page.getByRole("button", { name: "İadeye dön", exact: true }).click();
     await expect(page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true })).toBeFocused();
     await page.getByLabel("Ürün ara", { exact: true }).fill("İçme");
@@ -38,8 +45,22 @@ test("selected return month shows pinned daily amounts, original cost and comple
     await app.evaluate(({ dialog }, filePath) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath }); }, output);
     await page.getByRole("button", { name: "Seçili ürünü Excel'e aktar", exact: true }).click();
     await expect(detail).toContainText("Seçili ürün dosyası kaydedildi");
-    const sheets = await readSheet(output, { sheet: 1 });
+    if (reviewDirectory) { await detail.scrollIntoViewIfNeeded(); await page.screenshot({ path: `${reviewDirectory}/product-export.png` }); await page.waitForTimeout(6000); }
+    const sheets = await readSheet(output, 1);
     expect(JSON.stringify(sheets)).toContain("-40");
+    const report = await page.evaluate(() => window.esmer.openMonthly({ period: "2025-09" }));
+    if (report.status !== "monthly") throw new Error("Expected monthly report");
+    const monthlyPath = join(root, "monthly.xlsx");
+    await app.evaluate(({ dialog }, filePath) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath }); }, monthlyPath);
+    expect(await page.evaluate(reportId => window.esmer.exportReportVersion({ reportId }), report.report.id)).toEqual({ status: "saved" });
+    const monthly = await readSheet(monthlyPath, 1);
+    expect(monthly.find(row => row[0] === "Kapsanan tahmini brüt kâr")?.[1]).toBe(-20);
+    if (reviewDirectory) {
+      await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+      await page.getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
+      await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
+      await page.screenshot({ path: `${reviewDirectory}/monthly-export.png` }); await page.waitForTimeout(6000);
+    }
     await page.screenshot({ path: testInfo.outputPath("selected-summary.png"), fullPage: true });
   } finally { await app.close(); await rm(root, { recursive: true, force: true }); }
 });

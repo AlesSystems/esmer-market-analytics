@@ -65,6 +65,76 @@ test("independent artifact and exported key recover financial history and every 
   }
 });
 
+test("encrypted recovery preserves accepted cross-month product proof and every product Excel sheet after source replacement and profile loss", async () => {
+  const { businessPackage, productProfitRecords } = await import("../helpers/business-fixtures");
+  const { excelProductReport } = await import("../../src/reports/export");
+  const root = await mkdtemp(join(tmpdir(), "esmer-product-proof-recovery-"));
+  const original = join(root, "original"), fresh = join(root, "fresh"), destination = join(root, "retained-backups");
+  await Promise.all([mkdir(original), mkdir(fresh), mkdir(destination)]);
+  const originalPath = join(original, "analytics.sqlite"), restoredPath = join(fresh, "analytics.sqlite");
+  const key = generateRecoveryKey(), keyPath = join(root, "retained-key.esmerkey");
+  await writeFile(keyPath, encodeRecoveryKey(key), { mode: 0o600 });
+  let recovery: Recovery | undefined;
+  try {
+    recovery = await Recovery.open(originalPath, { destination, key });
+    const store = recovery.store!;
+    await populateRecoveryStore(store);
+    const records = productProfitRecords(false);
+    records.documents.find(row => row.id === "A1")!.date = "2025-08-31";
+    const coverage = { from: "2025-08-31", to: "2025-09-30", complete: true };
+    expect(store.importPackage(businessPackage(records, { extractionId: "product-original", coverage })).status).toBe("active");
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly") throw new Error("Expected product monthly report");
+    const previousAcceptedId = versions.list({ period: "2025-09" }).reports[0].id;
+    const accepted = versions.accept({ candidateId: opened.report.id, previousAcceptedId, reason: "Sentetik aylar arası iade kanıtı" });
+    if (accepted.status !== "monthly") throw new Error("Expected accepted report");
+    const productRequest = { reportId: accepted.report.id, productId: "A" };
+    const dependencyRequest = { ...productRequest, returnLineId: "A2", offset: 0 };
+    const detailBefore = versions.product(productRequest), dependencyBefore = versions.productDependency(dependencyRequest);
+    expect(detailBefore).toMatchObject({ status: "product", summary: { netSales: "-100", coveredCost: "-60", coveredGrossProfit: "-40", coveredMarginPercent: null, quantities: [{ unit: "piece", sold: "0", returned: "1", net: "-1" }] } });
+    if (detailBefore.status !== "product") throw new Error("Expected product detail");
+    expect(detailBefore.daily.find(day => day.date === "2025-09-02")).toMatchObject({ netSales: "-100", coveredCost: "-60", coveredGrossProfit: "-40", trend: "-40" });
+    expect(dependencyBefore).toMatchObject({ status: "product-dependency", originalLineId: "A1", document: { id: "A1", date: "2025-08-31" }, original: { id: "A1", business: { historicalCost: { unitCost: "60" } } }, returnOutcome: { lineId: "A2", cost: "-60" } });
+    const workbookBefore = await readAll(await excelProductReport(accepted.report, "A"));
+    expect(workbookBefore.length).toBeGreaterThan(1);
+    expect(workbookBefore.flatMap(sheet => sheet.data.flat())).toContain("A1");
+
+    const replacement = structuredClone(records);
+    for (const line of replacement.lines.filter(row => row.sales?.productId === "A")) line.business!.historicalCost!.unitCost = "99";
+    expect(store.importPackage(businessPackage(replacement, { extractionId: "product-corrected", coverage })).status).toBe("active");
+    const newer = versions.open({ period: "2025-09" });
+    if (newer.status !== "monthly") throw new Error("Expected corrected candidate");
+    expect(versions.product({ reportId: newer.report.id, productId: "A" })).toMatchObject({ status: "product", summary: { coveredCost: "-99", coveredGrossProfit: "-1" } });
+    expect(versions.product(productRequest)).toEqual(detailBefore);
+    expect(versions.productDependency(dependencyRequest)).toEqual(dependencyBefore);
+    expect(await readAll(await excelProductReport(versions.selected(accepted.report.id), "A"))).toEqual(workbookBefore);
+    const before = financialRecords(originalPath);
+    const status = await recovery.backupNow();
+    expect(status.state).toBe("ready");
+    const latest = [...status.backups].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+    const artifact = join(destination, `${latest.id}.esmerbackup`);
+    await recovery.close(); recovery = undefined;
+    await rm(original, { recursive: true });
+    key.fill(0);
+
+    recovery = await Recovery.open(restoredPath);
+    const preview = await recovery.prepareRestore(artifact, decodeRecoveryKey(await readFile(keyPath)));
+    expect(preview.reports).toBe(2);
+    expect(recovery.store!.availability()).toMatchObject({ store: "empty" });
+    await recovery.confirmRestore(preview.token);
+    expect(financialRecords(restoredPath)).toEqual(before);
+    const restoredVersions = new ReportVersions(recovery.store!, new SalesReports(recovery.store!));
+    expect(restoredVersions.selected(accepted.report.id)).toEqual(accepted.report);
+    expect(restoredVersions.product(productRequest)).toEqual(detailBefore);
+    expect(restoredVersions.productDependency(dependencyRequest)).toEqual(dependencyBefore);
+    expect(await readAll(await excelProductReport(restoredVersions.selected(accepted.report.id), "A"))).toEqual(workbookBefore);
+  } finally {
+    await recovery?.close();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("deep validation rejects a v2 accepted report whose pinned unit cost is altered", async () => {
   const { businessPackage } = await import("../helpers/business-fixtures");
   const { openStore } = await import("../../src/store/store");
