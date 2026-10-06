@@ -21,12 +21,17 @@ test("report history failure has retry, while a successful empty history explain
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();
+  await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
   await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toHaveCount(0);
   const restored=new DatabaseSync(database);restored.exec("ALTER TABLE report_versions_unavailable RENAME TO report_versions");restored.close();
   await page.getByRole("button",{name:"Raporları yeniden yükle"}).click();
   await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toBeVisible();
   await expect(page.getByText("Doğrulanmış satış verisi henüz hazır değil.",{exact:false})).toBeVisible();
   await expect(page.getByRole("main")).toHaveCount(1);
+  const failedAgain=new DatabaseSync(database);failedAgain.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");failedAgain.close();
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
+  await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
+  const repaired=new DatabaseSync(database);repaired.exec("ALTER TABLE report_versions_unavailable RENAME TO report_versions");repaired.close();await page.getByRole("button",{name:"Raporları yeniden yükle"}).click();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
