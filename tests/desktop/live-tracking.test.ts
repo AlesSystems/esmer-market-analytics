@@ -9,7 +9,7 @@ import {openSettings} from "../helpers/desktop-navigation";
 
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 
-test("packaged tracking retains selected period, filters and document across source captures",async()=>{
+test("packaged tracking retains month and filters while requiring fresh document selection across captures",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"live-tracking-")),database=join(userData,"analytics.sqlite");
  const snapshot=rawSnapshot();snapshot.to="2025-11-12";
  const seed=openStore(database),first=seed.importSourcePreview(writeRawPackage(snapshot,"fixture:tracking","capture-1"));seed.close();
@@ -33,6 +33,9 @@ test("packaged tracking retains selected period, filters and document across sou
   await expect(page.getByLabel("Dönem",{exact:true})).toBeVisible();
   await expect(page.getByText("fixture:tracking · Paket: capture-2",{exact:false})).toHaveCount(1);
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
+  await expect(page.getByText("Kaynak sürümü değişti. Eski belge detayı kapatıldı; kayıt kimlikleri yeni kaynakta yeniden seçilmelidir.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
+  await page.getByRole("button",{name:"1",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("3");
@@ -45,25 +48,35 @@ test("packaged tracking retains selected period, filters and document across sou
   const corrected={...snapshot,headers:[{...snapshot.headers[0],GENELTOPLAM:"456.00"}]};
   await importCapture(writeRawPackage(corrected,"fixture:tracking","capture-3"),"capture-3");
   await expect(page.getByText("fixture:tracking · Paket: capture-3",{exact:false})).toHaveCount(1);
+  await expect(page.getByText("Kaynak sürümü değişti. Eski belge detayı kapatıldı; kayıt kimlikleri yeni kaynakta yeniden seçilmelidir.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
+  await page.getByRole("button",{name:"1",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();
   const recordedAmount=page.locator(".source-document-summary dl>div").filter({has:page.getByText("Kaynak belge tutarı · doğrulanmadı",{exact:true})}).locator("dd");
   await expect(recordedAmount.getByText("456",{exact:true})).toBeVisible();
+  await page.getByRole("region",{name:"Kaynak belge ayrıntıları",exact:true}).getByText("Veri ve hesaplama ayrıntıları",{exact:true}).click();
   await page.getByRole("checkbox",{name:"Tam kaynak değerlerini göster",exact:true}).check();
   await expect(recordedAmount.getByText("456.00",{exact:true})).toBeVisible();
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
   await importCapture(writeRawPackage({...snapshot,headers:[],lines:[]},"fixture:tracking","capture-4"),"capture-4");
-  await expect(page.getByRole("alert")).toContainText("Belge seçili kaynak kapsamında bulunamadı.");
+  await expect(page.getByText("Kaynak sürümü değişti. Eski belge detayı kapatıldı; kayıt kimlikleri yeni kaynakta yeniden seçilmelidir.",{exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
-  await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
+  await expect(page.getByRole("button",{name:"1",exact:true})).toHaveCount(0);
+  await expect(recordedAmount).toHaveCount(0);
+  await expect(page.getByText("Eşleşen kayıt yok",{exact:true})).toHaveCount(2);
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("3");
   await importCapture(writeRawPackage({...snapshot,databaseId:"00000000-0000-4000-8000-000000000002"},"fixture:tracking","capture-5"),"capture-5");
   await expect(page.getByText("fixture:tracking · Paket: capture-5",{exact:false})).toHaveCount(1);
   await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
-  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-11");
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-10");
+  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
+  await expect(recordedAmount).toHaveCount(0);
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();
   await expect(page.getByLabel("Ürün kayıt ID’si",{exact:true})).toHaveValue("");
+  await expect(page.getByLabel("Belge türü (kaynak kodu)",{exact:true})).toHaveValue("");
+  await expect(page.getByRole("button",{name:"1",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toHaveCount(0);
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
