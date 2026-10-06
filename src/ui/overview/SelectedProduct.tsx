@@ -79,7 +79,7 @@ export function ProductDependency({ reportId, productId, returnLineId, onClose, 
   }, [reportId, productId, returnLineId, offset, attempt,active]);
   useEffect(() => { if (active && (page || error) && heading.current?.getClientRects().length) heading.current.focus(); }, [page, error,active]);
   const originalCost = page?.original.business?.historicalCost;
-  return <section className="block" aria-label="Asıl satış kanıtı"><h3 ref={heading} tabIndex={-1}>Asıl satış kanıtı</h3><Button variant="outline" onClick={onClose}>İadeye dön</Button>
+  return <section aria-label="Asıl satış kanıtı"><h3 ref={heading} tabIndex={-1}>Asıl satış kanıtı</h3><Button variant="outline" onClick={onClose}>İadeye dön</Button>
     <p>Seçili ayın toplamına eklenmez. Bu kayıtlar raporun saklanan kanıtıdır; yeniden hesaplanmış satış sonucu değildir.</p>
     {error ? <div role="alert" className="notice warning">{error}<Button variant="outline" onClick={() => setAttempt(value => value + 1)}>Asıl satış kanıtını yeniden yükle</Button></div> : !page ? <p role="status">Asıl satış kanıtı yükleniyor…</p> : <>
       <p>Asıl belge: {page.document.id} · {date(page.document.date)} · Asıl satır: {page.original.id}</p>
