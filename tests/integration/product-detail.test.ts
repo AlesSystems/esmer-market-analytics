@@ -199,3 +199,19 @@ test("legacy, unsupported and incomplete saved detail remains unavailable", asyn
     expect(reportProduct(missingLine, "water")).toMatchObject({ status: "unavailable", code: "MISSING_STORED_FACTS" });
   } finally { store.close(); }
 });
+
+
+test("report-bound product export matches the immutable artifact without exposing it", async () => {
+  const { excelProductReport } = await import("../../src/reports/export");
+  const { default: readAll } = await import("read-excel-file/node");
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const versions = new ReportVersions(store, new SalesReports(store));
+    const opened = versions.open({ period: "2025-09" });
+    if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2");
+    const productId = opened.report.productProfit.products[0].productId;
+    expect(await readAll(await versions.exportProduct({ reportId: opened.report.id, productId }))).toEqual(await readAll(await excelProductReport(opened.report, productId)));
+    expect(versions.selected(opened.report.id)).toEqual(opened.report);
+  } finally { store.close(); }
+});
