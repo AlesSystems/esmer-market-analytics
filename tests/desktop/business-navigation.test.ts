@@ -117,3 +117,16 @@ test("failed product highlights are a recoverable error rather than an empty mon
   await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();await expect(page.getByText("Ürün öne çıkanları okunamadı.",{exact:true})).toBeVisible();await page.getByRole("button",{name:"Satışlar listesine git",exact:true}).click();await expect(page.getByRole("region",{name:"Ürün katkıları",exact:true}).getByRole("button",{name:"İçme suyu",exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
+
+test("recorded month failure remains visible during a protected retry and page changes", async () => {
+ const {rawSnapshot}=await import("../helpers/raw-fixture"),{writeRawPackage}=await import("../../src/source/raw-package");const userData=await mkdtemp(join(tmpdir(),"esmer-source-retry-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:retry","batch-1"));}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  await app.evaluate(({ipcMain})=>{const registry=ipcMain as unknown as {_invokeHandlers:Map<string,(event:unknown,operation:string,payload:unknown)=>unknown>},original=registry._invokeHandlers.get("esmer:request")!;let attempts=0;ipcMain.removeHandler("esmer:request");ipcMain.handle("esmer:request",(event,operation,payload)=>{if(operation==="querySourceWorkspace"&&(payload as {period?:string}).period==="2024-01"){const failure={status:"source-unavailable",code:"SERVICE_UNAVAILABLE",message:"Sentetik korunacak dönem hatası"};if(++attempts===1)return failure;return new Promise(resolve=>Reflect.set(globalThis,"releaseSourceRetry",()=>resolve(failure)));}return original(event,operation,payload);});});
+  await page.getByLabel("Dönem",{exact:true}).fill("2024-01");const retry=page.getByRole("button",{name:"Kaynağı yeniden aç",exact:true});await expect(retry).toBeVisible();await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(retry).toBeVisible();
+  await page.getByRole("button",{name:"Gider ekle",exact:true}).click();await page.getByLabel("Kategori",{exact:true}).fill("Sentetik taslak");await retry.click();await page.getByRole("button",{name:"Düzenlemeye devam et",exact:true}).click();await expect(page.getByLabel("Kategori",{exact:true})).toHaveValue("Sentetik taslak");
+  await retry.click();await page.getByRole("button",{name:"Bilgileri bırak",exact:true}).click();await expect(page.getByText("Kaynak kayıtları yükleniyor…",{exact:true})).toBeVisible();expect(await retry.isVisible()).toBe(true);await expect(page.getByRole("alert")).toContainText("Sentetik korunacak dönem hatası");
+  await app.evaluate(()=>{Reflect.get(globalThis,"releaseSourceRetry")?.();Reflect.deleteProperty(globalThis,"releaseSourceRetry");});await expect(page.getByText("Kaynak kayıtları yükleniyor…",{exact:true})).toHaveCount(0);await expect(retry).toBeVisible();
+ } finally {await app.evaluate(()=>Reflect.get(globalThis,"releaseSourceRetry")?.()).catch(()=>{});await app.close();await rm(userData,{recursive:true,force:true});}
+});
