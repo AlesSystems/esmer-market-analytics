@@ -1,3 +1,4 @@
+import { excelProductReport } from "./export";
 import { reportProduct, reportProductDependency } from "./product-detail";
 import { canonical } from "../source/package";
 import { Exact } from "../domain/money";
@@ -57,6 +58,9 @@ export class ReportVersions {
   }
   purchasing({ reportId }: { reportId: string }) {
     return { status: "purchasing" as const, view: structuredClone(this.resolve(reportId).purchasing) };
+  }
+  exportProduct({ reportId, productId }: { reportId: string; productId: string }) {
+    return excelProductReport(this.resolve(reportId), productId);
   }
   protectedDatasetIds(): string[] { return this.candidate ? [this.candidate.context.datasetId] : []; }
   selected(reportId: string): MonthlyReport {

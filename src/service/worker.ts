@@ -15,7 +15,7 @@ import { Recovery } from "../recovery/backup";
 import { recoveryFailure, recoveryOperations, type RecoveryServiceRequest } from "../recovery/contracts";
 import { ReportVersions } from "../reports/versions";
 import { displayResult } from "../reports/display";
-import { excelReport, excelProductReport } from "../reports/export";
+import { excelReport } from "../reports/export";
 import type { OperationControl } from "../reports/contracts";
 import { Expenses } from "../expenses/import";
 import { monthlyOperations, validMonthlyRequest, validReportRequest, validExpenseRequest } from "../desktop/requests";
@@ -219,7 +219,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "readReportProductDependency") result = versions!.productDependency(request.payload);
     else if (request.operation === "exportReportProduct") {
       const detail = versions!.product(request.payload);
-      result = detail.status === "unavailable" ? detail : { status: "export", bytes: await excelProductReport(versions!.selected(request.payload.reportId), request.payload.productId) };
+      result = detail.status === "unavailable" ? detail : { status: "export", bytes: await versions!.exportProduct(request.payload) };
     }
     else if (request.operation === "readReportProducts") result = versions!.products(request.payload);
     else if (request.operation === "readReportPurchasing") result = versions!.purchasing(request.payload);
