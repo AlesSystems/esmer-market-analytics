@@ -1,0 +1,180 @@
+{
+  "label": "candidate",
+  "measuredAt": "2026-10-06T09:40:03.883Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.15.0",
+  "sha": "28461fc1585ef63f1c29e46ec08f6b1c5ed31f07",
+  "executableHash": "588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8",
+  "asarHash": "1861ac006eef16efa713e62cd5831ed3a08fdfe0c511882d5eb81f2aedb892f8",
+  "fixture": {
+    "kind": "synthetic-business",
+    "products": 205,
+    "documents": 205,
+    "lines": 205,
+    "bytes": 132606,
+    "hash": "d08b243debe3d7f19d9d807cefa92846a8f1654f413f2adb39f8ea5311f2da73",
+    "expectedNetSales": "2050",
+    "expectedCost": "1230",
+    "expectedProfit": "820"
+  },
+  "samples": [
+    {
+      "index": 0,
+      "launchMonthReadyMs": 421.606084,
+      "selectionMs": 62.62950000000001,
+      "pagingMs": 53.1115420000001,
+      "freshMonthlyServiceMs": 16.778790999999956,
+      "exportMs": 61.620583000000124,
+      "exportBytes": 119143,
+      "exported": {
+        "status": "saved"
+      },
+      "capabilities": {
+        "readReportProduct": "function",
+        "exportReportProduct": "function"
+      },
+      "processes": [
+        {
+          "pid": 18180,
+          "type": "Browser",
+          "name": null,
+          "workingSetSizeKiB": 285456,
+          "peakWorkingSetSizeKiB": 558816,
+          "rssKiB": 285568
+        },
+        {
+          "pid": 18181,
+          "type": "GPU",
+          "name": null,
+          "workingSetSizeKiB": 255360,
+          "peakWorkingSetSizeKiB": 398432,
+          "rssKiB": 255360
+        },
+        {
+          "pid": 18182,
+          "type": "Utility",
+          "name": "Network Service",
+          "workingSetSizeKiB": 49520,
+          "peakWorkingSetSizeKiB": 49520,
+          "rssKiB": 49520
+        },
+        {
+          "pid": 18184,
+          "type": "Tab",
+          "name": null,
+          "workingSetSizeKiB": 226784,
+          "peakWorkingSetSizeKiB": 226784,
+          "rssKiB": 226784
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "launchMonthReadyMs": 413.22174999999993,
+      "selectionMs": 59.38545799999997,
+      "pagingMs": 37.50770899999998,
+      "freshMonthlyServiceMs": 17.366040999999996,
+      "exportMs": 63.117249999999785,
+      "exportBytes": 119147,
+      "exported": {
+        "status": "saved"
+      },
+      "capabilities": {
+        "readReportProduct": "function",
+        "exportReportProduct": "function"
+      },
+      "processes": [
+        {
+          "pid": 18209,
+          "type": "Browser",
+          "name": null,
+          "workingSetSizeKiB": 281072,
+          "peakWorkingSetSizeKiB": 287024,
+          "rssKiB": 281136
+        },
+        {
+          "pid": 18210,
+          "type": "GPU",
+          "name": null,
+          "workingSetSizeKiB": 100064,
+          "peakWorkingSetSizeKiB": 100256,
+          "rssKiB": 100064
+        },
+        {
+          "pid": 18211,
+          "type": "Utility",
+          "name": "Network Service",
+          "workingSetSizeKiB": 49184,
+          "peakWorkingSetSizeKiB": 49184,
+          "rssKiB": 49184
+        },
+        {
+          "pid": 18213,
+          "type": "Tab",
+          "name": null,
+          "workingSetSizeKiB": 188208,
+          "peakWorkingSetSizeKiB": 188208,
+          "rssKiB": 188208
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "launchMonthReadyMs": 417.11012500000015,
+      "selectionMs": 55.60525000000007,
+      "pagingMs": 33.56408300000021,
+      "freshMonthlyServiceMs": 18.6372080000001,
+      "exportMs": 63.03949999999986,
+      "exportBytes": 119139,
+      "exported": {
+        "status": "saved"
+      },
+      "capabilities": {
+        "readReportProduct": "function",
+        "exportReportProduct": "function"
+      },
+      "processes": [
+        {
+          "pid": 18238,
+          "type": "Browser",
+          "name": null,
+          "workingSetSizeKiB": 281344,
+          "peakWorkingSetSizeKiB": 287760,
+          "rssKiB": 281520
+        },
+        {
+          "pid": 18239,
+          "type": "GPU",
+          "name": null,
+          "workingSetSizeKiB": 100992,
+          "peakWorkingSetSizeKiB": 101168,
+          "rssKiB": 100992
+        },
+        {
+          "pid": 18240,
+          "type": "Utility",
+          "name": "Network Service",
+          "workingSetSizeKiB": 49216,
+          "peakWorkingSetSizeKiB": 49216,
+          "rssKiB": 49216
+        },
+        {
+          "pid": 18242,
+          "type": "Tab",
+          "name": null,
+          "workingSetSizeKiB": 185728,
+          "peakWorkingSetSizeKiB": 185728,
+          "rssKiB": 185728
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "macOS only; Windows deliberately skipped",
+    "3 fresh processes with clean profiles; OS cache and concurrent build activity uncontrolled",
+    "205 products unless argument overrides; not full real population",
+    "Native save dialog mocked to a local disposable output; export still writes XLSX",
+    "RSS snapshots after export; not sampled peak service memory"
+  ]
+}
