@@ -50,7 +50,7 @@ export function PurchasingWorkspace({ context, saved, active = true, onParentBac
     const close = (event: KeyboardEvent) => { if (event.key === "Escape" && title.current?.getClientRects().length) { returnEvidence(); } };
     window.addEventListener("keydown", close); return () => window.removeEventListener("keydown", close);
   }, [documentId,active]);
-  useEffect(()=>{if(active&&documentId)onParentBack?.(returnEvidence);},[active,documentId,onParentBack]);
+  useEffect(()=>{if(!active||!documentId)return;onParentBack?.(returnEvidence);return()=>onParentBack?.(null);},[active,documentId,onParentBack]);
   const source = (id: string, linked = false) => <Button variant="link" className="source-link" data-focus-key={`purchase-evidence-${context.sessionId}-${id}`} onClick={event => { if(linked&&documentId)parents.current.push({context:{...context},documentId,receipt:captureReturn(event.currentTarget)});else{parents.current=[];opener.current=event.currentTarget;receipt.current=captureReturn(event.currentTarget);}setDocumentId(id); }}>{id}</Button>;
   if (error) return <div className="notice warning" role="alert"><span>{error}</span><Button variant="outline" onClick={() => setAttempt(attempt + 1)}>Yeniden dene</Button></div>;
   if (!view) return <p role="status">Maliyet ve alış raporu yükleniyor…</p>;
