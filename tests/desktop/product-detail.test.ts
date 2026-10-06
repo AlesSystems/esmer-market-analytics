@@ -34,6 +34,8 @@ test("selected return month shows pinned daily amounts, original cost and comple
     const original = page.getByRole("region", { name: "Asıl satış kanıtı", exact: true });
     await expect(original).toContainText("31.08.2025");
     await expect(original).toContainText("60,00 ₺");
+    await expect(original).toContainText("Kaydedilen asıl miktar: 2 adet");
+    await expect(original).toContainText("60,00 ₺ / adet · KDV hariç");
     await expect(original).toContainText("Seçili ayın toplamına eklenmez");
     await original.scrollIntoViewIfNeeded();
     await page.screenshot({ path: testInfo.outputPath("original-sale.png") });
@@ -57,10 +59,38 @@ test("selected return month shows pinned daily amounts, original cost and comple
     expect(monthly.find(row => row[0] === "Kapsanan tahmini brüt kâr")?.[1]).toBe(-20);
     if (reviewDirectory) {
       await page.getByRole("button", { name: "Raporlar", exact: true }).click();
-      await page.getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
+      await page.getByRole("button", { name: "Aday raporu aç", exact: true }).click();
+      await page.getByRole("region", { name: "Seçili rapor", exact: true }).getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
       await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
       await page.screenshot({ path: `${reviewDirectory}/monthly-export.png` }); await page.waitForTimeout(6000);
     }
     await page.screenshot({ path: testInfo.outputPath("selected-summary.png"), fullPage: true });
+  } finally { await app.close(); await rm(root, { recursive: true, force: true }); }
+});
+
+test("original-sale evidence preserves mixed and unknown quantity units and cost basis", async () => {
+  const root = await mkdtemp(join(tmpdir(), "esmer-original-units-"));
+  const records = productProfitRecords();
+  const original = records.lines.find(row => row.id === "A1")!;
+  records.documents.find(row => row.id === "A1")!.date = "2025-08-31";
+  original.sales!.unit = "unknown";
+  original.business!.historicalCost!.unit = "unknown";
+  original.business!.historicalCost!.taxBasis = "unknown";
+  for (const [id, unit, quantity] of [["kg-sibling", "kg", "1.25"], ["piece-sibling", "piece", "3"]] as const) {
+    records.lines.push({ ...structuredClone(original), id, quantity, net: "0", sales: { ...original.sales!, productId: id, productName: id, unit, unitNet: "0", tax: "0", gross: "0" }, business: { historicalCost: null, inventory: null } });
+  }
+  const store = openStore(join(root, "analytics.sqlite"));
+  try { expect(store.importPackage(businessPackage(records, { coverage: { from: "2025-08-31", to: "2025-09-30", complete: true } })).status).toBe("active"); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
+  try {
+    const page = await app.firstWindow();
+    await page.getByRole("button", { name: "Çay", exact: true }).click();
+    await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click();
+    const evidence = page.getByRole("region", { name: "Asıl satış kanıtı", exact: true });
+    await expect(evidence).toContainText("Kaydedilen asıl miktar: 2 birim bilinmiyor");
+    await expect(evidence).toContainText("60,00 ₺ / birim bilinmiyor · KDV temeli bilinmiyor");
+    await expect(evidence.locator("article").filter({ hasText: "kg-sibling" })).toContainText("Kaydedilen miktar: 1,25 kg");
+    await expect(evidence.locator("article").filter({ hasText: "piece-sibling" })).toContainText("Kaydedilen miktar: 3 adet");
+    await expect(evidence).toContainText("Bu kaydın varlığı tek başına iade maliyetini doğrulamaz");
   } finally { await app.close(); await rm(root, { recursive: true, force: true }); }
 });
