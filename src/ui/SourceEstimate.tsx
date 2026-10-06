@@ -6,12 +6,12 @@ import {Input} from "./components/ui/input";
 import {Button} from "./components/ui/button";
 import {date,money,percent} from "./format";
 const amount=(value:string|null)=>value===null?"Bilinmiyor":money(value);
-export function SourceEstimate({hash,period,onProduct}:{hash:string;period:string;onProduct:(id:string)=>void}) {
+export function SourceEstimate({hash,period,onProduct,active=true}:{active?:boolean;hash:string;period:string;onProduct:(id:string)=>void}) {
  const frame=useContext(AppFrame);
  const [queryResult,setQueryResult]=useState<Awaited<ReturnType<typeof window.esmer.querySourceEstimate>>|null>(null),[offset,setOffset]=useState(0),[productId,setProductId]=useState<string|null>(null),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[loading,setLoading]=useState(true),[exporting,setExporting]=useState(false);
  const sequence=useRef(0);
  useEffect(()=>{setOffset(0);setProductId(null);setSearch("");setQueryResult(null);setMessage("");},[hash,period]);
- useEffect(()=>{const id=++sequence.current;setLoading(true);setQueryResult(null);setMessage("");window.esmer.querySourceEstimate({hash,period,view:"products",offset,productId}).then(value=>{if(id!==sequence.current)return;setQueryResult(value);}).catch(()=>{if(id===sequence.current)setMessage("Tahmin okunamadı.");}).finally(()=>{if(id===sequence.current)setLoading(false);});return()=>{++sequence.current;};},[hash,period,offset,productId]);
+ useEffect(()=>{if(!active)return;const id=++sequence.current;setLoading(true);setQueryResult(null);setMessage("");window.esmer.querySourceEstimate({hash,period,view:"products",offset,productId}).then(value=>{if(id!==sequence.current)return;setQueryResult(value);}).catch(()=>{if(id===sequence.current)setMessage("Tahmin okunamadı.");}).finally(()=>{if(id===sequence.current)setLoading(false);});return()=>{++sequence.current;};},[hash,period,offset,productId,active]);
  async function exportReport(){const id=sequence.current;setExporting(true);setMessage("");try{const value=await window.esmer.exportSourceEstimate({hash,period});if(id!==sequence.current)return;if(value.status==="saved")setMessage("Doğrulanmamış tahmin kaydedildi.");else if(value.status!=="cancelled")setMessage(value.message);}catch{if(id===sequence.current)setMessage("Tahmin dosyası kaydedilemedi.");}finally{setExporting(false);}}
  const result=queryResult?.status==="source-estimate"?queryResult:null;
  const recovery=queryResult?.status==="source-unavailable"&&queryResult.code==="ESTIMATE_UNAVAILABLE";

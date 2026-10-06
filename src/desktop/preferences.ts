@@ -1,3 +1,4 @@
+import {validSelectedMonth} from "../domain/month";
 import { join } from "node:path";
 import { atomicWriteFile } from "./atomic-file";
 import { readPackageFile } from "./package-file";
@@ -9,7 +10,7 @@ export function validPreferencesPatch(value: unknown): value is PreferencesPatch
   const patch = value as Record<string, unknown>, keys = Object.keys(patch);
   return keys.length > 0 && keys.every(key => key === "textSize" || key === "selectedMonth")
     && (!keys.includes("textSize") || typeof patch.textSize === "string" && Object.hasOwn(textSizes, patch.textSize))
-    && (!keys.includes("selectedMonth") || typeof patch.selectedMonth === "string" && /^(?:19|[2-9][0-9])[0-9]{2}-(?:0[1-9]|1[0-2])$/.test(patch.selectedMonth));
+    && (!keys.includes("selectedMonth") || validSelectedMonth(patch.selectedMonth));
 }
 export function validPreferences(value: unknown): value is Preferences {
   return validPreferencesPatch(value) && Object.hasOwn(value, "textSize");

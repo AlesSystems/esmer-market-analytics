@@ -1,3 +1,4 @@
+import {validSelectedMonth} from "../domain/month";
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
@@ -15,7 +16,7 @@ export const APP_URL = "esmer://app/index.html";
 function exact(value: unknown, fields: string[]): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join() === fields.sort().join();
 }
-const period = (value: unknown) => typeof value === "string" && /^(?:19[0-9]{2}|[2-9][0-9]{3})-(?:0[1-9]|1[0-2])$/.test(value) && value < "9999";
+const period = validSelectedMonth;
 export function validReportRequest(operation: string, value: unknown): boolean {
   if (operation === "queryPurchaseDocuments" || operation === "inspectPurchaseDocument") {
     if (!exact(value, operation === "queryPurchaseDocuments" ? ["context", "offset", "search"] : ["context", "offset", "documentId"])) return false;

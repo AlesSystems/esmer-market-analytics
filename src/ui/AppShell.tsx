@@ -18,7 +18,7 @@ export function AppShell({ destination, navigate, controls, children }: {
     <div className="sidebar">
       <div className="brand"><img src="/assets/esmer-market-logo.png" alt="Esmer Market" width="459" height="110" /></div>
       <div className="sidebar-controls">{controls}</div>
-      {navigate && <nav aria-label="Ana gezinme">{destinations.map(([id, label], index) => <Button type="button" variant="ghost" className="justify-start" key={id} aria-current={!away && destination === id ? "page" : undefined} onClick={() => { frame?.show("workspace"); if (!away || destination !== id) navigate(id); }}>
+      {navigate && <nav aria-label="Ana gezinme">{destinations.map(([id, label], index) => <Button type="button" variant="ghost" className="justify-start" key={id} aria-current={!away && destination === id ? "page" : undefined} onClick={() => { if(away){if(destination===id)frame?.show("workspace");else frame?.show("workspace",()=>navigate(id));}else navigate(id); }}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d={[
           "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
           "M3 20V4 M3 20h18 M7 16l4-6 4 3 6-9",

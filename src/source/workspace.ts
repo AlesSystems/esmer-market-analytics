@@ -1,3 +1,4 @@
+import {validSelectedMonth} from "../domain/month";
 import type {RawPackage} from "./raw-package";
 import type {SqlRow} from "./sql-server";
 export type SourceQuery = {hash:string|null;period:string|null;view:"overview"|"documents"|"products"|"detail";scope:"all"|"sales"|"purchasing";documentType:string|null;productId:string|null;documentId:string|null;offset:number};
@@ -12,7 +13,7 @@ export function validSourceQuery(value:unknown):value is SourceQuery {
  const v=value as Record<string,unknown>;
  return Object.keys(v).sort().join() === "documentId,documentType,hash,offset,period,productId,scope,view" &&
  (v.hash===null||typeof v.hash==="string"&&/^[a-f0-9]{64}$/.test(v.hash)) &&
- (v.period===null||typeof v.period==="string"&&/^(?:19|[2-9][0-9])[0-9]{2}-(?:0[1-9]|1[0-2])$/.test(v.period)) &&
+ (v.period===null||validSelectedMonth(v.period)) &&
  typeof v.view==="string" && ["overview","documents","products","detail"].includes(v.view) && typeof v.scope==="string" && ["all","sales","purchasing"].includes(v.scope) &&
  (v.documentType===null||id(v.documentType)) && (v.productId===null||id(v.productId)) &&
  (v.view==="detail" ? id(v.documentId) : v.documentId===null) &&

@@ -170,6 +170,7 @@ export function SettingsPage({ availability, source, view, onView, live, importi
           <div><dt>Kaynak yedeği</dt><dd>{source ? <>{date(source.from)}–{date(source.to)}<small>Kayıt sayıları; mali anlam doğrulanmadı</small></> : unread ?? "Henüz yok"}</dd></div>
         </dl>
         {unread && !source ? <p className="coverage-empty">Yerel veri durumu: {unread}</p> : <Coverage source={source} cutoff={dataset?.cutoff} />}
+        <p>Gerçek yedek görünümü, izole SQL yedeğindeki kayıtları gösterir; mali anlamlar doğrulanmış değildir. Korunan mali veri görünümü, kendi yerel veri sürümünden hesaplanan raporları gösterir. Sentetik örnekler gerçek market verisi değildir. Görünüm değişince seçili dönem korunur.</p>
         {onView && <div className="view-switch" role="group" aria-label="Görüntülenen veri">
           <button type="button" aria-pressed={view === "source"} onClick={() => onView("source")}>Gerçek yedek görünümü</button>
           <button type="button" aria-pressed={view === "financial"} onClick={() => onView("financial")}>Korunan mali veri görünümü</button>

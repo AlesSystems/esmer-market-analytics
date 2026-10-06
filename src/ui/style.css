@@ -328,3 +328,5 @@
   .manual-expense [aria-invalid="true"] { border-color: var(--red); }
   @media (max-width: 640px) { .manual-expense-fields { grid-template-columns: minmax(0, 1fr); } }
 }
+
+.sales-app .detail-panel.dedicated-detail{position:static;inset:auto;z-index:auto;max-height:none;overflow:visible;width:100%;max-width:none;border:0;box-shadow:none;padding:24px 0}
