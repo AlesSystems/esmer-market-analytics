@@ -34,11 +34,14 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
  const receipt=useRef<ReturnReceipt|null>(null),originQuery=useRef<SourceQuery|null>(null),returnPending=useRef(false);
  const visited=useRef(new Set<Destination>(["monthly"]));
  const savedFilters=useRef<Partial<Record<"overview"|"purchasing",SourceQuery>>>({});
+ const seenHash=useRef(source.hash),failedQuery=useRef<SourceQuery|null>(null);
  const sourceIdentity=useRef({lineage:source.lineage,databaseId:source.databaseId});
  const [sourceChangedNotice,setSourceChangedNotice]=useState(false);
  const [documentMissing,setDocumentMissing]=useState(false);
  const sequence=useRef(0),heading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>{
+  if(seenHash.current===source.hash)return;
+  seenHash.current=source.hash;failedQuery.current=null;
   ++sequence.current;
   const previous=sourceIdentity.current,sameSource=previous.lineage===source.lineage&&previous.databaseId===source.databaseId;
   sourceIdentity.current={lineage:source.lineage,databaseId:source.databaseId};
@@ -50,9 +53,9 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
   else{savedFilters.current={};setView(source);setQuery({...initialSourceQuery,hash:source.hash,period:source.period});setScreen("monthly");}
   setError("");setChanged(false);setDocumentMissing(false);
  },[source.hash]);
- useEffect(()=>{if(!workspaceActive||screen==="expenses"||screen==="versions")return;if(!error&&!changed&&loadedQuery===JSON.stringify(query)&&view.hash===query.hash&&view.period===query.period)return;const id=++sequence.current;setBusy(true);setError("");setDocumentMissing(false);window.esmer.querySourceWorkspace(query).then(value=>{if(id!==sequence.current)return;if(value.status==="source-workspace"){setLoadedQuery(JSON.stringify(query));setView(value);setChanged(false);if(query.hash===null||query.period===null)setQuery(q=>({...q,hash:value.hash,period:value.period}));}else{setError(value.status==="source-empty"?"Kaynak örneği bulunamadı.":value.message);setChanged(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED");setDocumentMissing(value.status==="source-unavailable"&&value.code==="NOT_FOUND"&&query.view==="detail");}}).catch(()=>{if(id===sequence.current)setError("Kaynak kayıtları okunamadı.");}).finally(()=>{if(id===sequence.current)setBusy(false);});return()=>{++sequence.current;};},[query,screen,workspaceActive]);
+ useEffect(()=>{if(!workspaceActive||screen==="expenses"||screen==="versions"){setBusy(false);return;}if(error&&failedQuery.current===query)return;if(!error&&!changed&&loadedQuery===JSON.stringify(query)&&view.hash===query.hash&&view.period===query.period)return;const id=++sequence.current;setBusy(true);setDocumentMissing(false);window.esmer.querySourceWorkspace(query).then(value=>{if(id!==sequence.current)return;if(value.status==="source-workspace"){failedQuery.current=null;setError("");setLoadedQuery(JSON.stringify(query));setView(value);setChanged(false);if(query.hash===null||query.period===null)setQuery(q=>({...q,hash:value.hash,period:value.period}));}else{failedQuery.current=query;setError(value.status==="source-empty"?"Kaynak örneği bulunamadı.":value.message);setChanged(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED");setDocumentMissing(value.status==="source-unavailable"&&value.code==="NOT_FOUND"&&query.view==="detail");}}).catch(()=>{if(id===sequence.current){failedQuery.current=query;setError("Kaynak kayıtları okunamadı.");}}).finally(()=>{if(id===sequence.current)setBusy(false);});return()=>{++sequence.current;};},[query,screen,workspaceActive]);
  function navigate(next:Destination){visited.current.add(next);if(screen==="overview"||screen==="purchasing")savedFilters.current[screen]={...query,...(query.view==="detail"?originQuery.current??query:query),documentId:null};setScreen(next);if(next==="monthly")setQuery(q=>({...q,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0}));else if(next==="overview"||next==="purchasing")setQuery(q=>({...q,view:"documents",scope:next==="overview"?"sales":"purchasing",documentType:null,productId:null,documentId:null,offset:0,...savedFilters.current[next],hash:q.hash,period:q.period}));}
- function filter(patch:Partial<SourceQuery>){setQuery(q=>({...q,...patch,documentId:null,offset:0,view:patch.view??(q.view==="detail"?"documents":q.view)}));}
+ function filter(patch:Partial<SourceQuery>){if(patch.period&&patch.period!==query.period)setError("");setQuery(q=>({...q,...patch,documentId:null,offset:0,view:patch.view??(q.view==="detail"?"documents":q.view)}));}
  useEffect(()=>{if(query.period!==selectedMonth)filter({period:selectedMonth});},[selectedMonth]);
  function returnToList(){returnPending.current=true;setQuery(originQuery.current??{...query,view:"documents",documentId:null,offset:0});}
  useEffect(()=>{if(returnPending.current&&!busy&&!error&&query.view!=="detail"&&view.document===null&&loadedQuery===JSON.stringify(query)){returnPending.current=false;restoreReturn(receipt.current,heading.current);}},[busy,error,query,view,loadedQuery]);
