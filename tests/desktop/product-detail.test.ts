@@ -50,13 +50,8 @@ test("selected return month shows pinned daily amounts, original cost and comple
     if (reviewDirectory) { await detail.scrollIntoViewIfNeeded(); await page.screenshot({ path: `${reviewDirectory}/product-export.png` }); await page.waitForTimeout(6000); }
     const sheets = await readSheet(output, 1);
     expect(JSON.stringify(sheets)).toContain("-40");
-    const report = await page.evaluate(() => window.esmer.openMonthly({ period: "2025-09" }));
-    if (report.status !== "monthly") throw new Error("Expected monthly report");
     const monthlyPath = join(root, "monthly.xlsx");
     await app.evaluate(({ dialog }, filePath) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath }); }, monthlyPath);
-    expect(await page.evaluate(reportId => window.esmer.exportReportVersion({ reportId }), report.report.id)).toEqual({ status: "saved" });
-    const monthly = await readSheet(monthlyPath, 1);
-    expect(monthly.find(row => row[0] === "Kapsanan tahmini brüt kâr")?.[1]).toBe(-20);
     if (reviewDirectory) {
       await page.getByRole("button", { name: "Raporlar", exact: true }).click();
       await page.getByRole("button", { name: "Aday raporu aç", exact: true }).click();
@@ -64,6 +59,11 @@ test("selected return month shows pinned daily amounts, original cost and comple
       await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
       await page.screenshot({ path: `${reviewDirectory}/monthly-export.png` }); await page.waitForTimeout(6000);
     }
+    const report = await page.evaluate(() => window.esmer.openMonthly({ period: "2025-09" }));
+    if (report.status !== "monthly") throw new Error("Expected monthly report");
+    expect(await page.evaluate(reportId => window.esmer.exportReportVersion({ reportId }), report.report.id)).toEqual({ status: "saved" });
+    const monthly = await readSheet(monthlyPath, 1);
+    expect(monthly.find(row => row[0] === "Kapsanan tahmini brüt kâr")?.[1]).toBe(-20);
     await page.screenshot({ path: testInfo.outputPath("selected-summary.png"), fullPage: true });
   } finally { await app.close(); await rm(root, { recursive: true, force: true }); }
 });
