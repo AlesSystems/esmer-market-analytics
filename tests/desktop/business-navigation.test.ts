@@ -79,3 +79,41 @@ test("recorded invoice return restores its second page and the working month sur
   await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await page.getByRole("button",{name:"Gerçek yedek görünümü",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
  } finally {await app.close();await rm(userData,{recursive:true,force:true});}
 });
+
+test("overview expense figure excludes owner contributions and uses the existing classified summary", async () => {
+ const {Expenses}=await import("../../src/expenses/import"),{workbook,row}=await import("../helpers/expense-fixtures");
+ const userData=await mkdtemp(join(tmpdir(),"esmer-overview-expense-")),store=openStore(join(userData,"analytics.sqlite"));
+ try {
+  store.importPackage(businessPackage());const expenses=new Expenses(store),operating=[...row];operating[1]="15.09.2025";operating[2]=null;
+  const owner=[...operating];owner[0]="owner-1";owner[3]="Sentetik sahip katkısı";owner[4]="owner-contribution";owner[5]="500";owner[7]="500";
+  const preview=expenses.preview(await workbook([operating,owner]));expect(preview.errors).toEqual([]);expenses.confirm({previewId:preview.previewId,keepCandidateRows:[]});
+ } finally {store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {const page=await app.firstWindow(),figure=page.getByRole("region",{name:"Aylık performans",exact:true}).getByRole("button",{name:/Kayıtlı giderler/});await expect(figure.locator("strong")).toHaveText("50,00 ₺");await expect(figure).toContainText("eksiksiz");}finally{await app.close();await rm(userData,{recursive:true,force:true});}
+});
+
+test("transaction inspection replaces the primary sales product list", async () => {
+ const userData=await mkdtemp(join(tmpdir(),"esmer-dedicated-sale-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByText("İşlemler ve satış dağılımı",{exact:true}).click();await page.getByRole("button",{name:"Tüm işlemleri göster",exact:true}).click();
+  const row=page.getByRole("button",{name:"S1",exact:true});await row.click();await expect(page.getByRole("heading",{name:"İşlem Detayı",exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Ürün katkıları",exact:true})).toHaveCount(0);await expect(page.getByRole("region",{name:"Satış özeti",exact:true})).toHaveCount(0);await expect(page.getByRole("main")).toHaveCount(1);
+  await page.getByRole("button",{name:"Satışlara dön",exact:true}).click();await expect(row).toBeFocused();
+ } finally {await app.close();await rm(userData,{recursive:true,force:true});}
+});
+
+test("classic financial input keeps visible highlights and a searchable initial sales list", async () => {
+ const {salesPackage}=await import("../helpers/sales-fixtures");const userData=await mkdtemp(join(tmpdir(),"esmer-classic-sales-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(salesPackage());}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Öne çıkan ürünler",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:/İçme suyu/})).toBeVisible();await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Satışlar",exact:true}).click();const list=page.getByRole("region",{name:"Ürün katkıları",exact:true});await list.getByLabel("Ürün ara",{exact:true}).fill("içme");await expect(list.getByRole("button",{name:"İçme suyu",exact:true})).toBeVisible();await expect(list).toContainText("180,00 ₺");}finally{await app.close();await rm(userData,{recursive:true,force:true});}
+});
+
+test("failed product highlights are a recoverable error rather than an empty month", async () => {
+ const {writeFile}=await import("node:fs/promises"),{salesPackage}=await import("../helpers/sales-fixtures");const userData=await mkdtemp(join(tmpdir(),"esmer-highlight-error-")),path=join(userData,"fixture.esmer");await writeFile(path,salesPackage());const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Henüz mali rapor verisi yok",exact:true})).toBeVisible();
+  await app.evaluate(({ipcMain,dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});const registry=ipcMain as unknown as {_invokeHandlers:Map<string,(event:unknown,operation:string,payload:unknown)=>unknown>},original=registry._invokeHandlers.get("esmer:request")!;let failed=false;ipcMain.removeHandler("esmer:request");ipcMain.handle("esmer:request",(event,operation,payload)=>{if(operation==="readReportProducts"&&!failed){failed=true;return {status:"unavailable",code:"SERVICE_UNAVAILABLE",message:"Sentetik ürün yükleme hatası"};}return original(event,operation,payload);});},path);
+  await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();await expect(page.getByText("Ürün öne çıkanları okunamadı.",{exact:true})).toBeVisible();await page.getByRole("button",{name:"Satışlar listesine git",exact:true}).click();await expect(page.getByRole("region",{name:"Ürün katkıları",exact:true}).getByRole("button",{name:"İçme suyu",exact:true})).toBeVisible();
+ }finally{await app.close();await rm(userData,{recursive:true,force:true});}
+});

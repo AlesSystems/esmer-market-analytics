@@ -32,3 +32,18 @@ test("complete invoice list preserves empty documents and returns to page and ke
   await expect(page.getByText("51–56 / 56",{exact:true})).toBeVisible();
  } finally {await app.close();await rm(userData,{recursive:true,force:true});}
 });
+
+test("hidden purchasing detail never handles another page Escape key", async () => {
+ const userData=await mkdtemp(join(tmpdir(),"esmer-hidden-purchase-")),records=businessRecords();addPurchase(records,"P1");
+ const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try {
+  const page=await app.firstWindow();await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  await page.getByRole("button",{name:"P1",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Giderler",exact:true}).click();
+  const button=page.getByRole("button",{name:"Gider ekle",exact:true});await button.focus();const scroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));await page.keyboard.press("Escape");await expect(button).toBeFocused();expect(await page.evaluate(()=>({x:scrollX,y:scrollY}))).toEqual(scroll);
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Ayarlar",exact:true})).toBeVisible();await page.keyboard.press("Escape");
+  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+ } finally {await app.close();await rm(userData,{recursive:true,force:true});}
+});
