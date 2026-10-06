@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-04",
+  "scope": "isolated copy, system metadata and hash-pinned native definitions only",
+  "attempts": [
+    {
+      "attempt": "issue-67-native-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "cf9cbd2acdf5b1ea2a0c5cd074667809d2d1f366150107e476b0d1735397f16e",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": false,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "cleanupErrors": [],
+        "result": {
+          "ok": false,
+          "phase": "definitions",
+          "code": "DEFINITION_UNAVAILABLE",
+          "number": null
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-native-admin-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "a8ea66879cbb93027ecc73c48fb71f5d01d6915cf7a4a6f0a937a5d5316999e6",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "objects": 2,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-writer-metadata-20261004",
+      "scripts": {
+        "client.mjs": "5a84f64c4ddbb0234be5635014f0bcc372cf3a22aebc07918c0216888d455bf8",
+        "run.py": "34844ccae78c36298da466825f7f9f7b467e9fcc37763c99f0887e16e27bc032",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "candidates": 40,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-writer-definitions-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "710989ad9b51e2495cef1b43f5f60dec3ca3dc5835f514f2662a4074b154bf18",
+        "pins.json": "1cfe7ffccad96f381ab32c1e5d0d309976e1c81287e60e0ca834b9541368c67b"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "objects": 2,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    }
+  ]
+}

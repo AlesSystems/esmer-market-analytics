@@ -62,6 +62,9 @@ export interface DesktopApi {
   exportReportVersion(request: ReportRequestMap["exportReportVersion"]): Promise<ReportExportResult | RequestError>;
   readReportEvidence(request: ReportRequestMap["readReportEvidence"]): Promise<ReportEvidencePage | SalesFailure | RequestError>;
   readReportProducts(request: ReportRequestMap["readReportProducts"]): Promise<ReportProductsPage | SalesFailure | RequestError>;
+  readReportProduct(request: ReportRequestMap["readReportProduct"]): Promise<import("../reports/product-detail").ProductDetailResult | RequestError>;
+  readReportProductDependency(request: ReportRequestMap["readReportProductDependency"]): Promise<import("../reports/product-detail").ProductDependencyResult | RequestError>;
+  exportReportProduct(request: ReportRequestMap["exportReportProduct"]): Promise<ReportExportResult | RequestError>;
   readReportPurchasing(request: ReportRequestMap["readReportPurchasing"]): Promise<PurchasingReportResult | RequestError>;
   getOperationStatus(): Promise<OperationStatus | RequestError>;
   cancelOperation(request: {id: number}): Promise<{status: "cancelling"} | {status: "idle"} | RequestError>;

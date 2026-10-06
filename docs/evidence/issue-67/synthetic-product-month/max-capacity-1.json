@@ -1,0 +1,446 @@
+{
+  "measuredAt": "2026-10-06T09:48:54.157Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.15.0",
+  "sha": "ea16d03afbf3e19ac4bf78c242464afdfee77f4f",
+  "executableHash": "588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8",
+  "asarHash": "230d52265d81c6207c0f2c6185c60d36bbf6ab57197a1353eee27cc97b8ce086",
+  "fixture": {
+    "groups": 16666,
+    "records": 99996,
+    "originalSaleDocuments": 16666,
+    "originalSaleLines": 16666,
+    "packageBytes": 32121670,
+    "sha256": "6cc6ecf9f522d0ab934887785537864488f3dc49eccbe5193ea6dc1912c53c9a"
+  },
+  "prepareMs": 1075.6355409999999,
+  "importMs": 2784.437417,
+  "launchMonthReadyMs": 2185.550167,
+  "monthlyMs": 1515.6762080000008,
+  "productDetailMs": 55.475625000000036,
+  "dependencyMs": 71.01666599999953,
+  "exportMs": 1959.9279999999999,
+  "exportBytes": 4076183,
+  "monthlyNet": "-833300",
+  "monthlyProfit": "-333320",
+  "productProfit": "-666640",
+  "detailBytes": 13012,
+  "dependencyBytes": 1961,
+  "metrics": [
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 6.645978,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 21616,
+      "type": "Browser",
+      "creationTime": 1791280128358.52,
+      "memory": {
+        "workingSetSize": 982928,
+        "peakWorkingSetSize": 982928
+      },
+      "sandboxed": false
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.17631,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 21617,
+      "type": "GPU",
+      "creationTime": 1791280128492.027,
+      "serviceName": "GPU",
+      "memory": {
+        "workingSetSize": 95248,
+        "peakWorkingSetSize": 99536
+      },
+      "sandboxed": true
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.049387,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 21618,
+      "type": "Utility",
+      "creationTime": 1791280128493.125,
+      "serviceName": "network.mojom.NetworkService",
+      "name": "Network Service",
+      "memory": {
+        "workingSetSize": 49456,
+        "peakWorkingSetSize": 49504
+      },
+      "sandboxed": true
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.331868,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 21620,
+      "type": "Tab",
+      "creationTime": 1791280128597.84,
+      "memory": {
+        "workingSetSize": 203056,
+        "peakWorkingSetSize": 203056
+      },
+      "sandboxed": true
+    }
+  ],
+  "memory": {
+    "intervalMs": 100,
+    "sampleCount": 56,
+    "peakBrowserRssKiB": 982928,
+    "peakDirectChildrenRssKiB": 351024,
+    "samples": [
+      {
+        "elapsedMs": 314.6069169999996,
+        "browserRssKiB": 216816,
+        "directChildrenRssKiB": 214224,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 413.702084,
+        "browserRssKiB": 261792,
+        "directChildrenRssKiB": 277296,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 514.9064590000003,
+        "browserRssKiB": 308496,
+        "directChildrenRssKiB": 277376,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 617.1017919999999,
+        "browserRssKiB": 372624,
+        "directChildrenRssKiB": 277392,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 716.4806249999997,
+        "browserRssKiB": 388912,
+        "directChildrenRssKiB": 277424,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 818.1326249999997,
+        "browserRssKiB": 397456,
+        "directChildrenRssKiB": 277456,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 919.2196250000002,
+        "browserRssKiB": 407392,
+        "directChildrenRssKiB": 277456,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1020.6069169999996,
+        "browserRssKiB": 420432,
+        "directChildrenRssKiB": 277456,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1122.818917,
+        "browserRssKiB": 437408,
+        "directChildrenRssKiB": 277456,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1223.5476670000003,
+        "browserRssKiB": 438032,
+        "directChildrenRssKiB": 324656,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1324.2259589999999,
+        "browserRssKiB": 444992,
+        "directChildrenRssKiB": 324608,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1427.3655839999997,
+        "browserRssKiB": 457984,
+        "directChildrenRssKiB": 324720,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1527.3173339999998,
+        "browserRssKiB": 474048,
+        "directChildrenRssKiB": 325120,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1628.9133340000003,
+        "browserRssKiB": 482368,
+        "directChildrenRssKiB": 325248,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1729.5372919999995,
+        "browserRssKiB": 490016,
+        "directChildrenRssKiB": 325408,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1829.6857919999998,
+        "browserRssKiB": 512624,
+        "directChildrenRssKiB": 325504,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1932.4552499999995,
+        "browserRssKiB": 533152,
+        "directChildrenRssKiB": 325488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2033.0648749999996,
+        "browserRssKiB": 512656,
+        "directChildrenRssKiB": 341088,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2136.916917,
+        "browserRssKiB": 512656,
+        "directChildrenRssKiB": 346368,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2234.558584,
+        "browserRssKiB": 515344,
+        "directChildrenRssKiB": 347152,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2334.406542,
+        "browserRssKiB": 515344,
+        "directChildrenRssKiB": 347152,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2435.98425,
+        "browserRssKiB": 516496,
+        "directChildrenRssKiB": 348848,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2538.315709,
+        "browserRssKiB": 534736,
+        "directChildrenRssKiB": 348832,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2638.4143339999996,
+        "browserRssKiB": 540624,
+        "directChildrenRssKiB": 348816,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2739.813167,
+        "browserRssKiB": 550944,
+        "directChildrenRssKiB": 348816,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2840.2559589999996,
+        "browserRssKiB": 555264,
+        "directChildrenRssKiB": 348912,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2942.1895,
+        "browserRssKiB": 567296,
+        "directChildrenRssKiB": 348912,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3042.499542,
+        "browserRssKiB": 574160,
+        "directChildrenRssKiB": 348800,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3143.0632920000003,
+        "browserRssKiB": 597408,
+        "directChildrenRssKiB": 348784,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3244.4349589999997,
+        "browserRssKiB": 606432,
+        "directChildrenRssKiB": 348768,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3344.886209,
+        "browserRssKiB": 616704,
+        "directChildrenRssKiB": 348944,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3445.0123339999996,
+        "browserRssKiB": 628144,
+        "directChildrenRssKiB": 348928,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3546.141459,
+        "browserRssKiB": 647136,
+        "directChildrenRssKiB": 348912,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3646.053209,
+        "browserRssKiB": 664144,
+        "directChildrenRssKiB": 348976,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3747.0407090000003,
+        "browserRssKiB": 665360,
+        "directChildrenRssKiB": 350176,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3846.972542,
+        "browserRssKiB": 669184,
+        "directChildrenRssKiB": 350992,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3948.59675,
+        "browserRssKiB": 669520,
+        "directChildrenRssKiB": 350688,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4048.8592089999997,
+        "browserRssKiB": 690352,
+        "directChildrenRssKiB": 350752,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4150.839749999999,
+        "browserRssKiB": 709472,
+        "directChildrenRssKiB": 350768,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4251.368959000001,
+        "browserRssKiB": 718544,
+        "directChildrenRssKiB": 350816,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4351.454250000001,
+        "browserRssKiB": 724864,
+        "directChildrenRssKiB": 350912,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4453.022500000001,
+        "browserRssKiB": 731600,
+        "directChildrenRssKiB": 350960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4554.047500000001,
+        "browserRssKiB": 739328,
+        "directChildrenRssKiB": 351024,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4655.205,
+        "browserRssKiB": 765712,
+        "directChildrenRssKiB": 351024,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4756.039125000001,
+        "browserRssKiB": 782336,
+        "directChildrenRssKiB": 351008,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4857.130292,
+        "browserRssKiB": 766544,
+        "directChildrenRssKiB": 347440,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4958.717209,
+        "browserRssKiB": 766496,
+        "directChildrenRssKiB": 347248,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5060.1182499999995,
+        "browserRssKiB": 810784,
+        "directChildrenRssKiB": 347264,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5161.002959000001,
+        "browserRssKiB": 948016,
+        "directChildrenRssKiB": 347408,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5261.417084000001,
+        "browserRssKiB": 948816,
+        "directChildrenRssKiB": 347568,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5361.729667,
+        "browserRssKiB": 949632,
+        "directChildrenRssKiB": 347584,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5461.953750000001,
+        "browserRssKiB": 944176,
+        "directChildrenRssKiB": 347520,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5562.4282920000005,
+        "browserRssKiB": 954704,
+        "directChildrenRssKiB": 347504,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5663.9817920000005,
+        "browserRssKiB": 964848,
+        "directChildrenRssKiB": 347504,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5764.275125,
+        "browserRssKiB": 965488,
+        "directChildrenRssKiB": 347504,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5802.541792,
+        "browserRssKiB": 982928,
+        "directChildrenRssKiB": 347760,
+        "processes": 4
+      }
+    ]
+  },
+  "limitations": [
+    "One synthetic maximum dependency closure run; macOS only, Windows skipped",
+    "Browser RSS includes threaded Node service; no independently measurable worker-process RSS",
+    "RSS sampling begins after Electron launch resolves; earlier startup peak can be missed",
+    "OS caches and concurrent activity uncontrolled; 100ms sampled peak is not exact peak",
+    "Native save dialog mocked, actual XLSX writes measured; output removed after file size receipt"
+  ]
+}

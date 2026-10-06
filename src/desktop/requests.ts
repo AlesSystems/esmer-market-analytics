@@ -25,8 +25,10 @@ export function validReportRequest(operation: string, value: unknown): boolean {
   return exact(c, ["sessionId", "datasetId", "appRevision", "calculationVersion", "period"]) && validId(c.sessionId) && validId(c.datasetId) && validId(c.calculationVersion) && period(c.period) && Number.isSafeInteger(c.appRevision) && Number(c.appRevision) >= 0
     && exact(f, ["categoryId", "productId", "search", "kind"]) && (f.categoryId === null || validId(f.categoryId)) && (f.productId === null || validId(f.productId)) && typeof f.search === "string" && f.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(f.search) && ["all", "sale", "customer-return"].includes(String(f.kind)) && typeof f.kind === "string";
 }
-export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportProducts", "readReportPurchasing"];
+export const monthlyOperations = ["openMonthly", "queryMonthly", "listReportVersions", "readReportVersion", "compareReportVersion", "acceptReportVersion", "exportReportVersion", "readReportEvidence", "readReportProducts", "readReportPurchasing", "readReportProduct", "readReportProductDependency", "exportReportProduct"];
 export function validMonthlyRequest(operation: string, value: unknown): boolean {
+  if (operation === "readReportProduct" || operation === "exportReportProduct") return exact(value, ["reportId", "productId"]) && validId(value.reportId) && validId(value.productId);
+  if (operation === "readReportProductDependency") return exact(value, ["reportId", "productId", "returnLineId", "offset"]) && validId(value.reportId) && validId(value.productId) && validId(value.returnLineId) && Number.isSafeInteger(value.offset) && Number(value.offset) >= 0;
   if (operation === "readReportProducts") return exact(value, ["reportId", "search", "sort", "direction", "offset"])
     && validId(value.reportId) && typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search)
     && typeof value.sort === "string" && ["profit", "name", "netSales", "coverage"].includes(value.sort)

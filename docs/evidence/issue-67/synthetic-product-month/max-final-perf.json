@@ -1,0 +1,477 @@
+{
+  "label": "max-final",
+  "measuredAt": "2026-10-06T09:39:43.547Z",
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v24.15.0",
+  "sha": "28461fc1585ef63f1c29e46ec08f6b1c5ed31f07",
+  "executableHash": "588478afc5f2bc73b6433d6e565a214dc830144be39a3d79805723292754ccd8",
+  "asarHash": "1861ac006eef16efa713e62cd5831ed3a08fdfe0c511882d5eb81f2aedb892f8",
+  "fixture": {
+    "groups": 16666,
+    "records": 99996,
+    "originalSaleDocuments": 16666,
+    "originalSaleLines": 16666,
+    "packageBytes": 32121670,
+    "sha256": "6cc6ecf9f522d0ab934887785537864488f3dc49eccbe5193ea6dc1912c53c9a"
+  },
+  "prepareMs": 1102.110292,
+  "importMs": 2879.0467499999995,
+  "launchMonthReadyMs": 3877.202958,
+  "monthlyMs": 1660.3919580000002,
+  "productDetailMs": 56.584375000000364,
+  "dependencyMs": 69.77670800000124,
+  "exportMs": 1953.9681249999994,
+  "exportBytes": 4076189,
+  "monthlyNet": "-833300",
+  "monthlyProfit": "-333320",
+  "productProfit": "-666640",
+  "detailBytes": 13012,
+  "dependencyBytes": 1961,
+  "metrics": [
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 7.091167,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 17778,
+      "type": "Browser",
+      "creationTime": 1791279575914.308,
+      "memory": {
+        "workingSetSize": 1029536,
+        "peakWorkingSetSize": 1049072
+      },
+      "sandboxed": false
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.188509,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 17779,
+      "type": "GPU",
+      "creationTime": 1791279577265.783,
+      "serviceName": "GPU",
+      "memory": {
+        "workingSetSize": 85312,
+        "peakWorkingSetSize": 94304
+      },
+      "sandboxed": true
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.052025,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 17780,
+      "type": "Utility",
+      "creationTime": 1791279577268.537,
+      "serviceName": "network.mojom.NetworkService",
+      "name": "Network Service",
+      "memory": {
+        "workingSetSize": 42992,
+        "peakWorkingSetSize": 49152
+      },
+      "sandboxed": true
+    },
+    {
+      "cpu": {
+        "cumulativeCPUUsage": 0.319533,
+        "percentCPUUsage": 0,
+        "idleWakeupsPerSecond": 0
+      },
+      "pid": 17782,
+      "type": "Tab",
+      "creationTime": 1791279577379.195,
+      "memory": {
+        "workingSetSize": 184256,
+        "peakWorkingSetSize": 184784
+      },
+      "sandboxed": true
+    }
+  ],
+  "memory": {
+    "intervalMs": 100,
+    "sampleCount": 61,
+    "peakBrowserRssKiB": 1029536,
+    "peakDirectChildrenRssKiB": 317728,
+    "samples": [
+      {
+        "elapsedMs": 1544.3889159999999,
+        "browserRssKiB": 215904,
+        "directChildrenRssKiB": 210272,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1754.563666,
+        "browserRssKiB": 224416,
+        "directChildrenRssKiB": 276480,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1864.1705410000004,
+        "browserRssKiB": 288800,
+        "directChildrenRssKiB": 276544,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 1956.7114579999998,
+        "browserRssKiB": 316704,
+        "directChildrenRssKiB": 278016,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2049.803583,
+        "browserRssKiB": 351888,
+        "directChildrenRssKiB": 255632,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2147.5565000000006,
+        "browserRssKiB": 351408,
+        "directChildrenRssKiB": 237840,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2247.840166,
+        "browserRssKiB": 363792,
+        "directChildrenRssKiB": 237936,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2350.3275830000002,
+        "browserRssKiB": 369776,
+        "directChildrenRssKiB": 237936,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2449.6524580000005,
+        "browserRssKiB": 381376,
+        "directChildrenRssKiB": 239280,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2552.864625,
+        "browserRssKiB": 397072,
+        "directChildrenRssKiB": 257872,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2652.3712910000004,
+        "browserRssKiB": 402368,
+        "directChildrenRssKiB": 288320,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2752.2001250000003,
+        "browserRssKiB": 408688,
+        "directChildrenRssKiB": 288304,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2854.1643329999997,
+        "browserRssKiB": 429904,
+        "directChildrenRssKiB": 288288,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 2954.856541,
+        "browserRssKiB": 438816,
+        "directChildrenRssKiB": 288832,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3056.5436660000005,
+        "browserRssKiB": 448368,
+        "directChildrenRssKiB": 288816,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3160.0052910000004,
+        "browserRssKiB": 461168,
+        "directChildrenRssKiB": 288800,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3258.3934580000005,
+        "browserRssKiB": 493296,
+        "directChildrenRssKiB": 288848,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3358.8240000000005,
+        "browserRssKiB": 514528,
+        "directChildrenRssKiB": 288848,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3461.7962079999998,
+        "browserRssKiB": 492544,
+        "directChildrenRssKiB": 288944,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3562.52775,
+        "browserRssKiB": 492560,
+        "directChildrenRssKiB": 289008,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3663.0266250000004,
+        "browserRssKiB": 492704,
+        "directChildrenRssKiB": 312368,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3769.025458,
+        "browserRssKiB": 492704,
+        "directChildrenRssKiB": 312352,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3872.882708,
+        "browserRssKiB": 492704,
+        "directChildrenRssKiB": 313072,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 3968.191833,
+        "browserRssKiB": 492816,
+        "directChildrenRssKiB": 313936,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4067.6974580000006,
+        "browserRssKiB": 502144,
+        "directChildrenRssKiB": 313920,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4172.021041,
+        "browserRssKiB": 539760,
+        "directChildrenRssKiB": 316128,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4279.786040999999,
+        "browserRssKiB": 547904,
+        "directChildrenRssKiB": 316112,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4371.324041,
+        "browserRssKiB": 560832,
+        "directChildrenRssKiB": 316096,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4472.423000000001,
+        "browserRssKiB": 565008,
+        "directChildrenRssKiB": 316096,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4573.270333,
+        "browserRssKiB": 571280,
+        "directChildrenRssKiB": 316096,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4673.811374999999,
+        "browserRssKiB": 581040,
+        "directChildrenRssKiB": 316112,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4773.621916,
+        "browserRssKiB": 591504,
+        "directChildrenRssKiB": 316208,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4875.751083000001,
+        "browserRssKiB": 611616,
+        "directChildrenRssKiB": 316192,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 4977.507958,
+        "browserRssKiB": 619920,
+        "directChildrenRssKiB": 316176,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5076.687416000001,
+        "browserRssKiB": 627904,
+        "directChildrenRssKiB": 316112,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5178.475875,
+        "browserRssKiB": 657600,
+        "directChildrenRssKiB": 316096,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5279.381041000001,
+        "browserRssKiB": 695120,
+        "directChildrenRssKiB": 316080,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5380.25375,
+        "browserRssKiB": 688736,
+        "directChildrenRssKiB": 316192,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5481.2353330000005,
+        "browserRssKiB": 710080,
+        "directChildrenRssKiB": 316176,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5581.889999999999,
+        "browserRssKiB": 710352,
+        "directChildrenRssKiB": 317600,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5683.098416000001,
+        "browserRssKiB": 714608,
+        "directChildrenRssKiB": 317504,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5783.1419160000005,
+        "browserRssKiB": 730416,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5885.280708,
+        "browserRssKiB": 753104,
+        "directChildrenRssKiB": 317472,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 5985.28275,
+        "browserRssKiB": 769200,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6087.031333000001,
+        "browserRssKiB": 780016,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6188.095291,
+        "browserRssKiB": 786560,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6288.276833,
+        "browserRssKiB": 791936,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6389.0322909999995,
+        "browserRssKiB": 798832,
+        "directChildrenRssKiB": 317488,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6490.593500000001,
+        "browserRssKiB": 825296,
+        "directChildrenRssKiB": 317616,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6591.441833000001,
+        "browserRssKiB": 842368,
+        "directChildrenRssKiB": 317728,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6692.229083,
+        "browserRssKiB": 853712,
+        "directChildrenRssKiB": 316976,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6793.99625,
+        "browserRssKiB": 860976,
+        "directChildrenRssKiB": 316976,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6895.6895,
+        "browserRssKiB": 1027360,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 6996.111583,
+        "browserRssKiB": 970624,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7095.950583,
+        "browserRssKiB": 971456,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7197.977708,
+        "browserRssKiB": 972352,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7298.857166,
+        "browserRssKiB": 992032,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7400.1639159999995,
+        "browserRssKiB": 1003200,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7500.353416,
+        "browserRssKiB": 1009328,
+        "directChildrenRssKiB": 316960,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7600.8399580000005,
+        "browserRssKiB": 1010944,
+        "directChildrenRssKiB": 316976,
+        "processes": 4
+      },
+      {
+        "elapsedMs": 7635.814333,
+        "browserRssKiB": 1029536,
+        "directChildrenRssKiB": 312560,
+        "processes": 4
+      }
+    ]
+  },
+  "limitations": [
+    "One synthetic maximum dependency closure run; macOS only, Windows skipped",
+    "Browser RSS includes threaded Node service; no independently measurable worker-process RSS",
+    "RSS sampling begins after Electron launch resolves; earlier startup peak can be missed",
+    "OS caches and concurrent activity uncontrolled; 100ms sampled peak is not exact peak",
+    "Native save dialog mocked, actual XLSX writes measured; output removed after file size receipt"
+  ]
+}

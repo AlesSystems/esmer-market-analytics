@@ -58,7 +58,7 @@ export class SalesReports {
     const sales = this.query({ context, filters: { ...emptySalesFilters } });
     if (sales.status !== "report") return sales;
     step("purchasing", 1);
-    const purchasing = this.purchasing({ context });
+    const purchasing = this.purchasingCandidate(context);
     if (purchasing.status !== "purchasing") return purchasing;
     step("operating", 2);
     const operating = this.operating({ context });
@@ -158,6 +158,9 @@ export class SalesReports {
     return structuredClone({ status: "report", view: { context: { ...context }, cutoff: metadata.cutoff, importedAt: snapshot.importedAt, extractedAt: metadata.extractedAt, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, complete: current.complete && period.covered, filters: { ...filters }, metrics, comparisons: { month: month.comparison, year: year.comparison }, categories: breakdown("category"), products: breakdown("product"), daily: dailyTotals.map(row => ({ ...row, height: maximum.isZero() ? "0" : new Exact(row.netSales).abs().div(maximum).times(100).toDecimalPlaces(6).toFixed(), negative: new Exact(row.netSales).lt(0) })), transactions: current.documents.filter(doc => ids.has(doc.documentId)).map(doc => ({ ...doc, scopeNet: sum(transactionScopes.get(doc.documentId)!) })).sort((a, b) => b.date.localeCompare(a.date) || a.documentId.localeCompare(b.documentId)), exclusions: current.exclusions, warnings: [...snapshot.warnings] } } satisfies SalesReportResult);
   }
   purchasing({ context }: QueryPurchasingRequest): PurchasingReportResult {
+    return structuredClone(this.purchasingCandidate(context));
+  }
+  private purchasingCandidate(context: ReportContext): PurchasingReportResult {
     const session = this.resolve(context);
     if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
     const { snapshot } = session, metadata = snapshot.metadata!, period = range(snapshot, context.period);
@@ -172,7 +175,7 @@ export class SalesReports {
     for (const row of snapshot.records.lines) if (ids.has(row.documentId) && row.business?.historicalCost?.originalSaleLineId) lineIds.add(row.business.historicalCost.originalSaleLineId);
     for (const row of snapshot.records.lines) if (lineIds.has(row.id)) ids.add(row.documentId);
     const evidence = { documents: snapshot.records.documents.filter(row => ids.has(row.id)), lines: snapshot.records.lines.filter(row => ids.has(row.documentId)) };
-    return structuredClone({ status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, evidence, gross, purchasing } } satisfies PurchasingReportResult);
+    return { status: "purchasing", view: { coverage: !period.overlap ? "unavailable" : period.partial ? "partial" : "complete", costCalculationVersion: COST_CALCULATION_VERSION, purchasingCalculationVersion: PURCHASING_CALCULATION_VERSION, context: { ...context }, cutoff: metadata.cutoff, lineage: metadata.lineage, extractionId: metadata.extractionId, mappingVersion: metadata.mappingVersion, from: period.from, to: period.to, stale: active.status !== "ready" || active.store !== "loaded" || active.dataset.datasetId !== context.datasetId || this.store.readPin().appRevision !== context.appRevision, evidence, gross, purchasing } } satisfies PurchasingReportResult;
   }
   operating({ context }: QueryPurchasingRequest): OperatingReportResult {
     const session = this.resolve(context);

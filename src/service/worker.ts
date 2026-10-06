@@ -215,6 +215,12 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "listReportVersions") result = versions!.list(request.payload);
     else if (request.operation === "readReportVersion") result = versions!.display(request.payload);
     else if (request.operation === "readReportEvidence") result = versions!.evidence(request.payload);
+    else if (request.operation === "readReportProduct") result = versions!.product(request.payload);
+    else if (request.operation === "readReportProductDependency") result = versions!.productDependency(request.payload);
+    else if (request.operation === "exportReportProduct") {
+      const detail = versions!.product(request.payload);
+      result = detail.status === "unavailable" ? detail : { status: "export", bytes: await versions!.exportProduct(request.payload) };
+    }
     else if (request.operation === "readReportProducts") result = versions!.products(request.payload);
     else if (request.operation === "readReportPurchasing") result = versions!.purchasing(request.payload);
     else if (request.operation === "compareReportVersion") result = versions!.compare(request.payload);

@@ -1,0 +1,240 @@
+{
+  "date": "2026-10-04",
+  "scope": "isolated copy, exact native POS lifecycle metadata and hash-pinned definitions; no business rows or routine execution",
+  "attempts": [
+    {
+      "attempt": "issue-67-sale-writers-20261004",
+      "scripts": {
+        "client.mjs": "7d655ed611ff27130f34a50968cb6eb9ce16b5cf1998464d3f2b973d0fe4b790",
+        "run.py": "43c202f87a2d8a1d11ad905db0c33bba215a1485e3b112a60d492981bb406a04",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "candidates": 9,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-pos-definitions-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "77d80363dc4784b0790e19facfad261fc8610376efbf6899739a41afb9c05a12",
+        "pins.json": "7c20a104722e6a414608f3bcbfb45478c1e6d3da330962bdd9dd6231d1fc52c9"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "objects": 2,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      },
+      "definitionPins": [
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_FIS_MALIYET",
+          "definitionBytes": "1402",
+          "definitionHash": "24F2306578BA7C149D68D9A7B91B95F30AEAB843D3C2E6D16161F7E12148219E"
+        },
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_FISI_KAPAT_POS_GECICI",
+          "definitionBytes": "3358",
+          "definitionHash": "9C890B23EC8FF7DCE8DE05DD290C769B0CD09A94AF6D9021708853A594939698"
+        }
+      ]
+    },
+    {
+      "attempt": "issue-67-pos-links-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "a12ba3dbc80376e8e114098dc668337cd335d6faf47dbac6cd1517a1fc6cee10",
+        "pins.json": "869946f6d324bcbd90fc58849fd3e266d3e942b69fcb19ac65b7726926a24e61"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "objects": 2,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      },
+      "definitionPins": [
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_IADE_FIS_SECIMI_FIS_NO",
+          "definitionBytes": "1162",
+          "definitionHash": "CEE216EA7DFAF70328C3FC1DFBCB636B0F72F61882C5199B8D2D63A9721367DA"
+        },
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_FIS_NO_VER_FIS_KAPAT",
+          "definitionBytes": "718",
+          "definitionHash": "C35FA24D8FD84BBFA4B13C73A958B3338FF3FFD10BBC53D9D48BE4C5B06195D3"
+        }
+      ]
+    },
+    {
+      "attempt": "issue-67-event-writers-20261004",
+      "scripts": {
+        "client.mjs": "9d055928e8d1acac534c58a4bdd1649f190b76c19301e3f87a4e5c066329e84a",
+        "run.py": "27e3a7afd65d40b300292694c769e6f4cb8e14ad246eafcaa6de90a1263f31af",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": false,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": false,
+          "phase": "sale-writer-metadata",
+          "code": "METADATA_REJECTED",
+          "number": null
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-event-writers-diagnostic-20261004",
+      "scripts": {
+        "client.mjs": "79fe86d9fbbfe32594cbf962a2c716070ceb506194c15f5caf206c20fb69b72b",
+        "run.py": "b0ec1ddcfe9b5ecebc010b8654008fc28ccb5114b3e1f28e394ac1b2e714a99a",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": false,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": false,
+          "phase": "sale-writer-metadata",
+          "code": "CANDIDATE_LIMIT_EXCEEDED",
+          "number": null
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-pos-writer-catalog-20261004",
+      "scripts": {
+        "client.mjs": "909fd730541723bad6f174b5bbc68b76cee605871bb938d8a4ff1f7de454594d",
+        "run.py": "727183333ef15ddecfb2495bbae38f75f85583a20dd9979891f7b715e70efc1e",
+        "pins.json": "3fd46afec1cf20c201275df611283aecfd5184343dce8b34cb74474324e2a90d"
+      },
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "candidates": 43,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    },
+    {
+      "attempt": "issue-67-pos-posting-20261004",
+      "scripts": {
+        "client.mjs": "546f75b4c8626acc53b10e5269ae58defdcc5676680ae2ec3669c4af9732d802",
+        "run.py": "e2eb0fbf5fbdf47ba262e152bb3e3b49a47c69aaf4e37f4f7cb6cb20615c7dcf",
+        "pins.json": "55b90e441dad3117ef33813e6e9f2a5684691f80cbbe74413a424754c1152caf"
+      },
+      "definitionPins": [
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_ANADATAYA_ISLEDI",
+          "definitionBytes": "1206",
+          "definitionHash": "D5452CAF0207A0C40CDA72074F921940FA63F77374F4C039DA42E11D4CDE1E98"
+        },
+        {
+          "schemaName": "dbo",
+          "objectName": "POS_IPTAL",
+          "definitionBytes": "1528",
+          "definitionHash": "03F10EEBC9C0B5AE412193129CB28DA1BBF8BA33A907B609B077EBF3556A3A3F"
+        }
+      ],
+      "receipt": {
+        "ok": true,
+        "sourceWrites": false,
+        "originalTargetAccessed": false,
+        "userTableValuesRead": false,
+        "metadataAdminOnly": true,
+        "cleanupErrors": [],
+        "result": {
+          "ok": true,
+          "phase": "guard-after",
+          "objects": 2,
+          "guardBeforeAfter": true,
+          "userTableValuesRead": false,
+          "routinesExecuted": false
+        },
+        "ownedCopyStopped": true,
+        "temporaryClientAbsent": true,
+        "originalStatePreserved": true,
+        "temporaryConfigAbsent": true
+      }
+    }
+  ]
+}

@@ -139,7 +139,7 @@ test("late product, document and month responses cannot replace the current sele
       ipcMain.handle("esmer:request", async (event, operation, payload) => {
         const request = payload as { search?: string; productId?: string; documentId?: string; context?: { period: string } };
         const result = await original(event, operation, payload);
-        if (operation === "readReportProducts" && request.search === "ÇAY" || operation === "readReportEvidence" && (request.productId === "A" || request.documentId === "A1") || operation === "queryMonthly" && request.context?.period === "2025-10") await new Promise(resolve => setTimeout(resolve, 500));
+        if (operation === "readReportProducts" && request.search === "ÇAY" || operation === "readReportProduct" && request.productId === "A" || operation === "readReportEvidence" && (request.productId === "A" || request.documentId === "A1") || operation === "queryMonthly" && request.context?.period === "2025-10") await new Promise(resolve => setTimeout(resolve, 500));
         return result;
       });
     });
@@ -154,7 +154,7 @@ test("late product, document and month responses cannot replace the current sele
     await page.getByLabel("Ürün ara", { exact: true }).fill("");
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toContainText("30,00 ₺");
+    await expect(page.getByRole("region", { name: "Seçili ürün özeti", exact: true })).toContainText("30,00 ₺");
     await page.waitForTimeout(600);
     await expect(page.getByRole("heading", { name: "Seçili ürün · İçme suyu" })).toBeFocused();
     await expect(page.getByRole("button", { name: "Belgeyi aç · A1", exact: true })).toHaveCount(0);
@@ -201,9 +201,16 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
     if (scenario === "empty") { await expect(page.locator(".monthly-amount")).toHaveText("Bu ay satış veya iade yok"); await expect(page.locator(".zero-marker")).toHaveCount(30); }
     if (scenario === "zero") { await expect(page.locator(".monthly-amount")).toHaveText("0,00 ₺"); await expect(page.locator(".zero-marker")).toHaveCount(30); }
     if (scenario === "loss") { await expect(page.locator(".monthly-amount")).toHaveText("-20,00 ₺"); await expect(summary).toContainText("Tahmini brüt zarar"); }
-    if (scenario === "return-only") { await expect(page.locator(".monthly-amount")).toHaveText("-40,00 ₺"); await expect(summary).toContainText("Hesaplanamıyor"); await page.getByRole("button", { name: "Çay", exact: true }).click(); await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toContainText("Asıl belgenin ayrıntısı bu görünümde mevcut değil"); }
+    if (scenario === "return-only") { await expect(page.locator(".monthly-amount")).toHaveText("-40,00 ₺"); await expect(summary).toContainText("Hesaplanamıyor"); await page.getByRole("button", { name: "Çay", exact: true }).click(); await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click(); await expect(page.getByRole("region", { name: "Asıl satış kanıtı", exact: true })).toContainText("31.08.2025"); }
     if (scenario === "no-cost" || scenario === "unsupported") { await expect(page.locator(".monthly-amount")).toHaveText("Hesaplanamıyor"); await expect(page.locator(".monthly-trend .bar-column").first().locator("rect, circle")).toHaveCount(0); }
     if (scenario === "partial") { await expect(summary).toContainText("Kısmi dönem"); await expect(page.locator(".zero-marker")).toHaveCount(1); await expect(page.locator(".monthly-trend .bar-column").nth(2).locator("rect, circle")).toHaveCount(0); }
+    if (["zero", "loss", "no-cost", "partial"].includes(scenario)) {
+      await page.getByRole("region", { name: "Ürün katkıları", exact: true }).locator("tbody button").first().click();
+      const selected = page.getByRole("region", { name: "Seçili ürün özeti", exact: true });
+      await expect(selected).toContainText(scenario === "zero" ? "0,00 ₺" : scenario === "loss" ? "-20,00 ₺" : scenario === "no-cost" ? "Hesaplanamıyor" : "40,00 ₺");
+      if (scenario === "no-cost") await expect(selected).toContainText("0 kapsanan / 1 dışlanan");
+      if (scenario === "partial") await expect(selected).toContainText("Dönem veya kaynak kapsamı eksik");
+    }
     await page.getByText("Günlük tutarlar", { exact: true }).click();
     await expect(page.locator(".monthly-trend table tbody tr")).toHaveCount(30);
     await page.screenshot({ path: testInfo.outputPath("lane-06-07.png") });
@@ -230,6 +237,9 @@ test("keyboard zoom, full-document scope and filtered export preserve the pinned
     await expect(opener).toBeFocused();
     await opener.press("Enter");
     await expect(page.getByRole("heading", { name: "Seçili ürün · Çay" })).toBeFocused();
+    await expect(page.getByRole("region", { name: "Seçili ürün özeti", exact: true })).toContainText("%40");
+    await page.getByText("Seçili ürünün günlük tutarları", { exact: true }).click();
+    await expect(page.getByRole("table", { name: "Seçili ürünün günlük tutarları", exact: true }).locator("tbody tr")).toHaveCount(30);
     await page.getByRole("button", { name: "Belgeyi aç · A1", exact: true }).press("Enter");
     const documentProof = page.getByRole("region", { name: "Sabit belge kanıtı" });
     await expect(documentProof).toContainText("Kaydedilen tam belge neti: 250,00 ₺");

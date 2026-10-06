@@ -58,8 +58,8 @@ function requestService(request: {operation:"querySourceWorkspace";payload:Sourc
 function requestService(request: {operation: "readSourcePreview"; payload: SourcePreviewRequest}): Promise<SourcePreviewResult>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
-function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
-function requestService(request: Extract<ReportServiceRequest, {operation: "exportReportVersion"}>): Promise<ServiceResponse["result"]>;
+function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
+function requestService(request: Extract<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}>): Promise<ServiceResponse["result"]>;
 function requestService(request: { operation: "queryPurchasing"; payload: QueryPurchasingRequest }): Promise<PurchasingReportResult>;
 function requestService(request: { operation: "openSales"; payload: OpenSalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
@@ -205,9 +205,9 @@ app.whenReady().then(async () => {
         },
         async (operation, payload) => {
           const request = {operation, payload} as ReportServiceRequest;
-          if (request.operation === "exportReportVersion") return saveReportExport(
+          if (request.operation === "exportReportVersion" || request.operation === "exportReportProduct") return saveReportExport(
             () => requestService(request),
-            () => dialog.showSaveDialog(window, {title: "Seçili raporu Excel olarak kaydet", defaultPath: "Esmer-aylik-rapor.xlsx", filters: [{name: "Excel çalışma kitabı", extensions: ["xlsx"]}]}),
+            () => dialog.showSaveDialog(window, {title: request.operation === "exportReportProduct" ? "Seçili ürünü Excel olarak kaydet" : "Tüm ay raporunu Excel olarak kaydet", defaultPath: request.operation === "exportReportProduct" ? "Esmer-secilen-urun.xlsx" : "Esmer-aylik-rapor.xlsx", filters: [{name: "Excel çalışma kitabı", extensions: ["xlsx"]}]}),
             atomicWriteFile,
           );
           if (request.operation === "openMonthly" || request.operation === "queryMonthly") return jobs.run(request.operation, job => requestService({...request, job}));

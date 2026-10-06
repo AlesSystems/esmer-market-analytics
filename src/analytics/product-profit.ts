@@ -9,7 +9,7 @@ type Scope = { netSales: string | null; coveredSales: string | null; coveredCost
 export type ProductProfitLine = SalesComponent & { cost: string | null; historicalUnitCost: string | null; originalSaleLineId: string | null; costReason: CostRow["reason"] | "UNSUPPORTED_COST_MAPPING" | null; costEvidence: string | null };
 export type ProductProfit = { version: typeof PRODUCT_PROFIT_VERSION; lineage: string; period: string; summary: Scope & { status: "empty" | "ready" | "unavailable"; scope: "market" | "covered"; salesCoverage: { complete: boolean; unresolvedCount: number; exposure: string | null }; periodCoverage: { from: string; to: string; complete: boolean }; warnings: string[] }; products: (Scope & { productId: string; displayName: string; displayStatus: "approved" | "fallback" })[]; daily: (Scope & { date: string; status: "empty" | "ready" | "unavailable"; sourceCoverage: "complete" | "partial" | "unavailable"; trend: string | null })[]; lines: ProductProfitLine[]; sourceExclusions: { documentId: string; date: string; reason: SalesResult["exclusions"][number]["reason"]; exposure: null }[] };
 
-function scope(lines: ProductProfitLine[], supported: boolean): Scope {
+export function projectProductProfitScopeV1(lines: ProductProfitLine[], supported: boolean): Scope {
   const covered = lines.filter(row => row.costReason === null), excluded = lines.filter(row => row.costReason !== null);
   const netSales = sum(lines.map(row => row.net)), coveredSales = sum(covered.map(row => row.net));
   const coveredCost = supported && covered.length ? sum(covered.map(row => row.cost!)) : null;
@@ -50,19 +50,19 @@ export function buildProductProfit(input: { sales: SalesResult; gross: GrossResu
   const relevant = (date: string) => sourceExclusions.some(row => row.date === date && ["UNKNOWN_MEANING", "CONVERSION_CONFLICT", "NO_LINES"].includes(row.reason)) || sales.documents.some(doc => doc.date === date && !doc.reconciled);
   const groups = new Map<string, ProductProfitLine[]>();
   for (const line of lines) { const group = groups.get(line.productId) ?? []; group.push(line); groups.set(line.productId, group); }
-  const products = [...groups].map(([productId, group]) => { const name = group[0].productName?.trim(); return { productId, displayName: name || `Ürün #${productId}`, displayStatus: name ? "approved" as const : "fallback" as const, ...scope(group, supported) }; })
+  const products = [...groups].map(([productId, group]) => { const name = group[0].productName?.trim(); return { productId, displayName: name || `Ürün #${productId}`, displayStatus: name ? "approved" as const : "fallback" as const, ...projectProductProfitScopeV1(group, supported) }; })
     .sort((a, b) => a.productId.localeCompare(b.productId, "en"));
   const daily: ProductProfit["daily"] = [];
   const last = new Date(Date.UTC(Number(period.slice(0, 4)), Number(period.slice(5, 7)), 0)).getUTCDate();
   for (let day = 1; day <= last; day++) {
     const date = `${period}-${String(day).padStart(2, "0")}`;
-    const group = lines.filter(line => line.date === date), values = scope(group, supported);
+    const group = lines.filter(line => line.date === date), values = projectProductProfitScopeV1(group, supported);
     const observed = date >= coverage.from && date <= coverage.to;
     const sourceCoverage = !observed ? "unavailable" : !coverage.complete || relevant(date) ? "partial" : "complete";
     const status = !supported || sourceCoverage !== "complete" && !group.length || sourceCoverage === "unavailable" || group.length > 0 && values.coveredCount === 0 ? "unavailable" : group.length ? "ready" : "empty";
     daily.push({ ...values, ...(status === "unavailable" && !group.length ? { netSales: null, coveredSales: null, coveredCost: null, coveredGrossProfit: null, coveredMarginPercent: null, costCoveragePercent: null } : {}), date, status, sourceCoverage, trend: status === "unavailable" && !group.length ? null : values.coveredGrossProfit ?? (status === "empty" ? "0" : null) });
   }
-  const summary = scope(lines, supported);
+  const summary = projectProductProfitScopeV1(lines, supported);
   const complete = supported && sales.complete && coverage.complete && coverage.from <= `${period}-01` && coverage.to >= `${period}-${last}` && summary.excludedCount === 0;
   const unresolvedCount = sourceExclusions.filter(row => ["UNKNOWN_MEANING", "CONVERSION_CONFLICT", "NO_LINES"].includes(row.reason)).length + sales.documents.filter(row => !row.reconciled).length;
   return { version: PRODUCT_PROFIT_VERSION, lineage, period, summary: { ...summary, status: supported && !lines.length && unresolvedCount === 0 && complete ? "empty" : !supported || !summary.coveredCount || !lines.length && unresolvedCount > 0 ? "unavailable" : "ready", scope: complete ? "market" : "covered", salesCoverage: { complete: sales.complete, unresolvedCount, exposure: unresolvedCount ? null : "0" }, periodCoverage: coverage, warnings: [...new Set([...gross.warnings, ...(!sales.complete ? ["INCOMPLETE_SALES"] : [])])] }, products, daily, lines, sourceExclusions };
