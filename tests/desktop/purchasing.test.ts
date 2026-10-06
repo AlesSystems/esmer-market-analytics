@@ -52,6 +52,7 @@ test("purchasing shows covered estimates and follows converted return evidence w
     const panel = page.getByRole("main", { name: "Alış kaynak detayı" });
     await expect(panel.getByRole("heading", { name: "Maliyet ve alış kaynak detayı" })).toBeFocused();
     await expect(panel.getByText("İrsaliye", { exact: true })).toBeVisible();
+    await panel.locator(":scope > details > summary").click();
     await expect(panel.getByText("business-1", { exact: true })).toBeVisible();
     await page.screenshot({ path: "test-results/phase-6-purchasing-source.png", fullPage: true });
     await panel.getByRole("button", { name: "R1", exact: true }).click();
@@ -59,9 +60,15 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await panel.getByRole("button", { name: "D1", exact: true }).click();
     await expect(panel.getByText("İrsaliye", { exact: true })).toBeVisible();
     await page.keyboard.press("Escape");
+    await expect(panel.getByText("Fatura", {exact:true})).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel.getByText("İrsaliye", {exact:true})).toBeVisible();
+    await page.keyboard.press("Escape");
     await expect(page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).getByRole("button", { name: "D1", exact: true })).toBeFocused();
     await page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).getByRole("button", { name: "D1", exact: true }).click();
     await panel.getByRole("button", { name: "R1", exact: true }).click();
+    await panel.getByRole("button", { name: "Önceki belgeye dön", exact: true }).click();
+    await expect(panel.getByRole("button", {name:"R1",exact:true})).toBeFocused();
     await panel.getByRole("button", { name: "Alışlara dön", exact: true }).click();
     await expect(page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).getByRole("button", { name: "D1", exact: true })).toBeFocused();
     await page.setViewportSize({ width: 680, height: 720 });
@@ -71,12 +78,14 @@ test("purchasing shows covered estimates and follows converted return evidence w
     await importPackage(page);
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
     await page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).getByRole("button", { name: "D1", exact: true }).click();
+    await panel.locator(":scope > details > summary").click();
     await expect(panel.getByText("business-1", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Raporu yenile" }).click();
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
     await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
     await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
     await page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true }).getByRole("button", { name: "D1", exact: true }).click();
+    await panel.locator(":scope > details > summary").click();
     await expect(panel.getByText("business-2", { exact: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -105,6 +114,9 @@ test("customer return evidence opens its original sale from the prior month and 
     await expect(panel.getByText("15.08.2025", { exact: true })).toBeVisible();
     await expect(panel.getByText("Satır: L1", { exact: true })).toBeVisible();
     await expect(panel.getByRole("heading", { name: "Maliyet ve alış kaynak detayı" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(panel.getByRole("button",{name:"S1",exact:true})).toBeFocused();
+    await expect(panel.getByText("15.09.2025",{exact:true})).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(opener).toBeFocused();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
