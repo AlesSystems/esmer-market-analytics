@@ -9,7 +9,6 @@ type Scope = { netSales: string | null; coveredSales: string | null; coveredCost
 export type ProductProfitLine = SalesComponent & { cost: string | null; historicalUnitCost: string | null; originalSaleLineId: string | null; costReason: CostRow["reason"] | "UNSUPPORTED_COST_MAPPING" | null; costEvidence: string | null };
 export type ProductProfit = { version: typeof PRODUCT_PROFIT_VERSION; lineage: string; period: string; summary: Scope & { status: "empty" | "ready" | "unavailable"; scope: "market" | "covered"; salesCoverage: { complete: boolean; unresolvedCount: number; exposure: string | null }; periodCoverage: { from: string; to: string; complete: boolean }; warnings: string[] }; products: (Scope & { productId: string; displayName: string; displayStatus: "approved" | "fallback" })[]; daily: (Scope & { date: string; status: "empty" | "ready" | "unavailable"; sourceCoverage: "complete" | "partial" | "unavailable"; trend: string | null })[]; lines: ProductProfitLine[]; sourceExclusions: { documentId: string; date: string; reason: SalesResult["exclusions"][number]["reason"]; exposure: null }[] };
 
-// Frozen monthly-product-profit-v1 aggregation; reads reuse stored inclusion outcomes.
 export function projectProductProfitScopeV1(lines: ProductProfitLine[], supported: boolean): Scope {
   const covered = lines.filter(row => row.costReason === null), excluded = lines.filter(row => row.costReason !== null);
   const netSales = sum(lines.map(row => row.net)), coveredSales = sum(covered.map(row => row.net));
