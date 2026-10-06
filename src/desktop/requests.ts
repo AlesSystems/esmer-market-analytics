@@ -1,8 +1,8 @@
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
-import type { LiveResult, Preferences, PreferencesResult } from "../domain/contracts";
-import { validPreferences } from "./preferences";
+import type { LiveResult, PreferencesPatch, PreferencesResult } from "../domain/contracts";
+import { validPreferencesPatch } from "./preferences";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
 import type { ExpenseRequests, ExpenseResult, OperatingReportResult } from "../expenses/contracts";
@@ -91,7 +91,7 @@ export async function handleRequest(
   sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
   sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
-  preferences?: {get: () => Promise<PreferencesResult>; set: (request: Preferences) => Promise<PreferencesResult>},
+  preferences?: {get: () => Promise<PreferencesResult>; set: (request: PreferencesPatch) => Promise<PreferencesResult>},
 ): Promise<PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
@@ -101,7 +101,7 @@ export async function handleRequest(
     };
   if (preferences && (operation === "getPreferences" || operation === "setPreferences")) {
     if (operation === "getPreferences" && payload === null) return preferences.get();
-    if (operation === "setPreferences" && validPreferences(payload)) return preferences.set(payload);
+    if (operation === "setPreferences" && validPreferencesPatch(payload)) return preferences.set(payload);
     return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
   }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {
