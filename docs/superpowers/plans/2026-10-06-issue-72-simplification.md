@@ -111,7 +111,7 @@ Inspect actual owners before adding each proposed file. Reuse existing types/hel
 | N03d | Expenses, reports and Settings composition | N03b, N03c | Completed; existing mutations, report history/export and source modes preserved |
 | N04 | Integrated and packaged verification | N03d | Completed; suites, screenshots, window/zoom/keyboard and build evidence |
 | N05 | Independent code, UX, accessibility and data-meaning review | N04 | Completed; findings fixed and re-tested |
-| N06 | Integration, product/design delta and exact handoff | N05 | Running; evidence and coherent commits prepared; PR delivery pending |
+| N06 | Integration, product/design delta and exact handoff | N05 | Completed; evidence, coherent commits and [PR #73](https://github.com/AlesSystems/esmer-market-analytics/pull/73) delivered; platform gates remain open |
 
 One implementation owner serializes shell/month/detail writes. Read-only review is independent. Use a suitable attached worktree or create `codex/issue-72-simplification` at execution time. Preserve existing untracked `outputs/` and other worktrees. Verify origin before any commit/push/PR. No merge is part of this plan.
 
@@ -164,7 +164,7 @@ Each unit begins with focused failing behavioral tests, distinguishes applicatio
 - [x] Update product/design and affected contracts/briefs explicitly. Issue 72 supersedes prior overview composition and inline detail placement, while preserving their calculation and evidence contracts.
 - [x] Record task/gate, commit/build, safe fixture, environment, procedure, expected/actual outcomes, screenshots, limitations and Windows continuation in `docs/evidence/2026-10-06-issue-72-simplification.md`.
 - [x] Complete the issue's nine owner tasks in the working application using synthetic automated packaged journeys. This verifies workflow behavior; it does not establish uncoached owner usability. User-reviewed prototype is N01 evidence only. Eralp acceptance remains open; no owner contact occurred.
-- [ ] Use small coherent commits and a PR linked to #72 and this plan. Attach screenshots and identify preference-file change, narrow IPC extension and lack of new financial/source semantics. Report branch, hashes, PR and remaining gates.
+- [x] Use small coherent commits and a PR linked to #72 and this plan. Attach screenshots and identify preference-file change, narrow IPC extension and lack of new financial/source semantics. Report branch, hashes, PR and remaining gates.
 
 ## Review focus
 

@@ -4,7 +4,7 @@ The user approved the representative UI and [implementation plan](../superpowers
 
 ## Build and boundaries
 
-Application/test commit: `7ba289141899fda18306e2a7f4daa0aba335d42d`. Branch: `codex/issue-72-simplification`. Base: main `afe93cdd1abe5f127240d761a6174aaa1c172e8f`. Verified origin: `https://github.com/AlesSystems/esmer-market-analytics.git`. A native attached worktree isolates this change; unrelated primary-checkout output and other worktrees were preserved. Documentation and evidence are a subsequent separate commit.
+Application/test commit: `7ba289141899fda18306e2a7f4daa0aba335d42d`. Branch: `codex/issue-72-simplification`. Base: main `afe93cdd1abe5f127240d761a6174aaa1c172e8f`. Verified origin: `https://github.com/AlesSystems/esmer-market-analytics.git`. A native attached worktree isolates this change; unrelated primary-checkout output and other worktrees were preserved. Documentation and evidence are a subsequent separate commit (`407abae`), followed by this delivery receipt. [PR #73](https://github.com/AlesSystems/esmer-market-analytics/pull/73) targets main and is open for review.
 
 Environment: macOS 27.0 arm64, Node 24.15.0, npm 11.12.1, Electron 44.3.0. Fixtures are synthetic: `productProfitRecords`, legacy sales mapping, purchasing snapshots, `rawSnapshot`, prepared estimate packages, app-owned expense profiles and saved v1/v2 reports. Visual fixtures add fabricated P1/EMPTY purchase documents and `purchase2`. No identifying records or credentials appear in captures.
 
@@ -85,7 +85,7 @@ The remaining captures under `issue-72/` cover sales, products, transactions, pu
 
 ## Execution state and Windows continuation
 
-N01 design/user review, N02 behavioral contracts, N03 implementation, N04 local integrated verification and N05 independent review are completed. N06 documentation/integration delivers this receipt and the requested PR. Local N04 completion records the attempted Windows packaging and open gates; it does not certify Windows acceptance. Small Conventional Commits retain the test/implementation/regression sequence; no unrelated cleanup is included.
+N01 design/user review, N02 behavioral contracts, N03 implementation, N04 local integrated verification and N05 independent review are completed. N06 documentation/integration is completed with this receipt and [PR #73](https://github.com/AlesSystems/esmer-market-analytics/pull/73). Local N04 completion records the attempted Windows packaging and open gates; it does not certify Windows acceptance. Small Conventional Commits retain the test/implementation/regression sequence; no unrelated cleanup is included.
 
 Use branch `codex/issue-72-simplification`, application build `7ba2891` or the later documentation-only PR head, on a supported Windows x64 environment:
 
