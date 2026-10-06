@@ -160,11 +160,11 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
       parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
-    const known = ["querySourceEstimate", "exportSourceEstimate", "querySourceWorkspace", "readSourcePreview", "createExpense", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
+    const known = ["querySourceEstimate", "exportSourceEstimate", "querySourceWorkspace", "readSourcePreview", "createExpense", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchaseDocuments", "inspectPurchaseDocument", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (monthlyOperations.includes(request.operation) && (!("payload" in request) || !validMonthlyRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
-    if (["queryPurchasing", "openSales", "querySales", "inspectSales"].includes(request.operation) && (!("payload" in request) || !validReportRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
+    if (["queryPurchaseDocuments", "inspectPurchaseDocument", "queryPurchasing", "openSales", "querySales", "inspectSales"].includes(request.operation) && (!("payload" in request) || !validReportRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
     let progressPhase = "", progressTime = 0;
     const control: OperationControl = request.job ? {
       checkCancelled: () => { if (Atomics.load(new Int32Array(request.job!.cancellation), 0)) throw new Error("CANCELLED"); },
@@ -206,6 +206,8 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       if (!validSourcePreviewRequest(request.payload)) throw new Error("INVALID_PAYLOAD");
       result = store.readSourcePreview(request.payload);
     }
+    else if (request.operation === "queryPurchaseDocuments") result = reports!.purchaseDocuments(request.payload);
+    else if (request.operation === "inspectPurchaseDocument") result = reports!.purchaseDocument(request.payload);
     else if (request.operation === "queryPurchasing") result = reports!.purchasing(request.payload);
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);

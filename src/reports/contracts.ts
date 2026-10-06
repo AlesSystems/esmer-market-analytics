@@ -20,6 +20,12 @@ export type QueryPurchasingRequest = { context: ReportContext };
 export type PurchasingView = { coverage: "complete" | "partial" | "unavailable"; costCalculationVersion: string; purchasingCalculationVersion: string; context: ReportContext; cutoff: string; lineage: string; extractionId: string; mappingVersion: string; from: string; to: string; stale: boolean; evidence: { documents: import("../source/package").DocumentRecord[]; lines: import("../source/package").LineRecord[] }; gross: import("../analytics/costs").GrossResult; purchasing: import("../analytics/purchasing").PurchasingResult };
 export type PurchasingReportResult = { status: "purchasing"; view: PurchasingView } | SalesFailure;
 
+export type PurchaseDocumentsRequest = {context: ReportContext; search: string; offset: number};
+export type PurchaseDocumentRequest = {context: ReportContext; documentId: string; offset: number};
+export type PurchaseDocumentRow = {id: string; date: string; representation: "invoice" | "dispatch" | "unknown"; supplierName: string | null; recorded: {net: string; tax: string; gross: string} | null; lineCount: number; recognition: "calculated" | "unsupported" | "unknown"; reasons: string[]};
+export type PurchaseDocumentsResult = {status: "purchase-documents"; context: ReportContext; documents: PurchaseDocumentRow[]; total: number; offset: number} | SalesFailure;
+export type PurchaseDocumentResult = {status: "purchase-document"; context: ReportContext; document: PurchaseDocumentRow; lines: import("../source/package").LineRecord[]; total: number; offset: number; linkedDocuments: PurchaseDocumentRow[]} | SalesFailure;
+
 export type OperationControl = { checkCancelled?: () => void; onProgress?: (phase: string, completed: number, total: number) => void };
 type MonthlyBase = {
   id: string; context: ReportContext;
