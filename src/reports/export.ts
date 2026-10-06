@@ -2,6 +2,7 @@ import writeXlsxFile, { type Row, type Cell } from "write-excel-file/node";
 import { Exact } from "../domain/money";
 import { classificationLabels, type Classification } from "../expenses/contracts";
 import { canonical } from "../source/package";
+import { reportProduct, productDependencySelector } from "./product-detail";
 import type { MonthlyReport } from "./contracts";
 
 const text = (value: unknown): Cell => value === null || value === undefined ? null : { type: String, value: String(value) };
@@ -96,6 +97,10 @@ export async function excelReport(input: MonthlyReport): Promise<Buffer> {
     );
   }
   const sheets = sections.map(([sheet, data]) => ({ sheet, data: [...metadata, ...data], columns: Array.from({ length: data.reduce((maximum, row) => Math.max(maximum, row.length), 5) }, (_, index) => ({ width: index === 0 ? 42 : index % 3 === 0 ? 36 : 24 })) }));
+  return writeWorkbook(sheets);
+}
+
+async function writeWorkbook(sheets: { sheet: string; data: Row[]; columns?: { width: number }[] }[]): Promise<Buffer> {
   for (const sheet of sheets) {
     if (sheet.data.length > 1_048_576) throw new Error("EXCEL_ROW_LIMIT");
     for (const row of sheet.data) {
@@ -104,4 +109,56 @@ export async function excelReport(input: MonthlyReport): Promise<Buffer> {
     }
   }
   return writeXlsxFile(sheets).toBuffer();
+}
+
+export async function excelProductReport(report: MonthlyReport, productId: string): Promise<Buffer> {
+  const detail = reportProduct(report, productId);
+  if (detail.status === "unavailable") throw new Error(detail.code);
+  if (report.format !== "monthly-report-v2") throw new Error("PRODUCT_PROFIT_UNAVAILABLE");
+  const lines = report.productProfit.lines.filter(row => row.productId === productId);
+  const documentIds = new Set(lines.map(row => row.documentId)), permittedDocuments = new Set<string>();
+  const selectDependency = productDependencySelector(report, productId);
+  const dependencies = lines.filter(row => row.kind === "customer-return").map(row => {
+    const result = selectDependency(row.lineId, 0);
+    if (result.status === "product-dependency") {
+      permittedDocuments.add(result.document.id);
+      return { returnLineId: row.lineId, originalLineId: result.originalLineId, documentId: result.document.id, status: "available", reason: null };
+    }
+    return { returnLineId: row.lineId, originalLineId: row.originalSaleLineId, documentId: null, status: "unavailable", reason: result.message };
+  });
+  const metadata: Row[] = [
+    [text("Kapsam"), text("Seçili ürün; özgün belgeler yalnız kanıttır, dönem toplamına eklenmez")],
+    [text("Rapor sürümü"), text(detail.reportId)], [text("Ürün kimliği"), text(productId)], [text("Ürün"), text(detail.summary.displayName)],
+    [text("Kaynak kökeni"), text(detail.lineage)], [text("Dönem"), text(detail.period)], [text("Veri kesimi"), text(detail.cutoff)],
+    [text("Kaynak veri kümesi"), text(report.context.datasetId)], [text("Uygulama revizyonu"), text(report.context.appRevision)],
+    [text("Hesaplama sürümleri"), text(canonical(detail.calculations))], [text("Yöntem kuralları"), text(canonical(detail.rules))], [text("Para birimi"), text("TRY")],
+    [text("Maliyet yöntemi"), text("Tarihsel son alış maliyeti tahmini; yalnız kapsanan satışlar; giderlerden önce")],
+    [text("Kaynak kapsamı"), text(detail.sourceCoverage.complete ? "Tam" : "Kısmi; ürüne atanmamış tutar bilinmiyor")],
+    [text("Çözümlenmemiş kaynak sayısı"), text(detail.sourceCoverage.unresolvedCount)], [text("Bilinmeyen kaynak tutarı"), text(detail.sourceCoverage.exposure)],
+    ...[...new Set(detail.warnings)].map(warning => [text("Uyarı"), text(label(warning)), text(warning)]),
+  ];
+  const metrics = [
+    ["Net satış", "netSales"], ["Maliyet kapsamındaki satış", "coveredSales"], ["Kapsanan maliyet", "coveredCost"],
+    ["Kapsanan tahmini brüt kâr", "coveredGrossProfit"], ["Kapsanan tahmini brüt marj (%)", "coveredMarginPercent"], ["Maliyet kapsamı (%)", "costCoveragePercent"],
+  ] as const;
+  const summary: Row[] = [[heading("Gösterge"), heading("Değer"), heading("Kesin ondalık değer"), heading("Duyarlılık açıklaması")],
+    ...metrics.map(([title, key]) => [text(title), ...numeric(detail.summary[key])]),
+    [text("Kapsanan satır sayısı"), text(detail.summary.coveredCount)], [text("Maliyeti dışlanan satır sayısı"), text(detail.summary.excludedCount)],
+    ...Object.entries(detail.summary.exposures).map(([key, value]) => [text(({ coveredSales: "Kapsanan satış tutarı", coveredReturns: "Kapsanan iade tutarı", excludedSales: "Dışlanan satış tutarı", excludedReturns: "Dışlanan iade tutarı" } as Record<string, string>)[key]), ...numeric(value)]),
+    ...detail.summary.quantities.flatMap(row => [[text(`Satılan miktar (${label(row.unit)})`), ...numeric(row.sold)], [text(`İade miktarı (${label(row.unit)})`), ...numeric(row.returned)], [text(`Net miktar (${label(row.unit)})`), ...numeric(row.net)]]),
+    ...detail.summary.exclusionReasons.map(reason => [text("Maliyet dışlama nedeni"), text(label(reason)), text(reason)]),
+  ];
+  const daily = table(detail.daily, [{ title: "Tarih", value: row => row.date }, { title: "Durum", value: row => label(row.status) }, { title: "Kaynak kapsamı", value: row => label(row.sourceCoverage) },
+    ...metrics.map(([title, key]) => ({ title, value: (row: typeof detail.daily[number]) => row[key], numeric: true })),
+    { title: "Kapsanan satır", value: row => row.coveredCount }, { title: "Dışlanan satır", value: row => row.excludedCount },
+    { title: "Miktarlar (ayrı birimler)", value: row => canonical(row.quantities) }, { title: "Satış ve iade kapsamı", value: row => canonical(row.exposures) }, { title: "Nedenler", value: row => row.exclusionReasons.map(label).join("; ") }]);
+  const sections: [string, Row[]][] = [
+    ["Ürün özeti", summary], ["Ürün günlük", daily], ["Ürün satırları", technical(lines)],
+    ["Ürün belgeleri", technical(report.salesEvidence.documents.filter(row => documentIds.has(row.id)))],
+    ["Özgün bağlantılar", table(dependencies, [{ title: "İade satırı", value: row => row.returnLineId }, { title: "Özgün satış satırı", value: row => row.originalLineId }, { title: "Özgün belge", value: row => row.documentId }, { title: "Durum", value: row => row.status === "available" ? "Kayıtlı kanıt" : "Kullanılamıyor" }, { title: "Neden", value: row => row.reason }])],
+    ["Özgün belgeler", technical(report.purchasing.evidence.documents.filter(row => permittedDocuments.has(row.id)))],
+    ["Özgün satırlar", technical(report.purchasing.evidence.lines.filter(row => permittedDocuments.has(row.documentId)))],
+    ["Kaynak belirsizliği", technical({ attribution: "Ürüne atanmamış kaynak dışlamaları; tutar bilinmiyor", sourceCoverage: detail.sourceCoverage, exclusions: report.productProfit.sourceExclusions })],
+  ];
+  return writeWorkbook(sections.map(([sheet, data]) => ({ sheet, data: [...metadata, ...data] })));
 }

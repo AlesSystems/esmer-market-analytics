@@ -1,3 +1,4 @@
+import { reportProduct, reportProductDependency } from "./product-detail";
 import { canonical } from "../source/package";
 import { Exact } from "../domain/money";
 import type { openStore } from "../store/store";
@@ -47,6 +48,12 @@ export class ReportVersions {
   }
   products(request: ReportProductsRequest) {
     return structuredClone(reportProducts(this.resolve(request.reportId), request));
+  }
+  product(request: { reportId: string; productId: string }) {
+    return reportProduct(this.resolve(request.reportId), request.productId);
+  }
+  productDependency(request: { reportId: string; productId: string; returnLineId: string; offset: number }) {
+    return reportProductDependency(this.resolve(request.reportId), request);
   }
   purchasing({ reportId }: { reportId: string }) {
     return { status: "purchasing" as const, view: structuredClone(this.resolve(reportId).purchasing) };
@@ -108,7 +115,7 @@ export class ReportVersions {
       const decimal = (v: unknown): v is string => typeof v === "string" && /^-?\d+(?:\.\d+)?$/.test(v);
       changes.push({ path, before: old, after: next, delta: decimal(old) && decimal(next) ? new Exact(next).minus(old).toFixed() : null });
     };
-    const comparable = (r: MonthlyReport) => ({ format: r.format, calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence, productProfit: r.format === "monthly-report-v2" ? { version: r.productProfit.version, summary: r.productProfit.summary } : null });
+    const comparable = (r: MonthlyReport) => ({ format: r.format, calculations: r.calculations, rules: r.rules, datasetId: r.context.datasetId, appRevision: r.context.appRevision, sales: { ...r.sales, context: undefined, stale: undefined }, purchasing: { ...r.purchasing, context: undefined, stale: undefined }, operating: { ...r.operating, context: undefined, stale: undefined }, salesEvidence: r.salesEvidence, appEvidence: r.appEvidence, productProfit: r.format === "monthly-report-v2" ? before.format === "monthly-report-v2" && after.format === "monthly-report-v2" ? r.productProfit : { version: r.productProfit.version, summary: r.productProfit.summary } : null });
     walk(comparable(before), comparable(after), "");
     return { status: "difference", candidateId, acceptedId, changes };
   }
