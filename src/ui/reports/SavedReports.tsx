@@ -12,6 +12,7 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod, active=tr
  const receipt=useRef<ReturnReceipt|null>(null);
  const heading=useRef<HTMLHeadingElement>(null);
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
+ const historyPeriod=useRef<string|null>(null),completedHistory=useRef<string|null>(null),readSequence=useRef(0),currentPeriod=useRef(period);currentPeriod.current=period;
  const [history,setHistory]=useState<ReportSummary[]>([]);
  const [historyState,setHistoryState]=useState<"loading"|"failed"|"ready">("loading");
  const [attempt,setAttempt]=useState(0);
@@ -23,24 +24,28 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod, active=tr
  const [busy,setBusy]=useState(false);
  useEffect(()=>{if(reportOpen&&active)heading.current?.focus();},[reportOpen,active]);
  useEffect(()=>{
-  if(!active)return;
+  const key=JSON.stringify([period,attempt]);
+  if(!active||completedHistory.current===key)return;
   let current=true;
-  setReport(undefined);setReportOpen(false);setHistory([]);setMessage("");setHistoryState("loading");
+  if(historyPeriod.current!==period){++readSequence.current;setBusy(false);setReport(undefined);setReportOpen(false);}
+  setMessage("");setHistoryState("loading");
   window.esmer.listReportVersions({period}).then(value=>{
    if(!current)return;
-   if(value.status==="history"){setHistory(value.reports);setHistoryState("ready");}
+   completedHistory.current=key;
+   if(value.status==="history"){historyPeriod.current=period;setHistory(value.reports);setHistoryState("ready");}
    else {setMessage(value.message);setHistoryState("failed");}
-  }).catch(()=>{if(current){setMessage("Kaydedilmiş raporlar okunamadı.");setHistoryState("failed");}});
+  }).catch(()=>{if(current){completedHistory.current=key;setMessage("Kaydedilmiş raporlar okunamadı.");setHistoryState("failed");}});
   return()=>{current=false;};
  },[period,attempt,active]);
- async function read(reportId:string,button?:HTMLButtonElement){if(button)receipt.current=captureReturn(button);setBusy(true);setMessage("");try{const value=await window.esmer.readReportVersion({reportId});if(!alive.current)return;if(value.status==="monthly"){setReport(value.report);if(button)setReportOpen(true);}else setMessage(value.message);}catch{if(alive.current)setMessage("Rapor açılamadı.");}finally{if(alive.current)setBusy(false);}}
+ async function read(reportId:string,button?:HTMLButtonElement){const request=++readSequence.current,requestedPeriod=period;if(button)receipt.current=captureReturn(button);setBusy(true);setMessage("");try{const value=await window.esmer.readReportVersion({reportId});if(!alive.current||request!==readSequence.current||requestedPeriod!==currentPeriod.current)return;if(value.status==="monthly"){setReport(value.report);if(button)setReportOpen(true);}else setMessage(value.message);}catch{if(alive.current&&request===readSequence.current)setMessage("Rapor açılamadı.");}finally{if(alive.current&&request===readSequence.current)setBusy(false);}}
  async function exportReport(){if(!report)return;setBusy(true);try{const value=await window.esmer.exportReportVersion({reportId:report.id});if(!alive.current)return;setMessage(value.status==="saved"?"Kaydedilmiş rapor Excel dosyasına aktarıldı.":value.status==="cancelled"?"Dışa aktarma iptal edildi.":value.message);}catch{if(alive.current)setMessage("Rapor dışa aktarılamadı.");}finally{if(alive.current)setBusy(false);}}
  return <section className="report-workspace" aria-busy={busy||historyState==="loading"}><div className="page-heading"><div><h1 ref={heading} tabIndex={-1}>Raporlar</h1><p>Kaydedilmiş rapor arşivi · {period}</p></div></div>
   <p className="notice warning">Kaydedilmiş raporlar açık SQL yedeğinden üretilmedi; kendi kaynak sürümlerine aittir.</p>
   <p>Doğrulanmış satış verisi henüz hazır değil. Açık SQL yedeği yalnızca kaynak kayıtlarını gösterir; buradan yeni mali rapor oluşturulamaz.</p>
   {message&&historyState!=="failed"&&<p role={reportOpen?"status":"alert"} className="notice warning">{message}</p>}
   <div hidden={reportOpen}>
-   {historyState==="loading"?<p role="status">Raporlar yükleniyor…</p>:historyState==="failed"?<div className="notice warning" role="alert"><p>{message}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Raporları yeniden yükle</Button></div>:<ReportArchive active={!reportOpen} history={history} report={report} busy={busy} onSelect={id=>void read(id)} onOpen={(id,button)=>void read(id,button)} onExport={()=>void exportReport()}/>}
+   {historyState==="loading"&&<p role="status">Raporlar yükleniyor…</p>}{historyState==="failed"&&<div className="notice warning" role="alert"><p>{message}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Raporları yeniden yükle</Button></div>}
+   <div hidden={historyPeriod.current!==period}><ReportArchive active={active&&!reportOpen} history={history} report={report} busy={busy} onSelect={id=>void read(id)} onOpen={(id,button)=>void read(id,button)} onExport={()=>void exportReport()}/></div>
    {historyState==="ready"&&history.length===0&&onSourceSummary&&<Button variant="outline" onClick={onSourceSummary}>Kaynak kayıtlarının özetine dön</Button>}
   </div>
   {reportOpen&&report&&<>

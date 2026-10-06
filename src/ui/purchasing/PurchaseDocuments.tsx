@@ -14,7 +14,8 @@ export function PurchaseDocuments({context, active, onParentBack, onDetailOpen}:
  const identity=JSON.stringify(context),key=JSON.stringify([identity,query,attempt]);
  const detail=storedDetail&&JSON.stringify(storedDetail.context)===identity?storedDetail:undefined;
  const rows=list?.key===key?list.value:undefined;
- useEffect(()=>{setDetail(undefined);parents.current=[];++sequence.current;},[identity]);
+ useEffect(()=>{setDetail(undefined);setBusy(false);parents.current=[];++sequence.current;},[identity]);
+ useEffect(()=>{if(!active){++sequence.current;setBusy(false);}},[active]);
  useEffect(()=>{
   if(!active||list?.key===key)return;
   const token=++sequence.current;setError("");setBusy(true);
@@ -23,10 +24,10 @@ export function PurchaseDocuments({context, active, onParentBack, onDetailOpen}:
  },[key,active]);
  useEffect(()=>{if(detail&&active)detailHeading.current?.focus();},[detail,active]);
  async function inspect(documentId:string,offset=0,button?:HTMLButtonElement,linked=false){
-  if(linked&&detail)parents.current.push({detail,receipt:button?captureReturn(button):null});
-  else if(button)receipt.current=captureReturn(button);
+  const parent=linked&&detail?{detail,receipt:button?captureReturn(button):null}:null;
+  if(!linked&&button)receipt.current=captureReturn(button);
   const token=++sequence.current;setBusy(true);setError("");
-  try{const result=await window.esmer.inspectPurchaseDocument({context,documentId,offset});if(token!==sequence.current)return;if(result.status==="purchase-document")setDetail(result);else setError(result.message);}catch{if(token===sequence.current)setError("Belge okunamadı. Yeniden seçin.");}finally{if(token===sequence.current)setBusy(false);}
+  try{const result=await window.esmer.inspectPurchaseDocument({context,documentId,offset});if(token!==sequence.current)return;if(result.status==="purchase-document"){if(parent)parents.current.push(parent);setDetail(result);}else setError(result.message);}catch{if(token===sequence.current)setError("Belge okunamadı. Yeniden seçin.");}finally{if(token===sequence.current)setBusy(false);}
  }
  function back(){++sequence.current;setBusy(false);setError("");const parent=parents.current.pop();if(parent){setDetail(parent.detail);restoreReturn(parent.receipt,detailHeading.current);}else{setDetail(undefined);restoreReturn(receipt.current,heading.current);}}
  useEffect(()=>{onDetailOpen?.(!!detail);},[detail,onDetailOpen]);
