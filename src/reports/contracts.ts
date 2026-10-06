@@ -8,7 +8,7 @@ export type Breakdown = { id: string; name: string; categoryId?: string; netSale
 export type Transaction = SalesDocumentResult & { scopeNet: string };
 export type SalesView = { context: ReportContext; cutoff: string; importedAt: string | null; extractedAt: string; mappingVersion: string; from: string; to: string; coverage: "complete" | "partial" | "unavailable"; stale: boolean; complete: boolean; filters: SalesFilters; metrics: ReportMetrics; comparisons: { month: Comparison; year: Comparison }; categories: Breakdown[]; products: Breakdown[]; daily: { date: string; netSales: string; height: string; negative: boolean }[]; transactions: Transaction[]; exclusions: SalesExclusion[]; warnings: string[] };
 export type SalesDetail = { context: ReportContext; cutoff: string; lineage: string; importedAt: string | null; extractionId: string; mappingVersion: string; documentId: string; date: string; kind: string; state: string; scopeNet: string; totals: { net: string; tax: string; gross: string }; recorded: { net: string; tax: string; gross: string } | null; reconciled: boolean; exclusion: string | null; lines: (SalesComponent & { matchesScope: boolean })[]; excludedLines: { lineId: string; quantity: string; net: string; productName: string; reason: string; input: SalesLine | null }[] };
-export type SalesFailure = { status: "unavailable"; code: "EMPTY_STORE" | "UNSUPPORTED_MAPPING" | "STALE_CONTEXT" | "NOT_FOUND" | "UNSUPPORTED_ADJUSTMENTS" | "SERVICE_UNAVAILABLE" | "REPORT_NOT_FOUND" | "PRODUCT_PROFIT_UNAVAILABLE" | "INCOMPARABLE_REPORTS" | "REVIEW_CONFLICT" | "REPORT_TOO_LARGE" | "INVALID_REVIEW" | "EXCEL_ROW_LIMIT" | "EXCEL_COLUMN_LIMIT" | "EXCEL_CELL_LIMIT"; message: string };
+export type SalesFailure = { status: "unavailable"; code: "EMPTY_STORE" | "UNSUPPORTED_MAPPING" | "STALE_CONTEXT" | "NOT_FOUND" | "UNSUPPORTED_ADJUSTMENTS" | "SERVICE_UNAVAILABLE" | "REPORT_NOT_FOUND" | "PRODUCT_PROFIT_UNAVAILABLE" | "INCOMPARABLE_REPORTS" | "REVIEW_CONFLICT" | "REPORT_TOO_LARGE" | "INVALID_REVIEW" | "EXCEL_ROW_LIMIT" | "EXCEL_COLUMN_LIMIT" | "EXCEL_CELL_LIMIT" | "UNSUPPORTED_PROJECTION_VERSION" | "MISSING_STORED_FACTS"; message: string };
 export type SalesReportResult = { status: "report"; view: SalesView } | SalesFailure;
 export type SalesDetailResult = { status: "detail"; detail: SalesDetail } | SalesFailure;
 export type OpenSalesRequest = { period: string | null };
@@ -51,5 +51,8 @@ export type ReportRequestMap = {
   readReportEvidence: import("./display").ReportEvidenceRequest;
   readReportProducts: import("./display").ReportProductsRequest;
   readReportPurchasing: { reportId: string };
+  readReportProduct: { reportId: string; productId: string };
+  readReportProductDependency: { reportId: string; productId: string; returnLineId: string; offset: number };
+  exportReportProduct: { reportId: string; productId: string };
 };
-export type ReportResponse = import("./display").MonthlyDisplayResult | import("./display").ReportEvidencePage | import("./display").ReportProductsPage | PurchasingReportResult | ReportHistoryResult | ReportDifference;
+export type ReportResponse = import("./display").MonthlyDisplayResult | import("./display").ReportEvidencePage | import("./display").ReportProductsPage | PurchasingReportResult | ReportHistoryResult | ReportDifference | import("./product-detail").ProductDetailResult | import("./product-detail").ProductDependencyResult;

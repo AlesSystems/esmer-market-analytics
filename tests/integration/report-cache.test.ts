@@ -66,3 +66,23 @@ test("cancelled monthly composition leaves the session reusable and returned mut
     expect(warm.report.id).toBe(id);
   } finally { store.close(); }
 });
+
+
+test("public purchasing evidence remains detached from the pinned monthly candidate", () => {
+  const store = openStore(":memory:");
+  try {
+    store.importPackage(businessPackage());
+    const reports = new SalesReports(store);
+    const opened = reports.open({ period: "2025-09" });
+    if (opened.status !== "report") throw new Error("Expected report");
+    const before = reports.monthly(opened.view.context);
+    const purchasing = reports.purchasing({ context: opened.view.context });
+    if (before.status !== "monthly" || purchasing.status !== "purchasing") throw new Error("Expected reports");
+    purchasing.view.evidence.lines[0].net = "999";
+    purchasing.view.evidence.documents.length = 0;
+    purchasing.view.gross.coveredCost = "999";
+    purchasing.view.purchasing.history.length = 0;
+    expect(reports.monthly(opened.view.context)).toEqual(before);
+    expect(reports.purchasing({ context: opened.view.context })).toEqual({ status: "purchasing", view: before.report.purchasing });
+  } finally { store.close(); }
+});

@@ -1,6 +1,8 @@
-# Phase 10 release acceptance
+# Phase 10 release acceptance record
 
-**First-release acceptance is blocked.** Preview 0.2.0 is a tested synthetic development package, not the approved real-data reveal. This record tracks [issue #13](https://github.com/AlesSystems/esmer-market-analytics/issues/13), Tasks 10.1 and 10.2. Do not close the issue solely because the implementation PR merges.
+This is the historical Phase 10 matrix, not a current-build certification. [The evidence index](index.md) links later recorded-source estimates, manual expense entry and current open gates. A prepared estimate package is now usable with explicit assumptions; it does not validate the real financial mapping or replace the proof requirements below.
+
+**First-release acceptance was blocked at this recorded boundary.** Preview 0.2.0 is a tested synthetic development package, not the approved real-data reveal. This record tracks [issue #13](https://github.com/AlesSystems/esmer-market-analytics/issues/13), Tasks 10.1 and 10.2. Do not close the issue solely because the implementation PR merges.
 
 The branch is `codex/phase-10-windows-acceptance`, based on `db776c9`. [Windows evidence](windows-acceptance.md), [the machine-readable proof](phase-10-proof.json), [performance samples](phase-10-performance.json), and [licences](licences.md) identify the exact artifacts and observations. The package files remain local under `release/`. No GitHub release, owner contact, installation on Eralp's computer, or production connection occurred.
 

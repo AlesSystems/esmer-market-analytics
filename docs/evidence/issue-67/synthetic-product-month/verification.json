@@ -1,0 +1,99 @@
+{
+  "applicationCommit": "ea16d03afbf3e19ac4bf78c242464afdfee77f4f",
+  "baseCommit": "66e97f53453d10816f2d8b51cf2353cb99d78489",
+  "appAsarSha256": "230d52265d81c6207c0f2c6185c60d36bbf6ab57197a1353eee27cc97b8ce086",
+  "environment": {
+    "platform": "macOS27.0",
+    "architecture": "arm64",
+    "node": "24.15.0",
+    "electron": "44.3.0"
+  },
+  "suites": {
+    "unit": {
+      "passed": 53,
+      "skipped": 0
+    },
+    "integration": {
+      "passed": 341,
+      "skipped": 14
+    },
+    "packagedDesktop": {
+      "passed": 88,
+      "skipped": 11
+    }
+  },
+  "checks": [
+    {
+      "command": "npm test",
+      "result": "passed",
+      "passed": 482,
+      "skipped": 25,
+      "localReceipt": "work/issue-67/verified-tests.log",
+      "receiptSha256": "8a9784b3de036790d23779805dda05777e08210240618c3cd97800d2f354ea29"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed",
+      "passed": null,
+      "skipped": 0,
+      "localReceipt": "work/issue-67/verified-typecheck.log",
+      "receiptSha256": "47a4fc125a1978631dd2b956404c649f17ab25e1e666317b7442c8e06a281fdf"
+    },
+    {
+      "command": "npm run lint",
+      "result": "passed",
+      "passed": null,
+      "skipped": 0,
+      "localReceipt": "work/issue-67/verified-lint.log",
+      "receiptSha256": "17bc714d8256aa9bbdf4bde7fea75ec28d7a9afc549b24d0f6cb4b43ebcc93d8"
+    },
+    {
+      "command": "npm run package:local",
+      "result": "passed",
+      "passed": null,
+      "skipped": 0,
+      "localReceipt": "work/issue-67/final-package.log",
+      "receiptSha256": "49db3c3f12c2f810a440f58cc2a359318a789e53b39bae2b78fdbf2acd38a753"
+    }
+  ],
+  "windows": "Skipped by user instruction; acceptance remains open",
+  "realData": "Not accessed; G01 remains blocked",
+  "skippedIntegration": "Isolated synthetic SQL opt-ins in live-consistency, live-sql-server and synthetic-sql-dev",
+  "skippedDesktop": {
+    "windows": 6,
+    "isolatedSql": 3,
+    "privatePackages": 2
+  },
+  "review": {
+    "standards": "no remaining actionable findings; independent delta review excludes reviewer-authored unit fix",
+    "spec": "no remaining actionable findings; independently reviewed unit fix",
+    "modelDiversity": "same model family",
+    "standardsFocusedTests": 17,
+    "specFocusedTests": 33
+  },
+  "limitations": [
+    "Native dialogs stubbed to real temporary workbook writes",
+    "Non-Windows recovery uses existing safeStorage test substitute; no DPAPI proof",
+    "Capacity RSS is sampled combined Browser/service, not exact or service-only memory",
+    "Baseline/head small-fixture samples were batched rather than interleaved",
+    "Maximum export probe measures successful writing and file size; row read-back equivalence is tested on smaller boundary fixtures"
+  ],
+  "demo": {
+    "commit": "4787427",
+    "command": "ESMER_S02_REVIEW=docs/evidence/issue-67/synthetic-product-month npm exec -- playwright test tests/desktop/product-detail.test.ts",
+    "passed": 2,
+    "durationSeconds": 32.7,
+    "video": "walkthrough.webm",
+    "note": "Final test-only repair keeps optional UI export before direct IPC context replacement; full suite app build unchanged",
+    "receiptSha256": "8b5fe3ee22ca88b3bbdf523e9d63f9d836388cbeb13ba433de73f73fb7a06a02",
+    "videoDurationSeconds": 33.04
+  },
+  "artifactHashes": {
+    "monthly-export.png": "68ae52b66744911ee0f3ab59df3d015ee17855878776b35276d32207e3333e7a",
+    "daily.png": "1d73302549bdadb638d1080d805a9a613005174da1a0c9c492bc0858389ae828",
+    "selected-summary.png": "0e835a8ad3ddfda607bd05de324f1f2f2142f30e8eed85f65ad02f62db4697d7",
+    "walkthrough.webm": "40e1e614a190563c68c4f20e5602f49df5fef5c7500a5e0ed7cc502e2b22a621",
+    "product-export.png": "227ec6d5cb5db0dcf36df35af3f1f5569814f8973cb7182d1a9bfe1de8f870ef",
+    "original-sale.png": "8fd39ea02c2dac6e30599d41b88544bba896b9f7b3ce3f333fef865da655aade"
+  }
+}

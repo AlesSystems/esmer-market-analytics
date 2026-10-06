@@ -1,5 +1,7 @@
 # Prepare Esmer Market for a real-data profit release
 
+Historical execution record from 2026-10-01. Branch pins, tracker states and instructions below describe that run. Use [the current evidence index](../docs/evidence/index.md) and the assigned task for present scope and acceptance.
+
 Deliver an offline Windows application for Eralp with explainable monthly product profit.
 Keep historical cost labelled as an estimate and unsupported financial meanings unavailable.
 Continue issues #39, #40, #41, #42, and #43 under trackers #36 and #3.
@@ -61,7 +63,7 @@ flowchart TD
 
 ### PR mechanics, for every PR
 
-- [ ] Use `gh` for tracker and PR operations as required by `docs/agents/issue-tracker.md`. Reuse #46 and #47. New PR numbers remain unassigned until GitHub creates them. R39, R40, R41, R42, and R43 below are local work-unit IDs, not invented PR numbers.
+- [ ] Use `gh` for tracker and PR operations as required by `AGENTS.md`. Reuse #46 and #47. New PR numbers remain unassigned until GitHub creates them. R39, R40, R41, R42, and R43 below are local work-unit IDs, not invented PR numbers.
 - [ ] Review #46 as a documentation prerequisite. Check its four changed files, local links, privacy boundaries, and evidence claims at its current head. Merge only after an independent docs verdict. Record that #39 remains open. Runtime lane matrices do not apply to this evidence-only PR.
 - [ ] Preserve small Conventional Commits. First expose a missing behavioral contract with a focused failing test, then implement the smallest fix, then add boundary coverage and evidence where needed. Record toolchain failures separately from application failures.
 - [ ] Run deslop before commits and no-comments before code review. For docs-only changes, check the diff and links instead of rerunning the application suite. Do not modify unrelated comments or files.

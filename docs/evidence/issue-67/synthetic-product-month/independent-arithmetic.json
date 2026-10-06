@@ -1,0 +1,22 @@
+{
+  "cross_month_return": {
+    "sales": "-100",
+    "cost": "-60",
+    "gross": "-40"
+  },
+  "mixed_units": {
+    "sales": "130",
+    "cost": "173/2",
+    "gross": "87/2"
+  },
+  "full_precision_export": {
+    "sales": "123/40",
+    "cost": "0",
+    "gross": "123/40"
+  },
+  "maximum_dependencies": {
+    "sales": "-833300",
+    "cost": "-499980",
+    "gross": "-333320"
+  }
+}

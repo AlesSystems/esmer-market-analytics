@@ -8,7 +8,7 @@
 
 **Tech stack:** Electron, TypeScript, React, Node and SQLite. Use Vitest for focused TypeScript tests; select and lock compatible maintained build, decimal, SQLite and Excel dependencies in Phase 1 after checking Windows packaging and licences.
 
-**Approved foundation:** The user has approved the three written planning documents. This plan records implementation phases, dependencies and completion criteria. It contains no delivery schedule or effort estimates. The user subsequently authorized repository creation and a documentation-only PR and merge. Repository setup is complete; application implementation, database access, installation on Eralp's computer and production integration remain outside this change.
+**Record scope:** This original plan organizes the approved foundation into phases, dependencies and verification contracts. Implementation subsequently proceeded under separate direction. Proposed file names, unchecked tasks and dated stop/branch instructions below describe the original plan or a historical handoff. Use [the evidence index](../../evidence/index.md), current source and the assigned issue for present status. Source access, owner installation and production rollout retain their separate authorization boundaries.
 
 **Spec:** Read the [foundation specification](../specs/2026-09-04-esmer-market-rebuild-design.md), [database audit](../specs/2026-09-04-esmer-market-rebuild-audit.md) and [release acceptance checklist](../specs/2026-09-04-esmer-market-rebuild-acceptance.md) before execution. They remain authoritative; this plan organizes their delivery without replacing their calculation or safety requirements.
 
@@ -52,7 +52,7 @@ Phases 1–10 form the first release. Phase 11 is a separate release boundary. A
 
 ## Implementation structure and decisions
 
-All implementation paths below are proposed paths **inside this independent repository**. They do not refer to existing implementation files. Create them only during authorized execution. The approved specifications and this plan are stored in `docs/superpowers/`; their repository context and approval status have been updated while retaining their requirements and evidence limitations.
+Implementation paths below were proposed inside this independent repository. Inspect current files before executing a task; some paths and interfaces changed during implementation. Preserve the approved requirements and evidence limits when adapting a historical task.
 
 | Location | Responsibility |
 | --- | --- |
@@ -94,7 +94,7 @@ For each behavioural task below:
 4. Run the focused test, type checking and relevant lint; commit the implementation with a scoped `feat:` or `fix:` message.
 5. Add separate regression/integration coverage where the boundary requires it. Record acceptance evidence for financial, privacy, source-safety and recovery changes.
 
-Phase 1 must establish `npm run test:unit -- <file>`, `npm run test:integration -- <file>`, `npm run test:desktop -- <file>`, `npm run typecheck`, `npm run lint`, `npm run build` and `npm run package:win`. Configure unit and integration commands to run Vitest once with a file filter; configure desktop checks to exercise the actual packaged application. Commands in this plan are contracts to establish, not claims that scripts already exist. [Vitest test filtering](https://vitest.dev/guide/filtering.html)
+Phase 1 must establish `npm run test:unit -- <file>`, `npm run test:integration -- <file>`, `npm run test:desktop -- <file>`, `npm run typecheck`, `npm run lint`, `npm run build` and `npm run package:win`. Configure unit and integration commands to run Vitest once with a file filter; configure desktop checks to exercise the actual packaged application. These commands were established during implementation. Inspect `package.json` for current definitions and required environments. [Vitest test filtering](https://vitest.dev/guide/filtering.html)
 
 Tests use synthetic values or approved reduced fixtures. Examples below are test assertions to author during execution, not implemented application code. A source-backed expectation must be independently reviewed before it becomes an oracle; current program output is not its own proof.
 
@@ -535,4 +535,4 @@ Phase 10 implementation and Windows synthetic verification are recorded in [Wind
 | A07 — Packaging, usability and performance | 1, 8, 10 | Windows lifecycle, measured full-data behaviour and Excel evidence |
 | L01 — Later live integration | 11 | Permission, consistency, reconciliation, impact and rollout evidence |
 
-Repository setup and transfer of the approved planning artifacts are complete. The checkboxes above are the original plan. They were not all reticked when later evidence landed. The [evidence index](../../evidence/index.md) is the completion record. Synthetic implementation through Phase 10, and the isolated live preview, are on `main`. Real-source acceptance, the remaining Windows gates and L01 stay open. No production rollout is complete.
+Repository setup and transfer of the approved planning artifacts are complete. The checkboxes above are the original plan. They were not all reticked when later evidence landed. The [evidence index](../../evidence/index.md) is the completion record. Synthetic implementation through Phase 10, isolated raw previews, recorded-source contribution estimates and manual expense entry are implemented. [Issue #67](https://github.com/AlesSystems/esmer-market-analytics/issues/67) tracks the remaining real-data product gross-profit and margin path. Original source-dependent, current-build Windows, independent-recovery and L01 obligations require their own evidence. No production rollout is complete.
