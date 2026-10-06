@@ -16,8 +16,8 @@ async function measure(page: Page, action: string, selector: string, expected: s
     const start = performance.now();
     button.click();
     const check = () => {
-      const loading = [...document.querySelectorAll('[role="status"]')].some(node => /yükleniyor|hesaplanıyor/i.test(node.textContent ?? ""));
-      if (!loading && document.querySelector(selector)?.textContent?.includes(expected)) requestAnimationFrame(() => requestAnimationFrame(() => done(performance.now() - start)));
+      const loading = [...document.querySelectorAll('[role="status"]')].some(node => node.getClientRects().length > 0 && /yükleniyor|hesaplanıyor/i.test(node.textContent ?? ""));
+      if (!loading && [...document.querySelectorAll(selector)].some(node => node.getClientRects().length > 0 && node.textContent?.includes(expected))) requestAnimationFrame(() => requestAnimationFrame(() => done(performance.now() - start)));
       else if (performance.now() - start > 30_000) fail(new Error(`Readiness timeout ${action}`));
       else requestAnimationFrame(check);
     };
@@ -51,21 +51,25 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
       const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
       try {
         const page = await app.firstWindow();
-        await page.waitForFunction(() => document.querySelector("h1")?.textContent === "Aylık Ürün Kârlılığı" && document.body.textContent?.includes("2.500.000,00"));
+        await page.waitForFunction(() => document.querySelector("h1")?.textContent === "Ay bir bakışta" && document.body.textContent?.includes("2.500.000,00"));
         const sample = { process: iteration + 1, startupMs: performance.now() - start, ordinary: {} as Record<string, number> };
         samples.push(sample);
+        await page.getByRole("button", { name: "Raporlar", exact: true }).click();
         await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-        sample.ordinary.salesFirst = await measure(page, "Satışlar", "h1", "Satış Özeti");
+        sample.ordinary.salesFirst = await measure(page, "Satışlar", ".monthly-profit-page h1", "Satışlar");
+        await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
         sample.ordinary.transactionsFirst = await measure(page, "Tüm işlemleri göster", "h1", "İşlemler");
-        await expect(page.locator("main tbody tr")).toHaveCount(100);
+        await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(100);
         sample.ordinary.nextPage = await measure(page, "Sonraki 100", 'nav[aria-label="İşlemler sayfaları"]', "Sayfa 2 / 250");
-        const firstId = await page.locator("main tbody .row-link").first().textContent();
-        sample.ordinary.transactionDetail = await measure(page, firstId!, 'aside[aria-label="İşlem detayı"] h2', "İşlem Detayı");
-        await expect(page.getByRole("complementary", { name: "İşlem detayı" })).toContainText("100,00 ₺");
-        sample.ordinary.monthlyReturn = await measure(page, "Özet", "h1", "Aylık Ürün Kârlılığı");
-        sample.ordinary.salesWarm = await measure(page, "Satışlar", "h1", "Satış Özeti");
+        const firstId = await page.locator(".sales-control-desk tbody .row-link").filter({ visible: true }).first().textContent();
+        sample.ordinary.transactionDetail = await measure(page, firstId!, 'section[aria-label="İşlem detayı"] h2', "İşlem Detayı");
+        await expect(page.getByRole("region", { name: "İşlem detayı" })).toContainText("100,00 ₺");
+        sample.ordinary.monthlyReturn = await measure(page, "Özet", "h1", "Ay bir bakışta");
+        sample.ordinary.salesWarm = await measure(page, "Satışlar", ".sales-control-desk h1", "İşlemler");
+        await page.getByRole("button", { name: "Satışlara dön", exact: true }).click();
+        await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
         sample.ordinary.transactionsWarm = await measure(page, "Tüm işlemleri göster", "h1", "İşlemler");
-        sample.ordinary.monthlyWarm = await measure(page, "Özet", "h1", "Aylık Ürün Kârlılığı");
+        sample.ordinary.monthlyWarm = await measure(page, "Özet", "h1", "Ay bir bakışta");
         if (iteration === 0) await page.screenshot({ path: testInfo.outputPath("full-synthetic-monthly.png"), fullPage: true });
       } finally { await app.close(); }
     }

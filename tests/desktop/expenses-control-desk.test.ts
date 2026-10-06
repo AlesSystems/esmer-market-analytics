@@ -10,15 +10,17 @@ test("plain month tasks selects existing tasks and preserves the review draft", 
     const page = await app.firstWindow();
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.locator("canvas")).toHaveCount(0);
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Excel hazırlığı", exact: true })).toBeFocused();
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).press("Enter");
-    await page.getByRole("button", { name: "Tamlık incelemesi", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Excel’den aktar", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await page.getByLabel("İnceleme açıklaması").fill("Ay sonu incelemesi");
     await page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum").check();
-    await page.getByRole("button", { name: "Tamlık incelemesi", exact: true }).click();
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await expect(page.getByLabel("İnceleme açıklaması")).toHaveValue("Ay sonu incelemesi");
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).toBeChecked();
     const capture = async (name: string) => {
@@ -27,8 +29,8 @@ test("plain month tasks selects existing tasks and preserves the review draft", 
       await page.screenshot({ path, fullPage: true });
     };
     await capture("expenses-review");
-    await page.getByRole("button", { name: "Kayıtlar", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Kayıtlar", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Excel’den aktar", exact: true })).toBeVisible();
     await page.setViewportSize({ width: 1440, height: 1000 });
     await capture("expenses-desktop");
     await page.setViewportSize({ width: 390, height: 844 });
@@ -49,12 +51,14 @@ test("recorded-source expenses embed one main and keep the plain task draft", as
     const page = await app.firstWindow();
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("main")).toHaveCount(1);
-    await expect(page.getByRole("navigation", { name: "Gider görevleri" })).toBeVisible();
-    await page.getByRole("button", { name: "Tamlık incelemesi", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Gider ekle", exact: true }).first()).toBeVisible();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
     await page.getByLabel("İnceleme açıklaması").fill("Kaydedilen giderleri kontrol et");
     await page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum").check();
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).click();
-    await page.getByRole("button", { name: "Tamlık incelemesi", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
+    await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).press("Enter");
     await expect(page.getByLabel("İnceleme açıklaması")).toHaveValue("Kaydedilen giderleri kontrol et");
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).toBeChecked();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
@@ -73,12 +77,12 @@ test("plain task switches retain preview and explicit duplicate decisions", asyn
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await page.getByLabel("Satır 3: benzer kayda rağmen ayrı gider olarak ekle").check();
-    await page.getByRole("button", { name: "Kayıtlar", exact: true }).click();
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
     await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
     await expect(page.getByLabel("Satır 3: benzer kayda rağmen ayrı gider olarak ekle")).toBeChecked();
     await expect(page.getByRole("button", { name: "İçe aktarmayı onayla", exact: true })).toBeEnabled();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

@@ -17,6 +17,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
     await expect(page.getByRole("navigation", { name: "Alış ve maliyet görünümleri" })).toBeVisible();
     await expect(page.getByRole("region", { name: "Alış geçmişi", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true })).toHaveCount(0);
@@ -31,7 +32,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).not.toBeChecked();
     await expect(page.getByRole("button", { name: "Eksiksizliği onayla", exact: true })).toBeDisabled();
     await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click();
-    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Dönem kayıtları", exact: true })).toHaveCount(0);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

@@ -23,7 +23,7 @@ for (const mode of ["financial", "source"] as const) {
     try {
       const page = await app.firstWindow();
       if (mode === "source") {
-        const summary = page.getByText("Kaynak ve kapsam ayrıntıları", { exact: true });
+        const summary = page.locator(".data-status > summary");
         await expect(summary).toBeVisible();
         await summary.focus();
         await expect(summary).toBeFocused();
@@ -32,6 +32,7 @@ for (const mode of ["financial", "source"] as const) {
         await page.keyboard.press("Enter");
       }
       await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+      if (mode === "financial") await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
       await expect(page.getByRole("heading", { name: mode === "financial" ? "Satış Özeti" : "Satışlar", exact: true })).toBeVisible();
       if (mode === "financial") await expect(page.locator(".metric").first()).toContainText("365,00 ₺");
       else await expect(page.getByRole("cell", { name: "123,4567890123456789", exact: true })).toBeVisible();
@@ -48,9 +49,9 @@ for (const mode of ["financial", "source"] as const) {
       await expect(desk).toBeVisible();
       await expect(page.locator("canvas")).toHaveCount(0);
       if (mode === "financial") {
-        await page.getByLabel("Ürün ara", { exact: true }).fill("İÇME");
-        await expect(page.getByRole("button", { name: "İçme suyu", exact: true })).toBeVisible();
-        await page.getByRole("button", { name: "İçme suyu", exact: true }).press("Enter");
+        await page.locator(".sales-control-desk").getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("İÇME");
+        await expect(page.locator(".sales-control-desk").getByRole("button", { name: "İçme suyu", exact: true })).toBeVisible();
+        await page.locator(".sales-control-desk").getByRole("button", { name: "İçme suyu", exact: true }).press("Enter");
         await expect(page.getByRole("heading", { name: "İşlemler", exact: true })).toBeVisible();
       } else {
         await page.getByRole("button", { name: "Ürün kimliklerini göster", exact: true }).press("Enter");

@@ -16,7 +16,7 @@ test("forced colors keeps a keyboard focus outline on actions and period input",
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.emulateMedia({ forcedColors: "active" });
-    for (const control of [page.getByRole("button", { name: "Giderleri incele", exact: true }), page.getByLabel("Dönem", { exact: true })]) {
+    for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByLabel("Dönem", { exact: true })]) {
       await control.focus();
       await control.press("Tab");
       await page.keyboard.press("Shift+Tab");
@@ -44,7 +44,7 @@ async function importedApp(bytes = representativeMonthPackage()) {
 }
 
 async function capture(page: Page, path: string, fullPage = false) {
-  await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+  await expect(page.locator('[aria-busy="true"]').filter({ visible: true })).toHaveCount(0);
   await page.screenshot({ path, fullPage, animations: "disabled" });
 }
 
@@ -75,7 +75,7 @@ async function checkContrast(page: Page) {
       return (values[0] + 0.05) / (values[1] + 0.05);
     }
     const heading = document.querySelector(".monthly-overview h1");
-    const action = [...document.querySelectorAll("button")].find(node => node.textContent?.trim() === "Giderleri incele");
+    const action = [...document.querySelectorAll("button")].find(node => node.textContent?.trim() === "Giderler");
     const period = document.querySelector('input[type="month"]');
     if (!heading || !action || !period) throw new Error("Representative text, action or period control missing");
     return { heading: ratio(heading), action: ratio(action), period: ratio(period) };
@@ -92,6 +92,7 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await page.setViewportSize({ width: 1440, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
     await expect(page.locator(".data-status")).toContainText("30.09.2025");
@@ -102,7 +103,7 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await expect(overview).toContainText("Tüm market kârı belirlenemiyor");
     await page.getByText("Giderler ve faaliyet sonucu", { exact: true }).click();
     await expect(overview.getByRole("heading", { name: /Faaliyet kârı hesaplanamıyor.*gider verileri eksik/ })).toBeVisible();
-    await expect(overview.getByRole("button", { name: "Giderleri incele", exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
     await expect(overview.getByText(monthlyUiExpected.coveredCost, { exact: true }).first()).toBeVisible();
     await expect(overview.getByText("1.500,00 ₺", { exact: false }).filter({ visible: true }).first(), "covered sales exposure stays visible").toBeVisible();
     await expect(overview.getByText("1.400,00 ₺", { exact: false }).filter({ visible: true }).first(), "excluded sale exposure stays visible").toBeVisible();
@@ -122,10 +123,11 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await expect(page.locator(".monthly-trend tbody tr").filter({ hasText: "15.09.2025" })).toContainText("Hesaplanamıyor");
     await evidence.press("Enter");
     await expect(evidence).toBeFocused();
-    await overview.getByRole("button", { name: "Giderleri incele", exact: true }).click();
+    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Özet", exact: true }).click();
     await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
   } finally {
     await app.close();
@@ -142,6 +144,7 @@ test("long Turkish labels and a large amount remain usable in a paginated narrow
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Tüm ürünler", exact: true }).click();
     await expect(page.getByRole("button", { name: "Uzun ömürlü çamaşır deterjanı", exact: true })).toBeVisible();
@@ -173,12 +176,14 @@ test("packaged visual journey retains every destination and important desktop st
     await capture(page, testInfo.outputPath("empty-1440.png"));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
     const dismiss = page.getByRole("button", { name: "Bildirimi kapat" });
     if (await dismiss.isVisible()) await dismiss.click();
     await capture(page, testInfo.outputPath("overview-1440.png"));
     const contrast = await checkContrast(page);
-    const gapAction = page.getByRole("button", { name: "Giderleri incele", exact: true });
+    await page.getByText("Giderler ve faaliyet sonucu", { exact: true }).click();
+    const gapAction = page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true });
     await gapAction.focus();
     await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Tab");
@@ -191,6 +196,7 @@ test("packaged visual journey retains every destination and important desktop st
 
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
     await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("sales-summary.png"));
     await page.getByRole("button", { name: "Tüm ürünler", exact: true }).click();
@@ -201,15 +207,16 @@ test("packaged visual journey retains every destination and important desktop st
     await expect(page.getByRole("heading", { name: "İşlemler", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("sales-transactions.png"));
     await page.getByRole("button", { name: "UI01", exact: true }).click();
-    await expect(page.getByRole("complementary", { name: "İşlem detayı" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "İşlem detayı" })).toBeVisible();
     await capture(page, testInfo.outputPath("sales-receipt.png"));
-    await page.getByRole("complementary", { name: "İşlem detayı" }).getByRole("button", { name: "Kaynak detayını göster" }).click();
-    await expect(page.getByRole("complementary", { name: "Kaynak detayı" })).toBeVisible();
+    await page.getByRole("region", { name: "İşlem detayı" }).getByRole("button", { name: "Kaynak detayını göster" }).click();
+    await expect(page.getByRole("region", { name: "Kaynak detayı" })).toBeVisible();
     await capture(page, testInfo.outputPath("sales-source.png"));
-    await page.getByRole("button", { name: "Kapat", exact: true }).click();
+    await page.getByRole("button", { name: "Satışlara dön", exact: true }).click();
     await expect(page.getByRole("button", { name: "UI01", exact: true })).toBeFocused();
 
     await nav.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("purchasing-history.png"));
     for (const [label, file] of [["Tedarikçi iadeleri", "purchasing-returns.png"], ["İkame maliyeti", "purchasing-replacement.png"], ["Stok ve fire", "purchasing-stock.png"]] as const) {
@@ -228,16 +235,16 @@ test("packaged visual journey retains every destination and important desktop st
     const expensePath = join(userData, "synthetic-expense.xlsx");
     await writeFile(expensePath, await workbook([["ui-rent-1", "15.09.2025", "01.10.2025", ...row.slice(3)]]));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, expensePath);
-    await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
     await capture(page, testInfo.outputPath("expenses-import.png"));
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
     await expect(page.getByRole("region", { name: "Excel önizlemesi" })).toBeVisible();
     await capture(page, testInfo.outputPath("expenses-preview.png"));
 
     await nav.getByRole("button", { name: "Raporlar", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Rapor sürümleri", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Raporlar", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("reports-list.png"));
-    await page.getByRole("button", { name: "Aday raporu aç", exact: true }).click();
+
     await expect(page.getByRole("region", { name: "Seçili rapor" })).toBeVisible();
     await capture(page, testInfo.outputPath("reports-candidate.png"));
 
@@ -254,16 +261,17 @@ test("packaged visual journey retains every destination and important desktop st
     for (const width of [680, 453]) {
       await page.setViewportSize({ width, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `document overflow at ${width}px`).toBe(true);
-      await expect(page.getByRole("button", { name: "Giderleri incele", exact: true })).toBeVisible();
+      await expect(page.getByRole("button", { name: /Kayıtlı giderler/ })).toBeVisible();
       await capture(page, testInfo.outputPath(`overview-${width}.png`), true);
     }
     for (const [destination, file] of [["Satışlar", "sales-summary-453.png"], ["Alışlar ve maliyet", "purchasing-history-453.png"], ["Giderler", "expenses-records-453.png"], ["Raporlar", "reports-list-453.png"]] as const) {
       await nav.getByRole("button", { name: destination, exact: true }).click();
-      await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+      await expect(page.locator('[aria-busy="true"]').filter({ visible: true })).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `document overflow in ${destination} at 453px`).toBe(true);
       await capture(page, testInfo.outputPath(file), true);
     }
     await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster", exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "document overflow around the narrow transaction table").toBe(true);
     await capture(page, testInfo.outputPath("sales-transactions-453.png"), true);
@@ -275,7 +283,9 @@ test("packaged visual journey retains every destination and important desktop st
     await page.route(/^https?:\/\//, route => { externalRequests.push(route.request().url()); return route.abort(); });
     await page.context().setOffline(true);
     await page.reload();
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
     expect(externalRequests).toEqual([]);
     await capture(page, testInfo.outputPath("offline-reload.png"), true);

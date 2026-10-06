@@ -20,7 +20,7 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     await expect(page.getByText("İşlemler", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Bağlantı ayarları", { exact: true })).toHaveCount(0);
 
@@ -43,17 +43,17 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     await openSettings(page);
     await page.getByRole("radio", { name: "Büyük", exact: true }).check();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
-    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large" });
+    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large", selectedMonth: "2025-09" });
     await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
     await app.close();
 
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     page = await app.firstWindow();
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
     await openSettings(page);
     await expect(page.getByRole("radio", { name: "Büyük", exact: true })).toBeChecked();

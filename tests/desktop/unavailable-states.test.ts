@@ -32,17 +32,17 @@ test("monthly loading, failure retry and missing period preserve useful navigati
     await expect(page.getByText("Aylık rapor hesaplanıyor…", { exact: true })).toHaveCount(0);
     await page.screenshot({ path: "test-results/shadcn-monthly-error.png", fullPage: true });
     await page.getByRole("button", { name: "Aylık raporu yeniden yükle" }).click();
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    await expect(page.locator(".notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
-    await expect(page.getByText("Açık", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("Kısmi dönem");
+    await expect(page.locator(".c-heading")).toContainText("Açık");
     await page.screenshot({ path: "test-results/shadcn-monthly-partial.png", fullPage: true });
     await page.getByLabel("Dönem", { exact: true }).fill("2024-01");
     await expect(page.getByRole("alert")).toContainText("Sentetik dönem yükleme hatası.");
     await expect(page.locator(".monthly-amount")).toHaveCount(0);
     await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2024-01");
     await page.getByRole("button", { name: "Aylık raporu yeniden yükle" }).click();
-    await expect(page.getByText("Dönem verisi yok", { exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("Hesaplanamıyor");
+    await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("Dönem verisi yok");
+    await expect(page.getByRole("region", { name: "Aylık performans" })).toContainText("Hesaplanamıyor");
     await page.screenshot({ path: "test-results/phase-8-unavailable.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -57,7 +57,7 @@ test("real background import exposes progress, cancels and leaves previous data 
     const page = await app.firstWindow();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     const records = businessRecords(), document = records.documents[0], line = records.lines[0];
     records.documents = Array.from({ length: 25_000 }, (_, index) => ({ ...document, id: `bulk-${index}` }));
     records.lines = Array.from({ length: 25_000 }, (_, index) => ({ ...line, id: `bulk-line-${index}`, documentId: `bulk-${index}` }));
@@ -70,7 +70,7 @@ test("real background import exposes progress, cancels and leaves previous data 
     await page.getByRole("button", { name: "İşlemi iptal et", exact: true }).click();
     await expect(page.getByText("İçe aktarma iptal edildi.", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Özet", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("200,00 ₺");
+    await expect(page.getByRole("region", { name: "Aylık performans" })).toContainText("200,00 ₺");
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toHaveCount(0);
     await page.screenshot({ path: "test-results/phase-8-cancelled.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

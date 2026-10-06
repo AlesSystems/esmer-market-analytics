@@ -38,7 +38,7 @@ for (const mode of ["financial", "source"] as const) {
         await page.setViewportSize({ width: 1440, height: 1000 });
       }
       await page.getByRole("button", { name: "Giderler", exact: true }).first().press("Enter");
-      await page.getByRole("button", { name: "Excel’den gider ekle", exact: true }).press("Enter");
+      await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
       await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
       await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).press("Enter");
       await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).press("Enter");
@@ -46,7 +46,7 @@ for (const mode of ["financial", "source"] as const) {
       await page.getByRole("button", { name: "Özet", exact: true }).press("Enter");
       if (mode === "financial") {
         await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("40,00 ₺");
-        await expect(page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" })).toContainText("%50");
+        await expect(page.locator(".c-evidence")).toContainText("%50");
       } else {
         await expect(page.getByRole("region", { name: "Kaynak kayıt göstergeleri" })).toContainText("Belge kaydı");
         await expect(page.getByRole("complementary", { name: "Kaynak kapsamı ve yöntem" })).toContainText("Mali sonuçlar doğrulanmadı");

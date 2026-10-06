@@ -50,13 +50,13 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
     await page.screenshot({ path: `${directory}/empty.png` });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.locator(".monthly-amount")).toHaveText("40,00 ₺");
-    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("200,00 ₺");
+    await expect(page.getByRole("region", { name: "Aylık performans" })).toContainText("40,00 ₺");
+    await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("200,00 ₺");
     await page.getByRole("button", { name: "Bildirimi kapat" }).click();
     await page.screenshot({ path: `${directory}/overview-1440.png` });
     for (const destination of ["Satışlar", "Alışlar ve maliyet", "Giderler", "Raporlar"]) {
       await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: destination, exact: true }).click();
-      await expect(page.locator(".workspace h1").first()).toBeVisible();
+      await expect(page.locator(".workspace h1:visible").first()).toBeVisible();
       await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
       await page.screenshot({ path: `${directory}/${destination === "Satışlar" ? "sales" : destination === "Alışlar ve maliyet" ? "purchasing" : destination === "Giderler" ? "expenses" : "reports"}.png` });
     }
@@ -68,8 +68,8 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
     await expect(page.getByText("Yedekleme henüz kurulmadı.", { exact: true })).toBeVisible();
     await page.screenshot({ path: `${directory}/recovery.png` });
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Özet", exact: true }).click();
-    await expect(page.locator(".monthly-amount")).toHaveText("40,00 ₺");
-    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("200,00 ₺");
+    await expect(page.getByRole("region", { name: "Aylık performans" })).toContainText("40,00 ₺");
+    await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("200,00 ₺");
     for (const width of [680, 453]) {
       await page.setViewportSize({ width, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

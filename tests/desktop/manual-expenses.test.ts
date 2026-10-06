@@ -13,19 +13,19 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
+    if (host !== "empty") await expect(page.getByRole("heading", { name: host === "source" ? "Aylık Market Özeti" : "Ay bir bakışta", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.locator("#expense-manual").click();
     await expect(page.getByRole("heading", { name: "Elle gider ekle", exact: true })).toBeFocused();
     await expect(page.getByLabel("Gider tarihi", { exact: true })).toHaveValue("");
     await expect(page.getByLabel("KDV tutarı (TRY)", { exact: true })).toHaveValue("");
     await page.getByLabel("Kategori", { exact: true }).fill("Sentetik elektrik");
-    await page.getByRole("button", { name: "Elle giriş", exact: true }).click();
     await expect(page.getByRole("alertdialog")).toHaveCount(0);
     if (host !== "empty") { await page.getByRole("button", { name: "Giderler", exact: true }).click(); await expect(page.getByRole("alertdialog")).toHaveCount(0); }
     const period = page.getByLabel("Dönem", { exact: true }), previous = await period.inputValue();
     if (host === "sales") {
-      await period.fill("9999-01"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
-      await expect(page.getByRole("alert")).toContainText("İstek geçerli değil."); await expect(period).toHaveValue(previous);
+      await period.fill("9999-01"); await expect(page.getByRole("alertdialog")).toHaveCount(0);
+      await expect(period).toHaveValue(previous);
       await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
     }
     await period.fill("2026-01");
@@ -137,7 +137,7 @@ test("an absent pending receipt requires current-record review before another ma
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
     await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBe("absent-after-older-backup");
-    await page.getByRole("button", { name: "Excel hazırlığı", exact: true }).click(); await page.getByRole("button", { name: "Elle giriş", exact: true }).click();
+    await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click(); await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click(); await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).click(); await page.locator("#expense-manual").click();
     await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
@@ -169,13 +169,27 @@ for (const host of ["source", "sales"] as const) test(`host error recovery retai
   if (host === "source") store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:manual-error", "manual-error-host")); else store.importPackage(businessPackage()); store.close();
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill(host === "source" ? "1800-01" : "9999-01");
+    const page = await app.firstWindow();
+    await expect(page.getByRole("heading", { name: host === "source" ? "Aylık Market Özeti" : "Ay bir bakışta", exact: true })).toBeVisible();
+    await app.evaluate(({ ipcMain }, host) => {
+      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
+      const original = registry._invokeHandlers.get("esmer:request")!;
+      ipcMain.removeHandler("esmer:request");
+      ipcMain.handle("esmer:request", (event, operation, payload) => {
+        const request = payload as { period?: string };
+        if (request.period === "2024-01" && operation === (host === "source" ? "querySourceWorkspace" : "openSales")) return host === "source" ? { status: "source-unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik host hatası." } : { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik host hatası." };
+        return original(event, operation, payload);
+      });
+    }, host);
+    if (host === "sales") await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await page.getByLabel("Dönem", { exact: true }).fill("2024-01");
+    if (host === "source") { await expect(page.getByRole("button", { name: "Kaynağı yeniden aç", exact: true })).toBeVisible(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); }
     const retry = page.getByRole("button", { name: host === "source" ? "Kaynağı yeniden aç" : "Yeniden dene", exact: true }); await expect(retry).toBeVisible();
     await page.locator("#expense-manual").click(); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik korunacak taslak");
     await retry.click(); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
     await retry.click(); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
-    if (host === "source") await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
+    if (host === "source") { await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeVisible(); await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2024-01"); }
     else {
       await expect(retry).toBeVisible(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
       await page.getByRole("button", { name: "Vazgeç", exact: true }).click(); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();

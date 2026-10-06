@@ -23,15 +23,16 @@ test("packaged sales tables render at most 100 rows and every transaction remain
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster" }).click();
-    await expect(page.locator("tbody tr")).toHaveCount(100);
+    await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(100);
     await expect(page.getByRole("button", { name: "S001", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Sonraki 100", exact: true }).click();
-    await expect(page.locator("tbody tr")).toHaveCount(100);
+    await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(100);
     await page.getByRole("button", { name: "Sonraki 100", exact: true }).click();
-    await expect(page.locator("tbody tr")).toHaveCount(1);
+    await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(1);
     await expect(page.getByRole("button", { name: "S201", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Önceki 100", exact: true }).click();
-    await expect(page.locator("tbody tr")).toHaveCount(100);
+    await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(100);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
