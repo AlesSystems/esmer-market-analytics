@@ -53,3 +53,9 @@ test("type summaries disclose truncation while all source codes remain queryable
  const snapshot=rawSnapshot();snapshot.headers=Array.from({length:60},(_,i)=>({...snapshot.headers[0],ID:String(i+1),FIS_TURU:String(i+1)}));snapshot.lines=[];
  const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:raw","batch-1"));const result=store.querySourceWorkspace(request());if(result.status!=="source-workspace")throw Error("missing");expect(result.typeTotal).toBe(60);expect(result.types).toHaveLength(50);const page=store.querySourceWorkspace(request({hash:result.hash,period:result.period,view:"documents",documentType:"60"}));expect(page.status==="source-workspace"&&page.documents.map(row=>row.ID)).toEqual(["60"]);}finally{store.close();}
 });
+
+test("raw first-use month follows dated records rather than extraction boundary", () => {
+ const snapshot=rawSnapshot(); snapshot.to="2025-11-30";
+ const result=querySource({schemaVersion:"sql-backup-preview-v1",provenance:"isolated-sql-backup",sourceReconciled:false,sha256:"0".repeat(64),lineage:"fixture:raw",extractionId:"batch-1",snapshot},"0".repeat(64),request());
+ expect(result).toMatchObject({status:"source-workspace",period:"2025-10"});
+});
