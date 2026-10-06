@@ -89,3 +89,31 @@ test("purchasing preserves partial and unavailable source-period coverage separa
     }
   } finally { store.close(); }
 });
+
+test("first use resolves the latest actual document month instead of declared cutoff", () => {
+ const store = openStore(":memory:");
+ try {
+  store.importPackage(businessPackage(businessRecords(), {cutoff: "2025-10-31", coverage: {from: "2025-09-01", to: "2025-10-31", complete: true}}));
+  expect(new SalesReports(store).open({period: null})).toMatchObject({status: "report", view: {context: {period: "2025-09"}}});
+ } finally {store.close();}
+});
+
+test("purchase document browser retains empty invoices and pinned linked dispatches", () => {
+ const records = businessRecords();
+ addPurchase(records, "P1"); addPurchase(records, "D1");
+ records.documents.find(row => row.id === "D1")!.purchasing = {...records.documents.find(row => row.id === "D1")!.purchasing!, representation: "dispatch", convertedTo: "P1", invoiced: true};
+ const empty = {...records.documents.find(row => row.id === "P1")!, id: "EMPTY"}; records.documents.push(empty);
+ const store = openStore(":memory:");
+ try {
+  store.importPackage(businessPackage(records));
+  const reports = new SalesReports(store), sales = reports.open({period: "2025-09"});
+  if (sales.status !== "report") throw Error("Expected sales");
+  const context = sales.view.context;
+  const list = reports.purchaseDocuments({context, search: "", offset: 0});
+  expect(list).toMatchObject({status: "purchase-documents", total: 2});
+  if (list.status !== "purchase-documents") throw Error("Expected documents");
+  expect(list.documents.find(row => row.id === "EMPTY")).toMatchObject({lineCount: 0, recorded: {net: "25", gross: "25"}});
+  expect(reports.purchaseDocument({context, documentId: "P1", offset: 0})).toMatchObject({status: "purchase-document", linkedDocuments: [{id: "D1"}]});
+  expect(reports.purchaseDocuments({context: {...context, sessionId: "wrong"}, search: "", offset: 0})).toMatchObject({code: "STALE_CONTEXT"});
+ } finally {store.close();}
+});
