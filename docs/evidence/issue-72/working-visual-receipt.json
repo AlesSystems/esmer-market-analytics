@@ -1,0 +1,166 @@
+{
+  "fixture": "productProfitRecords plus synthetic P1/EMPTY and rawSnapshot with purchase2",
+  "captures": [
+    {
+      "name": "overview-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "sales-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "product-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "product-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "transaction-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "transaction-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "purchasing-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "invoice-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "invoice-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "expenses-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "reports-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "settings-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "overview-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "unavailable-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "unavailable-expenses-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    },
+    {
+      "name": "overview-200-percent",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "source-overview-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "source-invoices-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "source-invoice-desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false
+    },
+    {
+      "name": "source-invoice-narrow",
+      "viewport": {
+        "width": 560,
+        "height": 900
+      },
+      "overflow": false
+    }
+  ],
+  "errors": []
+}

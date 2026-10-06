@@ -11,14 +11,14 @@ Mode: Operate. Eralp reads this month’s net sales, investigates an unusual con
 
 ## Direction contract
 
-THESIS: The user replaced Option B with a light shadcn-led working system. The sidebar keeps navigation, period, cutoff and operations together while the content remains an evidence-first financial workspace.
+THESIS: The user approved issue 72's simple business navigation on 2026-10-06. Five business destinations share one remembered month, a page title and compact data status. Substantial details occupy the content area and return to their origin with filters, scroll and focus intact.
 
-OWN-WORLD: Light paper and zinc surfaces, charcoal primary controls, restrained teal selection, Segoe UI, tabular numerals, compact ledger rows and modest corners. Amber holds incomplete evidence; green and red only supplement signed changes.
+OWN-WORLD: Existing white ground, cobalt actions, Manrope Variable, local logo, tabular numerals, compact tables and fine separators. Settings retains its separate Glazed Tile Panel. Financial signs and qualifications keep their existing meanings.
 
-STORY: Read net sales and its monthly comparison, inspect costs and expense completeness, then follow categories and source records without changing the report’s identity.
+STORY: Read the monthly summary, find a product or invoice, record expenses, then inspect and export a monthly report without losing the selected month or pinned identity.
 
-FIRST VIEWPORT: Persistent light 208px sidebar at desktop width. Dominant sales amount sits beside the daily trend, followed by a full-width attention row and finance/category regions. Narrow windows wrap labelled navigation and retain period/cutoff.
+FIRST VIEWPORT: Labelled sidebar navigation at desktop width. Özet shows concise figures, daily sales and product highlights. Narrow windows wrap labelled navigation and retain month and cutoff. Dense tables scroll within a keyboard-accessible region.
 
-FORM: Three shared controls — Button, Input, Badge — provide the reusable shadcn-led layer. Native tables, select controls, details disclosures and the SVG chart remain. The user explicitly authorized the light replacement on 2026-09-25; code-led build remains the visual source of truth.
+FORM: Existing Button, Input and Badge controls, native tables, selects, disclosures and SVG charts remain. Technical evidence starts collapsed under Veri ve hesaplama ayrıntıları. Material financial caveats remain beside numbers. Dedicated details use labelled return controls.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

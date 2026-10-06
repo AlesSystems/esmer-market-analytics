@@ -1,0 +1,30 @@
+{
+  "innerWidth": 720,
+  "clientWidth": 720,
+  "scrollWidth": 720,
+  "ratio": 4,
+  "media": true,
+  "rects": [
+    {
+      "text": "ÖzetSatışlarAlışlar ve maliyetGiderlerRaporlar",
+      "x": 20,
+      "right": 700
+    },
+    {
+      "text": "Net satış190,00 ₺Karşılaştırılamıyor önceki aya gö",
+      "x": 20,
+      "right": 246.6640625
+    },
+    {
+      "text": "Kapsanan tahmini brüt kâr60,00 ₺Kapsanan satışta m",
+      "x": 246.6640625,
+      "right": 473.33203125
+    },
+    {
+      "text": "Kayıtlı giderlerHesaplanamıyorSınıflandırılmış dön",
+      "x": 473.33203125,
+      "right": 700
+    }
+  ],
+  "zoomFactor": 2
+}
