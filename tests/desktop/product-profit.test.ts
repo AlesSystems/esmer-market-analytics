@@ -136,56 +136,69 @@ test("late product, document and month responses cannot replace the current sele
   try { expect(store.importPackage(businessPackage(productProfitRecords())).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    await app.evaluate(({ ipcMain }) => {
-      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
-      const original = registry._invokeHandlers.get("esmer:request")!;
-      ipcMain.removeHandler("esmer:request");
-      ipcMain.handle("esmer:request", async (event, operation, payload) => {
-        const request = payload as { search?: string; productId?: string; documentId?: string; context?: { period: string } };
-        const result = await original(event, operation, payload);
-        if (operation === "readReportProducts" && request.search === "ÇAY" || operation === "readReportProduct" && request.productId === "A" || operation === "readReportEvidence" && (request.productId === "A" || request.documentId === "A1") || operation === "queryMonthly" && request.context?.period === "2025-10") await new Promise(resolve => setTimeout(resolve, 500));
-        return result;
+    const page = await test.step("initialReportArrival", async () => {
+      await app.evaluate(({ ipcMain }) => {
+        const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
+        const original = registry._invokeHandlers.get("esmer:request")!;
+        ipcMain.removeHandler("esmer:request");
+        ipcMain.handle("esmer:request", async (event, operation, payload) => {
+          const request = payload as { search?: string; productId?: string; documentId?: string; context?: { period: string } };
+          const result = await original(event, operation, payload);
+          if (operation === "readReportProducts" && request.search === "ÇAY" || operation === "readReportProduct" && request.productId === "A" || operation === "readReportEvidence" && (request.productId === "A" || request.documentId === "A1") || operation === "queryMonthly" && request.context?.period === "2025-10") await new Promise(resolve => setTimeout(resolve, 500));
+          return result;
+        });
       });
+      const page = await app.firstWindow();
+      await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
+      return page;
     });
-    const page = await app.firstWindow();
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("ÇAY");
-    await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("İÇ");
-    await expect(page.getByRole("region", { name: "Ürün katkıları", exact: true }).locator("tbody tr")).toHaveCount(1);
-    await expect(page.getByRole("button", { name: "İçme suyu", exact: true })).toBeVisible();
-    await page.waitForTimeout(600);
-    await expect(page.getByRole("button", { name: "Çay", exact: true })).toHaveCount(0);
-    await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("");
-    await page.getByRole("button", { name: "Çay", exact: true }).click();
-    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
-    await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Seçili ürün özeti", exact: true })).toContainText("30,00 ₺");
-    await page.waitForTimeout(600);
-    await expect(page.getByRole("heading", { name: "Seçili ürün · İçme suyu" })).toBeFocused();
-    await expect(page.getByRole("button", { name: "Belgeyi aç · A1", exact: true })).toHaveCount(0);
-    await page.getByRole("button", { name: "Belgeyi aç · B1", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Kaydedilen tam belge neti: 50,00 ₺");
-    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
-    await page.getByRole("button", { name: "Çay", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Belgeyi aç · A1", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Belgeyi aç · A1", exact: true }).click();
-    await expect(page.getByText("Belge kanıtı yükleniyor…", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
-    await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
-    await page.getByRole("button", { name: "Belgeyi aç · B1", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Kaydedilen tam belge neti: 50,00 ₺");
-    await page.waitForTimeout(600);
-    await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Belge kanıtı · B1");
-    await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).not.toContainText("200,00 ₺");
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-10");
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
-    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("60,00 ₺");
-    await page.waitForTimeout(600);
-    await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toHaveCount(0);
-    await expect(page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true })).toHaveValue("");
-    await page.screenshot({ path: testInfo.outputPath("lane-05.png") });
-  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+    await test.step("searchrace", async () => {
+      await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("ÇAY");
+      await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("İÇ");
+      await expect(page.getByRole("region", { name: "Ürün katkıları", exact: true }).locator("tbody tr")).toHaveCount(1);
+      await expect(page.getByRole("button", { name: "İçme suyu", exact: true })).toBeVisible();
+      await page.waitForTimeout(600);
+      await expect(page.getByRole("button", { name: "Çay", exact: true })).toHaveCount(0);
+      await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("");
+    });
+    await test.step("productrace", async () => {
+      await page.getByRole("button", { name: "Çay", exact: true }).click();
+      await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+      await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
+      await expect(page.getByRole("region", { name: "Seçili ürün özeti", exact: true })).toContainText("30,00 ₺");
+      await page.waitForTimeout(600);
+      await expect(page.getByRole("heading", { name: "Seçili ürün · İçme suyu" })).toBeFocused();
+      await expect(page.getByRole("button", { name: "Belgeyi aç · A1", exact: true })).toHaveCount(0);
+    });
+    await test.step("documentrace", async () => {
+      await page.getByRole("button", { name: "Belgeyi aç · B1", exact: true }).click();
+      await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Kaydedilen tam belge neti: 50,00 ₺");
+      await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+      await page.getByRole("button", { name: "Çay", exact: true }).click();
+      await expect(page.getByRole("button", { name: "Belgeyi aç · A1", exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "Belgeyi aç · A1", exact: true }).click();
+      await expect(page.getByText("Belge kanıtı yükleniyor…", { exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+      await page.getByRole("button", { name: "İçme suyu", exact: true }).click();
+      await page.getByRole("button", { name: "Belgeyi aç · B1", exact: true }).click();
+      await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Kaydedilen tam belge neti: 50,00 ₺");
+      await page.waitForTimeout(600);
+      await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Belge kanıtı · B1");
+      await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).not.toContainText("200,00 ₺");
+    });
+    await test.step("monthrace", async () => {
+      await page.getByLabel("Dönem", { exact: true }).fill("2025-10");
+      await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
+      await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("60,00 ₺");
+      await page.waitForTimeout(600);
+      await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toHaveCount(0);
+      await expect(page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true })).toHaveValue("");
+      await page.screenshot({ path: testInfo.outputPath("lane-05.png") });
+    });
+  } finally {
+    await test.step("cleanup", async () => { await app.close(); await rm(userData, { recursive: true, force: true }); });
+  }
 });
 
 for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsupported", "partial"]) test(`profit page distinguishes ${scenario} and keeps unknown days as gaps`, async ({}, testInfo) => {
