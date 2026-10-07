@@ -7,8 +7,8 @@ related_targets: ["src/ui/overview/control-desk.css", "src/ui/branding.css"]
 
 # Özet control desk
 
-The user selected prototype C and its cobalt blue on 2026-10-03. The first viewport answers how the month performed through four figures. Daily net sales, categories and evidence share the next reading level. Detailed reports remain below.
+Mode: Operate. The user selected prototype C and its cobalt blue on 2026-10-03, then approved issue 72's simpler layout on 2026-10-06. The first viewport answers how the month performed through net sales and comparable change, available covered gross estimate, and recorded expenses. A compact daily-sales chart and product highlights follow. Detailed reports open in Raporlar.
 
-White, cobalt #2459d5, ink #182644, Manrope Variable, tabular figures, fine separators and a compact evidence column define this surface. Source and expense limits remain written beside the result. MonthlyDisplay supplies all financial values.
+White, cobalt #2459d5, ink #182644, Manrope Variable, tabular figures and fine separators define this surface. Source and expense limits remain written beside the result. Technical evidence starts collapsed. MonthlyDisplay supplies all financial values.
 
-The Esmer Market logo comes from the owner-specified website and ships locally. The user requested removal of decorative 3D elements on 2026-10-03. Ordinary controls and native disclosures expose tasks and evidence directly. Scope overrides the earlier monthly direction in src-ui-app-tsx.md; other workspaces keep that direction.
+The Esmer Market logo comes from the owner-specified website and ships locally. The user requested removal of decorative 3D elements on 2026-10-03. Ordinary controls and native disclosures expose tasks and evidence directly. This composition supersedes the earlier four-figure matrix, permanent evidence column and full report below Özet. Other business pages share its visual identity under docs/contracts/page-control-desks.md. Settings retains its approved tile layout.

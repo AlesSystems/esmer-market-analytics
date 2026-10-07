@@ -317,11 +317,11 @@ components:
 
 The owner selected prototype C and its blue palette on 2026-10-03. This direction governs the monthly overview and its active shell. Other workspaces and the settings panel retain their existing rules below. The website logo replaces the text brand across the shared shell, using a packaged local image.
 
-The first reading level is a four-column matrix of net sales, covered historical estimated cost, covered estimated gross profit, and the eligible operating result. The daily net-sales chart and category ranking occupy the main column. A narrow evidence column carries cost coverage, source status, and a native method disclosure. Existing detailed reports remain below the overview.
+On 2026-10-06 the user approved issue 72's simpler composition while retaining this visual identity. The first reading level shows net sales with its comparable-period change, available covered estimated gross profit before operating expenses, and recorded expenses with their completeness qualification. A small daily-sales chart and product highlights follow. Detailed monthly reports open in Raporlar. The permanent evidence column and the full report below Özet are superseded by this navigation contract.
 
 Use cobalt `#2459d5`, ink `#182644`, muted ink `#5c6980`, separators `#dce3ee`, and white. Manrope Variable is packaged locally for this surface, including Turkish characters, with Segoe UI and system fallbacks. Amounts use tabular numerals. Blue indicates actions and selection; financial signs and evidence text retain their meanings.
 
-The user requested removal of decorative 3D elements on 2026-10-03. The metric matrix and native disclosures expose the financial tasks directly. Narrow windows stack the evidence column below the chart and use a two-column metric matrix.
+The user requested removal of decorative 3D elements on 2026-10-03. Native controls expose business tasks directly. Narrow windows reflow summary figures and keep dense tables within keyboard-accessible horizontal scroll regions.
 
 The `MonthlyDisplay` report remains the authority for every amount, comparison, coverage state, chart height, and category share. Prototype fixtures and their comparison controls are excluded from the production entry. See [the implementation contract](workstreams/ozet-control-desk/CONTRACT.md).
 
@@ -580,3 +580,5 @@ The ledger Do's and Don'ts above govern surfaces outside settings and the select
 ## Sales, purchasing, expenses and reports extension
 
 The user approved the overview visual system for all four workspaces on 2026-10-03. These pages inherit its white ground, cobalt actions, Manrope Variable typography and fine separators. The selected structures and data boundaries are recorded in [the workspace contract](docs/contracts/page-control-desks.md). The later simplicity request removes production 3D objects and duplicate panels. Native controls retain task navigation, draft state and source evidence. Settings keeps the Glazed Tile Panel with shorter supporting copy.
+
+Issue 72 supersedes the earlier first-view compositions and inline substantial details. Every business page shows its title, shared working month and compact source status. Product, transaction and invoice details occupy the content area with their parent destination active and a labelled return. Returning restores the originating filters, page, scroll and keyboard focus. Archived reports show their saved month and provenance instead of an editable working-month control. Technical evidence starts collapsed under `Veri ve hesaplama ayrıntıları`; material financial caveats stay beside the affected result. The data-view choice remains in Settings with a short provenance and verification explanation. Other Settings controls keep their approved layout.

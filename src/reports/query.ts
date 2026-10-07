@@ -4,7 +4,7 @@ import { relevantExpenseRevision } from "../expenses/adjustments";
 import type { OperatingReportResult } from "../expenses/contracts";
 import { estimateGrossResult, COST_CALCULATION_VERSION, type GrossResult } from "../analytics/costs";
 import { calculatePurchasing, PURCHASING_CALCULATION_VERSION, type PurchasingResult } from "../analytics/purchasing";
-import type { QueryPurchasingRequest, PurchasingReportResult, MonthlyReport, MonthlyResult, OperationControl } from "./contracts";
+import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, PurchaseDocumentRow, QueryPurchasingRequest, PurchasingReportResult, MonthlyReport, MonthlyResult, OperationControl } from "./contracts";
 import { randomUUID } from "node:crypto";
 import { calculateSales, SALES_CALCULATION_VERSION, totals, type SalesComponent, type SalesResult } from "../analytics/sales";
 import { Exact, percentageChange, sum } from "../domain/money";
@@ -37,7 +37,9 @@ export class SalesReports {
       : failure("EMPTY_STORE", "Henüz veri içe aktarılmadı.");
     if (![SALES_MAPPING_VERSION, BUSINESS_MAPPING_VERSION].includes(snapshot.metadata.mappingVersion)) return failure("UNSUPPORTED_MAPPING", "Bu pakette satış hesabı için doğrulanmış ürün, birim ve KDV anlamları yok.");
     if (snapshot.app.some(row => row.kind === "adjustment" && row.applicability !== "reversed")) return failure("UNSUPPORTED_ADJUSTMENTS", "Satış düzeltmelerinin etkisi henüz desteklenmiyor. Düzeltilmiş toplam gösterilemiyor.");
-    const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? snapshot.metadata.cutoff.slice(0, 7) };
+    const latest = snapshot.records.documents.reduce((value, row) => row.date > value ? row.date : value, "");
+    if (!request.period && !latest) return failure("EMPTY_STORE", "Henüz tarihli kayıt yok. Bir dönem seçin.");
+    const context: ReportContext = { sessionId: randomUUID(), datasetId: snapshot.pin.datasetId, appRevision: snapshot.pin.appRevision, calculationVersion: SALES_CALCULATION_VERSION, period: request.period ?? latest.slice(0, 7) };
     this.session = { snapshot, context, calculations: { sales: new Map(), gross: null, purchasing: null, monthly: null } };
     return this.query({ context, filters: { ...emptySalesFilters } });
   }
@@ -159,6 +161,39 @@ export class SalesReports {
   }
   purchasing({ context }: QueryPurchasingRequest): PurchasingReportResult {
     return structuredClone(this.purchasingCandidate(context));
+  }
+  private purchaseRows(session: NonNullable<SalesReports["session"]>): Map<string, PurchaseDocumentRow> {
+    const counts = new Map<string, number>();
+    for (const line of session.snapshot.records.lines) counts.set(line.documentId, (counts.get(line.documentId) ?? 0) + 1);
+    const suppliers = new Map(session.snapshot.records.suppliers.map(row => [row.id, row.name ?? null]));
+    const result = this.purchasingCandidate(session.context), reasons = new Map<string, string[]>(), calculated = new Set<string>();
+    if (result.status === "purchasing") {
+      for (const row of result.view.purchasing.exclusions) reasons.set(row.documentId, [...(reasons.get(row.documentId) ?? []), row.reason]);
+      for (const row of result.view.purchasing.history) row.sourceDocumentIds.forEach(id => calculated.add(id));
+    }
+    return new Map(session.snapshot.records.documents.filter(row => row.kind === "purchase").map(document => [document.id, {
+      id: document.id, date: document.date, representation: document.purchasing?.representation ?? "unknown", supplierName: suppliers.get(document.supplierId ?? "") ?? null,
+      recorded: document.sales ? {net: document.sales.net, tax: document.sales.tax, gross: document.sales.gross} : null,
+      lineCount: counts.get(document.id) ?? 0, recognition: calculated.has(document.id) ? "calculated" : reasons.has(document.id) ? "unsupported" : "unknown", reasons: reasons.get(document.id) ?? []
+    }]));
+  }
+  purchaseDocuments({context, search, offset}: PurchaseDocumentsRequest): PurchaseDocumentsResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const documents = [...this.purchaseRows(session).values()].filter(row => row.date.startsWith(context.period) && row.representation !== "dispatch").filter(row => `${row.id} ${row.supplierName ?? ""}`.toLocaleLowerCase("tr-TR").includes(search.trim().toLocaleLowerCase("tr-TR")))
+      .sort((a,b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
+    const page = documents.length ? Math.min(offset, Math.floor((documents.length - 1) / 50) * 50) : 0;
+    return structuredClone({status: "purchase-documents", context: {...context}, documents: documents.slice(page,page+50), total: documents.length, offset: page});
+  }
+  purchaseDocument({context, documentId, offset}: PurchaseDocumentRequest): PurchaseDocumentResult {
+    const session = this.resolve(context);
+    if (!session) return failure("STALE_CONTEXT", "Rapor sürümü geçerli değil. Raporu yeniden açın.");
+    const document = session.snapshot.records.documents.find(row => row.id === documentId && row.kind === "purchase");
+    if (!document) return failure("NOT_FOUND", "Alış belgesi bu raporda bulunamadı.");
+    const lines = session.snapshot.records.lines.filter(row => row.documentId === documentId), page = lines.length ? Math.min(offset, Math.floor((lines.length-1)/50)*50) : 0;
+    const linked = session.snapshot.records.documents.filter(row => row.kind === "purchase" && (row.purchasing?.convertedTo === documentId || row.id === document.purchasing?.convertedTo));
+    const rows = this.purchaseRows(session);
+    return structuredClone({status: "purchase-document", context: {...context}, document: rows.get(documentId)!, lines: lines.slice(page,page+50), total: lines.length, offset: page, linkedDocuments: linked.map(row => rows.get(row.id)!)});
   }
   private purchasingCandidate(context: ReportContext): PurchasingReportResult {
     const session = this.resolve(context);

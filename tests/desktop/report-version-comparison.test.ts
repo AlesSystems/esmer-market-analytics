@@ -28,7 +28,7 @@ test("saved comparison stays separate from candidate review and report details r
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click(); await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await page.getByLabel("Rapor inceleme açıklaması").fill("Yeni aday incelemesi");
     await page.getByLabel("Eski sürüm", { exact: true }).selectOption(firstId);
     await page.getByLabel("Yeni sürüm", { exact: true }).selectOption(secondId);

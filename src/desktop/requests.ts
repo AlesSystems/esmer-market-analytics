@@ -1,13 +1,14 @@
+import {validSelectedMonth} from "../domain/month";
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
-import type { LiveResult, Preferences, PreferencesResult } from "../domain/contracts";
-import { validPreferences } from "./preferences";
+import type { LiveResult, PreferencesPatch, PreferencesResult } from "../domain/contracts";
+import { validPreferencesPatch } from "./preferences";
 import type { ReportRequestMap, ReportResponse } from "../reports/contracts";
 import type { JobOutcome, OperationStatus, ReportExportResult } from "../domain/contracts";
 import type { ExpenseRequests, ExpenseResult, OperatingReportResult } from "../expenses/contracts";
 import { validCreateExpenseRequest, validFields, validPeriod } from "../expenses/validation";
-import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
+import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { validId } from "../store/revisions";
 import type { Availability, ImportOutcome, RequestError } from "../domain/contracts";
 import { recoveryOperations } from "../recovery/contracts";
@@ -15,8 +16,14 @@ export const APP_URL = "esmer://app/index.html";
 function exact(value: unknown, fields: string[]): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join() === fields.sort().join();
 }
-const period = (value: unknown) => typeof value === "string" && /^(?:19[0-9]{2}|[2-9][0-9]{3})-(?:0[1-9]|1[0-2])$/.test(value) && value < "9999";
+const period = validSelectedMonth;
 export function validReportRequest(operation: string, value: unknown): boolean {
+  if (operation === "queryPurchaseDocuments" || operation === "inspectPurchaseDocument") {
+    if (!exact(value, operation === "queryPurchaseDocuments" ? ["context", "offset", "search"] : ["context", "offset", "documentId"])) return false;
+    return Number.isSafeInteger(value.offset) && Number(value.offset) >= 0 && Number(value.offset) <= 100000 && Number(value.offset) % 50 === 0
+      && (operation === "queryPurchaseDocuments" ? typeof value.search === "string" && value.search.length <= 160 && !/[\u0000-\u001f\u007f]/.test(value.search) : validId(value.documentId))
+      && validReportRequest("querySales", {context: value.context, filters: {categoryId:null, productId:null, search:"", kind:"all"}});
+  }
   if (operation === "openSales" || operation === "openMonthly") return exact(value, ["period"]) && (value.period === null || period(value.period));
   if ((operation === "queryPurchasing" || operation === "queryOperating" || operation === "queryMonthly")) return exact(value, ["context"]) && validReportRequest("querySales", { context: value.context, filters: { categoryId: null, productId: null, search: "", kind: "all" } });
   if (!exact(value, operation === "inspectSales" ? ["context", "filters", "documentId"] : ["context", "filters"])) return false;
@@ -75,7 +82,7 @@ export function validExpenseRequest(operation: string, payload: unknown): boolea
   return false;
 }
 export type ExpenseService = (operation: keyof ExpenseRequests, payload: ExpenseRequests[keyof ExpenseRequests]) => Promise<ExpenseResult | OperatingReportResult>;
-type SalesService = { purchasing?: (request: QueryPurchasingRequest) => Promise<PurchasingReportResult>; open: (request: OpenSalesRequest) => Promise<SalesReportResult>; query: (request: QuerySalesRequest) => Promise<SalesReportResult>; inspect: (request: InspectSalesRequest) => Promise<SalesDetailResult> };
+type SalesService = { purchaseDocuments?: (request: PurchaseDocumentsRequest) => Promise<PurchaseDocumentsResult>; purchaseDocument?: (request: PurchaseDocumentRequest) => Promise<PurchaseDocumentResult>; purchasing?: (request: QueryPurchasingRequest) => Promise<PurchasingReportResult>; open: (request: OpenSalesRequest) => Promise<SalesReportResult>; query: (request: QuerySalesRequest) => Promise<SalesReportResult>; inspect: (request: InspectSalesRequest) => Promise<SalesDetailResult> };
 export async function handleRequest(
   trustedSender: boolean,
   operation: unknown,
@@ -91,8 +98,8 @@ export async function handleRequest(
   sourcePreview?: (request: SourcePreviewRequest) => Promise<SourcePreviewResult>,
   sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
-  preferences?: {get: () => Promise<PreferencesResult>; set: (request: Preferences) => Promise<PreferencesResult>},
-): Promise<PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  preferences?: {get: () => Promise<PreferencesResult>; set: (request: PreferencesPatch) => Promise<PreferencesResult>},
+): Promise<PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
@@ -101,7 +108,7 @@ export async function handleRequest(
     };
   if (preferences && (operation === "getPreferences" || operation === "setPreferences")) {
     if (operation === "getPreferences" && payload === null) return preferences.get();
-    if (operation === "setPreferences" && validPreferences(payload)) return preferences.set(payload);
+    if (operation === "setPreferences" && validPreferencesPatch(payload)) return preferences.set(payload);
     return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
   }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {
@@ -137,8 +144,10 @@ export async function handleRequest(
     if (!validExpenseRequest(operation, payload)) return { status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil." };
     return expenses(operation as keyof ExpenseRequests, payload as ExpenseRequests[keyof ExpenseRequests]);
   }
-  if (sales && typeof operation === "string" && ["openSales", "querySales", "inspectSales", ...(sales.purchasing ? ["queryPurchasing"] : [])].includes(operation)) {
+  if (sales && typeof operation === "string" && ["openSales", "querySales", "inspectSales", ...(sales.purchasing ? ["queryPurchasing"] : []), ...(sales.purchaseDocuments ? ["queryPurchaseDocuments"] : []), ...(sales.purchaseDocument ? ["inspectPurchaseDocument"] : [])].includes(operation)) {
     if (!validReportRequest(operation, payload)) return { status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil." };
+    if (operation === "queryPurchaseDocuments") return sales.purchaseDocuments!(payload as PurchaseDocumentsRequest);
+    if (operation === "inspectPurchaseDocument") return sales.purchaseDocument!(payload as PurchaseDocumentRequest);
     if (operation === "queryPurchasing") return sales.purchasing!(payload as QueryPurchasingRequest);
     if (operation === "openSales") return sales.open(payload as OpenSalesRequest);
     if (operation === "querySales") return sales.query(payload as QuerySalesRequest);

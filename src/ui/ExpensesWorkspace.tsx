@@ -10,7 +10,7 @@ import { date, money } from "./format";
 const failed = "Yerel hizmete ulaşılamadı. Yeniden deneyin.";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
 
-export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod }: { period: string; onPeriod?: (period: string) => void; onChange?: () => void; embedded?: boolean }) {
+export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod, active = true, visible = true }: {visible?:boolean;active?: boolean; period: string; onPeriod?: (period: string) => void; onChange?: () => void; embedded?: boolean }) {
   const navigation = useExpenseNavigation();
   const [savedPeriod, setSavedPeriod] = useState<{ incurred: string; payment: string | null; related: string }>();
   const [savedEntity, setSavedEntity] = useState<string>();
@@ -21,7 +21,8 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
   const taskTitle = useRef<HTMLHeadingElement>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
-  const [view, setView] = useState<ExpensePeriod>();
+  const [storedView, setView] = useState<ExpensePeriod>();
+  const view=storedView?.period===period?storedView:undefined;
   const [preview, setPreview] = useState<ExpensePreview>();
   const [keep, setKeep] = useState<number[]>([]);
   const [busy, setBusy] = useState(false);
@@ -31,9 +32,9 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
   const [reviewed, setReviewed] = useState(false);
   const [reviewReason, setReviewReason] = useState("");
   const generation = useRef(0);
-  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); restoreFocus.current = true; }
-  useEffect(() => { if (restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading]);
-  useEffect(() => { if (task !== "records") taskTitle.current?.focus(); }, [task]);
+  function returnToRecords() { setTask("records"); setSelected(undefined); restoreFocus.current = true; }
+  useEffect(() => { if (visible && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading,visible]);
+  useEffect(() => { if (visible && task !== "records") taskTitle.current?.focus(); }, [task,visible]);
   async function load(): Promise<boolean> {
     const id = ++generation.current;
     setLoading(true); setLoadError("");
@@ -46,8 +47,9 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
     finally { if (id === generation.current) setLoading(false); }
     return false;
   }
-  useEffect(() => { restoreFocus.current = false; setSummaryOpen(false); setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period]);
+  useEffect(() => { if(!active){if(task==="manual"&&!busy&&!localStorage.getItem(pendingExpenseKey))setTask("records");return;} if(!visible)return; if(view?.period===period)return; restoreFocus.current = false; setSummaryOpen(false); setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period,active,visible]);
   async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false) {
+    navigation.protect({dirty:false,locked:true});
     setBusy(true); setError(""); setMessage("");
     try {
       const result = await action();
@@ -55,20 +57,15 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
       if (result.status === "preview") { setPreview(result); setKeep([]); return; }
       if (result.status === "cancelled") { setMessage("İşlem iptal edildi. Kayıtlar değiştirilmedi."); return; }
       setMessage(result.status === "already-imported" ? "Bu çalışma kitabı zaten içe aktarılmış. Kayıtlar değiştirilmedi." : result.status === "imported" && preview ? `${success} Paket: ${preview.batchId}` : success);
-      if (mutation) { returnToRecords(); await load(); onChange?.(); }
+      if (mutation) { setPreview(undefined);setKeep([]);returnToRecords(); await load(); onChange?.(); }
     } catch { setError(failed); }
-    finally { setBusy(false); }
+    finally { navigation.protect({dirty:false,locked:false});setBusy(false); }
   }
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
-  function selectTask(next: ExpenseTask) {
-    if (busy || selected || next === task) return;
-    if (next !== "records") opener.current = () => document.getElementById(`expense-folio-${next}`)?.focus();
-    navigation.leave(() => setTask(next));
-  }
   const Container = embedded ? "section" : "main";
   return <Container className="expenses-workspace" aria-busy={busy}>
-    <div className="page-heading"><h1>Giderler</h1>{task === "records" && !selected ? <div className="expense-actions"><Button variant="default" id="expense-import" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); setMessage(""); }}>Excel’den gider ekle</Button><Button variant="outline" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}>Elle gider ekle</Button><Button variant="outline" id="expense-completeness" disabled={busy || !view} onClick={() => { opener.current = () => document.getElementById("expense-completeness")?.focus(); setReviewed(false); setReviewReason(""); setTask("completeness"); setMessage(""); }}>Giderlerin eksiksizliğini incele</Button></div> : <Button variant="outline" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Kayıtlara dön</Button>}</div>
-    {view && !selected && <nav className="expense-actions" aria-label="Gider görevleri">{([["records", "Kayıtlar"], ["manual", "Elle giriş"], ["import", "Excel hazırlığı"], ["completeness", "Tamlık incelemesi"]] as const).map(([value, label]) => <Button key={value} id={`expense-folio-${value}`} variant={task === value ? "outline" : "ghost"} disabled={busy} aria-pressed={task === value} onClick={() => selectTask(value)}>{label}</Button>)}</nav>}
+    <div className="page-heading"><h1>Giderler</h1>{task === "records" && !selected ? <div className="expense-actions"><Button variant="default" id="expense-import" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); setMessage(""); }}>Excel’den aktar</Button><Button variant="outline" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}>Gider ekle</Button><Button variant="outline" id="expense-completeness" disabled={busy || !view} onClick={() => { opener.current = () => document.getElementById("expense-completeness")?.focus(); setTask("completeness"); setMessage(""); }}>Giderlerin eksiksizliğini incele</Button></div> : <Button variant="outline" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Kayıtlara dön</Button>}</div>
+
     {task === "manual" && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { onChange?.(); if (!current) return; setSavedEntity(result.entityId); setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi. Dönemin giderlerini yeniden inceleyin."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
     {savedPeriod && task === "records" && <p className="notice">Giderin oluşma dönemi: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme dönemi: {savedPeriod.payment}</>}.{onPeriod && <Button variant="link" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>İlgili aya git</Button>}</p>}
     {task === "import" && <section className="workspace-task" aria-label="Gider içe aktarma"><h2 ref={taskTitle} tabIndex={-1}>{preview ? "2. Önizle ve hataları düzelt" : "1. Şablonu indir / dosya seç"}</h2><p>İşçilik yalnızca aylık toplam olarak girilir; kişi veya bordro bilgisi eklemeyin.</p><div className="expense-actions"><Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.saveExpenseTemplate(), "Gider şablonu kaydedildi.")}>Şablonu kaydet</Button><Button variant="default" disabled={busy} onClick={() => void run(() => window.esmer.previewExpenses(), "")}>Excel seç</Button></div>
@@ -80,7 +77,7 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
     {loading && <p role="status">Giderler yükleniyor…</p>}
     {view && <>
       {task === "records" && !selected && <>
-      {!view.rows.length && <section className="block expense-section empty-state"><h2>Bu dönemde gider kaydı yok.</h2><p>Giderleri Excel’den veya tek tek ekleyin. Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p><Button variant="outline" id="expense-manual-empty" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual-empty")?.focus(); setTask("manual"); }}>Elle gider ekle</Button><Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.saveExpenseTemplate(), "Gider şablonu kaydedildi.")}>Şablonu kaydet</Button></section>}
+      {!view.rows.length && <section className="block expense-section empty-state"><h2>Bu dönemde gider kaydı yok.</h2><p>Giderleri Excel’den veya tek tek ekleyin. Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p><Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.saveExpenseTemplate(), "Gider şablonu kaydedildi.")}>Şablonu kaydet</Button></section>}
       <div className={`notice ${view.complete ? "" : "warning"}`}><strong>{view.complete ? "Dönemin giderleri eksiksiz olarak onaylandı" : "Faaliyet kârı hesaplanamıyor — gider verileri eksik."}</strong>{view.rows.length > 0 && <span>İçe aktarma ve her değişiklik sonrasında dönem yeniden incelenmelidir.</span>}</div>
       {view.rows.length > 0 && <div className="metrics expense-summary" aria-label="Gider göstergeleri"><article className="metric"><h2>Dönem giderleri</h2><strong>{view.summary.expenses === null ? "Hesaplanamıyor" : money(view.summary.expenses)}</strong><Button variant="ghost" className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.coverage === "missing" ? "Kanıt eksik · gider kaydı yok" : view.summary.coverage === "incomplete" ? "Kanıt eksik" : view.complete ? "İncelenmiş kayıtlar" : "Kayıtlı tutar · tamlık onaysız"}</Button></article><article className="metric"><h2>İşçilik</h2><strong>{view.summary.labour === null ? "Hesaplanamıyor" : money(view.summary.labour)}</strong><Button variant="ghost" className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.labourCoverage === "missing" ? "Kanıt eksik · toplam verilmedi" : view.summary.labourCoverage === "incomplete" ? "Kanıt eksik" : "Kayıtlı aylık toplam"}</Button></article><article className="metric"><h2>Tamlık durumu</h2><strong>{view.complete ? "Onaylı" : "Onay bekliyor"}</strong><Button variant="ghost" className="metric-status" onClick={() => setSummaryOpen(true)}>Dönem ve kapsam</Button></article></div>}
       <details className="block expense-help" open={summaryOpen} onToggle={event => setSummaryOpen(event.currentTarget.open)}><summary>Gider hesabı ve kapsamı</summary><p>{period} döneminin oluşma tarihine göre sınıflandırılmış faaliyet gideri, işçilik ve maliyette yer almayan ayrı stok kaybı kayıtları kapsanır. KDV işlemi kanıtına göre net veya brüt tutar kullanılır.</p><p>{view.complete ? "Bu gider revizyonunun dönem tamlığı onaylanmıştır; bu onay kârı kesinleştirmez." : "Dönem tamlığı onaylanmamıştır; gösterilen kayıtlı tutar dönemin tüm giderlerini temsil etmeyebilir."}</p>{view.summary.reasons.length > 0 && <ul className="warnings">{view.summary.reasons.map(reason => <li key={reason}>{({ UNKNOWN_TAX: "KDV işlemi veya kanıtı eksik.", LEGACY_EXPENSE: "Eski gider kaydının sınıflandırma ve KDV kanıtları eksik.", UNCLASSIFIED: "Sınıflandırılmamış hareket var.", LOSS_REVIEW: "Stok kaybı kanıtı incelenmeli." } as Record<string, string>)[reason] ?? "Gider hesabının kanıtı eksik."}</li>)}</ul>}{view.summary.excluded.length > 0 && <><h3>Gider toplamı dışında</h3><ul>{view.summary.excluded.map(item => <li key={item.entityId}>{item.classification === "already-in-cost" ? "Maliyette yer alan stok kaybı" : classificationLabels[item.classification as keyof typeof classificationLabels]} · {money(item.amount)}</li>)}</ul></>}

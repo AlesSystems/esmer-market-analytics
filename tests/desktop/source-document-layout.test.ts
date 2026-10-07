@@ -16,6 +16,11 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
   const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try{
    const page=await app.firstWindow();await page.setViewportSize({width:1440,height:1000});
+   const evidence=page.getByRole("complementary",{name:"Kaynak kapsamı ve yöntem",exact:true});
+   await expect(evidence).toBeVisible();
+   await expect(evidence.getByText("fixture:document-layout",{exact:true})).not.toBeVisible();
+   await evidence.getByText("Veri ve hesaplama ayrıntıları",{exact:true}).click();
+   await expect(evidence.getByText("fixture:document-layout",{exact:true})).toBeVisible();
    await page.getByRole("button",{name:destination,exact:true}).click();
    await page.getByLabel("Belge türü (kaynak kodu)",{exact:true}).fill(type);
    await page.getByText("Gelişmiş filtreler",{exact:true}).click();
@@ -30,6 +35,12 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
    await expect(first).toBeInViewport();
    await expect(page.getByRole("cell",{name:"12,34567890123456789",exact:true})).toHaveCount(7);
    await expect(page.getByRole("cell",{name:"3,4567890123456789",exact:true})).toHaveCount(7);
+   const detail=page.getByRole("region",{name:"Kaynak belge ayrıntıları",exact:true});
+   await expect(detail.getByText("Kaynak döviz kimliği",{exact:true})).not.toBeVisible();
+   await expect(detail.getByText("Durum kodu",{exact:true})).not.toBeVisible();
+   await expect(detail.getByText("Aktif kodu",{exact:true})).not.toBeVisible();
+   await expect(detail.getByText("TRY",{exact:true})).toBeVisible();
+   await detail.getByText("Veri ve hesaplama ayrıntıları",{exact:true}).click();
    const control=page.getByRole("checkbox",{name:"Tam kaynak değerlerini göster",exact:true});await control.focus();await page.keyboard.press("Space");await expect(control).toBeChecked();
    await expect(page.getByText("2025-10-01T12:00:00.000",{exact:true})).toBeVisible();
    const summary=page.locator(".source-document-summary");

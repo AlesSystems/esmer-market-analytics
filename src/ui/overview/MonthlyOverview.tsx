@@ -13,10 +13,10 @@ function FigureStatus({ label, children }: { label: string; children: ReactNode 
   return <details className="figure-status"><summary>{label}</summary><div className="metric-evidence"><strong>Bu sayı nasıl oluştu?</strong>{children}</div></details>;
 }
 
-type Props = { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean };
+type Props = { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean; onReport?: () => void; onProduct?: (id: string) => void; salesOnly?: boolean; onParentBack?: (back: (() => void) | null) => void; active?: boolean; initialProductId?: string };
 
 export function MonthlyOverview(props: Props) {
-  if (!props.embedded) return <ControlDesk {...props}><MonthlyOverview {...props} embedded /></ControlDesk>;
+  if (!props.embedded && !props.salesOnly) return <ControlDesk {...props} />;
   return props.report.format === "monthly-report-v2" ? <MonthlyProfitPage key={props.report.id} {...props} report={props.report} /> : <LegacyMonthlyOverview {...props} />;
 }
 

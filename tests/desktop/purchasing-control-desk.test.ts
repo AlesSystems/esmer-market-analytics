@@ -14,6 +14,7 @@ test("purchasing inspection selects actual excluded cost evidence with plain key
   const page = await app.firstWindow();
   await app.evaluate(({ dialog }, file) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] }); }, path);
   await importPackage(page); await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
   const inspector = page.getByRole("region", { name: "Maliyet kapsamı incelemesi" });
   await expect(inspector).toBeVisible();
   await expect(page.locator("canvas")).toHaveCount(0);
@@ -60,7 +61,7 @@ test("source purchasing remains raw evidence with keyboard controls without deco
   await page.getByRole("button", { name: "Ürün kimliklerini göster", exact: true }).press("Enter");
   await page.getByRole("button", { name: "Belgeleri göster", exact: true }).press("Enter");
   await expect(page.getByRole("columnheader", { name: "Kaynak belge tutarı · doğrulanmadı" })).toBeVisible();
-  await page.getByText("Kaynak ve kapsam ayrıntıları", { exact: true }).press("Enter");
+  await page.locator(".data-status > summary").press("Enter");
   await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-no-webgl.png" : testInfo.outputPath("source-no-webgl.png"), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await page.locator("main").count()).toBe(1);

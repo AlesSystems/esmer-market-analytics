@@ -1,0 +1,87 @@
+{
+  "issue": 72,
+  "applicationCommit": "7ba289141899fda18306e2a7f4daa0aba335d42d",
+  "baseCommit": "afe93cdd1abe5f127240d761a6174aaa1c172e8f",
+  "branch": "codex/issue-72-simplification",
+  "environment": "macOS 27.0 arm64; Node 24.15.0; npm 11.12.1; Electron 44.3.0",
+  "verification": {
+    "npm test": {
+      "exitCode": 0,
+      "unitPassed": 53,
+      "integrationPassed": 346,
+      "integrationGatedSkipped": 14,
+      "packagedMacDesktopPassed": 102,
+      "desktopGatedSkipped": 11
+    },
+    "npm run typecheck && npm run lint": {
+      "exitCode": 0
+    },
+    "npm run package:win": {
+      "exitCode": 1,
+      "failure": "NSIS makensis spawn: Unknown system error -86; bundled Mach-O x86_64 executable on arm64 host"
+    },
+    "partialWindowsPayload": {
+      "noticesDependencies": 80,
+      "files": 87,
+      "archiveFiles": 3079,
+      "violations": []
+    }
+  },
+  "artifacts": [
+    {
+      "path": "release/mac-arm64/Esmer Market Analytics.app/Contents/Resources/app.asar",
+      "sha256": "62489d4d20da68a61f3cfdbf4d4f8d0a2f97b1e3999b0139989fc44e8469d81b",
+      "bytes": 39407115
+    },
+    {
+      "path": "release/win-unpacked/resources/app.asar",
+      "sha256": "62489d4d20da68a61f3cfdbf4d4f8d0a2f97b1e3999b0139989fc44e8469d81b",
+      "bytes": 39407115
+    }
+  ],
+  "logs": [
+    {
+      "path": "work/issue-72/final-suite-handoff.log",
+      "sha256": "6e1716c06fa2d38b7518199c060a95f162db155b312e7c7b970e842b385aec47",
+      "bytes": 19759,
+      "storage": "ignored local synthetic verification log"
+    },
+    {
+      "path": "work/issue-72/final-static.log",
+      "sha256": "6aa6cd714bfcbfc31f42a9dc451575dda6e3dcc1f22c7bb08a2b9b0d1fa160e3",
+      "bytes": 107,
+      "storage": "ignored local synthetic verification log"
+    },
+    {
+      "path": "work/issue-72/windows-package-final.log",
+      "sha256": "fee22330743901f14d565f72b8809e2868b2c8ea0854b6783cb9f24faaf821c8",
+      "bytes": 9606,
+      "storage": "ignored local synthetic verification log"
+    },
+    {
+      "path": "work/issue-72/windows-notices-final.log",
+      "sha256": "d02144bd188234dd1e6d03a0536bc3fac5e74efce72dd660071a14af9d9b7162",
+      "bytes": 35,
+      "storage": "ignored local synthetic verification log"
+    },
+    {
+      "path": "work/issue-72/windows-inventory-final.log",
+      "sha256": "fad3795ae5c85c609f2554bfa452c0382fed46cae7607af83f3b5167f7d9bd50",
+      "bytes": 49,
+      "storage": "ignored local synthetic verification log"
+    }
+  ],
+  "screenshots": {
+    "applicationCommit": "f4c66e70af11efeaf4c6e9ecd6ea9b812992f61a",
+    "count": 20,
+    "visualRounds": 2,
+    "nativeZoomFactor": 2,
+    "errors": []
+  },
+  "openGates": [
+    "Windows installer and portable distribution verification",
+    "actual Windows runtime and scaling",
+    "real-source financial validation",
+    "owner acceptance"
+  ]
+}

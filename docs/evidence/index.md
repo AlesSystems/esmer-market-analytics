@@ -14,8 +14,11 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 ## Later implementation evidence
 
+The October 6 [business navigation simplification](2026-10-06-issue-72-simplification.md) starts at main `afe93cd`, which includes PRs #69 and #71. It records the approved page responsibilities, remembered month, supported invoice browsing and build-specific checks. Its local synthetic results do not close Windows, real-source financial or owner acceptance gates.
+
 | Work | Evidence and continuation |
 | --- | --- |
+| Business navigation simplification | [Approved plan](../superpowers/plans/2026-10-06-issue-72-simplification.md), [implementation and platform handoff](2026-10-06-issue-72-simplification.md) |
 | Prepared-package recovery | [PR #68 receipt](2026-10-04-estimate-package-recovery.md) |
 | Manual expense entry | [Plan](../superpowers/plans/2026-10-04-manual-expense-entry.md), [local packaged evidence and open Windows checks](2026-10-04-manual-expense-entry.md) |
 | Synthetic SQL update tracking | [Packaged verification](live-mock-tracking.md), [disposable SQL procedure](../operations/synthetic-sql-environment.md) |

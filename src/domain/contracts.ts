@@ -5,7 +5,7 @@ import type { LiveStatus } from "../source/live-contracts";
 import type { SqlServerConfig } from "../source/sql-server";
 import type { MonthlyDisplayResult, ReportEvidencePage, ReportProductsPage } from "../reports/display";
 import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../expenses/contracts";
-import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
+import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
 import type { RecoveryResult, RecoveryServiceRequest } from "../recovery/contracts";
 export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "openMonthly" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
@@ -33,11 +33,12 @@ export type LiveResult = {status: "live"; configured: boolean; configurationErro
 export type LiveServiceRequest = {operation: "getLiveStatus" | "refreshLiveSource"} | {operation: "configureLiveSource"; payload: {config: SqlServerConfig; enabled: boolean}} | {operation: "setLiveEnabled"; payload: {enabled: boolean}};
 export const textSizes = {normal: 1, large: 1.15, larger: 1.3} as const;
 export type TextSize = keyof typeof textSizes;
-export type Preferences = {textSize: TextSize};
+export type Preferences = {textSize: TextSize; selectedMonth?: string};
+export type PreferencesPatch = Partial<Preferences>;
 export type PreferencesResult = {status: "preferences"; preferences: Preferences} | {status: "preferences-failed"; code: "PREFERENCES_UNAVAILABLE"; message: string};
 export interface DesktopApi {
   getPreferences(): Promise<PreferencesResult | RequestError>;
-  setPreferences(request: Preferences): Promise<PreferencesResult | RequestError>;
+  setPreferences(request: PreferencesPatch): Promise<PreferencesResult | RequestError>;
   querySourceEstimate(request:EstimateRequest):Promise<EstimateResult|RequestError|{status:"unavailable";message:string}>;
   exportSourceEstimate(request:EstimateExportRequest):Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>|RequestError>;
   querySourceWorkspace(request: SourceQuery): Promise<SourceWorkspaceResult | RequestError | {status:"unavailable";message:string}>;
@@ -77,6 +78,8 @@ export interface DesktopApi {
   restoreExpense(request: ExpenseRequests["restoreExpense"]): Promise<ExpenseResult | RequestError>;
   confirmExpenseCompleteness(request: ExpenseRequests["confirmExpenseCompleteness"]): Promise<ExpenseResult | RequestError>;
   queryOperating(request: ExpenseRequests["queryOperating"]): Promise<OperatingReportResult | RequestError>;
+  queryPurchaseDocuments(request: PurchaseDocumentsRequest): Promise<PurchaseDocumentsResult | RequestError>;
+  inspectPurchaseDocument(request: PurchaseDocumentRequest): Promise<PurchaseDocumentResult | RequestError>;
   queryPurchasing(request: QueryPurchasingRequest): Promise<PurchasingReportResult | RequestError>;
   openSales(request: OpenSalesRequest): Promise<SalesReportResult | RequestError>;
   querySales(request: QuerySalesRequest): Promise<SalesReportResult | RequestError>;
@@ -85,7 +88,7 @@ export interface DesktopApi {
   importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
-export type ServiceResponse = { id: number; result: EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest} | {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest} | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceResponse = { id: number; result: EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
 
 export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };

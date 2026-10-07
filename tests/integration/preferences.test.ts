@@ -78,3 +78,14 @@ test("validPreferences accepts only known text sizes with exact keys", () => {
   for (const textSize of ["normal", "large", "larger"] satisfies Preferences["textSize"][]) expect(validPreferences({textSize})).toBe(true);
   for (const value of [null, undefined, "normal", [], {}, {textSize: "huge"}, {textSize: "constructor"}, {textSize: "normal", extra: 1}, Object.create({textSize: "normal"})]) expect(validPreferences(value)).toBe(false);
 });
+
+ test("month and text size patches merge in queue and survive restart", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "esmer-month-"));
+  try {
+    const service = preferencesService(directory, {textSize: "normal"}, vi.fn());
+    await Promise.all([service.set({selectedMonth: "2026-09"}), service.set({textSize: "large"})]);
+    expect(await loadPreferences(directory)).toEqual({textSize: "large", selectedMonth: "2026-09"});
+    expect(await invoke(true, "setPreferences", {selectedMonth: "2026-10"}, service)).toEqual({status: "preferences", preferences: {textSize: "large", selectedMonth: "2026-10"}});
+    for (const selectedMonth of ["2026-00", "2026-13", "26-09", "2026-09-01", null]) expect(await invoke(true, "setPreferences", {selectedMonth}, service)).toMatchObject({code: "INVALID_PAYLOAD"});
+  } finally { await rm(directory, {recursive: true, force: true}); }
+});

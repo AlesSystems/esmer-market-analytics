@@ -1,0 +1,17 @@
+# Spec review
+
+Original review: nonempty `git diff afe93cd...f4c66e7`, 18 pinned commits, issue #72, approved October 6 plan, affected contracts and prepared documentation delta. One isolated synthetic macOS packaged probe confirmed three P2 findings (`work/issue-72/spec-probe/results.json`).
+
+Scoped follow-ups inspected `f4c66e7..bc3d426`, `bc3d426..de4a5e5` and `de4a5e5..7ba2891`. Final fixed head `7ba289141899fda18306e2a7f4daa0aba335d42d`. Only original findings and their behavioral tests were rechecked.
+
+1. **P2, resolved: Recorded archive lost selected detail after Settings return.** Requirement: "Retain the active mode's business page state across sidebar navigation." At `f4c66e7`, `SavedReports.tsx:25–35` cleared report/detail on every active toggle. The original probe confirmed that loss; fast-response search/sort loss was not claimed. At `bc3d426`, `src/ui/reports/SavedReports.tsx:26–39` caches completed history by period/retry, clears detail only for a different period and skips another matching history read. Line 48 keeps `ReportArchive` mounted. `tests/desktop/navigation-lifecycle.test.ts:29–40` checks Settings detail retention, filtered/sorted second-page restoration and sidebar revisiting, with any additional history response held to expose unintended reloads.
+
+2. **P2, resolved: Retained purchasing links skipped their immediate parent.** Requirements: "A nested product → transaction or return → original-sale path restores its immediate parent before the list." "Invoice and transaction detail use the same pattern." Originally, linked document selection overwrote `documentId`; back/Escape/sidebar cleared all detail. At `bc3d426`, `src/ui/purchasing/PurchasingWorkspace.tsx:46–54` pushes context-bound parent/document receipts and restores the immediate parent through all three return actions. `navigation-lifecycle.test.ts:42–50` checks dispatch → invoice → dispatch and restored opener focus using labelled back, Escape and parent sidebar.
+
+3. **P2, resolved: Purchasing detail expanded technical evidence.** Requirement: "Collapse transaction/source IDs, status codes and calculation evidence by default under **Veri ve hesaplama ayrıntıları**." The original unconditional technical `<dl>` is now behind closed native disclosures at `src/ui/purchasing/PurchasingWorkspace.tsx:93`, keyed by document. Dates, linked document references, amounts and cost/tax meaning remain visible. `navigation-lifecycle.test.ts:47` checks hidden metadata and explicit expansion.
+
+Later cleanup at `PurchasingWorkspace.tsx:53` unregisters inactive return handlers without clearing detail/stack. `navigation-lifecycle.test.ts:49` verifies the dispatch survives visiting Özet.
+
+At `7ba2891`, `SavedReports.tsx:48` mounts the archive only after its first successful history response, then retains that mount. Unknown/failed empty history is hidden without discarding archive state. `report-expense-states.test.ts:24–34` distinguishes first failure, cached-empty/new-month failure and successful retry. Matching-history caching and Settings/detail retention remain unchanged.
+
+All three original findings remain resolved at `7ba2891`. Coordinator reports focused checks passed 12/12 and static checks passed; the fresh full suite is coordinator-owned. Reviewer inspected code/tests without rerunning tests or launching an app. No new hunt, visual round, source access or public write. N06 and Windows/real-source/owner gates remain separate.

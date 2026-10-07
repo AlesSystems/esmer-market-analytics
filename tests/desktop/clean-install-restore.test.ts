@@ -66,9 +66,12 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(restored.locator(".brand")).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
-    await expect(restored.getByRole("heading", {name: "Aylık Ürün Kârlılığı"})).toBeVisible();
+    await expect(restored.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır", exact: true })).toBeVisible();
+    await restored.getByLabel("Dönem", { exact: true }).fill("2025-09");
+    await expect(restored.getByRole("heading", {name: "Ay bir bakışta"})).toBeVisible();
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
     await restored.getByRole("button", {name: "Raporlar"}).click();
+    await restored.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await restored.getByRole("button", {name: "Kaydedilmiş sürümü aç"}).click();
     await expect(restored.locator(".monthly-amount")).toHaveText("40,00 ₺");
     await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Net satış (KDV hariç)"}).locator("xpath=following-sibling::dd")).toContainText("100,00 ₺");

@@ -20,7 +20,7 @@ import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { APP_URL, handleRequest } from "./requests";
 import type { Availability, ImportOutcome, ServiceRequest, ServiceResponse } from "../domain/contracts";
-import type { QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
+import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { readPackageFile } from "./package-file";
 import { loadRecoveryConfig, outsideUserData, saveRecoveryConfig, restoreRecoveryConfig, validRecoveryLocations, readRecoveryKeyFile } from "./recovery-config";
 import { generateRecoveryKey, encodeRecoveryKey } from "../recovery/keys";
@@ -60,6 +60,8 @@ function requestService(request: Omit<Extract<ServiceRequest, { operation: "getA
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
 function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
 function requestService(request: Extract<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}>): Promise<ServiceResponse["result"]>;
+function requestService(request: {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest}): Promise<PurchaseDocumentsResult>;
+function requestService(request: {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest}): Promise<PurchaseDocumentResult>;
 function requestService(request: { operation: "queryPurchasing"; payload: QueryPurchasingRequest }): Promise<PurchasingReportResult>;
 function requestService(request: { operation: "openSales"; payload: OpenSalesRequest }): Promise<SalesReportResult>;
 function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
@@ -124,7 +126,8 @@ app.whenReady().then(async () => {
   try { recoveryConfig = await loadRecoveryConfig(app.getPath("userData")) ?? undefined; }
   catch { recoveryConfigError = true; }
   try { savedLive = await loadLiveConfig(app.getPath("userData")); } catch { liveConfigError = true; }
-  let textSize = (await loadPreferences(app.getPath("userData"))).textSize;
+  const savedPreferences = await loadPreferences(app.getPath("userData"));
+  let textSize = savedPreferences.textSize;
   worker = new Worker(join(__dirname, "../service/worker.cjs"), { workerData: { databasePath: join(app.getPath("userData"), "analytics.sqlite"), recoveryConfig, recoveryConfigUnavailable: recoveryConfigError, liveConfig: savedLive?.config, liveEnabled: savedLive?.enabled === true } });
   worker.on("message", (message: ServiceResponse | ServiceProgress) => {
     if ("jobId" in message) { jobs.progress(message.jobId, message.phase, message.completed, message.total); return; }
@@ -156,7 +159,7 @@ app.whenReady().then(async () => {
     event.preventDefault(),
   );
   window.webContents.on("did-finish-load", () => window.webContents.setZoomFactor(textSizes[textSize]));
-  const preferences = preferencesService(app.getPath("userData"), {textSize}, saved => {
+  const preferences = preferencesService(app.getPath("userData"), savedPreferences, saved => {
     textSize = saved.textSize;
     window.webContents.setZoomFactor(textSizes[textSize]);
   });
@@ -186,7 +189,7 @@ app.whenReady().then(async () => {
             return { status: "failed", code: "INVALID_PACKAGE", message: "Veri paketi okunamadı veya boyutu sınırı aşıyor. Son geçerli veriler korundu." } as const;
           }
         }),
-        { purchasing: payload => requestService({ operation: "queryPurchasing", payload }), open: payload => requestService({ operation: "openSales", payload }), query: payload => requestService({ operation: "querySales", payload }), inspect: payload => requestService({ operation: "inspectSales", payload }) },
+        { purchaseDocuments: payload => requestService({operation: "queryPurchaseDocuments", payload}), purchaseDocument: payload => requestService({operation: "inspectPurchaseDocument", payload}), purchasing: payload => requestService({ operation: "queryPurchasing", payload }), open: payload => requestService({ operation: "openSales", payload }), query: payload => requestService({ operation: "querySales", payload }), inspect: payload => requestService({ operation: "inspectSales", payload }) },
         async (operation, payload) => {
           try {
             if (operation === "saveExpenseTemplate") {

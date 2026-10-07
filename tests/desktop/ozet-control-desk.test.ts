@@ -17,11 +17,16 @@ test("Kontrol masası presents the pinned month with real navigation and offline
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     const matrix = page.getByRole("region", { name: "Aylık performans", exact: true });
     await expect(matrix).toContainText("200,00 ₺");
-    await expect(matrix).toContainText("60,00 ₺");
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("60,00 ₺");
+    await page.getByRole("button", { name: "Özet", exact: true }).click();
     await expect(matrix).toContainText("40,00 ₺");
-    await expect(matrix).toContainText("Hesaplanamıyor");
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("Faaliyet kârı hesaplanamıyor");
+    await page.getByRole("button", { name: "Özet", exact: true }).click();
+    await expect(matrix).toContainText("Kayıtlı giderlerHesaplanamıyor");
     await expect(matrix).toContainText("Karşılaştırılamıyor");
-    await expect(page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" })).toContainText("%50");
+    await expect(page.locator(".c-evidence")).toContainText("%50");
     const logo = page.getByRole("img", { name: "Esmer Market", exact: true });
     await expect(logo).toBeVisible();
     await expect.poll(() => logo.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(459);
@@ -30,7 +35,7 @@ test("Kontrol masası presents the pinned month with real navigation and offline
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.screenshot({ path: testInfo.outputPath("control-desk-desktop.png"), fullPage: true });
     await matrix.getByRole("button", { name: /Net satış/ }).press("Enter");
-    await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Satışlar", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Özet", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Giderler", exact: true }).first().click();
@@ -53,10 +58,11 @@ test("Kontrol masası keeps financial evidence accessible with keyboard disclosu
   try {
     const page = await app.firstWindow();
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
-    const rail = page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" });
-    await rail.locator("details summary").press("Enter");
-    await expect(rail.locator("details")).toHaveAttribute("open", "");
-    await expect(rail.locator("details")).toContainText("Paket:");
+    const rail = page.locator(".c-evidence");
+    await rail.locator(":scope > summary").press("Enter");
+    await expect(rail).toHaveAttribute("open", "");
+    await rail.locator(".c-method > summary").press("Enter");
+    await expect(rail.locator(".c-method")).toContainText("Paket:");
     await expect(rail.locator("canvas")).toHaveCount(0);
     await expect(rail).toContainText("%50");
     await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("40,00 ₺");
@@ -81,7 +87,9 @@ test("large monthly figures fit the desk and preserve report evidence", async ({
     const page = await app.firstWindow();
     const matrix = page.getByRole("region", { name: "Aylık performans", exact: true });
     await expect(matrix).toContainText("1.248.600,00 ₺");
-    await expect(matrix).toContainText("825.000,00 ₺");
+    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("825.000,00 ₺");
+    await page.getByRole("button", { name: "Özet", exact: true }).click();
     await expect(matrix).toContainText("423.600,00 ₺");
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.fonts.check('14px "Manrope Variable"', "İıŞşĞğÜüÖöÇç"))).toBe(true);
@@ -92,9 +100,9 @@ test("large monthly figures fit the desk and preserve report evidence", async ({
       await page.screenshot({ path: testInfo.outputPath(`control-desk-large-${width}.png`) });
     }
     await page.setViewportSize({ width: 1440, height: 1100 });
-    const rail = page.getByRole("complementary", { name: "Veri kapsamı ve yöntem" });
-    await rail.locator("details summary").press("Enter");
-    await expect(rail.locator("details")).toHaveAttribute("open", "");
-    await expect(rail.locator("details summary")).toBeFocused();
+    const rail = page.locator(".c-evidence");
+    await rail.locator(":scope > summary").press("Enter");
+    await expect(rail).toHaveAttribute("open", "");
+    await expect(rail.locator(":scope > summary")).toBeFocused();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

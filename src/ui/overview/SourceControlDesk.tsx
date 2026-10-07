@@ -59,10 +59,9 @@ export function SourceControlDesk({view, period, outside, onDocuments, onProduct
         <h2>Kaynak kapsamı ve yöntem</h2><p className="c-evidence-intro">Mali sonuçlar doğrulanmadı</p>
         <div className="c-proof-list">
           <div><span>Yedek kapsamı</span><strong>{sourceDate(view.from)}–{sourceDate(view.to)}</strong><p>Kayıt sayıları tüm durumları içerir.</p></div>
-          <div><span>Kaynak</span><strong>{view.lineage}</strong><p>Paket: {view.extractionId}</p></div>
           <div><span>Kayıt anlamları</span><strong>Ham kaynak kayıtları</strong><p>Tür kodları tamamlanmış işlem veya tanınmış tutar anlamına gelmez.</p></div>
         </div>
-        <details className="c-method"><summary>Kaynak yöntemini göster</summary><p>Veritabanı: {view.databaseId}<br/>Hazırlanma: {view.extractedAt}<br/>Sürüm: {view.hash}</p><p>Ürün adı, kategori ve tedarikçi bu örnekte yok. Tarihsel tür açıklamaları bu yedekte yeniden doğrulanmış mali anlam değildir. Maliyet adayı içeren paketler ayrı doğrulanmamış tahmin gösterir.</p></details>
+        <details className="c-method"><summary>Veri ve hesaplama ayrıntıları</summary><p>{view.lineage}</p><p>Paket: {view.extractionId}</p><p>Veritabanı: {view.databaseId}<br/>Hazırlanma: {view.extractedAt}<br/>Sürüm: {view.hash}</p><p>Ürün adı, kategori ve tedarikçi bu örnekte yok. Tarihsel tür açıklamaları bu yedekte yeniden doğrulanmış mali anlam değildir. Maliyet adayı içeren paketler ayrı doğrulanmamış tahmin gösterir.</p></details>
       </aside>
     </div>
   </div>;
