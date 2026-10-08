@@ -14,6 +14,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 ## Later implementation evidence
 
+The October 8 [compact-copy receipt](2026-10-08-compact-copy.md) records a further presentation refinement on main `46f654b`. It includes synthetic before/after screenshots, packaged workflow checks and the unresolved Windows packaging boundary.
+
 The October 6 [business navigation simplification](2026-10-06-issue-72-simplification.md) starts at main `afe93cd`, which includes PRs #69 and #71. It records the approved page responsibilities, remembered month, supported invoice browsing and build-specific checks. Its local synthetic results do not close Windows, real-source financial or owner acceptance gates.
 
 | Work | Evidence and continuation |
