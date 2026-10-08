@@ -48,7 +48,7 @@ function Tile({ glaze, name, line, seal, status, className = "", children }: { g
 function Coverage({ source, cutoff }: { source?: { from: string; to: string }; cutoff?: string }) {
   const today = day(new Date().toISOString());
   const ends = [source && day(source.to), cutoff && day(cutoff)].filter((value): value is number => typeof value === "number");
-  if (!ends.length) return <p className="coverage-empty">Henüz yerel veri yok. Kapsam şeridi ilk içe aktarmadan sonra görünür.</p>;
+  if (!ends.length) return <p className="coverage-empty">Henüz yerel veri yok.</p>;
   const fromCutoff = !source || (cutoff !== undefined && day(cutoff) < day(source.from));
   const start = fromCutoff ? day(cutoff!) : day(source!.from);
   const span = Math.max(DAY, today - start);
@@ -140,7 +140,7 @@ function DisplayTile() {
     } catch { if (request !== latest.current) return; }
     setSize(confirmed.current); setError(message);
   }
-  return <Tile glaze="saffron" name="Görünüm" line="Yazı ve düğme boyutu bütün ekranlarda geçerli olur." seal={size ? "ready" : "unknown"}>
+  return <Tile glaze="saffron" name="Görünüm" line="Tüm ekranlar için yazı boyutu." seal={size ? "ready" : "unknown"}>
     <fieldset className="size-choice" disabled={!size}>
       <legend>Yazı boyutu</legend>
       {(Object.keys(textSizes) as TextSize[]).map(key => <label key={key} data-size={key}>
@@ -164,13 +164,13 @@ export function SettingsPage({ availability, source, view, onView, live, importi
       <button type="button" className="tile-action" onClick={onClose}>Ayarları kapat</button>
     </div>
     <div className="tile-panel">
-      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Raporlar bu bilgisayardaki yerel verileri okur." seal={dataset || source ? "ready" : unread ? "unknown" : "empty"}>
+      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Bu bilgisayardaki veriler." seal={dataset || source ? "ready" : unread ? "unknown" : "empty"}>
         <dl className="tile-facts">
           <div><dt>Mali veri seti</dt><dd>{dataset ? <>Kesim {date(dataset.cutoff)}<small>Paket {date(dataset.extractedAt)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</small></> : unread ?? "Henüz yok"}</dd></div>
           <div><dt>Kaynak yedeği</dt><dd>{source ? <>{date(source.from)}–{date(source.to)}<small>Kayıt sayıları; mali anlam doğrulanmadı</small></> : unread ?? "Henüz yok"}</dd></div>
         </dl>
         {unread && !source ? <p className="coverage-empty">Yerel veri durumu: {unread}</p> : <Coverage source={source} cutoff={dataset?.cutoff} />}
-        <p>Gerçek yedek görünümü, izole SQL yedeğindeki kayıtları gösterir; mali anlamlar doğrulanmış değildir. Korunan mali veri görünümü, kendi yerel veri sürümünden hesaplanan raporları gösterir. Sentetik örnekler gerçek market verisi değildir. Görünüm değişince seçili dönem korunur.</p>
+        <p>Gerçek yedek görünümü izole SQL kayıtlarını gösterir; mali anlamları doğrulanmadı. Korunan mali veri görünümü ayrı yerel raporları gösterir. Sentetik veri gerçek market verisi değildir.</p>
         {onView && <div className="view-switch" role="group" aria-label="Görüntülenen veri">
           <button type="button" aria-pressed={view === "source"} onClick={() => onView("source")}>Gerçek yedek görünümü</button>
           <button type="button" aria-pressed={view === "financial"} onClick={() => onView("financial")}>Korunan mali veri görünümü</button>
@@ -186,7 +186,7 @@ export function SettingsPage({ availability, source, view, onView, live, importi
       <LiveTile live={live} sourceCutoff={source?.to} sqlImporting={sqlImporting} onImportSql={onImportSql} />
       <BackupTile onRecovery={onRecovery} />
       <DisplayTile />
-      <Tile glaze="ink" name="Hakkında" line="Tek mağaza, tek bilgisayar için çevrimdışı analiz." seal="ready">
+      <Tile glaze="ink" name="Hakkında" line="Çevrimdışı analiz." seal="ready">
         <dl className="tile-facts">
           <div><dt>Uygulama</dt><dd>Esmer Market Analytics<small>Sürüm {process.env.APP_VERSION}</small></dd></div>
           <div><dt>Para birimi</dt><dd>Türk lirası (TRY)</dd></div>
