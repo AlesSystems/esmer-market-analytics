@@ -12,7 +12,7 @@ test("real source workspace filters observational types and pages without financ
  try {
   store.importSourcePreview(writeRawPackage(snapshot,"fixture:raw","batch-1"));
   const overview=store.querySourceWorkspace(request());
-  expect(overview.status).toBe("source-workspace"); if(overview.status!=="source-workspace")throw Error("missing");
+  expect(overview).toMatchObject({status:"source-workspace",sourceFormat:"sql-backup-preview-v1"}); if(overview.status!=="source-workspace")throw Error("missing");
   expect(overview.counts).toEqual({documents:3,lines:2,products:1,emptyDocuments:1});
   expect(overview.types).toEqual([{code:"1",documents:1},{code:"11",documents:1},{code:"999",documents:1}]);
   const sales=store.querySourceWorkspace(request({hash:overview.hash,period:"2025-10",view:"documents",scope:"sales"}));
