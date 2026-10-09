@@ -19,7 +19,7 @@ function macLink(path: string) {
   return /^Contents\/Frameworks\/(Electron Framework|ReactiveObjC|Squirrel|Mantle)\.framework\/(?:Versions\/Current|Electron Framework|ReactiveObjC|Squirrel|Mantle|Resources|Libraries|Helpers)$/.test(path);
 }
 function macFile(path: string) {
-  if (["Contents/Info.plist", "Contents/PkgInfo", "Contents/MacOS/Esmer Market Analytics", "Contents/Resources/app.asar", "Contents/Resources/electron.icns"].includes(path)) return true;
+  if (["Contents/Info.plist", "Contents/PkgInfo", "Contents/MacOS/Esmer Market Analytics", "Contents/Resources/app.asar", "Contents/Resources/app-update.yml", "Contents/Resources/electron.icns"].includes(path)) return true;
   if (path.startsWith("Contents/Resources/licences/")) return runtimeFiles.has(path.replace("Contents/Resources/", "resources/"));
   if (/^Contents\/Resources\/[a-zA-Z0-9_-]+\.lproj\/locale.pak$/.test(path)) return true;
   if (/^Contents\/Frameworks\/Esmer Market Analytics Helper(?: \((?:Renderer|Plugin|GPU)\))?\.app\/Contents\/(?:Info.plist|PkgInfo|MacOS\/Esmer Market Analytics Helper(?: \((?:Renderer|Plugin|GPU)\))?)$/.test(path)) return true;
