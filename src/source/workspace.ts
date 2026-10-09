@@ -25,8 +25,7 @@ export function querySource(pkg:RawPackage,hash:string,request:SourceQuery):Sour
  if(!validSourceQuery(request))throw Error("INVALID_PAYLOAD");
  if(request.hash!==null&&request.hash!==hash)return {status:"source-unavailable",code:"SOURCE_CHANGED",message:"Kaynak sürümü değişti. Yeni sürümü açın."};
  const snapshot=pkg.snapshot,latest=snapshot.headers.reduce((value,row)=>row.FIS_TARIHI!>value?row.FIS_TARIHI!:value,"");
- if(!request.period&&!latest)return {status:"source-empty"};
- const period=request.period??latest.slice(0,7);
+ const period=request.period??(latest||snapshot.to).slice(0,7);
  const products=request.productId===null?null:new Set(snapshot.lines.filter(row=>row.STOK===request.productId).map(row=>row.FIS));
  const headers=snapshot.headers.filter(row=>row.FIS_TARIHI!.startsWith(period)&&(!scopes[request.scope]||scopes[request.scope]!.has(row.FIS_TURU!))&&(request.documentType===null||row.FIS_TURU===request.documentType)&&(!products||products.has(row.ID)));
  const headerIds=new Set(headers.map(row=>row.ID));

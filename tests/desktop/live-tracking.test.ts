@@ -19,7 +19,7 @@ test("packaged tracking retains month and filters while requiring fresh document
   const page=await app.firstWindow();
   await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-10");
-  await page.getByRole("button",{name:"Satışlar",exact:true}).click();
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByRole("button",{name:"Kaydedilmiş satış belgelerini aç",exact:true}).click();
   await page.getByText("Gelişmiş filtreler",{exact:true}).click();
   await page.getByLabel("Ürün kayıt ID’si",{exact:true}).fill("3");
   await page.getByRole("button",{name:"Filtreleri uygula",exact:true}).click();

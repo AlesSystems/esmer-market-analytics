@@ -19,6 +19,7 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
   try {
     const page = await app.firstWindow();
     await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
+    await page.getByText("Kaydedilmiş belge ve satır sayıları", {exact: true}).click();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix).toBeVisible();
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("3");
@@ -71,6 +72,7 @@ test("source desk discloses truncated type counts and an empty month within the 
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow();
+    await page.getByText("Kaydedilmiş belge ve satır sayıları", {exact: true}).click();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("51");
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("51");

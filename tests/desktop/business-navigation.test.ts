@@ -75,8 +75,8 @@ test("recorded invoice return restores its second page and the working month sur
   await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
   await expect(row).toBeFocused();await expect(page.getByRole("status").filter({hasText:"51–60 / 60"}).first()).toBeVisible();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Ayarlar",exact:true}).click();
-  await page.getByRole("button",{name:"Korunan mali veri görünümü",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
-  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await page.getByRole("button",{name:"Gerçek yedek görünümü",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
+  await expect(page.getByRole("button",{name:"Korunan mali veri görünümü",exact:true})).toHaveCount(0);await page.getByRole("button",{name:"Ayarları kapat",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await expect(page.getByRole("button",{name:"Gerçek yedek görünümü",exact:true})).toHaveCount(0);await page.getByRole("button",{name:"Ayarları kapat",exact:true}).click();await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");
  } finally {await app.close();await rm(userData,{recursive:true,force:true});}
 });
 

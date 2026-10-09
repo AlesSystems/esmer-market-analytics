@@ -48,6 +48,7 @@ for (const mode of ["financial", "source"] as const) {
         await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("40,00 ₺");
         await expect(page.locator(".c-evidence")).toContainText("%50");
       } else {
+        await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();
         await expect(page.getByRole("region", { name: "Kaynak kayıt göstergeleri" })).toContainText("Belge kaydı");
         await expect(page.getByRole("complementary", { name: "Kaynak kapsamı ve yöntem" })).toContainText("Mali sonuçlar doğrulanmadı");
       }

@@ -16,12 +16,14 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
   const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try{
    const page=await app.firstWindow();await page.setViewportSize({width:1440,height:1000});
+   await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();
    const evidence=page.getByRole("complementary",{name:"Kaynak kapsamı ve yöntem",exact:true});
    await expect(evidence).toBeVisible();
    await expect(evidence.getByText("fixture:document-layout",{exact:true})).not.toBeVisible();
    await evidence.getByText("Veri ve hesaplama ayrıntıları",{exact:true}).click();
    await expect(evidence.getByText("fixture:document-layout",{exact:true})).toBeVisible();
    await page.getByRole("button",{name:destination,exact:true}).click();
+   if(destination==="Satışlar")await page.getByRole("button",{name:"Kaydedilmiş satış belgelerini aç",exact:true}).click();
    await page.getByLabel("Belge türü (kaynak kodu)",{exact:true}).fill(type);
    await page.getByText("Gelişmiş filtreler",{exact:true}).click();
    await page.getByLabel("Ürün kayıt ID’si",{exact:true}).fill("300");

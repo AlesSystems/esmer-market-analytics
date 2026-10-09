@@ -14,9 +14,9 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   let page=await app.firstWindow();await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"});await expect(estimate.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();await expect(estimate.getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("-30,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
   const screenshot=testInfo.outputPath("source-estimate.png");await page.screenshot({path:screenshot});
-  const evidence=resolve("workstreams/estimated-v1/evidence");await mkdir(evidence,{recursive:true});await writeFile(join(evidence,"source-estimate.png"),await readFile(screenshot));
-  await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
-  await app.evaluate(({webContents})=>{webContents.getAllWebContents().find(w=>w.getType()==="window")?.setZoomFactor(1.25);});
+  const evidence=resolve("workstreams/estimated-v1/evidence");await mkdir(evidence,{recursive:true});if(process.env.ESMER_CAPTURE_EVIDENCE)await writeFile(join(evidence,"source-estimate.png"),await readFile(screenshot));
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
+  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({webContents})=>{webContents.getAllWebContents().find(w=>w.getType()==="window")?.setZoomFactor(1.25);});
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows()[0].setSize(680,800);});
   await page.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
@@ -29,7 +29,7 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   await page.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(1180,1000);window.webContents.setZoomFactor(1);});
   await page.getByRole("button",{name:"Ürün #3",exact:true}).click();await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("columnheader",{name:"Tarihsel alış maliyeti adayı · doğrulanmadı",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Özet",exact:true}).click();await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);const exportButton=page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true});await exportButton.focus();await page.keyboard.press("Enter");await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();expect((await readFile(output)).byteLength).toBeGreaterThan(1000);
+  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);const exportButton=page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true});await exportButton.focus();await page.keyboard.press("Enter");await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();expect((await readFile(output)).byteLength).toBeGreaterThan(1000);
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await page.getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
@@ -54,7 +54,7 @@ test("private prepared estimate imports exports and restarts offline without rev
   };
   await expect.poll(matches).toBe(true);
   await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},exportPath!);
-  await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).click();
+  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).click();
   await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();
   let exported=false;try{exported=(await readFile(exportPath!)).byteLength>1000;}catch{exported=false;}expect(exported).toBe(true);
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect.poll(matches).toBe(true);
@@ -106,6 +106,6 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   await expect(recovery()).toBeVisible();await expect(region().getByText("-20,00 ₺",{exact:true})).toHaveCount(0);
   await openRecovery();await choose(missingFile);await importChosen();
   await expect(region().getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();
-  await expect(region().getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();await expect(region().getByText("Maliyet eksik: 1",{exact:true})).toBeVisible();await expect(recovery()).toHaveCount(0);
+  await expect(region().getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();await region().getByText("Maliyet kapsamı ve dışlanan satırlar",{exact:true}).click();await expect(region().getByText("Maliyet eksik: 1",{exact:true})).toBeVisible();await expect(recovery()).toHaveCount(0);
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
