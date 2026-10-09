@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "vitest";
-import { mkdtemp, mkdir, writeFile, rm, rename, symlink } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm, rename, symlink, copyFile, appendFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createPackage } from "@electron/asar";
@@ -47,6 +47,15 @@ test("Mac inventory rejects an approved framework link that resolves outside the
   const path = "Contents/Frameworks/Electron Framework.framework/Resources";
   await symlink(tmpdir(), join(release, path));
   expect((await inspectMacRelease(release)).violations).toContain(`link:${path}`);
+});
+
+test.skipIf(process.platform !== "darwin" || process.arch !== "arm64")("Mac inventory admits the exact locked Electron binary but scans a modified binary", async () => {
+  const release = await macFixture();
+  const path = "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework";
+  await copyFile(join("node_modules/electron/dist/Electron.app", path), join(release, path));
+  expect((await inspectMacRelease(release)).violations).toEqual([]);
+  await appendFile(join(release, path), "-----BEGIN PRIVATE KEY-----");
+  expect((await inspectMacRelease(release)).violations).toContain(`content:${path}`);
 });
 
 async function fixture(extraPath?: string, content = "synthetic", currentBuild = false) {
