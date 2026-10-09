@@ -20,6 +20,7 @@ test("report history failure has retry, while a successful empty history explain
   const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await page.getByRole("button",{name:"Önceki kaydedilmiş raporlar",exact:true}).click();
   await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();
   await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
   await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toHaveCount(0);
@@ -51,6 +52,7 @@ test("source expenses and opened saved reports expose one main landmark and usef
   await page.getByRole("button",{name:"Excel’den aktar"}).click();
   await expect(page.getByRole("heading",{name:"1. Şablonu indir / dosya seç"})).toBeFocused();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await page.getByRole("button",{name:"Önceki kaydedilmiş raporlar",exact:true}).click();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
   await expect(page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true})).toBeVisible();
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
