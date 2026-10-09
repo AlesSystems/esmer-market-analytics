@@ -42,6 +42,13 @@ test("Mac inventory rejects nested data, unknown runtime files and escaping link
   expect(result.violations).toContain("content:Contents/Info.plist");
 });
 
+test("Mac inventory rejects an approved framework link that resolves outside the app", async () => {
+  const release = await macFixture();
+  const path = "Contents/Frameworks/Electron Framework.framework/Resources";
+  await symlink(tmpdir(), join(release, path));
+  expect((await inspectMacRelease(release)).violations).toContain(`link:${path}`);
+});
+
 async function fixture(extraPath?: string, content = "synthetic", currentBuild = false) {
   const root = await mkdtemp(join(tmpdir(), "esmer-release-")); roots.push(root);
   const app = join(root, "app"), release = join(root, "release");
