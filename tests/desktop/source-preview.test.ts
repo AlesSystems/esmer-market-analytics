@@ -41,7 +41,7 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
     expect(countsMatch).toBe(true);
     if (!actual) {
       await page.screenshot({path:"test-results/source-preview.png",fullPage:true});
-      await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
+      await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
       await page.getByRole("button",{name:"Sonraki kaynak kayıtları"}).first().click();
       await expect(page.getByText("51–60 / 60",{exact:true}).first()).toBeVisible();
       await writeFile(sourceFile,writeRawPackage(rawSnapshot(),"fixture:raw","batch-2"));

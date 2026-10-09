@@ -52,7 +52,7 @@ async function setup() {
       await page.getByRole("button", {name: "SQL kaynağını içe aktar", exact: true}).click();
       await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible({timeout: 30_000});
       await page.getByLabel("Dönem", {exact: true}).fill("2025-09");
-      await page.getByRole("button", {name: "Satışlar", exact: true}).click();await page.getByRole("button",{name:"Kaydedilmiş satış belgelerini aç",exact:true}).click();
+      await page.getByRole("button", {name: "Satışlar", exact: true}).click();
       await expect(page.getByRole("button", {name: "1001", exact: true})).toBeVisible();
       return {fixture, userData, app, page, before, accepted, reportId};
     } catch (error) {await app.close(); throw error;}

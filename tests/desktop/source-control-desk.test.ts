@@ -19,7 +19,6 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
   try {
     const page = await app.firstWindow();
     await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
-    await page.getByText("Kaydedilmiş belge ve satır sayıları", {exact: true}).click();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix).toBeVisible();
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("3");
@@ -28,7 +27,7 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("1");
     const evidence = page.getByRole("complementary", {name: "Kaynak kapsamı ve yöntem", exact: true});
     await expect(evidence).toContainText("Mali sonuçlar doğrulanmadı");
-    await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toContainText("Bu paket maliyet adayı içermiyor; tahmin hazırlanamadı.");
+    await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toHaveCount(0);
     await expect(page.getByRole("img", {name: "Günlük kaynak belge kayıtları"})).toBeVisible();
     await page.getByText("Günlük tam sayıları göster", {exact: true}).click();
     const days = page.getByRole("table", {name: "Günlük kaynak belge kayıtları tablosu"});
@@ -72,7 +71,6 @@ test("source desk discloses truncated type counts and an empty month within the 
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow();
-    await page.getByText("Kaydedilmiş belge ve satır sayıları", {exact: true}).click();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("51");
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("51");

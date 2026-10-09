@@ -23,7 +23,6 @@ test("source filters keep fields stable and actions grouped when expanded at des
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     for (const destination of ["Satışlar", "Alışlar ve maliyet"]) {
       await page.getByRole("button", { name: destination, exact: true }).click();
-      if(destination === "Satışlar") await page.getByRole("button", {name: "Kaydedilmiş satış belgelerini aç", exact: true}).click();
       await expect(page.getByRole("heading", { name: destination, exact: true })).toBeVisible();
       for (const { width, zoom } of [{ width: 1440, zoom: 1 }, { width: 1120, zoom: 1 }, { width: 680, zoom: 1 }, { width: 390, zoom: 1 }, { width: 680, zoom: 1.3 }]) {
         await app.evaluate(({ BrowserWindow }, size) => {

@@ -32,7 +32,6 @@ for (const mode of ["financial", "source"] as const) {
         await page.keyboard.press("Enter");
       }
       await page.getByRole("button", { name: "Satışlar", exact: true }).click();
-      if (mode === "source") await page.getByRole("button", {name: "Kaydedilmiş satış belgelerini aç", exact: true}).click();
       if (mode === "financial") await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
       await expect(page.getByRole("heading", { name: mode === "financial" ? "Satış Özeti" : "Satışlar", exact: true })).toBeVisible();
       if (mode === "financial") await expect(page.locator(".metric").first()).toContainText("365,00 ₺");

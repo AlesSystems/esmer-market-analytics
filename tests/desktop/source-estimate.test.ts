@@ -81,7 +81,7 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   const recovery=()=>region().getByRole("button",{name:"Veri paketi içe aktarmaya git",exact:true});
   const openRecovery=async()=>{await recovery().focus();await page.keyboard.press("Enter");await expect(page.getByRole("heading",{name:"Ayarlar",exact:true})).toBeFocused();};
   const importChosen=async()=>page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
-  await choose(previewFile);await importChosen();await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
+  await choose(previewFile);await importChosen();await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await expect(recovery()).toBeVisible();
   await expect(region().getByText("Tahmini satış katkısını görmek için maliyet adayı içeren hazırlanmış bir veri paketi gerekir. Ayarlar’dan Veri paketi içe aktar ile bu paketi seçin.",{exact:true})).toBeVisible();
   await recovery().scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("estimate-recovery.png")});
@@ -102,7 +102,7 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   await expect(region().getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
-  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await choose(previewFile);await importChosen();
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await choose(previewFile);await importChosen();await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await expect(recovery()).toBeVisible();await expect(region().getByText("-20,00 ₺",{exact:true})).toHaveCount(0);
   await openRecovery();await choose(missingFile);await importChosen();
   await expect(region().getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();

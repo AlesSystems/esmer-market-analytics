@@ -21,7 +21,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   let page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
-  await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
+  await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
   await expect(page.getByRole("img",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
   await page.getByText("Belge türlerinin tam sayılarını göster",{exact:true}).click();
   await page.getByText("Günlük tam sayıları göster",{exact:true}).click();
@@ -30,7 +30,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await expect(page.getByText("3 / 3 tür kodu gösteriliyor",{exact:false})).toBeVisible();
   await expect(page.getByRole("table",{name:"Kaynak belge türleri tablosu"}).getByRole("button",{name:"999 · Tür anlamı doğrulanmadı"})).toBeVisible();
   await page.screenshot({path:testInfo.outputPath("source-workspace.png"),fullPage:true});
-  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByRole("button",{name:"Kaydedilmiş satış belgelerini aç",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
   await expect(page.getByRole("cell",{name:"123,4567890123456789",exact:true})).toBeVisible();
   await expect(page.getByRole("cell",{name:"01.10.2025",exact:true})).toBeVisible();
   await page.getByText("Gelişmiş filtreler",{exact:true}).click();
