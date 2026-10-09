@@ -5,7 +5,7 @@ import {join,resolve} from "node:path";
 import {openStore} from "../../src/store/store";
 import {businessPackage} from "../helpers/business-fixtures";
 import {estimatePackage,estimateSnapshot} from "../helpers/estimate-fixture";
-const executablePath=process.env.ESMER_EXECUTABLE??resolve("release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics");
+const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 for(const empty of [false,true])test(`demo prioritizes ${empty?"empty":"estimated"} imported source across one workspace`,async()=>{
  const userData=await mkdtemp(join(tmpdir(),"esmer-demo-")),store=openStore(join(userData,"analytics.sqlite"));
  try{store.importPackage(businessPackage());const snapshot=estimateSnapshot();if(empty){snapshot.headers=[];snapshot.lines=[];}store.importSourcePreview(estimatePackage(snapshot));}finally{store.close();}
