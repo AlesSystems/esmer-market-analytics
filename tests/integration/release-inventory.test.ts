@@ -49,6 +49,18 @@ test("Mac inventory rejects an approved framework link that resolves outside the
   expect((await inspectMacRelease(release)).violations).toContain(`link:${path}`);
 });
 
+test("Mac inventory admits exact updater metadata and still rejects secrets and unreviewed filenames", async () => {
+  const release = await macFixture();
+  const updater = "Contents/Resources/app-update.yml";
+  await writeFile(join(release, updater), "provider: github\nowner: AlesSystems\nrepo: esmer-market-analytics\n");
+  expect((await inspectMacRelease(release)).violations).toEqual([]);
+  await writeFile(join(release, updater), "-----BEGIN PRIVATE KEY-----");
+  await writeFile(join(release, "Contents/Resources/custom-update.yml"), "synthetic");
+  const result = await inspectMacRelease(release);
+  expect(result.violations).toContain(`content:${updater}`);
+  expect(result.violations).toContain("distribution:Contents/Resources/custom-update.yml");
+});
+
 test.skipIf(process.platform !== "darwin" || process.arch !== "arm64")("Mac inventory admits the exact locked Electron binary but scans a modified binary", async () => {
   const release = await macFixture();
   const path = "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework";
