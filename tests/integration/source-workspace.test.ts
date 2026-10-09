@@ -59,3 +59,5 @@ test("raw first-use month follows dated records rather than extraction boundary"
  const result=querySource({schemaVersion:"sql-backup-preview-v1",provenance:"isolated-sql-backup",sourceReconciled:false,sha256:"0".repeat(64),lineage:"fixture:raw",extractionId:"batch-1",snapshot},"0".repeat(64),request());
  expect(result).toMatchObject({status:"source-workspace",period:"2025-10"});
 });
+
+test("an imported empty source remains present and selects its declared end month",()=>{const snapshot=rawSnapshot();snapshot.headers=[];snapshot.lines=[];const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:empty","empty-1"));expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",period:"2025-10",counts:{documents:0,lines:0}});}finally{store.close();}});
