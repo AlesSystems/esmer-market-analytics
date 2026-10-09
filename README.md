@@ -2,7 +2,7 @@
 
 Private Turkish desktop analytics for one owner and one Esmer Market store in the TRNC/KKTC. The application uses Electron, TypeScript, React, a local Node service and SQLite on Windows.
 
-The local application includes sales, purchasing, Excel and manual expense entry, monthly reports, Excel export and encrypted recovery. Financial datasets still use synthetic mappings. Separately, an authorized prepared SQL package can supply raw-record browsing or unverified product/day/month contribution estimates. These estimates disclose assumed source meanings, excluded returns and unsupported costs. They do not activate validated financial reports or establish whole-market profit.
+The local application includes sales, purchasing, Excel and manual expense entry, monthly reports, Excel export and encrypted recovery. v0.5 automatically uses imported source records across its pages, with one SQLite store and no financial/source view selector. Existing financial-only installations remain supported. Financial datasets still use synthetic mappings; prepared source packages support raw-record browsing and qualified product/day/month contribution estimates. These estimates disclose assumed source meanings, excluded returns and unsupported costs. They do not activate validated financial reports or establish whole-market profit.
 
 The optional isolated SQL test connection starts disabled. Imported records remain usable offline. Production rollout, validated real-source financial mapping and current-build Windows/recovery acceptance require separate evidence and direction. [The evidence index](docs/evidence/index.md) identifies current work and preserved historical receipts.
 
@@ -19,6 +19,8 @@ npm run build
 ```
 
 `npm run test:desktop -- tests/desktop/startup.test.ts` builds and launches the packaged application for the current host. Unit and integration scripts accept file filters. `npm run package:local` creates an unpacked host application. On Windows, `npm run package:win` creates unsigned x64 installer and portable artifacts in `release/`.
+
+`npm run package:mac` creates the unsigned v0.5 Apple Silicon demo ZIP and its privacy inventory. Follow [the Turkish demo guide](docs/operations/demo-v0.5-tr.md) and [build-specific evidence](docs/evidence/2026-10-09-v0.5-demo.md). Mac demo delivery does not satisfy Windows acceptance.
 
 Inspect `package.json` for the current commands and locked dependencies. Optional SQL, private-package, performance and Windows tests require their documented environments; report skips separately. Local tests cannot pass another platform's acceptance gates.
 
