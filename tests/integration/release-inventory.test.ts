@@ -1,12 +1,46 @@
 import { afterEach, expect, test } from "vitest";
-import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm, rename, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createPackage } from "@electron/asar";
-import { inspectRelease } from "../../tools/release-inventory";
+import { inspectRelease, inspectMacRelease } from "../../tools/release-inventory";
 
 const roots: string[] = [];
 afterEach(async () => { for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true }); });
+
+async function macFixture() {
+  const release = await fixture();
+  await mkdir(join(release, "Contents", "MacOS"), {recursive:true});
+  await rename(join(release, "resources"), join(release, "Contents", "Resources"));
+  await writeFile(join(release, "Contents", "Info.plist"), "synthetic plist");
+  await writeFile(join(release, "Contents", "MacOS", "Esmer Market Analytics"), "synthetic executable");
+  const framework = join(release, "Contents", "Frameworks", "Electron Framework.framework", "Versions", "A");
+  await mkdir(framework, {recursive:true});
+  await writeFile(join(framework, "Electron Framework"), "synthetic framework");
+  await symlink("A", join(framework, "..", "Current"));
+  return release;
+}
+
+test("Mac inventory hashes app content and admits internal framework links", async () => {
+  const result = await inspectMacRelease(await macFixture());
+  expect(result.violations).toEqual([]);
+  expect(result.files.map(file => file.path)).toContain("Contents/MacOS/Esmer Market Analytics");
+  expect(result.archiveFiles.map(file => file.path)).toContain("dist/desktop/main.cjs");
+  expect(result.files.every(file => /^[a-f0-9]{64}$/.test(file.sha256))).toBe(true);
+});
+
+test("Mac inventory rejects nested data, unknown runtime files and escaping links", async () => {
+  const release = await macFixture(), framework = "Contents/Frameworks/Electron Framework.framework/Versions/A";
+  await writeFile(join(release, framework, "private.sqlite"), "synthetic");
+  await writeFile(join(release, framework, "private.dat"), "synthetic");
+  await writeFile(join(release, "Contents", "Info.plist"), "-----BEGIN PRIVATE KEY-----");
+  await symlink("../../../../../../outside", join(release, framework, "escape"));
+  const result = await inspectMacRelease(release);
+  expect(result.violations).toContain(`distribution:${framework}/private.sqlite`);
+  expect(result.violations).toContain(`distribution:${framework}/private.dat`);
+  expect(result.violations).toContain(`link:${framework}/escape`);
+  expect(result.violations).toContain("content:Contents/Info.plist");
+});
 
 async function fixture(extraPath?: string, content = "synthetic", currentBuild = false) {
   const root = await mkdtemp(join(tmpdir(), "esmer-release-")); roots.push(root);
