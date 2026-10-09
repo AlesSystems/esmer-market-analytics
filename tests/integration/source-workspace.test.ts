@@ -1,6 +1,7 @@
 import {expect, test} from "vitest";
 import {openStore} from "../../src/store/store";
 import {writeRawPackage} from "../../src/source/raw-package";
+import {estimatePackage} from "../helpers/estimate-fixture";
 import {rawSnapshot} from "../helpers/raw-fixture";
 import {querySource, validSourceQuery, type SourceQuery} from "../../src/source/workspace";
 const request = (override: Partial<SourceQuery> = {}): SourceQuery => ({hash:null,period:null,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0,...override});
@@ -61,3 +62,5 @@ test("raw first-use month follows dated records rather than extraction boundary"
 });
 
 test("an imported empty source remains present and selects its declared end month",()=>{const snapshot=rawSnapshot();snapshot.headers=[];snapshot.lines=[];const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:empty","empty-1"));expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",period:"2025-10",counts:{documents:0,lines:0}});}finally{store.close();}});
+
+test("prepared estimate source reports its validated format",()=>{const store=openStore(":memory:");try{store.importSourcePreview(estimatePackage());expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",sourceFormat:"sql-backup-estimate-v1"});}finally{store.close();}});
