@@ -138,7 +138,7 @@ test("welcome loads bundled Newsreader fonts without external requests or page e
     await page.reload();
     await expect(page.getByRole("heading", { name: "Marketinize bir bütün olarak bakın.", level: 1 })).toBeVisible();
     const faces = await page.evaluate(async () => {
-      const fonts = await document.fonts.load('italic 48px "Welcome Newsreader"', "olarak bakın.");
+      const fonts = await document.fonts.load('italic 48px "Welcome Newsreader"', "olarak bakın. ĞŞİğş");
       return fonts.map(font => ({ family: font.family, status: font.status }));
     });
     expect(faces.length).toBeGreaterThan(0);
@@ -148,4 +148,37 @@ test("welcome loads bundled Newsreader fonts without external requests or page e
     expect(externalRequests).toEqual([]);
     expect(errors).toEqual([]);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("a Sales launch pending initial financial load starts only its destination calculation", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-pending-sales-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importPackage(businessPackage()); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await app.evaluate(({ ipcMain }) => {
+      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
+      const original = registry._invokeHandlers.get("esmer:request")!;
+      ipcMain.removeHandler("esmer:request");
+      ipcMain.handle("esmer:request", async (event, operation, payload) => {
+        const result = await original(event, operation, payload);
+        if (operation === "openSales") return new Promise(resolve => Reflect.set(globalThis, "releaseWelcomeSales", () => resolve(result)));
+        if (operation === "queryMonthly") Reflect.set(globalThis, "welcomeMonthlyReads", (Reflect.get(globalThis, "welcomeMonthlyReads") ?? 0) + 1);
+        return result;
+      });
+    });
+    await page.reload();
+    await page.getByRole("navigation", { name: "Doğrudan aç" }).getByRole("button", { name: /Satışlar/ }).click();
+    await expect(page.getByRole("region", { name: "Satış özeti", exact: true })).toHaveCount(0);
+    await expect.poll(() => app.evaluate(() => typeof Reflect.get(globalThis, "releaseWelcomeSales"))).toBe("function");
+    await app.evaluate(() => Reflect.get(globalThis, "releaseWelcomeSales")());
+    await expect(page.getByRole("heading", { name: "Satışlar", exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Satış özeti", exact: true })).toContainText("200,00 ₺");
+    await expect(page.getByRole("alert")).toHaveCount(0);
+    expect(await app.evaluate(() => Reflect.get(globalThis, "welcomeMonthlyReads"))).toBe(1);
+  } finally {
+    await app.evaluate(() => Reflect.get(globalThis, "releaseWelcomeSales")?.()).catch(() => {});
+    await app.close(); await rm(userData, { recursive: true, force: true });
+  }
 });
