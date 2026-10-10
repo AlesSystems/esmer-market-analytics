@@ -4,7 +4,7 @@ import {tmpdir} from "node:os";
 import {join, resolve} from "node:path";
 import {createLiveSqlFixture, syntheticHeader, syntheticLine} from "../helpers/live-sql-fixture";
 import {businessPackage} from "../helpers/business-fixtures";
-import {openSettings} from "../helpers/desktop-navigation";
+import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import {openStore} from "../../src/store/store";
 import {SalesReports} from "../../src/reports/query";
 import {ReportVersions} from "../../src/reports/versions";
@@ -46,7 +46,7 @@ async function setup() {
     } finally {store.close();}
     const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     try {
-      const page = await app.firstWindow();
+      const page = await app.firstWindow();await openWorkspace(page);
       await openSettings(page);
       await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);
       await page.getByRole("button", {name: "SQL kaynağını içe aktar", exact: true}).click();
@@ -126,7 +126,7 @@ test("packaged disposable SQL tracks captures without losing inspection and reta
     await page.screenshot({path: testInfo.outputPath("tracking-recovered-synthetic.png"), fullPage: true});
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
-    const restarted = await app.firstWindow();
+    const restarted = await app.firstWindow();await openWorkspace(restarted);
     await expect(restarted.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
     expect(await restarted.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true});
     await app.close();

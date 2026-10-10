@@ -19,6 +19,7 @@ const kind = (value: string) => ({ sale: "Satış", "customer-return": "Müşter
 
 export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth, active=true }: { active?:boolean; selectedMonth: string; onMonth: (month: string) => void; view: SalesView; setView: (view: SalesView) => void; stale: boolean }) {
   const frame=useContext(AppFrame),workspaceActive=active&&(!frame||frame.view==="workspace");
+  const consumedLaunch = useRef<number | null>(null);
   const expenseNavigation = useExpenseNavigation();
   const evidenceSummary = useRef<HTMLElement>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
@@ -107,6 +108,8 @@ export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth, a
   const chartBaseline = view.daily.some(day => day.negative) ? 55 : 100;
   const chartScale = chartBaseline === 55 ? 0.5 : 1;
   const destination: Destination = screen === "products" || screen === "transactions" ? "overview" : screen;
+  const launchRequest = frame?.launchRequest;
+  const childActive = workspaceActive && (!launchRequest || consumedLaunch.current === launchRequest.sequence || launchRequest.destination === destination);
   function navigate(next: Destination) {
     if(!opening.current){++request.current;setBusy(false);setError("");}
     setDetail(undefined);setLineId(undefined);
@@ -114,6 +117,12 @@ export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth, a
     visited.current.add(next);
     setScreen(next === "overview" ? lastSalesScreen.current : next);
   }
+  useEffect(() => {
+    const request = frame?.launchRequest;
+    if (!workspaceActive || !request || consumedLaunch.current === request.sequence) return;
+    consumedLaunch.current = request.sequence;
+    navigate(request.destination);
+  }, [frame?.launchRequest, workspaceActive]);
   return <AppShell destination={destination} navigate={next => {if(next===destination){if(detail)closePanel();else if(salesSecondaryOpen)setSalesSecondaryOpen(false);else parentBack.current?.();}else expenseNavigation.leave(() => navigate(next));}} controls={<>
     {screen === "versions" && savedPeriod ? <span>Rapor dönemi {savedPeriod} · Kaydedilmiş sürüm</span> : <label className="period-label">Dönem <Input type="month" lang="tr" value={selectedMonth} onChange={event => { if (validSelectedMonth(event.target.value)) { const next = event.target.value; expenseNavigation.leave(() => onMonth(next)); } }} /></label>}
     {!(screen === "versions" && savedPeriod) && <details className="data-status"><summary>Veri: <strong>{date(view.cutoff)}</strong></summary><div className="data-popover"><dl className="evidence"><dt>Paket hazırlanma</dt><dd>{date(view.extractedAt)}</dd><dt>İçe aktarım</dt><dd>{view.importedAt ? date(view.importedAt) : "Kayıt yok"}</dd><dt>Veri sürümü</dt><dd>{view.context.datasetId}</dd><dt>Hesaplama sürümü</dt><dd>{view.context.calculationVersion}</dd></dl><p>Raporlar yerel veri sürümünden okunur.</p></div></details>}
@@ -122,12 +131,12 @@ export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth, a
       {!(screen === "versions" && savedPeriod) && (stale || view.stale) && <div className="notice"><strong>Yeni veri sürümü hazır</strong><span>Bu rapor ve kaynak detayları açık sürümde sabit tutuluyor.</span><Button variant="outline" onClick={() => expenseNavigation.leave(() => void open(view.context.period))}>Raporu yenile</Button></div>}
       {error && <div className="notice warning" role="alert"><span>{error}</span><Button variant="outline" onClick={() => expenseNavigation.leave(() => retry.current())}>Yeniden dene</Button></div>}
       {busy && <p role="status">Rapor yükleniyor…</p>}
-      <div hidden={screen !== "monthly" || busy || selectedMonth !== view.context.period}><MonthlyWorkspace active={workspaceActive && screen === "monthly" && !busy && selectedMonth === view.context.period} onReport={() => navigate("versions")} onProduct={id => {setHighlightProduct(id);navigate("overview");}} onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} context={view.context} versions={false} revision={expenseRevision} refresh={() => void open(selectedMonth)} onSales={() => navigate("overview")} /></div>
-      {visited.current.has("versions") && <div hidden={screen !== "versions"}>{selectedMonth === view.context.period ? <MonthlyWorkspace active={workspaceActive && screen === "versions" && !busy} onDetailPeriod={detailPeriod} context={view.context} versions revision={expenseRevision} refresh={() => void open(selectedMonth)} /> : <SavedReports active={workspaceActive&&screen==="versions"} onDetailPeriod={detailPeriod} period={selectedMonth} />}</div>}
-      {visited.current.has("expenses") && <div hidden={screen !== "expenses"}><ExpensesWorkspace visible={workspaceActive && screen === "expenses"} active={workspaceActive && screen === "expenses"} period={selectedMonth} onPeriod={next => expenseNavigation.leave(() => onMonth(next))} onChange={() => setExpenseRevision(value => value + 1)} /></div>}
-      {visited.current.has("purchasing") && <div hidden={screen !== "purchasing" || busy || selectedMonth !== view.context.period}><PurchasingWorkspace onParentBack={back=>{parentBack.current=back;}} active={workspaceActive && screen === "purchasing" && !busy && selectedMonth === view.context.period} context={view.context} /></div>}
+      <div hidden={screen !== "monthly" || busy || selectedMonth !== view.context.period}><MonthlyWorkspace active={childActive && screen === "monthly" && !busy && selectedMonth === view.context.period} onReport={() => navigate("versions")} onProduct={id => {setHighlightProduct(id);navigate("overview");}} onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} context={view.context} versions={false} revision={expenseRevision} refresh={() => void open(selectedMonth)} onSales={() => navigate("overview")} /></div>
+      {visited.current.has("versions") && <div hidden={screen !== "versions"}>{selectedMonth === view.context.period ? <MonthlyWorkspace active={childActive && screen === "versions" && !busy} onDetailPeriod={detailPeriod} context={view.context} versions revision={expenseRevision} refresh={() => void open(selectedMonth)} /> : <SavedReports active={childActive&&screen==="versions"} onDetailPeriod={detailPeriod} period={selectedMonth} />}</div>}
+      {visited.current.has("expenses") && <div hidden={screen !== "expenses"}><ExpensesWorkspace visible={childActive && screen === "expenses"} active={childActive && screen === "expenses"} period={selectedMonth} onPeriod={next => expenseNavigation.leave(() => onMonth(next))} onChange={() => setExpenseRevision(value => value + 1)} /></div>}
+      {visited.current.has("purchasing") && <div hidden={screen !== "purchasing" || busy || selectedMonth !== view.context.period}><PurchasingWorkspace onParentBack={back=>{parentBack.current=back;}} active={childActive && screen === "purchasing" && !busy && selectedMonth === view.context.period} context={view.context} /></div>}
       {visited.current.has("overview") && <div hidden={destination !== "overview" || busy || selectedMonth !== view.context.period}>
-      <div hidden={salesSecondaryOpen || !!detail}><MonthlyWorkspace active={workspaceActive && destination === "overview" && !salesSecondaryOpen && !busy && selectedMonth === view.context.period} onParentBack={back=>{parentBack.current=back;}} context={view.context} versions={false} salesOnly initialProductId={highlightProduct} revision={expenseRevision} refresh={() => void open(selectedMonth)} /></div>
+      <div hidden={salesSecondaryOpen || !!detail}><MonthlyWorkspace active={childActive && destination === "overview" && !salesSecondaryOpen && !busy && selectedMonth === view.context.period} onParentBack={back=>{parentBack.current=back;}} context={view.context} versions={false} salesOnly initialProductId={highlightProduct} revision={expenseRevision} refresh={() => void open(selectedMonth)} /></div>
       <details open={salesSecondaryOpen} onToggle={event=>{const open=event.currentTarget.open;setSalesSecondaryOpen(open);if(!open&&detail)setDetail(undefined);}}><summary>İşlemler ve satış dağılımı</summary>
       <div className={`work-grid sales-control-desk${detail ? " has-detail" : ""}`}><main aria-busy={busy}>
         <div hidden={!!detail} className="page-heading"><div><h1>{screen === "overview" ? "Satış Özeti" : screen === "products" ? "Kategori / Ürün Detayı" : "İşlemler"}</h1><p>{scope}</p></div><label className="search-label">Ürün ara<Input type="search" disabled={opening.current} value={search} placeholder="Ürün adı" onChange={event => { setSearch(event.target.value); void query({ ...emptySalesFilters, search: event.target.value }, event.target.value ? "products" : "overview"); }} /></label></div>

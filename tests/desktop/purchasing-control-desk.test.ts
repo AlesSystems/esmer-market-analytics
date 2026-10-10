@@ -2,7 +2,7 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { businessPackage } from "../helpers/business-fixtures";
 import { purchasingJourney } from "../helpers/purchasing-journey";
 const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics");
@@ -11,7 +11,7 @@ test("purchasing inspection selects actual excluded cost evidence with plain key
  const path = join(dir, "synthetic.json"); await writeFile(path, businessPackage(purchasingJourney()));
  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
  try {
-  const page = await app.firstWindow();
+  const page = await app.firstWindow();await openWorkspace(page);
   await app.evaluate(({ dialog }, file) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] }); }, path);
   await importPackage(page); await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
   await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
@@ -43,7 +43,7 @@ test("source purchasing remains raw evidence with keyboard controls without deco
  store.importSourcePreview(writeRawPackage(snapshot, "fixture:cost-desk", "cost-source-1")); store.close();
  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
  try {
-  const page = await app.firstWindow();
+  const page = await app.firstWindow();await openWorkspace(page);
   await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
   await expect(page.locator("canvas")).toHaveCount(0);

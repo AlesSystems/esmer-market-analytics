@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -27,7 +28,7 @@ test("saved comparison stays separate from candidate review and report details r
   } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Raporlar", exact: true }).click(); await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await page.getByLabel("Rapor inceleme açıklaması").fill("Yeni aday incelemesi");
     await page.getByLabel("Eski sürüm", { exact: true }).selectOption(firstId);

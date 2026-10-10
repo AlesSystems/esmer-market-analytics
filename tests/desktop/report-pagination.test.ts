@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -19,7 +19,7 @@ test("packaged sales tables render at most 100 rows and every transaction remain
   await writeFile(packagePath, salesPackage({ documents, lines, suppliers: [] }, { cutoff: "2025-09-30", coverage: { from: "2025-09-01", to: "2025-09-30", complete: true } }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Satışlar", exact: true }).click();

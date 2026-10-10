@@ -1,5 +1,5 @@
 import { executablePath } from "../helpers/desktop-executable";
-import { importPackage, openSettings } from "../helpers/desktop-navigation";
+import {importPackage, openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -13,7 +13,7 @@ test("sidebar keeps the reporting period through analysis and recovery", async (
   await writeFile(packagePath, businessPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
@@ -44,7 +44,7 @@ test("Option B visual evidence covers desktop, narrow and forced colors", async 
   const directory = "test-results/option-b-evidence";
   await mkdir(directory, { recursive: true });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.setViewportSize({ width: 1440, height: 1000 });
     await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await page.screenshot({ path: `${directory}/empty.png` });

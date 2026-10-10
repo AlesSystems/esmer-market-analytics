@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,7 +22,7 @@ for (const mode of ["financial", "source"] as const) {
     } finally { store.close(); }
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
-      const page = await app.firstWindow();
+      const page = await app.firstWindow();await openWorkspace(page);
       if (mode === "source") {
         const summary = page.locator(".data-status > summary");
         await expect(summary).toBeVisible();

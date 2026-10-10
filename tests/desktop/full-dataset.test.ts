@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -50,7 +51,7 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
       const start = performance.now();
       const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
       try {
-        const page = await app.firstWindow();
+        const page = await app.firstWindow();await openWorkspace(page);
         await page.waitForFunction(() => document.querySelector("h1")?.textContent === "Ay bir bakışta" && document.body.textContent?.includes("2.500.000,00"));
         const sample = { process: iteration + 1, startupMs: performance.now() - start, ordinary: {} as Record<string, number> };
         samples.push(sample);

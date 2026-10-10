@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,7 +11,7 @@ test("legacy sales remain usable while purchasing evidence is explicitly unavail
   await writeFile(packagePath, salesPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
@@ -31,7 +31,7 @@ test("purchasing shows covered estimates and follows converted return evidence w
   await writeFile(packagePath, businessPackage(purchasingJourney()));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
@@ -100,7 +100,7 @@ test("customer return evidence opens its original sale from the prior month and 
   await writeFile(packagePath, businessPackage(records, { coverage: { from: "2025-08-01", to: "2025-09-30", complete: true } }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
@@ -129,7 +129,7 @@ test("purchasing distinguishes partial source coverage from a period with no sou
   await writeFile(packagePath, businessPackage(purchasingJourney(), { coverage: { from: "2025-09-01", to: "2025-09-30", complete: false } }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();

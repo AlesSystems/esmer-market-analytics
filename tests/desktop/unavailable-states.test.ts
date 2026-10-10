@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,7 +11,7 @@ test("monthly loading, failure retry and missing period preserve useful navigati
   await writeFile(packagePath, businessPackage(undefined, { cutoff: "2025-09-10", coverage: { from: "2025-09-01", to: "2025-09-10", complete: true } }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await app.evaluate(({ ipcMain, dialog }, path) => {
       dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] });
@@ -54,7 +54,7 @@ test("real background import exposes progress, cancels and leaves previous data 
   await writeFile(packagePath, businessPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();

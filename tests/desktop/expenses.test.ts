@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -8,7 +8,7 @@ test("expenses are reachable without a source and cancelled selection leaves an 
   const userData = await mkdtemp(join(tmpdir(), "esmer-expenses-"));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
     await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
@@ -38,7 +38,7 @@ test("expense workbook review, correction, reversal, history restoration and own
   await writeFile(workbookPath, await writeXlsxFile(rows.map(row => row.map(value => ({ type: String, value })))).toBuffer());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, templatePath);
@@ -97,7 +97,7 @@ test("invalid rows block a whole workbook and duplicate candidates require expli
   await write([good, ["ref-b", "31.02.2026", ...good.slice(2)]]);
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
@@ -130,7 +130,7 @@ test("operating report stays pinned after expense edits until the owner reopens 
   await writeFile(workbookPath, await writeXlsxFile(rows.map(row => row.map(value => ({ type: String, value })))).toBuffer());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();
@@ -167,7 +167,7 @@ test("initial expense query failure ends loading and can be retried", async () =
   const userData = await mkdtemp(join(tmpdir(), "esmer-expense-retry-"));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ ipcMain }) => {
       const listeners = ipcMain as typeof ipcMain & { _invokeHandlers: Map<string, (...args: unknown[]) => unknown> };
       const handler = listeners._invokeHandlers.get("esmer:request")!;

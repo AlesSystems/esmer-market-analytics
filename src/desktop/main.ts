@@ -96,6 +96,8 @@ app.whenReady().then(async () => {
     ["/assets/esmer-market-logo.png", ["assets/esmer-market-logo.png", "image/png"]],
     ["/assets/manrope-latin-wght-normal.woff2", ["assets/manrope-latin-wght-normal.woff2", "font/woff2"]],
     ["/assets/manrope-latin-ext-wght-normal.woff2", ["assets/manrope-latin-ext-wght-normal.woff2", "font/woff2"]],
+    ["/assets/newsreader-latin-wght-italic.woff2", ["assets/newsreader-latin-wght-italic.woff2", "font/woff2"]],
+    ["/assets/newsreader-latin-ext-wght-italic.woff2", ["assets/newsreader-latin-ext-wght-italic.woff2", "font/woff2"]],
   ]);
   localSession.webRequest.onBeforeRequest((details, callback) => {
     const url = new URL(details.url);

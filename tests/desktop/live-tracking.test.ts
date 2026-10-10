@@ -5,7 +5,7 @@ import {join,resolve} from "node:path";
 import {openStore} from "../../src/store/store";
 import {writeRawPackage} from "../../src/source/raw-package";
 import {rawSnapshot} from "../helpers/raw-fixture";
-import {openSettings} from "../helpers/desktop-navigation";
+import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
 
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 
@@ -16,7 +16,7 @@ test("packaged tracking retains month and filters while requiring fresh document
  if(first.status!=="preview-imported")throw Error("fixture");
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();
+  const page=await app.firstWindow();await openWorkspace(page);
   await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await page.getByLabel("Dönem",{exact:true}).fill("2025-10");
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();
@@ -86,7 +86,7 @@ test("packaged stale status acknowledges retained raw-only source records",async
  if(first.status!=="preview-imported")throw Error("fixture");
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();
+  const page=await app.firstWindow();await openWorkspace(page);
   await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   const configFile=join(userData,"synthetic-source.json");
   await writeFile(configFile,JSON.stringify({server:"localhost",port:1,database:"synthetic",user:"reader",password:"SYNTHETIC",scope:"isolated-copy",lineage:"fixture:tracking",expectedDatabaseId:rawSnapshot().databaseId,from:"2025-10-01",to:"2025-10-12"}));
