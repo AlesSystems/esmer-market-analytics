@@ -19,9 +19,9 @@ type Props = {
 export function SourceControlDesk({view, period, outside, onDocuments, onProducts, onDocumentType}: Props) {
   const indicators = [
     {label: "Belge kaydı", value: view.counts.documents, detail: "Tüm durum ve türler", action: onDocuments},
-    {label: "Satır kaydı", value: view.counts.lines, detail: "Kaynak belge satırları", action: onDocuments},
-    {label: "Ürün kayıt ID’si", value: view.counts.products, detail: "Ayrı ürün kimlikleri", action: onProducts},
-    {label: "Satırsız belge", value: view.counts.emptyDocuments, detail: "Satırı bulunmayan belgeler", action: onDocuments},
+    {label: "Satır kaydı", value: view.counts.lines, detail: null, action: onDocuments},
+    {label: "Ürün kayıt ID’si", value: view.counts.products, detail: null, action: onProducts},
+    {label: "Satırsız belge", value: view.counts.emptyDocuments, detail: null, action: onDocuments},
   ];
   const maxDay = Math.max(1, ...view.days.map(row => row.documents));
   const maxType = Math.max(1, ...view.types.map(row => row.documents));
@@ -35,7 +35,7 @@ export function SourceControlDesk({view, period, outside, onDocuments, onProduct
     </header>
     <section className="c-matrix" aria-label="Kaynak kayıt göstergeleri">
       {indicators.map(indicator => <button key={indicator.label} className={outside ? "c-unavailable" : undefined} onClick={indicator.action}>
-        <span>{indicator.label}</span><strong>{outside ? "Kapsam dışında" : count(indicator.value)}</strong><small>{indicator.detail}</small><em>Kayıtları aç <span aria-hidden="true">↗</span></em>
+        <span>{indicator.label}</span><strong>{outside ? "Kapsam dışında" : count(indicator.value)}</strong>{indicator.detail && <small>{indicator.detail}</small>}<em><span aria-hidden="true">↗</span></em>
       </button>)}
     </section>
     <div className="c-body">

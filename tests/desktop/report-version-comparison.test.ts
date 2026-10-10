@@ -40,7 +40,7 @@ test("saved comparison stays separate from candidate review and report details r
     const firstOpener = firstRow.getByRole("button", { name: "Kaydedilmiş sürümü aç", exact: true });
     await firstOpener.click();
     await expect(page.getByRole("heading", { name: "Seçili rapor", exact: true })).toBeFocused();
-    await expect(page.getByRole("region", { name: "Seçili rapor", exact: true })).toContainText("Seçili dönem: 2025-09");
+    await expect(page.getByRole("region", { name: "Seçili rapor", exact: true })).toContainText("Dönem: 2025-09");
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("200,00 ₺");
     await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await expect(firstOpener).toBeFocused();

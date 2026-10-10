@@ -16,6 +16,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 The October 9 [v0.5 Mac demo receipt](2026-10-09-v0.5-demo.md) records a single imported-source workspace, preserved SQLite storage, automatic source priority and a Mac demo artifact. It supersedes the manual financial/source selector in the October 6 UI. Calculation caveats and Windows/source acceptance boundaries remain in force. [The demo guide](../operations/demo-v0.5-tr.md) gives the presentation flow.
 
+The October 8 [compact-copy receipt](2026-10-08-compact-copy.md) records a further presentation refinement on main `46f654b`. It includes synthetic before/after screenshots, packaged workflow checks and the unresolved Windows packaging boundary.
+
 The October 6 [business navigation simplification](2026-10-06-issue-72-simplification.md) starts at main `afe93cd`, which includes PRs #69 and #71. It records the approved page responsibilities, remembered month, supported invoice browsing and build-specific checks. Its local synthetic results do not close Windows, real-source financial or owner acceptance gates.
 
 | Work | Evidence and continuation |

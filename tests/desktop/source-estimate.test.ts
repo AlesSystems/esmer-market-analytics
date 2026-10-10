@@ -83,7 +83,7 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   const importChosen=async()=>page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
   await choose(previewFile);await importChosen();await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await expect(recovery()).toBeVisible();
-  await expect(region().getByText("Tahmini satış katkısını görmek için maliyet adayı içeren hazırlanmış bir veri paketi gerekir. Ayarlar’dan Veri paketi içe aktar ile bu paketi seçin.",{exact:true})).toBeVisible();
+  await expect(region().getByText("Tahmin için maliyet adayı içeren veri paketi seçin.",{exact:true})).toBeVisible();
   await recovery().scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("estimate-recovery.png")});
   await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(680,800);window.webContents.setZoomFactor(2);});
   await recovery().scrollIntoViewIfNeeded();await expect(recovery()).toBeInViewport();

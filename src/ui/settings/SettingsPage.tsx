@@ -46,7 +46,7 @@ function Tile({ glaze, name, line, seal, status, className = "", children }: { g
 function Coverage({ source, cutoff }: { source?: { from: string; to: string }; cutoff?: string }) {
   const today = day(new Date().toISOString());
   const ends = [source && day(source.to), cutoff && day(cutoff)].filter((value): value is number => typeof value === "number");
-  if (!ends.length) return <p className="coverage-empty">Henüz yerel veri yok. Kapsam şeridi ilk içe aktarmadan sonra görünür.</p>;
+  if (!ends.length) return <p className="coverage-empty">Henüz yerel veri yok.</p>;
   const fromCutoff = !source || (cutoff !== undefined && day(cutoff) < day(source.from));
   const start = fromCutoff ? day(cutoff!) : day(source!.from);
   const span = Math.max(DAY, today - start);
@@ -138,7 +138,7 @@ function DisplayTile() {
     } catch { if (request !== latest.current) return; }
     setSize(confirmed.current); setError(message);
   }
-  return <Tile glaze="saffron" name="Görünüm" line="Yazı ve düğme boyutu bütün ekranlarda geçerli olur." seal={size ? "ready" : "unknown"}>
+  return <Tile glaze="saffron" name="Görünüm" line="Tüm ekranlar için yazı boyutu." seal={size ? "ready" : "unknown"}>
     <fieldset className="size-choice" disabled={!size}>
       <legend>Yazı boyutu</legend>
       {(Object.keys(textSizes) as TextSize[]).map(key => <label key={key} data-size={key}>
@@ -162,9 +162,9 @@ export function SettingsPage({ availability, source, sourceResolution, live, imp
       <button type="button" className="tile-action" onClick={onClose}>Ayarları kapat</button>
     </div>
     <div className="tile-panel">
-      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Raporlar bu bilgisayardaki yerel verileri okur." seal={sourceResolution.status !== "resolved" ? "unknown" : dataset || source ? "ready" : unread ? "unknown" : "empty"}>
+      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Bu bilgisayardaki veriler." seal={sourceResolution.status !== "resolved" ? "unknown" : dataset || source ? "ready" : unread ? "unknown" : "empty"}>
         {sourceResolution.status !== "resolved" ? <p role={sourceResolution.status === "failed" ? "alert" : "status"}>{sourceResolution.status === "failed" ? sourceResolution.message : "Kaynak durumu kontrol ediliyor…"}</p> : source ? <><dl className="tile-facts"><div><dt>Etkin kaynak yedeği</dt><dd>{date(source.from)}–{date(source.to)}<small>Kaydedilmiş veriler; hesaplama anlamları doğrulanmadı</small></dd></div></dl><Coverage source={source} />{dataset && <details><summary>Korunan geçmiş veriler</summary><p>Önceki analiz paketi · Kesim {date(dataset.cutoff)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</p></details>}</> : <><dl className="tile-facts"><div><dt>Etkin analiz paketi</dt><dd>{dataset ? <>Kesim {date(dataset.cutoff)}<small>Paket {date(dataset.extractedAt)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</small></> : unread ?? "Henüz yok"}</dd></div></dl>{unread ? <p className="coverage-empty">Yerel veri durumu: {unread}</p> : <Coverage cutoff={dataset?.cutoff} />}</>}
-        {sourceResolution.status === "resolved" && <p>{source ? "Güncel tahminler kaynak yedeğini kullanır. Giderler bu bilgisayarda tutulur; önceki raporlar kendi kaynak sürümleriyle korunur." : "Raporlar bu bilgisayardaki analiz paketini kullanır. Sentetik örnekler gerçek market verisi değildir."}</p>}
+        {sourceResolution.status === "resolved" && <p>{source ? "Güncel tahminler kaynak yedeğini kullanır. Giderler ve önceki raporların kaynak sürümleri korunur. Sentetik veri gerçek market verisi değildir." : "Raporlar yerel analiz paketini kullanır. Sentetik veri gerçek market verisi değildir."}</p>}
       </Tile>
       <Tile glaze="cobalt" name="Veri içe aktarma" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : dataset ? "ready" : "empty"}>
         <div className="import-choice">
@@ -176,7 +176,7 @@ export function SettingsPage({ availability, source, sourceResolution, live, imp
       <LiveTile live={live} sourceCutoff={source?.to} sqlImporting={sqlImporting} onImportSql={onImportSql} />
       <BackupTile onRecovery={onRecovery} />
       <DisplayTile />
-      <Tile glaze="ink" name="Hakkında" line="Tek mağaza, tek bilgisayar için çevrimdışı analiz." seal="ready">
+      <Tile glaze="ink" name="Hakkında" line="Çevrimdışı analiz." seal="ready">
         <dl className="tile-facts">
           <div><dt>Uygulama</dt><dd>Esmer Market Analytics<small>Sürüm {process.env.APP_VERSION}</small></dd></div>
           <div><dt>Para birimi</dt><dd>Türk lirası (TRY)</dd></div>
