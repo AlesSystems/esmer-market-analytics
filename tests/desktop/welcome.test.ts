@@ -182,3 +182,35 @@ test("a Sales launch pending initial financial load starts only its destination 
     await app.close(); await rm(userData, { recursive: true, force: true });
   }
 });
+
+test("empty profile expense return restores summary navigation and readiness", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-empty-return-"));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await page.getByRole("navigation", { name: "Doğrudan aç" }).getByRole("button", { name: /Giderler/ }).click();
+    await expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
+    await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Özet", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toHaveCount(0);
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("keyboard guide close restores its trigger and next workspace action", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-guide-focus-"));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    const trigger = page.getByRole("button", { name: /Başlangıç rehberi/ });
+    await trigger.focus();
+    await page.keyboard.press("Enter");
+    const close = page.getByRole("button", { name: "Rehberi kapat", exact: true });
+    await close.focus();
+    await page.keyboard.press("Enter");
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
