@@ -18,7 +18,7 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({webContents})=>{webContents.getAllWebContents().find(w=>w.getType()==="window")?.setZoomFactor(1.25);});
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows()[0].setSize(680,800);});
-  await page.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
+  await estimate.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).scrollIntoViewIfNeeded();
   await expect(page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true})).toBeInViewport();
@@ -26,7 +26,7 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
   await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).scrollIntoViewIfNeeded();
   await expect(page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true})).toBeInViewport();
-  await page.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
+  await estimate.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(1180,1000);window.webContents.setZoomFactor(1);});
   await page.getByRole("button",{name:"Ürün #3",exact:true}).click();await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("columnheader",{name:"Tarihsel alış maliyeti adayı · doğrulanmadı",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);const exportButton=page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true});await exportButton.focus();await page.keyboard.press("Enter");await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();expect((await readFile(output)).byteLength).toBeGreaterThan(1000);
