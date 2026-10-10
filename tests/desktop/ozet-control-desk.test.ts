@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -13,7 +14,7 @@ test("Kontrol masası presents the pinned month with real navigation and offline
   try { expect(store.importPackage(businessPackage()).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     const matrix = page.getByRole("region", { name: "Aylık performans", exact: true });
     await expect(matrix).toContainText("200,00 ₺");
@@ -56,7 +57,7 @@ test("Kontrol masası keeps financial evidence accessible with keyboard disclosu
   try { expect(store.importPackage(businessPackage()).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     const rail = page.locator(".c-evidence");
     await rail.locator(":scope > summary").press("Enter");
@@ -84,7 +85,7 @@ test("large monthly figures fit the desk and preserve report evidence", async ({
   try { expect(store.importPackage(businessPackage(records)).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     const matrix = page.getByRole("region", { name: "Aylık performans", exact: true });
     await expect(matrix).toContainText("1.248.600,00 ₺");
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();

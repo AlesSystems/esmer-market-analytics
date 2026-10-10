@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -12,7 +13,7 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
   if (host !== "empty") { const store = openStore(join(userData, "analytics.sqlite")); if (host === "source") store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:manual", "manual-host")); else store.importPackage(businessPackage()); store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     if (host !== "empty") await expect(page.getByRole("heading", { name: host === "source" ? "Aylık Market Özeti" : "Ay bir bakışta", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.locator("#expense-manual").click();
@@ -49,7 +50,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-save-"));
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    let page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    let page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await page.locator("#expense-manual").click(); await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByLabel("Gider tarihi", { exact: true })).toBeFocused();
@@ -80,7 +81,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
     const original = await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" })); if (original.status !== "expenses") throw Error("expenses missing");
     await page.evaluate(id => localStorage.setItem("esmer.pending-manual-expense", id), (original.rows[0].value as {origin: {requestId: string}}).origin.requestId);
     await app.evaluate(({ session }) => session.fromPartition("persist:esmer").flushStorageData());
-    await app.close(); app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();
+    await app.close(); app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();await openWorkspace(page);
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).not.toBeNull();
     await page.getByRole("button", { name: "Giderler", exact: true }).click(); await expect(page.locator(".notice[role=status]")).toContainText("Gider kaydedildi. Dönemin giderlerini yeniden inceleyin.");
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBeNull();
@@ -109,7 +110,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
 test("an in-flight save loses its renderer reply and resolves through the retained request identity", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-lost-reply-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.locator("#expense-manual").click();
+    const page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.locator("#expense-manual").click();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik kayıp yanıt");
     for (const label of ["Net tutar (TRY)", "KDV tutarı (TRY)", "Brüt tutar (TRY)"]) await page.getByLabel(label, { exact: true }).fill(label === "KDV tutarı (TRY)" ? "0" : "75");
     await app.evaluate(({ app }) => {
@@ -118,7 +119,7 @@ test("an in-flight save loses its renderer reply and resolves through the retain
     });
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
     const requestId = await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense")); expect(requestId).not.toBeNull();
-    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.reload({ waitUntil: "domcontentloaded" });await openWorkspace(page);
     await app.evaluate(() => { const db = Reflect.get(globalThis, "manualExpenseTestLock"); db.exec("COMMIT"); db.close(); Reflect.deleteProperty(globalThis, "manualExpenseTestLock"); });
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.locator(".notice[role=status]")).toContainText("Gider kaydedildi.");
@@ -130,7 +131,7 @@ test("an in-flight save loses its renderer reply and resolves through the retain
 test("an absent pending receipt requires current-record review before another manual submission", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-absent-receipt-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow(); await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
+    const page = await app.firstWindow();await openWorkspace(page); await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
     await page.evaluate(() => localStorage.setItem("esmer.pending-manual-expense", "absent-after-older-backup"));
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
@@ -153,7 +154,7 @@ test("an absent pending receipt requires current-record review before another ma
 test("a payment outside the displayed incurred month offers the payment month without changing selection", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-payment-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow(); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await page.locator("#expense-manual").click();
+    const page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await page.locator("#expense-manual").click();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Ödeme tarihi (isteğe bağlı)", { exact: true }).fill("2026-02-01"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik ayrı ödeme ayı");
     for (const label of ["Net tutar (TRY)", "KDV tutarı (TRY)", "Brüt tutar (TRY)"]) await page.getByLabel(label, { exact: true }).fill(label === "KDV tutarı (TRY)" ? "0" : "75");
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
@@ -169,7 +170,7 @@ for (const host of ["source", "sales"] as const) test(`host error recovery retai
   if (host === "source") store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:manual-error", "manual-error-host")); else store.importPackage(businessPackage()); store.close();
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", { name: host === "source" ? "Aylık Market Özeti" : "Ay bir bakışta", exact: true })).toBeVisible();
     await app.evaluate(({ ipcMain }, host) => {
       const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };

@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { executablePath } from "../helpers/desktop-executable";
-import { openSettings } from "../helpers/desktop-navigation";
+import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import { openStore } from "../../src/store/store";
 import { businessPackage } from "../helpers/business-fixtures";
 import { writeRawPackage } from "../../src/source/raw-package";
@@ -19,7 +19,7 @@ for (const mode of ["financial", "source"] as const) {
     } finally { store.close(); }
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
-      const page = await app.firstWindow();
+      const page = await app.firstWindow();await openWorkspace(page);
       if (mode === "source") {
         const indicators = page.getByRole("region", { name: "Kaynak kayıt göstergeleri" });
         await expect(indicators).toContainText("Tüm durum ve türler");

@@ -1,4 +1,4 @@
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -11,7 +11,7 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
   await writeFile(packagePath, businessPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
@@ -43,7 +43,7 @@ test("reviewed monthly values and source explanations survive refresh and export
   await writeFile(packagePath, businessPackage(initial));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, paths) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [paths.packagePath] }); dialog.showSaveDialog = async () => ({ canceled: false, filePath: paths.exportPath }); }, { packagePath, exportPath });
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();

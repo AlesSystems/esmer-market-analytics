@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -54,7 +55,7 @@ test("packaged Windows profile retains app-owned history across launch and resta
     expect(baseline.accepted).toMatchObject({ output: { report: { sales: { metrics: { netSales: "100" } }, purchasing: { gross: { coveredGrossProfit: "40" } }, operating: { result: { expenses: reusePhase8 ? "50" : "60" } } } } });
     for (let launch = 0; launch < 2; launch++) {
       app = await electron.launch({ executablePath, args: [`--user-data-dir=${profile}`] });
-      const page = await app.firstWindow();
+      const page = await app.firstWindow();await openWorkspace(page);
       expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
       expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(actualProfile);
       await expect(page.getByRole("button", { name: "Raporlar", exact: true })).toBeVisible();

@@ -45,6 +45,22 @@ colors:
   settings-error-ink: "#8a2614"
   settings-choice-line: "#cfc7b6"
   settings-selection: "#c9d6f2"
+  # Welcome B: scoped to the launch page.
+  welcome-stage: "#244fcd"
+  welcome-action: "#2459d5"
+  welcome-action-hover: "#1942a4"
+  welcome-ink: "#182644"
+  welcome-launch: "#f5f6f9"
+  welcome-muted: "#59667d"
+  welcome-line: "#d4dbe6"
+  welcome-stage-muted: "#e0e8ff"
+  welcome-seal-line: "#7594ed"
+  welcome-local: "#526059"
+  welcome-local-dot: "#34715c"
+  welcome-guide: "#e9ede4"
+  welcome-focus: "#ae651d"
+  welcome-selection: "#cbd8f8"
+  welcome-scrollbar: "#aab4c5"
 typography:
   chart-label:
     fontFamily: "Segoe UI, system-ui, sans-serif"
@@ -159,6 +175,38 @@ typography:
     fontFamily: "Segoe UI, system-ui, sans-serif"
     fontSize: "14.5px"
     fontWeight: 600
+  welcome-display:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "clamp(45px, 4.7vw, 70px)"
+    fontWeight: 500
+    lineHeight: 1.12
+    letterSpacing: "-0.035em"
+  welcome-display-italic:
+    fontFamily: "Welcome Newsreader, serif"
+    fontWeight: 400
+  welcome-title:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "35px"
+    fontWeight: 500
+    letterSpacing: "-0.025em"
+  welcome-body:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "14px"
+    lineHeight: 1.8
+  welcome-action:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "16px"
+    fontWeight: 600
+  welcome-row-title:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "14px"
+    fontWeight: 600
+  welcome-row-description:
+    fontFamily: "Manrope Variable, sans-serif"
+    fontSize: "11px"
+  welcome-seal:
+    fontFamily: "Welcome Newsreader, serif"
+    fontSize: "43px"
 rounded:
   control: "6px"
   notice: "8px"
@@ -166,6 +214,8 @@ rounded:
   settings-tile: "6px"
   settings-track: "4px"
   settings-pill: "999px"
+  welcome-panel: "12px"
+  welcome-action: "8px"
 spacing:
   compact: "8px"
   control-inline: "12px"
@@ -179,6 +229,15 @@ spacing:
   settings-tile-block: "18px"
   settings-tile-inline: "20px"
 components:
+  welcome-action:
+    backgroundColor: "{colors.welcome-action}"
+    textColor: "{colors.primary-foreground}"
+    typography: "{typography.welcome-action}"
+    rounded: "{rounded.welcome-action}"
+    padding: "18px 20px"
+  welcome-action-hover:
+    backgroundColor: "{colors.welcome-action-hover}"
+    textColor: "{colors.primary-foreground}"
   button-default:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.primary-foreground}"
@@ -327,6 +386,8 @@ The `MonthlyDisplay` report remains the authority for every amount, comparison, 
 
 ## Overview
 
+The user selected welcome prototype B, **Çalışma masası**, on 2026-10-10. Its cobalt split stage is a scoped launch surface. Welcome tokens apply only within `.welcome-page`; the ledger, overview and settings worlds retain their existing decisions.
+
 **Creative North Star: "The Quiet Market Ledger"**
 
 This is a light desktop operating system for reading a market month without turning the work into a dashboard spectacle. White working space, soft zinc surfaces, charcoal actions, a restrained teal selection, and visible rules let the figures, evidence, and Turkish labels do the work.
@@ -357,6 +418,8 @@ The world is scoped. Its tokens carry the `settings-` prefix and apply inside th
 - Segoe UI and tabular figures, inherited from the ledger.
 
 ## Colors
+
+Welcome uses `welcome-stage` for the cobalt editorial panel and `welcome-action` for the Özet action. `welcome-launch` is the quiet launch ground; `welcome-ink`, `welcome-muted` and `welcome-line` distinguish labels and row separators. The green local dot accompanies written local/connection status and makes no financial claim. The amber `welcome-focus` outline remains visible on keyboard controls.
 
 The palette is neutral first: charcoal directs action, teal establishes location, and financial state colours remain supporting signals.
 
@@ -407,6 +470,8 @@ The settings palette is glazed earthenware: warm grout and glaze-white for the m
 
 ## Typography
 
+Welcome uses locally bundled Manrope Variable for display and controls, paired with true locally bundled Newsreader italic under the `Welcome Newsreader` family for the headline emphasis and EM seal. Both Latin and Latin Extended italic subsets are shipped offline; `font-synthesis: none` prevents a simulated italic. At ≤900px the headline is 49px; at ≤700px the launch title is 30px. This pairing does not replace body typography elsewhere.
+
 **Interface Font:** Segoe UI with system-ui and sans-serif fallbacks.
 
 **Character:** The system uses the Windows-native reading face already present in the build. Hierarchy comes from compact size and weight changes, while tabular numerals make financial comparison stable.
@@ -438,6 +503,8 @@ The settings world keeps Segoe UI and steps its own ramp around the tile.
 
 ## Layout
 
+Welcome has a 1300px maximum desk width, a `1.1fr 1fr` split, 610px minimum desk height, 5.5% page inset and 112px masthead. Below 900px the inset becomes 24px and panels use 32px padding. Below 700px the desk stacks, the inset becomes 20px, and content scrolls naturally; the panels keep their shared outer silhouette.
+
 The desktop shell is a 208px sticky sidebar beside a flexible main area. The workspace is capped at 1660px and uses 28px top, 32px inline, and 48px lower padding. Reused spacing moves from 8px inside compact controls through 16px fields and 22–24px surface groups.
 
 The monthly workspace uses a two-to-three-column grid: answer and daily trend first, a full-width attention row, then finance and category regions. At 1050px it becomes a single sequence. At 800px the sidebar becomes a wrapping top strip; at 650px summary and attention groups simplify to one column; at 500px the ledger values return beneath their labels. Dense tables scroll within their own region.
@@ -456,6 +523,8 @@ At 1050px, import and live each take the full width, backup and display share a 
 
 ## Elevation & Depth
 
+Welcome panels are flat. The cobalt/light tonal split and fine launch-row rules establish hierarchy without a drop shadow. Controls use a 150ms ease-out colour transition, removed for reduced motion.
+
 The working surface is flat: borders and tonal differences establish ordinary structure. Only a popover, operations hub, or compact evidence panel receives depth, because it temporarily overlaps the ledger.
 
 ### Shadow Vocabulary
@@ -473,6 +542,8 @@ Tiles sit flat in the grout; the grout gap, not a shadow, separates them. The on
 
 ## Shapes
 
+Welcome uses 12px outer panel/guide corners and 8px primary-action corners. The two panels share one outline: outer corners round on the desktop split and on the top/bottom of the stacked layout. Launch rows remain square with a bottom rule.
+
 Controls and compact status markers use a 6px radius. Notices and attention groups widen to 8px; reusable workspace blocks, recovery sections, and overlays use 10px. Borders are fine and visible. Tables, ledgers, and charts are defined by alignment and separators rather than decorative containers.
 
 ### Settings surface — Glazed Tile Panel
@@ -480,6 +551,8 @@ Controls and compact status markers use a 6px radius. Notices and attention grou
 Tiles, controls, notices, and size choices share one small tile corner (`settings-tile`). Inset pieces (the coverage track and its source bar, and view-switch segments) use the tighter `settings-track` corner. Status pills are fully round (`settings-pill`). The seal is a 22px circle with a 1.5px rim and an eight-point star built from two overlaid 8px squares, one rotated 45°; in the sidebar badge it shrinks to 14px with 5px squares. Outline controls use a 1.5px ink border. The coverage gap is a 135° hatch of 2px coral lines every 7px.
 
 ## Components
+
+Welcome presents one prominent `Özeti aç` action and four quiet real-page shortcuts: Satışlar, Alışlar ve maliyet, Giderler and Raporlar. Ayarlar opens from the masthead. The inline Başlangıç rehberi expands with `aria-expanded`; closing restores focus to its trigger. The heading receives focus when entering welcome. The sidebar Karşılama action returns through the existing expense draft guard.
 
 ### Button
 

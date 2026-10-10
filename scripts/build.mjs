@@ -56,3 +56,9 @@ await copyFile("node_modules/@fontsource-variable/manrope/LICENSE", "dist/licenc
 for (const dependency of ["its-fine", "react-use-measure", "suspend-react", "zustand", "use-sync-external-store", "scheduler", "react"]) {
   await copyFile(`node_modules/${dependency}/LICENSE`, `dist/licences/${dependency}-LICENSE`);
 }
+
+for (const subset of ["latin", "latin-ext"]) {
+  const filename = `newsreader-${subset}-wght-italic.woff2`;
+  await copyFile(`node_modules/@fontsource-variable/newsreader/files/${filename}`, `dist/ui/assets/${filename}`);
+}
+await copyFile("node_modules/@fontsource-variable/newsreader/LICENSE", "dist/licences/newsreader-LICENSE");

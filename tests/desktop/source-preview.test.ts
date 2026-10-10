@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, relative, isAbsolute } from "node:path";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { readRawPackage, writeRawPackage } from "../../src/source/raw-package";
-import { importPackage } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
 
 test.use({trace: "off", video: "off", screenshot: "off"});
 
@@ -27,7 +27,7 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
   const sourceFile = join(userData,"preview.json"); await writeFile(sourceFile,bytes,{mode:0o600});
   let app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try {
-    let page = await app.firstWindow();
+    let page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading",{name:"Henüz mali rapor verisi yok"})).toBeVisible();
     await app.evaluate(({dialog},path) => {dialog.showOpenDialog = async () => ({canceled:false,filePaths:[path]});},sourceFile);
     await importPackage(page);
@@ -50,7 +50,7 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
       await expect(page.getByText("1–1 / 1",{exact:true}).first()).toBeVisible();
     }
     await app.close();
-    app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();
+    app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status:"live", live:{phase:"disabled"}});
   } finally {await app.close().catch(() => {}); await rm(userData,{recursive:true,force:true});}

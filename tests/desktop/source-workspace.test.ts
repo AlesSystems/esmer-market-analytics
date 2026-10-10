@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import {test,expect,_electron as electron} from "@playwright/test";
 import {mkdtemp,rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -20,7 +21,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
  store.importSourcePreview(writeRawPackage(snapshot,"fixture:workspace","batch-1"));store.close();
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  let page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  let page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
   await expect(page.getByRole("img",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
   await page.getByText("Belge türlerinin tam sayılarını göster",{exact:true}).click();
@@ -64,7 +65,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
   await expect(page.getByText("Kapsam dışında",{exact:true}).first()).toBeVisible();
   await expect(page.getByText("Belge türleri bu dönem için gösterilemiyor; dönem yedek kapsamında değil.",{exact:true})).toBeVisible();
   await expect(page.getByText("Günlük kayıtlar bu dönem için gösterilemiyor; dönem yedek kapsamında değil.",{exact:true})).toBeVisible();
-  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"Satışlar",exact:true})).toBeVisible();
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();await expect(page.getByRole("button",{name:"Satışlar",exact:true})).toBeVisible();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
@@ -76,7 +77,7 @@ test("an unreadable source retains expense recovery and replacement-import acces
  const db=new DatabaseSync(database);db.prepare("UPDATE source_preview SET package_json='{}'").run();db.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Kaynak kayıtları açılamadı",exact:true})).toBeVisible();
+  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Kaynak kayıtları açılamadı",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Giderler",exact:true}).click();await expect(page.getByRole("heading",{name:"Giderler",exact:true})).toBeVisible();await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();
   await page.getByRole("button",{name:"Yedekleme ve kurtarma",exact:true}).click();await expect(page.getByRole("heading",{name:"Yedekleme ve kurtarma",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();

@@ -10,8 +10,9 @@ import { ExpensesWorkspace } from "./ExpensesWorkspace";
 import { SalesWorkspace } from "./SalesWorkspace";
 import type { SalesView } from "../reports/contracts";
 import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
-import { AppShell } from "./AppShell";
-import { AppFrame, type FrameView } from "./frame";
+import { WelcomePage } from "./welcome/WelcomePage";
+import { AppShell, destinations, type Destination } from "./AppShell";
+import { AppFrame, type FrameView, type LaunchRequest } from "./frame";
 import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
 import { LiveBadge, SettingsPage } from "./settings/SettingsPage";
 import { useLiveConnection } from "./settings/live";
@@ -53,8 +54,12 @@ function App() {
   const [source,setSource]=useState<SourceView>();
   const [sourceError,setSourceError]=useState("");
   const [sourceResolved,setSourceResolved]=useState(false);
-  const [frameView, setFrameView] = useState<FrameView>("workspace");
-  const current = useRef<FrameView>("workspace");
+  const [frameView, setFrameView] = useState<FrameView>("welcome");
+  const current = useRef<FrameView>("welcome");
+  const launchSequence = useRef(0);
+  const [launchRequest, setLaunchRequest] = useState<LaunchRequest | null>(null);
+  const settingsOrigin = useRef<"welcome" | "workspace">("welcome");
+  const recoveryOrigin = useRef<FrameView>("welcome");
   const opener = useRef<HTMLElement | null>(null);
   const focusPending = useRef(false);
   const show = useCallback((next: FrameView, after?: () => void) => {
@@ -62,7 +67,9 @@ function App() {
     const transition = () => {
     const previous = current.current;
     if (previous === next) return;
-    if (previous === "workspace") opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (next === "settings" && (previous === "welcome" || previous === "workspace")) settingsOrigin.current = previous;
+    if (next === "recovery") recoveryOrigin.current = previous === "settings" ? settingsOrigin.current : previous;
+    if (previous === "workspace" || previous === "welcome") opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     if (next === "settings") focusPending.current = true;
     if (next === "workspace") requestAnimationFrame(() => {
       if (document.activeElement && document.activeElement !== document.body) return;
@@ -70,7 +77,7 @@ function App() {
     });
     current.current = next; setFrameView(next);after?.();
   };
-    if(next === "settings" || current.current === "settings" && next === "workspace" && !after)transition();else expenseNavigation.leave(transition);
+    if(next === "settings" || current.current === "settings" && next === settingsOrigin.current && !after)transition();else expenseNavigation.leave(transition);
   }, [expenseNavigation.leave]);
   const claimFocus = useCallback(() => { const pending = focusPending.current; focusPending.current = false; return pending; }, []);
   const [expensesOpen, setExpensesOpen] = useState(false);
@@ -88,7 +95,7 @@ function App() {
   useEffect(()=>{if(!preferencesReady||availability?.status!=="ready")return;let active=true;
     window.esmer.querySourceWorkspace({...initialSourceQuery,period:selectedMonth}).then(value=>{if(!active)return;setSource(value.status==="source-workspace"?value:undefined);if(value.status==="source-workspace"&&selectedMonth===null)selectMonth(value.period);setSourceError(value.status==="source-workspace"||value.status==="source-empty"?"":value.message);setSourceResolved(true);}).catch(()=>{if(active){setSource(undefined);setSourceError("Kaynak kayıtları okunamadı.");setSourceResolved(true);}});return()=>{active=false;};
   },[availability,preferencesReady]);
-  function restored(){show("workspace");setSales(undefined);setSource(undefined);setSourceResolved(false);void window.esmer.getAvailability().then(setAvailability);}
+  function restored(){setLaunchRequest(null);show("workspace");setSales(undefined);setSource(undefined);setSourceResolved(false);void window.esmer.getAvailability().then(setAvailability);}
   useEffect(() => {
     if (!preferencesReady || !sourceResolved || (source || sourceError) || availability?.status !== "ready" || availability.store !== "loaded" || sales) return;
     let current = true;
@@ -103,7 +110,7 @@ function App() {
     setImporting(true); setResult(undefined); setSqlNotice("");
     try {
       const imported=await window.esmer.importPackage();setResult(imported);
-      if(imported.status==="preview-imported"||imported.status==="active"){setSourceResolved(false);show("workspace");}
+      if(imported.status==="preview-imported"||imported.status==="active"){setSourceResolved(false);setLaunchRequest(null);show("workspace");}
       setAvailability(await window.esmer.getAvailability());
     } catch { setResult({ status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message }); }
     finally { setImporting(false); }
@@ -131,38 +138,42 @@ function App() {
     {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="ghost" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
   </>;
   const overlay = frameView === "recovery"
-    ? <RecoveryWorkspace embedded onClose={() => show("workspace")} onRestored={restored} />
+    ? <RecoveryWorkspace embedded onClose={() => show(recoveryOrigin.current)} onRestored={restored} />
     : <SettingsPage availability={availability} source={source && { from: source.from, to: source.to }} sourceResolution={availability && availability.status !== "ready" ? {status:"failed",message:availability.message} : sourceError ? {status:"failed",message:sourceError} : {status:sourceResolved ? "resolved" : "pending"}}
-      live={live} importing={importing} sqlImporting={sqlImporting} onImportPackage={() => expenseNavigation.leave(()=>void importPackage())} onImportSql={() => expenseNavigation.leave(()=>void importSql())} onRecovery={() => show("recovery")} onClose={() => show("workspace")} claimFocus={claimFocus} />;
+      live={live} importing={importing} sqlImporting={sqlImporting} onImportPackage={() => expenseNavigation.leave(()=>void importPackage())} onImportSql={() => expenseNavigation.leave(()=>void importSql())} onRecovery={() => show("recovery")} onClose={() => show(settingsOrigin.current)} claimFocus={claimFocus} />;
 
-  const sourceLoading = <AppShell><h1>Kaynak durumu kontrol ediliyor</h1><p role="status">Yerel kaynak verileri açılıyor…</p></AppShell>;
-  const availabilityFailure = availability && availability.status !== "ready" ? <AppShell><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></AppShell> : undefined;
+  const launch = (destination: Destination) => show("workspace", () => {setExpensesOpen(destination === "expenses");setLaunchRequest({destination, sequence: ++launchSequence.current});});
+  const fallbackDestination = launchRequest?.destination ?? "monthly";
+  const fallbackNavigate = (destination: Destination) => expenseNavigation.leave(() => {setExpensesOpen(destination === "expenses");setLaunchRequest({destination, sequence: ++launchSequence.current});});
+  const sourceLoading = <AppShell destination={fallbackDestination} navigate={fallbackNavigate}><h1>Kaynak durumu kontrol ediliyor</h1><p role="status">Yerel kaynak verileri açılıyor…</p></AppShell>;
+  const availabilityFailure = availability && availability.status !== "ready" ? <AppShell destination={fallbackDestination} navigate={fallbackNavigate}><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></AppShell> : undefined;
   let content: ReactNode;
   if (source) content = <SourceWorkspace source={source} selectedMonth={selectedMonth ?? source.period} onMonth={selectMonth} />;
-  else if ((!sales || sourceError) && expensesOpen) content = <AppShell destination="expenses" controls={<span>Yerel veriler</span>}>
-    <Button variant="outline" onClick={() => expenseNavigation.leave(() => setExpensesOpen(false))}>Ana sayfaya dön</Button><label className="period-label">Dönem<Input type="month" value={expensePeriod} onChange={event => { if (validSelectedMonth(event.target.value)) { const next = event.target.value; expenseNavigation.leave(() => selectMonth(next)); } }} /></label><ExpensesWorkspace key={expensePeriod} period={expensePeriod} onPeriod={next=>expenseNavigation.leave(()=>selectMonth(next))} />
+  else if ((!sales || sourceError) && expensesOpen) content = <AppShell destination="expenses" navigate={fallbackNavigate} controls={<span>Yerel veriler</span>}>
+    <Button variant="outline" onClick={() => fallbackNavigate("monthly")}>Ana sayfaya dön</Button><label className="period-label">Dönem<Input type="month" value={expensePeriod} onChange={event => { if (validSelectedMonth(event.target.value)) { const next = event.target.value; expenseNavigation.leave(() => selectMonth(next)); } }} /></label><ExpensesWorkspace active={frameView === "workspace"} visible={frameView === "workspace"} key={expensePeriod} period={expensePeriod} onPeriod={next=>expenseNavigation.leave(()=>selectMonth(next))} />
   </AppShell>;
-  else if (sourceError) content = <AppShell><h1>Kaynak kayıtları açılamadı</h1><p role="alert">{sourceError}</p><Button variant="default" disabled={importing} onClick={() => void importPackage()}>Veri paketi içe aktar</Button><Button variant="outline" onClick={() => setExpensesOpen(true)}>Giderler</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button><Button variant="outline" onClick={refreshAvailability}>Kaynağı yeniden aç</Button></AppShell>;
+  else if (sourceError) content = <AppShell destination={fallbackDestination} navigate={fallbackNavigate}><h1>Kaynak kayıtları açılamadı</h1><p role="alert">{sourceError}</p><Button variant="default" disabled={importing} onClick={() => void importPackage()}>Veri paketi içe aktar</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button><Button variant="outline" onClick={refreshAvailability}>Kaynağı yeniden aç</Button></AppShell>;
   else if (sales) content = <><div hidden={!sourceResolved || !!availabilityFailure}><SalesWorkspace active={sourceResolved && !availabilityFailure} selectedMonth={selectedMonth ?? sales.context.period} onMonth={selectMonth} view={sales} setView={setSales} stale={loaded && ready.dataset.datasetId !== sales.context.datasetId} /></div>{availabilityFailure ?? (!sourceResolved ? sourceLoading : undefined)}</>;
   else if (availabilityFailure) content = availabilityFailure;
   else if (!sourceResolved) content = sourceLoading;
-  else content = <AppShell controls={<><span>Yerel analiz</span><label className="period-label">Dönem<Input type="month" value={selectedMonth??""} onChange={event=>{const month=event.target.value;if(!validSelectedMonth(month))return;expenseNavigation.leave(()=>{selectMonth(month);if(!source)void window.esmer.querySourceWorkspace({...initialSourceQuery,period:month}).then(value=>{if(value.status==="source-workspace")setSource(value);}).catch(()=>setSalesError(unavailable.message));});}}/></label></>}><main className="start-workspace">
+  else content = <AppShell destination={fallbackDestination} navigate={fallbackNavigate} controls={<><span>Yerel analiz</span><label className="period-label">Dönem<Input type="month" value={selectedMonth??""} onChange={event=>{const month=event.target.value;if(!validSelectedMonth(month))return;expenseNavigation.leave(()=>{selectMonth(month);if(!source)void window.esmer.querySourceWorkspace({...initialSourceQuery,period:month}).then(value=>{if(value.status==="source-workspace")setSource(value);}).catch(()=>setSalesError(unavailable.message));});}}/></label></>}><main className="start-workspace">
     <section className="block start-state" aria-live="polite" aria-busy={importing || sqlImporting}>
       {!availability ? <h1>Yerel veriler açılıyor</h1> : availability.status === "ready" ? <>
-        <h1>{availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz mali rapor verisi yok"}</h1>
+        <h1>{fallbackDestination === "monthly" ? availability.store === "loaded" ? "Verileriniz bu bilgisayarda hazır" : "Henüz mali rapor verisi yok" : destinations.find(([id]) => id === fallbackDestination)?.[1]}</h1>
+        {fallbackDestination !== "monthly" && <p>Bu çalışma alanı için veri henüz hazır değil. Ayarlar bölümünden veri paketi içe aktarabilirsiniz.</p>}
         {availability.store === "loaded" ? <>
           <p>Veri kesim tarihi: <strong>{date(availability.dataset.cutoff)}</strong><br />Paket hazırlanma tarihi: {date(availability.dataset.extractedAt)}</p>
           <p>{new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.documents)} belge · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.lines)} satır · {new Intl.NumberFormat("tr-TR").format(availability.dataset.counts.suppliers)} tedarikçi</p>
           <ul className="warnings">{availability.dataset.warnings.map(code => <li key={code}>{warnings[code] ?? "Veri kalitesi uyarısı bulunuyor."}</li>)}</ul>
           <Button variant="default" type="button" disabled={importing} onClick={() => void importPackage()}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</Button>
-          <Button variant="outline" type="button" onClick={() => setExpensesOpen(true)}>Giderler</Button>
+
           <Button variant="outline" type="button" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button>
           <p className="note">Raporlar bu bilgisayardaki verileri kullanır. İsteğe bağlı izole test bağlantısı Ayarlar bölümünden yönetilir.</p>
         </> : <>
           <p>İzole SQL bağlantı dosyasını seçerek kaynak kayıtlarını okuyun. Mali raporlar yalnızca doğrulanmış veri paketiyle açılır.</p>
           <Button variant="default" type="button" disabled={importing || sqlImporting} onClick={() => void importSql()}>{sqlImporting ? "SQL kaynağı okunuyor…" : "SQL kaynağını içe aktar"}</Button>
           <Button variant="outline" type="button" disabled={importing || sqlImporting} onClick={() => void importPackage()}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</Button>
-          <Button variant="outline" type="button" onClick={() => setExpensesOpen(true)}>Giderler</Button>
+
           <Button variant="outline" type="button" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button>
           <p className="note">SQL okuması kaynak önizlemesi yazar. Mali veri setini etkinleştirmez.</p>
         </>}
@@ -171,6 +182,6 @@ function App() {
     </section>
     <footer>Esmer Market · Çevrimdışı analiz</footer>
   </main></AppShell>;
-  return <AppFrame.Provider value={{ view: frameView, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>{content}</AppFrame.Provider>;
+  return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>{frameView === "welcome" && <WelcomePage onLaunch={launch} onSettings={() => show("settings")} connection={({off:"Canlı bağlantı kapalı",on:"İzole test bağlantısı açık",checking:"Kaynak kontrol ediliyor",stale:"Kaynak güncel değil",unknown:"Bağlantı durumu okunamadı"})[live.state]} />}<div hidden={frameView === "welcome"}>{content}</div></AppFrame.Provider>;
 }
 createRoot(document.getElementById("root")!).render(<ExpenseNavigationProvider><App /></ExpenseNavigationProvider>);

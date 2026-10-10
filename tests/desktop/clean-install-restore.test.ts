@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { readSheet } from "read-excel-file/node";
@@ -37,7 +38,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
         return safeStorage.isEncryptionAvailable() && !protectedBytes.equals(Buffer.from(sample)) && safeStorage.decryptString(protectedBytes) === sample;
       })).toBe(true);
     }
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
     await page.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
     await page.getByRole("button", {name: "Yedeklemeyi kur"}).click();
@@ -56,7 +57,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
       dialog.showOpenDialog = (async (...args: unknown[]) => { const options = args.at(-1) as {filters?: {extensions?: string[]}[]}; return {canceled: false, filePaths: options.filters?.some(filter => filter.extensions?.includes("txt")) ? [paths.keyPath] : [paths.backupPath]}; }) as typeof dialog.showOpenDialog;
       dialog.showMessageBox = async () => ({response: 0, checkboxChecked: false});
     }, {backupPath, keyPath});
-    const restored = await app.firstWindow();
+    const restored = await app.firstWindow();await openWorkspace(restored);
     await restored.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
     await restored.getByRole("button", {name: "Yedek ve anahtar seç"}).click();
     await expect(restored.getByRole("heading", {name: "Geri yükleme önizlemesi"})).toBeVisible();

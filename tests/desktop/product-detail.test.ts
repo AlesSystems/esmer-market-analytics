@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -18,7 +19,7 @@ test("selected return month shows pinned daily amounts, original cost and comple
   if (reviewDirectory) test.setTimeout(90_000);
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`], ...(reviewDirectory ? { recordVideo: { dir: reviewDirectory } } : {}) });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     const detail = page.getByRole("region", { name: "Seçili ürün özeti", exact: true });
@@ -86,7 +87,7 @@ test("original-sale evidence preserves mixed and unknown quantity units and cost
   try { expect(store.importPackage(businessPackage(records, { coverage: { from: "2025-08-31", to: "2025-09-30", complete: true } })).status).toBe("active"); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click();

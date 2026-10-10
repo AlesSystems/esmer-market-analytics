@@ -4,7 +4,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
-import { importPackage, openSettings } from "../helpers/desktop-navigation";
+import {importPackage, openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } from "../helpers/shadcn-fixtures";
 
@@ -12,9 +12,10 @@ import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } fro
 test("forced colors keeps a keyboard focus outline on actions and period input", async ({}, testInfo) => {
   const { app, userData, packagePath } = await importedApp();
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
+    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
     await page.emulateMedia({ forcedColors: "active" });
     for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByLabel("Dönem", { exact: true })]) {
       await control.focus();
@@ -88,7 +89,7 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
   test.skip(process.platform !== "win32", "Packaged Windows layout contract");
   const { app, userData, packagePath } = await importedApp();
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.setViewportSize({ width: 1440, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
@@ -139,7 +140,7 @@ test("long Turkish labels and a large amount remain usable in a paginated narrow
   test.skip(process.platform !== "win32", "Packaged Windows visual stress check");
   const { app, userData, packagePath, fixtureHash } = await importedApp(stressMonthPackage());
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.setViewportSize({ width: 453, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
@@ -170,7 +171,7 @@ test("packaged visual journey retains every destination and important desktop st
   test.skip(process.platform !== "win32", "Packaged Windows visual evidence");
   const { app, userData, packagePath, fixtureHash } = await importedApp();
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.setViewportSize({ width: 1440, height: 900 });
     await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
     await capture(page, testInfo.outputPath("empty-1440.png"));
@@ -282,7 +283,7 @@ test("packaged visual journey retains every destination and important desktop st
     const externalRequests: string[] = [];
     await page.route(/^https?:\/\//, route => { externalRequests.push(route.request().url()); return route.abort(); });
     await page.context().setOffline(true);
-    await page.reload();
+    await page.reload();await openWorkspace(page);
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();

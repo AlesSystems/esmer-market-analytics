@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -12,7 +13,7 @@ test("complete invoice list preserves empty documents and returns to page and ke
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
-  const page=await app.firstWindow();await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Faturalar",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Son alışlar",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Sonraki 50 kayıt",exact:true}).click();
@@ -38,7 +39,7 @@ test("hidden purchasing detail never handles another page Escape key", async () 
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
-  const page=await app.firstWindow();await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
   await page.getByRole("button",{name:"P1",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
   await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Giderler",exact:true}).click();
   const button=page.getByRole("button",{name:"Gider ekle",exact:true});await button.focus();const scroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));await page.keyboard.press("Escape");await expect(button).toBeFocused();expect(await page.evaluate(()=>({x:scrollX,y:scrollY}))).toEqual(scroll);

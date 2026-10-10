@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import {test,expect,_electron as electron} from "@playwright/test";
 import {mkdtemp,rm,mkdir} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -15,7 +16,7 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
   const store=openStore(join(userData,"analytics.sqlite"));store.importSourcePreview(writeRawEstimatePackage(snapshot,"fixture:document-layout","seven-lines"));store.close();
   const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try{
-   const page=await app.firstWindow();await page.setViewportSize({width:1440,height:1000});
+   const page=await app.firstWindow();await openWorkspace(page);await page.setViewportSize({width:1440,height:1000});
    await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();
    const evidence=page.getByRole("complementary",{name:"Kaynak kapsamı ve yöntem",exact:true});
    await expect(evidence).toBeVisible();

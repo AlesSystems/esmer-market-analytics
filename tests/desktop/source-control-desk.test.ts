@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import {test, expect, _electron as electron} from "@playwright/test";
 import {mkdtemp, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -17,7 +18,7 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
   try { expect(store.importSourcePreview(writeRawPackage(snapshot, "fixture:source-control-desk", "source-desk-1")).status).toBe("preview-imported"); } finally { store.close(); }
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix).toBeVisible();
@@ -70,7 +71,7 @@ test("source desk discloses truncated type counts and an empty month within the 
   try { expect(store.importSourcePreview(writeRawPackage(snapshot, "fixture:source-control-desk-types", "source-desk-types-1")).status).toBe("preview-imported"); } finally { store.close(); }
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("51");
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("51");

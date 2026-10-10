@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -7,7 +8,7 @@ test("plain month tasks selects existing tasks and preserves the review draft", 
   const userData = await mkdtemp(join(tmpdir(), "esmer-expense-desk-"));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.locator("canvas")).toHaveCount(0);
     await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
@@ -48,7 +49,7 @@ test("recorded-source expenses embed one main and keep the plain task draft", as
   try { store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:expense-desk", "expense-desk-source")); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("main")).toHaveCount(1);
     await expect(page.getByRole("button", { name: "Gider ekle", exact: true }).first()).toBeVisible();
@@ -73,7 +74,7 @@ test("plain task switches retain preview and explicit duplicate decisions", asyn
   await writeFile(workbookPath, await writeXlsxFile([expenseColumns, good, ["folio-b", ...good.slice(1)]].map(row => row.map(value => ({ type: String, value })))).toBuffer());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
     await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);

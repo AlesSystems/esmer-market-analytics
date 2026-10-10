@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -19,7 +20,7 @@ test("source filters keep fields stable and actions grouped when expanded at des
   await mkdir(captureDir, { recursive: true });
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();
+    const page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     for (const destination of ["Satışlar", "Alışlar ve maliyet"]) {
       await page.getByRole("button", { name: destination, exact: true }).click();

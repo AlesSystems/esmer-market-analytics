@@ -21,7 +21,8 @@
     "package:local": "npm run build && electron-builder --dir",
     "package:win": "npm run build && electron-builder --win nsis portable --x64 && node scripts/verify-package.mjs release/win-unpacked/resources/app.asar && node tools/release-inventory.ts release/win-unpacked release/release-inventory.json && node scripts/verify-distributions.mjs",
     "prototype:ozet": "node scripts/prototype-ozet.mjs",
-    "package:mac": "npm run build && electron-builder --mac zip --arm64 && node scripts/verify-package.mjs \"release/mac-arm64/Esmer Market Analytics.app/Contents/Resources/app.asar\" && node tools/release-inventory.ts \"release/mac-arm64/Esmer Market Analytics.app\" release/mac-release-inventory.json mac"
+    "package:mac": "npm run build && electron-builder --mac zip --arm64 && node scripts/verify-package.mjs \"release/mac-arm64/Esmer Market Analytics.app/Contents/Resources/app.asar\" && node tools/release-inventory.ts \"release/mac-arm64/Esmer Market Analytics.app\" release/mac-release-inventory.json mac",
+    "prototype:welcome": "node scripts/prototype-welcome.mjs"
   },
   "dependencies": {
     "class-variance-authority": "0.7.1",

@@ -1,3 +1,4 @@
+import { openWorkspace } from "../helpers/desktop-navigation";
 import {test, expect, _electron as electron} from "@playwright/test";
 import {mkdtemp, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -17,7 +18,7 @@ test("report history failure has retry, while a successful empty history explain
  const store=openStore(database);store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:reports","batch-1"));store.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
   await page.getByRole("button",{name:"Raporlar",exact:true}).click();
   await page.getByRole("button",{name:"Önceki kaydedilmiş raporlar",exact:true}).click();
@@ -43,7 +44,7 @@ test("source expenses and opened saved reports expose one main landmark and usef
  store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:landmarks","batch-1"));store.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Giderler",exact:true}).click();
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByText("Bu dönemde gider kaydı yok.",{exact:true})).toBeVisible();
