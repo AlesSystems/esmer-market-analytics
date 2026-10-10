@@ -19,7 +19,7 @@ export function SavedReports({period, onSourceSummary, onDetailPeriod, active=tr
  const [report,setReport]=useState<MonthlyDisplay>();
  const [reportOpen,setReportOpen]=useState(false);
 
- useEffect(()=>{onDetailPeriod?.(reportOpen&&report?report.context.period:null);return()=>onDetailPeriod?.(null);},[reportOpen,report,onDetailPeriod]);
+ useEffect(()=>{onDetailPeriod?.(active&&reportOpen&&report?report.context.period:null);return()=>onDetailPeriod?.(null);},[active,reportOpen,report,onDetailPeriod]);
  const [message,setMessage]=useState("");
  const [busy,setBusy]=useState(false);
  useEffect(()=>{if(reportOpen&&active)heading.current?.focus();},[reportOpen,active]);

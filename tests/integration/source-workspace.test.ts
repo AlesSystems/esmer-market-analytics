@@ -1,6 +1,7 @@
 import {expect, test} from "vitest";
 import {openStore} from "../../src/store/store";
 import {writeRawPackage} from "../../src/source/raw-package";
+import {estimatePackage} from "../helpers/estimate-fixture";
 import {rawSnapshot} from "../helpers/raw-fixture";
 import {querySource, validSourceQuery, type SourceQuery} from "../../src/source/workspace";
 const request = (override: Partial<SourceQuery> = {}): SourceQuery => ({hash:null,period:null,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0,...override});
@@ -12,7 +13,7 @@ test("real source workspace filters observational types and pages without financ
  try {
   store.importSourcePreview(writeRawPackage(snapshot,"fixture:raw","batch-1"));
   const overview=store.querySourceWorkspace(request());
-  expect(overview.status).toBe("source-workspace"); if(overview.status!=="source-workspace")throw Error("missing");
+  expect(overview).toMatchObject({status:"source-workspace",sourceFormat:"sql-backup-preview-v1"}); if(overview.status!=="source-workspace")throw Error("missing");
   expect(overview.counts).toEqual({documents:3,lines:2,products:1,emptyDocuments:1});
   expect(overview.types).toEqual([{code:"1",documents:1},{code:"11",documents:1},{code:"999",documents:1}]);
   const sales=store.querySourceWorkspace(request({hash:overview.hash,period:"2025-10",view:"documents",scope:"sales"}));
@@ -59,3 +60,7 @@ test("raw first-use month follows dated records rather than extraction boundary"
  const result=querySource({schemaVersion:"sql-backup-preview-v1",provenance:"isolated-sql-backup",sourceReconciled:false,sha256:"0".repeat(64),lineage:"fixture:raw",extractionId:"batch-1",snapshot},"0".repeat(64),request());
  expect(result).toMatchObject({status:"source-workspace",period:"2025-10"});
 });
+
+test("an imported empty source remains present and selects its declared end month",()=>{const snapshot=rawSnapshot();snapshot.headers=[];snapshot.lines=[];const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:empty","empty-1"));expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",period:"2025-10",counts:{documents:0,lines:0}});}finally{store.close();}});
+
+test("prepared estimate source reports its validated format",()=>{const store=openStore(":memory:");try{store.importSourcePreview(estimatePackage());expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",sourceFormat:"sql-backup-estimate-v1"});}finally{store.close();}});

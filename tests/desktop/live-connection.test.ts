@@ -57,9 +57,9 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await openSettings(page);
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
-    if (configured) await page.getByRole("button", {name: "Korunan mali veri görünümü", exact: true}).click();
-    else await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
-    await expect(page.getByRole("region", {name: "Aylık performans"})).toContainText("200,00 ₺");
+    await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
+    if(configured) await expect(page.getByRole("region", {name: "Kaynak kayıt göstergeleri"})).toBeVisible();
+    else await expect(page.getByRole("region", {name: "Aylık performans"})).toContainText("200,00 ₺");
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));
     try {expect(store.readSnapshot()).toEqual(before);} finally {store.close();}

@@ -17,8 +17,8 @@ import { salesReasonLabels } from "./report-labels";
 import { PageControls, pageRows } from "./PageControls";
 const kind = (value: string) => ({ sale: "Satış", "customer-return": "Müşteri iadesi", purchase: "Alış", "supplier-return": "Tedarikçi iadesi" })[value] ?? "Türü bilinmiyor";
 
-export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth }: { selectedMonth: string; onMonth: (month: string) => void; view: SalesView; setView: (view: SalesView) => void; stale: boolean }) {
-  const frame=useContext(AppFrame),workspaceActive=!frame||frame.view==="workspace";
+export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth, active=true }: { active?:boolean; selectedMonth: string; onMonth: (month: string) => void; view: SalesView; setView: (view: SalesView) => void; stale: boolean }) {
+  const frame=useContext(AppFrame),workspaceActive=active&&(!frame||frame.view==="workspace");
   const expenseNavigation = useExpenseNavigation();
   const evidenceSummary = useRef<HTMLElement>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
@@ -50,17 +50,17 @@ export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth }:
   const line = detail?.lines.find(item => item.lineId === lineId);
   const excludedLine = detail?.excludedLines.find(item => item.lineId === lineId);
   const sourceOpen = !!(line || excludedLine);
-  useEffect(() => { if (selectedMonth !== view.context.period) void open(selectedMonth); }, [selectedMonth]);
+  useEffect(() => { if (workspaceActive && selectedMonth !== view.context.period) void open(selectedMonth); }, [selectedMonth,workspaceActive]);
   function resetPages() { setCategoryPage(0); setProductPage(0); setTransactionPage(0); setExclusionPage(0); }
   const scope = view.products.find(item => item.id === view.filters.productId)?.name ?? view.categories.find(item => item.id === view.filters.categoryId)?.name ?? view.filters.productId ?? view.filters.categoryId ?? "Tüm ürünler";
   function closePanel() { setDetail(undefined); setLineId(undefined); restoreReturn(transactionReceipt.current, panelTitle.current); }
   useEffect(() => { if (detail && panelTitle.current?.getClientRects().length) panelTitle.current.focus(); }, [detail, lineId]);
   useEffect(() => {
-    if (!detail) return;
+    if (!detail || !workspaceActive) return;
     function escape(event: KeyboardEvent) { if (event.key === "Escape" && panelTitle.current?.getClientRects().length) { setDetail(undefined); setLineId(undefined); restoreReturn(transactionReceipt.current, panelTitle.current); } }
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
-  }, [detail]);
+  }, [detail,workspaceActive]);
   async function query(filters: SalesFilters, next = screen) {
     if (opening.current) return;
     retry.current = () => { void query(filters, next); };
@@ -124,7 +124,7 @@ export function SalesWorkspace({ view, setView, stale, selectedMonth, onMonth }:
       {busy && <p role="status">Rapor yükleniyor…</p>}
       <div hidden={screen !== "monthly" || busy || selectedMonth !== view.context.period}><MonthlyWorkspace active={workspaceActive && screen === "monthly" && !busy && selectedMonth === view.context.period} onReport={() => navigate("versions")} onProduct={id => {setHighlightProduct(id);navigate("overview");}} onExpenses={() => navigate("expenses")} onPurchasing={() => navigate("purchasing")} context={view.context} versions={false} revision={expenseRevision} refresh={() => void open(selectedMonth)} onSales={() => navigate("overview")} /></div>
       {visited.current.has("versions") && <div hidden={screen !== "versions"}>{selectedMonth === view.context.period ? <MonthlyWorkspace active={workspaceActive && screen === "versions" && !busy} onDetailPeriod={detailPeriod} context={view.context} versions revision={expenseRevision} refresh={() => void open(selectedMonth)} /> : <SavedReports active={workspaceActive&&screen==="versions"} onDetailPeriod={detailPeriod} period={selectedMonth} />}</div>}
-      {visited.current.has("expenses") && <div hidden={screen !== "expenses"}><ExpensesWorkspace visible={workspaceActive && screen === "expenses"} active={screen === "expenses"} period={selectedMonth} onPeriod={next => expenseNavigation.leave(() => onMonth(next))} onChange={() => setExpenseRevision(value => value + 1)} /></div>}
+      {visited.current.has("expenses") && <div hidden={screen !== "expenses"}><ExpensesWorkspace visible={workspaceActive && screen === "expenses"} active={workspaceActive && screen === "expenses"} period={selectedMonth} onPeriod={next => expenseNavigation.leave(() => onMonth(next))} onChange={() => setExpenseRevision(value => value + 1)} /></div>}
       {visited.current.has("purchasing") && <div hidden={screen !== "purchasing" || busy || selectedMonth !== view.context.period}><PurchasingWorkspace onParentBack={back=>{parentBack.current=back;}} active={workspaceActive && screen === "purchasing" && !busy && selectedMonth === view.context.period} context={view.context} /></div>}
       {visited.current.has("overview") && <div hidden={destination !== "overview" || busy || selectedMonth !== view.context.period}>
       <div hidden={salesSecondaryOpen || !!detail}><MonthlyWorkspace active={workspaceActive && destination === "overview" && !salesSecondaryOpen && !busy && selectedMonth === view.context.period} onParentBack={back=>{parentBack.current=back;}} context={view.context} versions={false} salesOnly initialProductId={highlightProduct} revision={expenseRevision} refresh={() => void open(selectedMonth)} /></div>

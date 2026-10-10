@@ -13,7 +13,7 @@ import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../d
 import { AppShell } from "./AppShell";
 import { AppFrame, type FrameView } from "./frame";
 import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
-import { LiveBadge, SettingsPage, type DataView } from "./settings/SettingsPage";
+import { LiveBadge, SettingsPage } from "./settings/SettingsPage";
 import { useLiveConnection } from "./settings/live";
 import { importSqlSource } from "./sql-import";
 
@@ -53,7 +53,6 @@ function App() {
   const [source,setSource]=useState<SourceView>();
   const [sourceError,setSourceError]=useState("");
   const [sourceResolved,setSourceResolved]=useState(false);
-  const [mode,setMode]=useState<DataView>("source");
   const [frameView, setFrameView] = useState<FrameView>("workspace");
   const current = useRef<FrameView>("workspace");
   const opener = useRef<HTMLElement | null>(null);
@@ -83,15 +82,15 @@ function App() {
   const [sqlImporting, setSqlImporting] = useState(false);
   const [sqlNotice, setSqlNotice] = useState("");
   const [result, setResult] = useState<ImportOutcome | RequestError | JobOutcome>();
-  const refreshAvailability = () => { void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); };
+  const refreshAvailability = () => { setSourceResolved(false); void window.esmer.getAvailability().then(setAvailability).catch(() => setAvailability(unavailable)); };
   const live = useLiveConnection(refreshAvailability);
   useEffect(refreshAvailability, []);
   useEffect(()=>{if(!preferencesReady||availability?.status!=="ready")return;let active=true;
     window.esmer.querySourceWorkspace({...initialSourceQuery,period:selectedMonth}).then(value=>{if(!active)return;setSource(value.status==="source-workspace"?value:undefined);if(value.status==="source-workspace"&&selectedMonth===null)selectMonth(value.period);setSourceError(value.status==="source-workspace"||value.status==="source-empty"?"":value.message);setSourceResolved(true);}).catch(()=>{if(active){setSource(undefined);setSourceError("Kaynak kayıtları okunamadı.");setSourceResolved(true);}});return()=>{active=false;};
   },[availability,preferencesReady]);
-  function restored(){show("workspace");setSales(undefined);setSource(undefined);setSourceResolved(false);setMode("source");void window.esmer.getAvailability().then(setAvailability);}
+  function restored(){show("workspace");setSales(undefined);setSource(undefined);setSourceResolved(false);void window.esmer.getAvailability().then(setAvailability);}
   useEffect(() => {
-    if (!preferencesReady || !sourceResolved || ((source || sourceError) && mode==="source") || availability?.status !== "ready" || availability.store !== "loaded" || sales) return;
+    if (!preferencesReady || !sourceResolved || (source || sourceError) || availability?.status !== "ready" || availability.store !== "loaded" || sales) return;
     let current = true;
     window.esmer.openSales({ period: selectedMonth }).then(value => {
       if (!current) return;
@@ -99,14 +98,12 @@ function App() {
       else setSalesError(value.message);
     }).catch(() => { if (current) setSalesError(unavailable.message); });
     return () => { current = false; };
-  }, [availability, sales, sourceResolved, source, sourceError, mode, preferencesReady, selectedMonth]);
+  }, [availability, sales, sourceResolved, source, sourceError, preferencesReady, selectedMonth]);
   async function importPackage() {
     setImporting(true); setResult(undefined); setSqlNotice("");
     try {
       const imported=await window.esmer.importPackage();setResult(imported);
-      if(imported.status==="preview-imported")setMode("source");
-      else if(imported.status==="active")setMode("financial");
-      if(imported.status==="preview-imported"||imported.status==="active")show("workspace");
+      if(imported.status==="preview-imported"||imported.status==="active"){setSourceResolved(false);show("workspace");}
       setAvailability(await window.esmer.getAvailability());
     } catch { setResult({ status: "failed", code: "SERVICE_UNAVAILABLE", message: unavailable.message }); }
     finally { setImporting(false); }
@@ -120,7 +117,7 @@ function App() {
         refreshLiveSource: () => window.esmer.refreshLiveSource(),
       }));
       if (outcome?.status === "cancelled") setSqlNotice("SQL içe aktarma iptal edildi.");
-      else if (outcome?.status === "live" && outcome.live.phase === "idle" && !outcome.configurationError) { setMode(outcome.live.lastRecord === "dataset" ? "financial" : "source"); show("workspace"); }
+      else if (outcome?.status === "live" && outcome.live.phase === "idle" && !outcome.configurationError) { show("workspace"); }
       else show("settings");
     } finally { setSqlImporting(false); }
   }
@@ -135,16 +132,20 @@ function App() {
   </>;
   const overlay = frameView === "recovery"
     ? <RecoveryWorkspace embedded onClose={() => show("workspace")} onRestored={restored} />
-    : <SettingsPage availability={availability} source={source && { from: source.from, to: source.to }} view={source && mode === "source" ? "source" : "financial"} onView={source && loaded ? next => { expenseNavigation.leave(() => { setMode(next); show("workspace"); }); } : undefined}
+    : <SettingsPage availability={availability} source={source && { from: source.from, to: source.to }} sourceResolution={availability && availability.status !== "ready" ? {status:"failed",message:availability.message} : sourceError ? {status:"failed",message:sourceError} : {status:sourceResolved ? "resolved" : "pending"}}
       live={live} importing={importing} sqlImporting={sqlImporting} onImportPackage={() => expenseNavigation.leave(()=>void importPackage())} onImportSql={() => expenseNavigation.leave(()=>void importSql())} onRecovery={() => show("recovery")} onClose={() => show("workspace")} claimFocus={claimFocus} />;
 
+  const sourceLoading = <AppShell><h1>Kaynak durumu kontrol ediliyor</h1><p role="status">Yerel kaynak verileri açılıyor…</p></AppShell>;
+  const availabilityFailure = availability && availability.status !== "ready" ? <AppShell><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></AppShell> : undefined;
   let content: ReactNode;
-  if (source && mode === "source") content = <SourceWorkspace source={source} selectedMonth={selectedMonth ?? source.period} onMonth={selectMonth} />;
-  else if ((!sales || sourceError && mode === "source") && expensesOpen) content = <AppShell destination="expenses" controls={<span>Yerel veriler</span>}>
+  if (source) content = <SourceWorkspace source={source} selectedMonth={selectedMonth ?? source.period} onMonth={selectMonth} />;
+  else if ((!sales || sourceError) && expensesOpen) content = <AppShell destination="expenses" controls={<span>Yerel veriler</span>}>
     <Button variant="outline" onClick={() => expenseNavigation.leave(() => setExpensesOpen(false))}>Ana sayfaya dön</Button><label className="period-label">Dönem<Input type="month" value={expensePeriod} onChange={event => { if (validSelectedMonth(event.target.value)) { const next = event.target.value; expenseNavigation.leave(() => selectMonth(next)); } }} /></label><ExpensesWorkspace key={expensePeriod} period={expensePeriod} onPeriod={next=>expenseNavigation.leave(()=>selectMonth(next))} />
   </AppShell>;
-  else if (sourceError && mode === "source") content = <AppShell><h1>Kaynak kayıtları açılamadı</h1><p role="alert">{sourceError}</p><Button variant="default" disabled={importing} onClick={() => void importPackage()}>Veri paketi içe aktar</Button><Button variant="outline" onClick={() => setExpensesOpen(true)}>Giderler</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button><Button variant="outline" onClick={refreshAvailability}>Kaynağı yeniden aç</Button>{loaded && <Button variant="outline" onClick={() => setMode("financial")}>Korunan mali veri görünümü</Button>}</AppShell>;
-  else if (sales) content = <SalesWorkspace selectedMonth={selectedMonth ?? sales.context.period} onMonth={selectMonth} view={sales} setView={setSales} stale={loaded && ready.dataset.datasetId !== sales.context.datasetId} />;
+  else if (sourceError) content = <AppShell><h1>Kaynak kayıtları açılamadı</h1><p role="alert">{sourceError}</p><Button variant="default" disabled={importing} onClick={() => void importPackage()}>Veri paketi içe aktar</Button><Button variant="outline" onClick={() => setExpensesOpen(true)}>Giderler</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekleme ve kurtarma</Button><Button variant="outline" onClick={refreshAvailability}>Kaynağı yeniden aç</Button></AppShell>;
+  else if (sales) content = <><div hidden={!sourceResolved || !!availabilityFailure}><SalesWorkspace active={sourceResolved && !availabilityFailure} selectedMonth={selectedMonth ?? sales.context.period} onMonth={selectMonth} view={sales} setView={setSales} stale={loaded && ready.dataset.datasetId !== sales.context.datasetId} /></div>{availabilityFailure ?? (!sourceResolved ? sourceLoading : undefined)}</>;
+  else if (availabilityFailure) content = availabilityFailure;
+  else if (!sourceResolved) content = sourceLoading;
   else content = <AppShell controls={<><span>Yerel analiz</span><label className="period-label">Dönem<Input type="month" value={selectedMonth??""} onChange={event=>{const month=event.target.value;if(!validSelectedMonth(month))return;expenseNavigation.leave(()=>{selectMonth(month);if(!source)void window.esmer.querySourceWorkspace({...initialSourceQuery,period:month}).then(value=>{if(value.status==="source-workspace")setSource(value);}).catch(()=>setSalesError(unavailable.message));});}}/></label></>}><main className="start-workspace">
     <section className="block start-state" aria-live="polite" aria-busy={importing || sqlImporting}>
       {!availability ? <h1>Yerel veriler açılıyor</h1> : availability.status === "ready" ? <>

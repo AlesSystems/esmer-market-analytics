@@ -1,12 +1,74 @@
 import { afterEach, expect, test } from "vitest";
-import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm, rename, symlink, copyFile, appendFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { createPackage } from "@electron/asar";
-import { inspectRelease } from "../../tools/release-inventory";
+import { inspectRelease, inspectMacRelease } from "../../tools/release-inventory";
 
 const roots: string[] = [];
 afterEach(async () => { for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true }); });
+
+async function macFixture() {
+  const release = await fixture();
+  await mkdir(join(release, "Contents", "MacOS"), {recursive:true});
+  await rename(join(release, "resources"), join(release, "Contents", "Resources"));
+  await writeFile(join(release, "Contents", "Info.plist"), "synthetic plist");
+  await writeFile(join(release, "Contents", "MacOS", "Esmer Market Analytics"), "synthetic executable");
+  const framework = join(release, "Contents", "Frameworks", "Electron Framework.framework", "Versions", "A");
+  await mkdir(framework, {recursive:true});
+  await writeFile(join(framework, "Electron Framework"), "synthetic framework");
+  await symlink("A", join(framework, "..", "Current"));
+  return release;
+}
+
+test("Mac inventory hashes app content and admits internal framework links", async () => {
+  const result = await inspectMacRelease(await macFixture());
+  expect(result.violations).toEqual([]);
+  expect(result.files.map(file => file.path)).toContain("Contents/MacOS/Esmer Market Analytics");
+  expect(result.archiveFiles.map(file => file.path)).toContain("dist/desktop/main.cjs");
+  expect(result.files.every(file => /^[a-f0-9]{64}$/.test(file.sha256))).toBe(true);
+});
+
+test("Mac inventory rejects nested data, unknown runtime files and escaping links", async () => {
+  const release = await macFixture(), framework = "Contents/Frameworks/Electron Framework.framework/Versions/A";
+  await writeFile(join(release, framework, "private.sqlite"), "synthetic");
+  await writeFile(join(release, framework, "private.dat"), "synthetic");
+  await writeFile(join(release, "Contents", "Info.plist"), "-----BEGIN PRIVATE KEY-----");
+  await symlink("../../../../../../outside", join(release, framework, "escape"));
+  const result = await inspectMacRelease(release);
+  expect(result.violations).toContain(`distribution:${framework}/private.sqlite`);
+  expect(result.violations).toContain(`distribution:${framework}/private.dat`);
+  expect(result.violations).toContain(`link:${framework}/escape`);
+  expect(result.violations).toContain("content:Contents/Info.plist");
+});
+
+test("Mac inventory rejects an approved framework link that resolves outside the app", async () => {
+  const release = await macFixture();
+  const path = "Contents/Frameworks/Electron Framework.framework/Resources";
+  await symlink(tmpdir(), join(release, path));
+  expect((await inspectMacRelease(release)).violations).toContain(`link:${path}`);
+});
+
+test("Mac inventory admits exact updater metadata and still rejects secrets and unreviewed filenames", async () => {
+  const release = await macFixture();
+  const updater = "Contents/Resources/app-update.yml";
+  await writeFile(join(release, updater), "provider: github\nowner: AlesSystems\nrepo: esmer-market-analytics\n");
+  expect((await inspectMacRelease(release)).violations).toEqual([]);
+  await writeFile(join(release, updater), "-----BEGIN PRIVATE KEY-----");
+  await writeFile(join(release, "Contents/Resources/custom-update.yml"), "synthetic");
+  const result = await inspectMacRelease(release);
+  expect(result.violations).toContain(`content:${updater}`);
+  expect(result.violations).toContain("distribution:Contents/Resources/custom-update.yml");
+});
+
+test.skipIf(process.platform !== "darwin" || process.arch !== "arm64")("Mac inventory admits the exact locked Electron binary but scans a modified binary", async () => {
+  const release = await macFixture();
+  const path = "Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework";
+  await copyFile(join("node_modules/electron/dist/Electron.app", path), join(release, path));
+  expect((await inspectMacRelease(release)).violations).toEqual([]);
+  await appendFile(join(release, path), "-----BEGIN PRIVATE KEY-----");
+  expect((await inspectMacRelease(release)).violations).toContain(`content:${path}`);
+});
 
 async function fixture(extraPath?: string, content = "synthetic", currentBuild = false) {
   const root = await mkdtemp(join(tmpdir(), "esmer-release-")); roots.push(root);

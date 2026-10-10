@@ -31,6 +31,8 @@ for (const mode of ["financial", "source"] as const) {
         await expect(page.getByRole("button", { name: "Ürün kimliklerini göster", exact: true })).toBeVisible();
         await expect(page.locator(".source-results-toolbar")).not.toContainText("belge kaydı");
         await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+        await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toContainText("maliyet adayı içeren veri paketi seçin");
+        await page.getByRole("button", {name: "Önceki kaydedilmiş raporlar", exact: true}).click();
         await expect(page.locator(".report-workspace")).toContainText("kendi kaynak sürümlerine aittir");
         await expect(page.locator(".report-workspace")).toContainText("buradan yeni mali rapor oluşturulamaz");
       } else {
