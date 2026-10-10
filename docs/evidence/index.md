@@ -14,6 +14,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 ## Later implementation evidence
 
+The October 10 [publication and main integration receipt](2026-10-10-v0.5-main-integration.md) distinguishes the immutable v0.5.0 Mac tag from the PR branch that also preserves the later compact-copy update. It records uploaded asset digests and integration verification.
+
 The October 9 [v0.5 Mac demo receipt](2026-10-09-v0.5-demo.md) records a single imported-source workspace, preserved SQLite storage, automatic source priority and a Mac demo artifact. It supersedes the manual financial/source selector in the October 6 UI. Calculation caveats and Windows/source acceptance boundaries remain in force. [The demo guide](../operations/demo-v0.5-tr.md) gives the presentation flow.
 
 The October 8 [compact-copy receipt](2026-10-08-compact-copy.md) records a further presentation refinement on main `46f654b`. It includes synthetic before/after screenshots, packaged workflow checks and the unresolved Windows packaging boundary.
@@ -22,6 +24,7 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 
 | Work | Evidence and continuation |
 | --- | --- |
+| v0.5 publication and main integration | [Published artifact and branch continuation](2026-10-10-v0.5-main-integration.md) |
 | v0.5 unified Mac demo | [Scope and work contracts](../superpowers/plans/2026-10-09-v0.5-demo.md), [verification receipt](2026-10-09-v0.5-demo.md), [Turkish demo guide](../operations/demo-v0.5-tr.md) |
 | Business navigation simplification | [Approved plan](../superpowers/plans/2026-10-06-issue-72-simplification.md), [implementation and platform handoff](2026-10-06-issue-72-simplification.md) |
 | Prepared-package recovery | [PR #68 receipt](2026-10-04-estimate-package-recovery.md) |
