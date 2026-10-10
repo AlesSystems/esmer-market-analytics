@@ -7,6 +7,7 @@ import { liveErrors, type LiveConnection, type LiveState } from "./live";
 type Props = {
   availability?: Availability | RequestError;
   source?: { from: string; to: string };
+  sourceResolution: { status: "pending" | "resolved" } | { status: "failed"; message: string };
   live: LiveConnection;
   importing: boolean;
   sqlImporting: boolean;
@@ -149,7 +150,7 @@ function DisplayTile() {
   </Tile>;
 }
 
-export function SettingsPage({ availability, source, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
+export function SettingsPage({ availability, source, sourceResolution, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { if (claimFocus()) heading.current?.focus(); }, [claimFocus]);
   const ready = availability?.status === "ready" ? availability : undefined;
@@ -161,9 +162,9 @@ export function SettingsPage({ availability, source, live, importing, sqlImporti
       <button type="button" className="tile-action" onClick={onClose}>Ayarları kapat</button>
     </div>
     <div className="tile-panel">
-      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Raporlar bu bilgisayardaki yerel verileri okur." seal={dataset || source ? "ready" : unread ? "unknown" : "empty"}>
-        {source ? <><dl className="tile-facts"><div><dt>Etkin kaynak yedeği</dt><dd>{date(source.from)}–{date(source.to)}<small>Kaydedilmiş veriler; hesaplama anlamları doğrulanmadı</small></dd></div></dl><Coverage source={source} />{dataset && <details><summary>Korunan geçmiş veriler</summary><p>Önceki analiz paketi · Kesim {date(dataset.cutoff)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</p></details>}</> : <><dl className="tile-facts"><div><dt>Etkin analiz paketi</dt><dd>{dataset ? <>Kesim {date(dataset.cutoff)}<small>Paket {date(dataset.extractedAt)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</small></> : unread ?? "Henüz yok"}</dd></div></dl>{unread ? <p className="coverage-empty">Yerel veri durumu: {unread}</p> : <Coverage cutoff={dataset?.cutoff} />}</>}
-        <p>{source ? "Güncel tahminler kaynak yedeğini kullanır. Giderler bu bilgisayarda tutulur; önceki raporlar kendi kaynak sürümleriyle korunur." : "Raporlar bu bilgisayardaki analiz paketini kullanır. Sentetik örnekler gerçek market verisi değildir."}</p>
+      <Tile glaze="ink" className="tile-wide" name="Etkin veriler" line="Raporlar bu bilgisayardaki yerel verileri okur." seal={sourceResolution.status !== "resolved" ? "unknown" : dataset || source ? "ready" : unread ? "unknown" : "empty"}>
+        {sourceResolution.status !== "resolved" ? <p role={sourceResolution.status === "failed" ? "alert" : "status"}>{sourceResolution.status === "failed" ? sourceResolution.message : "Kaynak durumu kontrol ediliyor…"}</p> : source ? <><dl className="tile-facts"><div><dt>Etkin kaynak yedeği</dt><dd>{date(source.from)}–{date(source.to)}<small>Kaydedilmiş veriler; hesaplama anlamları doğrulanmadı</small></dd></div></dl><Coverage source={source} />{dataset && <details><summary>Korunan geçmiş veriler</summary><p>Önceki analiz paketi · Kesim {date(dataset.cutoff)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</p></details>}</> : <><dl className="tile-facts"><div><dt>Etkin analiz paketi</dt><dd>{dataset ? <>Kesim {date(dataset.cutoff)}<small>Paket {date(dataset.extractedAt)} · {count(dataset.counts.documents)} belge · {count(dataset.counts.lines)} satır</small></> : unread ?? "Henüz yok"}</dd></div></dl>{unread ? <p className="coverage-empty">Yerel veri durumu: {unread}</p> : <Coverage cutoff={dataset?.cutoff} />}</>}
+        {sourceResolution.status === "resolved" && <p>{source ? "Güncel tahminler kaynak yedeğini kullanır. Giderler bu bilgisayarda tutulur; önceki raporlar kendi kaynak sürümleriyle korunur." : "Raporlar bu bilgisayardaki analiz paketini kullanır. Sentetik örnekler gerçek market verisi değildir."}</p>}
       </Tile>
       <Tile glaze="cobalt" name="Veri içe aktarma" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : dataset ? "ready" : "empty"}>
         <div className="import-choice">

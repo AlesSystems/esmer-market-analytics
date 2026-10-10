@@ -132,7 +132,7 @@ function App() {
   </>;
   const overlay = frameView === "recovery"
     ? <RecoveryWorkspace embedded onClose={() => show("workspace")} onRestored={restored} />
-    : <SettingsPage availability={availability} source={source && { from: source.from, to: source.to }}
+    : <SettingsPage availability={availability} source={source && { from: source.from, to: source.to }} sourceResolution={availability && availability.status !== "ready" ? {status:"failed",message:availability.message} : sourceError ? {status:"failed",message:sourceError} : {status:sourceResolved ? "resolved" : "pending"}}
       live={live} importing={importing} sqlImporting={sqlImporting} onImportPackage={() => expenseNavigation.leave(()=>void importPackage())} onImportSql={() => expenseNavigation.leave(()=>void importSql())} onRecovery={() => show("recovery")} onClose={() => show("workspace")} claimFocus={claimFocus} />;
 
   const sourceLoading = <AppShell><h1>Kaynak durumu kontrol ediliyor</h1><p role="status">Yerel kaynak verileri açılıyor…</p></AppShell>;
