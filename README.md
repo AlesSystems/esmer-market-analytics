@@ -6,6 +6,8 @@ The local application includes sales, purchasing, Excel and manual expense entry
 
 The optional isolated SQL test connection starts disabled. Imported records remain usable offline. Production rollout, validated real-source financial mapping and current-build Windows/recovery acceptance require separate evidence and direction. [The evidence index](docs/evidence/index.md) identifies current work and preserved historical receipts.
 
+The welcome page appears on every launch. `Özeti aç` opens Özet; Satışlar, Alışlar ve maliyet, Giderler and Raporlar open their existing pages directly. Ayarlar remains available from welcome. The sidebar `Karşılama` return preserves the remembered month and passes through existing expense draft protection.
+
 ## Develop and verify
 
 Use Node 24.15 or a compatible newer Node 24 patch and npm 11.

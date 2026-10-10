@@ -22,6 +22,8 @@ Help the owner understand sales, changes over time, purchasing costs, supplier r
 
 ## Operating Context
 
+The welcome page appears on every launch. `Özeti aç` opens Özet; Satışlar, Alışlar ve maliyet, Giderler and Raporlar open their existing pages directly. Ayarlar remains available from welcome. The sidebar `Karşılama` return preserves the remembered month and passes through existing expense draft protection.
+
 - All dashboards read a local analytics store and remain usable offline.
 - The first release uses prepared analytics packages from authorized backup preparation. It must not require the owner to restore or administer the POS database.
 - Source access is permanently read-only. The first release does not require a live connection. An isolated test connection can be configured, stays off until enabled, and cannot activate a real financial dataset. Completing live integration still requires separate acceptance and authorization.

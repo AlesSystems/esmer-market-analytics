@@ -1,9 +1,26 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-03T00:00:00.000Z",
+  "generatedAt": "2026-10-10T00:00:00.000Z",
   "title": "Design System: Esmer Market",
   "extensions": {
+    "roundedMeta": {"welcome-panel": {"scope": "welcome", "purpose": "Shared outer panel silhouette and inline guide."}, "welcome-action": {"scope": "welcome", "purpose": "Primary \u00d6zet launch action."}},
     "colorMeta": {
+      "welcome-stage": {"role": "primary", "scope": "welcome", "displayName": "Stage", "canonical": "#244fcd"},
+      "welcome-action": {"role": "primary", "scope": "welcome", "displayName": "Action", "canonical": "#2459d5"},
+      "welcome-action-hover": {"role": "primary", "scope": "welcome", "displayName": "Action Hover", "canonical": "#1942a4"},
+      "welcome-ink": {"role": "neutral", "scope": "welcome", "displayName": "Ink", "canonical": "#182644"},
+      "welcome-launch": {"role": "neutral", "scope": "welcome", "displayName": "Launch", "canonical": "#f5f6f9"},
+      "welcome-muted": {"role": "neutral", "scope": "welcome", "displayName": "Muted", "canonical": "#59667d"},
+      "welcome-line": {"role": "neutral", "scope": "welcome", "displayName": "Line", "canonical": "#d4dbe6"},
+      "welcome-stage-muted": {"role": "neutral", "scope": "welcome", "displayName": "Stage Muted", "canonical": "#e0e8ff"},
+      "welcome-seal-line": {"role": "neutral", "scope": "welcome", "displayName": "Seal Line", "canonical": "#7594ed"},
+      "welcome-local": {"role": "neutral", "scope": "welcome", "displayName": "Local", "canonical": "#526059"},
+      "welcome-local-dot": {"role": "neutral", "scope": "welcome", "displayName": "Local Dot", "canonical": "#34715c"},
+      "welcome-guide": {"role": "neutral", "scope": "welcome", "displayName": "Guide", "canonical": "#e9ede4"},
+      "welcome-focus": {"role": "neutral", "scope": "welcome", "displayName": "Focus", "canonical": "#ae651d"},
+      "welcome-selection": {"role": "neutral", "scope": "welcome", "displayName": "Selection", "canonical": "#cbd8f8"},
+      "welcome-scrollbar": {"role": "neutral", "scope": "welcome", "displayName": "Scrollbar", "canonical": "#aab4c5"},
+
       "overview-blue": {"role": "primary", "scope": "overview", "displayName": "Cobalt Action", "canonical": "#2459d5"},
       "overview-ink": {"role": "neutral", "scope": "overview", "displayName": "Overview Ink", "canonical": "#182644"},
       "overview-muted": {"role": "neutral", "scope": "overview", "displayName": "Overview Muted", "canonical": "#5c6980"},
@@ -36,6 +53,15 @@
       "settings-selection": { "role": "neutral", "scope": "settings", "displayName": "Ink Selection", "canonical": "#c9d6f2" }
     },
     "typographyMeta": {
+      "welcome-display": {"displayName": "Display", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-display-italic": {"displayName": "Display Italic", "scope": "welcome", "purpose": "Welcome launch page only; true local Newsreader italic for italic display and seal."},
+      "welcome-title": {"displayName": "Title", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-body": {"displayName": "Body", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-action": {"displayName": "Action", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-row-title": {"displayName": "Row Title", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-row-description": {"displayName": "Row Description", "scope": "welcome", "purpose": "Welcome launch page only."},
+      "welcome-seal": {"displayName": "Seal", "scope": "welcome", "purpose": "Welcome launch page only; true local Newsreader italic for italic display and seal."},
+
       "chart-label": { "displayName": "Chart Label", "purpose": "The compact daily trend tick." },
       "status": { "displayName": "Status Marker", "purpose": "Compact badge and figure-status text." },
       "supporting": { "displayName": "Supporting Text", "purpose": "Captions, evidence detail, and muted operational context." },
@@ -210,6 +236,7 @@
       { "name": "The Glaze Is The Depth Rule", "scope": "settings", "body": "Depth belongs to the band's glaze sheen. Tiles never take a drop shadow.", "section": "elevation" }
     ],
     "scopedWorlds": [
+      {"scope": "welcome", "appliesTo": "WelcomePage and its welcome.css; no business workspace restyling.", "northStar": "Çalışma masası", "overview": "User-selected prototype B, 2026-10-10: a cobalt split stage, large Manrope display with true local Newsreader italic, actual market logo and quiet real-destination launch list. Every launch opens welcome. Returning respects expense drafts and remembered workspace state.", "keyCharacteristics": ["Flat cobalt and light split panels with shared 12px outer corners.", "One strong Özet action and four named shortcuts.", "Locally bundled fonts, Turkish copy and honest written connection status.", "Stacked natural scrolling below 700px."], "dos": ["Keep welcome vocabulary scoped to .welcome-page.", "Route launch actions to existing pages and preserve draft protection."], "donts": ["Do not imply financial readiness from welcome branding or local status.", "Do not ship prototype switching or simulated destinations."]},
       {"scope": "overview", "appliesTo": "The non-embedded Özet monthly workspace and its active shell.", "northStar": "Kontrol masası", "overview": "The owner selected prototype C on 2026-10-03. White, cobalt, Manrope Variable, four monthly figures, daily sales, category ranking and a narrow evidence column define the monthly surface. The website logo ships locally. Existing financial details and saved report semantics remain available.", "keyCharacteristics": ["Blue #2459d5 actions and selection, ink #182644, fine separators.", "Local Manrope Latin and Latin Extended fonts, tabular amounts.", "Fixed-camera three-layer object selects evidence explanations with equivalent HTML controls.", "MonthlyDisplay remains the authority for all figures and evidence states."], "dos": ["Keep missing cost and incomplete expenses explicit.", "Keep 3D fallback usable and motion inactive by default."], "donts": ["Do not map the object proportions to financial amounts.", "Do not ship prototype fixtures or selection controls in production."]},
       {
         "scope": "settings",
