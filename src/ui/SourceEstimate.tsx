@@ -4,14 +4,14 @@ import {AppFrame} from "./frame";
 import {reasonLabels} from "../source/estimate";
 import {Input} from "./components/ui/input";
 import {Button} from "./components/ui/button";
-import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type DailyDay} from "./charts";
+import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type DailyDay,type RankRow} from "./charts";
 import {count} from "./overview/SourceCountCharts";
 import {dailyDay,dailySeries,sourceBridgeSteps} from "./source-estimate-days";
 import {date,money,percent} from "./format";
 const amount=(value:string|null)=>value===null?"Bilinmiyor":money(value);
 const coverage=(value:string|null)=>value===null?"Hesaplanamıyor":percent(value);
 const returnLabel="İade tutarı adayı (katkıya dahil değil)";
-export function SourceEstimate({hash,period,onProduct,active=true,presentation,heading,actions}:{presentation:"summary"|"products"|"report";active?:boolean;hash:string;period:string;heading:ReactNode;actions?:ReactNode;onProduct:(id:string,button?:HTMLButtonElement)=>void}) {
+export function SourceEstimate({hash,period,onProduct,active=true,presentation,heading,actions,onLoaded}:{onLoaded?:()=>void;presentation:"summary"|"products"|"report";active?:boolean;hash:string;period:string;heading:ReactNode;actions?:ReactNode;onProduct:(id:string,button?:HTMLButtonElement)=>void}) {
  const frame=useContext(AppFrame);
  const [loaded,setLoaded]=useState<{key:string;value:Awaited<ReturnType<typeof window.esmer.querySourceEstimate>>}>(),[offset,setOffset]=useState(0),[productId,setProductId]=useState<string|null>(null),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[loading,setLoading]=useState(true),[exporting,setExporting]=useState(false);
  const sequence=useRef(0);
@@ -24,11 +24,12 @@ export function SourceEstimate({hash,period,onProduct,active=true,presentation,h
  const ctx=`${hash}|${period}`,kept=useRef<{ctx:string;value:NonNullable<typeof result>}|null>(null);
  if(result)kept.current={ctx,value:result};
  const base=result??(kept.current?.ctx===ctx?kept.current.value:null);
+ useEffect(()=>{if(result)onLoaded?.();},[result]);
  const totals=(t:EstimateTotals)=><><td className="number">{amount(t.candidateSaleAmount)}</td><td className="number">{amount(t.candidateReturnAmount)}</td><td className="number">{amount(t.coveredSaleAmount)}</td><td className="number">{amount(t.candidateCost)}</td><td className="number">{amount(t.contribution)}</td><td>{t.coveredLines} / {t.totalLines}</td></>;
  const headings=<><th>Satış tutarı adayı</th><th>İade tutarı adayı</th><th>Kapsanan satış adayı</th><th>Maliyet adayı</th><th>Kapsanan katkı</th><th>Kapsanan / tüm satırlar</th></>;
 
  const unknown=base?(()=>{const t=base.report.summary,parts=[];if(t.unknownSaleAmounts+t.unknownReturnAmounts>0)parts.push(`${count(t.unknownSaleAmounts)} satış ve ${count(t.unknownReturnAmounts)} iade adayının tutarı bilinmiyor; gösterilen tutarlar bilinen alt toplamdır.`);if(base.report.emptyDocuments>0)parts.push(`${count(base.report.emptyDocuments)} satırsız belgenin tutar etkisi bilinmiyor.`);return parts.join(" ");})():"";
- const rankRows=base?base.ranking.map(row=>({id:row.productId,label:`Ürün #${row.productId}`,value:row.contribution,detail:`Maliyet kapsamı ${coverage(row.costCoveragePercent)}`,onSelect:()=>onProduct(row.productId,document.activeElement instanceof HTMLButtonElement?document.activeElement:undefined)})):[];
+ const rankRows:RankRow[]=base?base.ranking.map(row=>({id:row.productId,label:`Ürün #${row.productId}`,value:row.contribution,detail:`Maliyet kapsamı ${coverage(row.costCoveragePercent)}`,focusKey:`estimate-rank-${hash}-${period}-${row.productId}`,onSelect:button=>onProduct(row.productId,button)})):[];
  const dailyTable:ChartTable|undefined=base?{caption:"Günlük tahminler",columns:[{label:"Tarih"},{label:"Satış tutarı adayı",numeric:true},{label:"Kapsanan satış adayı",numeric:true},{label:"Maliyet adayı",numeric:true},{label:"Kapsanan katkı",numeric:true},{label:"Maliyeti bilinmeyen satış",numeric:true},{label:"İade tutarı adayı",numeric:true},{label:"Kapsanan / tüm satırlar"},{label:"Tutarı bilinmeyen satır",numeric:true}],rows:base.report.days.map(d=>{const t=d.totals;return t?[date(d.date),amount(t.candidateSaleAmount),amount(t.coveredSaleAmount),amount(t.candidateCost),amount(t.contribution),amount(t.uncoveredSaleAmount),amount(t.candidateReturnAmount),`${t.coveredLines} / ${t.totalLines}`,count(t.unknownSaleAmounts+t.unknownReturnAmounts)]:[date(d.date),...Array.from({length:8},()=>"Kapsam dışı")];})}:undefined;
  const summary=base?.report.summary;
  const kpis=summary&&<div className="est-kpis">

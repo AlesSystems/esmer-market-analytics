@@ -381,6 +381,11 @@ test("Satışlar and Raporlar lead with charts that keep unknown, zero and cover
     await expect(unknown).toHaveCount(1);
     await expect(unknown).toContainText("Maliyeti bilinmeyen ürün");
     await expect(unknown).toContainText("Bilinmiyor");
+    const rankButton = ranking.getByRole("button").first();
+    await rankButton.click();
+    await expect(page.getByRole("heading", { name: /^Seçili ürün · / })).toBeFocused();
+    await page.getByRole("button", { name: "Ürün listesine dön" }).click();
+    await expect(rankButton).toBeFocused();
     await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
     await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" }).filter({ visible: true })).toBeVisible();

@@ -42,6 +42,21 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
+test("a product opened from the Özet ranking returns to Özet with focus on that row",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"estimate-rank-return-")),file=join(userData,"estimate.json");await writeFile(file,estimatePackage());
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const ranking=page.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"});await expect(ranking).toBeVisible();
+  const row=ranking.getByRole("button").first();await expect(row).toHaveAttribute("data-focus-key",/./);const key=await row.getAttribute("data-focus-key");
+  await row.click();
+  await expect(page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Aylık Market Özeti",level:1})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Satışlar",level:1})).toHaveCount(0);
+  await expect(page.locator(`[data-focus-key="${key}"]`)).toBeFocused();
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
 test("private prepared estimate imports exports and restarts offline without revealing operands",async()=>{
  const {ESMER_ESTIMATE_PACKAGE:packagePath,ESMER_ESTIMATE_EXPECTED:expectedPath,ESMER_ESTIMATE_EXPORT:exportPath}=process.env;
  test.skip(!packagePath||!expectedPath||!exportPath,"Private package, expectation and export opt-in required");

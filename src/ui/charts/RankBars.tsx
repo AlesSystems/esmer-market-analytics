@@ -7,7 +7,10 @@ export type RankRow = {
   /** Decimal string, or null when unknown (drawn as a hatched stub, never as zero). */
   value: string | null;
   detail?: string;
-  onSelect?: () => void;
+  /** Receives the clicked button so callers can capture a return receipt for it. */
+  onSelect?: (button: HTMLButtonElement) => void;
+  /** Rendered as data-focus-key on the row button, so focus can be restored after the view is rebuilt. */
+  focusKey?: string;
 };
 export type RankBarsProps = {
   rows: RankRow[];
@@ -40,7 +43,7 @@ export function RankBars({ rows, color, formatValue, max, ariaLabel = "Sıralama
         );
         return (
           <li key={row.id} data-state={unknown ? "unknown" : "value"}>
-            {row.onSelect ? <button type="button" className="viz-row" onClick={row.onSelect}>{body}</button> : <div className="viz-row">{body}</div>}
+            {row.onSelect ? <button type="button" className="viz-row" data-focus-key={row.focusKey} onClick={(event) => row.onSelect?.(event.currentTarget)}>{body}</button> : <div className="viz-row">{body}</div>}
           </li>
         );
       })}

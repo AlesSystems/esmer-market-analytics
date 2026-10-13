@@ -303,6 +303,18 @@ describe("rendering", () => {
     expect(empty).not.toContain("<svg");
   });
 
+  test("RankBars passes the clicked button to onSelect and renders focusKey as data-focus-key", () => {
+    const rows = [{ id: "a", label: "Ürün A", value: "10", focusKey: "rank-a", onSelect: () => undefined }, { id: "b", label: "Ürün B", value: "5" }];
+    const markup = renderToStaticMarkup(h(RankBars, { rows, color: "red", formatValue: money }));
+    expect(markup).toMatch(/<button[^>]*data-focus-key="rank-a"/);
+    expect(markup.match(/data-focus-key/g)).toHaveLength(1);
+    const element = h(RankBars, { rows, color: "red", formatValue: money }) as { type: (props: unknown) => { props: { children: { key: string; props: { children: { props: { onClick: (event: { currentTarget: string }) => void } } } }[] } } };
+    let received: unknown;
+    const tree = element.type({ rows: [{ ...rows[0], onSelect: (button: unknown) => { received = button; } }], color: "red", formatValue: money });
+    tree.props.children[0].props.children.props.onClick({ currentTarget: "the-button" });
+    expect(received).toBe("the-button");
+  });
+
   test("RankBars prints exact values, never draws null as a bar and names it Bilinmiyor", () => {
     const markup = renderToStaticMarkup(h(RankBars, {
       color: "var(--viz-sales)", formatValue: money, ariaLabel: "Ürün sıralaması",

@@ -87,11 +87,12 @@ export function useTopProducts(report: MonthlyDisplay, sort: ReportProductsReque
 }
 
 type Metric = "netSales" | "coveredGrossProfit";
-export function ProductRanking({ rows, metric, title, summary, onSelect, empty, ariaLabel }: { rows: ProductRow[]; metric: Metric; title: string; summary: string; onSelect?: (row: ProductRow) => void; empty: string; ariaLabel: string }) {
+export function ProductRanking({ rows, metric, title, summary, onSelect, empty, ariaLabel }: { rows: ProductRow[]; metric: Metric; title: string; summary: string; onSelect?: (row: ProductRow, button: HTMLButtonElement) => void; empty: string; ariaLabel: string }) {
   const rankRows: RankRow[] = rows.map(row => ({
     id: row.productId, label: row.displayName, value: row[metric],
     detail: metric === "netSales" ? `Maliyet kapsamı ${row.costCoveragePercent === null ? "bilinmiyor" : percent(row.costCoveragePercent)}` : undefined,
-    onSelect: onSelect ? () => onSelect(row) : undefined,
+    focusKey: `product-rank-${metric}-${row.productId}`,
+    onSelect: onSelect ? button => onSelect(row, button) : undefined,
   }));
   const table: ChartTable = { caption: title, columns: [{ label: "Ürün" }, { label: metric === "netSales" ? "Net satış" : "Kapsanan kâr", numeric: true }, { label: "Maliyet kapsamı", numeric: true }], rows: rows.map(row => [row.displayName, amount(row[metric]), row.costCoveragePercent === null ? "Hesaplanamıyor" : percent(row.costCoveragePercent)]) };
   return <ChartFrame title={title} summary={summary} table={table.rows.length ? table : undefined} headingLevel="h2" className="c-viz c-viz-rank">

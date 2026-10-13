@@ -65,10 +65,6 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   const Container = embedded ? "section" : "main";
   const Heading = embedded ? "h2" : "h1";
   function select(product: Product, button: HTMLButtonElement) { receipt.current = captureReturn(button); if (selected?.productId === product.productId) { detailHeading.current?.focus(); return; } focusPending.current = true; setSelected(product); setEvidenceOffset(0); setDocumentId(null); setReturnLineId(null); }
-  function selectFromChart(row: ProductRow) {
-    const opener = document.activeElement instanceof HTMLButtonElement && document.activeElement.closest(".viz-rows") ? document.activeElement : null;
-    if (opener) select(row, opener); else { setSelected(row); focusPending.current = true; setEvidenceOffset(0); setDocumentId(null); setReturnLineId(null); }
-  }
   function returnToTable() {
     setSelected(null); setDocumentId(null); setReturnLineId(null);
     restoreReturn(receipt.current, tableHeading.current);
@@ -87,7 +83,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
     {report.operating.stale && <div className="notice"><strong>Gider kayıtları değişti</strong><span>Bu rapor önceki gider sürümünde sabit tutuluyor.</span><Button variant="outline" onClick={refresh}>Aylık raporu yeni giderlerle aç</Button></div>}
     {salesOnly&&<section className="metrics" aria-label="Satış özeti"><article className="metric"><h2>Kapsanan net satış</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":money(report.sales.metrics.netSales)}</strong><p>Önceki aya göre {report.sales.comparisons.month.available?ratio(report.sales.comparisons.month.netChange):"Karşılaştırılamıyor"} · KDV hariç; müşteri iadeleri düşülmüş</p>{(!report.sales.complete||report.sales.coverage!=="complete")&&<p className="notice warning">Kaynak kapsamı {report.sales.coverage==="unavailable"?"yok":"eksik"}; tam dönem sonucu değildir.</p>}</article><article className="metric"><h2>Satış belgesi</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":report.sales.metrics.saleDocumentCount.toLocaleString("tr-TR")}</strong><p>Tamamlanmış satış belgeleri · müşteri iadeleri dahil değildir</p></article><article className="metric"><h2>Ortalama sepet</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":amount(report.sales.metrics.averageBasket)}</strong><p>Satış neti / satış belgesi · iadeler dahil değildir</p></article></section>}
     {salesOnly && <div className="monthly-visuals">
-      {topProducts.loaded ? <ProductRanking rows={topProducts.rows} metric="coveredGrossProfit" title="En çok kâr getiren ürünler" summary={`İlk on · ${partial ? "kapsanan" : "tahmini"} brüt kâr · giderler dahil değil`} ariaLabel="Kapsanan kâra göre ilk on ürün" empty="Bu ayda ürün katkısı yok." onSelect={selectFromChart} /> : <p role="status">{topProducts.failed ? "Ürün grafiği yüklenemedi; ürün tablosu kullanılabilir." : "Ürün grafiği yükleniyor…"}</p>}
+      {topProducts.loaded ? <ProductRanking rows={topProducts.rows} metric="coveredGrossProfit" title="En çok kâr getiren ürünler" summary={`İlk on · ${partial ? "kapsanan" : "tahmini"} brüt kâr · giderler dahil değil`} ariaLabel="Kapsanan kâra göre ilk on ürün" empty="Bu ayda ürün katkısı yok." onSelect={select} /> : <p role="status">{topProducts.failed ? "Ürün grafiği yüklenemedi; ürün tablosu kullanılabilir." : "Ürün grafiği yükleniyor…"}</p>}
       <section className="monthly-trend"><DailyProfit report={report} partial={partial} /></section>
     </div>}
     <div hidden={salesOnly}>
