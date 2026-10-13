@@ -268,7 +268,7 @@ describe("rendering", () => {
     expect(two).toContain("Bilinmiyor");
   });
 
-  test("DailyBars is one focusable labelled image, hatches unknown days and gives unique pattern ids", () => {
+  test("DailyBars is one focusable labelled interactive group, hatches unknown days and gives unique pattern ids", () => {
     const props = {
       period: "2026-10",
       days: [day(1, [{ key: "cost", value: "100.00" }, { key: "contribution", value: "50.00" }]), day(2, [], { state: "unknown" })],
@@ -277,7 +277,9 @@ describe("rendering", () => {
       ariaLabel: "Ekim 2026 günlük satış",
     };
     const markup = renderToStaticMarkup(h(Fragment, null, h(DailyBars, props), h(DailyBars, props)));
-    expect(markup).toContain('role="img"');
+    expect(markup).toContain('role="group"');
+    expect(markup).toContain('aria-roledescription="grafik"');
+    expect(markup).not.toContain('role="img"');
     expect(markup).toContain('aria-label="Ekim 2026 günlük satış"');
     expect(markup).toContain('tabindex="0"');
     expect(markup).toContain('data-state="unknown"');

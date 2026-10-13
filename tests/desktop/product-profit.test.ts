@@ -93,7 +93,7 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
     await expect(summary).toContainText(missingCost ? "%89,74" : "%100");
     if (missingCost) { await expect(summary).toContainText("Tüm market kârı belirlenemiyor"); await expect(summary.locator(".partial-reasons")).toContainText("Maliyet kanıtı eksik"); }
     else { await expect(summary).not.toContainText("Tüm market kârı belirlenemiyor"); await expect(summary.locator(".partial-reasons")).toHaveCount(0); }
-    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
     await expect(page.locator(".monthly-trend [data-state='value']").first()).toBeVisible();
     await page.locator(".monthly-trend").getByRole("button", { name: "Tablo", exact: true }).click();
     await expect(page.locator(".monthly-trend table")).toContainText("100,00 ₺");
@@ -387,9 +387,9 @@ test("Satışlar and Raporlar lead with charts that keep unknown, zero and cover
     await expect(page.getByRole("heading", { name: /^Seçili ürün · / })).toBeFocused();
     await page.getByRole("button", { name: "Ürün listesine dön" }).click();
     await expect(rankButton).toBeFocused();
-    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
-    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" }).filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("img", { name: /^Satırların kapsanan \d+, dışlanan [1-9]/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("dışlanan satır");
     await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("Giderler dahil değil");

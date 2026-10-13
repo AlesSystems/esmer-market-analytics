@@ -29,7 +29,7 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     const evidence = page.getByRole("complementary", {name: "Kaynak kapsamı ve yöntem", exact: true});
     await expect(evidence).toContainText("Mali sonuçlar doğrulanmadı");
     await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toHaveCount(0);
-    const dailyChart = page.getByRole("img", {name: "Günlük kaynak belge kayıtları"});
+    const dailyChart = page.getByRole("group", {name: "Günlük kaynak belge kayıtları"});
     await expect(dailyChart).toBeVisible();
     await expect(dailyChart.locator('g[data-date="2025-10-01"] [data-key="documents"]')).toHaveCount(1);
     await expect(dailyChart.locator('g[data-date="2025-10-02"] rect[data-state="unknown"]')).toHaveCount(1);

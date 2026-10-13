@@ -32,7 +32,7 @@ test("Kontrol masası presents the pinned month with real navigation and offline
     await expect(logo).toBeVisible();
     await expect.poll(() => logo.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(459);
     expect(await logo.getAttribute("src")).not.toMatch(/^https?:/);
-    await expect(page.getByRole("img", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
     await expect(matrix).toContainText("Giderler düşülmemiştir");
     await expect(matrix).toContainText("maliyet kapsamı %50");
     await expect(matrix).not.toContainText("Eksik maliyet sıfır kabul edilmez");
@@ -132,7 +132,7 @@ test("Özet daily chart keeps days outside source coverage as hatched gaps, neve
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("img", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
     await expect(page.locator(".c-viz-daily .viz-zero-marker")).toHaveCount(1);
     const gap = page.locator('.c-viz-daily g[data-date="2025-09-03"]');
     await expect(gap.locator('[data-state="value"], .viz-zero-marker')).toHaveCount(0);

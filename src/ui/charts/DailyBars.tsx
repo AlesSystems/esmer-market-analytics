@@ -101,7 +101,7 @@ export function DailyBars({ period, days, series, formatValue, negativeLabel = "
   const tipLeft = active === null ? 0 : Math.min(Math.max(layout.columns[active].cx, tipWidth / 2), Math.max(tipWidth / 2, layout.width - tipWidth / 2));
   return (
     <div className="viz-daily" ref={ref}>
-      <div className="viz-plot" role="img" aria-label={label} tabIndex={0}
+      <div className="viz-plot" role="group" aria-roledescription="grafik" aria-label={label} tabIndex={0}
         onKeyDown={move} onFocus={focus} onBlur={() => setActive(null)}
         onPointerMove={point} onPointerDown={point}
         onPointerLeave={(event) => { if (!event.currentTarget.matches(":focus-visible")) setActive(null); }}>

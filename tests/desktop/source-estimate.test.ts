@@ -16,8 +16,8 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"});await expect(estimate.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();await expect(estimate.getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("-30,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
   await expect(page.locator(".viz-estimate")).toHaveCount(1);
   await expect(estimate.getByRole("list",{name:"Satıştan katkıya köprü"})).toBeVisible();
-  await expect(estimate.getByRole("img",{name:/günlük grafik/})).toBeVisible();
-  await expect(estimate.getByRole("img",{name:/günlük grafik/}).locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
+  await expect(estimate.getByRole("group",{name:/günlük grafik/})).toBeVisible();
+  await expect(estimate.getByRole("group",{name:/günlük grafik/}).locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
   await expect(estimate.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"})).toBeVisible();
   await expect(estimate.getByText("Maliyet kapsamı",{exact:true}).first()).toBeVisible();
   await expect(estimate.getByText("katkıya dahil değil — sonucu yüksek gösterebilir",{exact:true})).toBeVisible();
