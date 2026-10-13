@@ -7,7 +7,9 @@
 @import "./expenses-control-desk.css";
 @import "./reports/reports-control-desk.css";
 @import "./source-document-detail.css";
+@import "./overview/source-control-desk.css";
 @import "./welcome/welcome.css";
+@import "./charts/charts.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);
@@ -142,12 +144,6 @@
   .bar-column { position: relative; flex: 1; min-width: 0; }
   .bar-column svg { width: 100%; height: 100%; }
   .bar-column small { text-align: center; font-size: 11px; }
-  .source-day-chart { overflow-x: auto; }
-  .source-day-chart .bar-column { min-width: 24px; }
-  .source-type-chart { display: grid; gap: 8px; max-height: 260px; overflow-y: auto; margin: 16px 0; }
-  .source-type-bar { display: grid; grid-template-columns: minmax(120px,180px) minmax(0,1fr) 64px; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; font-size: 13px; }
-  .source-type-bar svg { width: 100%; height: 14px; background: var(--muted-surface); }
-  .source-type-bar strong { text-align: right; font-weight: 500; }
   .source-record-bar { fill: var(--muted); }
   .source-count-details { margin-top: 16px; }
   .source-count-details > summary { cursor: pointer; color: var(--accent-foreground); font-weight: 500; }

@@ -10,6 +10,7 @@ import { OperatingSummary } from "../OperatingSummary";
 import { purchasingWarningLabels } from "../purchasing/PurchasingWorkspace";
 import { SelectedProduct, ProductDependency } from "./SelectedProduct";
 import { ReportEvidence } from "./ReportEvidence";
+import { DailyProfit, LineCoverage, ProductRanking, useTopProducts } from "./financial-charts";
 
 type V2 = Extract<MonthlyDisplay, { format: "monthly-report-v2" }>;
 type Product = ReportProductsPage["rows"][number];
@@ -55,6 +56,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   }, [report.id, selected, evidenceOffset, evidenceAttempt, evidenceKey,active]);
   useEffect(() => { if (selected && active && focusPending.current) { detailHeading.current?.focus(); focusPending.current = false; } }, [selected,active]);
   useEffect(()=>{if(active)onParentBack?.(selected?returnToTable:null);return()=>{if(active)onParentBack?.(null);};},[active,selected,onParentBack]);
+  const topProducts = useTopProducts(report, "profit", 10, active && salesOnly);
   const summary = report.productProfit.summary, partial = summary.scope === "covered", loss = summary.coveredGrossProfit?.startsWith("-");
   const headline = `${partial ? "Kapsanan " : ""}tahmini brüt ${loss ? "zarar" : "kâr"}`;
   const term = query.search.trim().toLocaleLowerCase("tr-TR");
@@ -75,33 +77,33 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
   return <Container className="monthly-overview monthly-profit-page">
     <div hidden={!!selected}>
     <div className="page-heading"><div><Heading>{salesOnly ? "Satışlar" : "Aylık Ürün Kârlılığı"}</Heading><Badge variant="warning">{report.state === "open" ? "Açık" : "Geçici"}</Badge></div><Badge variant="outline">{report.review ? "İncelenmiş sürüm" : "Aday rapor"}</Badge></div>
-    <p>Seçili ay · tüm ürünler · {report.context.period} · Veri sonu: {date(report.sales.cutoff)}</p>
-    <p>Geçmiş kaynak verisi · Kapsanan dönem: {date(summary.periodCoverage.from)} – {date(summary.periodCoverage.to)}</p>
+    <p>Seçili ay · tüm ürünler · {report.context.period} · Veri sonu: {date(report.sales.cutoff)} · Geçmiş kaynak verisi · Kapsanan dönem: {date(summary.periodCoverage.from)} – {date(summary.periodCoverage.to)}</p>
     {report.sales.warnings.includes("SYNTHETIC_ONLY") && <p>Sentetik gösterim verisi; gerçek market verisi değildir.</p>}
     {report.sales.stale && <div className="notice"><strong>Daha yeni veri var · bu rapor önceki sürümü gösteriyor</strong><Button variant="outline" onClick={refresh}>Aylık raporu yenile</Button></div>}
     {report.operating.stale && <div className="notice"><strong>Gider kayıtları değişti</strong><span>Bu rapor önceki gider sürümünde sabit tutuluyor.</span><Button variant="outline" onClick={refresh}>Aylık raporu yeni giderlerle aç</Button></div>}
     {salesOnly&&<section className="metrics" aria-label="Satış özeti"><article className="metric"><h2>Kapsanan net satış</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":money(report.sales.metrics.netSales)}</strong><p>Önceki aya göre {report.sales.comparisons.month.available?ratio(report.sales.comparisons.month.netChange):"Karşılaştırılamıyor"} · KDV hariç; müşteri iadeleri düşülmüş</p>{(!report.sales.complete||report.sales.coverage!=="complete")&&<p className="notice warning">Kaynak kapsamı {report.sales.coverage==="unavailable"?"yok":"eksik"}; tam dönem sonucu değildir.</p>}</article><article className="metric"><h2>Satış belgesi</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":report.sales.metrics.saleDocumentCount.toLocaleString("tr-TR")}</strong><p>Tamamlanmış satış belgeleri · müşteri iadeleri dahil değildir</p></article><article className="metric"><h2>Ortalama sepet</h2><strong>{report.sales.coverage==="unavailable"?"Veri yok":amount(report.sales.metrics.averageBasket)}</strong><p>Satış neti / satış belgesi · iadeler dahil değildir</p></article></section>}
+    {salesOnly && <div className="monthly-visuals">
+      {topProducts.loaded ? <ProductRanking rows={topProducts.rows} metric="coveredGrossProfit" title="En çok kâr getiren ürünler" summary={`İlk on · ${partial ? "kapsanan" : "tahmini"} brüt kâr · giderler dahil değil`} ariaLabel="Kapsanan kâra göre ilk on ürün" empty="Bu ayda ürün katkısı yok." onSelect={select} /> : <p role="status">{topProducts.failed ? "Ürün grafiği yüklenemedi; ürün tablosu kullanılabilir." : "Ürün grafiği yükleniyor…"}</p>}
+      <section className="monthly-trend"><DailyProfit report={report} partial={partial} /></section>
+    </div>}
     <div hidden={salesOnly}>
     <section className="block" aria-label="Aylık göstergeler">
       <h2>{headline.charAt(0).toLocaleUpperCase("tr-TR") + headline.slice(1)}</h2>
       <strong className="monthly-amount">{summary.status === "empty" ? "Bu ay satış veya iade yok" : amount(summary.coveredGrossProfit)}</strong>
       {report.sales.coverage === "unavailable" && <p className="notice warning">Dönem verisi yok</p>}
       {summary.status === "unavailable" && <p className="notice warning">{report.sales.coverage === "unavailable" || !summary.salesCoverage.complete ? "Kâr hesaplanamıyor · kaynak anlamı doğrulanmadı" : "Kâr hesaplanamıyor · maliyet kanıtı yok"}</p>}
-      {partial && <div className="notice warning"><strong>Kapsam eksik</strong><span>Tüm market kârı belirlenemiyor. Eksik maliyet sıfır kabul edilmez.</span></div>}
+      {partial && <p className="notice warning"><strong>Kapsam eksik</strong> · Tüm market kârı belirlenemiyor.{summary.exclusionReasons.length > 0 && <span className="partial-reasons"> Dışlanma nedenleri: {summary.exclusionReasons.map(reason).join(" · ")}.</span>}</p>}
       <dl className="financial-ledger"><div><dt>Net satış (KDV hariç)</dt><dd>{amount(summary.netSales)}</dd></div><div><dt>Maliyeti kapsanan net satış</dt><dd>{amount(summary.coveredSales)}</dd></div><div><dt>Tarihsel tahmini maliyet (kapsanan)</dt><dd>{amount(summary.coveredCost)}</dd></div><div><dt>Maliyet kapsamı (mutlak net tutar)</dt><dd>{ratio(summary.costCoveragePercent)}</dd></div><div><dt>Kapsanan tahmini brüt kâr marjı</dt><dd>{ratio(summary.coveredMarginPercent)}</dd></div></dl>
-      <p>{summary.coveredCount} kapsanan / {summary.excludedCount} dışlanan satır. Dışlanan satış: {money(summary.exposures.excludedSales)} · Dışlanan müşteri iadesi: {money(summary.exposures.excludedReturns)}</p>
+      <p>{summary.coveredCount} kapsanan / {summary.excludedCount} dışlanan satır. Dışlanan satış: {money(summary.exposures.excludedSales)} · Dışlanan müşteri iadesi: {money(summary.exposures.excludedReturns)} · Giderler dahil değil.</p>
       {!summary.salesCoverage.complete && <p className="notice warning">Kaynak kanıtı eksik · {summary.salesCoverage.unresolvedCount} çözümlenmemiş kayıt · katkı {summary.salesCoverage.exposure === null ? "bilinmiyor; sıfır sayılmaz" : money(summary.salesCoverage.exposure)}</p>}
       {(report.sales.coverage === "partial" || !summary.periodCoverage.complete) && <p className="notice warning"><strong>Kısmi dönem</strong> · dönem kapsamı eksik.</p>}
-      {summary.exclusionReasons.length > 0 && <ul>{summary.exclusionReasons.map(code => <li key={code}>{reason(code)}</li>)}</ul>}
-      <p>İşletme giderleri bu brüt tahmine dahil değil. Tarihsel son alış maliyeti tahmini; doğrulanmış net kâr değildir.</p>
       <details className="monthly-operating"><summary>Giderler ve faaliyet sonucu</summary><p>İşçilik: {report.operating.result.breakdownCoverage.labour === "missing" ? "Henüz sağlanmadı" : report.operating.result.breakdownCoverage.labour === "incomplete" ? "Kanıt eksik" : money(report.operating.result.breakdown.labour)}</p><OperatingSummary context={report.context} revision={0} refresh={refresh} saved={report.operating} /></details>
       <div className="report-actions">{onExpenses && <Button variant="outline" onClick={onExpenses}>Giderleri incele</Button>}{onPurchasing && <Button variant="outline" onClick={onPurchasing}>Maliyetleri incele</Button>}{onSales && <Button variant="outline" onClick={() => onSales()}>Satışları incele</Button>}</div>
     </section>
-    <section className="block monthly-trend"><div className="section-heading"><h2>Günlük tahmini brüt kâr</h2><span>TRY · {partial ? "Kapsanan sonuç" : "Tahmini sonuç"} · tüm ürünler</span></div>
-      <div className="chart" role="img" aria-label="Günlük tahmini brüt kâr grafiği">{report.productProfit.daily.map(day => <div className="bar-column" key={day.date}><svg viewBox="0 0 40 110" preserveAspectRatio="none" aria-hidden="true"><line x1="0" x2="40" y1="55" y2="55" stroke="currentColor" strokeWidth="0.5" />{day.height !== null && <rect x="8" y={day.negative ? 55 : 55 - Number(day.height) * 0.5} width="24" height={Number(day.height) * 0.5} className={day.negative ? "negative-bar" : "positive-bar"} />}{day.zero && <circle cx="20" cy="55" r="2" fill="currentColor" className="zero-marker" />}</svg><small>{day.date.slice(8)}</small><span className="sr-only">{date(day.date)}: {amount(day.trend)}</span></div>)}</div>
-      <p>Çizginin altı tahmini zarar. Kapsanmayan veya maliyeti bilinmeyen günler boşluktur; sıfır değildir.</p>
-      <details><summary>Günlük tutarlar</summary><div className="table-scroll" tabIndex={0}><table><thead><tr><th>Gün</th><th className="number">Tahmini katkı</th><th>Kapsam</th></tr></thead><tbody>{report.productProfit.daily.map(day => <tr key={day.date}><td>{date(day.date)}</td><td className="number">{amount(day.trend)}</td><td>{day.status === "empty" ? "İşlemsiz gün" : day.trend === null ? "Hesaplanamıyor" : day.sourceCoverage === "complete" && day.excludedCount === 0 ? "Kapsanan katkı" : "Kapsam eksik"}</td></tr>)}</tbody></table></div></details>
-    </section>
+    <div className="monthly-visuals monthly-pair">
+      <section className="monthly-trend"><DailyProfit report={report} partial={partial} /></section>
+      <section className="monthly-coverage"><LineCoverage covered={summary.coveredCount} excluded={summary.excludedCount} /></section>
+    </div>
     </div>
     <section className="block" aria-label="Ürün katkıları"><h2 ref={tableHeading} tabIndex={-1}>Ürün katkıları</h2>
       <div className="report-actions"><label>Ürün ara<Input type="search" maxLength={160} value={query.search} onChange={event => setQuery({ ...query, search: event.target.value, offset: 0 })} /></label><label>Sıralama<select value={query.sort} onChange={event => setQuery({ ...query, sort: event.target.value as ReportProductsRequest["sort"], offset: 0 })}><option value="profit">Kapsanan kâr</option><option value="name">Ürün adı</option><option value="netSales">Net satış</option><option value="coverage">Maliyet kapsamı</option></select></label><label>Sıralama yönü<select value={query.direction} onChange={event => setQuery({ ...query, direction: event.target.value as ReportProductsRequest["direction"], offset: 0 })}><option value="desc">Azalan</option><option value="asc">Artan</option></select></label></div>
@@ -116,7 +118,7 @@ export function MonthlyProfitPage({ report, embedded = false, refresh, onSales, 
       {returnLineId && <ProductDependency active={active} key={`${report.id}:${selected.productId}:${returnLineId}`} reportId={report.id} productId={selected.productId} returnLineId={returnLineId} onClose={() => { setReturnLineId(null); restoreReturn(dependencyReceipt.current,detailHeading.current); }} />}
       {documentId && <PinnedDocument active={active} key={`${report.id}:${selected.productId}:${documentId}`} reportId={report.id} productId={selected.productId} documentId={documentId} onClose={() => { setDocumentId(null); restoreReturn(documentReceipt.current,detailHeading.current); }} />}
     </section>}
-    <details hidden={!!selected} className="block report-proof"><summary>Veri ve hesaplama ayrıntıları</summary><p>{report.review ? "İncelenmiş sürüm kaydedildi." : "Aday rapor henüz kaydedilmedi."} Kaydetmek tahmini maliyeti güvenilir kâra dönüştürmez.</p><details><summary>Kaynak ve yöntem</summary><p>Rapor: {report.id} · Kaynak / paket: {report.purchasing.lineage} / {report.purchasing.extractionId} · {Object.values(report.calculations).join(" · ")}</p></details><Button variant="outline" onClick={() => setProof(value => !value)} aria-expanded={proof}>Sabit rapor kanıtlarını {proof ? "gizle" : "göster"}</Button>{proof && <ReportEvidence report={report} />}</details>
+    <details hidden={!!selected} className="block report-proof"><summary>Veri ve hesaplama ayrıntıları</summary><p>{report.review ? "İncelenmiş sürüm kaydedildi." : "Aday rapor henüz kaydedilmedi."} Kaydetmek tahmini maliyeti güvenilir kâra dönüştürmez.</p><p>İşletme giderleri bu brüt tahmine dahil değil. Tarihsel son alış maliyeti tahmini; doğrulanmış net kâr değildir. Eksik maliyet sıfır kabul edilmez.</p><details><summary>Kaynak ve yöntem</summary><p>Rapor: {report.id} · Kaynak / paket: {report.purchasing.lineage} / {report.purchasing.extractionId} · {Object.values(report.calculations).join(" · ")}</p></details><Button variant="outline" onClick={() => setProof(value => !value)} aria-expanded={proof}>Sabit rapor kanıtlarını {proof ? "gizle" : "göster"}</Button>{proof && <ReportEvidence report={report} />}</details>
   </Container>;
 }
 

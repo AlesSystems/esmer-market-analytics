@@ -94,7 +94,7 @@ The [static sketch](../diagrams/monthly-product-profit.html) uses conspicuously 
 4. **Ürün katkıları**, search and sortable columns for product, sold/returned/net quantities by unit, net sales, covered historical cost, covered profit and coverage.
 5. **Seçili ürün** followed by its transaction, original-sale and cost evidence. Show source IDs and calculation details on expansion.
 
-The user confirmed that the app will include graphs, with a maximum of three, on 2026-09-29. The sketch uses daily covered gross profit, product covered profit and cost coverage. All graphs use the same pinned monthly report and remain independent of product-table search, sorting, pagination and selection. Missing cost is never plotted as zero. Keep accessible numerical alternatives.
+The user confirmed that the app will include graphs, with a maximum of three, on 2026-09-29. On 2026-10-13 the user asked for a more visual UI; [chart-led pages](page-control-desks.md#chart-led-pages-2026-10-13) relax this to at most three graphs per page under the same rules. The sketch uses daily covered gross profit, product covered profit and cost coverage. All graphs use the same pinned monthly report and remain independent of product-table search, sorting, pagination and selection. Missing cost is never plotted as zero. Keep accessible numerical alternatives.
 
 | Action | Product table | Headline and trend | Detail |
 | --- | --- | --- | --- |

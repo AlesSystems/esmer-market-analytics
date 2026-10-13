@@ -29,7 +29,16 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     const evidence = page.getByRole("complementary", {name: "Kaynak kapsamı ve yöntem", exact: true});
     await expect(evidence).toContainText("Mali sonuçlar doğrulanmadı");
     await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toHaveCount(0);
-    await expect(page.getByRole("img", {name: "Günlük kaynak belge kayıtları"})).toBeVisible();
+    const dailyChart = page.getByRole("group", {name: "Günlük kaynak belge kayıtları"});
+    await expect(dailyChart).toBeVisible();
+    await expect(dailyChart.locator('g[data-date="2025-10-01"] [data-key="documents"]')).toHaveCount(1);
+    await expect(dailyChart.locator('g[data-date="2025-10-02"] rect[data-state="unknown"]')).toHaveCount(1);
+    await expect(dailyChart.locator('g[data-date="2025-10-02"] [data-key="documents"]')).toHaveCount(0);
+    await expect(dailyChart.locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
+    await expect(dailyChart.locator(".viz-zero-marker")).toHaveCount(0);
+    const typeChart = page.getByRole("list", {name: "Kaynak belge türlerine göre kayıt sayıları"});
+    await expect(typeChart).toBeVisible();
+    await expect(typeChart.getByRole("listitem")).toHaveCount(3);
     await page.getByText("Günlük tam sayıları göster", {exact: true}).click();
     const days = page.getByRole("table", {name: "Günlük kaynak belge kayıtları tablosu"});
     await expect(days.getByRole("row")).toHaveCount(3);

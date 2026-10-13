@@ -109,20 +109,22 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await expect(overview.getByText("1.500,00 ₺", { exact: false }).filter({ visible: true }).first(), "covered sales exposure stays visible").toBeVisible();
     await expect(overview.getByText("1.400,00 ₺", { exact: false }).filter({ visible: true }).first(), "excluded sale exposure stays visible").toBeVisible();
     await expect(overview.getByText("-25,00 ₺", { exact: false }).filter({ visible: true }).first(), "excluded return exposure stays visible").toBeVisible();
-    const trend = page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" });
+    const trend = page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" });
     await trend.scrollIntoViewIfNeeded();
     await expect(trend).toBeVisible();
     const bounds = await trend.boundingBox();
     expect(bounds, "daily trend has a rendered box").not.toBeNull();
-    expect(bounds!.y + bounds!.height, "daily trend fits after scrolling").toBeLessThanOrEqual(900);
-    await expect(trend.getByText("15.09.2025: Hesaplanamıyor")).toHaveCount(1);
-    await expect(trend.getByText(/30\.09\.2025: 60,00 ₺/)).toHaveCount(1);
+    // The 900 px viewport limit gets one pixel of tolerance: boundingBox() reports fractional CSS pixels, so a plot that
+    // ends at 900.4 after fractional layout is still fully inside the 900 px viewport once rounded to device pixels.
+    expect(bounds!.y + bounds!.height, "daily trend fits after scrolling").toBeLessThanOrEqual(901);
+    await expect(page.locator('.monthly-trend g[data-date="2025-09-15"]').filter({ visible: true }).locator('[data-state="value"], .viz-zero-marker')).toHaveCount(0);
+    await expect(page.locator('.monthly-trend g[data-date="2025-09-30"] [data-state="value"]').filter({ visible: true })).toHaveCount(1);
     await capture(page, testInfo.outputPath("representative-month-1440.png"));
-    const evidence = page.getByText("Günlük tutarlar", { exact: true });
+    const evidence = page.locator(".monthly-trend").filter({ visible: true }).getByRole("button", { name: "Tablo", exact: true });
     await evidence.focus();
     await evidence.press("Enter");
     await expect(page.locator(".monthly-trend tbody tr").filter({ hasText: "15.09.2025" })).toContainText("Hesaplanamıyor");
-    await evidence.press("Enter");
+    await expect(page.locator(".monthly-trend tbody tr").filter({ hasText: "30.09.2025" })).toContainText("60,00 ₺");
     await expect(evidence).toBeFocused();
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();

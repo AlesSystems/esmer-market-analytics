@@ -14,6 +14,13 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
  try{
   let page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"});await expect(estimate.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();await expect(estimate.getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("-30,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
+  await expect(page.locator(".viz-estimate")).toHaveCount(1);
+  await expect(estimate.getByRole("list",{name:"Satıştan katkıya köprü"})).toBeVisible();
+  await expect(estimate.getByRole("group",{name:/günlük grafik/})).toBeVisible();
+  await expect(estimate.getByRole("group",{name:/günlük grafik/}).locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
+  await expect(estimate.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"})).toBeVisible();
+  await expect(estimate.getByText("Maliyet kapsamı",{exact:true}).first()).toBeVisible();
+  await expect(estimate.getByText("katkıya dahil değil — sonucu yüksek gösterebilir",{exact:true})).toBeVisible();
   const screenshot=testInfo.outputPath("source-estimate.png");await page.screenshot({path:screenshot});
   const evidence=resolve("workstreams/estimated-v1/evidence");await mkdir(evidence,{recursive:true});if(process.env.ESMER_CAPTURE_EVIDENCE)await writeFile(join(evidence,"source-estimate.png"),await readFile(screenshot));
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
@@ -35,6 +42,37 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
+test("a product opened from the Özet ranking returns to Özet with focus on that row",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"estimate-rank-return-")),file=join(userData,"estimate.json");await writeFile(file,estimatePackage());
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const ranking=page.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"});await expect(ranking).toBeVisible();
+  const row=ranking.getByRole("button").first();await expect(row).toHaveAttribute("data-focus-key",/./);const key=await row.getAttribute("data-focus-key");
+  await row.click();
+  await expect(page.getByRole("button",{name:"Özete dön",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Özete dön",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Aylık Market Özeti",level:1})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Satışlar",level:1})).toHaveCount(0);
+  await expect(page.locator(`[data-focus-key="${key}"]`)).toBeFocused();
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
+test("a day with unknown-amount lines keeps a hatched segment and counts those rows in the table twin",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"estimate-unknown-day-")),file=join(userData,"estimate.json");const s=estimateSnapshot();s.lines.push({...s.lines[0],ID:"9",TOPLAM_KDV_MATRAHI:null});await writeFile(file,estimatePackage(s));
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const estimate=page.getByRole("region",{name:"Kaynak tahmini"}),chart=estimate.getByRole("group",{name:/günlük grafik/}),day=chart.locator('g[data-date="2025-10-01"]');
+  await expect(day.locator('[data-key="unknownAmount"][data-state="unknown"]')).toHaveCount(1);
+  await expect(day.locator('[data-state="value"]').first()).toBeVisible();
+  await expect(chart.locator('g[data-date="2025-10-02"] [data-key="unknownAmount"]')).toHaveCount(0);
+  await expect(estimate.locator(".viz-legend .viz-hatch").first()).toBeVisible();
+  await estimate.locator(".est-chart").filter({hasText:"Günlük tahmini katkı"}).getByRole("button",{name:"Tablo",exact:true}).click();
+  const table=estimate.getByRole("table",{name:"Günlük tahminler"});
+  await expect(table.getByRole("columnheader",{name:"Tutarı bilinmeyen satır",exact:true})).toBeVisible();
+  await expect(table.getByRole("row").filter({hasText:"01.10.2025"}).getByRole("cell").last()).toHaveText("1");
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
 test("private prepared estimate imports exports and restarts offline without revealing operands",async()=>{
  const {ESMER_ESTIMATE_PACKAGE:packagePath,ESMER_ESTIMATE_EXPECTED:expectedPath,ESMER_ESTIMATE_EXPORT:exportPath}=process.env;
  test.skip(!packagePath||!expectedPath||!exportPath,"Private package, expectation and export opt-in required");

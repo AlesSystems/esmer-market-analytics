@@ -37,3 +37,13 @@ The October 4, 2026 document-detail refinement groups identity and date, currenc
 The primary display retains every nonzero decimal digit and uses Turkish grouping. It removes only trailing decimal zeros. The native "Tam kaynak değerlerini göster" checkbox reveals each exact source string beneath its corresponding value, including source timestamps and quantity precision. Null remains distinct from zero. Every projected header field, existing line column and conditional cost-candidate column remains available. Recorded amounts retain their unverified labels. This presentation does not change source queries, source access, calculations, stored records or report versions.
 
 [Packaged verification and synthetic screenshots](../evidence/source-document-layout.md) record the local evidence. Windows acceptance remains open.
+
+## Chart-led pages (2026-10-13)
+
+On 2026-10-13 the user reported that the graphs were basic and hard to read and asked for a more visual UI with fewer confusing text sections, toward v1. The seven missing source-evidence items stay unavailable, so validated real profit and operating profit remain gated. This presentation update leads each page with charts and condenses the caveats. It does not change calculations or evidence rules.
+
+This direction relaxes the 2026-09-29 limit of three graphs in [monthly product profit](monthly-product-profit.md) to **at most three graphs per page**. Every graph keeps the existing rules: it uses the same pinned report or source/month estimate, stays independent of table search, sort, pagination and selection, draws unknown, missing-cost and out-of-coverage values as visible gaps or hatched unknown marks (never as zero), and has an exact numeric table alternative.
+
+Shared SVG primitives in `src/ui/charts` replace the duplicated per-site bar code. They have no new dependency, no canvas and no WebGL. Each plot has an accessible name and keyboard and hover values. Colour never carries meaning alone. Series colours are validated for colour-vision deficiency and contrast. Displayed amounts come only from service strings through the existing formatters. The renderer converts strings to numbers only for geometry.
+
+Each page shows the unverified-estimate state once, as a compact `Doğrulanmamış tahmin` badge. The badge discloses the estimate's limits. Returns, unknown amounts, coverage and incomplete expenses still stay beside the affected number. Technical evidence remains under `Veri ve hesaplama ayrıntıları`.

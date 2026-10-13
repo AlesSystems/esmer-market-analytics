@@ -18,6 +18,8 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
   try{
    const page=await app.firstWindow();await openWorkspace(page);await page.setViewportSize({width:1440,height:1000});
    await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();
+   await expect(page.getByRole("region",{name:"Kaynak kayıt göstergeleri",exact:true})).toBeVisible();
+   expect(await page.locator(".viz-plot:visible, .viz-rows:visible").count()).toBeLessThanOrEqual(3);
    const evidence=page.getByRole("complementary",{name:"Kaynak kapsamı ve yöntem",exact:true});
    await expect(evidence).toBeVisible();
    await expect(evidence.getByText("fixture:document-layout",{exact:true})).not.toBeVisible();
