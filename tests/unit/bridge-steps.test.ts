@@ -27,6 +27,11 @@ describe("financial bridge",()=>{
 });
 
 describe("source bridge",()=>{
+ test("keeps the uncovered step when unknown sale amounts hide behind a zero known subtotal",()=>{
+  const step=sourceBridgeSteps(totals("0",2)).at(-1)!;
+  expect(step).toMatchObject({kind:"unknown",value:"0"});
+  expect(step.detail).toContain("bilinen alt toplam");
+ });
  test("omits the uncovered step when the known subtotal is a decimal zero",()=>{
   for(const zero of ["0","0.00"])expect(sourceBridgeSteps(totals(zero)).map(step=>step.kind)).toEqual(["total","minus","result"]);
  });

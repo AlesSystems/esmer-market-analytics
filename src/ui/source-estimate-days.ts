@@ -20,5 +20,5 @@ export function dailyDay(day:{date:string;totals:EstimateTotals|null}):DailyDay 
 export function sourceBridgeSteps(t:EstimateTotals):BridgeStep[] {
  const uncovered=t.uncoveredSaleAmount;
  return [{label:"Kapsanan satış adayı",value:t.coveredSaleAmount,kind:"total"},{label:"Tahmini maliyet adayı",value:t.candidateCost,kind:"minus"},{label:"Tahmini katkı",value:t.contribution,kind:"result"},
-  ...(uncovered!==null&&isZeroDecimal(uncovered)?[]:[{label:"Maliyeti bilinmeyen satış",value:uncovered,kind:"unknown" as const,detail:`maliyeti bilinmiyor · kâra dahil değil${t.unknownSaleAmounts>0?" · bilinen alt toplam":""}`}])];
+  ...(uncovered!==null&&isZeroDecimal(uncovered)&&t.unknownSaleAmounts===0?[]:[{label:"Maliyeti bilinmeyen satış",value:uncovered,kind:"unknown" as const,detail:`maliyeti bilinmiyor · kâra dahil değil${t.unknownSaleAmounts>0?" · bilinen alt toplam":""}`}])];
 }
