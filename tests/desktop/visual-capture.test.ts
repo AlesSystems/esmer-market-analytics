@@ -5,18 +5,19 @@ import {join, resolve} from "node:path";
 import {openStore} from "../../src/store/store";
 import {businessPackage} from "../helpers/business-fixtures";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
+import {richBusinessPackage, seedRichExpenses} from "../helpers/rich-business-fixture";
 import {openWorkspace} from "../helpers/desktop-navigation";
 import {executablePath} from "../helpers/desktop-executable";
 
 const output = process.env.ESMER_CAPTURE_VISUAL;
 const pages = ["Özet", "Satışlar", "Alışlar ve maliyet", "Giderler", "Raporlar"];
-const profiles = [{name: "source", source: true, month: "2025-10"}, {name: "financial", source: false, month: null}];
+const profiles = [{name: "source", source: true, rich: false, month: "2025-10"}, {name: "financial", source: false, rich: false, month: null}, {name: "financial-rich", source: false, rich: true, month: "2025-09"}];
 
 for (const profile of profiles) test(`capture ${profile.name} pages`, async () => {
   test.skip(!output, "set ESMER_CAPTURE_VISUAL to a directory");
   test.setTimeout(120_000);
   const userData = await mkdtemp(join(tmpdir(), "esmer-visual-")), store = openStore(join(userData, "analytics.sqlite"));
-  try { store.importPackage(businessPackage()); if (profile.source) store.importSourcePreview(richEstimatePackage()); } finally { store.close(); }
+  try { store.importPackage(profile.rich ? richBusinessPackage() : businessPackage()); if (profile.rich) seedRichExpenses(store); if (profile.source) store.importSourcePreview(richEstimatePackage()); } finally { store.close(); }
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow(), directory = resolve(output!, profile.name);
