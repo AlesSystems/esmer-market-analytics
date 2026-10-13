@@ -3,6 +3,8 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { openStore } from "../../src/store/store";
+import { richBusinessPackage, seedRichExpenses } from "../helpers/rich-business-fixture";
 const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics");
 test("plain month tasks selects existing tasks and preserves the review draft", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-expense-desk-"));
@@ -86,5 +88,45 @@ test("plain task switches retain preview and explicit duplicate decisions", asyn
     await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
     await expect(page.getByLabel("Satır 3: benzer kayda rağmen ayrı gider olarak ekle")).toBeChecked();
     await expect(page.getByRole("button", { name: "İçe aktarmayı onayla", exact: true })).toBeEnabled();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("expense records lead with a status line, count and largest-record charts, and unknown totals never become zero", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-expense-charts-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importPackage(richBusinessPackage()); seedRichExpenses(store); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();await openWorkspace(page);
+    await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
+    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await expect(page.getByText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.", { exact: true })).toBeVisible();
+    const kpis = page.getByRole("region", { name: "Gider göstergeleri" });
+    await expect(kpis).toContainText("Kayıtlı giderler");
+    await expect(kpis).toContainText("Hesaplanamıyor");
+    await expect(kpis).not.toContainText("0,00 ₺");
+    await expect(kpis).toContainText("Kayıt sayısı");
+    await expect(kpis.locator(".metric").nth(2).locator("strong")).toHaveText("8");
+    await expect(page.getByRole("img", { name: /Kira 1/ })).toBeVisible();
+    await expect(page.getByText("kayıt sayısı", { exact: false }).first()).toBeVisible();
+    const largest = page.getByRole("list", { name: "En büyük gider kayıtları" });
+    await expect(largest.getByRole("listitem")).toHaveCount(8);
+    await expect(largest.getByRole("listitem").first()).toContainText("İşçilik");
+    await expect(largest.getByRole("listitem").first()).toContainText("41.500,00 ₺");
+    await expect(largest.getByRole("listitem").nth(1)).toContainText("Kira");
+    await expect(largest.getByRole("listitem").nth(1)).toContainText("28.000,00 ₺");
+    expect(await page.locator(".expenses-workspace .viz-frame").count()).toBe(2);
+    await page.getByRole("button", { name: "Tablo", exact: true }).nth(1).click();
+    await expect(page.locator(".viz-table").first()).toContainText("28.000,00 ₺");
+    await expect(page.locator(".expense-totals")).toHaveCount(1);
+    await expect(page.getByRole("region", { name: "Gider kayıtları" })).toBeVisible();
+    for (const width of [1440, 1120, 680, 390]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
+    await page.getByLabel("Dönem", { exact: true }).fill("2025-08");
+    await expect(page.getByText("Bu dönemde gider kaydı yok.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Kayıt bulunmaması, gider olmadığı anlamına gelmez.", { exact: true })).toBeVisible();
+    await expect(page.locator(".expenses-workspace .viz-frame")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Excel’den aktar", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toBeVisible();
+    await expect(page.locator("canvas")).toHaveCount(0);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
