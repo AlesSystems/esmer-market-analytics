@@ -35,13 +35,15 @@ export function compactMoney(value: number | string): string {
 }
 
 /** Round ticks covering [min, max]; step is 1, 2 or 5 times a power of ten and zero is always a tick when inside the domain. */
-export function niceTicks(min: number, max: number, intervals = 3): { ticks: number[]; min: number; max: number } {
+export function niceTicks(min: number, max: number, intervals = 3, options: { integer?: boolean } = {}): { ticks: number[]; min: number; max: number } {
   if (min === 0 && max === 0) return { ticks: [0], min: 0, max: 1 };
   if (!(max > min)) max = min + 1;
   const raw = (max - min) / intervals;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
   const ratio = raw / magnitude;
-  const step = (ratio <= 1 ? 1 : ratio <= 2 ? 2 : ratio <= 5 ? 5 : 10) * magnitude;
+  const nice = (ratio <= 1 ? 1 : ratio <= 2 ? 2 : ratio <= 5 ? 5 : 10) * magnitude;
+  /** Count axes use whole steps only, so rounded tick labels cannot repeat. */
+  const step = options.integer ? Math.max(1, nice) : nice;
   const start = Math.floor(min / step) * step;
   const end = Math.ceil(max / step) * step;
   const count = Math.round((end - start) / step);
@@ -106,7 +108,7 @@ export type DailyLayout = {
   ticks: { value: number; y: number; label: string }[];
   columns: DailyColumn[];
 };
-type DailyInput = { period: string; days: DailyDay[]; seriesKeys: string[]; width: number; plotHeight?: number; formatTick?: (value: number) => string };
+type DailyInput = { period: string; days: DailyDay[]; seriesKeys: string[]; width: number; plotHeight?: number; formatTick?: (value: number) => string; integerTicks?: boolean };
 
 export const monthDates = (period: string): string[] => {
   const [year, month] = period.split("-").map(Number);
@@ -145,14 +147,14 @@ function partsOf(day: DailyDay | undefined, seriesKeys: string[]): DayParts {
   return { state: "value", positives, negatives, unknownTop, unknownBelow };
 }
 
-export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220, formatTick = compactMoney }: DailyInput): DailyLayout {
+export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220, formatTick = compactMoney, integerTicks = false }: DailyInput): DailyLayout {
   const dates = monthDates(period);
   const byDate = new Map(days.map((day) => [day.date, day]));
   const parts = dates.map((value) => partsOf(byDate.get(value), seriesKeys));
   const sum = (items: Raw[]) => items.reduce((total, item) => total + item.value, 0);
   const hi = Math.max(0, ...parts.map((part) => sum(part.positives)));
   const lo = -Math.max(0, ...parts.map((part) => sum(part.negatives)));
-  const domain = niceTicks(lo, hi, 3);
+  const domain = niceTicks(lo, hi, 3, { integer: integerTicks });
   const left = 56;
   const right = 8;
   const top = 16;

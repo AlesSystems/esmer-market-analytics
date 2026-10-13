@@ -145,6 +145,18 @@ describe("daily layout", () => {
     expect(describeDay(layoutDays[0], series, money).rows.some((row) => row.unknown && row.key.startsWith("negative"))).toBe(true);
   });
 
+  test("integer ticks never use a fractional step, so count axes cannot repeat a label", () => {
+    expect(niceTicks(0, 1).ticks).toEqual([0, 0.5, 1]);
+    expect(niceTicks(0, 1, 3, { integer: true })).toEqual({ ticks: [0, 1], min: 0, max: 1 });
+    expect(niceTicks(0, 2, 3, { integer: true }).ticks).toEqual([0, 1, 2]);
+    expect(niceTicks(0, 7, 3, { integer: true }).ticks.every(Number.isInteger)).toBe(true);
+    expect(niceTicks(0, 0, 3, { integer: true }).ticks).toEqual([0]);
+    const layout = dailyLayout({ period: "2026-10", days: [day(1, [{ key: "documents", value: "1" }])], seriesKeys: ["documents"], width: 720, integerTicks: true, formatTick: (value) => String(Math.round(value)) });
+    const labels = layout.ticks.map((tick) => tick.label);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(labels).toEqual(["0", "1"]);
+  });
+
   test("all-unknown input keeps a valid zero-only axis", () => {
     const layout = layoutOf([day(1, [], { state: "unknown" })]);
     expect(layout.ticks.map((tick) => tick.value)).toEqual([0]);

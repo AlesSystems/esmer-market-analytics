@@ -18,6 +18,8 @@ export type DailyBarsProps = {
   plotHeight?: number;
   /** Axis tick labels; defaults to compact TRY. Pass a count formatter for non-money series. */
   formatTick?: (value: number) => string;
+  /** Whole-number axis steps, for count series. */
+  integerTicks?: boolean;
   empty?: string;
 };
 
@@ -58,13 +60,13 @@ export function dailyTable({ days, series, formatValue, negativeLabel = "İade" 
   };
 }
 
-export function DailyBars({ period, days, series, formatValue, negativeLabel = "İade", ariaLabel, plotHeight, formatTick, empty = "Gösterilecek gün yok." }: DailyBarsProps) {
+export function DailyBars({ period, days, series, formatValue, negativeLabel = "İade", ariaLabel, plotHeight, formatTick, integerTicks, empty = "Gösterilecek gün yok." }: DailyBarsProps) {
   const [ref, width] = useWidth<HTMLDivElement>();
   const [active, setActive] = useState<number | null>(null);
   const patternId = `viz-hatch-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   if (days.length === 0) return <p className="viz-empty">{empty}</p>;
 
-  const layout = dailyLayout({ period, days, seriesKeys: series.map((item) => item.key), width, plotHeight, formatTick });
+  const layout = dailyLayout({ period, days, seriesKeys: series.map((item) => item.key), width, plotHeight, formatTick, integerTicks });
   const byDate = new Map(days.map((day) => [day.date, day]));
   const count = (state: string) => layout.columns.filter((column) => column.state === state).length;
   const label = ariaLabel ?? `${monthName.format(new Date(`${period}-01`))} günlük grafik: ${count("value")} gün değerli, ${count("unknown")} gün bilinmiyor, ${count("out-of-range")} gün kapsam dışı.`;

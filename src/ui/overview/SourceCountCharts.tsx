@@ -21,7 +21,7 @@ export function dailyCountDays(view:Pick<SourceView,"days"|"from"|"to">,period:s
 export function SourceDailyCounts({view,period,outside,title="Günlük belge kayıtları",ariaLabel="Günlük kaynak belge kayıtları",note="Kayıt sayısıdır; tutar veya tamamlanmış işlem değildir. Kayıt görünmeyen günler sıfır kabul edilmez.",emptyText}:{view:SourceView;period:string;outside:boolean;title?:string;ariaLabel?:string;note?:string;emptyText?:string}) {
  const empty=view.days.length===0;
  return <ChartFrame className="source-count-chart" title={title} summary={empty?undefined:note} headingLevel="h2">
-  {empty?<p className="viz-empty">{outside?"Günlük kayıtlar bu dönem için gösterilemiyor; dönem yedek kapsamında değil.":emptyText??"Bu dönem için günlük belge kaydı yok."}</p>:<DailyBars period={period} days={dailyCountDays(view,period)} series={[documents]} formatValue={countText} formatTick={countTick} ariaLabel={ariaLabel} plotHeight={160}/>}
+  {empty?<p className="viz-empty">{outside?"Günlük kayıtlar bu dönem için gösterilemiyor; dönem yedek kapsamında değil.":emptyText??"Bu dönem için günlük belge kaydı yok."}</p>:<DailyBars period={period} days={dailyCountDays(view,period)} series={[documents]} formatValue={countText} formatTick={countTick} integerTicks ariaLabel={ariaLabel} plotHeight={160}/>}
  </ChartFrame>;
 }
 
