@@ -94,7 +94,8 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
     if (missingCost) await expect(summary).toContainText("Tüm market kârı belirlenemiyor");
     else await expect(summary).not.toContainText("Tüm market kârı belirlenemiyor");
     await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
-    await page.getByText("Günlük tutarlar", { exact: true }).click();
+    await expect(page.locator(".monthly-trend [data-state='value']").first()).toBeVisible();
+    await page.locator(".monthly-trend").getByRole("button", { name: "Tablo", exact: true }).click();
     await expect(page.locator(".monthly-trend table")).toContainText("100,00 ₺");
     await expect(page.locator(".monthly-trend table")).toContainText("-40,00 ₺");
     await page.getByRole("button", { name: "Çay", exact: true }).click();
@@ -223,12 +224,12 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
     await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     const summary = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    if (scenario === "empty") { await expect(page.locator(".monthly-amount")).toHaveText("Bu ay satış veya iade yok"); await expect(page.locator(".zero-marker")).toHaveCount(30); }
-    if (scenario === "zero") { await expect(page.locator(".monthly-amount")).toHaveText("0,00 ₺"); await expect(page.locator(".zero-marker")).toHaveCount(30); }
+    if (scenario === "empty") { await expect(page.locator(".monthly-amount")).toHaveText("Bu ay satış veya iade yok"); await expect(page.locator(".monthly-trend .viz-zero-marker")).toHaveCount(30); }
+    if (scenario === "zero") { await expect(page.locator(".monthly-amount")).toHaveText("0,00 ₺"); await expect(page.locator(".monthly-trend .viz-zero-marker")).toHaveCount(30); }
     if (scenario === "loss") { await expect(page.locator(".monthly-amount")).toHaveText("-20,00 ₺"); await expect(summary).toContainText("Tahmini brüt zarar"); }
     if (scenario === "return-only") { await expect(page.locator(".monthly-amount")).toHaveText("-40,00 ₺"); await expect(summary).toContainText("Hesaplanamıyor"); await page.getByRole("button", { name: "Çay", exact: true }).click(); await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click(); await expect(page.getByRole("region", { name: "Asıl satış kanıtı", exact: true })).toContainText("31.08.2025"); }
-    if (scenario === "no-cost" || scenario === "unsupported") { await expect(page.locator(".monthly-amount")).toHaveText("Hesaplanamıyor"); await expect(page.locator(".monthly-trend .bar-column").first().locator("rect, circle")).toHaveCount(0); }
-    if (scenario === "partial") { await expect(summary).toContainText("Kısmi dönem"); await expect(page.locator(".zero-marker")).toHaveCount(1); await expect(page.locator(".monthly-trend .bar-column").nth(2).locator("rect, circle")).toHaveCount(0); }
+    if (scenario === "no-cost" || scenario === "unsupported") { await expect(page.locator(".monthly-amount")).toHaveText("Hesaplanamıyor"); const gap = page.locator('.monthly-trend g[data-date="2025-09-01"]'); await expect(gap.locator('[data-state="value"], .viz-zero-marker')).toHaveCount(0); await expect(gap.locator(".viz-ghost")).toHaveCount(1); }
+    if (scenario === "partial") { await expect(summary).toContainText("Kısmi dönem"); await expect(page.locator(".monthly-trend .viz-zero-marker")).toHaveCount(1); const gap = page.locator('.monthly-trend g[data-date="2025-09-03"]'); await expect(gap.locator('[data-state="value"], .viz-zero-marker')).toHaveCount(0); await expect(gap.locator('.viz-ghost[data-state="out-of-range"]')).toHaveCount(1); }
     if (["zero", "loss", "no-cost", "partial"].includes(scenario)) {
       await page.getByRole("region", { name: "Ürün katkıları", exact: true }).locator("tbody button").first().click();
       const selected = page.getByRole("region", { name: "Seçili ürün özeti", exact: true });
@@ -237,8 +238,9 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
       if (scenario === "partial") await expect(selected).toContainText("Dönem veya kaynak kapsamı eksik");
     }
     if (await page.getByRole("button", { name: "Ürün listesine dön" }).isVisible()) await page.getByRole("button", { name: "Ürün listesine dön" }).click();
-    await page.getByText("Günlük tutarlar", { exact: true }).click();
+    await page.locator(".monthly-trend").getByRole("button", { name: "Tablo", exact: true }).click();
     await expect(page.locator(".monthly-trend table tbody tr")).toHaveCount(30);
+    if (["no-cost", "unsupported"].includes(scenario)) await expect(page.locator(".monthly-trend table tbody tr").first()).toContainText("Hesaplanamıyor");
     await page.screenshot({ path: testInfo.outputPath("lane-06-07.png") });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -361,5 +363,29 @@ test("product and evidence failures retry locally without replacing the monthly 
     await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).toContainText("Kaydedilen tam belge neti: 40,00 ₺");
     await expect(page.locator(".monthly-amount")).toHaveText("60,00 ₺");
     await page.screenshot({ path: testInfo.outputPath("lane-06-retry.png") });
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("Satışlar and Raporlar lead with charts that keep unknown, zero and coverage distinct", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-profit-charts-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { expect(store.importPackage(businessPackage(productProfitRecords(true))).status).toBe("active"); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();await openWorkspace(page);
+    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    const ranking = page.getByRole("list", { name: "Kapsanan kâra göre ilk on ürün" });
+    await expect(ranking).toBeVisible();
+    await expect(ranking.locator("li[data-state='value']").first()).toContainText("₺");
+    const unknown = ranking.locator("li[data-state='unknown']");
+    await expect(unknown).toHaveCount(1);
+    await expect(unknown).toContainText("Maliyeti bilinmeyen ürün");
+    await expect(unknown).toContainText("Bilinmiyor");
+    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
+    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: /^Satırların kapsanan \d+, dışlanan [1-9]/ })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("dışlanan satır");
+    await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("Giderler dahil değil");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

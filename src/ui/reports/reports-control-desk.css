@@ -30,3 +30,16 @@
 .report-inspector dd { min-width:0; }
 .report-workspace .notice { overflow-wrap:anywhere; }
 @media(max-width:900px){.report-inspector dl{grid-template-columns:minmax(0,1fr)}}
+
+/* chart-led financial report and Satışlar lead (2026-10-13) */
+.monthly-profit-page .monthly-visuals{display:grid;gap:36px;margin:28px 0 34px;min-width:0}
+.monthly-profit-page .monthly-visuals>section,.monthly-profit-page .monthly-visuals>.viz-frame{min-width:0}
+.monthly-profit-page .viz-frame .viz-title{font-size:18px;font-weight:650}
+.monthly-profit-page .viz-frame .viz-summary{margin:4px 0 0;font-size:12px;color:#526078}
+.monthly-profit-page .viz-gap-note{margin:10px 0 0;font-size:11px;color:#526078}
+.monthly-profit-page .monthly-trend{grid-area:auto;border:0;padding:0;background:transparent;box-shadow:none}
+@media(min-width:1200px){.monthly-profit-page .monthly-visuals.monthly-pair{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:44px;align-items:start}}
+.monthly-profit-page .financial-ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 22px;border-top:2px solid #182644;margin:16px 0 12px}
+.monthly-profit-page .financial-ledger>div{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-bottom:1px solid #dce3ee}
+.monthly-profit-page .financial-ledger dt{font-size:12px;color:#526078}
+.monthly-profit-page .financial-ledger dd{margin:0;font-size:18px;text-align:left}

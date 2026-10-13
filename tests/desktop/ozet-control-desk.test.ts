@@ -33,6 +33,22 @@ test("Kontrol masası presents the pinned month with real navigation and offline
     await expect.poll(() => logo.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(459);
     expect(await logo.getAttribute("src")).not.toMatch(/^https?:/);
     await expect(page.getByRole("img", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
+    await expect(matrix).toContainText("Giderler düşülmemiştir");
+    await expect(matrix).toContainText("maliyet kapsamı %50");
+    await expect(matrix).not.toContainText("Eksik maliyet sıfır kabul edilmez");
+    await expect(page.locator(".c-evidence")).toContainText("Eksik maliyet sıfır kabul edilmez");
+    await expect(page.locator(".c-viz-daily .viz-zero-marker")).toHaveCount(29);
+    const bridge = page.getByRole("list", { name: "Kapsanan satıştan brüt kâra köprü" });
+    await expect(bridge).toContainText("Kapsanan satış");
+    await expect(bridge).toContainText("Kapsanan maliyet");
+    await expect(bridge).toContainText("Kapsanan tahmini brüt kâr");
+    await expect(bridge.locator("li[data-state='unknown']")).toContainText("Maliyeti eksik satış");
+    await expect(page.getByRole("list", { name: "Net satışa göre ilk beş ürün" })).toBeVisible();
+    await page.locator(".c-viz-daily").getByRole("button", { name: "Tablo", exact: true }).click();
+    await expect(page.locator(".c-viz-daily table tbody tr")).toHaveCount(30);
+    await expect(page.locator(".c-viz-daily table tbody tr").first()).toContainText("200,00 ₺");
+    await expect(page.locator(".c-viz-daily table tbody tr").nth(1)).toContainText("İşlemsiz gün");
+    await page.locator(".c-viz-daily").getByRole("button", { name: "Grafik", exact: true }).click();
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.screenshot({ path: testInfo.outputPath("control-desk-desktop.png"), fullPage: true });
     await matrix.getByRole("button", { name: /Net satış/ }).press("Enter");
@@ -105,5 +121,24 @@ test("large monthly figures fit the desk and preserve report evidence", async ({
     await rail.locator(":scope > summary").press("Enter");
     await expect(rail).toHaveAttribute("open", "");
     await expect(rail.locator(":scope > summary")).toBeFocused();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("Özet daily chart keeps days outside source coverage as hatched gaps, never zero", async () => {
+  const records = businessRecords(); records.documents = records.documents.slice(0, 1); records.lines = records.lines.slice(0, 1);
+  const userData = await mkdtemp(join(tmpdir(), "esmer-control-desk-gap-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { expect(store.importPackage(businessPackage(records, { cutoff: "2025-09-02", coverage: { from: "2025-09-01", to: "2025-09-02", complete: true } })).status).toBe("active"); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();await openWorkspace(page);
+    await expect(page.getByRole("img", { name: "Günlük net satış grafiği", exact: true })).toBeVisible();
+    await expect(page.locator(".c-viz-daily .viz-zero-marker")).toHaveCount(1);
+    const gap = page.locator('.c-viz-daily g[data-date="2025-09-03"]');
+    await expect(gap.locator('[data-state="value"], .viz-zero-marker')).toHaveCount(0);
+    await expect(gap.locator('.viz-ghost[data-state="out-of-range"]')).toHaveCount(1);
+    await page.locator(".c-viz-daily").getByRole("button", { name: "Tablo", exact: true }).click();
+    await expect(page.locator(".c-viz-daily table tbody tr").nth(2)).toContainText("Kapsam dışı");
+    await expect(page.locator(".c-viz-daily table tbody tr").nth(2)).not.toContainText("0,00 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
