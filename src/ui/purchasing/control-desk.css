@@ -12,3 +12,14 @@
 .source-purchasing-main { min-width:0; }
 .source-purchasing-main > .data-status { overflow-wrap:anywhere; }
 .source-purchasing-desk .table-scroll table { min-width:720px; }
+
+/* chart-led first view */
+.purchasing-control-desk{--pur-change:var(--viz-cost);--pur-slate:#5c6980;--pur-gold:#b8860b;--pur-violet:#7c4dbd}
+.purchasing-control-desk .metrics{border-top:2px solid #182644;border-bottom:1px solid #dce3ee;grid-template-columns:repeat(2,minmax(0,1fr));margin:20px 0 26px}
+.purchasing-control-desk .metric h2{font-size:12px;line-height:1.5}
+.purchasing-control-desk .metric > strong{font-size:clamp(22px,2.4vw,32px);letter-spacing:-.035em}
+.purchasing-control-desk .metric p{margin-top:0;font-size:12px;line-height:1.5;color:#526078}
+.purchasing-charts{display:grid;grid-template-columns:minmax(0,1fr);gap:34px;align-items:start;margin:0 0 30px;padding-bottom:28px;border-bottom:1px solid #dce3ee}
+.purchasing-charts > *{min-width:0}
+.purchasing-control-desk > main > .block{border:0;border-radius:0;background:none;box-shadow:none;padding:0 0 26px;margin-bottom:6px}
+.purchasing-control-desk .section-heading{margin-top:22px}
