@@ -14,6 +14,13 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
  try{
   let page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"});await expect(estimate.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();await expect(estimate.getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("-30,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
+  await expect(page.locator(".viz-estimate")).toHaveCount(1);
+  await expect(estimate.getByRole("list",{name:"Satıştan katkıya köprü"})).toBeVisible();
+  await expect(estimate.getByRole("img",{name:/günlük grafik/})).toBeVisible();
+  await expect(estimate.getByRole("img",{name:/günlük grafik/}).locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
+  await expect(estimate.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"})).toBeVisible();
+  await expect(estimate.getByText("Maliyet kapsamı",{exact:true}).first()).toBeVisible();
+  await expect(estimate.getByText("katkıya dahil değil — sonucu yüksek gösterebilir",{exact:true})).toBeVisible();
   const screenshot=testInfo.outputPath("source-estimate.png");await page.screenshot({path:screenshot});
   const evidence=resolve("workstreams/estimated-v1/evidence");await mkdir(evidence,{recursive:true});if(process.env.ESMER_CAPTURE_EVIDENCE)await writeFile(join(evidence,"source-estimate.png"),await readFile(screenshot));
   await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();

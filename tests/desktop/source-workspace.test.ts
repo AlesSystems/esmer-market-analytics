@@ -23,7 +23,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
  try{
   let page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
   await expect(page.getByRole("img",{name:"Günlük kaynak belge kayıtları"})).toBeVisible();
-  await expect(page.getByRole("img",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
+  await expect(page.getByRole("list",{name:"Kaynak belge türlerine göre kayıt sayıları"})).toBeVisible();
   await page.getByText("Belge türlerinin tam sayılarını göster",{exact:true}).click();
   await page.getByText("Günlük tam sayıları göster",{exact:true}).click();
   await expect(page.getByRole("table",{name:"Günlük kaynak belge kayıtları tablosu"})).toBeVisible();
