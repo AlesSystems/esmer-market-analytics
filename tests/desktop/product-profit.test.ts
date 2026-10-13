@@ -241,6 +241,7 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
     await page.locator(".monthly-trend").getByRole("button", { name: "Tablo", exact: true }).click();
     await expect(page.locator(".monthly-trend table tbody tr")).toHaveCount(30);
     if (["no-cost", "unsupported"].includes(scenario)) await expect(page.locator(".monthly-trend table tbody tr").first()).toContainText("Hesaplanamıyor");
+    if (scenario === "partial") { const outside = page.locator(".monthly-trend table tbody tr").filter({ hasText: "03.09.2025" }); await expect(outside).toContainText("Kapsam dışı"); await expect(outside).not.toContainText("Hesaplanamıyor"); }
     await page.screenshot({ path: testInfo.outputPath("lane-06-07.png") });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

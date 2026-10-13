@@ -111,6 +111,7 @@ test("expense records lead with a status line, count and largest-record charts, 
     await expect(page.getByText("kayıt sayısı", { exact: false }).first()).toBeVisible();
     const largest = page.getByRole("list", { name: "En büyük gider kayıtları" });
     await expect(largest.getByRole("listitem")).toHaveCount(8);
+    await expect(page.locator(".viz-frame").filter({ has: largest }).locator(".viz-summary")).toContainText("Kayıt başına kayıtlı tutar (brüt; eski kayıtlarda net)");
     await expect(largest.getByRole("listitem").first()).toContainText("İşçilik");
     await expect(largest.getByRole("listitem").first()).toContainText("41.500,00 ₺");
     await expect(largest.getByRole("listitem").nth(1)).toContainText("Kira");

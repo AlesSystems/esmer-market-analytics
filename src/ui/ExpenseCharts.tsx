@@ -42,7 +42,7 @@ export function LargestExpensesChart({ rows, onSelect }: { rows: ExpenseRecord[]
   const label = (item: Item) => currentValue(item.row)?.category ?? "Eski kayıt";
   const detail = (item: Item) => { const value = currentValue(item.row); return `${date(item.row.value.date)} · ${value ? classificationLabels[value.classification] : "yalnızca net tutar"}`; };
   const table = { caption: "En büyük gider kayıtları", columns: [{ label: "Kategori" }, { label: "Tarih" }, { label: "Tutar", numeric: true }], rows: shown.map(item => [label(item), date(item.row.value.date), `${money(item.amount)} ${item.basis}`]) };
-  return <ChartFrame title="En büyük gider kayıtları" summary={`Kayıtlı brüt tutarlar, kayıt başına${items.length > shown.length ? ` · en büyük ${LARGEST} kayıt` : ""}. Dönem gideri toplamı değildir.`} table={table}>
+  return <ChartFrame title="En büyük gider kayıtları" summary={`Kayıt başına kayıtlı tutar (brüt; eski kayıtlarda net)${items.length > shown.length ? ` · en büyük ${LARGEST} kayıt` : ""}. Dönem gideri toplamı değildir.`} table={table}>
     <RankBars ariaLabel="En büyük gider kayıtları" color="var(--viz-cost)" formatValue={money} rows={shown.map(item => ({ id: item.row.entityId, label: label(item), detail: detail(item), value: item.amount, onSelect: () => onSelect(item.row) }))} />
   </ChartFrame>;
 }
