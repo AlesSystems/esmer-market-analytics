@@ -89,10 +89,6 @@
 .control-desk .c-matrix strong{font-size:clamp(18px,2.2vw,29px);white-space:normal;overflow-wrap:anywhere}
 .control-desk .c-matrix small{font-size:10px;line-height:1.6;color:var(--c-muted)}
 .control-desk .c-heading p+p{font-size:11px;margin-top:5px}
-.control-desk .c-daily-chart{display:grid;height:205px;gap:3px;color:var(--c-blue);align-items:stretch}
-.control-desk .c-daily-chart>div{min-width:0;text-align:center}
-.control-desk .c-daily-chart svg{display:block;width:100%;height:180px}
-.control-desk .c-daily-chart small{display:block;font-size:9px;padding-top:7px;color:var(--c-muted)}
 .control-desk .c-daily-values{margin-top:14px;font-size:11px}
 .control-desk .c-caption{font-size:11px;margin-top:8px}
 .control-desk .c-report-details{border-top:2px solid var(--c-ink);margin-top:38px;padding-top:26px;min-width:0}
@@ -110,8 +106,6 @@
 .control-desk .c-matrix>button{min-height:148px}
 .control-desk .c-categories>button{grid-template-columns:minmax(0,1fr) minmax(80px,auto) 40px 12px;gap:7px}
 .control-desk .c-categories strong{overflow-wrap:anywhere}
-.control-desk .c-daily-chart{gap:0}
-.control-desk .c-daily-chart small{font-size:7px}
 .control-desk .c-chart-foot{gap:9px}
 .control-desk .c-report-details .report-actions{flex-wrap:wrap}
 .control-desk .c-report-details input{max-width:100%}
@@ -120,7 +114,6 @@
 .control-desk .c-matrix strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
 .control-desk .c-matrix em{flex-wrap:wrap}
 .control-desk .c-categories>button{font-family:inherit;color:inherit;cursor:pointer}
-.control-desk .c-daily-chart>div{grid-row:1}
 
 .control-desk .c-text-action{font-family:inherit;cursor:pointer}
 
