@@ -10,7 +10,7 @@ import { OperatingSummary } from "../OperatingSummary";
 import { purchasingWarningLabels } from "../purchasing/PurchasingWorkspace";
 import { SelectedProduct, ProductDependency } from "./SelectedProduct";
 import { ReportEvidence } from "./ReportEvidence";
-import { DailyProfit, LineCoverage, ProductRanking, useTopProducts, type ProductRow } from "./financial-charts";
+import { DailyProfit, LineCoverage, ProductRanking, useTopProducts } from "./financial-charts";
 
 type V2 = Extract<MonthlyDisplay, { format: "monthly-report-v2" }>;
 type Product = ReportProductsPage["rows"][number];

@@ -4,7 +4,7 @@ import {AppFrame} from "./frame";
 import {reasonLabels} from "../source/estimate";
 import {Input} from "./components/ui/input";
 import {Button} from "./components/ui/button";
-import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type DailyDay,type RankRow} from "./charts";
+import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type RankRow} from "./charts";
 import {count} from "./overview/SourceCountCharts";
 import {dailyDay,dailySeries,sourceBridgeSteps} from "./source-estimate-days";
 import {date,money,percent} from "./format";
