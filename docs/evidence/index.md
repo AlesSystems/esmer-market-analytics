@@ -14,6 +14,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 ## Later implementation evidence
 
+The October 13 [chart-led v1 visual receipt](2026-10-13-v1-visual.md) records shared SVG charts, a per-page limit of three graphs, the estimate ranking and synthetic before/after screenshots. Real-source profit, operating profit and Windows acceptance remain open.
+
 The October 10 [welcome B receipt](2026-10-10-welcome-b.md) records the selected launch page, real shortcuts, guarded return, scoped design vocabulary and packaged macOS verification. It distinguishes the full desktop stage from later focused review repairs and leaves Windows runtime acceptance open.
 
 The October 10 [publication and main integration receipt](2026-10-10-v0.5-main-integration.md) distinguishes the immutable v0.5.0 Mac tag from the PR branch that also preserves the later compact-copy update. It records uploaded asset digests and integration verification.
@@ -26,6 +28,7 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 
 | Work | Evidence and continuation |
 | --- | --- |
+| Chart-led v1 visual edition | [Charts, review repairs and open gates](2026-10-13-v1-visual.md) |
 | Welcome B launch page | [Implementation, review and platform limits](2026-10-10-welcome-b.md) |
 | v0.5 publication and main integration | [Published artifact and branch continuation](2026-10-10-v0.5-main-integration.md) |
 | v0.5 unified Mac demo | [Scope and work contracts](../superpowers/plans/2026-10-09-v0.5-demo.md), [verification receipt](2026-10-09-v0.5-demo.md), [Turkish demo guide](../operations/demo-v0.5-tr.md) |
