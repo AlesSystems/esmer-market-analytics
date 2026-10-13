@@ -91,8 +91,8 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
     const summary = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(summary).toContainText("60,00 ₺");
     await expect(summary).toContainText(missingCost ? "%89,74" : "%100");
-    if (missingCost) await expect(summary).toContainText("Tüm market kârı belirlenemiyor");
-    else await expect(summary).not.toContainText("Tüm market kârı belirlenemiyor");
+    if (missingCost) { await expect(summary).toContainText("Tüm market kârı belirlenemiyor"); await expect(summary.locator(".partial-reasons")).toContainText("Maliyet kanıtı eksik"); }
+    else { await expect(summary).not.toContainText("Tüm market kârı belirlenemiyor"); await expect(summary.locator(".partial-reasons")).toHaveCount(0); }
     await expect(page.getByRole("img", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
     await expect(page.locator(".monthly-trend [data-state='value']").first()).toBeVisible();
     await page.locator(".monthly-trend").getByRole("button", { name: "Tablo", exact: true }).click();
