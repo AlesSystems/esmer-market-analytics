@@ -14,9 +14,11 @@ type Props = {
   onDocuments: () => void;
   onProducts: () => void;
   onDocumentType: (code: string) => void;
+  /** Off inside the prepared estimate's collapsed counts, where the estimate already holds the page's three graphs. */
+  charts?: boolean;
 };
 
-export function SourceControlDesk({view, period, outside, onDocuments, onProducts, onDocumentType}: Props) {
+export function SourceControlDesk({view, period, outside, onDocuments, onProducts, onDocumentType, charts = true}: Props) {
   const indicators = [
     {label: "Belge kaydı", value: view.counts.documents, detail: "Tüm durum ve türler", action: onDocuments},
     {label: "Satır kaydı", value: view.counts.lines, detail: null, action: onDocuments},
@@ -37,11 +39,11 @@ export function SourceControlDesk({view, period, outside, onDocuments, onProduct
     <div className="c-body">
       <div className="c-main">
         <section className="c-chart">
-          <SourceDailyCounts view={view} period={period} outside={outside}/>
+          {charts && <SourceDailyCounts view={view} period={period} outside={outside}/>}
           <details className="source-count-details c-daily-values"><summary>Günlük tam sayıları göster</summary><div className="table-scroll"><table aria-label="Günlük kaynak belge kayıtları tablosu"><thead><tr><th>Kaynak tarihi</th><th>Belge kaydı</th></tr></thead><tbody>{view.days.map(row => <tr key={row.date}><td>{sourceDate(row.date)}</td><td className="number">{count(row.documents)}</td></tr>)}</tbody></table></div></details>
         </section>
         <section className="c-ranking">
-          <SourceTypeCounts view={view} outside={outside}/>
+          {charts && <SourceTypeCounts view={view} outside={outside}/>}
           <details className="source-count-details"><summary>Belge türlerinin tam sayılarını göster</summary><div className="table-scroll"><table aria-label="Kaynak belge türleri tablosu"><thead><tr><th>Tür kodu / tarihsel açıklama</th><th>Belge kaydı</th></tr></thead><tbody>{view.types.map(row => <tr key={row.code}><td><button className="c-text-action source-type-action" onClick={() => onDocumentType(row.code)}>{typeLabel(row.code)}</button></td><td className="number">{count(row.documents)}</td></tr>)}</tbody></table></div></details>
         </section>
       </div>

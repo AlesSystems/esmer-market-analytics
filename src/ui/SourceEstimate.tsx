@@ -9,7 +9,7 @@ import {count} from "./overview/SourceCountCharts";
 import {date,money,percent} from "./format";
 const amount=(value:string|null)=>value===null?"Bilinmiyor":money(value);
 const coverage=(value:string|null)=>value===null?"Hesaplanamıyor":percent(value);
-const dailySeries=[{key:"cost",label:"Tahmini maliyet adayı",color:"var(--viz-cost)"},{key:"contribution",label:"Tahmini katkı",color:"var(--viz-contribution)"},{key:"uncovered",label:"Maliyeti bilinmeyen satış",color:"var(--viz-accent-3)"}];
+const dailySeries=[{key:"cost",label:"Tahmini maliyet adayı",color:"var(--viz-cost)"},{key:"contribution",label:"Tahmini katkı",color:"var(--viz-contribution)"},{key:"uncovered",label:"Maliyeti bilinmeyen satış",color:"var(--viz-sales)"}];
 const returnLabel="İade tutarı adayı (katkıya dahil değil)";
 /** Service strings pass through untouched; unknown stays null. A day without any recorded line is unknown, never zero. */
 function dailyDay(day:{date:string;totals:EstimateTotals|null}):DailyDay {
