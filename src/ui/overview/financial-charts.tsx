@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { MonthlyDisplay, ReportProductsPage, ReportProductsRequest } from "../../reports/display";
 import { Bridge, ChartFrame, CompositionBar, DailyBars, RankBars, type BridgeStep, type ChartTable, type DailyDay, type RankRow } from "../charts";
-import { date, money, percent } from "../format";
+import { date, isZeroDecimal, money, percent } from "../format";
 
 /**
  * Chart wiring for the financial path. Every figure is a service string passed through money()/percent();
@@ -111,7 +111,8 @@ export function bridgeSteps(report: MonthlyDisplay): BridgeStep[] | null {
     { label: "Kapsanan satış", value: sales, kind: "total" },
     { label: "Kapsanan maliyet", value: cost, kind: "minus", detail: "tarihsel tahmin" },
     { label: result.startsWith("-") ? "Kapsanan tahmini brüt zarar" : "Kapsanan tahmini brüt kâr", value: result, kind: "result", detail: "giderler düşülmemiştir" },
-    { label: "Maliyeti eksik satış", value: exposures.excludedSales, kind: "unknown", detail: "kâra dahil değil · sıfır değildir" },
+    // At full coverage the excluded amount is a known zero: no step, so the bridge never claims an unknown that is not there.
+    ...(isZeroDecimal(exposures.excludedSales) ? [] : [{ label: "Maliyeti eksik satış", value: exposures.excludedSales, kind: "unknown" as const, detail: "maliyeti bilinmiyor · kâra dahil değil" }]),
   ];
 }
 

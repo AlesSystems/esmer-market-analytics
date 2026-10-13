@@ -6,7 +6,7 @@ import {Input} from "./components/ui/input";
 import {Button} from "./components/ui/button";
 import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type DailyDay} from "./charts";
 import {count} from "./overview/SourceCountCharts";
-import {dailyDay,dailySeries} from "./source-estimate-days";
+import {dailyDay,dailySeries,sourceBridgeSteps} from "./source-estimate-days";
 import {date,money,percent} from "./format";
 const amount=(value:string|null)=>value===null?"Bilinmiyor":money(value);
 const coverage=(value:string|null)=>value===null?"Hesaplanamıyor":percent(value);
@@ -44,7 +44,7 @@ export function SourceEstimate({hash,period,onProduct,active=true,presentation,h
   <RankBars rows={rankRows} color="var(--viz-contribution)" formatValue={money} ariaLabel="Ürünlere göre tahmini satış katkısı sıralaması" empty="Katkısı hesaplanabilen ürün yok."/>
  </ChartFrame>;
  const bridge=summary&&<ChartFrame className="est-chart" headingLevel="h2" title="Satıştan katkıya" summary="Maliyeti bilinmeyen satış katkıya girmez.">
-  <Bridge steps={[{label:"Kapsanan satış adayı",value:summary.coveredSaleAmount,kind:"total"},{label:"Tahmini maliyet adayı",value:summary.candidateCost,kind:"minus"},{label:"Tahmini katkı",value:summary.contribution,kind:"result"},{label:"Maliyeti bilinmeyen satış",value:summary.uncoveredSaleAmount,kind:"unknown"}]} formatValue={money}/>
+  <Bridge steps={sourceBridgeSteps(summary)} formatValue={money}/>
  </ChartFrame>;
  return <section className="source-est" aria-label="Kaynak tahmini" aria-busy={loading}>
  <header className="est-head">{heading}<EstimateBadge label="Doğrulanmamış tahmin — net kâr değildir.">Birim, vergi, tamamlanma ve tarihsel maliyet anlamları doğrulanmadı. Giderler dahil değildir.</EstimateBadge><div className="est-actions">{presentation==="report"&&result&&<Button variant="outline" disabled={exporting} onClick={()=>void exportReport()}>{exporting?"Tahmin kaydediliyor…":"Tahmini Excel olarak kaydet"}</Button>}{actions}</div></header>
