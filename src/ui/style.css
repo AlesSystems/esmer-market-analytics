@@ -8,6 +8,7 @@
 @import "./reports/reports-control-desk.css";
 @import "./source-document-detail.css";
 @import "./welcome/welcome.css";
+@import "./charts/charts.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);
