@@ -20,6 +20,7 @@ const series = [
 const day = (n: number, segments: DailyDay["segments"], extra: Partial<DailyDay> = {}): DailyDay =>
   ({ date: `2026-10-${String(n).padStart(2, "0")}`, segments, state: "value", ...extra });
 const layoutOf = (days: DailyDay[], width = 720) => dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width });
+const layoutDays: DailyDay[] = [day(1, [{ key: "cost", value: "100" }], { negative: "40", negativeUnknown: true })];
 const allMarks = (layout: ReturnType<typeof layoutOf>) => layout.columns.flatMap((column) => column.marks);
 
 describe("compact money and numbers", () => {
@@ -125,6 +126,23 @@ describe("daily layout", () => {
     expect(unknownReturns).toBeDefined();
     expect(unknownReturns!.y).toBeGreaterThanOrEqual(layout.zeroY);
     expect(unknownReturns!.h).toBeGreaterThan(0);
+  });
+
+  test("a known return bar with unknown-amount rows keeps a hatched stub below it", () => {
+    const layout = layoutOf([
+      day(1, [{ key: "cost", value: "100" }], { negative: "40", negativeUnknown: true }),
+      day(2, [{ key: "cost", value: "100" }], { negative: "40" }),
+      day(3, [{ key: "cost", value: "10" }], { negative: "0", negativeUnknown: true }),
+    ]);
+    const marks = layout.columns[0].marks;
+    const known = marks.find((mark) => mark.key === "negative" && mark.kind === "value")!;
+    const stub = marks.find((mark) => mark.key === "negative" && mark.kind === "unknown")!;
+    expect(stub).toBeDefined();
+    expect(stub.y).toBeGreaterThanOrEqual(known.y + known.h);
+    expect(stub.y + stub.h).toBeLessThanOrEqual(layout.top + layout.plotH + layout.belowPad + 0.0001);
+    expect(layout.columns[1].marks.some((mark) => mark.kind === "unknown")).toBe(false);
+    expect(layout.columns[2].marks.some((mark) => mark.key === "negative" && mark.kind === "unknown")).toBe(true);
+    expect(describeDay(layoutDays[0], series, money).rows.some((row) => row.unknown && row.key.startsWith("negative"))).toBe(true);
   });
 
   test("all-unknown input keeps a valid zero-only axis", () => {

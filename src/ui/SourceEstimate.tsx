@@ -6,17 +6,11 @@ import {Input} from "./components/ui/input";
 import {Button} from "./components/ui/button";
 import {Bridge,ChartFrame,DailyBars,EstimateBadge,RankBars,type ChartTable,type DailyDay} from "./charts";
 import {count} from "./overview/SourceCountCharts";
+import {dailyDay,dailySeries} from "./source-estimate-days";
 import {date,money,percent} from "./format";
 const amount=(value:string|null)=>value===null?"Bilinmiyor":money(value);
 const coverage=(value:string|null)=>value===null?"Hesaplanamıyor":percent(value);
-const dailySeries=[{key:"cost",label:"Tahmini maliyet adayı",color:"var(--viz-cost)"},{key:"contribution",label:"Tahmini katkı",color:"var(--viz-contribution)"},{key:"uncovered",label:"Maliyeti bilinmeyen satış",color:"var(--viz-sales)"}];
 const returnLabel="İade tutarı adayı (katkıya dahil değil)";
-/** Service strings pass through untouched; unknown stays null. A day without any recorded line is unknown, never zero. */
-function dailyDay(day:{date:string;totals:EstimateTotals|null}):DailyDay {
- const t=day.totals;
- if(t===null)return {date:day.date,segments:[],state:"out-of-range"};
- return {date:day.date,state:"value",segments:t.totalLines===0||t.saleCandidateLines===0?[]:[{key:"cost",value:t.candidateCost},{key:"contribution",value:t.contribution},{key:"uncovered",value:t.uncoveredSaleAmount}],...(t.returnCandidateLines>0?{negative:t.candidateReturnAmount}:{})};
-}
 export function SourceEstimate({hash,period,onProduct,active=true,presentation,heading,actions}:{presentation:"summary"|"products"|"report";active?:boolean;hash:string;period:string;heading:ReactNode;actions?:ReactNode;onProduct:(id:string,button?:HTMLButtonElement)=>void}) {
  const frame=useContext(AppFrame);
  const [loaded,setLoaded]=useState<{key:string;value:Awaited<ReturnType<typeof window.esmer.querySourceEstimate>>}>(),[offset,setOffset]=useState(0),[productId,setProductId]=useState<string|null>(null),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[loading,setLoading]=useState(true),[exporting,setExporting]=useState(false);
@@ -35,7 +29,7 @@ export function SourceEstimate({hash,period,onProduct,active=true,presentation,h
 
  const unknown=base?(()=>{const t=base.report.summary,parts=[];if(t.unknownSaleAmounts+t.unknownReturnAmounts>0)parts.push(`${count(t.unknownSaleAmounts)} satış ve ${count(t.unknownReturnAmounts)} iade adayının tutarı bilinmiyor; gösterilen tutarlar bilinen alt toplamdır.`);if(base.report.emptyDocuments>0)parts.push(`${count(base.report.emptyDocuments)} satırsız belgenin tutar etkisi bilinmiyor.`);return parts.join(" ");})():"";
  const rankRows=base?base.ranking.map(row=>({id:row.productId,label:`Ürün #${row.productId}`,value:row.contribution,detail:`Maliyet kapsamı ${coverage(row.costCoveragePercent)}`,onSelect:()=>onProduct(row.productId,document.activeElement instanceof HTMLButtonElement?document.activeElement:undefined)})):[];
- const dailyTable:ChartTable|undefined=base?{caption:"Günlük tahminler",columns:[{label:"Tarih"},{label:"Satış tutarı adayı",numeric:true},{label:"Kapsanan satış adayı",numeric:true},{label:"Maliyet adayı",numeric:true},{label:"Kapsanan katkı",numeric:true},{label:"Maliyeti bilinmeyen satış",numeric:true},{label:"İade tutarı adayı",numeric:true},{label:"Kapsanan / tüm satırlar"}],rows:base.report.days.map(d=>{const t=d.totals;return t?[date(d.date),amount(t.candidateSaleAmount),amount(t.coveredSaleAmount),amount(t.candidateCost),amount(t.contribution),amount(t.uncoveredSaleAmount),amount(t.candidateReturnAmount),`${t.coveredLines} / ${t.totalLines}`]:[date(d.date),...Array.from({length:6},()=>"Kapsam dışı"),"Kapsam dışı"];})}:undefined;
+ const dailyTable:ChartTable|undefined=base?{caption:"Günlük tahminler",columns:[{label:"Tarih"},{label:"Satış tutarı adayı",numeric:true},{label:"Kapsanan satış adayı",numeric:true},{label:"Maliyet adayı",numeric:true},{label:"Kapsanan katkı",numeric:true},{label:"Maliyeti bilinmeyen satış",numeric:true},{label:"İade tutarı adayı",numeric:true},{label:"Kapsanan / tüm satırlar"},{label:"Tutarı bilinmeyen satır",numeric:true}],rows:base.report.days.map(d=>{const t=d.totals;return t?[date(d.date),amount(t.candidateSaleAmount),amount(t.coveredSaleAmount),amount(t.candidateCost),amount(t.contribution),amount(t.uncoveredSaleAmount),amount(t.candidateReturnAmount),`${t.coveredLines} / ${t.totalLines}`,count(t.unknownSaleAmounts+t.unknownReturnAmounts)]:[date(d.date),...Array.from({length:8},()=>"Kapsam dışı")];})}:undefined;
  const summary=base?.report.summary;
  const kpis=summary&&<div className="est-kpis">
   <article className="metric est-hero"><h3>Tahmini satış katkısı (kapsanan satırlar)</h3><strong>{amount(summary.contribution)}</strong><p>yalnız maliyeti bilinen satırlar · giderler dahil değil</p></article>
@@ -43,7 +37,7 @@ export function SourceEstimate({hash,period,onProduct,active=true,presentation,h
   <article className="metric"><h3>Maliyet kapsamı</h3><strong>{coverage(summary.costCoveragePercent)}</strong><p>{count(summary.coveredLines)} / {count(summary.totalLines)} satır</p></article>
   <article className="metric"><h3>İade tutarı adayı</h3><strong>{amount(summary.candidateReturnAmount)}</strong><p>katkıya dahil değil — sonucu yüksek gösterebilir</p></article>
  </div>;
- const dailyChart=base&&dailyTable&&<ChartFrame className="est-chart" headingLevel="h2" title={presentation==="report"?"Günlük tahminler":"Günlük tahmini katkı"} summary="Kapsam dışı günler boşluktur; boş günler satış yapılmadığını göstermez." legend={[...dailySeries.map(item=>({key:item.key,label:item.label,color:item.color})),{key:"return",label:returnLabel,color:"var(--viz-negative)"}]} table={dailyTable}>
+ const dailyChart=base&&dailyTable&&<ChartFrame className="est-chart" headingLevel="h2" title={presentation==="report"?"Günlük tahminler":"Günlük tahmini katkı"} summary="Kapsam dışı günler boşluktur; boş günler satış yapılmadığını göstermez." legend={[...dailySeries.filter(item=>item.key!=="unknownAmount").map(item=>({key:item.key,label:item.label,color:item.color})),{key:"return",label:returnLabel,color:"var(--viz-negative)"},{key:"unknown",label:"Tutarı bilinmeyen satır (taralı)",color:"unknown"}]} table={dailyTable}>
   <DailyBars period={period} days={base.report.days.map(dailyDay)} series={dailySeries} formatValue={money} negativeLabel={returnLabel} plotHeight={200}/>
  </ChartFrame>;
  const rankChart=base&&<ChartFrame className="est-chart" headingLevel="h2" title={presentation==="products"?"Ürünlere göre tahmini satış katkısı":"En yüksek katkılı ürünler"} summary={presentation==="products"?"İlk 10 ürün · yalnız kapsanan satırlar. Katkı iadeleri içermez, sonucu yüksek gösterebilir. Ürün seçimi kaynak belgelerini açar.":"İlk 10 ürün · yalnız kapsanan satırlar. Ürün seçimi kaynak belgelerini açar."}>

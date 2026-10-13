@@ -71,6 +71,8 @@ export type DailyDay = {
   segments: { key: string; value: string | null }[];
   /** Magnitude drawn below the baseline (returns). null means unknown, undefined means none. */
   negative?: string | null;
+  /** Some rows behind the day have an unknown return amount: a known `negative` is then only a subtotal, so a hatched stub follows it. */
+  negativeUnknown?: boolean;
   state: DailyState;
 };
 export type DailySeries = { key: string; label: string; color: string };
@@ -132,7 +134,7 @@ function partsOf(day: DailyDay | undefined, seriesKeys: string[]): DayParts {
     if (value > 0) positives.push({ key, value });
     else if (value < 0) negatives.push({ key, value: -value });
   }
-  let unknownBelow = false;
+  let unknownBelow = day.negativeUnknown === true;
   if (day.negative === null) unknownBelow = true;
   else if (day.negative !== undefined) {
     const value = toNumber(day.negative);
@@ -150,7 +152,6 @@ export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220,
   const sum = (items: Raw[]) => items.reduce((total, item) => total + item.value, 0);
   const hi = Math.max(0, ...parts.map((part) => sum(part.positives)));
   const lo = -Math.max(0, ...parts.map((part) => sum(part.negatives)));
-  const belowPad = lo === 0 && parts.some((part) => part.unknownBelow) ? STUB + GAP : 0;
   const domain = niceTicks(lo, hi, 3);
   const left = 56;
   const right = 8;
@@ -160,6 +161,8 @@ export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220,
   const span = domain.max - domain.min;
   const y = (value: number) => top + ((domain.max - value) / span) * plotH;
   const zeroY = y(0);
+  /** The hatched stub under a known return bar can end below the plot; reserve room for it. */
+  const belowPad = parts.some((part) => part.unknownBelow && y(-sum(part.negatives)) + (part.negatives.length ? GAP : 0) + STUB > top + plotH + 0.0001) ? STUB + GAP : 0;
   const colW = plotW / dates.length;
   const barW = Math.max(BAR_MIN, Math.min(BAR_MAX, colW - GAP));
 
@@ -230,6 +233,7 @@ export function describeDay(day: DailyDay, series: DailySeries[], formatValue: (
     const known = toNumber(day.negative) !== null;
     rows.push({ key: NEGATIVE_KEY, label: negativeLabel, color: "var(--viz-negative)", text: known ? formatValue(day.negative as string) : UNKNOWN, unknown: !known });
   }
+  if (day.negativeUnknown && toNumber(day.negative) !== null) rows.push({ key: `${NEGATIVE_KEY}-unknown`, label: `${negativeLabel} · tutarı bilinmeyen satır`, color: "unknown", text: UNKNOWN, unknown: true });
   return { heading, rows };
 }
 
