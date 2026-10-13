@@ -50,8 +50,8 @@ test("a product opened from the Özet ranking returns to Özet with focus on tha
   const ranking=page.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"});await expect(ranking).toBeVisible();
   const row=ranking.getByRole("button").first();await expect(row).toHaveAttribute("data-focus-key",/./);const key=await row.getAttribute("data-focus-key");
   await row.click();
-  await expect(page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true}).click();
+  await expect(page.getByRole("button",{name:"Özete dön",exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Özete dön",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Aylık Market Özeti",level:1})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Satışlar",level:1})).toHaveCount(0);
   await expect(page.locator(`[data-focus-key="${key}"]`)).toBeFocused();
@@ -70,7 +70,7 @@ test("a day with unknown-amount lines keeps a hatched segment and counts those r
   await estimate.locator(".est-chart").filter({hasText:"Günlük tahmini katkı"}).getByRole("button",{name:"Tablo",exact:true}).click();
   const table=estimate.getByRole("table",{name:"Günlük tahminler"});
   await expect(table.getByRole("columnheader",{name:"Tutarı bilinmeyen satır",exact:true})).toBeVisible();
-  await expect(table.getByRole("row").filter({hasText:"01.10.2025"})).toContainText("1");
+  await expect(table.getByRole("row").filter({hasText:"01.10.2025"}).getByRole("cell").last()).toHaveText("1");
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 test("private prepared estimate imports exports and restarts offline without revealing operands",async()=>{
