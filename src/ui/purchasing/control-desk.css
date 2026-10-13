@@ -14,7 +14,7 @@
 .source-purchasing-desk .table-scroll table { min-width:720px; }
 
 /* chart-led first view */
-.purchasing-control-desk{--pur-change:var(--viz-cost);--pur-slate:#5c6980;--pur-gold:#b8860b;--pur-violet:#7c4dbd}
+.purchasing-control-desk{--pur-change:var(--viz-cost);--pur-gold:#b8860b;--pur-violet:#7c4dbd}
 .purchasing-control-desk .metrics{border-top:2px solid #182644;border-bottom:1px solid #dce3ee;grid-template-columns:repeat(2,minmax(0,1fr));margin:20px 0 26px}
 .purchasing-control-desk .metric h2{font-size:12px;line-height:1.5}
 .purchasing-control-desk .metric > strong{font-size:clamp(22px,2.4vw,32px);letter-spacing:-.035em}

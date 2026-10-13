@@ -3,9 +3,13 @@ import type { CostRow } from "../../analytics/costs";
 import type { ReplacementRow } from "../../analytics/purchasing";
 import { money, percent } from "../format";
 const unit = (value: string) => value === "kg" ? "kg" : value === "piece" ? "adet" : "Bilinmiyor";
-export const reasonColors = ["var(--viz-accent-3)", "var(--viz-cost)", "var(--pur-slate)", "var(--pur-gold)", "var(--pur-violet)"];
-/** A reason keeps its colour whatever its count: the hue follows its fixed position among the reason codes. */
-export const reasonColor = (reason: string, labels: Record<string, string>) => reasonColors[Math.max(0, Object.keys(labels).indexOf(reason)) % reasonColors.length];
+const reasonOrder = ["MISSING_COST", "UNVALIDATED_COST", "UNKNOWN_UNIT", "UNKNOWN_TAX", "NEGATIVE_COST", "UNDOCUMENTED_ZERO", "RETURN_ATTRIBUTION"];
+/** Validated hues beside the covered teal; reasons past these fold into a neutral "Diğer nedenler" part. */
+const reasonPalette = ["var(--viz-accent-3)", "var(--pur-violet)", "var(--pur-gold)", "var(--viz-sales)"];
+const rank = (reason: string) => { const index = reasonOrder.indexOf(reason); return index < 0 ? reasonOrder.length : index; };
+/** Shown reasons take distinct hues in fixed reason-code order, so a colour follows the reason and never its count. */
+export const reasonColors = (reasons: string[]): Record<string, string> =>
+  Object.fromEntries(reasons.toSorted((a, b) => rank(a) - rank(b) || a.localeCompare(b)).map((reason, index) => [reason, reasonPalette[index % reasonPalette.length]]));
 const count = (value: number) => value.toLocaleString("tr-TR");
 
 /** Graph 1: line counts only (covered versus excluded by reason). No amounts are summed. */
@@ -17,12 +21,16 @@ export function CostCoverageChart({ covered, excluded, labels }: { covered: numb
     else unknown += 1;
   }
   const known = [...groups.entries()].sort((a, b) => b[1] - a[1]);
+  const shown = known.slice(0, known.length > reasonPalette.length ? reasonPalette.length - 1 : reasonPalette.length), rest = known.slice(shown.length);
+  const colors = reasonColors(shown.map(([reason]) => reason));
   const parts: CompositionPart[] = [
     { key: "covered", label: "Maliyeti kapsanan satırlar", value: covered, color: "var(--viz-contribution)" },
-    ...known.map(([reason, value]) => ({ key: reason, label: labels[reason], value, color: reasonColor(reason, labels) })),
+    ...shown.map(([reason, value]) => ({ key: reason, label: labels[reason], value, color: colors[reason] })),
+    ...(rest.length ? [{ key: "__other", label: `Diğer ${count(rest.length)} neden`, value: rest.reduce((total, [, value]) => total + value, 0), color: "var(--viz-cost)" }] : []),
     ...(unknown > 0 ? [{ key: "unknown", label: "Dışlanma nedeni bilinmiyor", value: unknown, color: "unknown" as const }] : []),
   ];
-  const table = { caption: "Maliyet kapsamı satır sayıları", columns: [{ label: "Durum veya dışlanma nedeni" }, { label: "Satır sayısı", numeric: true }], rows: parts.map(part => [part.label, count(part.value)]) };
+  const rows = [["Maliyeti kapsanan satırlar", covered], ...known.map(([reason, value]) => [labels[reason], value]), ...(unknown > 0 ? [["Dışlanma nedeni bilinmiyor", unknown]] : [])] as [string, number][];
+  const table = { caption: "Maliyet kapsamı satır sayıları", columns: [{ label: "Durum veya dışlanma nedeni" }, { label: "Satır sayısı", numeric: true }], rows: rows.map(([label, value]) => [label, count(value)]) };
   return <ChartFrame title="Maliyet kapsamı" summary="Satış satırı sayıları. Eksik maliyet sıfır sayılmaz." table={table}>
     <CompositionBar parts={parts} ariaLabel={`Maliyet kapsamı satır dağılımı: ${parts.map(part => `${part.label} ${count(part.value)}`).join(", ")}`} />
   </ChartFrame>;

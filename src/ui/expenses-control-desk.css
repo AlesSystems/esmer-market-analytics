@@ -2,7 +2,7 @@
 .expenses-workspace > nav { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 
 /* chart-led records view */
-.expenses-workspace{--exp-violet:#7c4dbd;--exp-gold:#b8860b;--exp-slate:#5c6980}
+.expenses-workspace{--exp-violet:#7c4dbd;--exp-gold:#b8860b}
 .expenses-workspace .expense-status{margin:0 0 6px;border-radius:8px}
 .expenses-workspace .expense-status > strong{font-weight:650}
 .expenses-workspace .expense-status > span{flex:1 1 220px;font-size:13px}
