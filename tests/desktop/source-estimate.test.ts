@@ -57,6 +57,22 @@ test("a product opened from the Özet ranking returns to Özet with focus on tha
   await expect(page.locator(`[data-focus-key="${key}"]`)).toBeFocused();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
+test("a day with unknown-amount lines keeps a hatched segment and counts those rows in the table twin",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"estimate-unknown-day-")),file=join(userData,"estimate.json");const s=estimateSnapshot();s.lines.push({...s.lines[0],ID:"9",TOPLAM_KDV_MATRAHI:null});await writeFile(file,estimatePackage(s));
+ const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const estimate=page.getByRole("region",{name:"Kaynak tahmini"}),chart=estimate.getByRole("group",{name:/günlük grafik/}),day=chart.locator('g[data-date="2025-10-01"]');
+  await expect(day.locator('[data-key="unknownAmount"][data-state="unknown"]')).toHaveCount(1);
+  await expect(day.locator('[data-state="value"]').first()).toBeVisible();
+  await expect(chart.locator('g[data-date="2025-10-02"] [data-key="unknownAmount"]')).toHaveCount(0);
+  await expect(estimate.locator(".viz-legend .viz-hatch").first()).toBeVisible();
+  await estimate.locator(".est-chart").filter({hasText:"Günlük tahmini katkı"}).getByRole("button",{name:"Tablo",exact:true}).click();
+  const table=estimate.getByRole("table",{name:"Günlük tahminler"});
+  await expect(table.getByRole("columnheader",{name:"Tutarı bilinmeyen satır",exact:true})).toBeVisible();
+  await expect(table.getByRole("row").filter({hasText:"01.10.2025"})).toContainText("1");
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
 test("private prepared estimate imports exports and restarts offline without revealing operands",async()=>{
  const {ESMER_ESTIMATE_PACKAGE:packagePath,ESMER_ESTIMATE_EXPECTED:expectedPath,ESMER_ESTIMATE_EXPORT:exportPath}=process.env;
  test.skip(!packagePath||!expectedPath||!exportPath,"Private package, expectation and export opt-in required");
