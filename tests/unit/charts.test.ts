@@ -268,6 +268,13 @@ describe("rendering", () => {
     const markup = renderToStaticMarkup(h(DailyBars, { period: "2026-10", days, series, formatValue: money }));
     expect(markup.match(/class="viz-zero-marker"/g)).toHaveLength(1);
   });
+  test("count charts can replace the currency tick labels", () => {
+    const days = [day(1, [{ key: "cost", value: "1200" }, { key: "contribution", value: "300" }])];
+    const layout = dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width: 720, formatTick: (n) => n.toLocaleString("tr-TR") });
+    expect(layout.ticks.map((tick) => tick.label).join(" ")).not.toContain("₺");
+    expect(dailyLayout({ period: "2026-10", days, seriesKeys: ["cost"], width: 720 }).ticks.some((tick) => tick.label.includes("₺"))).toBe(true);
+    expect(renderToStaticMarkup(h(DailyBars, { period: "2026-10", days, series, formatValue: money, formatTick: String }))).not.toMatch(/class="viz-tick"[^>]*>[^<]*₺/);
+  });
   test("DailyBars summarises counts when no aria label is passed and shows caller empty text", () => {
     const markup = renderToStaticMarkup(h(DailyBars, {
       period: "2026-10", days: [day(1, [{ key: "cost", value: "10" }]), day(2, [], { state: "unknown" })], series, formatValue: money,

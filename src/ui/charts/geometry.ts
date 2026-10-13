@@ -104,7 +104,7 @@ export type DailyLayout = {
   ticks: { value: number; y: number; label: string }[];
   columns: DailyColumn[];
 };
-type DailyInput = { period: string; days: DailyDay[]; seriesKeys: string[]; width: number; plotHeight?: number };
+type DailyInput = { period: string; days: DailyDay[]; seriesKeys: string[]; width: number; plotHeight?: number; formatTick?: (value: number) => string };
 
 export const monthDates = (period: string): string[] => {
   const [year, month] = period.split("-").map(Number);
@@ -143,7 +143,7 @@ function partsOf(day: DailyDay | undefined, seriesKeys: string[]): DayParts {
   return { state: "value", positives, negatives, unknownTop, unknownBelow };
 }
 
-export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220 }: DailyInput): DailyLayout {
+export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220, formatTick = compactMoney }: DailyInput): DailyLayout {
   const dates = monthDates(period);
   const byDate = new Map(days.map((day) => [day.date, day]));
   const parts = dates.map((value) => partsOf(byDate.get(value), seriesKeys));
@@ -205,7 +205,7 @@ export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220 
   return {
     width, left, top, plotW, plotH, zeroY, belowPad, columns,
     height: top + plotH + belowPad + 26,
-    ticks: domain.ticks.map((tick) => ({ value: tick, y: y(tick), label: compactMoney(tick) })),
+    ticks: domain.ticks.map((tick) => ({ value: tick, y: y(tick), label: formatTick(tick) })),
   };
 }
 
