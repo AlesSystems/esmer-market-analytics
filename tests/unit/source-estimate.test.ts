@@ -42,3 +42,37 @@ test("hash-pinned requests are exact, bounded and never return replaced values",
  for(const v of [{...q,offset:-1},{...q,sql:"SELECT"},{...q,period:"2025-13"},{...q,view:"arbitrary"}])expect(validEstimateRequest(v)).toBe(false);
  expect(querySourceEstimate(estimateParsed(),"b".repeat(64),q)).toMatchObject({status:"source-unavailable",code:"SOURCE_CHANGED"});
 });
+test("ranking lists top 10 products by decimal contribution, excludes unknown, ties by numeric productId, in every view",()=>{
+ const s=estimateSnapshot(),l=s.lines[0];s.lines=[];
+ const add=(productId:string,amount:string,cost:string|null)=>s.lines.push({...l,ID:String(s.lines.length+10),STOK:productId,MIKTAR_FIS:"1",TOPLAM_KDV_MATRAHI:amount,BELGE_TARIHINDEKI_SON_ALIS_FIYATI:cost});
+ add("10","20.5","10");add("9","20.5","10");add("3","9.75","0");add("3","10","0.25");add("1","5",null);add("21","1","6");
+ for(let i=1;i<=10;i++)add(String(10+i),String(i+1),"1");
+ const expectedIds=["9","10","20","3","19","18","17","16","15","14"];
+ for(const view of ["summary","products","evidence"] as const){
+  const r=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view,offset:0,productId:null});
+  if(r.status!=="source-estimate")throw Error("missing");
+  expect(r.ranking.map(p=>p.productId)).toEqual(expectedIds);
+  expect(r.ranking[0]).toEqual({productId:"9",coveredSaleAmount:"20.5",contribution:"10.5",candidateSaleAmount:"20.5",candidateReturnAmount:null,uncoveredSaleAmount:"0",costCoveragePercent:"100.00"});
+ }
+ const r=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view:"summary",offset:0,productId:null});
+ if(r.status!=="source-estimate")throw Error("missing");
+ expect(r.ranking.map(p=>p.contribution)).toEqual(["10.5","10.5","10","9.75","9","8","7","6","5","4"]);
+ expect(r.ranking.every(p=>p.productId!=="1"&&p.productId!=="21")).toBe(true);
+});
+test("ranking is empty when no product has covered lines and keeps negative contributions ordered numerically",()=>{
+ const s=estimateSnapshot();s.lines[0].BELGE_TARIHINDEKI_SON_ALIS_FIYATI=null;
+ const q={hash,period:"2025-10",view:"summary" as const,offset:0,productId:null};
+ const empty=querySourceEstimate(estimateParsed(s),hash,q);if(empty.status!=="source-estimate")throw Error("missing");expect(empty.ranking).toEqual([]);
+ const t=estimateSnapshot(),l=t.lines[0];t.lines=[{...l,ID:"20",STOK:"2",TOPLAM_KDV_MATRAHI:"1",BELGE_TARIHINDEKI_SON_ALIS_FIYATI:"11"},{...l,ID:"21",STOK:"3",TOPLAM_KDV_MATRAHI:"1",BELGE_TARIHINDEKI_SON_ALIS_FIYATI:"2"}];
+ const r=querySourceEstimate(estimateParsed(t),hash,q);if(r.status!=="source-estimate")throw Error("missing");expect(r.ranking.map(p=>[p.productId,p.contribution])).toEqual([["3","-3"],["2","-21"]]);
+});
+test("uncovered sale amount is candidate minus covered sale in the service for summary, days, products and ranking",()=>{
+ const s=estimateSnapshot(),l=s.lines[0];s.lines=[];
+ const add=(productId:string,amount:string|null,cost:string|null)=>s.lines.push({...l,ID:String(s.lines.length+10),STOK:productId,TOPLAM_KDV_MATRAHI:amount,BELGE_TARIHINDEKI_SON_ALIS_FIYATI:cost});
+ add("1","100","10");add("1","40.5",null);add("2","0.3",null);add("3",null,"5");
+ const r=calculateSourceEstimate(estimateParsed(s),"2025-10",hash),by=Object.fromEntries(r.products.map(p=>[p.productId,p.totals.uncoveredSaleAmount]));
+ expect(r.summary).toMatchObject({candidateSaleAmount:"140.8",coveredSaleAmount:"100",uncoveredSaleAmount:"40.8"});
+ expect(by).toEqual({"1":"40.5","2":"0.3","3":null});expect(r.days[0].totals!.uncoveredSaleAmount).toBe("40.8");expect(r.days[1].totals).toMatchObject({candidateSaleAmount:null,uncoveredSaleAmount:null});expect(r.days[12].totals).toBeNull();
+ const q=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view:"summary",offset:0,productId:null});if(q.status!=="source-estimate")throw Error("missing");
+ expect(q.ranking).toEqual([{productId:"1",coveredSaleAmount:"100",contribution:"80",candidateSaleAmount:"140.5",candidateReturnAmount:null,uncoveredSaleAmount:"40.5",costCoveragePercent:"71.17"}]);
+});
