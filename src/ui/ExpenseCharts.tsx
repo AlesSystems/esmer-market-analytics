@@ -3,8 +3,18 @@ import { classificationLabels, type ExpenseRecord, type ExpenseValue } from "../
 import { date, money } from "./format";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
 const count = (value: number) => value.toLocaleString("tr-TR");
-const palette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--exp-violet)", "var(--exp-gold)", "var(--exp-slate)"];
-const CATEGORIES = palette.length;
+/** The validated five hues. Slate (neutral) is reserved for the "Diğer" rest bucket. */
+export const categoryPalette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--exp-violet)", "var(--exp-gold)"];
+const CATEGORIES = categoryPalette.length + 1;
+/**
+ * A category keeps its colour whatever its rank: a small deterministic string hash picks the hue.
+ * Two categories can share a hue; every segment still has a direct label and a table twin.
+ */
+export const categoryColor = (name: string) => {
+  let hash = 0;
+  for (const char of name) hash = (Math.imul(hash, 31) + char.codePointAt(0)!) >>> 0;
+  return categoryPalette[hash % categoryPalette.length];
+};
 const LARGEST = 8;
 const active = (rows: ExpenseRecord[]) => rows.filter(row => !currentValue(row)?.voided);
 
@@ -16,7 +26,7 @@ export function ExpenseCategoryChart({ rows }: { rows: ExpenseRecord[] }) {
   for (const row of live) { const name = currentValue(row)?.category ?? "Eski kayıt"; groups.set(name, (groups.get(name) ?? 0) + 1); }
   const sorted = [...groups.entries()].sort((a, b) => b[1] - a[1]);
   const head = sorted.slice(0, sorted.length > CATEGORIES ? CATEGORIES - 1 : CATEGORIES), rest = sorted.slice(head.length);
-  const parts: CompositionPart[] = [...head.map(([name, value], index) => ({ key: name, label: name, value, color: palette[index] })), ...(rest.length ? [{ key: "__other", label: `Diğer ${count(rest.length)} kategori`, value: rest.reduce((total, [, value]) => total + value, 0), color: "var(--viz-cost)" }] : [])];
+  const parts: CompositionPart[] = [...head.map(([name, value]) => ({ key: name, label: name, value, color: categoryColor(name) })), ...(rest.length ? [{ key: "__other", label: `Diğer ${count(rest.length)} kategori`, value: rest.reduce((total, [, value]) => total + value, 0), color: "var(--viz-cost)" }] : [])];
   const table = { caption: "Kategoriye göre gider kaydı sayısı", columns: [{ label: "Kategori" }, { label: "Kayıt sayısı", numeric: true }], rows: sorted.map(([name, value]) => [name, count(value)]) };
   return <ChartFrame title="Kategoriye göre kayıt sayısı" summary="Tutar değil, kayıt adedi. Geri alınan kayıtlar sayılmaz." table={table}>
     <CompositionBar parts={parts} ariaLabel={`Kategoriye göre kayıt sayısı: ${parts.map(part => `${part.label} ${count(part.value)}`).join(", ")}`} />

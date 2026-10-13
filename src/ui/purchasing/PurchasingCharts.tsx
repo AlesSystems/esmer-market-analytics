@@ -3,7 +3,9 @@ import type { CostRow } from "../../analytics/costs";
 import type { ReplacementRow } from "../../analytics/purchasing";
 import { money, percent } from "../format";
 const unit = (value: string) => value === "kg" ? "kg" : value === "piece" ? "adet" : "Bilinmiyor";
-const excludedColors = ["var(--viz-accent-3)", "var(--viz-cost)", "var(--pur-slate)", "var(--pur-gold)", "var(--pur-violet)"];
+export const reasonColors = ["var(--viz-accent-3)", "var(--viz-cost)", "var(--pur-slate)", "var(--pur-gold)", "var(--pur-violet)"];
+/** A reason keeps its colour whatever its count: the hue follows its fixed position among the reason codes. */
+export const reasonColor = (reason: string, labels: Record<string, string>) => reasonColors[Math.max(0, Object.keys(labels).indexOf(reason)) % reasonColors.length];
 const count = (value: number) => value.toLocaleString("tr-TR");
 
 /** Graph 1: line counts only (covered versus excluded by reason). No amounts are summed. */
@@ -17,7 +19,7 @@ export function CostCoverageChart({ covered, excluded, labels }: { covered: numb
   const known = [...groups.entries()].sort((a, b) => b[1] - a[1]);
   const parts: CompositionPart[] = [
     { key: "covered", label: "Maliyeti kapsanan satırlar", value: covered, color: "var(--viz-contribution)" },
-    ...known.map(([reason, value], index) => ({ key: reason, label: labels[reason], value, color: excludedColors[index % excludedColors.length] })),
+    ...known.map(([reason, value]) => ({ key: reason, label: labels[reason], value, color: reasonColor(reason, labels) })),
     ...(unknown > 0 ? [{ key: "unknown", label: "Dışlanma nedeni bilinmiyor", value: unknown, color: "unknown" as const }] : []),
   ];
   const table = { caption: "Maliyet kapsamı satır sayıları", columns: [{ label: "Durum veya dışlanma nedeni" }, { label: "Satır sayısı", numeric: true }], rows: parts.map(part => [part.label, count(part.value)]) };
