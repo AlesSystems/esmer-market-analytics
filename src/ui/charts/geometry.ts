@@ -89,6 +89,8 @@ export type DailyColumn = {
   state: DailyState;
   ghost: Rect | null;
   marks: Mark[];
+  /** Known values that are all zero: drawn as a baseline marker, never as an empty or unknown column. */
+  zero: boolean;
 };
 export type DailyLayout = {
   width: number;
@@ -196,6 +198,7 @@ export function dailyLayout({ period, days, seriesKeys, width, plotHeight = 220 
       state: part.state,
       ghost: part.state === "value" ? null : { x: barX, y: top, w: barW, h: plotH },
       marks,
+      zero: part.state === "value" && marks.length === 0,
     };
   });
 

@@ -261,6 +261,13 @@ describe("rendering", () => {
     expect(markup).toContain("0 ₺");
   });
 
+  test("a known zero day gets a visible baseline marker, distinct from unknown and out-of-range days", () => {
+    const days = [day(1, [{ key: "cost", value: "0" }, { key: "contribution", value: "0.00" }]), day(2, [{ key: "cost", value: "10" }, { key: "contribution", value: "5" }]), day(3, [], { state: "unknown" })];
+    const layout = dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width: 720 });
+    expect(layout.columns.map((column) => column.zero)).toEqual([true, false, false, ...Array(28).fill(false)]);
+    const markup = renderToStaticMarkup(h(DailyBars, { period: "2026-10", days, series, formatValue: money }));
+    expect(markup.match(/class="viz-zero-marker"/g)).toHaveLength(1);
+  });
   test("DailyBars summarises counts when no aria label is passed and shows caller empty text", () => {
     const markup = renderToStaticMarkup(h(DailyBars, {
       period: "2026-10", days: [day(1, [{ key: "cost", value: "10" }]), day(2, [], { state: "unknown" })], series, formatValue: money,

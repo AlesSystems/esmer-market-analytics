@@ -112,3 +112,4 @@
 .viz-frame .viz-toggle button[aria-pressed="true"]{border:2px solid Highlight}
 .viz-estimate>summary,.viz-estimate-body{border:1px solid CanvasText}
 }
+.viz-zero-marker{fill:var(--viz-surface);stroke:var(--viz-ink);stroke-width:1.5}

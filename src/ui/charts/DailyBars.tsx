@@ -121,6 +121,7 @@ export function DailyBars({ period, days, series, formatValue, negativeLabel = "
             <g key={column.date} data-date={column.date}>
               {column.ghost && <rect className={`viz-ghost viz-ghost--${column.state}`} data-state={column.state} x={column.ghost.x} y={column.ghost.y} width={column.ghost.w} height={column.ghost.h} fill={`url(#${patternId})`} />}
               {column.marks.map((mark) => paint(mark, column.index))}
+              {column.zero && <circle className="viz-zero-marker" cx={column.cx} cy={layout.zeroY} r={3} />}
               {column.dayLabel && <text className="viz-tick" x={column.cx} y={layout.top + layout.plotH + layout.belowPad + 18} textAnchor="middle">{column.dayLabel}</text>}
             </g>
           ))}
