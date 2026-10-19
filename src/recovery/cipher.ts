@@ -34,9 +34,11 @@ export async function decryptSnapshot(source: string, target: string, key: Uint8
     aad = Buffer.concat([prefix,json]); offset = aad.length; end = size-17; tag=Buffer.alloc(16); await file.read(tag,0,16,size-16);
   } finally { await file.close(); }
   const decipher = createDecipheriv("aes-256-gcm",key,Buffer.from(header.nonce,"base64")); decipher.setAAD(aad); decipher.setAuthTag(tag);
+  const output = await open(target,"wx",0o600);
   try {
-    await pipeline(createReadStream(source,{start:offset,end}),decipher,createWriteStream(target,{flags:"wx",mode:0o600}));
-    const output=await open(target,"r+"); try { await output.sync(); } finally { await output.close(); }
+    await pipeline(createReadStream(source,{start:offset,end}),decipher,output.createWriteStream());
+    const completed=await open(target,"r+"); try { await completed.sync(); } finally { await completed.close(); }
     return header;
-  } catch(error) { await rm(target,{force:true}); throw error; }
+  } catch(error) { await output.close(); await rm(target,{force:true}); throw error; }
+  finally { await output.close(); }
 }
