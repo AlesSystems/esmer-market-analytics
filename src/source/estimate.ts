@@ -30,7 +30,7 @@ export function validEstimateRequest(value:unknown,exportOnly=false):value is Es
  const v=value as Record<string,unknown>;
  return Object.keys(v).sort().join()===(exportOnly?"hash,period":"hash,offset,period,productId,view")&&typeof v.hash==="string"&&/^[a-f0-9]{64}$/.test(v.hash)&&typeof v.period==="string"&&/^(?:19|[2-9][0-9])[0-9]{2}-(?:0[1-9]|1[0-2])$/.test(v.period)&&(exportOnly||["summary","products","evidence"].includes(String(v.view))&&Number.isSafeInteger(v.offset)&&Number(v.offset)>=0&&Number(v.offset)<=100000&&(v.productId===null||v.view==="products"&&typeof v.productId==="string"&&/^-?(?:0|[1-9][0-9]{0,18})$/.test(v.productId)));
 }
-const sum=(lines:EstimateLine[],key:"candidateSaleAmount"|"candidateReturnAmount"|"coveredSaleAmount"|"candidateCost"|"contribution")=>{const values=lines.map(l=>l[key]).filter((v):v is string=>v!==null);return values.length?values.reduce((a,v)=>a.plus(v),new D(0)).toFixed():null;};
+const sum=(lines:EstimateLine[],key:"candidateSaleAmount"|"candidateReturnAmount"|"coveredSaleAmount"|"candidateCost"|"contribution")=>{if(lines.length===1)return lines[0][key];const values=lines.map(l=>l[key]).filter((v):v is string=>v!==null);return values.length?values.reduce((a,v)=>a.plus(v),new D(0)).toFixed():null;};
 function totals(lines:EstimateLine[]):EstimateTotals {
  const candidateSaleAmount=sum(lines,"candidateSaleAmount"),candidateReturnAmount=sum(lines,"candidateReturnAmount"),coveredSaleAmount=sum(lines,"coveredSaleAmount");
  const exposure=new D(candidateSaleAmount??0).abs().plus(new D(candidateReturnAmount??0).abs());
