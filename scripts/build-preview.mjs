@@ -19,8 +19,9 @@ await cp("src/ui/assets/esmer-market-logo.png", `${output}/assets/esmer-market-l
 for (const subset of ["latin", "latin-ext"]) for (const [family,style] of [["manrope","normal"],["newsreader","italic"]]) await cp(`node_modules/@fontsource-variable/${family}/files/${family}-${subset}-wght-${style}.woff2`, `${output}/assets/${family}-${subset}-wght-${style}.woff2`);
 await writeFile(`${output}/index.html`, '<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Esmer Market · Sentetik tasarım önizlemesi</title><link rel="stylesheet" href="/style.css"></head><body><div id="root"></div><script type="module" src="/app.js"></script></body></html>');
 await mkdir(`${output}/licenses`, { recursive: true });
-const licenses = ["react", "react-dom", "scheduler", "@fontsource-variable/manrope", "@fontsource-variable/newsreader"];
-for (const name of licenses) await cp(`node_modules/${name}/LICENSE`, `${output}/licenses/${name.replaceAll("/", "-")}.txt`);
+const licenses = ["react", "react-dom", "scheduler", "@fontsource-variable/manrope", "@fontsource-variable/newsreader", "clsx", "class-variance-authority", "tailwind-merge", "decimal.js"];
+const licenseFiles = { clsx: "license", "tailwind-merge": "LICENSE.md", "decimal.js": "LICENCE.md" };
+for (const name of licenses) await cp(`node_modules/${name}/${licenseFiles[name] ?? "LICENSE"}`, `${output}/licenses/${name.replaceAll("/", "-")}.txt`);
 const files = [...licenses.map(name=>`licenses/${name.replaceAll("/", "-")}.txt`),"index.html", "app.js", "style.css", "synthetic.json", "assets/esmer-market-logo.png", ...["latin","latin-ext"].flatMap(subset=>[`assets/manrope-${subset}-wght-normal.woff2`,`assets/newsreader-${subset}-wght-italic.woff2`])];
 const manifest = await Promise.all(files.map(async path=>{const bytes=await readFile(`${output}/${path}`);return {path,bytes:bytes.length,sha256:createHash("sha256").update(bytes).digest("hex")};}));
 await writeFile(`${output}/manifest.json`, JSON.stringify({ kind: "synthetic-renderer-preview", source: "tests/helpers/rich-estimate-fixture.ts", limitations: ["No real market records", "No Electron IPC, SQLite, imports, exports or recovery", "Not Windows acceptance"], files: manifest }, null, 2));
