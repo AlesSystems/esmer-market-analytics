@@ -14,10 +14,11 @@ const returnLabel="İade tutarı adayı (katkıya dahil değil)";
 export function SourceEstimate({hash,period,onProduct,active=true,presentation,heading,actions,onLoaded}:{onLoaded?:()=>void;presentation:"summary"|"products"|"report";active?:boolean;hash:string;period:string;heading:ReactNode;actions?:ReactNode;onProduct:(id:string,button?:HTMLButtonElement)=>void}) {
  const frame=useContext(AppFrame);
  const [loaded,setLoaded]=useState<{key:string;value:Awaited<ReturnType<typeof window.esmer.querySourceEstimate>>}>(),[offset,setOffset]=useState(0),[productId,setProductId]=useState<string|null>(null),[search,setSearch]=useState(""),[message,setMessage]=useState(""),[loading,setLoading]=useState(true),[exporting,setExporting]=useState(false);
+ const [readFailed,setReadFailed]=useState(false),[retry,setRetry]=useState(0);
  const sequence=useRef(0);
  const key=JSON.stringify([hash,period,offset,productId]),queryResult=loaded?.key===key?loaded.value:null;
  useEffect(()=>{setOffset(0);setProductId(null);setSearch("");setLoaded(undefined);setMessage("");},[hash,period]);
- useEffect(()=>{if(!active||loaded?.key===key)return;const id=++sequence.current;setLoading(true);setLoaded(undefined);setMessage("");window.esmer.querySourceEstimate({hash,period,view:"products",offset,productId}).then(value=>{if(id!==sequence.current)return;setLoaded({key,value});}).catch(()=>{if(id===sequence.current)setMessage("Tahmin okunamadı.");}).finally(()=>{if(id===sequence.current)setLoading(false);});return()=>{++sequence.current;};},[hash,period,offset,productId,active,key]);
+ useEffect(()=>{if(!active||loaded?.key===key)return;const id=++sequence.current;setLoading(true);setReadFailed(false);setLoaded(undefined);setMessage("");window.esmer.querySourceEstimate({hash,period,view:"products",offset,productId}).then(value=>{if(id!==sequence.current)return;setLoaded({key,value});}).catch(()=>{if(id===sequence.current){setReadFailed(true);setMessage("Tahmin okunamadı.");}}).finally(()=>{if(id===sequence.current)setLoading(false);});return()=>{++sequence.current;};},[hash,period,offset,productId,active,key,retry]);
  async function exportReport(){const id=sequence.current;setExporting(true);setMessage("");try{const value=await window.esmer.exportSourceEstimate({hash,period});if(id!==sequence.current)return;if(value.status==="saved")setMessage("Doğrulanmamış tahmin kaydedildi.");else if(value.status!=="cancelled")setMessage(value.message);}catch{if(id===sequence.current)setMessage("Tahmin dosyası kaydedilemedi.");}finally{setExporting(false);}}
  const result=queryResult?.status==="source-estimate"?queryResult:null;
  const recovery=queryResult?.status==="source-unavailable"&&queryResult.code==="ESTIMATE_UNAVAILABLE";
@@ -49,7 +50,7 @@ export function SourceEstimate({hash,period,onProduct,active=true,presentation,h
  </ChartFrame>;
  return <section className="source-est" aria-label="Kaynak tahmini" aria-busy={loading}>
  <header className="est-head">{heading}<EstimateBadge label="Doğrulanmamış tahmin — net kâr değildir.">Birim, vergi, tamamlanma ve tarihsel maliyet anlamları doğrulanmadı. Giderler dahil değildir.</EstimateBadge><div className="est-actions">{presentation==="report"&&result&&<Button variant="outline" disabled={exporting} onClick={()=>void exportReport()}>{exporting?"Tahmin kaydediliyor…":"Tahmini Excel olarak kaydet"}</Button>}{actions}</div></header>
- {loading&&<p role="status">Tahmin yükleniyor…</p>}{queryResult&&queryResult.status!=="source-estimate"&&<p role="status">{queryResult.message}</p>}{recovery&&<><p>Tahmin için maliyet adayı içeren veri paketi seçin.</p>{frame&&<Button variant="outline" onClick={()=>frame.show("settings")}>Veri paketi içe aktarmaya git</Button>}</>}{message&&<p role="status">{message}</p>}
+ {loading&&<p role="status">Tahmin yükleniyor…</p>}{queryResult&&queryResult.status!=="source-estimate"&&<p role="status">{queryResult.message}</p>}{recovery&&<><p>Tahmin için maliyet adayı içeren veri paketi seçin.</p>{frame&&<Button variant="outline" onClick={()=>frame.show("settings")}>Veri paketi içe aktarmaya git</Button>}</>}{message&&<p role="status">{message}</p>}{readFailed&&!loading&&<Button variant="outline" onClick={()=>setRetry(value=>value+1)}>Tahmini yeniden yükle</Button>}
  {base&&<>
  {presentation!=="products"&&kpis}
  {unknown&&<p className="est-unknown">{unknown}</p>}
