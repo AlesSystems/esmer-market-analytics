@@ -54,8 +54,9 @@ const salesSeries = [{ key: "net", label: "Net satış", color: "var(--viz-sales
 const profitSeries = [{ key: "profit", label: "Kapsanan tahmini brüt kâr", color: "var(--viz-contribution)" }];
 
 export function DailyNetSales({ report }: { report: MonthlyDisplay }) {
+  const emptyDays = new Set(isV2(report) ? report.productProfit.daily.filter(day => day.status === "empty").map(day => day.date) : []);
   const days = netSalesDays(report), negative = days.some(day => day.segments.some(segment => segment.value?.startsWith("-")));
-  const table: ChartTable = { caption: "Günlük net satış", columns: [{ label: "Gün" }, { label: "Net satış", numeric: true }, { label: "Durum" }], rows: days.map(day => [date(day.date), day.state === "value" ? money(day.segments[0].value as string) : day.state === "unknown" ? "Hesaplanamıyor" : "Kapsam dışı", day.state === "value" ? (day.segments[0].value === "0" ? "İşlemsiz gün" : "Kayıtlı satış") : day.state === "unknown" ? "Kayıt kanıtı eksik" : "Yedek kapsamı dışında"]) };
+  const table: ChartTable = { caption: "Günlük net satış", columns: [{ label: "Gün" }, { label: "Net satış", numeric: true }, { label: "Durum" }], rows: days.map(day => [date(day.date), day.state === "value" ? money(day.segments[0].value as string) : day.state === "unknown" ? "Hesaplanamıyor" : "Kapsam dışı", day.state === "value" ? (emptyDays.has(day.date) ? "İşlemsiz gün" : "Kayıtlı satış") : day.state === "unknown" ? "Kayıt kanıtı eksik" : "Yedek kapsamı dışında"]) };
   return <ChartFrame title="Ay içindeki satışlar" summary={`Günlük net satış · ₺ · müşteri iadeleri dahil${negative ? " · çizginin altı negatif net satış" : ""}`} table={table} headingLevel="h2" className="c-viz c-viz-daily">
     <DailyBars period={report.context.period} days={days} series={salesSeries} formatValue={money} ariaLabel="Günlük net satış grafiği" />
   </ChartFrame>;
