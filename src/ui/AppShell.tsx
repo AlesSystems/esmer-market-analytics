@@ -30,6 +30,7 @@ export function AppShell({ destination, navigate, controls, children }: {
     return () => cancelAnimationFrame(id);
   }, [away, frame?.launchRequest, destination, children]);
   return <div className={`sales-app app-shell${destination === "monthly" && !away ? " monthly-shell" : destination && destination !== "monthly" && !away ? ` page-desk-shell${destination === "overview" ? " sales-desk-shell" : ""}` : ""}`}>
+    <button className="skip-workspace" onClick={() => body.current?.focus()}>İçeriğe geç</button>
     <div className="sidebar">
       <div className="brand"><img src="/assets/esmer-market-logo.png" alt="Esmer Market" width="459" height="110" /></div>
       <div className="sidebar-controls">{controls}</div>
@@ -50,7 +51,7 @@ export function AppShell({ destination, navigate, controls, children }: {
         </Button>
       </div>}
     </div>
-    <div className="app-body" ref={body}>
+    <div className="app-body" ref={body} tabIndex={-1}>
       <div className="workspace">
         {frame?.notices}
         <div className="workspace-content" hidden={away}>{children}</div>

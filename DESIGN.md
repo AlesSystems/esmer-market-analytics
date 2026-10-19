@@ -370,6 +370,29 @@ components:
     textColor: "{colors.warning-foreground}"
 ---
 
+## Owner workspace revision (2026-10-19)
+
+The current redesign direction is **Market ledger**: warm paper, dark olive navigation,
+brass focus accents and shallow layered surfaces. This revision supersedes the earlier
+cobalt/glazed aesthetic descriptions below; financial truth and interaction contracts remain.
+Implementation is centralized in `src/ui/owner-workspace.css`; the sidecar records its tokens.
+
+Manrope supports Turkish operational reading, with the existing Newsreader welcome accent.
+The hierarchy is owner question → covered contribution → daily movement → source evidence.
+Source estimates remain explicitly unverified. Returns excluded from contribution stay beside
+that headline; unknowns, valid zero and losses stay distinct. Quantitative marks remain 2D.
+
+Raised panels provide restrained depth without perspective distortion. Surfaces share cream
+`#f7f5ed` / `#fffef9`, olive ink `#243b32`, action `#315c45`, muted `#59685d`,
+and rules `#d8ddd0`. Dense content reflows at 1200, 800 and 500px; tables retain their
+own horizontal scroll area. A keyboard skip action reaches the workspace. Reduced motion
+and forced-colors are supported in CSS.
+
+Status: implementation draft. Wide, narrow and 200% zoom screenshots plus keyboard checks
+are required before design acceptance. Static/DOM tests do not establish visual acceptance.
+The hosted preview is synthetic and does not provide desktop source/import/backup access.
+
+
 # Design System: Esmer Market
 
 ## Selected Özet surface · Kontrol masası

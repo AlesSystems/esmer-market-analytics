@@ -1,0 +1,9 @@
+# New owner workspace and synthetic preview
+
+Issue #81. Market-ledger direction introduces cream work surfaces, olive navigation, brass accents, a unified welcome/settings/analytics palette and shallow panel depth. Chart geometry stays two-dimensional; financial source caveats remain visible. Skip-to-content moves keyboard focus into the workspace. Palette token contrast and focus DOM tests pass, but they do not prove visual layout.
+
+Build the real renderer preview with `node scripts/build-preview.mjs /workspace/shared/esmer-preview` (or a dedicated path ending in preview-dist). The service computes all example estimates from `tests/helpers/rich-estimate-fixture.ts`. A persistent Turkish banner labels every route synthetic. There are no database files, credentials, source maps, production connection operations or backend. Desktop-only operations are explained rather than simulated as successful. Output consists of index, minified renderer, CSS, synthetic JSON, local fonts/logo and third-party licenses.
+
+The manifest records every allowed output's SHA256 and byte count. Build rejects unexpected files and symlinks in the output. Negative verification with a synthetic unexpected.txt fails as required. Deploy only this exact manifest, after verifying its hashes and target approval.
+
+Status: draft, not visually accepted. Required wide/narrow and 200% zoom screenshots, keyboard traversal, chart/table interactions and route-state checks are blocked by current cloud preview access. Linux packaged Chromium also fails before UI launch because of socket policy. Vercel team access returned403; no alternate route was used to bypass denial. Do not merge this design until supported rendered verification is available. Windows/Electron release, real-source semantics and live SQL remain separate gates.
