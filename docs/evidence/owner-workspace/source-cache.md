@@ -1,0 +1,9 @@
+# Bounded source estimate query cache
+
+Issue #85. One store instance retains one validated serialized source and one calculated month. Every estimate query rereads and compares both persisted JSON and source hash. Missing/replaced/corrupt sources invalidate cached state; imports and close clear retention. The raw workspace and export paths retain independent parsing. Cached responses clone only the bounded page, report and top ranking; callers cannot mutate cached totals or source rows.
+
+Month summary and ranking always cover the whole selected month; product filters and page offsets affect only projected rows. Request validation, source-hash checks and schema checks remain before the cached calculation. Calculation policy is fixed by the running code, and the cache is never persisted across application versions.
+
+Reproduce using `scripts/benchmark-source-estimate.ts`, bundled with esbuild for Node. Synthetic only, Node 24.19.0, Linux, AMD EPYC 9V74, 9 exposed CPUs. With 99,999 lines / 3,529 products / 22.96 MB, baseline sequential pages 0/50/100 took 1843/1701/1830 ms; changed code took 1803/23/20 ms. First page is cold, later pages warm. These are local measurements, not Windows timing guarantees. Independent maximum-diversity reproduction (99,999 products) measured cold 2690 ms and warm 18/19 ms, versus baseline 2722/3388/3008 ms. First-load latency remains above 2 seconds on this Linux fixture and is an open optimization/acceptance limit.
+
+Tests compare cached and uncached full responses for page, product filter, evidence and month changes; mutate returned report/ranking/page and raw workspace output; replace source; corrupt persisted bytes while retaining the same hash; and remove the persisted source. The parsed cache is estimate-only, so raw workspace objects cannot contaminate estimates.
