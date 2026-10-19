@@ -279,7 +279,7 @@ export function bridgeLayout(steps: BridgeStep[]): { zero: number; rows: BridgeR
     if (value === null) { bars.push(null); continue; }
     if (step.kind === "minus") {
       const end: number = running ?? 0;
-      const start = end - Math.abs(value);
+      const start = end - value;
       bars.push({ from: start, to: end });
       if (running !== null) running = start;
     } else {
