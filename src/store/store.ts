@@ -1,4 +1,4 @@
-import {querySourceEstimate,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
+import {createSourceEstimateQuery,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
@@ -30,6 +30,7 @@ export function openStore(path: string, options: Options = {}) {
 }
 
 class AnalyticsStore {
+  private estimateCache?: {json:string;hash:string;query:ReturnType<typeof createSourceEstimateQuery>};
   private readonly salesEnabled: boolean;
   private readonly businessEnabled: boolean;
   constructor(private readonly db: DatabaseSync, private readonly options: Options) {
@@ -41,7 +42,7 @@ class AnalyticsStore {
     }
     db.prepare("UPDATE import_batches SET state='failed',error_code='INTERRUPTED' WHERE state IN ('staged','validated')").run();
   }
-  close() { this.db.close(); }
+  close() { this.estimateCache=undefined;this.db.close(); }
   backupTo(path: string, progress?: (info: {remainingPages: number; totalPages: number}) => void): Promise<number> { return backup(this.db, path, {progress}); }
   recoveryGeneration() {
     const row = this.db.prepare("SELECT changed,verified,last_verified_at FROM recovery_state WHERE singleton=1").get()!;
@@ -65,6 +66,7 @@ class AnalyticsStore {
         control.checkCancelled?.();
         this.db.prepare("INSERT INTO source_preview VALUES(1,?,?) ON CONFLICT(singleton) DO UPDATE SET package_json=excluded.package_json,hash=excluded.hash WHERE source_preview.hash != excluded.hash OR source_preview.package_json != excluded.package_json").run(value,digest);
         control.checkCancelled?.();
+        this.estimateCache=undefined;
         return {status: "preview-imported", hash: digest};
       });
     } catch (error) { return error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"} : {status: "failed", code: importErrorCode(error)}; }
@@ -84,8 +86,16 @@ class AnalyticsStore {
   }
   querySourceEstimate(request:EstimateRequest) {
     if(!validEstimateRequest(request))throw Error("INVALID_PAYLOAD");
-    const source=this.sourcePackage();
-    return source?querySourceEstimate(source.pkg,source.hash,request):{status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Tahmin kaynağı bulunamadı."} as const;
+    const row=this.db.prepare("SELECT package_json,hash FROM source_preview WHERE singleton=1").get();
+    if(!row){this.estimateCache=undefined;return {status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Tahmin kaynağı bulunamadı."} as const;}
+    const json=String(row.package_json),hash=String(row.hash);
+    if(this.estimateCache?.json!==json||this.estimateCache.hash!==hash){
+      this.estimateCache=undefined;
+      const pkg=readRawPackage(Buffer.from(json));
+      if(!pkg||createHash("sha256").update(json).digest("hex")!==hash)throw Error("INVALID_PACKAGE");
+      this.estimateCache={json,hash,query:createSourceEstimateQuery(pkg,hash)};
+    }
+    return this.estimateCache.query(request);
   }
   sourceEstimateForExport(request:EstimateExportRequest) {
     if(!validEstimateRequest(request,true))throw Error("INVALID_PAYLOAD");

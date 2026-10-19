@@ -71,10 +71,17 @@ export function calculateSourceEstimate(pkg:RawPackage,period:string,sourceHash:
  return {format:ESTIMATE_VERSION,calculationVersion:ESTIMATE_VERSION,quality:"unverified-estimate",sourceHash,period,from:pkg.snapshot.from,to:pkg.snapshot.to,extractedAt:pkg.snapshot.capturedAt,summary:totals(lines),emptyDocuments:[...headers.keys()].filter(id=>!used.has(id)).length,assumptions:estimateAssumptions,days:Array.from({length:last.getUTCDate()},(_,i)=>{const date=`${period}-${String(i+1).padStart(2,"0")}`;return {date,totals:date<pkg.snapshot.from||date>pkg.snapshot.to?null:totals(days.get(date)??[])};}),products:[...products].sort(([a],[b])=>BigInt(a)<BigInt(b)?-1:BigInt(a)>BigInt(b)?1:0).map(([productId,group])=>({productId,totals:totals(group)})),lines};
 }
 const rank=(products:SourceEstimate["products"]):EstimateRankingRow[]=>products.flatMap(({productId,totals:t})=>t.contribution===null?[]:[{productId,coveredSaleAmount:t.coveredSaleAmount,contribution:t.contribution,candidateSaleAmount:t.candidateSaleAmount,candidateReturnAmount:t.candidateReturnAmount,uncoveredSaleAmount:t.uncoveredSaleAmount,costCoveragePercent:t.costCoveragePercent}]).sort((a,b)=>new D(b.contribution).comparedTo(a.contribution)||(BigInt(a.productId)<BigInt(b.productId)?-1:BigInt(a.productId)>BigInt(b.productId)?1:0)).slice(0,10);
+export function createSourceEstimateQuery(pkg:RawPackage,hash:string) {
+ let cached:{period:string;estimate:SourceEstimate;ranking:EstimateRankingRow[]}|undefined;
+ return (request:EstimateRequest):EstimateResult=>{
+  if(!validEstimateRequest(request))throw Error("INVALID_PAYLOAD");
+  if(hash!==request.hash)return {status:"source-unavailable",code:"SOURCE_CHANGED",message:"Kaynak sürümü değişti. Yeni sürümü açın."};
+  if(pkg.schemaVersion!=="sql-backup-estimate-v1")return {status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Bu paket maliyet adayı içermiyor; tahmin hazırlanamadı."};
+  if(cached?.period!==request.period){const estimate=calculateSourceEstimate(pkg,request.period,hash);cached={period:request.period,estimate,ranking:rank(estimate.products)};}
+  const {products,lines,...report}=cached.estimate,rows=request.view==="products"?(request.productId===null?products:products.filter(p=>p.productId===request.productId)):request.view==="evidence"?lines:[],total=rows.length,offset=total?Math.min(request.offset,Math.floor((total-1)/50)*50):0;
+  return structuredClone({status:"source-estimate",report,ranking:cached.ranking,products:request.view==="products"?rows.slice(offset,offset+50) as SourceEstimate["products"]:[],lines:request.view==="evidence"?lines.slice(offset,offset+50):[],total,offset,view:request.view});
+ };
+}
 export function querySourceEstimate(pkg:RawPackage,hash:string,request:EstimateRequest):EstimateResult {
- if(!validEstimateRequest(request))throw Error("INVALID_PAYLOAD");
- if(hash!==request.hash)return {status:"source-unavailable",code:"SOURCE_CHANGED",message:"Kaynak sürümü değişti. Yeni sürümü açın."};
- if(pkg.schemaVersion!=="sql-backup-estimate-v1")return {status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Bu paket maliyet adayı içermiyor; tahmin hazırlanamadı."};
- const {products,lines,...report}=calculateSourceEstimate(pkg,request.period,hash),rows=request.view==="products"?(request.productId===null?products:products.filter(p=>p.productId===request.productId)):request.view==="evidence"?lines:[],total=rows.length,offset=total?Math.min(request.offset,Math.floor((total-1)/50)*50):0;
- return {status:"source-estimate",report,ranking:rank(products),products:request.view==="products"?rows.slice(offset,offset+50) as SourceEstimate["products"]:[],lines:request.view==="evidence"?lines.slice(offset,offset+50):[],total,offset,view:request.view};
+ return createSourceEstimateQuery(pkg,hash)(request);
 }
