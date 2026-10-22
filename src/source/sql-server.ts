@@ -3,7 +3,7 @@ import { MAX_BYTES, MAX_ROWS } from "./package.ts";
 
 export type SqlServerConfig = { server: string; port: number; database: string; user: string; password: string; trustServerCertificate: boolean; scope: "isolated-copy"; lineage: string; expectedDatabaseId: string; from: string; to: string };
 export type SqlRow = Record<string, string | null>;
-export type SqlSnapshot = { databaseId: string; engineVersion: string; capturedAt: string; from: string; to: string; headers: SqlRow[]; lines: SqlRow[] };
+export type SqlSnapshot = { databaseId: string; engineVersion: string; capturedAt: string; from: string; to: string; headers: SqlRow[]; lines: SqlRow[]; products?: SqlRow[] };
 const failure = (code = "SOURCE_REJECTED") => new Error(code);
 export function parseSqlServerConfig(value: unknown): SqlServerConfig {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw failure();
@@ -23,10 +23,19 @@ export function parseSqlServerConfig(value: unknown): SqlServerConfig {
 
 const headerColumns = ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM"];
 const lineColumns = ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"];
+export const productColumns = ["ID", "NAME", "CATEGORY", "UNIT"] as const;
+// Product catalogue physical names. They follow the observed FK/dictionary convention (FIS.DOVIZ_AD -> DOVIZ_AD.AD, FIS_DETAY.STOK_BIRIM -> STOK_BIRIM),
+// but STOK.AD, STOK.STOK_GRUP, STOK_GRUP.AD and STOK.STOK_BIRIM are UNVERIFIED against the private source catalog; if absent the query fails closed (SOURCE_REJECTED).
+// Only these columns may be selected (no STOK.CARI or other supplier/customer columns).
+const catalog = {product: "STOK", name: "AD", group: "STOK_GRUP", groupName: "AD", unit: "STOK_BIRIM", unitName: "AD"} as const;
+const unitName = `UPPER(LTRIM(RTRIM(u.[${catalog.unitName}])))`;
+const productSql = `SELECT TOP (256) CONVERT(varchar(20),s.ID) AS ID, CONVERT(nvarchar(200),s.[${catalog.name}]) AS NAME, CONVERT(nvarchar(200),g.[${catalog.groupName}]) AS CATEGORY, CASE WHEN u.ID IS NULL THEN NULL WHEN ${unitName} IN (N'ADET',N'AD') THEN 'adet' WHEN ${unitName} IN (N'KG',N'KILO',N'KİLO',N'KILOGRAM',N'KİLOGRAM') THEN 'kg' ELSE 'other' END AS UNIT FROM dbo.${catalog.product} s LEFT JOIN dbo.${catalog.group} g ON g.ID=s.[${catalog.group}] LEFT JOIN dbo.${catalog.unit} u ON u.ID=s.[${catalog.unit}] WHERE s.ID IN (SELECT l.STOK FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE RANGE) AND (@cursor IS NULL OR s.ID>CONVERT(bigint,@cursor)) ORDER BY s.ID`;
+const label = (v: string | null) => { const t = v?.trim(); return !t || t.length > 160 || /[\u0000-\u001f\u007f]/.test(t) ? null : t; };
+const guardTables = ["FIS", "FIS_DETAY", "DOVIZ_AD", catalog.product, catalog.group, catalog.unit];
 const guard = `IF ISNULL(IS_SRVROLEMEMBER('sysadmin'),1) <> 0 OR ISNULL(IS_MEMBER('db_owner'),1) <> 0 OR ISNULL(HAS_PERMS_BY_NAME(NULL,NULL,'CONTROL SERVER'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;
 ${["CONTROL", "ALTER", "CREATE TABLE", "EXECUTE"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
-${["FIS", "FIS_DETAY", "DOVIZ_AD"].map(t => `IF EXISTS (SELECT 1 FROM sys.fn_my_permissions('dbo.${t}','OBJECT') WHERE permission_name IN ('INSERT','UPDATE','DELETE','ALTER','CONTROL','TAKE OWNERSHIP')) THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
-${["FIS", "FIS_DETAY", "DOVIZ_AD"].flatMap(t => ["CONTROL", "ALTER", "INSERT", "UPDATE", "DELETE", "TAKE OWNERSHIP"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME('dbo.${t}','OBJECT','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`)).join("\n")}`;
+${guardTables.map(t => `IF EXISTS (SELECT 1 FROM sys.fn_my_permissions('dbo.${t}','OBJECT') WHERE permission_name IN ('INSERT','UPDATE','DELETE','ALTER','CONTROL','TAKE OWNERSHIP')) THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
+${guardTables.flatMap(t => ["CONTROL", "ALTER", "INSERT", "UPDATE", "DELETE", "TAKE OWNERSHIP"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME('dbo.${t}','OBJECT','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`)).join("\n")}`;
 const range = "f.FIS_TARIHI >= CONVERT(datetime,REPLACE(@from,'-',''),112) AND f.FIS_TARIHI < DATEADD(day,1,CONVERT(datetime,REPLACE(@to,'-',''),112))";
 
 export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSignal): Promise<SqlSnapshot> {
@@ -80,27 +89,30 @@ export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSig
     await query(guard);
     const identities = await query("SELECT CONVERT(varchar(36),database_guid) AS databaseId, CONVERT(varchar(40),SERVERPROPERTY('ProductVersion')) AS engineVersion FROM sys.database_recovery_status WHERE database_id = DB_ID()");
     if (identities.length !== 1 || !identities[0].databaseId || identities[0].databaseId.toLowerCase() !== config.expectedDatabaseId.toLowerCase()) throw failure("SOURCE_CHANGED");
-    const headers: SqlRow[] = []; const lines: SqlRow[] = [];
-    for (const stream of ["headers", "lines"] as const) {
+    const headers: SqlRow[] = []; const lines: SqlRow[] = []; const products: SqlRow[] = [];
+    for (const stream of ["headers", "lines", "products"] as const) {
       let cursor: string | null = null;
       while (true) {
         const sql = stream === "headers"
           ? `SELECT TOP (256) ${headerColumns.map(c => `CONVERT(varchar(80),f.[${c}]) AS [${c}]`).join(",")}, CONVERT(varchar(23),f.FIS_TARIHI,126) AS FIS_TARIHI, CASE WHEN d.AD='TRY' THEN 'TRY' WHEN d.AD='USD' THEN 'USD' WHEN d.ID IS NULL THEN NULL ELSE 'OTHER' END AS CURRENCY FROM dbo.FIS f LEFT JOIN dbo.DOVIZ_AD d ON d.ID=f.DOVIZ_AD WHERE ${range} AND (@cursor IS NULL OR f.ID>CONVERT(bigint,@cursor)) ORDER BY f.ID`
+          : stream === "products" ? productSql.replace("RANGE", range)
           : `SELECT TOP (256) ${lineColumns.map(c => `CONVERT(varchar(80),l.[${c}]) AS [${c}]`).join(",")} FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE ${range} AND (@cursor IS NULL OR l.ID>CONVERT(bigint,@cursor)) ORDER BY l.ID`;
         const batch = await query(sql, cursor);
-        if (headers.length + lines.length + batch.length > MAX_ROWS) throw failure();
+        if (headers.length + lines.length + products.length + batch.length > MAX_ROWS) throw failure();
         for (const row of batch) { if (!row.ID || !/^-?\d{1,19}$/.test(row.ID) || (cursor !== null && BigInt(row.ID) <= BigInt(cursor))) throw failure(); cursor = row.ID; }
-        (stream === "headers" ? headers : lines).push(...batch);
+        (stream === "headers" ? headers : stream === "lines" ? lines : products).push(...stream === "products" ? batch.map(row => ({...row, NAME: label(row.NAME), CATEGORY: label(row.CATEGORY)})) : batch);
         if (batch.length < 256) break;
       }
     }
     const ids = new Set(headers.map(row => row.ID));
     if (lines.some(row => !ids.has(row.FIS))) throw failure();
+    const stoks = new Set(lines.map(row => row.STOK));
+    if (products.some(row => !stoks.has(row.ID))) throw failure();
     await new Promise<void>((resolve, reject) => {
       rejectPending = reject;
       connection.commitTransaction(error => { rejectPending = undefined; if (stopped) reject(failure(stopped)); else if (error) reject(failure("SOURCE_REJECTED")); else resolve(); });
     });
-    return { databaseId: identities[0].databaseId, engineVersion: identities[0].engineVersion ?? "unknown", capturedAt: new Date().toISOString(), from: config.from, to: config.to, headers, lines };
+    return { databaseId: identities[0].databaseId, engineVersion: identities[0].engineVersion ?? "unknown", capturedAt: new Date().toISOString(), from: config.from, to: config.to, headers, lines, products };
   } finally {
     clearTimeout(deadline); signal?.removeEventListener("abort", abort); connection.close(); await closed;
   }
