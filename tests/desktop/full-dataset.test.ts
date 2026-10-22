@@ -12,7 +12,7 @@ const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/win-unpa
 
 async function measure(page: Page, action: string, selector: string, expected: string) {
   return page.evaluate(({ action, selector, expected }) => new Promise<number>((done, fail) => {
-    const button = [...document.querySelectorAll("button")].find(node => node.textContent?.trim() === action);
+    const button = [...document.querySelectorAll("button")].find(node => node.getClientRects().length > 0 && node.textContent?.trim() === action);
     if (!button) return fail(new Error(`Missing action ${action}`));
     const start = performance.now();
     button.click();
@@ -67,7 +67,6 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
         await expect(page.getByRole("region", { name: "İşlem detayı" })).toContainText("100,00 ₺");
         sample.ordinary.monthlyReturn = await measure(page, "Özet", "h1", "Ay bir bakışta");
         sample.ordinary.salesWarm = await measure(page, "Satışlar", ".sales-control-desk h1", "İşlemler");
-        await page.getByRole("button", { name: "Satışlara dön", exact: true }).click();
         await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
         sample.ordinary.transactionsWarm = await measure(page, "Tüm işlemleri göster", "h1", "İşlemler");
         sample.ordinary.monthlyWarm = await measure(page, "Özet", "h1", "Ay bir bakışta");
