@@ -39,3 +39,25 @@ test("persisted byte changes and deletion invalidate a warm estimate cache", () 
   db.prepare("DELETE FROM source_preview").run();expect(store.querySourceEstimate(request)).toMatchObject({code:"ESTIMATE_UNAVAILABLE"});
  } finally {db.close();store.close();rmSync(directory,{recursive:true,force:true});}
 });
+
+test("failed and cancelled replacement imports preserve warm exact totals and the last product", () => {
+ const snapshot=estimateSnapshot();snapshot.lines=Array.from({length:121},(_,i)=>({...snapshot.lines[0],ID:String(i+2),STOK:String(i+1),TOPLAM_KDV_MATRAHI:"0.3",MIKTAR_FIS:"0.1",BELGE_TARIHINDEKI_SON_ALIS_FIYATI:"0.2"}));
+ const store=openStore(":memory:");
+ try {
+  const imported=store.importSourcePreview(estimatePackage(snapshot));if(imported.status!=="preview-imported")throw Error("fixture");
+  const request:EstimateRequest={hash:imported.hash,period:"2025-10",view:"products",offset:0,productId:null};
+  const first=store.querySourceEstimate(request);expect(first.status).toBe("source-estimate");
+  expect(store.importSourcePreview(Buffer.from("{}"))).toMatchObject({status:"failed",code:"INVALID_PACKAGE"});
+  let checks=0;
+  expect(store.importSourcePreview(estimatePackage(undefined,"cancelled"),{checkCancelled(){if(++checks===3)throw Error("CANCELLED");}})).toEqual({status:"cancelled"});
+  const result=store.querySourceEstimate({...request,offset:100});
+  expect(result.status).toBe("source-estimate");
+  if(result.status!=="source-estimate")throw Error("estimate unavailable");
+  expect(result.report.sourceHash).toBe(imported.hash);
+  expect(result.report.summary).toMatchObject({totalLines:121,coveredLines:121,candidateSaleAmount:"36.3",candidateCost:"2.42",contribution:"33.88"});
+  expect(result.total).toBe(121);expect(result.products).toHaveLength(21);
+  expect(result.products.at(-1)).toMatchObject({productId:"121",totals:{candidateCost:"0.02",contribution:"0.28"}});
+  const exact=store.querySourceEstimate({...request,productId:"121"});
+  expect(exact).toMatchObject({status:"source-estimate",total:1,products:[{productId:"121",totals:{contribution:"0.28"}}]});
+ } finally {store.close();}
+});
