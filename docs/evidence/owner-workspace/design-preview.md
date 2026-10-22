@@ -6,4 +6,8 @@ Build the real renderer preview with `node scripts/build-preview.mjs /workspace/
 
 The manifest records every allowed output's SHA256 and byte count. Build rejects unexpected files and symlinks in the output. Negative verification with a synthetic unexpected.txt fails as required. Deploy only this exact manifest, after verifying its hashes and target approval.
 
-Status: draft, not visually accepted. Required wide/narrow and 200% zoom screenshots, keyboard traversal, chart/table interactions and route-state checks are blocked by current cloud preview access. Linux packaged Chromium also fails before UI launch because of socket policy. Vercel team access returned403; no alternate route was used to bypass denial. Do not merge this design until supported rendered verification is available. Windows/Electron release, real-source semantics and live SQL remain separate gates.
+Historical status on 2026-10-19: draft, not visually accepted. Required wide/narrow and 200% zoom screenshots, keyboard traversal, chart/table interactions and route-state checks are blocked by current cloud preview access. Linux packaged Chromium also fails before UI launch because of socket policy. Vercel team access returned403; no alternate route was used to bypass denial. Do not merge this design until supported rendered verification is available. Windows/Electron release, real-source semantics and live SQL remain separate gates.
+
+## 2026-10-22 superseding evidence
+
+Local packaged macOS rendering is now verified in the [acceptance receipt](2026-10-22-acceptance.md), including wide/narrow/200% zoom and keyboard traversal. This supersedes the earlier visual-review blocker. No hosted preview access or deployment is claimed.

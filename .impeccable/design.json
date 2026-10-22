@@ -3,7 +3,7 @@
   "generatedAt": "2026-10-19T00:00:00.000Z",
   "title": "Design System: Esmer Market",
   "extensions": {
-    "ownerWorkspace": {"direction": "Market ledger", "status": "draft pending rendered visual review", "canvas": "#f7f5ed", "surface": "#fffef9", "ink": "#243b32", "muted": "#59685d", "action": "#315c45", "rule": "#d8ddd0", "wash": "#e8eee0", "brass": "#a67b37", "depth": "0 10px 30px #243b3210, 0 2px 4px #243b3208", "chartPolicy": "2D, signed, unknown-safe; no perspective on quantitative marks", "implementation": "src/ui/owner-workspace.css"},
+    "ownerWorkspace": {"direction": "Market ledger", "status": "packaged macOS visually reviewed 2026-10-22; Windows acceptance separate", "canvas": "#f7f5ed", "surface": "#fffef9", "ink": "#243b32", "muted": "#59685d", "action": "#315c45", "rule": "#d8ddd0", "wash": "#e8eee0", "brass": "#a67b37", "depth": "0 10px 30px #243b3210, 0 2px 4px #243b3208", "chartPolicy": "2D, signed, unknown-safe; no perspective on quantitative marks", "implementation": "src/ui/owner-workspace.css"},
     "roundedMeta": {"welcome-panel": {"scope": "welcome", "purpose": "Shared outer panel silhouette and inline guide."}, "welcome-action": {"scope": "welcome", "purpose": "Primary \u00d6zet launch action."}},
     "colorMeta": {
       "welcome-stage": {"role": "primary", "scope": "welcome", "displayName": "Stage", "canonical": "#244fcd"},

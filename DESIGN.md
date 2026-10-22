@@ -388,8 +388,9 @@ and rules `#d8ddd0`. Dense content reflows at 1200, 800 and 500px; tables retain
 own horizontal scroll area. A keyboard skip action reaches the workspace. Reduced motion
 and forced-colors are supported in CSS.
 
-Status: implementation draft. Wide, narrow and 200% zoom screenshots plus keyboard checks
-are required before design acceptance. Static/DOM tests do not establish visual acceptance.
+Status: packaged macOS visual acceptance recorded on 2026-10-22 for wide, narrow,
+200% zoom and keyboard use. See [the acceptance receipt](docs/evidence/owner-workspace/2026-10-22-acceptance.md).
+Windows runtime and owner acceptance remain separate gates.
 The hosted preview is synthetic and does not provide desktop source/import/backup access.
 
 

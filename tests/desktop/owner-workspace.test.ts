@@ -33,11 +33,12 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
     const errors: string[] = [];
     page.on("pageerror", error => errors.push(error.message));
     const capture = async (name: string, zoom: number) => {
-      await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: "disabled" });
       if (zoom === 2) {
         const png = await app.evaluate(async ({ BrowserWindow }) =>
           (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));
         await writeFile(join(output, `${name}-native.png`), Buffer.from(png, "base64"));
+      } else {
+        await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: "disabled" });
       }
     };
     for (const size of sizes) {
