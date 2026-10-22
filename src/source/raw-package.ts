@@ -16,9 +16,14 @@ export function validSourcePreviewRequest(value: unknown): value is SourcePrevie
 }
 const hash = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
 function check(value: unknown): asserts value { if (!value) throw new Error("INVALID_PACKAGE"); }
-function keys(value: unknown, expected: readonly string[]): asserts value is Record<string, unknown> {
-  check(value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join() === [...expected].sort().join());
+const columnKeys = {headers: new Set<string>(rawColumns.headers), lines: new Set<string>(rawColumns.lines), estimate: new Set([...rawColumns.lines, "BELGE_TARIHINDEKI_SON_ALIS_FIYATI"])};
+function keys(value: unknown, expected: readonly string[] | ReadonlySet<string>): asserts value is Record<string, unknown> {
+  check(value && typeof value === "object" && !Array.isArray(value));
+  const allowed = Array.isArray(expected) ? new Set(expected) : expected as ReadonlySet<string>;
+  const actual = Object.keys(value);
+  check(actual.length === allowed.size && actual.every(key => allowed.has(key)));
 }
+
 const identity = (value: unknown) => typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(value);
 const sourceId = (value: unknown) => typeof value === "string" && /^-?(?:0|[1-9][0-9]{0,18})$/.test(value);
 const date = (value: unknown) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= "1900-01-01" && value <= "9998-12-31" && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0,10) === value;
@@ -36,7 +41,7 @@ function validate(value: unknown): asserts value is RawPackage {
   for (const stream of ["headers", "lines"] as const) {
     const ids = new Set<string>();
     for (const row of s[stream] as unknown[]) {
-      keys(row, stream === "lines" && value.schemaVersion === "sql-backup-estimate-v1" ? [...rawColumns.lines, "BELGE_TARIHINDEKI_SON_ALIS_FIYATI"] : rawColumns[stream]);
+      keys(row, stream === "lines" && value.schemaVersion === "sql-backup-estimate-v1" ? columnKeys.estimate : columnKeys[stream]);
       check(sourceId(row.ID) && !ids.has(String(row.ID)) && sourceId(row.FIS_TURU)); ids.add(String(row.ID));
       for (const [column, v] of Object.entries(row)) {
         if (column === "FIS_TARIHI") {
