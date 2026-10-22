@@ -16,6 +16,8 @@ On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issue
 
 ## Later implementation evidence
 
+The October 22 [monthly data path receipt](2026-10-22-monthly-data-path.md) records `npm run prepare:month`, the column-allowlist and multi-month import checks, and synthetic SQL Edge size and import timings. The bounds stay at 100,000 rows and 32 MiB, so about three September-sized months fit in one package ([decision](../decisions/issue-101-monthly-window.md)).
+
 The October 22 [merged-main app and CI receipt](2026-10-22-main-verification.md) records 614 passing Mac tests, the merged issue/PR inventory, and GitHub billing blocking Windows CI before execution.
 
 The October 22 [owner workspace acceptance](owner-workspace/2026-10-22-acceptance.md), [source performance receipt](source-performance-2026-10-22.md) and [monthly navigation regression](monthly-navigation-2026-10-22.md) record the follow-up to the October 19 merges.

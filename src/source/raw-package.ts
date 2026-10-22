@@ -69,7 +69,9 @@ function validate(value: unknown): asserts value is RawPackage {
 function write(snapshot: SqlSnapshot, lineage: string, extractionId: string, schemaVersion: RawPackage["schemaVersion"]): Buffer {
   const value = {schemaVersion, provenance: "isolated-sql-backup", sourceReconciled: false, lineage, extractionId, snapshot, sha256: hash({lineage, extractionId, snapshot})};
   validate(value);
-  const bytes = Buffer.from(canonical(value)); check(bytes.length <= MAX_BYTES); return bytes;
+  const bytes = Buffer.from(canonical(value));
+  if (bytes.length > MAX_BYTES) throw new Error("INVALID_PACKAGE", {cause: "SIZE_LIMIT"});
+  return bytes;
 }
 export function readRawPackage(bytes: Uint8Array): RawPackage | null {
   try {

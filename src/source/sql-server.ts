@@ -38,9 +38,23 @@ ${["CONTROL", "ALTER", "CREATE TABLE", "EXECUTE"].map(p => `IF ISNULL(HAS_PERMS_
 ${guardTables.map(t => `IF EXISTS (SELECT 1 FROM sys.fn_my_permissions('dbo.${t}','OBJECT') WHERE permission_name IN ('INSERT','UPDATE','DELETE','ALTER','CONTROL','TAKE OWNERSHIP')) THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
 ${guardTables.flatMap(t => ["CONTROL", "ALTER", "INSERT", "UPDATE", "DELETE", "TAKE OWNERSHIP"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME('dbo.${t}','OBJECT','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`)).join("\n")}`;
 const range = "f.FIS_TARIHI >= CONVERT(datetime,REPLACE(@from,'-',''),112) AND f.FIS_TARIHI < DATEADD(day,1,CONVERT(datetime,REPLACE(@to,'-',''),112))";
+const costColumn = "BELGE_TARIHINDEKI_SON_ALIS_FIYATI";
+export type ExtractOptions = { cost?: boolean };
+/** The only SQL the extractor sends. `cost` adds exactly the approved historical-cost candidate for estimate packages. */
+export function sourceQueries(options: ExtractOptions = {}) {
+  const lineSelect = [...lineColumns, ...options.cost ? [costColumn] : []];
+  return {
+    guard,
+    headers: `SELECT TOP (256) ${headerColumns.map(c => `CONVERT(varchar(80),f.[${c}]) AS [${c}]`).join(",")}, CONVERT(varchar(23),f.FIS_TARIHI,126) AS FIS_TARIHI, CASE WHEN d.AD='TRY' THEN 'TRY' WHEN d.AD='USD' THEN 'USD' WHEN d.ID IS NULL THEN NULL ELSE 'OTHER' END AS CURRENCY FROM dbo.FIS f LEFT JOIN dbo.DOVIZ_AD d ON d.ID=f.DOVIZ_AD WHERE ${range} AND (@cursor IS NULL OR f.ID>CONVERT(bigint,@cursor)) ORDER BY f.ID`,
+    lines: `SELECT TOP (256) ${lineSelect.map(c => `CONVERT(varchar(80),l.[${c}]) AS [${c}]`).join(",")} FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE ${range} AND (@cursor IS NULL OR l.ID>CONVERT(bigint,@cursor)) ORDER BY l.ID`,
+    products: productSql.replace("RANGE", range),
+  };
+}
 
-export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSignal): Promise<SqlSnapshot> {
+export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSignal, options: ExtractOptions = {}): Promise<SqlSnapshot> {
   const config = parseSqlServerConfig(input);
+  const queries = sourceQueries(options);
+  let tooLarge = false;
   if (signal?.aborted) throw failure("CANCELLED");
   const connection = new Connection({ server: config.server, authentication: { type: "default", options: { userName: config.user, password: config.password } }, options: { port: config.port, database: config.database, encrypt: true, trustServerCertificate: config.trustServerCertificate, connectTimeout: 10_000, requestTimeout: 15_000, cancelTimeout: 1000, appName: "Esmer isolated source reader" } });
   let stopped: string | undefined;
@@ -70,7 +84,7 @@ export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSig
           row[column.metadata.colName] = column.value;
         }
         bytes += Buffer.byteLength(JSON.stringify(row));
-        if (bytes > MAX_BYTES || rows.length >= 256) { stop("SOURCE_REJECTED"); return; }
+        if (bytes > MAX_BYTES || rows.length >= 256) { tooLarge ||= bytes > MAX_BYTES; stop("SOURCE_REJECTED"); return; }
         rows.push(row);
       });
       if (cursor !== undefined) {
@@ -82,24 +96,29 @@ export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSig
     });
   }
   try {
+    return await read();
+  } catch (error) {
+    // Size-bound failures keep the public SOURCE_REJECTED code; the cause lets monthly preparation choose a shorter window.
+    throw tooLarge && error instanceof Error && error.message === "SOURCE_REJECTED" ? new Error("SOURCE_REJECTED", {cause: "SIZE_LIMIT"}) : error;
+  } finally {
+    clearTimeout(deadline); signal?.removeEventListener("abort", abort); connection.close(); await closed;
+  }
+  async function read(): Promise<SqlSnapshot> {
     await new Promise<void>((resolve, reject) => { rejectPending = reject; connection.connect(error => { rejectPending = undefined; if (stopped) reject(failure(stopped)); else if (error) reject(failure("SOURCE_UNAVAILABLE")); else resolve(); }); });
     await new Promise<void>((resolve, reject) => {
       rejectPending = reject;
       connection.beginTransaction(error => { rejectPending = undefined; if (stopped) reject(failure(stopped)); else if (error) reject(failure("SOURCE_REJECTED")); else resolve(); }, "esmer_snapshot", ISOLATION_LEVEL.SERIALIZABLE);
     });
-    await query(guard);
+    await query(queries.guard);
     const identities = await query("SELECT CONVERT(varchar(36),database_guid) AS databaseId, CONVERT(varchar(40),SERVERPROPERTY('ProductVersion')) AS engineVersion FROM sys.database_recovery_status WHERE database_id = DB_ID()");
     if (identities.length !== 1 || !identities[0].databaseId || identities[0].databaseId.toLowerCase() !== config.expectedDatabaseId.toLowerCase()) throw failure("SOURCE_CHANGED");
     const headers: SqlRow[] = []; const lines: SqlRow[] = []; const products: SqlRow[] = [];
     for (const stream of ["headers", "lines", "products"] as const) {
       let cursor: string | null = null;
       while (true) {
-        const sql = stream === "headers"
-          ? `SELECT TOP (256) ${headerColumns.map(c => `CONVERT(varchar(80),f.[${c}]) AS [${c}]`).join(",")}, CONVERT(varchar(23),f.FIS_TARIHI,126) AS FIS_TARIHI, CASE WHEN d.AD='TRY' THEN 'TRY' WHEN d.AD='USD' THEN 'USD' WHEN d.ID IS NULL THEN NULL ELSE 'OTHER' END AS CURRENCY FROM dbo.FIS f LEFT JOIN dbo.DOVIZ_AD d ON d.ID=f.DOVIZ_AD WHERE ${range} AND (@cursor IS NULL OR f.ID>CONVERT(bigint,@cursor)) ORDER BY f.ID`
-          : stream === "products" ? productSql.replace("RANGE", range)
-          : `SELECT TOP (256) ${lineColumns.map(c => `CONVERT(varchar(80),l.[${c}]) AS [${c}]`).join(",")} FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE ${range} AND (@cursor IS NULL OR l.ID>CONVERT(bigint,@cursor)) ORDER BY l.ID`;
+        const sql = queries[stream];
         const batch = await query(sql, cursor);
-        if (headers.length + lines.length + products.length + batch.length > MAX_ROWS) throw failure();
+        if (headers.length + lines.length + products.length + batch.length > MAX_ROWS) { tooLarge = true; throw failure(); }
         for (const row of batch) { if (!row.ID || !/^-?\d{1,19}$/.test(row.ID) || (cursor !== null && BigInt(row.ID) <= BigInt(cursor))) throw failure(); cursor = row.ID; }
         (stream === "headers" ? headers : stream === "lines" ? lines : products).push(...stream === "products" ? batch.map(row => ({...row, NAME: label(row.NAME), CATEGORY: label(row.CATEGORY)})) : batch);
         if (batch.length < 256) break;
@@ -114,7 +133,5 @@ export async function extractSqlServer(input: SqlServerConfig, signal?: AbortSig
       connection.commitTransaction(error => { rejectPending = undefined; if (stopped) reject(failure(stopped)); else if (error) reject(failure("SOURCE_REJECTED")); else resolve(); });
     });
     return { databaseId: identities[0].databaseId, engineVersion: identities[0].engineVersion ?? "unknown", capturedAt: new Date().toISOString(), from: config.from, to: config.to, headers, lines, products };
-  } finally {
-    clearTimeout(deadline); signal?.removeEventListener("abort", abort); connection.close(); await closed;
   }
 }
