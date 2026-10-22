@@ -1,0 +1,76 @@
+{
+  "perMonth": {
+    "headers": 5508,
+    "lines": 18858,
+    "productPool": 3529
+  },
+  "node": "v24.15.0",
+  "platform": "darwin-arm64",
+  "cpu": "Apple M4 Pro",
+  "results": [
+    {
+      "requestedMonths": 1,
+      "months": 1,
+      "from": "2025-09-01",
+      "to": "2025-09-30",
+      "counts": {
+        "headers": 5508,
+        "lines": 18858,
+        "products": 3529
+      },
+      "rows": 27895,
+      "bytes": 7328994,
+      "prepareMs": 2101,
+      "importMs": 282,
+      "firstEstimateMs": 369
+    },
+    {
+      "requestedMonths": 2,
+      "months": 2,
+      "from": "2025-08-01",
+      "to": "2025-09-30",
+      "counts": {
+        "headers": 11016,
+        "lines": 37716,
+        "products": 3529
+      },
+      "rows": 52261,
+      "bytes": 14307878,
+      "prepareMs": 2553,
+      "importMs": 393,
+      "firstEstimateMs": 424
+    },
+    {
+      "requestedMonths": 3,
+      "months": 3,
+      "from": "2025-07-01",
+      "to": "2025-09-30",
+      "counts": {
+        "headers": 16524,
+        "lines": 56574,
+        "products": 3529
+      },
+      "rows": 76627,
+      "bytes": 21286762,
+      "prepareMs": 3473,
+      "importMs": 642,
+      "firstEstimateMs": 606
+    },
+    {
+      "requestedMonths": 6,
+      "months": 3,
+      "from": "2025-07-01",
+      "to": "2025-09-30",
+      "counts": {
+        "headers": 16524,
+        "lines": 56574,
+        "products": 3529
+      },
+      "rows": 76627,
+      "bytes": 21286762,
+      "prepareMs": 14141,
+      "importMs": 537,
+      "firstEstimateMs": 501
+    }
+  ]
+}
