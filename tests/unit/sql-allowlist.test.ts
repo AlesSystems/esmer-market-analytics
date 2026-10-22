@@ -19,6 +19,31 @@ function references(sql: string) {
   return {aliases, columns};
 }
 
+const outputs = {
+  headers: ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "FIS_TARIHI", "CURRENCY"],
+  lines: ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"],
+  products: ["ID", "NAME", "CATEGORY", "UNIT"],
+};
+// SQL syntax and fixed literals allowed in a select list; any other bare identifier (an unprefixed column) fails.
+const syntax = new Set(["CONVERT", "VARCHAR", "NVARCHAR", "CASE", "WHEN", "THEN", "ELSE", "END", "AS", "NULL", "IS", "IN", "LEN", "LTRIM", "RTRIM", "UPPER", "NULLIF", "N", "TRY", "USD", "OTHER", "ADET", "AD", "KG", "KILO", "KİLO", "KILOGRAM", "KİLOGRAM"]);
+function selectList(sql: string) {
+  const match = /^SELECT TOP \(256\) (.*?) FROM dbo\./s.exec(sql);
+  if (!match) throw Error("no select list");
+  const list = match[1];
+  const names = [...list.matchAll(/ AS \[?([A-Z_]+)\]?(?=,|$)/g)].map(m => m[1]);
+  const bare = list.replace(/'[^']*'/g, "").replace(/\b[a-z]\.\[?[A-Z_]+\]?/g, "").replace(/ AS \[?[A-Z_]+\]?(?=,|$)/g, "").match(/[A-ZİÜ_]{2,}|\bN\b/gu) ?? [];
+  return {names, bare: bare.filter(word => !syntax.has(word))};
+}
+
+for (const withCost of [false, true]) test(`${withCost ? "estimate" : "preview"} select lists are exactly the allowlisted outputs`, () => {
+  const queries = sourceQueries({cost: withCost});
+  for (const stream of ["headers", "lines", "products"] as const) {
+    const {names, bare} = selectList(queries[stream]);
+    expect(names).toEqual([...outputs[stream], ...withCost && stream === "lines" ? [cost] : []]);
+    expect(bare).toEqual([]);
+  }
+});
+
 for (const withCost of [false, true]) test(`${withCost ? "estimate" : "preview"} extraction selects only allowlisted columns`, () => {
   const queries = sourceQueries({cost: withCost});
   for (const sql of [queries.headers, queries.lines, queries.products]) {
