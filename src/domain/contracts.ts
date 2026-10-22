@@ -1,4 +1,5 @@
 import type {EstimateRequest,EstimateExportRequest,EstimateResult} from "../source/estimate";
+import type {MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
 import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import type { LiveStatus } from "../source/live-contracts";
@@ -39,6 +40,7 @@ export type PreferencesResult = {status: "preferences"; preferences: Preferences
 export interface DesktopApi {
   getPreferences(): Promise<PreferencesResult | RequestError>;
   setPreferences(request: PreferencesPatch): Promise<PreferencesResult | RequestError>;
+  readMonthProfit(request:MonthProfitRequest):Promise<MonthProfitResult|RequestError|{status:"unavailable";message:string}>;
   querySourceEstimate(request:EstimateRequest):Promise<EstimateResult|RequestError|{status:"unavailable";message:string}>;
   exportSourceEstimate(request:EstimateExportRequest):Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>|RequestError>;
   querySourceWorkspace(request: SourceQuery): Promise<SourceWorkspaceResult | RequestError | {status:"unavailable";message:string}>;
@@ -87,7 +89,7 @@ export interface DesktopApi {
   importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest} | {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest} | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
-export type ServiceResponse = { id: number; result: EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"readMonthProfit";payload:MonthProfitRequest}|{operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest} | {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest} | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceResponse = { id: number; result: MonthProfitResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
 
 export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };
