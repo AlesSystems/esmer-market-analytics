@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { extractSqlServer, type SqlSnapshot } from "../../src/source/sql-server";
 import { prepareSqlCandidate } from "../../src/source/sql-package";
-import { readRawPackage, writeRawEstimatePackage } from "../../src/source/raw-package";
+import { readRawPackage, writeRawEstimatePackage, writeRawPackage } from "../../src/source/raw-package";
 import { openStore } from "../../src/store/store";
 import { createLiveSqlFixture, syntheticHeader } from "../helpers/live-sql-fixture";
 
@@ -75,7 +75,7 @@ isolated("product names, categories and classified units come only from granted 
 
     const legacy: SqlSnapshot = {...snapshot};
     delete legacy.products;
-    expect(readRawPackage(writeRawEstimatePackage(legacy, "fixture:names", "names-1"))?.schemaVersion).toBe("sql-backup-estimate-v1");
+    expect(readRawPackage(writeRawPackage(legacy, "fixture:names", "names-1"))?.schemaVersion).toBe("sql-backup-preview-v1");
     const old = estimateProducts(legacy);
     expect(old.products).toHaveLength(8);
     for (const row of [...old.products, ...old.ranking]) expect(row).toMatchObject({productName: null, categoryName: null, unit: null});
