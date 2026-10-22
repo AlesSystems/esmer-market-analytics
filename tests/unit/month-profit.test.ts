@@ -3,18 +3,22 @@ import {readRawPackage,type RawPackage} from "../../src/source/raw-package";
 import type {AppRecord} from "../../src/store/revisions";
 import type {ExpenseValue} from "../../src/expenses/contracts";
 import {buildMonthProfit,type MonthProfitView} from "../../src/source/month-profit";
-import {monthProfitPackage} from "../helpers/month-profit-fixture";
+import {monthProfitPackage,monthProfitSnapshot} from "../helpers/month-profit-fixture";
+import {writeRawEstimatePackage} from "../../src/source/raw-package";
+import type {SqlSnapshot} from "../../src/source/sql-server";
 
 const hash="c".repeat(64);
 const pkg=():RawPackage=>readRawPackage(monthProfitPackage())!;
+const parse=(s:SqlSnapshot)=>readRawPackage(writeRawEstimatePackage(s,"fixture:month-profit","variant"))!;
+const fullOctober=()=>parse({...monthProfitSnapshot(),to:"2025-10-31"});
 const none={app:[] as AppRecord[],history:[] as AppRecord[]};
-function view(month:string,expenses=none):MonthProfitView{const r=buildMonthProfit(pkg(),hash,month,expenses);if(r.status!=="month-profit")throw Error(r.code);return r.view;}
+function view(month:string,expenses=none,source=pkg()):MonthProfitView{const r=buildMonthProfit(source,hash,month,expenses);if(r.status!=="month-profit")throw Error(r.code);return r.view;}
 
 test("October totals, previous month and history use literal hand-computed decimals",()=>{
  const v=view("2025-10");
- expect(v).toMatchObject({month:"2025-10",dataUntil:"2025-10-20",confidence:"estimate",source:{hash,extractedAt:"2026-09-26T00:00:00.000Z",from:"2025-08-01",to:"2025-10-20"}});
- expect(v.totals).toEqual({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",marginPct:"13.37",costKnownPct:"86.87",unknownCostSales:"50",unknownCostProducts:1,returns:"15",receipts:3,averageBasket:"160",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
- expect(v.previous).toEqual({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",marginPct:"20.00",costKnownPct:"100.00",unknownCostSales:"0",unknownCostProducts:0,returns:"0",receipts:2,averageBasket:"255",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
+ expect(v).toMatchObject({month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",confidence:"estimate",source:{hash,extractedAt:"2026-09-26T00:00:00.000Z",from:"2025-08-01",to:"2025-10-20"}});
+ expect(v.totals).toEqual({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",marginPct:"13.37",costKnownPct:"86.87",unknownCostSales:"50",unknownCostProducts:1,returns:"15",unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:3,averageBasket:"160",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"monthPartial"});
+ expect(v.previous).toEqual({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",marginPct:"20.00",costKnownPct:"100.00",unknownCostSales:"0",unknownCostProducts:0,returns:null,unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:2,averageBasket:"255",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
  expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:"20",marginPct:"20.00"},{month:"2025-09",sales:"510",grossProfit:"102",marginPct:"20.00"},{month:"2025-10",sales:"480",grossProfit:"57.5",marginPct:"13.37"}]);
 });
 
@@ -41,7 +45,7 @@ test("attention: literal thresholds and deterministic order (kind, then sales ra
 
 test("a month with no covered previous month has previous null and a one-month history",()=>{
  const v=view("2025-08");
- expect(v.previous).toBeNull();expect(v.dataUntil).toBe("2025-08-31");
+ expect(v.previous).toBeNull();expect(v.dataFrom).toBe("2025-08-01");expect(v.dataUntil).toBe("2025-08-31");
  expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:"20",marginPct:"20.00"}]);
  expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}]}]);
  expect(v.attention).toEqual([]);
@@ -59,17 +63,58 @@ const confirm=(revision:number,reviewedRevision:number):AppRecord=>({revision,ki
 const rent=expense(1,"rent",{}),labour=expense(2,"labour",{category:"Personel toplamı",classification:"labour",net:"10",tax:"0",gross:"10",taxTreatment:"non-recoverable",taxEvidence:"bordro-ozet"});
 
 test("net profit: confirmed complete month subtracts counted expenses (recoverable net, non-recoverable gross)",()=>{
- const t=view("2025-10",{app:[rent,labour,confirm(3,2)],history:[rent,labour]}).totals;
+ const t=view("2025-10",{app:[rent,labour,confirm(3,2)],history:[rent,labour]},fullOctober()).totals;
  expect(t).toMatchObject({grossProfit:"57.5",expenses:"30",expensesComplete:true,netProfit:"27.5",netProfitReason:null});
 });
 test("net profit: unconfirmed month shows expenses but withholds net",()=>{
- expect(view("2025-10",{app:[rent,labour],history:[rent,labour]}).totals).toMatchObject({expenses:"30",expensesComplete:false,netProfit:null,netProfitReason:"expensesIncomplete"});
+ expect(view("2025-10",{app:[rent,labour],history:[rent,labour]},fullOctober()).totals).toMatchObject({expenses:"30",expensesComplete:false,netProfit:null,netProfitReason:"expensesIncomplete"});
 });
 test("net profit: unknown tax treatment blocks the net figure even when confirmed",()=>{
  const unknown=expense(2,"labour",{...labour.value as ExpenseValue,taxTreatment:"unknown",taxEvidence:null});
- expect(view("2025-10",{app:[rent,unknown,confirm(3,2)],history:[rent,unknown]}).totals).toMatchObject({expenses:null,expensesComplete:true,netProfit:null,netProfitReason:"unknownTax"});
+ expect(view("2025-10",{app:[rent,unknown,confirm(3,2)],history:[rent,unknown]},fullOctober()).totals).toMatchObject({expenses:null,expensesComplete:true,netProfit:null,netProfitReason:"unknownTax"});
 });
 test("net profit: a revision after confirmation invalidates it",()=>{
  const revised=expense(4,"rent",{net:"25",tax:"4.5",gross:"29.5",replacesRevision:1,reason:"Düzeltme"});
- expect(view("2025-10",{app:[labour,confirm(3,2),revised],history:[rent,labour,revised]}).totals).toMatchObject({expenses:"35",expensesComplete:false,netProfit:null,netProfitReason:"confirmationStale"});
+ expect(view("2025-10",{app:[labour,confirm(3,2),revised],history:[rent,labour,revised]},fullOctober()).totals).toMatchObject({expenses:"35",expensesComplete:false,netProfit:null,netProfitReason:"confirmationStale"});
+});
+
+test("net profit: a month the window covers only partly withholds net even when confirmed",()=>{
+ expect(view("2025-10",{app:[rent,labour,confirm(3,2)],history:[rent,labour]}).totals).toMatchObject({grossProfit:"57.5",expenses:"30",expensesComplete:true,netProfit:null,netProfitReason:"monthPartial"});
+ const late=parse({...monthProfitSnapshot(),from:"2025-08-02",to:"2025-10-31"});
+ expect(view("2025-08",none,late)).toMatchObject({dataFrom:"2025-08-02",dataUntil:"2025-08-31",totals:{netProfitReason:"monthPartial"}});
+});
+
+test("a month without any known cost has null cost, gross profit and net (costUnknown), never zero",()=>{
+ const s=monthProfitSnapshot();for(const l of s.lines)if(l.FIS==="301")l.BELGE_TARIHINDEKI_SON_ALIS_FIYATI=null;
+ const august=expense(1,"rent-aug",{date:"2025-08-05"}),ok={app:[august,{...confirm(2,1),entityId:"expense-complete:2025-08",value:{period:"2025-08",reviewedRevision:1,complete:true,reason:"Ay tamam",evidence:"owner-review"}} as AppRecord],history:[august]};
+ const v=view("2025-08",ok,parse(s));
+ expect(v.totals).toMatchObject({sales:"100",knownCostSales:"0",cost:null,grossProfit:null,marginPct:null,unknownCostSales:"100",unknownCostProducts:1,expenses:"20",expensesComplete:true,netProfit:null,netProfitReason:"costUnknown"});
+ expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:null,marginPct:null}]);
+ expect(v.categories).toEqual([{name:"Süt ürünleri",sales:"100",grossProfit:null,marginPct:null}]);
+ expect(view("2025-09",none,parse(s)).history[0]).toEqual({month:"2025-08",sales:"100",grossProfit:null,marginPct:null});
+});
+
+test("unknown sale and return amounts are counted, and an all-unknown amount is null, not zero",()=>{
+ const s=monthProfitSnapshot();for(const l of s.lines)if(l.FIS==="301"||l.FIS==="104")l.TOPLAM_KDV_MATRAHI=null;
+ const aug=view("2025-08",none,parse(s)).totals,oct=view("2025-10",none,parse(s)).totals;
+ expect(aug).toMatchObject({sales:null,knownCostSales:"0",grossProfit:null,unknownSaleAmounts:1,unknownReturnAmounts:0,receipts:0,averageBasket:null});
+ expect(oct).toMatchObject({sales:"480",returns:null,unknownSaleAmounts:0,unknownReturnAmounts:1});
+});
+
+test("a package without the products stream has null labels and quantities and no categories",()=>{
+ const {products:_omit,...s}=monthProfitSnapshot();void _omit;
+ const v=view("2025-10",none,parse(s as SqlSnapshot));
+ expect(v.products.every(p=>p.name===null&&p.category===null&&p.unit===null&&p.quantity===null&&p.unitPrice===null&&p.unitCost===null)).toBe(true);
+ expect(v.categories).toEqual([]);
+ expect(v.products.find(p=>p.id==="1")).toMatchObject({sales:"150",grossProfit:"45",marginPct:"30.00"});
+});
+
+test("thresholds compare unrounded margins: a 1.495-point drop is not flagged, 7.995 % is under 8",()=>{
+ const s=monthProfitSnapshot();
+ for(const l of s.lines){if(l.ID==="2011")l.BELGE_TARIHINDEKI_SON_ALIS_FIYATI="13.701";if(l.ID==="1031")l.BELGE_TARIHINDEKI_SON_ALIS_FIYATI="184.01";}
+ const v=view("2025-10",none,parse(s));
+ // P1: Sep 62.99/200 = 31.495 % (shown 31.50), Oct 30 %. P4: Oct 15.99/200 = 7.995 % (shown 8.00).
+ expect(v.products.find(p=>p.id==="1")).toMatchObject({marginPct:"30.00",previousMarginPct:"31.50"});
+ expect(v.products.find(p=>p.id==="4")).toMatchObject({marginPct:"8.00"});
+ expect(v.attention).toEqual([{kind:"loss",productId:"3"},{kind:"marginDrop",productId:"5"},{kind:"lowMarginHighVolume",productId:"4"},{kind:"lowMarginHighVolume",productId:"3"},{kind:"missingCost",productId:"2"}]);
 });
