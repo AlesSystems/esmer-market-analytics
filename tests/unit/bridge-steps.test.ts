@@ -1,12 +1,12 @@
 import {describe,expect,test} from "vitest";
 import {bridgeSteps} from "../../src/ui/overview/financial-charts";
-import {sourceBridgeSteps} from "../../src/ui/source-estimate-days";
+import {monthBridgeSteps} from "../../src/ui/pages/month-summary";
+import type {MonthProfitTotals} from "../../src/source/month-profit";
 import {isZeroDecimal} from "../../src/ui/format";
 import type {MonthlyDisplay} from "../../src/reports/display";
-import type {EstimateTotals} from "../../src/source/estimate";
 
 const report=(excludedSales:string)=>({format:"monthly-report-v2",purchasing:{gross:{status:"unavailable"}},productProfit:{summary:{coveredSales:"100",coveredCost:"60",coveredGrossProfit:"40",exposures:{excludedSales,excludedReturns:"0"}}}}) as unknown as MonthlyDisplay;
-const totals=(uncoveredSaleAmount:string|null,unknownSaleAmounts=0)=>({coveredSaleAmount:"100",candidateCost:"60",contribution:"40",uncoveredSaleAmount,unknownSaleAmounts}) as unknown as EstimateTotals;
+const totals=(patch:Partial<MonthProfitTotals>={})=>({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",unknownCostSales:"50",unknownSaleAmounts:0,expenses:null,netProfit:null,...patch}) as MonthProfitTotals;
 
 describe("decimal zero check",()=>{
  test("matches decimal-string zeros only",()=>{
@@ -26,18 +26,24 @@ describe("financial bridge",()=>{
  });
 });
 
-describe("source bridge",()=>{
- test("keeps the uncovered step when unknown sale amounts hide behind a zero known subtotal",()=>{
-  const step=sourceBridgeSteps(totals("0",2)).at(-1)!;
-  expect(step).toMatchObject({kind:"unknown",value:"0"});
-  expect(step.detail).toContain("bilinen alt toplam");
+describe("month bridge",()=>{
+ test("sets unknown-cost sales aside before the known-cost base, and keeps missing expenses and net as unknown steps",()=>{
+  expect(monthBridgeSteps(totals())).toEqual([
+   {label:"Satış",value:"480",kind:"total"},
+   {label:"Maliyeti bilinmeyen satış",value:"50",kind:"unknown",detail:"kenara ayrıldı · kâra dahil değil"},
+   {label:"Maliyeti bilinen satış",value:"430",kind:"total"},
+   {label:"Mal maliyeti",value:"372.5",kind:"minus"},
+   {label:"Brüt kâr",value:"57.5",kind:"total"},
+   {label:"Giderler",value:null,kind:"minus",detail:"girilmedi"},
+   {label:"Net kâr",value:null,kind:"result",detail:"hesaplanamadı"},
+  ]);
  });
- test("omits the uncovered step when the known subtotal is a decimal zero",()=>{
-  for(const zero of ["0","0.00"])expect(sourceBridgeSteps(totals(zero)).map(step=>step.kind)).toEqual(["total","minus","result"]);
+ test("without unknown-cost sales the bridge starts at sales; known expenses and net are drawn",()=>{
+  expect(monthBridgeSteps(totals({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",unknownCostSales:"0",expenses:"30",netProfit:"72"}))).toEqual([
+   {label:"Satış",value:"510",kind:"total"},{label:"Mal maliyeti",value:"408",kind:"minus"},{label:"Brüt kâr",value:"102",kind:"total"},{label:"Giderler",value:"30",kind:"minus"},{label:"Net kâr",value:"72",kind:"result"},
+  ]);
  });
- test("keeps an unknown uncovered subtotal as a null step and a known one as a hatched amount",()=>{
-  expect(sourceBridgeSteps(totals(null)).at(-1)).toMatchObject({kind:"unknown",value:null});
-  expect(sourceBridgeSteps(totals("40.8")).at(-1)).toMatchObject({kind:"unknown",value:"40.8",detail:"maliyeti bilinmiyor · kâra dahil değil"});
-  expect(sourceBridgeSteps(totals("40.8",2)).at(-1)!.detail).toContain("bilinen alt toplam");
+ test("a zero known subtotal with unknown sale amounts still keeps the set-aside step",()=>{
+  expect(monthBridgeSteps(totals({unknownCostSales:"0",unknownSaleAmounts:2}))[1]).toMatchObject({kind:"unknown",value:"0",detail:"kenara ayrıldı · kâra dahil değil · bilinen alt toplam"});
  });
 });
