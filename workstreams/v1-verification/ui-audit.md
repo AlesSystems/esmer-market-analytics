@@ -65,7 +65,7 @@ Test the simplified controls directly rather than keeping a WebGL-failure simula
 
 Remove obsolete production scene selectors in `src/ui/overview/control-desk.css`, `src/ui/sales/sales-control-desk.css`, `src/ui/purchasing/control-desk.css`, `src/ui/expenses-control-desk.css` and `src/ui/reports/reports-control-desk.css`. Keep responsive grid changes needed by retained evidence panels and task navigation. The purchasing rail currently has a tinted rounded card while sales and reports use separators; flattening that rail reduces variation without introducing a new design system.
 
-`@react-three/fiber` and `three` remain used by `src/ui/overview/prototype/MonthObject.tsx` and prototype tooling. Do not remove their package declarations without first deciding whether prototype artifacts remain supported and checking all imports. Removing production scene entry points should remove these dependencies from the shipped renderer bundle without requiring unrelated prototype cleanup.
+`@react-three/fiber` and `three` remain used by `src/ui/overview/prototype/MonthObject.tsx` and prototype tooling. (2026-10-22: #100 removed the prototypes and both dependencies.) Do not remove their package declarations without first deciding whether prototype artifacts remain supported and checking all imports. Removing production scene entry points should remove these dependencies from the shipped renderer bundle without requiring unrelated prototype cleanup.
 
 ## Evidence and limits
 
