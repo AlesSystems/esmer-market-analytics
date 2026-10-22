@@ -26,7 +26,7 @@ test("products: missing cost stays null, loss stays negative, unit values only o
  const v=view("2025-10");
  expect(v.products.map(p=>p.id)).toEqual(["4","1","2","3","5","7"]);
  const by=Object.fromEntries(v.products.map(p=>[p.id,p]));
- expect(by["4"]).toEqual({id:"4",name:"Çay",category:null,unit:"adet",sales:"200",cost:"190",grossProfit:"10",marginPct:"5.00",previousMarginPct:"6.40",unitPrice:"200",unitCost:"190",quantity:"1",history:[{month:"2025-08",marginPct:null},{month:"2025-09",marginPct:"6.40"},{month:"2025-10",marginPct:"5.00"}]});
+ expect(by["4"]).toEqual({id:"4",name:"Çay",category:null,unit:"adet",sales:"200",cost:"190",grossProfit:"10",marginPct:"5.00",previousMarginPct:"6.40",unitPrice:"200",unitCost:"190",quantity:"1",history:[{month:"2025-08",marginPct:null},{month:"2025-09",marginPct:"6.40"},{month:"2025-10",marginPct:"5.00"}],marginChangePoints:"-1.40",unitProfit:"10",profitSharePct:"17.39",profitRank:2,flags:{loss:false,lowMargin10:true,marginDrop:false,missingCost:false}});
  expect(by["1"]).toMatchObject({sales:"150",cost:"105",grossProfit:"45",marginPct:"30.00",previousMarginPct:"31.50",unitPrice:"10",unitCost:"7",quantity:"15",history:[{month:"2025-08",marginPct:"20.00"},{month:"2025-09",marginPct:"31.50"},{month:"2025-10",marginPct:"30.00"}]});
  expect(by["2"]).toMatchObject({name:"Peynir",unit:"kg",sales:"50",cost:null,grossProfit:null,marginPct:null,previousMarginPct:"33.33",unitPrice:null,unitCost:null,quantity:null});
  expect(by["3"]).toMatchObject({sales:"40",cost:"44",grossProfit:"-4",marginPct:"-10.00",previousMarginPct:null,unitPrice:"10",unitCost:"11",quantity:"4"});
@@ -47,7 +47,7 @@ test("a month with no covered previous month has previous null and a one-month h
  const v=view("2025-08");
  expect(v.previous).toBeNull();expect(v.dataFrom).toBe("2025-08-01");expect(v.dataUntil).toBe("2025-08-31");
  expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:"20",marginPct:"20.00"}]);
- expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}]}]);
+ expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}],marginChangePoints:null,unitProfit:"2",profitSharePct:"100.00",profitRank:1,flags:{loss:false,lowMargin10:false,marginDrop:false,missingCost:false}}]);
  expect(v.attention).toEqual([]);
 });
 
@@ -142,4 +142,38 @@ test("net profit change needs both months' net profit and a positive previous ba
  const v=view("2025-10",{app:[rent,labour,sep,confirm(3,2),sepOk],history:[rent,labour,sep]},fullOctober());
  expect(v.previous).toMatchObject({netProfit:"82"});expect(v.totals).toMatchObject({netProfit:"27.5"});
  expect(v.changes).toMatchObject({netProfitPct:"-66.46"});
+});
+
+test("product card figures: margin change in points, unit profit, profit share and rank, from unrounded values",()=>{
+ const by=Object.fromEntries(view("2025-10").products.map(p=>[p.id,p]));
+ const pick=(id:string)=>{const p=by[id];return [p.marginChangePoints,p.unitProfit,p.profitSharePct,p.profitRank];};
+ // Total gross profit 57.5. P1 45/57.5 = 78.2608…; P5 6/57.5 = 10.4347…; P3 -4/57.5 = -6.9565…; P7 0.5/57.5 = 0.8695….
+ expect(pick("1")).toEqual(["-1.50","3","78.26",1]);
+ expect(pick("4")).toEqual(["-1.40","10","17.39",2]);
+ expect(pick("5")).toEqual(["-20.00","2","10.43",3]);
+ expect(pick("7")).toEqual([null,"0.5","0.87",4]);
+ expect(pick("3")).toEqual([null,"-1","-6.96",5]);
+ expect(pick("2")).toEqual([null,null,null,null]);
+});
+
+test("product filter flags: loss, margin under 10 %, margin drop and missing cost",()=>{
+ const flags=Object.fromEntries(view("2025-10").products.map(p=>[p.id,p.flags]));
+ expect(flags).toEqual({
+  "4":{loss:false,lowMargin10:true,marginDrop:false,missingCost:false},
+  "1":{loss:false,lowMargin10:false,marginDrop:true,missingCost:false},
+  "2":{loss:false,lowMargin10:false,marginDrop:false,missingCost:true},
+  "3":{loss:true,lowMargin10:true,marginDrop:false,missingCost:false},
+  "5":{loss:false,lowMargin10:false,marginDrop:true,missingCost:false},
+  "7":{loss:false,lowMargin10:true,marginDrop:false,missingCost:false},
+ });
+});
+
+test("margin change points and the 10 % flag use unrounded margins",()=>{
+ const s=monthProfitSnapshot();
+ // P1 Sep 62.99/200 = 31.495 %, Oct 30 %: change -1.495 shows as -1.50 (half up away from zero). P7 Oct cost 9.0001: 9.999 % < 10 though shown 10.00.
+ for(const l of s.lines){if(l.ID==="2011")l.BELGE_TARIHINDEKI_SON_ALIS_FIYATI="13.701";if(l.ID==="1033")l.BELGE_TARIHINDEKI_SON_ALIS_FIYATI="9.0001";}
+ const by=Object.fromEntries(view("2025-10",none,parse(s)).products.map(p=>[p.id,p]));
+ expect(by["1"].marginChangePoints).toBe("-1.50");
+ expect(by["1"].flags.marginDrop).toBe(false);
+ expect(by["7"]).toMatchObject({marginPct:"10.00",flags:{lowMargin10:true}});
 });
