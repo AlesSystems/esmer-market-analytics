@@ -5,13 +5,23 @@ export async function openSettings(page: Page) {
   await page.getByRole("heading", { name: "Ayarlar", exact: true, level: 1 }).waitFor();
 }
 
+/** Imports through Ayarlar, where the package import lives. */
 export async function importPackage(page: Page) {
-  const button = page.getByRole("button", { name: "Veri paketi içe aktar", exact: true });
-  if (!await button.isVisible()) await openSettings(page);
-  await button.click();
+  if (!await page.getByRole("heading", { name: "Ayarlar", exact: true, level: 1 }).isVisible()) await openSettings(page);
+  await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
 }
 
+/** Launch opens Bu ay directly; waits for the shell. */
 export async function openWorkspace(page: Page) {
-  await expect(page.getByRole("heading", { name: "Marketinize bir bütün olarak bakın.", level: 1 })).toBeVisible();
-  await page.getByRole("button", { name: "Özeti aç", exact: true }).click();
+  await expect(page.getByRole("navigation", { name: "Ana gezinme" })).toBeVisible();
+}
+
+export async function openSection(page: Page, name: "Bu ay" | "Ürünler" | "Giderler" | "Rapor ve Excel") {
+  await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true }).click();
+}
+
+/** Rapor ve Excel sub-views: "Aylık rapor" (reports and Excel), "Veri ve kaynak" (records and sales), "Alış belgeleri" (purchasing). */
+export async function openReportView(page: Page, name: "Aylık rapor" | "Veri ve kaynak" | "Alış belgeleri") {
+  await openSection(page, "Rapor ve Excel");
+  await page.getByRole("navigation", { name: "Rapor bölümleri" }).getByRole("button", { name, exact: true }).click();
 }

@@ -9,12 +9,12 @@ test("keyboard skip action moves focus directly into the owner workspace", async
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   const host = document.createElement("div"); document.body.append(host);
   const root = createRoot(host);
-  await act(async () => root.render(h(AppShell, { destination: "monthly", navigate: () => undefined, children: h("h1", null, "Sentetik çalışma alanı") })));
+  await act(async () => root.render(h(AppShell, { section: "month", navigate: () => undefined, children: h("h1", null, "Sentetik çalışma alanı") })));
   const skip = host.querySelector<HTMLButtonElement>(".skip-workspace")!;
   expect(skip.textContent).toBe("İçeriğe geç");
   await act(async () => skip.click());
   expect(document.activeElement).toBe(host.querySelector(".app-body"));
-  expect(host.querySelector('[aria-current="page"]')?.textContent).toBe("Özet");
+  expect(host.querySelector('[aria-current="page"]')?.textContent).toBe("Bu ay");
   await act(async () => root.unmount()); host.remove();
 });
 
