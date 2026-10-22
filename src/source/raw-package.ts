@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { canonical, MAX_BYTES, MAX_ROWS } from "./package.ts";
 import type { SqlSnapshot, SqlRow } from "./sql-server.ts";
 
+const unsafeLabel = /[\u0000-\u001f\u007f-\u009f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]/;
 export const rawColumns = {
   headers: ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "FIS_TARIHI", "CURRENCY"],
   lines: ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"],
@@ -57,7 +58,7 @@ function validate(value: unknown): asserts value is RawPackage {
   }
   if (v2) {
     const stoks = new Set((s.lines as SqlRow[]).map(row => row.STOK)), ids = new Set<string>();
-    const label = (v: unknown) => v === null || typeof v === "string" && v === v.trim() && v.length >= 1 && v.length <= 160 && !/[\u0000-\u001f\u007f]/.test(v);
+    const label = (v: unknown) => v === null || typeof v === "string" && v === v.trim() && v.length >= 1 && v.length <= 160 && !unsafeLabel.test(v);
     for (const row of s.products as unknown[]) {
       keys(row, columnKeys.products);
       check(sourceId(row.ID) && !ids.has(String(row.ID)) && stoks.has(String(row.ID)) && label(row.NAME) && label(row.CATEGORY) && (row.UNIT === null || row.UNIT === "adet" || row.UNIT === "kg" || row.UNIT === "other")); ids.add(String(row.ID));
