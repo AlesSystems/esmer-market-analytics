@@ -1,4 +1,4 @@
-import { importPackage, openWorkspace, openReportView } from "../helpers/desktop-navigation";
+import { importPackage, openWorkspace, openReportView, openSection } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -64,14 +64,20 @@ test("packaged sales workspace follows a number through product, document and so
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().click();
     await writeFile(packagePath, salesPackage(journeyRecords(), { extractionId: "sales-2" }));
     await importPackage(page);
-    // A successful import returns to Bu ay; the sales workspace then opens on the new version, never a stale pinned detail.
+    // The import returns to Bu ay; Rapor ve Excel keeps the open report pinned to the old version and says so.
     await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("status").getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
-    await openReportView(page, "Veri ve kaynak");
-    await expect(page.getByRole("heading", { name: "Satışlar", exact: true, level: 1 })).toBeVisible();
+    await openSection(page, "Rapor ve Excel");
+    await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
+    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
+    await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
+    await expect(page.locator(".sales-control-desk").getByLabel("Ürün ara")).toHaveValue("İÇME");
+    await panel.getByRole("button", { name: "Satışlara dön" }).click();
+    await page.getByRole("button", { name: "Raporu yenile" }).click();
+    const secondary = page.getByText("İşlemler ve satış dağılımı", { exact: true });
+    if (!await secondary.locator("..").evaluate(node => node.hasAttribute("open"))) await secondary.click();
+    await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toHaveCount(0);
-    await expect(page.locator(".detail-panel")).toHaveCount(0);
-    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster" }).click();
     await page.getByLabel("İşlem türü").selectOption("customer-return");
     await expect(page.getByRole("button", { name: "R001", exact: true })).toBeVisible();

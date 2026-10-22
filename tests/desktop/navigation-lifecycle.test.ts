@@ -53,16 +53,13 @@ test("retained purchasing links return to their immediate parent with technical 
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
-// Suspected regression (#103): the old sidebar kept an open purchase document across every destination.
-// ReportsPage is keyed by section, so leaving Rapor ve Excel remounts the hosted workspace and drops the detail.
-// Marked expected-to-fail so it flips once Rapor ve Excel retains its workspace across sections.
+// Rapor ve Excel stays mounted once visited, so an open purchase document survives other sections.
 test("open purchase detail survives leaving Rapor ve Excel for another section",async()=>{
- test.fail();
  const userData=await mkdtemp(join(tmpdir(),"esmer-purchase-section-")),records=businessRecords();addPurchase(records,"D1");
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Alış belgeleri");await page.getByRole("button",{name:"D1",exact:true}).click();const detail=page.getByRole("main",{name:"Alış kaynak detayı"});await expect(detail.locator("dl").first()).toContainText("D1");
-  await openSection(page,"Bu ay");await expect(page.getByRole("heading",{name:"Bu ay",level:1})).toBeVisible();await openReportView(page,"Alış belgeleri");await expect(detail.locator("dl").first()).toContainText("D1",{timeout:3000});
+  await openSection(page,"Bu ay");await expect(page.getByRole("heading",{name:"Bu ay",level:1})).toBeVisible();await openSection(page,"Rapor ve Excel");await expect(detail.locator("dl").first()).toContainText("D1",{timeout:3000});
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
