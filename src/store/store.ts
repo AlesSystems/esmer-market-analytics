@@ -115,7 +115,7 @@ class AnalyticsStore {
     if (!parsed || createHash("sha256").update(String(row.package_json)).digest("hex") !== row.hash) throw new Error("INVALID_PACKAGE");
     const {snapshot, ...rest} = parsed;
     const metadata = {schemaVersion: rest.schemaVersion, provenance: rest.provenance, sourceReconciled: rest.sourceReconciled, lineage: rest.lineage, extractionId: rest.extractionId};
-    const {headers, lines, ...source} = snapshot;
+    const {headers, lines, ...source} = snapshot; delete source.products;
     const referencedHeaders = new Set(lines.map(line => line.FIS));
     return {status: "source-preview", hash: String(row.hash), metadata: {...metadata, ...source}, counts: {headers: headers.length, lines: lines.length, emptyHeaders: headers.filter(header => !referencedHeaders.has(header.ID)).length}, stream: request.stream, offset: request.offset, total: snapshot[request.stream].length, rows: snapshot[request.stream].slice(request.offset,request.offset+50)};
   }

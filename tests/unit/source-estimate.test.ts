@@ -52,7 +52,7 @@ test("ranking lists top 10 products by decimal contribution, excludes unknown, t
   const r=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view,offset:0,productId:null});
   if(r.status!=="source-estimate")throw Error("missing");
   expect(r.ranking.map(p=>p.productId)).toEqual(expectedIds);
-  expect(r.ranking[0]).toEqual({productId:"9",coveredSaleAmount:"20.5",contribution:"10.5",candidateSaleAmount:"20.5",candidateReturnAmount:null,uncoveredSaleAmount:"0",costCoveragePercent:"100.00"});
+  expect(r.ranking[0]).toEqual({productId:"9",coveredSaleAmount:"20.5",contribution:"10.5",candidateSaleAmount:"20.5",candidateReturnAmount:null,uncoveredSaleAmount:"0",costCoveragePercent:"100.00",productName:null,categoryName:null,unit:null});
  }
  const r=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view:"summary",offset:0,productId:null});
  if(r.status!=="source-estimate")throw Error("missing");
@@ -74,5 +74,5 @@ test("uncovered sale amount is candidate minus covered sale in the service for s
  expect(r.summary).toMatchObject({candidateSaleAmount:"140.8",coveredSaleAmount:"100",uncoveredSaleAmount:"40.8"});
  expect(by).toEqual({"1":"40.5","2":"0.3","3":null});expect(r.days[0].totals!.uncoveredSaleAmount).toBe("40.8");expect(r.days[1].totals).toMatchObject({candidateSaleAmount:null,uncoveredSaleAmount:null});expect(r.days[12].totals).toBeNull();
  const q=querySourceEstimate(estimateParsed(s),hash,{hash,period:"2025-10",view:"summary",offset:0,productId:null});if(q.status!=="source-estimate")throw Error("missing");
- expect(q.ranking).toEqual([{productId:"1",coveredSaleAmount:"100",contribution:"80",candidateSaleAmount:"140.5",candidateReturnAmount:null,uncoveredSaleAmount:"40.5",costCoveragePercent:"71.17"}]);
+ expect(q.ranking).toEqual([{productId:"1",coveredSaleAmount:"100",contribution:"80",candidateSaleAmount:"140.5",candidateReturnAmount:null,uncoveredSaleAmount:"40.5",costCoveragePercent:"71.17",productName:null,categoryName:null,unit:null}]);
 });
