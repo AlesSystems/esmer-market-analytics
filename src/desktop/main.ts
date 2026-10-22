@@ -4,6 +4,7 @@ import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-pa
 import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
 import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
 import { OperationJobs } from "./jobs";
+import { createMonthlyRead } from "./monthly-read";
 import { saveReportExport } from "./report-export";
 import { atomicWriteFile } from "./atomic-file";
 import { loadPreferences, preferencesService } from "./preferences";
@@ -47,6 +48,7 @@ let restoring = false;
 let nativeRecoveryBusy = false;
 let requestId = 0;
 const jobs = new OperationJobs();
+const queryMonthly = createMonthlyRead(context => jobs.run("queryMonthly", job => requestService({operation:"queryMonthly",payload:{context},job})));
 const pending = new Map<number, (result: ServiceResponse["result"]) => void>();
 function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
@@ -215,7 +217,8 @@ app.whenReady().then(async () => {
             () => dialog.showSaveDialog(window, {title: request.operation === "exportReportProduct" ? "Seçili ürünü Excel olarak kaydet" : "Tüm ay raporunu Excel olarak kaydet", defaultPath: request.operation === "exportReportProduct" ? "Esmer-secilen-urun.xlsx" : "Esmer-aylik-rapor.xlsx", filters: [{name: "Excel çalışma kitabı", extensions: ["xlsx"]}]}),
             atomicWriteFile,
           );
-          if (request.operation === "openMonthly" || request.operation === "queryMonthly") return jobs.run(request.operation, job => requestService({...request, job}));
+          if (request.operation === "queryMonthly") return queryMonthly(request.payload.context);
+          if (request.operation === "openMonthly") return jobs.run(request.operation, job => requestService({...request, job}));
           return requestService(request);
         },
         {status: () => jobs.status(), cancel: request => jobs.cancel(request)},
