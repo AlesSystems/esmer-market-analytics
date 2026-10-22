@@ -9,6 +9,7 @@ User scope: finish open issues/PRs, merge without waiting for CI, exercise the a
 | #85 estimate paging performance | PR #94 merged; issue closed | `a9afc97e4cf1cae3013753284fbf4901347471b0` |
 | Concurrent monthly navigation reads | PR #95 merged | `de00b2871a9f19eb573fc9c3274ab1970019c9de` |
 | #81 owner workspace | PR #91 merged; issue closed | `35b0863` |
+| Windows CI configuration | PR #96 merged after independent review | `43515c0d55e1fb7da9b5b95206964894a2b70f4c` |
 
 Both implementation areas received independent standards and specification review. Final UI head `75c54c0` also resolves the evidence wording review about requested window sizes. Reviewers used the same model family. GitHub listed no open issues or PRs after these merges.
 
@@ -28,7 +29,13 @@ Skipped tests include platform-specific Windows checks, optional visual captures
 
 The repository had no workflow and no Actions runs. Windows validation is added after merged-main testing: locked dependencies, typecheck/lint, unit/integration, `package:win` with distribution verification, then the packaged Windows workflows. Actions are pinned to immutable commits, with read-only repository permission and synthetic evidence retention for 14 days. The executable override supplies the Windows binary to all existing tests. The Windows performance journey removes an obsolete detail-close click and measures visible controls only.
 
-CI execution results are pending at this receipt's initial commit. A configured workflow is not a passing Windows result. Real-source semantics, owner hardware/acceptance and production access remain separate gates.
+### Actual execution outcome
+
+Both the [PR run](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/39744081575) and [merged-main run](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/39744145621) failed before any step started. The main run targets `43515c0d55e1fb7da9b5b95206964894a2b70f4c`. Its check annotation reports failed recent account payments or a spending limit that needs increasing. This is an external GitHub billing gate, not a test failure; no passing Windows result is claimed. Account billing/spending settings must be restored before rerunning the workflow. No billing settings were changed.
+
+A local `npm run package:win` fallback built `win-unpacked` but failed at NSIS: the cached macOS `makensis` executable could not spawn (`Unknown system error -86`). Distribution verification and Windows runtime tests did not execute. The partial build is not accepted or published. This Mac tool incompatibility does not substitute for the blocked Windows runner.
+
+The code/issue work and automated Mac user-flow validation are complete. Windows CI execution remains blocked. Real-source semantics, owner hardware/acceptance and production access remain separate gates.
 
 ## Execution graph
 
@@ -42,7 +49,9 @@ CI execution results are pending at this receipt's initial commit. A configured 
 | G4 | review | G2,G3,G3a | Independent review findings resolved | completed |
 | G5 | integration | G4 | Reviewed PRs merged, issues closed | completed |
 | G6 | test | G5 | Full merged packaged app workflows pass | completed |
-| G7 | implementation/test | G6 | Windows CI configured and outcome checked | running |
-| G8 | documentation/review | G7 | Final evidence and unresolved gates reported | pending |
+| G7 | implementation/test | G6 | Windows CI configured; execution requires GitHub billing recovery | blocked |
+| G8 | documentation/review | G7 terminal outcome | Final evidence and unresolved gates reported | completed |
 
 Implementation ownership was isolated: root owned UI/integration; the worker owned performance and then navigation in separate worktrees. Benchmarks, builds and desktop tests were serialized. No shared source writes or source access occurred.
+
+G8 records the G7 external blocker rather than claiming successful Windows validation. The completion dependency was refined to permit an honest blocked handoff after all independent work was exhausted.

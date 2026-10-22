@@ -14,6 +14,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 ## Later implementation evidence
 
+The October 22 [merged-main app and CI receipt](2026-10-22-main-verification.md) records 614 passing Mac tests, the merged issue/PR inventory, and GitHub billing blocking Windows CI before execution.
+
 The October 22 [owner workspace acceptance](owner-workspace/2026-10-22-acceptance.md), [source performance receipt](source-performance-2026-10-22.md) and [monthly navigation regression](monthly-navigation-2026-10-22.md) record the follow-up to the October 19 merges.
 
 The October 13 [chart-led v1 visual receipt](2026-10-13-v1-visual.md) records shared SVG charts, a per-page limit of three graphs, the estimate ranking and synthetic before/after screenshots. Real-source profit, operating profit and Windows acceptance remain open.
