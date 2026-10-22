@@ -237,10 +237,6 @@
   .report-proof > .block { border: 0; padding: 24px 0; border-top: 1px solid var(--line); border-radius: 0; }
   .report-id, .expenses-workspace details small { overflow-wrap: anywhere; }
   .back-action { margin-bottom: 20px; }
-  .start-state { max-width: 720px; margin: 8vh auto; padding: 36px; }
-  .start-state h1 { margin-bottom: 18px; }
-  .start-state p { margin: 12px 0; }
-  .start-state button { margin: 10px 8px 8px 0; }
   .primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
   .note { font-size: 13px; }
   .app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; border-bottom: 1px solid var(--line); }
@@ -300,7 +296,6 @@
     .financial-ledger > div { grid-template-columns: minmax(0,1fr); gap: 6px; }
     .financial-ledger dd { text-align: left; }
     .detail-panel { inset: 12px; width: auto; max-width: none; }
-    .start-state { padding: 22px; }
   }
   @media (forced-colors: active) {
     .sidebar { background: Canvas; color: CanvasText; border-color: CanvasText; }

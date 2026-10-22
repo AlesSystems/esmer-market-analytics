@@ -1,4 +1,3 @@
-.sales-desk-shell :focus-visible{outline:3px solid var(--market-focus);outline-offset:3px}
 .sales-control-desk{display:block;font-variant-numeric:tabular-nums;align-items:start}
 .sales-control-desk>main,.source-sales-main{min-width:0}
 .sales-desk-body{display:grid;grid-template-columns:minmax(0,1fr);gap:30px;align-items:start}.has-detail .sales-desk-body{grid-template-columns:minmax(0,1fr) 360px}.sales-ledger{min-width:0}
@@ -24,9 +23,6 @@
 .source-sales-desk .table-scroll{max-width:100%}
 @media(max-width:1050px){.has-detail .sales-desk-body{grid-template-columns:minmax(0,1fr) 220px;gap:20px}.sales-control-desk .page-heading{align-items:start;flex-direction:column}.sales-control-desk .metric{padding:16px 9px}}
 @media(max-width:760px){.sales-desk-body,.has-detail .sales-desk-body{display:flex;flex-direction:column;gap:24px}.sales-ledger{width:100%}.sales-control-desk>main,.source-sales-main{width:100%}.sales-control-desk .metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.sales-control-desk .metric strong{font-size:19px}.sales-control-desk h1{font-size:28px}.sales-control-desk .table-scroll{overflow:auto}.sales-control-desk .search-label{width:100%}.sales-control-desk .search-label input{width:100%}}
-@media(prefers-reduced-motion:reduce){.sales-desk-shell *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-.sales-desk-shell .data-status{overflow-wrap:anywhere}
-.sales-desk-shell .workspace-content>main{min-width:0}
 .source-sales-main .table-scroll{width:100%;max-width:100%;overflow-x:auto}
 .source-sales-main .report-actions>label,.source-sales-main .source-advanced{max-width:100%}
 
