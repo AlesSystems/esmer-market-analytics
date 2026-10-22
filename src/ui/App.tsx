@@ -77,9 +77,11 @@ function App() {
     if (next === "settings" || current.current === "settings" && next === "workspace" && !after) transition(); else expenseNavigation.leave(transition);
   }, [expenseNavigation.leave]);
   const claimFocus = useCallback(() => { const pending = focusPending.current; focusPending.current = false; return pending; }, []);
-  const navigate = useCallback((next: Section, state: NavigationState = {}) => expenseNavigation.leave(() => {
+  const sectionRef = useRef<Section>("month");
+  const navigate = useCallback((next: Section, state: NavigationState = {}) => { if (next === sectionRef.current && !Object.keys(state).length) return; expenseNavigation.leave(() => {
+    sectionRef.current = next;
     setSection(next); setNavigationState(state); setLaunchRequest({ destination: next, sequence: ++launchSequence.current });
-  }), [expenseNavigation.leave]);
+  }); }, [expenseNavigation.leave]);
 
   const [availability, setAvailability] = useState<Availability | RequestError>();
   const [coverage, setCoverage] = useState<Coverage | null>(null);
@@ -103,7 +105,7 @@ function App() {
       setResolution({ status: "resolved" });
       if (selectedMonth === null && availability.store === "loaded") {
         const sales = await window.esmer.openSales({ period: null }).catch(() => undefined);
-        if (active && sales?.status === "report") selectMonth(sales.view.context.period);
+        if (active && sales?.status === "report" && monthWrite.current === 0) selectMonth(sales.view.context.period);
       }
     }).catch(() => { if (active) { setCoverage(null); setResolution({ status: "failed", message: "Kaynak kayıtları okunamadı." }); } });
     return () => { active = false; };
@@ -148,11 +150,15 @@ function App() {
   const onMonth = useCallback((month: string) => { if (validSelectedMonth(month)) expenseNavigation.leave(() => selectMonth(month)); }, [expenseNavigation.leave, selectMonth]);
   const Page = pages[section];
   // Without any data there is no latest month to pick; pages read the current month until data arrives, without remembering it.
-  const pageMonth = selectedMonth ?? (resolution.status === "resolved" && !coverage ? new Date().toISOString().slice(0, 7) : null);
-  const content = !availability ? <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>
-    : availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main>
-    : !preferencesReady ? <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>
-    : <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={availability} active={frameView === "workspace"} state={navigationState} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} />;
+  const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? new Date().toISOString().slice(0, 7) : null);
+  const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
+  if (ready) lastReady.current = ready;
+  const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
+  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
+  // A page that was open stays mounted (hidden) through a failed or pending availability refresh, so its open detail survives a retry.
+  const pageAvailability = ready ?? lastReady.current;
+  const page = preferencesReady && pageAvailability ? <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={frameView === "workspace" && !!ready} state={navigationState} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /> : undefined;
+  const content = <>{!(ready && page) && (failure ?? loading)}<div className="page-host" hidden={!(ready && page)}>{page}</div></>;
   return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>
     <AppShell section={section} navigate={navigate} controls={<label className="period-label">Dönem<Input type="month" lang="tr" value={selectedMonth ?? ""} onChange={event => onMonth(event.target.value)} /></label>}>{content}</AppShell>
   </AppFrame.Provider>;
