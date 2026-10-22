@@ -10,8 +10,9 @@ export function EmbeddedScreen({controls,children}:{destination?:Destination;nav
 }
 
 /** Hosts an older workspace and opens one of its screens; a new `sequence` re-opens it. */
-export function EmbeddedFrame({destination,sequence,children}:{destination:Destination;sequence:number;children:ReactNode}) {
+export function EmbeddedFrame({destination,sequence,active,children}:{destination:Destination;sequence:number;active:boolean;children:ReactNode}) {
  const frame=useContext(AppFrame);
- const value=useMemo(()=>frame&&{...frame,launchRequest:{destination,sequence}},[frame,destination,sequence]);
+ // While hidden behind another section the hosted workspace sees itself as away, so it starts no reads or key handlers.
+ const value=useMemo(()=>frame&&{...frame,view:active?frame.view:"settings" as const,launchRequest:{destination,sequence}},[frame,destination,sequence,active]);
  return <AppFrame.Provider value={value}>{children}</AppFrame.Provider>;
 }

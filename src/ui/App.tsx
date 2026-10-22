@@ -151,14 +151,20 @@ function App() {
   const Page = pages[section];
   // Without any data there is no latest month to pick; pages read the current month until data arrives, without remembering it.
   const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? new Date().toISOString().slice(0, 7) : null);
+  const reportsVisited = useRef(false);
+  const reportsState = useRef<NavigationState>({});
   const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
   if (ready) lastReady.current = ready;
   const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
   const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
   // A page that was open stays mounted (hidden) through a failed or pending availability refresh, so its open detail survives a retry.
   const pageAvailability = ready ?? lastReady.current;
-  const page = preferencesReady && pageAvailability ? <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={frameView === "workspace" && !!ready} state={navigationState} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /> : undefined;
-  const content = <>{!(ready && page) && (failure ?? loading)}<div className="page-host" hidden={!(ready && page)}>{page}</div></>;
+  if (section === "reports") reportsVisited.current = true;
+  if (section === "reports") reportsState.current = navigationState;
+  // Rapor ve Excel stays mounted (hidden, inactive) once visited, so an open report or document survives other sections.
+  const reports = preferencesReady && pageAvailability && reportsVisited.current ? <div hidden={section !== "reports"}><ReportsPage month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={section === "reports" && frameView === "workspace" && !!ready} state={reportsState.current} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /></div> : undefined;
+  const page = preferencesReady && pageAvailability && section !== "reports" ? <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={frameView === "workspace" && !!ready} state={navigationState} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /> : undefined;
+  const content = <>{!(ready && (page || reports)) && (failure ?? loading)}<div className="page-host" hidden={!(ready && (page || reports))}>{page}{reports}</div></>;
   return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>
     <AppShell section={section} navigate={navigate} controls={<label className="period-label">Dönem<Input type="month" lang="tr" value={selectedMonth ?? ""} onChange={event => onMonth(event.target.value)} /></label>}>{content}</AppShell>
   </AppFrame.Provider>;

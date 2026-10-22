@@ -12,7 +12,7 @@ const salesScreens:Record<ReportView,Destination>={report:"versions",data:"overv
 type Loaded={kind:"source";source:SourceView}|{kind:"sales";sales:SalesView}|{kind:"none"}|{kind:"failed";message:string};
 
 /** Rapor ve Excel: the existing report, export and source workspaces, until #107 redesigns this page. */
-export function ReportsPage({month,onMonth,availability,state,openSettings}:PageProps) {
+export function ReportsPage({month,onMonth,availability,active,state,openSettings}:PageProps) {
  const [view,setView]=useState<ReportView>(state.reportView??"report");
  const sequence=useRef(1),[launch,setLaunch]=useState(1);
  const [loaded,setLoaded]=useState<Loaded>();
@@ -20,9 +20,13 @@ export function ReportsPage({month,onMonth,availability,state,openSettings}:Page
  const [attempt,setAttempt]=useState(0);
  const choose=(next:ReportView)=>{setView(next);setLaunch(++sequence.current);};
  useEffect(()=>{if(state.reportView)choose(state.reportView);},[state]);
+ const current=useRef({loaded,attempt});current.current={loaded,attempt};
+ const salesAttempt=useRef(-1);
  useEffect(()=>{
-  // Reads once per availability (a new import or refresh) and per retry; Ayarlar opening and closing does not reload.
+  // Reads once per availability (a new import or refresh) and per retry. An open financial report stays on its
+  // dataset version until the owner refreshes it (the workspace then shows "Yeni veri sürümü hazır").
   if(availability?.status!=="ready")return;
+  if(current.current.loaded?.kind==="sales"&&salesAttempt.current===attempt)return;
   let live=true;
   window.esmer.querySourceWorkspace({...initialSourceQuery,period:month}).then(async value=>{
    if(!live)return;
@@ -30,7 +34,9 @@ export function ReportsPage({month,onMonth,availability,state,openSettings}:Page
    if(value.status!=="source-empty"){setLoaded({kind:"failed",message:value.message});return;}
    if(availability.store!=="loaded"){setLoaded({kind:"none"});return;}
    const sales=await window.esmer.openSales({period:month});
-   if(live)setLoaded(sales.status==="report"?{kind:"sales",sales:sales.view}:{kind:"failed",message:sales.message});
+   if(!live)return;
+   if(sales.status==="report")salesAttempt.current=attempt;
+   setLoaded(sales.status==="report"?{kind:"sales",sales:sales.view}:{kind:"failed",message:sales.message});
   }).catch(()=>{if(live)setLoaded({kind:"failed",message:"Raporlar okunamadı."});}); 
   return()=>{live=false;};
  },[availability,attempt]);
@@ -43,7 +49,7 @@ export function ReportsPage({month,onMonth,availability,state,openSettings}:Page
   {!loaded&&<p role="status">Rapor ve Excel açılıyor…</p>}
   {loaded?.kind==="failed"&&<div role="alert"><p>{loaded.message}</p><Button variant="outline" onClick={()=>{setLoaded(undefined);setAttempt(value=>value+1);}}>Yeniden dene</Button></div>}
   {loaded?.kind==="none"&&<div className="month-state"><h2>Henüz rapor verisi yok</h2><p>Veri paketi içe aktarınca aylık rapor, Excel ve kaynak kayıtları burada açılır.</p><Button onClick={openSettings}>Veri paketi içe aktar</Button></div>}
-  {loaded?.kind==="source"&&<EmbeddedFrame destination={sourceScreens[view]} sequence={launch}><SourceWorkspace source={loaded.source} selectedMonth={selected} onMonth={onMonth}/></EmbeddedFrame>}
-  {loaded?.kind==="sales"&&<EmbeddedFrame destination={salesScreens[view]} sequence={launch}><SalesWorkspace view={loaded.sales} setView={sales=>setLoaded({kind:"sales",sales})} stale={stale} selectedMonth={selected} onMonth={onMonth}/></EmbeddedFrame>}
+  {loaded?.kind==="source"&&<EmbeddedFrame destination={sourceScreens[view]} sequence={launch} active={active}><SourceWorkspace source={loaded.source} selectedMonth={selected} onMonth={onMonth}/></EmbeddedFrame>}
+  {loaded?.kind==="sales"&&<EmbeddedFrame destination={salesScreens[view]} sequence={launch} active={active}><SalesWorkspace view={loaded.sales} setView={sales=>setLoaded({kind:"sales",sales})} stale={stale} selectedMonth={selected} onMonth={onMonth}/></EmbeddedFrame>}
  </div>;
 }
