@@ -1,5 +1,6 @@
 import {validSelectedMonth} from "../domain/month";
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
+import {validMonthProfitRequest,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { LiveResult, PreferencesPatch, PreferencesResult } from "../domain/contracts";
@@ -99,7 +100,8 @@ export async function handleRequest(
   sourceWorkspace?: (request: SourceQuery) => Promise<SourceWorkspaceResult>,
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
   preferences?: {get: () => Promise<PreferencesResult>; set: (request: PreferencesPatch) => Promise<PreferencesResult>},
-): Promise<PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
+  monthProfit?: (request: MonthProfitRequest) => Promise<MonthProfitResult>,
+): Promise<MonthProfitResult | PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
       status: "rejected",
@@ -110,6 +112,10 @@ export async function handleRequest(
     if (operation === "getPreferences" && payload === null) return preferences.get();
     if (operation === "setPreferences" && validPreferencesPatch(payload)) return preferences.set(payload);
     return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+  }
+  if (operation === "readMonthProfit" && monthProfit) {
+    if (!validMonthProfitRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return monthProfit(payload);
   }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {
     if(!validEstimateRequest(payload,operation === "exportSourceEstimate"))return {status:"rejected",code:"INVALID_PAYLOAD",message:"İstek geçerli değil."};

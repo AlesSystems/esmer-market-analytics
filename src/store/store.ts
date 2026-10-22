@@ -1,4 +1,5 @@
 import {createSourceEstimateQuery,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
+import {buildMonthProfit,validMonthProfitRequest,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
@@ -103,6 +104,16 @@ class AnalyticsStore {
     if(!source)throw Error("ESTIMATE_UNAVAILABLE");
     if(source.hash!==request.hash)throw Error("SOURCE_CHANGED");
     return calculateSourceEstimate(source.pkg,request.period,source.hash);
+  }
+  readMonthProfit(request:MonthProfitRequest):MonthProfitResult {
+    if(!validMonthProfitRequest(request))throw Error("INVALID_PAYLOAD");
+    return this.transaction(()=>{
+      const source=this.sourcePackage();
+      if(!source)return {status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Tahmin kaynağı bulunamadı."};
+      const app=this.db.prepare(`SELECT r.revision,r.kind,r.entity_id,r.value_json FROM app_revisions r WHERE r.kind IN ('expense','confirmation') AND NOT EXISTS
+        (SELECT 1 FROM app_revisions newer WHERE newer.kind=r.kind AND newer.entity_id=r.entity_id AND newer.revision>r.revision) ORDER BY r.revision`).all().map(row=>({revision:Number(row.revision),kind:row.kind,entityId:String(row.entity_id),value:decode(row.value_json)}) as AppRecord);
+      return buildMonthProfit(source.pkg,source.hash,request.month,{app,history:this.revisionHistory()});
+    },true);
   }
   hasSourcePreview(): boolean {
     return !!this.db.prepare("SELECT 1 FROM source_preview WHERE singleton=1").get();
