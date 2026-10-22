@@ -1,5 +1,5 @@
 import { test, expect, _electron as electron } from "@playwright/test";
-import { mkdtemp, mkdir, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { openStore } from "../../src/store/store";
@@ -32,6 +32,14 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
     const page = await app.firstWindow();
     const errors: string[] = [];
     page.on("pageerror", error => errors.push(error.message));
+    const capture = async (name: string, zoom: number) => {
+      await page.screenshot({ path: join(output, `${name}.png`), fullPage: true, animations: "disabled" });
+      if (zoom === 2) {
+        const png = await app.evaluate(async ({ BrowserWindow }) =>
+          (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));
+        await writeFile(join(output, `${name}-native.png`), Buffer.from(png, "base64"));
+      }
+    };
     for (const size of sizes) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
@@ -44,9 +52,12 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
       await expect(page.getByRole("heading", { name: "Marketinize bir bütün olarak bakın." })).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
-      await page.screenshot({ path: join(output, `welcome-${size.name}.png`), fullPage: true });
+      await capture(`welcome-${size.name}`, size.zoom);
       await page.getByRole("button", { name: "Özeti aç", exact: true }).click();
-      await page.getByLabel("Dönem", { exact: true }).fill(source ? "2025-10" : "2025-09");
+      await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
+      await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
+      await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
+      await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue(source ? "2025-10" : "2025-09");
       for (const name of routes) {
         await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true }).click();
         await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
@@ -60,15 +71,15 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
         await page.keyboard.press("Tab");
         expect(await page.evaluate(() => document.activeElement?.closest(".app-body") !== null)).toBe(true);
         if (source && name === "Özet") {
-          await expect(page.getByText("katkıya dahil değil — sonucu yüksek gösterebilir", { exact: true })).toBeVisible();
+          await expect(page.getByRole("region", { name: "Kaynak tahmini" }).getByText("katkıya dahil değil — sonucu yüksek gösterebilir", { exact: true })).toBeVisible();
         }
-        await page.screenshot({ path: join(output, `${name}-${size.name}.png`), fullPage: true });
+        await capture(`${name}-${size.name}`, size.zoom);
       }
       await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
       await expect(page.getByRole("heading", { name: "Ayarlar", exact: true, level: 1 })).toBeVisible();
       await expect(page.getByRole("radio", { name: "Normal", exact: true })).toBeEnabled();
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
-      await page.screenshot({ path: join(output, `settings-${size.name}.png`), fullPage: true });
+      await capture(`settings-${size.name}`, size.zoom);
       await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
     }
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -77,6 +88,8 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
     if (!source) {
       const metric = page.locator(".c-matrix > button").first();
       await metric.focus();
+      await page.keyboard.press("Tab");
+      await page.keyboard.press("Shift+Tab");
       await expect(metric).toBeFocused();
       await expect(metric).toHaveCSS("outline-offset", "-3px");
       await page.screenshot({ path: join(output, "metric-keyboard-focus.png"), fullPage: true });

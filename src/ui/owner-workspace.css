@@ -74,7 +74,7 @@ body {
 }
 .app-shell .sidebar :focus-visible { outline-color: #e8c47c; }
 .app-shell .sidebar-footer { margin-top: auto; padding-top: 22px; border-top: 1px solid #506558; }
-.app-shell .workspace { max-width: 1660px; padding: 32px 38px 56px; }
+.app-shell .workspace { max-width: 1660px; padding: 32px 38px 56px; background: var(--market-paper); }
 .app-shell .app-body { background: var(--market-paper); }
 .app-shell .workspace-content > :first-child { margin-top: 0; }
 .app-shell h1 { font-size: 2rem; letter-spacing: -.025em; line-height: 1.2; }
@@ -90,6 +90,8 @@ body {
 .app-shell input, .app-shell textarea { caret-color: var(--market-action); }
 .app-shell button, .app-shell a { transition: background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out; }
 .app-shell .workspace button:focus-visible { outline: 3px solid #886222; outline-offset: 3px; }
+.app-shell .sales-control-desk .row-link { color: var(--market-action); }
+.app-shell .sales-control-desk .positive-bar { fill: var(--market-action); }
 .app-shell .control-desk {
   --c-ink: var(--market-ink);
   --c-blue: var(--market-action);
@@ -109,6 +111,7 @@ body {
   overflow: hidden;
 }
 .app-shell .control-desk .c-matrix > button { padding: 24px; gap: 12px; }
+.app-shell .control-desk .c-matrix > button:focus-visible { outline-offset: -3px; }
 .app-shell .control-desk .c-matrix > button:first-child { background: #e9efdf; padding-left: 24px; }
 .app-shell .control-desk .c-matrix > button:last-child { padding-right: 24px; }
 .app-shell .control-desk .c-matrix > button:hover { background: #f0f3e6; }
