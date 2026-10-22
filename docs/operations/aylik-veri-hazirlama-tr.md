@@ -2,7 +2,7 @@
 
 Bu rehber geliştirici içindir. Her ay yedekten, sahibinin içe aktaracağı tahmin paketini hazırlar. Paket seçilen ayı ve en çok 5 önceki ayı kapsar. Ürün adları, reyonlar ve birimler pakete dahildir.
 
-`BELGE_TARIHINDEKI_SON_ALIS_FIYATI` sütununu bu komutla okumak için sahibinin açık onayı gerekir. Onay gizlilik ve tahmin sözleşmelerine yazılmadan komutu gerçek yedekte çalıştırmayın.
+Sahibi 22 Ekim 2026'da `BELGE_TARIHINDEKI_SON_ALIS_FIYATI` sütununun okunmasını onayladı ([gizlilik izni](../contracts/privacy.md#recorded-estimate-package-allowance)). Onay yalnızca bu komutu ve yalnızca geri yüklenmiş yalıtılmış kopyayı kapsar. Canlı bağlantıyı kapsamaz.
 
 Kapsam ve sınır kararı: [aylık paket kararı](../decisions/issue-101-monthly-window.md). Ölçümler: [aylık veri yolu kanıtı](../evidence/2026-10-22-monthly-data-path.md).
 
