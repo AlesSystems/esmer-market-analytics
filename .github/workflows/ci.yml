@@ -1,0 +1,54 @@
+name: Windows validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.15.0
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Integration tests
+        run: npm run test:integration
+      - name: Build and verify Windows distributions
+        run: npm run package:win
+      - name: Packaged desktop workflows
+        shell: pwsh
+        run: |
+          $env:ESMER_EXECUTABLE = Join-Path $env:GITHUB_WORKSPACE 'release/win-unpacked/Esmer Market Analytics.exe'
+          npm exec -- playwright test
+      - name: Upload synthetic verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-evidence-${{ github.sha }}
+          path: |
+            test-results/
+            release/release-inventory.json
+          if-no-files-found: ignore
+          retention-days: 14
