@@ -114,11 +114,7 @@ test("classic financial input keeps visible highlights and a searchable initial 
  try {const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Veri ve kaynak");await expect(page.getByRole("heading",{name:"En çok kâr getiren ürünler",exact:true})).toBeVisible();await expect(page.getByRole("list",{name:"Kapsanan kâra göre ilk on ürün"}).getByRole("button",{name:/İçme suyu/})).toBeVisible();const list=page.getByRole("region",{name:"Ürün katkıları",exact:true});await list.getByLabel("Ürün ara",{exact:true}).fill("içme");await expect(list.getByRole("button",{name:"İçme suyu",exact:true})).toBeVisible();await expect(list).toContainText("180,00 ₺");}finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
-// Suspected app bug: src/ui/overview/MonthlyProfitPage.tsx renders the highlight ranking whenever
-// useTopProducts(...).loaded is true, which is also true after a failed read, so a failed read shows
-// "Bu ayda ürün katkısı yok." and the "Ürün grafiği yüklenemedi" status can never render.
 for (const highlightOnly of [false, true]) test(highlightOnly ? "failed product highlights are an error rather than an empty month" : "failed product reads are a recoverable error rather than an empty month", async () => {
- if (highlightOnly) test.fail();
  const {writeFile}=await import("node:fs/promises"),{salesPackage}=await import("../helpers/sales-fixtures");const userData=await mkdtemp(join(tmpdir(),"esmer-highlight-error-")),path=join(userData,"fixture.esmer");await writeFile(path,salesPackage());const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
   const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
