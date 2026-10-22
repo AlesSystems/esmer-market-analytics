@@ -13,15 +13,15 @@ const D=Decimal.clone({precision:200,rounding:Decimal.ROUND_HALF_UP});
 export const MONTH_PROFIT_VERSION="month-profit-v1";
 export type Money=string;
 export type Pct=string|null;
-export type NetProfitReason="expensesMissing"|"expensesIncomplete"|"unknownTax"|"confirmationStale";
-export type MonthProfitTotals={sales:Money;knownCostSales:Money;cost:Money;grossProfit:Money;marginPct:Pct;costKnownPct:Pct;unknownCostSales:Money;unknownCostProducts:number;returns:Money;receipts:number;averageBasket:Money|null;expenses:Money|null;expensesComplete:boolean;netProfit:Money|null;netProfitReason:NetProfitReason|null};
-export type MonthProfitProduct={id:string;name:string|null;category:string|null;unit:ProductLabel["unit"];sales:Money;cost:Money|null;grossProfit:Money|null;marginPct:Pct;previousMarginPct:Pct;unitPrice:Money|null;unitCost:Money|null;quantity:string|null;history:{month:string;marginPct:Pct}[]};
+export type NetProfitReason="costUnknown"|"monthPartial"|"expensesMissing"|"expensesIncomplete"|"unknownTax"|"confirmationStale";
+export type MonthProfitTotals={sales:Money|null;knownCostSales:Money;cost:Money|null;grossProfit:Money|null;marginPct:Pct;costKnownPct:Pct;unknownCostSales:Money;unknownCostProducts:number;returns:Money|null;unknownSaleAmounts:number;unknownReturnAmounts:number;receipts:number;averageBasket:Money|null;expenses:Money|null;expensesComplete:boolean;netProfit:Money|null;netProfitReason:NetProfitReason|null};
+export type MonthProfitProduct={id:string;name:string|null;category:string|null;unit:ProductLabel["unit"];sales:Money|null;cost:Money|null;grossProfit:Money|null;marginPct:Pct;previousMarginPct:Pct;unitPrice:Money|null;unitCost:Money|null;quantity:string|null;history:{month:string;marginPct:Pct}[]};
 export type AttentionKind="loss"|"marginDrop"|"lowMarginHighVolume"|"missingCost";
 export type MonthProfitView={
- version:typeof MONTH_PROFIT_VERSION;month:string;dataUntil:string;confidence:"estimate";
+ version:typeof MONTH_PROFIT_VERSION;month:string;dataFrom:string;dataUntil:string;confidence:"estimate";
  source:{hash:string;extractedAt:string;from:string;to:string};
  totals:MonthProfitTotals;previous:MonthProfitTotals|null;
- history:{month:string;sales:Money;grossProfit:Money;marginPct:Pct}[];
+ history:{month:string;sales:Money|null;grossProfit:Money|null;marginPct:Pct}[];
  products:MonthProfitProduct[];
  categories:{name:string;sales:Money;grossProfit:Money|null;marginPct:Pct}[];
  attention:{kind:AttentionKind;productId:string}[];
@@ -44,21 +44,22 @@ const pct=(value:Decimal|null):Pct=>value===null?null:value.toDecimalPlaces(2).t
 const div2=(num:Decimal,den:Decimal)=>num.div(den).toDecimalPlaces(2).toFixed();
 const byId=(a:string,b:string)=>BigInt(a)<BigInt(b)?-1:BigInt(a)>BigInt(b)?1:0;
 
-function netProfit(month:string,grossProfit:string,expenses:MonthProfitExpenses):Pick<MonthProfitTotals,"expenses"|"expensesComplete"|"netProfit"|"netProfitReason"> {
+function netProfit(month:string,grossProfit:string|null,partial:boolean,expenses:MonthProfitExpenses):Pick<MonthProfitTotals,"expenses"|"expensesComplete"|"netProfit"|"netProfitReason"> {
  const components=calculateExpenseComponents({period:month,expenses:expenses.app});
  const confirmation=expenses.app.find(row=>row.kind==="confirmation"&&row.entityId===`expense-complete:${month}`);
  const confirmed=confirmation?.kind==="confirmation"&&confirmation.value.complete&&confirmation.value.period===month;
  const complete=confirmed&&confirmation.value.reviewedRevision===relevantExpenseRevision(expenses.history,month);
  const anyAvailable=Object.values(components.breakdownCoverage).includes("available");
- const reason:NetProfitReason|null=components.reasons.includes("UNKNOWN_TAX")?"unknownTax":confirmed&&!complete?"confirmationStale":!confirmed&&!anyAvailable&&!components.reasons.length?"expensesMissing":!complete||components.reasons.length?"expensesIncomplete":null;
+ const reason:NetProfitReason|null=grossProfit===null?"costUnknown":partial?"monthPartial":components.reasons.includes("UNKNOWN_TAX")?"unknownTax":confirmed&&!complete?"confirmationStale":!confirmed&&!anyAvailable&&!components.reasons.length?"expensesMissing":!complete||components.reasons.length?"expensesIncomplete":null;
  const value=components.reasons.length||!complete&&!anyAvailable?null:components.expenses;
- return {expenses:value,expensesComplete:complete,netProfit:reason===null?new D(grossProfit).minus(components.expenses).toFixed():null,netProfitReason:reason};
+ return {expenses:value,expensesComplete:complete,netProfit:reason===null&&grossProfit!==null?new D(grossProfit).minus(components.expenses).toFixed():null,netProfitReason:reason};
 }
 type Product={label:ProductLabel;lines:EstimateLine[];totals:EstimateTotals};
-function monthTotals(estimate:SourceEstimate,products:Map<string,Product>,expenses:MonthProfitExpenses):MonthProfitTotals {
- const s=estimate.summary,sales=new D(s.candidateSaleAmount??0),known=new D(s.coveredSaleAmount??0),gross=new D(s.contribution??0);
+function monthTotals(pkg:RawPackage,estimate:SourceEstimate,products:Map<string,Product>,expenses:MonthProfitExpenses):MonthProfitTotals {
+ const s=estimate.summary,sales=s.candidateSaleAmount===null?null:new D(s.candidateSaleAmount),known=new D(s.coveredSaleAmount??0),gross=s.contribution===null?null:new D(s.contribution);
+ const partial=pkg.snapshot.from>`${estimate.period}-01`||pkg.snapshot.to<lastDay(estimate.period);
  const receipts=new Set(estimate.lines.filter(l=>l.saleCandidate&&l.reason!=="AMOUNT").map(l=>l.documentId)).size;
- return {sales:sales.toFixed(),knownCostSales:known.toFixed(),cost:new D(s.candidateCost??0).toFixed(),grossProfit:gross.toFixed(),marginPct:pct(ratio(gross,known)),costKnownPct:s.costCoveragePercent,unknownCostSales:new D(s.uncoveredSaleAmount??0).toFixed(),unknownCostProducts:[...products.values()].filter(p=>p.lines.some(l=>l.saleCandidate&&l.reason!==null&&COST_REASONS.has(l.reason))).length,returns:new D(s.candidateReturnAmount??0).negated().toFixed(),receipts,averageBasket:receipts?div2(sales,new D(receipts)):null,...netProfit(estimate.period,gross.toFixed(),expenses)};
+ return {sales:sales?.toFixed()??null,knownCostSales:known.toFixed(),cost:s.candidateCost,grossProfit:gross?.toFixed()??null,marginPct:gross===null?null:pct(ratio(gross,known)),costKnownPct:s.costCoveragePercent,unknownCostSales:s.uncoveredSaleAmount===null?"0":new D(s.uncoveredSaleAmount).toFixed(),unknownCostProducts:[...products.values()].filter(p=>p.lines.some(l=>l.saleCandidate&&l.reason!==null&&COST_REASONS.has(l.reason))).length,returns:s.candidateReturnAmount===null?null:new D(s.candidateReturnAmount).negated().toFixed(),unknownSaleAmounts:s.unknownSaleAmounts,unknownReturnAmounts:s.unknownReturnAmounts,receipts,averageBasket:receipts&&sales?div2(sales,new D(receipts)):null,...netProfit(estimate.period,gross?.toFixed()??null,partial,expenses)};
 }
 function productsOf(estimate:SourceEstimate):Map<string,Product> {
  const lines=new Map<string,EstimateLine[]>();for(const l of estimate.lines)if(l.saleCandidate){const g=lines.get(l.productId)??[];g.push(l);lines.set(l.productId,g);}
@@ -66,19 +67,20 @@ function productsOf(estimate:SourceEstimate):Map<string,Product> {
 }
 const productMargin=(p:Product|undefined)=>p?.totals.contribution==null?null:ratio(new D(p.totals.contribution),new D(p.totals.coveredSaleAmount??0));
 
-export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expenses:MonthProfitExpenses):MonthProfitResult {
+export type MonthEstimateCache=Map<string,{estimate:SourceEstimate;products:Map<string,Product>}>;
+export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expenses:MonthProfitExpenses,cache:MonthEstimateCache=new Map()):MonthProfitResult {
  if(pkg.schemaVersion!=="sql-backup-estimate-v1"&&pkg.schemaVersion!=="sql-backup-estimate-v2")return {status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE",message:"Bu paket maliyet bilgisi içermiyor; kâr tahmini hazırlanamadı."};
  if(!validSelectedMonth(month))throw Error("INVALID_PAYLOAD");
  if(!covered(pkg,month))return {status:"source-unavailable",code:"MONTH_NOT_COVERED",message:"Seçili ay kaynak paketinin kapsamı dışında."};
  const quantities=new Map(pkg.snapshot.lines.map(row=>[row.ID!,row.MIKTAR_FIS]));
  const window=Array.from({length:6},(_,i)=>shift(month,i-5)).filter(m=>covered(pkg,m));
- const months=new Map(window.map(m=>{const estimate=calculateSourceEstimate(pkg,m,hash);return [m,{estimate,products:productsOf(estimate)}];}));
+ const months=new Map(window.map(m=>{let entry=cache.get(m);if(!entry){const estimate=calculateSourceEstimate(pkg,m,hash);entry={estimate,products:productsOf(estimate)};cache.set(m,entry);}return [m,entry];}));
  const current=months.get(month)!,prevMonth=shift(month,-1),prev=months.get(prevMonth);
  const products:MonthProfitProduct[]=[...current.products].map(([id,p])=>{
   const t=p.totals,known=new D(t.coveredSaleAmount??0),coveredLines=p.lines.filter(l=>l.reason===null);
   const quantity=coveredLines.length&&p.label.unit!==null?coveredLines.reduce((a,l)=>a.plus(quantities.get(l.lineId)!),new D(0)):null;
-  return {id,name:p.label.productName,category:p.label.categoryName,unit:p.label.unit,sales:new D(t.candidateSaleAmount??0).toFixed(),cost:t.candidateCost,grossProfit:t.contribution,marginPct:pct(productMargin(p)),previousMarginPct:pct(productMargin(prev?.products.get(id))),unitPrice:quantity?.gt(0)?div2(known,quantity):null,unitCost:quantity?.gt(0)&&t.candidateCost!==null?div2(new D(t.candidateCost),quantity):null,quantity:quantity?.toFixed()??null,history:window.map(m=>({month:m,marginPct:pct(productMargin(months.get(m)!.products.get(id)))}))};
- }).sort((a,b)=>new D(b.sales).comparedTo(a.sales)||byId(a.id,b.id));
+  return {id,name:p.label.productName,category:p.label.categoryName,unit:p.label.unit,sales:t.candidateSaleAmount,cost:t.candidateCost,grossProfit:t.contribution,marginPct:pct(productMargin(p)),previousMarginPct:pct(productMargin(prev?.products.get(id))),unitPrice:quantity?.gt(0)?div2(known,quantity):null,unitCost:quantity?.gt(0)&&t.candidateCost!==null?div2(new D(t.candidateCost),quantity):null,quantity:quantity?.toFixed()??null,history:window.map(m=>({month:m,marginPct:pct(productMargin(months.get(m)!.products.get(id)))}))};
+ }).sort((a,b)=>new D(b.sales??-1).comparedTo(a.sales??-1)||byId(a.id,b.id));
  const categories=new Map<string,{sales:Decimal;gross:Decimal|null;known:Decimal}>();
  for(const p of current.products.values()){const name=p.label.categoryName;if(name===null)continue;const c=categories.get(name)??{sales:new D(0),gross:null,known:new D(0)};c.sales=c.sales.plus(p.totals.candidateSaleAmount??0);if(p.totals.contribution!==null){c.gross=(c.gross??new D(0)).plus(p.totals.contribution);c.known=c.known.plus(p.totals.coveredSaleAmount??0);}categories.set(name,c);}
  const margins=new Map(products.map(p=>[p.id,{now:productMargin(current.products.get(p.id)),before:productMargin(prev?.products.get(p.id))}]));
@@ -89,9 +91,9 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
   ...flag("lowMarginHighVolume",(p,rank)=>rank<ATTENTION.highVolumeRank&&(margins.get(p.id)!.now?.lt(ATTENTION.lowMarginPct)??false)),
   ...flag("missingCost",p=>current.products.get(p.id)!.lines.some(l=>l.reason!==null&&COST_REASONS.has(l.reason))),
  ];
- const totalsOf=(m:string)=>monthTotals(months.get(m)!.estimate,months.get(m)!.products,expenses);
- const totals=totalsOf(month);
- return {status:"month-profit",view:{version:MONTH_PROFIT_VERSION,month,dataUntil:pkg.snapshot.to<lastDay(month)?pkg.snapshot.to:lastDay(month),confidence:"estimate",source:{hash,extractedAt:pkg.snapshot.capturedAt,from:pkg.snapshot.from,to:pkg.snapshot.to},totals,previous:prev?totalsOf(prevMonth):null,
-  history:window.map(m=>{const t=m===month?totals:totalsOf(m);return {month:m,sales:t.sales,grossProfit:t.grossProfit,marginPct:t.marginPct};}),
+ const totalsByMonth=new Map(window.map(m=>[m,monthTotals(pkg,months.get(m)!.estimate,months.get(m)!.products,expenses)]));
+ const totals=totalsByMonth.get(month)!;
+ return {status:"month-profit",view:{version:MONTH_PROFIT_VERSION,month,dataFrom:pkg.snapshot.from>`${month}-01`?pkg.snapshot.from:`${month}-01`,dataUntil:pkg.snapshot.to<lastDay(month)?pkg.snapshot.to:lastDay(month),confidence:"estimate",source:{hash,extractedAt:pkg.snapshot.capturedAt,from:pkg.snapshot.from,to:pkg.snapshot.to},totals,previous:totalsByMonth.get(prevMonth)??null,
+  history:window.map(m=>{const t=totalsByMonth.get(m)!;return {month:m,sales:t.sales,grossProfit:t.grossProfit,marginPct:t.marginPct};}),
   products,categories:[...categories].map(([name,c])=>({name,sales:c.sales.toFixed(),grossProfit:c.gross?.toFixed()??null,marginPct:c.gross===null?null:pct(ratio(c.gross,c.known))})).sort((a,b)=>new D(b.sales).comparedTo(a.sales)||a.name.localeCompare(b.name,"tr")),attention}};
 }
