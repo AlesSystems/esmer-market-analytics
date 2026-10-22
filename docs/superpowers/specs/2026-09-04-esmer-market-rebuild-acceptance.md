@@ -1,7 +1,7 @@
 # Esmer Market rebuild — release acceptance and proof checklist
 
 - Date: 2026-09-04.
-- Status: Approved release proof requirements. Checkboxes retain the original checklist; current build-specific results and open gates are in [the evidence index](../../evidence/index.md).
+- Status: Approved release proof requirements. Checkboxes retain the original checklist; current build-specific results and open gates are in [the evidence index](../../evidence/index.md). Re-baselined for v1 on 2026-10-22 by [#98](https://github.com/AlesSystems/esmer-market-analytics/issues/98) ([decision record](../../decisions/issue-98-profit-first-estimate-edition.md)); the original checkboxes are preserved and none is passed by this change.
 - Related: [Foundation specification](2026-09-04-esmer-market-rebuild-design.md) · [Source audit](2026-09-04-esmer-market-rebuild-audit.md).
 
 ## 1. Release rule
@@ -9,6 +9,8 @@
 The surprise release is ready only when each applicable first-release gate has recorded evidence, with no unresolved source-write/privacy/data-loss failure. Writing this checklist or passing source `DBCC CHECKDB` does not pass application acceptance.
 
 Historical profit may remain honestly estimated. It may not be displayed as verified or conceal excluded costs/expenses. Later live integration has its own additional gate and is not needed for the reveal.
+
+Since 2026-10-22, the v1 gates follow the [#98 re-baseline](../../decisions/issue-98-profit-first-estimate-edition.md); the v1 status notes in A02, A03, A06, A07 and L01 below say which original items are post-v1.
 
 Use small coherent test/implementation/documentation changes in this independent repository. Tests precede financial implementation, and higher-risk changes retain their acceptance evidence. The original planning transfer introduced no test suite. Later implementation evidence is recorded separately.
 
@@ -26,6 +28,8 @@ For every gate, retain the tested build/commit, fixture or private source-batch 
 Evidence: scoped review, permission report from the isolated test instance, query/workflow traces without sensitive values, and successful read-only extraction. A string search alone is not sufficient proof.
 
 ## 3. A02 — Calculation correctness and golden scenarios
+
+**v1 status (2026-10-22, #98).** Verified real-source semantics ("trusted" profit) move out of v1. For v1, the estimate's acceptance in [recorded-source estimates](../../contracts/recorded-estimates.md) applies: independent synthetic golden amounts and a separate Python Decimal reconciliation. Missing or invalid cost is never zero, and decimal determinism still applies. Items that depend on verified source semantics (discounts, KDV, conversions, unit conversion, return attribution) are post-v1; the rest apply to the estimate edition.
 
 Approve an explicit source-to-domain contract before implementing affected formulas. Establish units and multipliers, KDV inclusion/exclusion in cost, header/line discounts, return attribution, business dates, decimal precision and rounding. Unknown semantics must be represented as unsupported/missing, not resolved by guessing.
 
@@ -60,6 +64,8 @@ These examples supplement, not replace, cases for fractional weights, precision 
 Evidence: approved oracle table, unit/property tests where useful, integration reconciliation, and passing regression results linked to the relevant calculation version.
 
 ## 4. A03 — Reconciliation, confidence and traceability
+
+**v1 status (2026-10-22, #98).** "Trusted" profitability, real-source reconciliation and market-local business-date validation are out of v1. v1 discloses the estimate state once per page through a trust chip, with method, coverage and exclusions available in Rapor. Incomplete expenses are still not zero, and accepted reports are still not overwritten. Items that depend on verified real-source semantics (header/line reconciliation, source-reconciled status, trusted profitability, market-local business dates) are post-v1. The other items apply to the estimate edition.
 
 - [ ] Summary → breakdown → transaction/line → source ID/batch/method traceability works for every released KPI, including exports.
 - [ ] Header and line totals reconcile under documented rules; unexplained differences are visible and cannot receive source-reconciled status.
@@ -104,6 +110,8 @@ Evidence: schema/package inspections, generated-output privacy tests using synth
 
 ## 7. A06 — Backup and recovery
 
+**v1 status (2026-10-22, #98).** The v1 gate is an encrypted backup file plus a documented restore. The remaining items, including the clean-machine loss exercise, are post-v1.
+
 - [ ] Automatic encrypted backups capture a consistent state including expenses, adjustments, accepted reports and their required provenance/data.
 - [ ] Recovery works on a clean installation after simulated loss of the original computer, using a separately retained recovery secret/key.
 - [ ] Losing the original OS credential store does not make every backup permanently unusable.
@@ -115,6 +123,8 @@ Evidence: schema/package inspections, generated-output privacy tests using synth
 Evidence: recorded backup → simulated machine loss → clean restore exercise; comparisons of restored records and financial outputs; Turkish recovery instructions. Creating an encrypted file without demonstrating restore does not pass this gate.
 
 ## 8. A07 — Windows packaging, usability and performance
+
+**v1 status (2026-10-22, #98).** The v1 gate is one Windows smoke test, deferred to [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). The two-second benchmark items are dropped unless prepared packages exceed 100,000 rows. The other Windows-specific items are post-v1. Items that are not Windows-specific (offline use without POS access, unavailable-profit states, Excel matching the display, licence review) still apply.
 
 - [ ] Installer and portable distribution are tested on the supported Windows configuration; no separately installed developer runtime is needed to view/import the prepared analytics dataset.
 - [ ] Installation, startup, restart, upgrade and uninstall behaviour preserve app-owned data as documented; upgrade never drops expenses or accepted reports.
@@ -133,6 +143,8 @@ Evidence: clean-Windows installation walkthrough, screenshots where useful, benc
 
 Not required for the surprise release and not authorized by this checklist.
 
+**v1 status (2026-10-22, #98).** L01 is explicitly out of v1.
+
 - [ ] Eralp has accepted the product and explicitly authorized access to the specific production source.
 - [ ] A restricted read-only account and protected credential handling are verified; no administrative credential or new source schema/configuration dependency is introduced.
 - [ ] Insert, update, deletion, backdating, incomplete transaction, source reset and reconnect cases have passed on an isolated representative source.
@@ -149,4 +161,4 @@ Evidence: permission and load reports, concurrency/reconciliation tests, measure
 
 The original planning transfer passed no application gate. Later synthetic, isolated-source and packaged checks are recorded in [the evidence index](../../evidence/index.md). Consult each receipt for its exact build, platform, population and limitations. Closed tracker issues do not establish that A01–A07 or L01 passed.
 
-[Recorded-source estimates](../../contracts/recorded-estimates.md) have independent arithmetic evidence for their declared assumptions. They do not validate source semantics or close the original verified-financial requirements. Current Windows, independent recovery, real-source financial acceptance and production rollout require their specified evidence and authorization.
+[Recorded-source estimates](../../contracts/recorded-estimates.md) have independent arithmetic evidence for their declared assumptions. They do not validate source semantics or close the original verified-financial requirements. Current Windows, independent recovery, real-source financial acceptance and production rollout require their specified evidence and authorization. The 2026-10-22 [#98 re-baseline](../../decisions/issue-98-profit-first-estimate-edition.md) narrows the v1 gates as noted in each section; it passes no gate.
