@@ -1,0 +1,230 @@
+:root {
+  --market-paper: #f7f5ed;
+  --market-surface: #fffef9;
+  --market-ink: #243b32;
+  --market-muted: #59685d;
+  --market-line: #d8ddd0;
+  --market-action: #315c45;
+  --market-wash: #e8eee0;
+  --market-brass: #a67b37;
+  --market-raised: 0 10px 30px #243b3210, 0 2px 4px #243b3208;
+}
+body {
+  background: var(--market-paper);
+  font-family: "Manrope Variable", "Segoe UI", sans-serif;
+}
+.app-shell, .app-shell.monthly-shell, .app-shell.page-desk-shell {
+  --background: var(--market-surface);
+  --foreground: var(--market-ink);
+  --primary: var(--market-action);
+  --primary-foreground: #fffef9;
+  --secondary: var(--market-wash);
+  --secondary-foreground: var(--market-ink);
+  --muted-surface: var(--market-paper);
+  --muted: var(--market-muted);
+  --accent: var(--market-wash);
+  --accent-foreground: var(--market-action);
+  --line: var(--market-line);
+  --input: #a6b3a4;
+  --ring: #886222;
+  --blue: var(--market-action);
+  --ink: var(--market-ink);
+  grid-template-columns: 236px minmax(0, 1fr);
+  background: var(--market-paper);
+  color: var(--market-ink);
+  font-family: "Manrope Variable", "Segoe UI", sans-serif;
+}
+.app-shell .sidebar {
+  background: var(--market-ink);
+  color: #f7f5ed;
+  border: 0;
+  padding: 28px 18px 24px;
+  gap: 24px;
+  box-shadow: 6px 0 24px #243b3210;
+  overflow-y: auto;
+}
+.app-shell .brand {
+  padding: 14px 12px;
+  background: var(--market-surface);
+  border-radius: 8px;
+}
+.app-shell .brand img { max-width: 184px; }
+.app-shell .sidebar nav { gap: 7px; }
+.app-shell .sidebar nav button,
+.app-shell .sidebar-footer > button,
+.app-shell .sidebar .live-badge {
+  color: #f0f3e8;
+  min-height: 46px;
+  border-radius: 8px;
+  background: transparent;
+}
+.app-shell .sidebar nav button:hover,
+.app-shell .sidebar-footer > button:hover { background: #365146; }
+.app-shell .sidebar nav button[aria-current="page"],
+.app-shell .sidebar-footer > button[aria-current="page"] {
+  background: #edf0df;
+  color: var(--market-ink);
+  box-shadow: 0 3px 8px #13261d24;
+}
+.app-shell .sidebar .period-label { color: #d6dfcf; font-size: 13px; }
+.app-shell .sidebar .period-label input {
+  background: #304b3e;
+  color: #fffef9;
+  border-color: #718775;
+  color-scheme: dark;
+}
+.app-shell .sidebar :focus-visible { outline-color: #e8c47c; }
+.app-shell .sidebar-footer { margin-top: auto; padding-top: 22px; border-top: 1px solid #506558; }
+.app-shell .workspace { max-width: 1660px; padding: 32px 38px 56px; background: var(--market-paper); }
+.app-shell .app-body { background: var(--market-paper); }
+.app-shell .workspace-content > :first-child { margin-top: 0; }
+.app-shell h1 { font-size: 2rem; letter-spacing: -.025em; line-height: 1.2; }
+.app-shell h2 { letter-spacing: -.015em; }
+.app-shell p { max-width: 75ch; }
+.app-shell .table-scroll, .app-shell .viz-table-wrap { background: var(--market-surface); border-radius: 10px; }
+.app-shell th { background: #edf0e5; color: var(--market-ink); }
+.app-shell td { border-color: var(--market-line); }
+.app-shell tbody tr:hover { background: #f1f4e9; }
+.app-shell summary { text-underline-offset: 4px; }
+.app-shell ::selection { background: #d8e6c5; color: #243b32; }
+.app-shell * { scrollbar-color: #83937c #eff1e7; }
+.app-shell input, .app-shell textarea { caret-color: var(--market-action); }
+.app-shell button, .app-shell a { transition: background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out; }
+.app-shell .workspace button:focus-visible { outline: 3px solid #886222; outline-offset: 3px; }
+.app-shell .sales-control-desk .row-link { color: var(--market-action); }
+.app-shell .sales-control-desk .positive-bar { fill: var(--market-action); }
+.app-shell .control-desk {
+  --c-ink: var(--market-ink);
+  --c-blue: var(--market-action);
+  --c-muted: var(--market-muted);
+  --c-line: var(--market-line);
+  background: transparent;
+  padding-bottom: 24px;
+}
+.app-shell .control-desk .c-heading { margin-bottom: 26px; padding-bottom: 22px; border-bottom: 1px solid var(--market-line); }
+.app-shell .control-desk .c-heading h1 { font-size: 2rem; }
+.app-shell .control-desk .c-matrix {
+  border: 0;
+  background: var(--market-surface);
+  border-radius: 14px;
+  box-shadow: var(--market-raised);
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+.app-shell .control-desk .c-matrix > button { padding: 24px; gap: 12px; }
+.app-shell .control-desk .c-matrix > button:focus-visible { outline-offset: -3px; }
+.app-shell .control-desk .c-matrix > button:first-child { background: #e9efdf; padding-left: 24px; }
+.app-shell .control-desk .c-matrix > button:last-child { padding-right: 24px; }
+.app-shell .control-desk .c-matrix > button:hover { background: #f0f3e6; }
+.app-shell .control-desk .c-matrix > button > span { font-size: 13px; }
+.app-shell .control-desk .c-matrix strong { font-size: 1.85rem; letter-spacing: -.025em; }
+.app-shell .control-desk .c-matrix small { font-size: 12px; }
+.app-shell .control-desk .c-matrix em { font-size: 12px; }
+.app-shell .control-desk .c-chart { padding: 24px; border: 0; background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); }
+.app-shell .control-desk .c-duo { gap: 30px; padding-top: 30px; }
+.app-shell .control-desk .c-ranking, .app-shell .control-desk .c-bridge { min-width: 0; }
+.app-shell .control-desk .c-text-action { color: var(--market-action); font-size: 13px; white-space: normal; text-align: left; }
+.app-shell .control-desk .c-evidence { padding-top: 22px; }
+.app-shell .control-desk .c-notice { background: #fff0d6; color: #694b17; border-radius: 10px; }
+.app-shell .viz-frame {
+  --viz-sales: #34644c;
+  --viz-contribution: #4c7963;
+  --viz-cost: #a58a57;
+  --viz-negative: #aa4a37;
+  --viz-unknown-fill: #f5ead5;
+  --viz-unknown-stroke: #927643;
+}
+.app-shell .viz-toggle button[aria-pressed="true"] { background: var(--market-ink); color: #fffef9; }
+.app-shell .viz-row-label, .app-shell .viz-row-value { color: var(--market-ink); }
+.app-shell .source-est { color: var(--market-ink); }
+.app-shell .est-head { padding-bottom: 24px; border-bottom: 1px solid var(--market-line); }
+.app-shell .est-kpis { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 0; margin-block: 24px; border-radius: 14px; overflow: hidden; background: var(--market-surface); box-shadow: var(--market-raised); }
+.app-shell .est-kpis .metric { border: 0; border-radius: 0; padding: 22px; border-right: 1px solid var(--market-line); background: transparent; min-width: 0; }
+.app-shell .est-kpis .metric:last-child { border-right: 0; }
+.app-shell .est-kpis .est-hero { background: #e9efdf; }
+.app-shell .est-kpis h3 { font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
+.app-shell .est-kpis strong { color: var(--market-ink); font-size: 1.65rem; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.app-shell .est-kpis p { font-size: 12px; margin-top: 12px; }
+.app-shell .est-chart { padding: 24px; background: var(--market-surface); border-radius: 14px; margin-block: 22px; box-shadow: var(--market-raised); }
+.app-shell .est-unknown { padding: 14px 18px; border-radius: 10px; background: #fff0d6; color: #694b17; }
+.app-shell .settings-page {
+  --glaze: var(--market-surface);
+  --grout-light: #edf0e4;
+  --ink: var(--market-ink);
+  --ink-soft: var(--market-muted);
+  --cobalt: #315c45;
+  --turquoise: #426c59;
+  --coral: #765d3b;
+  --saffron: #dfc38a;
+}
+.app-shell .tile-panel { gap: 18px; }
+.app-shell .tile { border-radius: 12px; box-shadow: var(--market-raised); }
+.app-shell .tile-band { background: var(--band); box-shadow: none; }
+.app-shell .tile-body { padding: 22px; }
+.app-shell .settings-heading h1 { font-size: 2rem; }
+.app-shell .skip-workspace { position: fixed; z-index: 100; left: 16px; top: -100px; background: var(--market-surface); color: var(--market-ink); }
+.app-shell .skip-workspace:focus { top: 12px; }
+.welcome-page { background: var(--market-paper); color: var(--market-ink); padding: 0 5% 48px; }
+.welcome-page .masthead { max-width: 1420px; margin: auto; height: 104px; }
+.welcome-page .desk { max-width: 1420px; grid-template-columns: .9fr 1.1fr; min-height: 650px; gap: 28px; }
+.welcome-page .blue-stage { background: var(--market-ink); color: #fffef9; border-radius: 16px; padding: 48px; box-shadow: 0 18px 42px #243b3220; }
+.welcome-page .stage-top { color: #d5dfcb; }
+.welcome-page .blue-stage h1 { font-size: 3.7rem; line-height: 1.15; letter-spacing: -.03em; margin: 64px 0 40px; }
+.welcome-page .blue-stage h1 em { color: #e8c47c; }
+.welcome-page .stage-bottom > span:first-child { color: #d5dfcb; font-size: 14px; }
+.welcome-page .stage-seal { border-color: #819477; color: #e8c47c; }
+.welcome-page .launch { background: var(--market-surface); border-radius: 16px; padding: 44px 48px; box-shadow: var(--market-raised); }
+.welcome-page .launch h2 { font-size: 2rem; font-weight: 650; }
+.welcome-page .launch-intro p, .welcome-page .launch-links div span { color: var(--market-muted); font-size: 14px; }
+.welcome-page .primary { background: var(--market-action); border-radius: 10px; color: #fffef9; box-shadow: 0 4px 10px #243b321a; }
+.welcome-page .primary:hover { background: #244b36; }
+.welcome-page .launch-links button { color: var(--market-ink); padding: 18px 0; border-color: var(--market-line); }
+.welcome-page .launch-links button:hover { color: var(--market-action); background: #f2f5e9; }
+.welcome-page .launch-links strong { font-size: 15px; }
+.welcome-page .launch-foot { font-size: 12px; }
+.welcome-page .launch-foot .text-button { font-size: 12px; }
+.welcome-page .guide { background: #e9efdf; color: var(--market-ink); }
+.welcome-page .text-button:hover { color: var(--market-action); }
+.welcome-page ::selection { background: #d8e6c5; color: var(--market-ink); }
+@media (max-width: 1200px) {
+  .app-shell .workspace { padding-inline: 26px; }
+  .app-shell .est-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .est-kpis .metric:nth-child(2) { border-right: 0; }
+  .app-shell .est-kpis .metric:nth-child(n+3) { border-top: 1px solid var(--market-line); }
+  .welcome-page .blue-stage, .welcome-page .launch { padding: 32px; }
+  .welcome-page .blue-stage h1 { font-size: 3rem; }
+}
+@media (max-width: 800px) {
+  .app-shell, .app-shell.monthly-shell, .app-shell.page-desk-shell { display: block; }
+  .app-shell .sidebar { height: auto; position: relative; padding: 18px; gap: 16px; }
+  .app-shell .brand { width: 190px; }
+  .app-shell .sidebar-footer { margin-top: 0; padding-top: 12px; }
+  .app-shell .workspace { padding: 24px 18px 40px; }
+  .app-shell .control-desk .c-matrix > button { padding: 20px; }
+  .welcome-page .desk { display: flex; flex-direction: column; gap: 20px; }
+  .welcome-page .blue-stage h1 { font-size: 2.75rem; margin: 30px 0; }
+  .welcome-page .blue-stage, .welcome-page .launch { border-radius: 14px; }
+}
+@media (max-width: 500px) {
+  .app-shell h1, .app-shell .control-desk .c-heading h1 { font-size: 1.65rem; }
+  .app-shell .est-kpis { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .est-kpis .metric { border-right: 0; border-top: 1px solid var(--market-line); }
+  .app-shell .est-kpis .metric:first-child { border-top: 0; }
+  .app-shell .control-desk .c-chart, .app-shell .est-chart { padding: 18px 14px; }
+  .welcome-page { padding-inline: 18px; }
+  .welcome-page .blue-stage, .welcome-page .launch { padding: 26px; }
+  .welcome-page .blue-stage h1 { font-size: 2.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .welcome-page * { transition: none !important; animation: none !important; }
+}
+@media (forced-colors: active) {
+  .app-shell, .app-shell .sidebar, .app-shell .app-body, .app-shell .control-desk,
+  .app-shell .c-matrix, .app-shell .c-chart, .app-shell .est-kpis,
+  .app-shell .est-kpis .metric, .app-shell .est-chart, .welcome-page,
+  .welcome-page .blue-stage, .welcome-page .launch { background: Canvas; color: CanvasText; box-shadow: none; }
+  .app-shell .sidebar nav button, .app-shell .sidebar-footer > button { color: ButtonText; }
+  .app-shell .sidebar nav button[aria-current="page"] { background: Highlight; color: HighlightText; border: 2px solid Highlight; }
+  .app-shell .c-matrix, .app-shell .c-chart, .app-shell .est-kpis, .app-shell .est-chart { border: 1px solid CanvasText; }
+  .app-shell :focus-visible, .welcome-page :focus-visible { outline-color: Highlight; }
+}

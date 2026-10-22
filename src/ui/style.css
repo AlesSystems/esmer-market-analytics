@@ -10,6 +10,7 @@
 @import "./overview/source-control-desk.css";
 @import "./welcome/welcome.css";
 @import "./charts/charts.css";
+@import "./owner-workspace.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);
