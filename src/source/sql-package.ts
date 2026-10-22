@@ -15,26 +15,33 @@ export function monthWindow(month: string, months = MAX_MONTHS): {from: string; 
   const match = /^(\d{4})-(\d{2})$/.exec(month);
   if (!match || !Number.isInteger(months) || months < 1 || months > MAX_MONTHS) throw new Error("INVALID_ARGUMENTS");
   const year = Number(match[1]), index = Number(match[2]) - 1;
-  if (index < 0 || index > 11 || year < 1900 || year > 9998) throw new Error("INVALID_ARGUMENTS");
-  return {from: iso(year, index - months + 1, 1), to: iso(year, index + 1, 0), months};
+  if (index < 0 || index > 11 || year > 9998) throw new Error("INVALID_ARGUMENTS");
+  const window = {from: iso(year, index - months + 1, 1), to: iso(year, index + 1, 0), months};
+  if (window.from < "1900-01-01") throw new Error("INVALID_ARGUMENTS");
+  return window;
 }
 
 export type MonthlyEstimate = {bytes: Buffer; from: string; to: string; months: number; counts: {headers: number; lines: number; products: number}};
+const sizeLimit = (error: unknown) => error instanceof Error && error.cause === "SIZE_LIMIT";
 
 /**
  * Writes an `sql-backup-estimate-v2` package for the selected month plus up to `months - 1` previous months.
- * The package bounds (100,000 rows, 32 MiB) stay fixed: when a window exceeds them, the oldest month is dropped and the
- * extraction repeats, down to the selected month alone. Every other failure is final.
+ * The connection file's from/to is the declared outer bound: the requested window must lie inside it.
+ * The package bounds (100,000 rows, 32 MiB) stay fixed: when a window exceeds them during extraction or when the
+ * package is written, the oldest month is dropped and the extraction repeats, down to the selected month alone.
+ * Every other failure is final.
  */
 export async function prepareMonthlyEstimate(config: SqlServerConfig, month: string, months = MAX_MONTHS, signal?: AbortSignal): Promise<MonthlyEstimate> {
-  for (let span = monthWindow(month, months).months; ; span--) {
+  const requested = monthWindow(month, months);
+  if (requested.from < config.from || requested.to > config.to) throw new Error("WINDOW_OUTSIDE_CONFIG");
+  for (let span = requested.months; ; span--) {
     const window = monthWindow(month, span);
     try {
       const snapshot = await extractSqlServer({...config, from: window.from, to: window.to}, signal, {cost: true});
       const bytes = writeRawEstimatePackage(snapshot, config.lineage, randomUUID());
       return {bytes, ...window, counts: {headers: snapshot.headers.length, lines: snapshot.lines.length, products: snapshot.products?.length ?? 0}};
     } catch (error) {
-      if (span === 1 || !(error instanceof Error && error.cause === "SIZE_LIMIT")) throw error;
+      if (span === 1 || !sizeLimit(error)) throw error;
     }
   }
 }

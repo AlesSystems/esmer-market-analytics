@@ -8,7 +8,8 @@ export async function readConnectionFile(path: string): Promise<SqlServerConfig>
   try {
     const stat = await file.stat();
     if (!stat.isFile() || stat.size > 16 * 1024 || process.platform !== "win32" && (stat.mode & 0o077) !== 0) throw Error("INVALID_CONFIG_FILE");
-    return parseSqlServerConfig(JSON.parse(await file.readFile("utf8")));
+    const text = await file.readFile("utf8");
+    try { return parseSqlServerConfig(JSON.parse(text)); } catch { throw Error("INVALID_CONFIG_FILE"); }
   } finally { await file.close(); }
 }
 
