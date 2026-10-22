@@ -63,7 +63,7 @@ test("selected return month shows pinned daily amounts, original cost and comple
       await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
       await page.screenshot({ path: `${reviewDirectory}/monthly-export.png` }); await page.waitForTimeout(6000);
     }
-    const report = await page.evaluate(() => window.esmer.openMonthly({ period: "2025-09" }));
+    const report = await page.evaluate(async () => { const sales = await window.esmer.openSales({ period: "2025-09" }); if (sales.status !== "report") throw new Error("Expected sales report"); return window.esmer.queryMonthly({ context: sales.view.context }); });
     if (report.status !== "monthly") throw new Error("Expected monthly report");
     expect(await page.evaluate(reportId => window.esmer.exportReportVersion({ reportId }), report.report.id)).toEqual({ status: "saved" });
     const monthly = await readSheet(monthlyPath, 1);

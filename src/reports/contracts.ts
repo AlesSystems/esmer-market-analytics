@@ -47,7 +47,6 @@ export type ReportSummary = { cutoff: string; id: string; period: string; datase
 export type ReportHistoryResult = { status: "history"; reports: ReportSummary[] };
 export type ReportDifference = { status: "difference"; candidateId: string; acceptedId: string; changes: { path: string; before: string | number | boolean | null; after: string | number | boolean | null; delta: string | null }[] };
 export type ReportRequestMap = {
-  openMonthly: OpenSalesRequest;
   queryMonthly: { context: ReportContext };
   listReportVersions: { period: string };
   readReportVersion: { reportId: string };

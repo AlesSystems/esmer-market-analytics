@@ -212,7 +212,6 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if (request.operation === "openSales") result = reports!.open(request.payload);
     else if (request.operation === "querySales") result = reports!.query(request.payload);
     else if (request.operation === "inspectSales") result = reports!.inspect(request.payload);
-    else if (request.operation === "openMonthly") result = versions!.openDisplay(request.payload, control);
     else if (request.operation === "queryMonthly") result = versions!.currentDisplay(request.payload, control);
     else if (request.operation === "listReportVersions") result = versions!.list(request.payload);
     else if (request.operation === "readReportVersion") result = versions!.display(request.payload);

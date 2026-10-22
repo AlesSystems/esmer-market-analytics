@@ -83,7 +83,7 @@ test("monthly and export requests reject spoofed fields before privileged work",
     ["readReportPurchasing", { reportId: "report-1", datasetId: "current" }],
     ["readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null, limit: 10000 }],
     ["acceptReportVersion", { candidateId: "candidate", previousAcceptedId: null, reason: "" }],
-    ["openMonthly", { period: "2025-99" }],
+    ["queryMonthly", { context: null }],
   ] as const) expect(await invoke(true, operation, payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
   expect(await invoke(false, "exportReportVersion", { reportId: "report-1" })).toMatchObject({ code: "UNTRUSTED_SENDER" });
   expect(await invoke(false, "readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null })).toMatchObject({ code: "UNTRUSTED_SENDER" });

@@ -8,7 +8,7 @@ import type { ExpenseResult, ExpenseRequests, OperatingReportResult } from "../e
 import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDifference, SalesFailure } from "../reports/contracts";
 import type { RecoveryResult, RecoveryServiceRequest } from "../recovery/contracts";
-export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "openMonthly" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
+export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
 export type JobOutcome = { status: "busy" } | { status: "cancelled" };
 export type ReportExportResult = Extract<EstimateResult,{status:"source-unavailable"}> | SalesFailure | { status: "saved" } | { status: "cancelled" } | { status: "failed"; code: "REPORT_EXPORT_FAILED"; message: string };
 export type ReportServiceRequest = { [K in keyof ReportRequestMap]: { operation: K; payload: ReportRequestMap[K] } }[keyof ReportRequestMap];
@@ -54,7 +54,6 @@ export interface DesktopApi {
   prepareRestore(): Promise<RecoveryResult | RequestError>;
   confirmRestore(request: {token: string}): Promise<RecoveryResult | RequestError>;
   cancelRestore(request: {token: string}): Promise<RecoveryResult | RequestError>;
-  openMonthly(request: ReportRequestMap["openMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
   queryMonthly(request: ReportRequestMap["queryMonthly"]): Promise<MonthlyDisplayResult | JobOutcome | RequestError>;
   listReportVersions(request: ReportRequestMap["listReportVersions"]): Promise<ReportHistoryResult | SalesFailure | RequestError>;
   readReportVersion(request: ReportRequestMap["readReportVersion"]): Promise<MonthlyDisplayResult | RequestError>;

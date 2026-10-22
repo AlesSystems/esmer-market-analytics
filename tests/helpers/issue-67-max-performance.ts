@@ -42,7 +42,7 @@ try{
  await expect(page.getByRole('region',{name:'Ürün katkıları',exact:true}).locator('tbody tr')).toHaveCount(2,{timeout:120000});
  await expect.poll(()=>page.evaluate(()=>window.esmer.getOperationStatus()),{timeout:120000}).toEqual({status:'idle'});
  const launchMonthReadyMs=performance.now()-started;
- let t=performance.now();const monthly=await page.evaluate(()=>window.esmer.openMonthly({period:'2025-09'}));const monthlyMs=performance.now()-t;
+ let t=performance.now();const monthly=await page.evaluate(async()=>{const sales=await window.esmer.openSales({period:'2025-09'});if(sales.status!=='report')throw Error('SALES_FAILED');return window.esmer.queryMonthly({context:sales.view.context});});const monthlyMs=performance.now()-t;
  assert.equal(monthly.status,'monthly');if(monthly.status!=='monthly'||monthly.report.format!=='monthly-report-v2')throw Error('MONTH_FAILED');
  assert.equal(monthly.report.productProfit.summary.coveredGrossProfit,String(-20n*BigInt(groups)));
  const reportId=monthly.report.id;
