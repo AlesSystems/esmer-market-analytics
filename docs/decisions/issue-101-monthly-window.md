@@ -5,7 +5,8 @@ Date: 2026-10-22. Implements the window/cap decision of [issue #101](https://git
 ## Decision
 
 1. **Windowed monthly packages, bounds unchanged.** `npm run prepare:month -- <conn.json> <YYYY-MM> [months=6] [out.json]` asks for the selected calendar month plus up to five previous months. The 100,000-row and 32 MiB package bounds in `src/source/package.ts` stay as they are.
-2. **Shrink from the oldest month.** If a window exceeds either bound, the command drops the oldest month and extracts again, down to the selected month alone. The printed line names the window actually written (`months=<written>/<requested>`). Every other failure (permissions, missing columns, wrong database, timeout) stops at once and writes nothing.
+2. **Shrink from the oldest month.** If a window exceeds either bound, during extraction or when the package is written, the command drops the oldest month and extracts again, down to the selected month alone. The printed line names the window actually written (`months=<written>/<requested>`). Every other failure (permissions, missing columns, wrong database, timeout) stops at once and writes nothing.
+4. **The connection file still declares the bound.** Its `from`/`to` is the outer range the operator allows, for example a whole year. The requested window must lie inside it, otherwise the command fails with `WINDOW_OUTSIDE_CONFIG` before reading.
 3. **One month that does not fit fails.** The command never splits or truncates a month.
 
 ## Why not raise the bounds
@@ -18,7 +19,7 @@ The [estimate contract](../contracts/recorded-estimates.md) states that it does 
 
 - At September 2025 volume the owner receives about three months per package. Month-over-month comparison works; a six-month trend (#108) does not, unless the real months are smaller or the bounds are later raised.
 - A newer package replaces the previous source package. Expenses, settings, report history and accepted reports stay unchanged (regression test `tests/integration/monthly-package.test.ts`).
-- Estimate packages need `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI`. The extractor selects it only for this command (`extractSqlServer(..., {cost: true})`); the live connection and the preview command keep their earlier projection. The privacy contract describes this column as an application-input allowance and not permission to broaden runtime SQL queries; this command is the isolated-copy preparation path, not runtime access. Reviewers should confirm that reading.
+- Estimate packages need `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI`. The extractor selects it only for this command (`extractSqlServer(..., {cost: true})`); the live connection and the preview command keep their earlier projection. Reading `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI` for `prepare:month` against the isolated copy needs explicit owner approval, recorded in [privacy](../contracts/privacy.md) and [recorded-source estimates](../contracts/recorded-estimates.md). That approval is pending; until it is recorded, do not run the command against a real backup.
 - The catalogue columns `STOK.AD`, `STOK.STOK_GRUP`, `STOK.STOK_BIRIM`, `STOK_GRUP.AD` and `STOK_BIRIM.AD` from #99 remain unverified against the real schema. If any is missing or not granted, extraction fails with `SOURCE_REJECTED` and nothing is written.
 
 ## Revisit when
