@@ -52,7 +52,6 @@
     --ink: var(--foreground);
     --green: var(--market-positive);
     --red: var(--market-negative);
-    --blue: var(--market-action);
   }
   * { box-sizing: border-box; scrollbar-color: color-mix(in srgb, var(--market-muted) 70%, var(--market-line)) var(--market-hover); }
   body { margin: 0; background: var(--background); color: var(--ink); font-size: 15px; line-height: 1.5; }
@@ -191,7 +190,7 @@
   .figure-status { font-size: 13px; font-weight: 400; padding: 0; margin: 8px 0 0; border: 0; }
   .figure-status summary { font-size: 12px; color: var(--muted); }
   .subview-nav, .report-actions, .expense-actions, .recovery-actions, .operation-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
-  .subview-nav button[aria-pressed="true"], .subview-nav button[aria-current="page"] { background: var(--accent); color: var(--accent-foreground); border-color: var(--line); }
+  .subview-nav button[aria-pressed="true"], .subview-nav button[aria-current="page"] { background: var(--accent); color: var(--accent-foreground); border-color: color-mix(in srgb, var(--market-action) 30%, var(--market-line)); }
   .purchase-filters { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
   .purchase-filters label, .expense-reason, .review-reason, .saved-evidence label, .report-actions label { display: grid; gap: 6px; max-width: 100%; min-width: 0; }
   .report-actions label { flex: 1 1 240px; }

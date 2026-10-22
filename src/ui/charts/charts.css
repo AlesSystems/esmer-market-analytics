@@ -1,5 +1,5 @@
 :root{
---viz-sales:#34644c;--viz-contribution:#4c7963;--viz-accent-3:#c2410c;--viz-violet:#7c4dbd;--viz-gold:#b8860b;--viz-cost:#a58a57;--viz-negative:#aa4a37;
+--viz-sales:#34644c;--viz-contribution:#4c7963;--viz-accent-3:#c2410c;--viz-violet:#7c4dbd;--viz-gold:#b8860b;--viz-cost:#a58a57;--viz-neutral:color-mix(in srgb,var(--market-muted) 45%,var(--market-line));--viz-negative:#aa4a37;
 --viz-unknown-fill:#f5ead5;--viz-unknown-stroke:#927643;
 --viz-grid:color-mix(in srgb,var(--market-line) 60%,var(--market-surface));--viz-axis:var(--market-input);--viz-weekend:color-mix(in srgb,var(--market-wash) 45%,var(--market-paper));--viz-hover:var(--market-hover);
 --viz-ink:var(--market-ink);--viz-muted:var(--market-muted);--viz-line:var(--market-line);--viz-surface:var(--market-surface);

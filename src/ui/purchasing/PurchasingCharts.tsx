@@ -47,6 +47,6 @@ export function ReplacementChart({ rows }: { rows: ReplacementRow[] }) {
   const id = (row: ReplacementRow) => `${row.productId}:${row.unit}`;
   const table = { caption: "İkame maliyeti nominal değişimi", columns: [{ label: "Ürün" }, { label: "Son birim fiyat", numeric: true }, { label: "Nominal değişim", numeric: true }], rows: shown.map(row => [row.productName, `${money(row.latestUnitCost)} / ${unit(row.unit)}`, row.nominalChangePercent === null ? "Bilinmiyor" : percent(row.nominalChangePercent)]) };
   return <ChartFrame title="İkame maliyeti değişimi" summary={`Son doğrulanmış alış fiyatına göre nominal değişim${known.length < rows.length - unknownRows.length ? ` · en büyük ${LIMIT} değişim` : ""}${unknownRows.length ? ` · ${count(unknownRows.length)} üründe karşılaştırma bilinmiyor (sıfır değil)` : ""}. Enflasyon veya reel büyüme değildir.`} table={table}>
-    <RankBars ariaLabel="İkame maliyeti değişimi" color="var(--viz-cost)" formatValue={percent} rows={shown.map(row => ({ id: id(row), label: row.productName, detail: `${money(row.latestUnitCost)} / ${unit(row.unit)}`, value: row.nominalChangePercent }))} />
+    <RankBars ariaLabel="İkame maliyeti değişimi" color="var(--viz-neutral)" formatValue={percent} rows={shown.map(row => ({ id: id(row), label: row.productName, detail: `${money(row.latestUnitCost)} / ${unit(row.unit)}`, value: row.nominalChangePercent }))} />
   </ChartFrame>;
 }

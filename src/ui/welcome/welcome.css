@@ -16,18 +16,18 @@
 .welcome-page .mark{width:25px;height:25px}
 .welcome-page .desk{max-width:1300px;margin:auto;display:grid;grid-template-columns:1.1fr 1fr;min-height:610px}
 .welcome-page .blue-stage{padding:42px 48px;display:flex;flex-direction:column;border-radius:12px 0 0 12px}
-.welcome-page .stage-top{display:flex;align-items:center;gap:12px;font-size:12px;}
+.welcome-page .stage-top{display:flex;align-items:center;gap:12px;font-size:12px}
 .welcome-page .blue-stage h1{font-size:clamp(45px,4.7vw,70px);font-weight:500;letter-spacing:-.035em;line-height:1.12;margin:54px 0 48px}
 .welcome-page .blue-stage h1 em{font-family:"Welcome Newsreader",serif;font-weight:400}
 .welcome-page .stage-bottom{display:flex;align-items:end;justify-content:space-between;margin-top:auto}
 .welcome-page .stage-bottom>span:first-child{font-size:13px;line-height:1.7}
-.welcome-page .stage-seal{font-family:"Welcome Newsreader",serif;font-size:43px;font-style:italic;border-top:1px solid;padding-top:8px}
+.welcome-page .stage-seal{font-family:"Welcome Newsreader",serif;font-size:43px;font-style:italic;border-top:1px solid color-mix(in srgb,var(--market-surface) 35%,var(--market-ink));padding-top:8px}
 .welcome-page .launch{padding:40px 48px;border-radius:0 12px 12px 0}
 .welcome-page .launch h2{font-size:35px;font-weight:500;letter-spacing:-.025em;margin:0 0 12px}
 .welcome-page .launch-intro p{font-size:14px;line-height:1.8;margin:0 0 26px}
 .welcome-page .launch .primary{width:100%;padding:18px 20px}
 .welcome-page .launch-links{margin-top:28px}
-.welcome-page .launch-links button{border-radius:0;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;border:0;border-bottom:1px solid;background:transparent;padding:16px 0}
+.welcome-page .launch-links button{border-radius:0;display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;border:0;border-bottom:1px solid var(--market-line);background:transparent;padding:16px 0}
 .welcome-page .launch-links strong{display:block;font-size:14px;font-weight:600}
 .welcome-page .launch-links div span{display:block;font-size:11px;margin-top:4px}
 .welcome-page .launch-foot{display:flex;justify-content:space-between;align-items:center;margin-top:24px;font-size:11px}

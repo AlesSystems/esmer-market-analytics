@@ -82,11 +82,11 @@ body {
 .app-shell h2 { letter-spacing: -.015em; }
 .app-shell p { max-width: 75ch; }
 .app-shell .table-scroll, .app-shell .viz-table-wrap { background: var(--market-surface); border-radius: 10px; }
-.app-shell th { background: var(--market-hover); color: var(--market-ink); }
+.app-shell th { background: color-mix(in srgb, var(--market-wash) 75%, var(--market-surface)); color: var(--market-ink); }
 .app-shell td { border-color: var(--market-line); }
 .app-shell tbody tr:hover { background: var(--market-hover); }
 .app-shell summary { text-underline-offset: 4px; }
-.app-shell ::selection, .welcome-page ::selection { background: var(--market-selection); color: var(--market-ink); }
+::selection { background: var(--market-selection); color: var(--market-ink); }
 .app-shell input, .app-shell textarea { caret-color: var(--market-action); }
 .app-shell button, .app-shell a { transition: background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out; }
 .app-shell .workspace button:focus-visible { outline: 3px solid var(--market-focus); outline-offset: 3px; }
@@ -142,13 +142,13 @@ body {
 .welcome-page .blue-stage h1 { font-size: 3.7rem; line-height: 1.15; letter-spacing: -.03em; margin: 64px 0 40px; }
 .welcome-page .blue-stage h1 em { color: var(--market-gold); }
 .welcome-page .stage-bottom > span:first-child { color: var(--market-line); font-size: 14px; }
-.welcome-page .stage-seal { border-color: color-mix(in srgb, var(--market-surface) 35%, var(--market-ink)); color: var(--market-gold); }
+.welcome-page .stage-seal { color: var(--market-gold); }
 .welcome-page .launch { background: var(--market-surface); border-radius: 16px; padding: 44px 48px; box-shadow: var(--market-raised); }
 .welcome-page .launch h2 { font-size: 2rem; font-weight: 650; }
 .welcome-page .launch-intro p, .welcome-page .launch-links div span { color: var(--market-muted); font-size: 14px; }
 .welcome-page .primary { background: var(--market-action); border-radius: 10px; color: var(--market-surface); box-shadow: 0 4px 10px color-mix(in srgb, var(--market-ink) 10%, transparent); }
 .welcome-page .primary:hover { background: color-mix(in srgb, var(--market-action) 80%, var(--market-ink)); }
-.welcome-page .launch-links button { color: var(--market-ink); padding: 18px 0; border-color: var(--market-line); }
+.welcome-page .launch-links button { color: var(--market-ink); padding: 18px 0; }
 .welcome-page .launch-links button:hover { color: var(--market-action); background: var(--market-hover); }
 .welcome-page .launch-links strong { font-size: 15px; }
 .welcome-page .launch-foot { font-size: 12px; }
