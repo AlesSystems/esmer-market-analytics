@@ -83,7 +83,7 @@ async function fixture(extraPath?: string, content = "synthetic", currentBuild =
       await writeFile(join(app, path), "synthetic build asset");
     }
     await mkdir(join(release, "resources", "licences"), { recursive: true });
-    for (const name of ["LICENSE", "LICENSES.chromium.html", "shadcn-LICENSE", "tailwindcss-LICENSE", "three-LICENSE", "react-three-fiber-LICENSE", "manrope-LICENSE", "newsreader-LICENSE", "its-fine-LICENSE", "react-use-measure-LICENSE", "suspend-react-LICENSE", "zustand-LICENSE", "use-sync-external-store-LICENSE", "scheduler-LICENSE", "react-LICENSE"]) {
+    for (const name of ["LICENSE", "LICENSES.chromium.html", "shadcn-LICENSE", "tailwindcss-LICENSE", "manrope-LICENSE", "newsreader-LICENSE", "scheduler-LICENSE", "react-LICENSE"]) {
       await writeFile(join(release, "resources", "licences", name), "synthetic dependency notice");
     }
   }
@@ -136,7 +136,7 @@ test("release inspection admits the current build assets and notices while inven
   expect(result.archiveFiles.map(file => file.path)).toEqual([
     "dist/desktop/main.cjs", "dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/manrope-latin-ext-wght-normal.woff2", "dist/ui/assets/manrope-latin-wght-normal.woff2", "dist/ui/assets/newsreader-latin-ext-wght-italic.woff2", "dist/ui/assets/newsreader-latin-wght-italic.woff2", "package.json",
   ]);
-  expect(result.files).toHaveLength(16);
+  expect(result.files).toHaveLength(9);
   expect(result.violations).toEqual([]);
 });
 
