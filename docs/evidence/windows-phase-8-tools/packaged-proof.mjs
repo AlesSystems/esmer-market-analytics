@@ -111,7 +111,9 @@ try {
     await expect(page.getByRole('region', { name: 'Aylık göstergeler' })).toContainText('200,00 ₺');
     const timed = await page.evaluate(async () => {
       const began = performance.now();
-      const opened = await window.esmer.openMonthly({ period: '2025-09' });
+      const sales = await window.esmer.openSales({ period: '2025-09' });
+      if (sales.status !== 'report') throw new Error('SALES_UNAVAILABLE');
+      const opened = await window.esmer.queryMonthly({ context: sales.view.context });
       const monthlyMs = performance.now() - began;
       if (opened.status !== 'monthly') throw new Error('MONTHLY_UNAVAILABLE');
       const drillStart = performance.now();
