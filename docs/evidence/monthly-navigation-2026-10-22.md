@@ -2,7 +2,7 @@
 
 Packaged owner-workspace verification found a financial Özet to Satışlar transition ending in `Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.` without its page heading. Separate `MonthlyWorkspace` instances request the same monthly report. Effect cleanup ignores late responses but does not stop the underlying desktop operation. The exclusive `OperationJobs` gate rejects a second overlapping request with `busy`.
 
-The focused reproduction uses the actual `OperationJobs` and a deferred service action. On commit `5e0becf`, the summary read succeeds while the overlapping sales read fails:
+The focused reproduction uses the actual `OperationJobs` and a deferred service action. On commit `c29b06c`, the summary read succeeds while the overlapping sales read fails:
 
 ```text
 FAIL tests/integration/monthly-read.test.ts > overlapping monthly navigation shares one pending read instead of displaying busy
@@ -16,11 +16,11 @@ AssertionError: expected { status: 'busy' } to deeply equal { Object (status, pe
   }
 ```
 
-Commit `668ee58` coalesces concurrent identical `queryMonthly` calls inside the validated desktop report handler. The key includes session, dataset, app revision, calculation version and period. It shares only a pending promise, not retained report data. Completion and rejection evict the entry. All work still passes through `OperationJobs`; different contexts, active imports and `openMonthly` retain exclusive admission. No write, cancellation, sender or payload validation is bypassed.
+Commit `4e698b1` coalesces concurrent identical `queryMonthly` calls inside the validated desktop report handler. The key includes session, dataset, app revision, calculation version and period. It shares only a pending promise, not retained report data. Completion and rejection evict the entry. All work still passes through `OperationJobs`; different contexts, active imports and `openMonthly` retain exclusive admission. No write, cancellation, sender or payload validation is bypassed.
 
 Lifting report ownership into `SalesWorkspace` was considered. That would change multiple component contracts and their lifecycle state. Sharing the pending named read fixes the measured dispatch conflict with a smaller surface. It preserves normal revalidation after a request settles.
 
-Verification after `bf262fd`:
+Verification after `e449f45`:
 
 ```text
 Test Files  2 passed (2)
