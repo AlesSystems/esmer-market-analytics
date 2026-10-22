@@ -60,6 +60,7 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
       await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue(source ? "2025-10" : "2025-09");
       for (const name of routes) {
         await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true }).click();
+        await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true })).toHaveAttribute("aria-current", "page");
         await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
         await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
         await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
@@ -92,10 +93,10 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
       await page.keyboard.press("Shift+Tab");
       await expect(metric).toBeFocused();
       await expect(metric).toHaveCSS("outline-offset", "-3px");
-      await page.screenshot({ path: join(output, "metric-keyboard-focus.png"), fullPage: true });
+      await capture("metric-keyboard-focus", 2);
     }
     await page.emulateMedia({ forcedColors: "active" });
-    await page.screenshot({ path: join(output, "forced-colors.png"), fullPage: true });
+    await capture("forced-colors", 2);
     expect(errors).toEqual([]);
   } finally {
     await app.close();
