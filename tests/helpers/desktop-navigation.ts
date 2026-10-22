@@ -25,3 +25,9 @@ export async function openReportView(page: Page, name: "Aylık rapor" | "Veri ve
   await openSection(page, "Rapor ve Excel");
   await page.getByRole("navigation", { name: "Rapor bölümleri" }).getByRole("button", { name, exact: true }).click();
 }
+
+/** Keyboard variant of openReportView: activates Rapor ve Excel, then the sub-view, with Enter. */
+export async function pressReportView(page: Page, name: "Aylık rapor" | "Veri ve kaynak" | "Alış belgeleri") {
+  await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Rapor ve Excel", exact: true }).press("Enter");
+  await page.getByRole("navigation", { name: "Rapor bölümleri" }).getByRole("button", { name, exact: true }).press("Enter");
+}

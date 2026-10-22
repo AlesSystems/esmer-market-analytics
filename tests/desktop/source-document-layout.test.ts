@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import {test,expect,_electron as electron} from "@playwright/test";
 import {mkdtemp,rm,mkdir} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -17,7 +17,7 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
   const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try{
    const page=await app.firstWindow();await openWorkspace(page);await page.setViewportSize({width:1440,height:1000});
-   await page.getByText("Kaydedilmiş belge ve satır sayıları",{exact:true}).click();
+   await openReportView(page,"Veri ve kaynak");
    await expect(page.getByRole("region",{name:"Kaynak kayıt göstergeleri",exact:true})).toBeVisible();
    expect(await page.locator(".viz-plot:visible, .viz-rows:visible").count()).toBeLessThanOrEqual(3);
    const evidence=page.getByRole("complementary",{name:"Kaynak kapsamı ve yöntem",exact:true});
@@ -25,8 +25,10 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
    await expect(evidence.getByText("fixture:document-layout",{exact:true})).not.toBeVisible();
    await evidence.getByText("Veri ve hesaplama ayrıntıları",{exact:true}).click();
    await expect(evidence.getByText("fixture:document-layout",{exact:true})).toBeVisible();
-   await page.getByRole("button",{name:destination,exact:true}).click();
-   if(destination==="Satışlar")await page.getByRole("button",{name:"Kaydedilmiş satış belgelerini aç",exact:true}).click();
+   // Satışlar: the counts desk opens the recorded source documents; Alışlar ve maliyet: Rapor ve Excel → Alış belgeleri.
+   if(destination==="Satışlar")await page.getByRole("region",{name:"Kaynak kayıt göstergeleri",exact:true}).getByRole("button",{name:/Belge kaydı/}).click();
+   else await openReportView(page,"Alış belgeleri");
+   await expect(page.getByRole("heading",{name:destination,level:1})).toBeVisible();
    await page.getByLabel("Belge türü (kaynak kodu)",{exact:true}).fill(type);
    await page.getByText("Gelişmiş filtreler",{exact:true}).click();
    await page.getByLabel("Ürün kayıt ID’si",{exact:true}).fill("300");
@@ -36,7 +38,8 @@ for(const destination of ["Satışlar","Alışlar ve maliyet"]){
    if(process.env.ESMER_CAPTURE_BEFORE==="1"&&destination==="Satışlar"){
     await mkdir("work/poteto/source-document-layout",{recursive:true});await page.screenshot({path:"work/poteto/source-document-layout/before.png",fullPage:true});
    }
-   const first=page.getByRole("row").filter({has:page.getByRole("cell",{name:"100",exact:true})});
+   await page.getByRole("heading",{name:"Kaynak belge 1",exact:true}).evaluate(e=>e.scrollIntoView({block:"start"}));
+   const first=page.getByRole("row").filter({has:page.getByRole("cell",{name:"100",exact:true})}).filter({visible:true});
    await expect(first).toBeInViewport();
    await expect(page.getByRole("cell",{name:"12,34567890123456789",exact:true})).toHaveCount(7);
    await expect(page.getByRole("cell",{name:"3,4567890123456789",exact:true})).toHaveCount(7);

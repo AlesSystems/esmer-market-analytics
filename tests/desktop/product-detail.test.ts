@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -20,7 +20,7 @@ test("selected return month shows pinned daily amounts, original cost and comple
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`], ...(reviewDirectory ? { recordVideo: { dir: reviewDirectory } } : {}) });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     const detail = page.getByRole("region", { name: "Seçili ürün özeti", exact: true });
     await expect(detail).toContainText("-100,00 ₺");
@@ -44,9 +44,9 @@ test("selected return month shows pinned daily amounts, original cost and comple
     if (reviewDirectory) { await page.screenshot({ path: `${reviewDirectory}/original-sale.png` }); await page.waitForTimeout(6000); }
     await page.getByRole("button", { name: "İadeye dön", exact: true }).click();
     await expect(page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true })).toBeFocused();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("İçme");
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     const output = join(root, "selected.xlsx");
     await app.evaluate(({ dialog }, filePath) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath }); }, output);
     await page.getByRole("button", { name: "Seçili ürünü Excel'e aktar", exact: true }).click();
@@ -57,7 +57,7 @@ test("selected return month shows pinned daily amounts, original cost and comple
     const monthlyPath = join(root, "monthly.xlsx");
     await app.evaluate(({ dialog }, filePath) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath }); }, monthlyPath);
     if (reviewDirectory) {
-      await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+      await openReportView(page, "Aylık rapor");
 
       await page.getByRole("region", { name: "Seçili rapor", exact: true }).getByRole("button", { name: "Seçili aylık raporu Excel'e aktar", exact: true }).click();
       await expect(page.getByText("Seçili rapor Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
@@ -88,7 +88,7 @@ test("original-sale evidence preserves mixed and unknown quantity units and cost
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${root}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByRole("button", { name: "Çay", exact: true }).click();
     await page.getByRole("button", { name: "Asıl satışı aç · A1", exact: true }).click();
     const evidence = page.getByRole("region", { name: "Asıl satış kanıtı", exact: true });

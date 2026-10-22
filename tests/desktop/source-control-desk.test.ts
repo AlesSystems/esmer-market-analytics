@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import {test, expect, _electron as electron} from "@playwright/test";
 import {mkdtemp, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -19,7 +19,8 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
+    await openReportView(page, "Veri ve kaynak");
+    await expect(page.getByRole("heading", {name: "Veri ve kaynak", exact: true})).toBeVisible();
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix).toBeVisible();
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("3");
@@ -56,13 +57,13 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
     await matrix.getByRole("button", {name: /Ürün kayıt ID’si/}).press("Enter");
     await expect(page.getByRole("columnheader", {name: "Ürün kayıt ID’si", exact: true})).toBeVisible();
     await expect(page.getByRole("button", {name: "444", exact: true})).toBeVisible();
-    await page.getByRole("button", {name: "Özet", exact: true}).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("Belge türlerinin tam sayılarını göster", {exact: true}).click();
     await page.getByRole("table", {name: "Kaynak belge türleri tablosu"}).getByRole("button", {name: "999 · Tür anlamı doğrulanmadı"}).press("Enter");
     await expect(page.getByRole("button", {name: "3", exact: true})).toBeVisible();
     await expect(page.getByRole("button", {name: "1", exact: true})).toHaveCount(0);
-    await page.getByRole("button", {name: "Özet", exact: true}).click();
-    await page.getByLabel("Dönem", {exact: true}).fill("2025-11");
+    await openReportView(page, "Veri ve kaynak");
+    await page.locator(".sidebar").getByLabel("Dönem", {exact: true}).fill("2025-11");
     await expect(matrix.getByRole("button")).toHaveCount(4);
     for (const button of await matrix.getByRole("button").all()) await expect(button).toContainText("Kapsam dışında");
     await expect(page.getByText("Seçili dönem yedek kapsamı dışında. Eksik veri sıfır sayılmaz.", {exact: true})).toBeVisible();
@@ -81,6 +82,7 @@ test("source desk discloses truncated type counts and an empty month within the 
   const app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     const page = await app.firstWindow();await openWorkspace(page);
+    await openReportView(page, "Veri ve kaynak");
     const matrix = page.getByRole("region", {name: "Kaynak kayıt göstergeleri", exact: true});
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("51");
     await expect(matrix.getByRole("button", {name: /Satırsız belge/})).toContainText("51");
@@ -88,7 +90,7 @@ test("source desk discloses truncated type counts and an empty month within the 
     await expect(page.getByText("diğer türler grafikte ve tabloda yok.", {exact: false})).toBeVisible();
     await page.getByText("Belge türlerinin tam sayılarını göster", {exact: true}).click();
     await expect(page.getByRole("table", {name: "Kaynak belge türleri tablosu"}).getByRole("row")).toHaveCount(51);
-    await page.getByLabel("Dönem", {exact: true}).fill("2025-09");
+    await page.locator(".sidebar").getByLabel("Dönem", {exact: true}).fill("2025-09");
     await expect(matrix.getByRole("button", {name: /Belge kaydı/})).toContainText("0");
     await expect(page.getByText("Bu dönem için günlük belge kaydı yok.", {exact: true})).toBeVisible();
     await expect(page.getByText("Bu dönem için belge türü kaydı yok.", {exact: true})).toBeVisible();

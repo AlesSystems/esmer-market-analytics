@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView, pressReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,8 +21,7 @@ test("packaged product-profit pages stay bounded and accepted values survive res
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("1.010,00 ₺");
     await expect(page.getByRole("region", { name: "Ürün katkıları", exact: true }).locator("tbody tr")).toHaveCount(100);
     await page.getByRole("button", { name: "Sonraki 100 ürün", exact: true }).click();
@@ -68,7 +67,7 @@ test("packaged product-profit pages stay bounded and accepted values survive res
     await app.close();
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("1.010,00 ₺");
     await expect.poll(() => page.evaluate(() => window.esmer.getOperationStatus())).toEqual({ status: "idle" });
     const reopened = await page.evaluate(reportId => window.esmer.readReportVersion({ reportId }), reportId);
@@ -86,7 +85,7 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`], ...(reviewDirectory ? { recordVideo: { dir: reviewDirectory } } : {}) });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     const summary = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(summary).toContainText("60,00 ₺");
@@ -151,7 +150,7 @@ test("late product, document and month responses cannot replace the current sele
         });
       });
       const page = await app.firstWindow();await openWorkspace(page);
-      await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+      await openReportView(page, "Aylık rapor");
       await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
       return page;
     });
@@ -190,8 +189,8 @@ test("late product, document and month responses cannot replace the current sele
       await expect(page.getByRole("region", { name: "Sabit belge kanıtı" })).not.toContainText("200,00 ₺");
     });
     await test.step("monthrace", async () => {
-      await page.getByLabel("Dönem", { exact: true }).fill("2025-10");
-      await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
+      await page.getByLabel("Dönem", { exact: true }).filter({ visible: true }).fill("2025-10");
+      await page.getByLabel("Dönem", { exact: true }).filter({ visible: true }).fill("2025-09");
       await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("60,00 ₺");
       await page.waitForTimeout(600);
       await expect(page.getByRole("region", { name: "Seçili ürün kanıtı" })).toHaveCount(0);
@@ -221,7 +220,7 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     const summary = page.getByRole("region", { name: "Aylık göstergeler", exact: true });
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     if (scenario === "empty") { await expect(page.locator(".monthly-amount")).toHaveText("Bu ay satış veya iade yok"); await expect(page.locator(".monthly-trend .viz-zero-marker")).toHaveCount(30); }
@@ -257,12 +256,12 @@ test("keyboard zoom, full-document scope and filtered export preserve the pinned
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await page.setViewportSize({ width: 680, height: 720 });
     await app.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(2); });
     const opener = page.getByRole("button", { name: "Çay", exact: true });
-    await page.getByLabel("Dönem", { exact: true }).focus();
+    await page.getByLabel("Dönem", { exact: true }).filter({ visible: true }).focus();
     for (let tab = 0; tab < 40 && !await opener.evaluate(node => node === document.activeElement); tab++) await page.keyboard.press("Tab");
     await expect(opener).toBeFocused();
     await opener.press("Enter");
@@ -280,7 +279,7 @@ test("keyboard zoom, full-document scope and filtered export preserve the pinned
     await expect(opener).toBeFocused();
     await page.screenshot({ path: testInfo.outputPath("lane-08.png") });
     await app.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(1); });
-    await page.getByRole("button", { name: "Raporlar", exact: true }).press("Enter");
+    await pressReportView(page, "Aylık rapor");
     await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await page.getByLabel("Rapor inceleme açıklaması").fill("Sentetik tam kapsam kontrolü");
     await page.getByRole("button", { name: "İncelenen raporu kaydet", exact: true }).press("Enter");
@@ -314,9 +313,8 @@ test("synthetic compatibility v1 shape keeps original overview and export withou
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
     await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await page.getByRole("button", { name: "Kaydedilmiş sürümü aç", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
@@ -349,7 +347,7 @@ test("product and evidence failures retry locally without replacing the monthly 
       });
     });
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
     await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("hata");
     await expect(page.getByRole("button", { name: "Ürün listesini yeniden yükle", exact: true })).toBeVisible();
@@ -374,7 +372,7 @@ test("Satışlar and Raporlar lead with charts that keep unknown, zero and cover
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     const ranking = page.getByRole("list", { name: "Kapsanan kâra göre ilk on ürün" });
     await expect(ranking).toBeVisible();
     await expect(ranking.locator("li[data-state='value']").first()).toContainText("₺");
@@ -388,7 +386,7 @@ test("Satışlar and Raporlar lead with charts that keep unknown, zero and cover
     await page.getByRole("button", { name: "Ürün listesine dön" }).click();
     await expect(rankButton).toBeFocused();
     await expect(page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" })).toBeVisible();
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("group", { name: "Günlük tahmini brüt kâr grafiği" }).filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("img", { name: /^Satırların kapsanan \d+, dışlanan [1-9]/ })).toBeVisible();
     await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("dışlanan satır");

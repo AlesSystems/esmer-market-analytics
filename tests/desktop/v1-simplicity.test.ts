@@ -1,4 +1,6 @@
 import { openWorkspace } from "../helpers/desktop-navigation";
+// Routes are the four sections, the three Rapor ve Excel views and Ayarlar (#103/#105), all entered by keyboard.
+// Rapor ve Excel hosts the older workspaces, which keep their own h1 under the page h1 until #107.
 import { executablePath } from "../helpers/desktop-executable";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
@@ -26,9 +28,16 @@ for (const mode of ["financial", "source"] as const) {
       const errors: string[] = [];
       page.on("pageerror", error => errors.push(error.message));
       const canvases: Record<string, number> = {};
-      for (const name of ["Özet", "Satışlar", "Alışlar ve maliyet", "Giderler", "Raporlar", "Ayarlar"]) {
-        await page.getByRole("button", { name, exact: true }).first().press("Enter");
-        await expect(page.locator("h1:visible")).toHaveCount(1);
+      const nav = page.getByRole("navigation", { name: "Ana gezinme" }), views = page.getByRole("navigation", { name: "Rapor bölümleri" });
+      const routes: [string, string, string?][] = [["Bu ay", "Bu ay"], ["Ürünler", "Ürünler"], ["Veri ve kaynak", "Rapor ve Excel", "Veri ve kaynak"], ["Alış belgeleri", "Rapor ve Excel", "Alış belgeleri"], ["Giderler", "Giderler"], ["Aylık rapor", "Rapor ve Excel", "Aylık rapor"], ["Ayarlar", "Ayarlar"]];
+      for (const [name, section, view] of routes) {
+        if (section === "Ayarlar") await page.getByRole("button", { name: "Ayarlar", exact: true }).press("Enter");
+        else await nav.getByRole("button", { name: section, exact: true }).press("Enter");
+        if (view) await views.getByRole("button", { name: view, exact: true }).press("Enter");
+        if (view) {
+          await expect(page.locator(".workspace-content h1:visible").first()).toHaveText("Rapor ve Excel");
+          await expect(page.locator("h1:visible")).toHaveCount(2);
+        } else await expect(page.locator("h1:visible")).toHaveCount(1);
         await page.evaluate(() => document.fonts.ready);
         for (const width of [1440, 1120, 680, 390]) {
           await page.setViewportSize({ width, height: 1000 });
@@ -38,23 +47,24 @@ for (const mode of ["financial", "source"] as const) {
         canvases[name] = await page.locator("canvas:visible").count();
         await page.setViewportSize({ width: 1440, height: 1000 });
       }
-      await page.getByRole("button", { name: "Giderler", exact: true }).first().press("Enter");
+      await nav.getByRole("button", { name: "Giderler", exact: true }).press("Enter");
       await page.getByRole("button", { name: "Excel’den aktar", exact: true }).press("Enter");
       await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toBeVisible();
       await page.getByRole("button", { name: "Kayıtlara dön", exact: true }).press("Enter");
       await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).press("Enter");
       await expect(page.getByRole("checkbox")).toBeVisible();
-      await page.getByRole("button", { name: "Özet", exact: true }).press("Enter");
+      await nav.getByRole("button", { name: "Rapor ve Excel", exact: true }).press("Enter");
       if (mode === "financial") {
-        await expect(page.getByRole("region", { name: "Aylık performans", exact: true })).toContainText("40,00 ₺");
-        await expect(page.locator(".c-evidence")).toContainText("%50");
+        await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("40,00 ₺");
+        await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("%50");
       } else {
+        await views.getByRole("button", { name: "Veri ve kaynak", exact: true }).press("Enter");
         await expect(page.getByRole("region", { name: "Kaynak kayıt göstergeleri" })).toContainText("Belge kaydı");
         await expect(page.getByRole("complementary", { name: "Kaynak kapsamı ve yöntem" })).toContainText("Mali sonuçlar doğrulanmadı");
       }
       await testInfo.attach("decorative-renderer-counts", { body: JSON.stringify(canvases), contentType: "application/json" });
       expect(errors).toEqual([]);
-      expect(canvases).toEqual({ "Özet": 0, "Satışlar": 0, "Alışlar ve maliyet": 0, "Giderler": 0, "Raporlar": 0, "Ayarlar": 0 });
+      expect(canvases).toEqual({ "Bu ay": 0, "Ürünler": 0, "Veri ve kaynak": 0, "Alış belgeleri": 0, "Giderler": 0, "Aylık rapor": 0, "Ayarlar": 0 });
     } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
   });
 }

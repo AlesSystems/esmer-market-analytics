@@ -4,7 +4,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
 import { openStore } from "../../src/store/store";
-import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import {openReportView, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+// The financial Özet desk was removed (#103); preserved local sales are read from Rapor ve Excel › Veri ve kaynak.
 
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin"
   ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`)
@@ -23,7 +24,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
   let app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
   try {
     let page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", {name: "Ay bir bakışta", exact: true})).toBeVisible();
+    await expect(page.getByRole("heading", {name: "Bu ay", level: 1})).toBeVisible();
     await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toBeHidden();
     await openSettings(page);
     await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toBeHidden();
@@ -50,7 +51,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     await expect(page.getByRole("button", {name: "Canlı bağlantı kapalı", exact: true})).toBeVisible();
     await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
-    if (!configured) await expect(page.getByRole("region", {name: "Aylık performans"})).toContainText("200,00 ₺");
+    if (!configured) {await openReportView(page, "Veri ve kaynak");await expect(page.getByRole("region", {name: "Satış özeti"})).toContainText("200,00 ₺");}
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     page = await app.firstWindow();await openWorkspace(page);
@@ -58,8 +59,9 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await expect(page.getByRole("button", {name: "Test bağlantısını aç", exact: true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
     await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
+    await openReportView(page, "Veri ve kaynak");
     if(configured) await expect(page.getByRole("region", {name: "Kaynak kayıt göstergeleri"})).toBeVisible();
-    else await expect(page.getByRole("region", {name: "Aylık performans"})).toContainText("200,00 ₺");
+    else await expect(page.getByRole("region", {name: "Satış özeti"})).toContainText("200,00 ₺");
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));
     try {expect(store.readSnapshot()).toEqual(before);} finally {store.close();}

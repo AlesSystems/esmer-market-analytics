@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -23,6 +23,7 @@ for (const mode of ["financial", "source"] as const) {
     const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     try {
       const page = await app.firstWindow();await openWorkspace(page);
+      await openReportView(page, "Veri ve kaynak");
       if (mode === "source") {
         const summary = page.locator(".data-status > summary");
         await expect(summary).toBeVisible();
@@ -32,7 +33,7 @@ for (const mode of ["financial", "source"] as const) {
         await expect(summary.locator("..")).toHaveAttribute("open", "");
         await page.keyboard.press("Enter");
       }
-      await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+      if (mode === "source") await page.getByRole("button", { name: "Tüm kaynak belgeleri" }).click();
       if (mode === "financial") await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
       await expect(page.getByRole("heading", { name: mode === "financial" ? "Satış Özeti" : "Satışlar", exact: true })).toBeVisible();
       if (mode === "financial") await expect(page.locator(".metric").first()).toContainText("365,00 ₺");

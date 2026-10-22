@@ -3,7 +3,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { executablePath } from "../helpers/desktop-executable";
-import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import {openReportView, openSection, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+// The Özet desks were removed (#103): source counts live in Rapor ve Excel › Veri ve kaynak, financial coverage in Aylık rapor.
 import { openStore } from "../../src/store/store";
 import { businessPackage } from "../helpers/business-fixtures";
 import { writeRawPackage } from "../../src/source/raw-package";
@@ -21,6 +22,7 @@ for (const mode of ["financial", "source"] as const) {
     try {
       const page = await app.firstWindow();await openWorkspace(page);
       if (mode === "source") {
+        await openReportView(page, "Veri ve kaynak");
         const indicators = page.getByRole("region", { name: "Kaynak kayıt göstergeleri" });
         await expect(indicators).toContainText("Tüm durum ve türler");
         await expect(indicators.getByRole("button", { name: /Belge kaydı/ })).toContainText("1");
@@ -30,14 +32,14 @@ for (const mode of ["financial", "source"] as const) {
         await expect(page.getByRole("button", { name: "1", exact: true })).toBeVisible();
         await expect(page.getByRole("button", { name: "Ürün kimliklerini göster", exact: true })).toBeVisible();
         await expect(page.locator(".source-results-toolbar")).not.toContainText("belge kaydı");
-        await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+        await openReportView(page, "Aylık rapor");
         await expect(page.getByRole("region", {name: "Kaynak tahmini"})).toContainText("maliyet adayı içeren veri paketi seçin");
         await page.getByRole("button", {name: "Önceki kaydedilmiş raporlar", exact: true}).click();
         await expect(page.locator(".report-workspace")).toContainText("kendi kaynak sürümlerine aittir");
         await expect(page.locator(".report-workspace")).toContainText("buradan yeni mali rapor oluşturulamaz");
       } else {
-        await expect(page.locator(".c-evidence")).toContainText("%50");
-        await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+        await openReportView(page, "Aylık rapor");
+        await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true }).locator("dt", { hasText: "Maliyet kapsamı (mutlak net tutar)" }).locator("xpath=following-sibling::dd[1]")).toHaveText("%50");
         const selected = page.getByRole("region", { name: "Seçili rapor", exact: true });
         await expect(selected).toContainText("30.09.2025");
         await expect(selected).not.toContainText("Seçili veri sonu");
@@ -46,7 +48,7 @@ for (const mode of ["financial", "source"] as const) {
         await expect(selected).toContainText("business-fixture");
         await expect(page.getByRole("region", { name: "Aylık göstergeler", exact: true })).toContainText("gider verileri eksik");
       }
-      await page.getByRole("button", { name: "Giderler", exact: true }).click();
+      await openSection(page, "Giderler");
       await expect(page.getByText("Kayıt bulunmaması, gider olmadığı anlamına gelmez.", { exact: true })).toBeVisible();
       await page.locator("#expense-manual").click();
       await expect(page.getByLabel("Gider tarihi", { exact: true })).toBeVisible();

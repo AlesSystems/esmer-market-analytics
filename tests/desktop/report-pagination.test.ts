@@ -1,4 +1,4 @@
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -22,7 +22,7 @@ test("packaged sales tables render at most 100 rows and every transaction remain
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster" }).click();
     await expect(page.locator(".sales-control-desk tbody tr").filter({ visible: true })).toHaveCount(100);

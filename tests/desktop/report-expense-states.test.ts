@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView, openSection } from "../helpers/desktop-navigation";
 import {test, expect, _electron as electron} from "@playwright/test";
 import {mkdtemp, rm} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -18,9 +18,9 @@ test("report history failure has retry, while a successful empty history explain
  const store=openStore(database);store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:reports","batch-1"));store.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
-  await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await openReportView(page, "Aylık rapor");
   await page.getByRole("button",{name:"Önceki kaydedilmiş raporlar",exact:true}).click();
   await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();
   await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
@@ -31,8 +31,8 @@ test("report history failure has retry, while a successful empty history explain
   await expect(page.getByText("Açık SQL yedeğinin mali anlamları doğrulanmadı;",{exact:false})).toBeVisible();
   await expect(page.getByRole("main")).toHaveCount(1);
   const failedAgain=new DatabaseSync(database);failedAgain.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");failedAgain.close();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
+  await page.locator(".sidebar").getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
+  await page.locator(".sidebar").getByLabel("Dönem",{exact:true}).fill("2025-10");await expect(page.getByRole("button",{name:"Raporları yeniden yükle"})).toBeVisible();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).not.toBeVisible();
   const repaired=new DatabaseSync(database);repaired.exec("ALTER TABLE report_versions_unavailable RENAME TO report_versions");repaired.close();await page.getByRole("button",{name:"Raporları yeniden yükle"}).click();await expect(page.getByText("Bu dönem için kaydedilmiş rapor yok.",{exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
@@ -44,17 +44,17 @@ test("source expenses and opened saved reports expose one main landmark and usef
  store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:landmarks","batch-1"));store.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Giderler",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
+  await openSection(page, "Giderler");
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByText("Bu dönemde gider kaydı yok.",{exact:true})).toBeVisible();
   await expect(page.getByRole("button",{name:"Excel’den aktar"})).toBeVisible();
   await expect(page.getByRole("button",{name:"Şablonu kaydet"})).toBeVisible();
   await page.getByRole("button",{name:"Excel’den aktar"}).click();
   await expect(page.getByRole("heading",{name:"1. Şablonu indir / dosya seç"})).toBeFocused();
-  await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await openReportView(page, "Aylık rapor");
   await page.getByRole("button",{name:"Önceki kaydedilmiş raporlar",exact:true}).click();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
+  await page.locator(".sidebar").getByLabel("Dönem",{exact:true}).fill("2025-09");
   await expect(page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true})).toBeVisible();
   const db=new DatabaseSync(database);db.exec("ALTER TABLE report_versions RENAME TO report_versions_unavailable");db.close();
   await page.getByRole("button",{name:"Kaydedilmiş sürümü aç",exact:true}).click();

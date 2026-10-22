@@ -1,4 +1,4 @@
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openReportView, openSection, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -118,7 +118,7 @@ test("invalid rows block a whole workbook and duplicate candidates require expli
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-test("operating report stays pinned after expense edits until the owner reopens it", async () => {
+test("operating report reopens on the reviewed expense revision after expense edits", async () => {
   const { writeFile } = await import("node:fs/promises");
   const { default: writeXlsxFile } = await import("write-excel-file/node");
   const { expenseColumns } = await import("../../src/expenses/template");
@@ -133,10 +133,10 @@ test("operating report stays pinned after expense edits until the owner reopens 
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     const operating = page.locator(".monthly-operating");
     await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await openSection(page, "Giderler");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
     await page.getByRole("button", { name: "Excel seç", exact: true }).click();
@@ -148,11 +148,9 @@ test("operating report stays pinned after expense edits until the owner reopens 
     await page.getByLabel("İnceleme açıklaması").fill("Eylül kontrolü");
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();
     await expect(page.getByText("Dönemin giderleri eksiksiz olarak onaylandı", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Özet", exact: true }).click();
-    await expect(page.getByText("Gider kayıtları değişti", { exact: true }).first()).toBeVisible();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
-    await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
-    await page.getByRole("button", { name: "Aylık raporu yeni giderlerle aç" }).click();
+    // Rapor ve Excel remounts after Giderler, so the report reopens on the new expense revision (no pinned stale notice).
+    await openReportView(page, "Aylık rapor");
+    await expect(page.getByText("Gider kayıtları değişti", { exact: true })).toHaveCount(0);
     await operating.locator(":scope > summary").click();
     await expect(operating).toContainText("Tahmini yönetim faaliyet kârı");
     await expect(operating.locator(".operating-value")).toHaveText("30,00 ₺");

@@ -1,4 +1,4 @@
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -18,10 +18,10 @@ test("packaged sales workspace follows a number through product, document and so
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
-    await expect(page.getByLabel("Dönem")).toHaveValue("2025-09");
+    await expect(page.locator(".sidebar").getByLabel("Dönem")).toHaveValue("2025-09");
     await expect(page.locator(".metric").first()).toContainText("365,00 ₺");
     await expect(page.locator(".metric").nth(1)).toContainText("3");
     await expect(page.locator(".metric").nth(2)).toContainText("133,33 ₺");
@@ -64,18 +64,14 @@ test("packaged sales workspace follows a number through product, document and so
     await panel.getByRole("button", { name: "Kaynak detayını göster" }).first().click();
     await writeFile(packagePath, salesPackage(journeyRecords(), { extractionId: "sales-2" }));
     await importPackage(page);
-    await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toBeVisible();
-    await panel.getByText("Kaynak ve yöntem", { exact: true }).click();
-    await expect(panel.getByText("sales-1", { exact: true })).toBeVisible();
-    await expect(page.locator(".sales-control-desk").getByLabel("Ürün ara")).toHaveValue("İÇME");
-    await page.screenshot({ path: "test-results/phase-5-sales-journey.png" });
-    await panel.getByRole("button", { name: "Satışlara dön" }).click();
-    await page.getByRole("button", { name: "Raporu yenile" }).click();
-    const secondary = page.getByText("İşlemler ve satış dağılımı", { exact: true });
-    if (!await secondary.locator("..").evaluate(node => node.hasAttribute("open"))) await secondary.click();
-    await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
+    // A successful import returns to Bu ay; the sales workspace then opens on the new version, never a stale pinned detail.
+    await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("status").getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
+    await openReportView(page, "Veri ve kaynak");
+    await expect(page.getByRole("heading", { name: "Satışlar", exact: true, level: 1 })).toBeVisible();
     await expect(page.getByText("Yeni veri sürümü hazır", { exact: true })).toHaveCount(0);
+    await expect(page.locator(".detail-panel")).toHaveCount(0);
+    await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster" }).click();
     await page.getByLabel("İşlem türü").selectOption("customer-return");
     await expect(page.getByRole("button", { name: "R001", exact: true })).toBeVisible();
@@ -101,7 +97,7 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await expect(page.locator(".sales-control-desk .notice").getByText("Kısmi dönem", { exact: true })).toBeVisible();
@@ -128,7 +124,7 @@ test("packaged sales workspace distinguishes discrepancies, excluded contributio
     await expect(panel.getByText("Kaydedilen başlık neti:", { exact: false })).toContainText("130,00 ₺");
     await page.screenshot({ path: "test-results/phase-5-sales-discrepancy.png" });
     await panel.getByRole("button", { name: "Satışlara dön" }).click();
-    await page.getByLabel("Dönem").fill("2025-10");
+    await page.locator(".sidebar").getByLabel("Dönem").fill("2025-10");
     await expect(page.getByText("Dönem verisi yok", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Satış özetine dön", exact: true }).click();
     await expect(page.locator(".metric").first()).toContainText("Veri yok");

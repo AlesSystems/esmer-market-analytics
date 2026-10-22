@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -55,7 +55,7 @@ test("complete 25000-document synthetic dataset keeps monthly and drill-down int
         await page.waitForFunction(() => document.querySelector("h1")?.textContent === "Ay bir bakışta" && document.body.textContent?.includes("2.500.000,00"));
         const sample = { process: iteration + 1, startupMs: performance.now() - start, ordinary: {} as Record<string, number> };
         samples.push(sample);
-        await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+        await openReportView(page, "Aylık rapor");
         await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
         sample.ordinary.salesFirst = await measure(page, "Satışlar", ".monthly-profit-page h1", "Satışlar");
         await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();

@@ -4,7 +4,7 @@ import {tmpdir} from "node:os";
 import {join, resolve} from "node:path";
 import {createLiveSqlFixture, syntheticHeader, syntheticLine} from "../helpers/live-sql-fixture";
 import {businessPackage} from "../helpers/business-fixtures";
-import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import {openSettings, openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import {openStore} from "../../src/store/store";
 import {SalesReports} from "../../src/reports/query";
 import {ReportVersions} from "../../src/reports/versions";
@@ -14,6 +14,16 @@ import {workbook, row} from "../helpers/expense-fixtures";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin"
   ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`)
   : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
+
+/** Sidebar month picker (embedded workspaces keep their own). */
+const month = (page: Page) => page.locator(".sidebar").getByLabel("Dönem", {exact: true});
+
+/** The old Satışlar screen: Veri ve kaynak → all source documents, narrowed to sales-related type codes. */
+async function openSourceSales(page: Page) {
+  await openReportView(page, "Veri ve kaynak");
+  await page.getByRole("button", {name: "Tüm kaynak belgeleri", exact: true}).click();
+  await page.getByLabel("Kayıt kapsamı").selectOption("sales");
+}
 
 async function backgroundRefresh(page: Page) {
   const result = await page.evaluate(() => window.esmer.refreshLiveSource());
@@ -50,9 +60,9 @@ async function setup() {
       await openSettings(page);
       await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);
       await page.getByRole("button", {name: "SQL kaynağını içe aktar", exact: true}).click();
-      await expect(page.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible({timeout: 30_000});
-      await page.getByLabel("Dönem", {exact: true}).fill("2025-09");
-      await page.getByRole("button", {name: "Satışlar", exact: true}).click();
+      await expect(page.getByRole("navigation", {name: "Ana gezinme"}).getByRole("button", {name: "Bu ay", exact: true})).toHaveAttribute("aria-current", "page", {timeout: 30_000});
+      await month(page).fill("2025-09");
+      await openSourceSales(page);
       await expect(page.getByRole("button", {name: "1001", exact: true})).toBeVisible();
       return {fixture, userData, app, page, before, accepted, reportId};
     } catch (error) {await app.close(); throw error;}
@@ -89,17 +99,17 @@ test("packaged disposable SQL tracks captures without losing inspection and reta
     await page.getByRole("checkbox", {name: "Tam kaynak değerlerini göster", exact: true}).check();
     await expect(recordedAmount.getByText("50.00000000", {exact: true})).toBeVisible();
     await expect(page.getByRole("heading", {name: "Kaynak belge 1001", exact: true})).toBeVisible();
-    await expect(page.getByLabel("Dönem", {exact: true})).toHaveValue("2025-09");
+    await expect(month(page)).toHaveValue("2025-09");
     await page.getByRole("button", {name: "Belgelere dön", exact: true}).click();
     await expect(page.getByLabel("Ürün kayıt ID’si", {exact: true})).toHaveValue("9007199254740997");
     await fixture.execute(`${syntheticHeader("1003", "2025-09-12")}; ${syntheticLine("2003", "1003")}; UPDATE dbo.FIS SET FIS_TARIHI='2025-08-01' WHERE ID=1002`);
     await backgroundRefresh(page);
     await expect(page.getByRole("button", {name: "1003", exact: true})).toBeVisible({timeout: 15_000});
     await expect(page.getByRole("button", {name: "1002", exact: true})).toHaveCount(0);
-    await page.getByLabel("Dönem", {exact: true}).fill("2025-08");
+    await month(page).fill("2025-08");
     await expect(page.getByRole("button", {name: "1002", exact: true})).toBeVisible();
     await expect(page.getByRole("cell", {name: "01.08.2025", exact: true})).toBeVisible();
-    await page.getByLabel("Dönem", {exact: true}).fill("2025-09");
+    await month(page).fill("2025-09");
     await page.getByRole("button", {name: "1003", exact: true}).click();
     await fixture.execute("DELETE dbo.FIS_DETAY WHERE FIS=1003; DELETE dbo.FIS WHERE ID=1003");
     await backgroundRefresh(page);
@@ -127,7 +137,8 @@ test("packaged disposable SQL tracks captures without losing inspection and reta
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     const restarted = await app.firstWindow();await openWorkspace(restarted);
-    await expect(restarted.getByRole("heading", {name: "Aylık Market Özeti", exact: true})).toBeVisible();
+    await openReportView(restarted, "Veri ve kaynak");
+    await expect(restarted.getByRole("heading", {name: "Veri ve kaynak", exact: true})).toBeVisible();
     expect(await restarted.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true});
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));
@@ -167,7 +178,7 @@ test("packaged disposable SQL discovers an insert on the actual five-minute serv
     expect(before).toMatchObject({status: "live", live: {phase: "idle"}});
     await fixture.execute(`${syntheticHeader("1005", "2025-09-14")}; ${syntheticLine("2005", "1005")}`);
     await expect.poll(() => page.getByRole("button", {name: "1005", exact: true}).count(), {timeout: 330_000, intervals: [5000]}).toBe(1);
-    await expect(page.getByLabel("Dönem", {exact: true})).toHaveValue("2025-09");
+    await expect(month(page)).toHaveValue("2025-09");
     await expect(page.getByRole("heading", {name: "Satışlar", exact: true})).toBeVisible();
     const after = await page.evaluate(() => window.esmer.getLiveStatus());
     if (before.status !== "live" || after.status !== "live") throw new Error("LIVE_STATUS_UNAVAILABLE");

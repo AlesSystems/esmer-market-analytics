@@ -1,5 +1,5 @@
 import { executablePath } from "../helpers/desktop-executable";
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace, openReportView, openSection } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -16,7 +16,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await openReportView(page, "Alış belgeleri");
     await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
     await expect(page.getByRole("navigation", { name: "Alış ve maliyet görünümleri" })).toBeVisible();
     await expect(page.getByRole("region", { name: "Alış geçmişi", exact: true })).toBeVisible();
@@ -25,7 +25,7 @@ test("daily workspaces separate ledgers from focused review tasks", async () => 
     await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).click();
     await expect(page.getByLabel("Tedarikçi", { exact: true })).toHaveValue("supplier-1");
     await expect(page.getByRole("region", { name: "Tedarikçi iadeleri", exact: true })).toContainText("Bilinmiyor");
-    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await openSection(page, "Giderler");
     await expect(page.getByRole("button", { name: "Excel seç", exact: true })).toHaveCount(0);
     await expect(page.getByLabel("Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum")).toHaveCount(0);
     await page.getByRole("button", { name: "Giderlerin eksiksizliğini incele", exact: true }).click();
