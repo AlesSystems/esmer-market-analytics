@@ -1,15 +1,14 @@
-import {ChartFrame,DailyBars,RankBars,type DailyDay} from "../charts";
-import {monthDates} from "../charts/geometry";
+import {ChartFrame,DailyBars,monthDates,RankBars,type DailyDay} from "../charts";
+import {count} from "../format";
 import type {SourceView} from "../SourceWorkspace";
 import {typeLabel} from "../source-fields";
 
-export const count=(value:number)=>value.toLocaleString("tr-TR");
 const countText=(value:string)=>count(Number(value));
 const countTick=(value:number)=>count(Math.round(value));
 const documents={key:"documents",label:"Belge kaydı",color:"var(--viz-sales)"};
 
 /** Day columns for a recorded-document count chart. A day without records inside the backup window is unknown (sparse data), outside the window it is out of range; neither is zero. */
-export function dailyCountDays(view:Pick<SourceView,"days"|"from"|"to">,period:string):DailyDay[] {
+function dailyCountDays(view:Pick<SourceView,"days"|"from"|"to">,period:string):DailyDay[] {
  const first=view.from.slice(0,10),last=view.to.slice(0,10),recorded=new Map(view.days.map(row=>[row.date,row.documents]));
  return monthDates(period).flatMap((date):DailyDay[]=>{
   if(date<first||date>last)return [];

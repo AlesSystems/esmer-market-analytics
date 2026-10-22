@@ -1,9 +1,7 @@
 import type {SourceView} from "../SourceWorkspace";
-import {date} from "../format";
+import {count,date} from "../format";
 import {typeLabel} from "../source-fields";
-import "./control-desk.css";
-import "./source-control-desk.css";
-import {SourceDailyCounts,SourceTypeCounts,count} from "./SourceCountCharts";
+import {SourceDailyCounts,SourceTypeCounts} from "./SourceCountCharts";
 
 const sourceDate = (value: string) => date(value.slice(0, 10));
 

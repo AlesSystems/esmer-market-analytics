@@ -4,6 +4,7 @@ export function decimal(value: string, minimum = 0) {
   const tail = fraction.padEnd(minimum, "0");
   return tail ? `${digits},${tail}` : digits;
 }
+export const count = (value: number) => value.toLocaleString("tr-TR");
 export const money = (value: string) => `${decimal(value, 2)} ₺`;
 const dateFormatter = new Intl.DateTimeFormat("tr-TR", { timeZone: "UTC" });
 export const date = (value: string) => dateFormatter.format(new Date(value));

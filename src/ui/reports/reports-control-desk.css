@@ -7,9 +7,9 @@
 .report-archive-filters { display:flex;gap:14px;margin:20px 0;flex-wrap:wrap; }
 .report-archive-filters label:first-child { flex:1;min-width:180px; }
 .report-archive-filters label { display:grid;gap:8px;font-size:12px;font-weight:600; }
-.report-archive-filters input,.report-archive-filters select { width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;padding:10px;background:white; }
+.report-archive-filters input,.report-archive-filters select { width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--market-surface); }
 .report-archive-list table { min-width:580px; }
-.report-archive-list tr[aria-selected=true] { background:#eff4fc; }
+.report-archive-list tr[aria-selected=true] { background:var(--market-wash); }
 .report-inspector { min-width:0;display:grid;gap:20px; }
 .report-inspector dl { display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;font-size:12px; }
 .report-inspector dd { margin:0;overflow-wrap:anywhere; }
@@ -35,11 +35,11 @@
 .monthly-profit-page .monthly-visuals{display:grid;gap:36px;margin:28px 0 34px;min-width:0}
 .monthly-profit-page .monthly-visuals>section,.monthly-profit-page .monthly-visuals>.viz-frame{min-width:0}
 .monthly-profit-page .viz-frame .viz-title{font-size:18px;font-weight:650}
-.monthly-profit-page .viz-frame .viz-summary{margin:4px 0 0;font-size:12px;color:#526078}
-.monthly-profit-page .viz-gap-note{margin:10px 0 0;font-size:11px;color:#526078}
+.monthly-profit-page .viz-frame .viz-summary{margin:4px 0 0;font-size:12px;color:var(--market-muted)}
+.monthly-profit-page .viz-gap-note{margin:10px 0 0;font-size:11px;color:var(--market-muted)}
 .monthly-profit-page .monthly-trend{grid-area:auto;border:0;padding:0;background:transparent;box-shadow:none}
 @media(min-width:1200px){.monthly-profit-page .monthly-visuals.monthly-pair{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:44px;align-items:start}}
-.monthly-profit-page .financial-ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 22px;border-top:2px solid #182644;margin:16px 0 12px}
-.monthly-profit-page .financial-ledger>div{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-bottom:1px solid #dce3ee}
-.monthly-profit-page .financial-ledger dt{font-size:12px;color:#526078}
+.monthly-profit-page .financial-ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 22px;border-top:2px solid var(--market-ink);margin:16px 0 12px}
+.monthly-profit-page .financial-ledger>div{display:flex;flex-direction:column;gap:6px;padding:14px 0;border-bottom:1px solid var(--market-line)}
+.monthly-profit-page .financial-ledger dt{font-size:12px;color:var(--market-muted)}
 .monthly-profit-page .financial-ledger dd{margin:0;font-size:18px;text-align:left}

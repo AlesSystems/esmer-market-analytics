@@ -1,13 +1,12 @@
-import { ChartFrame, CompositionBar, RankBars, type CompositionPart } from "./charts";
+import { ChartFrame, CompositionBar, foldRest, paletteColors, RankBars, type CompositionPart } from "./charts";
 import { classificationLabels, type ExpenseRecord, type ExpenseValue } from "../expenses/contracts";
-import { date, money } from "./format";
+import { count, date, money } from "./format";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
-const count = (value: number) => value.toLocaleString("tr-TR");
 /** The validated five hues. The "Diğer" rest bucket stays neutral (`--viz-cost`). */
-export const categoryPalette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--exp-violet)", "var(--exp-gold)"];
+export const categoryPalette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--viz-violet)", "var(--viz-gold)"];
 /** Shown categories take distinct hues in Turkish name order, so a colour follows the name and never the count. */
 export const categoryColors = (names: string[]): Record<string, string> =>
-  Object.fromEntries(names.toSorted((a, b) => a.localeCompare(b, "tr")).map((name, index) => [name, categoryPalette[index % categoryPalette.length]]));
+  paletteColors(names, categoryPalette, (a, b) => a.localeCompare(b, "tr"));
 const LARGEST = 8;
 const active = (rows: ExpenseRecord[]) => rows.filter(row => !currentValue(row)?.voided);
 
@@ -18,7 +17,7 @@ export function ExpenseCategoryChart({ rows }: { rows: ExpenseRecord[] }) {
   const groups = new Map<string, number>();
   for (const row of live) { const name = currentValue(row)?.category ?? "Eski kayıt"; groups.set(name, (groups.get(name) ?? 0) + 1); }
   const sorted = [...groups.entries()].sort((a, b) => b[1] - a[1]);
-  const head = sorted.slice(0, sorted.length > categoryPalette.length ? categoryPalette.length - 1 : categoryPalette.length), rest = sorted.slice(head.length);
+  const { head, rest } = foldRest(sorted, categoryPalette.length);
   const colors = categoryColors(head.map(([name]) => name));
   const parts: CompositionPart[] = [...head.map(([name, value]) => ({ key: name, label: name, value, color: colors[name] })), ...(rest.length ? [{ key: "__other", label: `Diğer ${count(rest.length)} kategori`, value: rest.reduce((total, [, value]) => total + value, 0), color: "var(--viz-cost)" }] : [])];
   const table = { caption: "Kategoriye göre gider kaydı sayısı", columns: [{ label: "Kategori" }, { label: "Kayıt sayısı", numeric: true }], rows: sorted.map(([name, value]) => [name, count(value)]) };

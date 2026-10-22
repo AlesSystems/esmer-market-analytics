@@ -2,7 +2,7 @@
 .source-control-desk .source-count-details{margin-top:16px;font-size:11px}
 .source-control-desk .source-count-details table{font-size:12px;width:100%}
 .source-control-desk .source-type-action{white-space:normal;text-align:left;justify-content:start}
-.source-control-desk .c-evidence-intro{margin-top:8px;color:#755026}
+.source-control-desk .c-evidence-intro{margin-top:8px;color:var(--market-warn-ink)}
 .source-control-desk .c-matrix small{min-height:32px}
 @media(max-width:480px){
 .source-control-desk .source-count-details table{font-size:10px}
@@ -12,7 +12,7 @@
 /* source header: one compact line plus the evidence disclosure */
 .source-header{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin:0 0 16px;font-size:12px;color:var(--muted)}
 .source-header>p{margin:0;font-size:12px}
-.source-header .source-outside{display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px solid #e4cea4;border-radius:6px;background:#fff8e9;color:#80580b;font-size:12px;font-weight:600}
+.source-header .source-outside{display:inline-flex;align-items:center;min-height:24px;padding:2px 10px;border:1px solid var(--market-warn-line);border-radius:6px;background:var(--market-warn-wash);color:var(--market-warn-ink);font-size:12px;font-weight:600}
 .source-header .data-status>summary{min-height:28px;padding:0;font-size:12px}
 .source-header .data-status{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .source-header .data-status[open]{flex-basis:100%}
@@ -39,7 +39,7 @@
 .est-kpis .metric>strong{margin:6px 0 4px;font-size:22px;line-height:1.2}
 .est-kpis .est-hero>strong{font-size:32px;letter-spacing:-.03em}
 .est-kpis .metric p{margin:0;font-size:12px;line-height:1.45}
-.est-unknown{margin:0;font-size:12px;line-height:1.5;color:#80580b}
+.est-unknown{margin:0;font-size:12px;line-height:1.5;color:var(--market-warn-ink)}
 .est-chart .viz-title{font-size:15px}
 .est-products h2{margin:0 0 2px;font-size:15px}
 .est-products .report-actions{margin:10px 0;align-items:end}

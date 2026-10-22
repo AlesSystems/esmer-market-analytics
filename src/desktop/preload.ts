@@ -14,7 +14,6 @@ const api: DesktopApi = {
   prepareRestore: () => ipcRenderer.invoke("esmer:request", "prepareRestore", null),
   confirmRestore: request => ipcRenderer.invoke("esmer:request", "confirmRestore", request),
   cancelRestore: request => ipcRenderer.invoke("esmer:request", "cancelRestore", request),
-  openMonthly: request => ipcRenderer.invoke("esmer:request", "openMonthly", request),
   queryMonthly: request => ipcRenderer.invoke("esmer:request", "queryMonthly", request),
   listReportVersions: request => ipcRenderer.invoke("esmer:request", "listReportVersions", request),
   readReportVersion: request => ipcRenderer.invoke("esmer:request", "readReportVersion", request),

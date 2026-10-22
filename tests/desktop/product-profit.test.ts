@@ -41,7 +41,7 @@ test("packaged product-profit pages stay bounded and accepted values survive res
     await page.screenshot({ path: testInfo.outputPath("lane-03-04.png") });
     await page.getByLabel("Ürün ara", { exact: true }).filter({ visible: true }).fill("");
     await expect.poll(() => page.evaluate(() => window.esmer.getOperationStatus())).toEqual({ status: "idle" });
-    const opened = await page.evaluate(() => window.esmer.openMonthly({ period: "2025-09" }));
+    const opened = await page.evaluate(async () => { const sales = await window.esmer.openSales({ period: "2025-09" }); if (sales.status !== "report") throw new Error("Expected sales report"); return window.esmer.queryMonthly({ context: sales.view.context }); });
     if (opened.status !== "monthly" || opened.report.format !== "monthly-report-v2") throw new Error("Expected v2 monthly display");
     const reportId = opened.report.id;
     expect(opened.report.productProfit).toMatchObject({ productCount: 101, summary: { netSales: "1010", coveredCost: "606", coveredGrossProfit: "404" } });

@@ -1,5 +1,7 @@
 # Özet UI prototypes
 
+#100 removed `src/ui/overview/prototype/`, `scripts/prototype-ozet.mjs` and the `prototype:ozet` script on 2026-10-22. This page is historical.
+
 Three throwaway alternatives answer: **Which layout makes overall monthly performance easiest to understand?** The owner has chosen that reading priority; no visual winner has been selected. These prototypes explore presentation, not production financial behavior.
 
 Run from the repository root:

@@ -1,16 +1,15 @@
-import { ChartFrame, CompositionBar, RankBars, type CompositionPart } from "../charts";
+import { ChartFrame, CompositionBar, foldRest, paletteColors, RankBars, type CompositionPart } from "../charts";
 import type { CostRow } from "../../analytics/costs";
 import type { ReplacementRow } from "../../analytics/purchasing";
-import { money, percent } from "../format";
+import { count, money, percent } from "../format";
 const unit = (value: string) => value === "kg" ? "kg" : value === "piece" ? "adet" : "Bilinmiyor";
 const reasonOrder = ["MISSING_COST", "UNVALIDATED_COST", "UNKNOWN_UNIT", "UNKNOWN_TAX", "NEGATIVE_COST", "UNDOCUMENTED_ZERO", "RETURN_ATTRIBUTION"];
 /** Validated hues beside the covered teal; reasons past these fold into a neutral "Diğer nedenler" part. */
-const reasonPalette = ["var(--viz-accent-3)", "var(--pur-violet)", "var(--pur-gold)", "var(--viz-sales)"];
+const reasonPalette = ["var(--viz-accent-3)", "var(--viz-violet)", "var(--viz-gold)", "var(--viz-sales)"];
 const rank = (reason: string) => { const index = reasonOrder.indexOf(reason); return index < 0 ? reasonOrder.length : index; };
 /** Shown reasons take distinct hues in fixed reason-code order, so a colour follows the reason and never its count. */
 export const reasonColors = (reasons: string[]): Record<string, string> =>
-  Object.fromEntries(reasons.toSorted((a, b) => rank(a) - rank(b) || a.localeCompare(b)).map((reason, index) => [reason, reasonPalette[index % reasonPalette.length]]));
-const count = (value: number) => value.toLocaleString("tr-TR");
+  paletteColors(reasons, reasonPalette, (a, b) => rank(a) - rank(b) || a.localeCompare(b));
 
 /** Graph 1: line counts only (covered versus excluded by reason). No amounts are summed. */
 export function CostCoverageChart({ covered, excluded, labels }: { covered: number; excluded: CostRow[]; labels: Record<string, string> }) {
@@ -21,7 +20,7 @@ export function CostCoverageChart({ covered, excluded, labels }: { covered: numb
     else unknown += 1;
   }
   const known = [...groups.entries()].sort((a, b) => b[1] - a[1]);
-  const shown = known.slice(0, known.length > reasonPalette.length ? reasonPalette.length - 1 : reasonPalette.length), rest = known.slice(shown.length);
+  const { head: shown, rest } = foldRest(known, reasonPalette.length);
   const colors = reasonColors(shown.map(([reason]) => reason));
   const parts: CompositionPart[] = [
     { key: "covered", label: "Maliyeti kapsanan satırlar", value: covered, color: "var(--viz-contribution)" },
@@ -48,6 +47,6 @@ export function ReplacementChart({ rows }: { rows: ReplacementRow[] }) {
   const id = (row: ReplacementRow) => `${row.productId}:${row.unit}`;
   const table = { caption: "İkame maliyeti nominal değişimi", columns: [{ label: "Ürün" }, { label: "Son birim fiyat", numeric: true }, { label: "Nominal değişim", numeric: true }], rows: shown.map(row => [row.productName, `${money(row.latestUnitCost)} / ${unit(row.unit)}`, row.nominalChangePercent === null ? "Bilinmiyor" : percent(row.nominalChangePercent)]) };
   return <ChartFrame title="İkame maliyeti değişimi" summary={`Son doğrulanmış alış fiyatına göre nominal değişim${known.length < rows.length - unknownRows.length ? ` · en büyük ${LIMIT} değişim` : ""}${unknownRows.length ? ` · ${count(unknownRows.length)} üründe karşılaştırma bilinmiyor (sıfır değil)` : ""}. Enflasyon veya reel büyüme değildir.`} table={table}>
-    <RankBars ariaLabel="İkame maliyeti değişimi" color="var(--pur-change)" formatValue={percent} rows={shown.map(row => ({ id: id(row), label: row.productName, detail: `${money(row.latestUnitCost)} / ${unit(row.unit)}`, value: row.nominalChangePercent }))} />
+    <RankBars ariaLabel="İkame maliyeti değişimi" color="var(--viz-neutral)" formatValue={percent} rows={shown.map(row => ({ id: id(row), label: row.productName, detail: `${money(row.latestUnitCost)} / ${unit(row.unit)}`, value: row.nominalChangePercent }))} />
   </ChartFrame>;
 }

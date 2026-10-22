@@ -61,6 +61,8 @@ test("sales operations validate exact contexts and filters before touching repor
     const reports = new SalesReports(store);
     const service = { open: async (request: Parameters<typeof reports.open>[0]) => reports.open(request), query: async (request: Parameters<typeof reports.query>[0]) => reports.query(request), inspect: async (request: Parameters<typeof reports.inspect>[0]) => reports.inspect(request) };
     const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, async () => store.availability(), undefined, service);
+    for (const payload of [{ period: "2025-99" }, { period: "2025-09", path: "/private" }]) expect(await invoke(true, "openSales", payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
+    expect(await invoke(true, "openMonthly", { period: "2025-09" })).toMatchObject({ code: "UNKNOWN_OPERATION" });
     const result = await invoke(true, "openSales", { period: "2025-09" });
     expect(result).toMatchObject({ status: "report", view: { metrics: { netSales: "180" } } });
     if (result.status !== "report") throw new Error("NO_REPORT");
@@ -83,7 +85,7 @@ test("monthly and export requests reject spoofed fields before privileged work",
     ["readReportPurchasing", { reportId: "report-1", datasetId: "current" }],
     ["readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null, limit: 10000 }],
     ["acceptReportVersion", { candidateId: "candidate", previousAcceptedId: null, reason: "" }],
-    ["openMonthly", { period: "2025-99" }],
+    ["queryMonthly", { context: null }],
   ] as const) expect(await invoke(true, operation, payload)).toMatchObject({ code: "INVALID_PAYLOAD" });
   expect(await invoke(false, "exportReportVersion", { reportId: "report-1" })).toMatchObject({ code: "UNTRUSTED_SENDER" });
   expect(await invoke(false, "readReportEvidence", { reportId: "report-1", section: "components", offset: 0, search: "", range: "current", documentId: null })).toMatchObject({ code: "UNTRUSTED_SENDER" });

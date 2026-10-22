@@ -1,5 +1,6 @@
 import { formatShare, shares } from "./geometry";
 import { Swatch } from "./ChartFrame";
+import { count } from "../format";
 
 export type CompositionPart = { key: string; label: string; value: number; color: string | "unknown" };
 export type CompositionBarProps = {
@@ -10,7 +11,6 @@ export type CompositionBarProps = {
   empty?: string;
 };
 
-const count = (value: number) => value.toLocaleString("tr-TR");
 
 export function CompositionBar({ parts, formatValue = count, ariaLabel, empty = "Gösterilecek veri yok." }: CompositionBarProps) {
   const percents = shares(parts.map((part) => part.value));

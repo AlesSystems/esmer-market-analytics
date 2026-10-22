@@ -17,29 +17,7 @@
 }
 @layer components {
   .brand img { display: block; width: 100%; max-width: 190px; height: auto; }
-  .monthly-shell {
-    font-family: "Manrope Variable", "Segoe UI", system-ui, sans-serif;
-    --primary: #2459d5;
-    --accent: #e9efff;
-    --accent-foreground: #2459d5;
-    --ring: #2459d5;
-    --blue: #2459d5;
-    --line: #dce3ee;
-    --muted: #5c6980;
-    --foreground: #182644;
-    --ink: #182644;
-    background: #ffffff;
-    color: var(--foreground);
-  }
-  .monthly-shell .sidebar { background: #ffffff; }
-  .monthly-shell .sidebar nav button[aria-current="page"] { background: #e9efff; color: #2459d5; }
-  .monthly-shell .workspace { max-width: 1660px; }
   @media (max-width: 760px) {
     .brand img { max-width: 176px; }
-  }
-  @media (forced-colors: active) {
-    .monthly-shell { background: Canvas; color: CanvasText; }
-    .monthly-shell .sidebar { background: Canvas; }
-    .monthly-shell .sidebar nav button[aria-current="page"] { background: Highlight; color: HighlightText; }
   }
 }

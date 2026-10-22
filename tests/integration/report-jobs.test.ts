@@ -17,7 +17,7 @@ test("one active job exposes real progress and cancels through shared memory wit
   });
   const state = jobs.status();
   expect(state).toMatchObject({status: "operation", phase: "documents", completed: 2, total: 5, cancelling: false});
-  expect(await jobs.run("openMonthly", async () => ({status: "cancelled"}))).toEqual({status: "busy"});
+  expect(await jobs.run("queryMonthly", async () => ({status: "cancelled"}))).toEqual({status: "busy"});
   if (state.status !== "operation") throw new Error("NO_JOB");
   expect(jobs.cancel({id: state.id + 1})).toEqual({status: "idle"});
   expect(Atomics.load(flag, 0)).toBe(0);
@@ -67,14 +67,16 @@ test("real worker rejects unknown work, observes shared cancellation, and stays 
     Atomics.store(new Int32Array(cancellation), 0, 1);
     expect(await request("importPackage", {bytes: salesPackage(undefined, {extractionId: "cancelled"}), job: {id: 1, cancellation}})).toEqual({status: "cancelled"});
     expect(await request("getAvailability")).toEqual(before);
-    expect(await request("openMonthly", {payload: {period: "2025-09"}, job: {id: 2, cancellation}})).toEqual({status: "cancelled"});
+    const opened = await request("openSales", {payload: {period: "2025-09"}});
+    if (opened.status !== "report") throw new Error("NO_SALES");
+    expect(await request("queryMonthly", {payload: {context: opened.view.context}, job: {id: 2, cancellation}})).toEqual({status: "cancelled"});
     Atomics.store(new Int32Array(cancellation), 0, 0);
-    const monthly = await request("openMonthly", {payload: {period: "2025-09"}, job: {id: 3, cancellation}});
+    const monthly = await request("queryMonthly", {payload: {context: opened.view.context}, job: {id: 3, cancellation}});
     expect(monthly).toMatchObject({status: "monthly", report: {sales: {metrics: {netSales: "180"}}}});
     expect(progress.length).toBeGreaterThan(0);
     expect(progress.every(row => row.completed >= 0 && row.total >= row.completed)).toBe(true);
     expect(await request("exportReportVersion", {payload: {reportId: "missing"}})).toMatchObject({status: "unavailable", code: "REPORT_NOT_FOUND"});
-    expect(await request("openMonthly", {payload: {period: "2025-09", path: "/private"}})).toMatchObject({status: "rejected", code: "INVALID_PAYLOAD"});
+    expect(await request("openSales", {payload: {period: "2025-09", path: "/private"}})).toMatchObject({status: "rejected", code: "INVALID_PAYLOAD"});
     if (monthly.status !== "monthly") throw new Error("NO_REPORT");
     expect(monthly.report).not.toHaveProperty("salesEvidence");
     const evidence = { reportId: monthly.report.id, section: "components", offset: 0, search: "", range: "current", documentId: null };

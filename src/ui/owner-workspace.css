@@ -1,3 +1,4 @@
+/* Market ledger tokens: the only literal colours outside the chart palette and the scoped welcome/settings blocks. */
 :root {
   --market-paper: #f7f5ed;
   --market-surface: #fffef9;
@@ -7,28 +8,27 @@
   --market-action: #315c45;
   --market-wash: #e8eee0;
   --market-brass: #a67b37;
-  --market-raised: 0 10px 30px #243b3210, 0 2px 4px #243b3208;
+  --market-focus: #886222;
+  --market-gold: #e8c47c;
+  --market-positive: #236c59;
+  --market-negative: #b42318;
+  --market-warn-wash: #fff8e9;
+  --market-warn-ink: #80580b;
+  --market-warn-line: #e4cea4;
+  --market-notice-wash: #fff0d6;
+  --market-notice-ink: #694b17;
+  --market-warn-soft: color-mix(in srgb, var(--market-warn-wash) 60%, var(--market-surface));
+  --market-hover: color-mix(in srgb, var(--market-wash) 60%, var(--market-surface));
+  --market-input: color-mix(in srgb, var(--market-muted) 40%, var(--market-line));
+  --market-selection: color-mix(in srgb, var(--market-action) 12%, var(--market-wash));
+  --market-shadow: color-mix(in srgb, var(--market-ink) 6%, transparent);
+  --market-raised: 0 10px 30px var(--market-shadow), 0 2px 4px color-mix(in srgb, var(--market-ink) 3%, transparent);
 }
 body {
   background: var(--market-paper);
   font-family: "Manrope Variable", "Segoe UI", sans-serif;
 }
-.app-shell, .app-shell.monthly-shell, .app-shell.page-desk-shell {
-  --background: var(--market-surface);
-  --foreground: var(--market-ink);
-  --primary: var(--market-action);
-  --primary-foreground: #fffef9;
-  --secondary: var(--market-wash);
-  --secondary-foreground: var(--market-ink);
-  --muted-surface: var(--market-paper);
-  --muted: var(--market-muted);
-  --accent: var(--market-wash);
-  --accent-foreground: var(--market-action);
-  --line: var(--market-line);
-  --input: #a6b3a4;
-  --ring: #886222;
-  --blue: var(--market-action);
-  --ink: var(--market-ink);
+.app-shell {
   grid-template-columns: 236px minmax(0, 1fr);
   background: var(--market-paper);
   color: var(--market-ink);
@@ -36,11 +36,11 @@ body {
 }
 .app-shell .sidebar {
   background: var(--market-ink);
-  color: #f7f5ed;
+  color: var(--market-paper);
   border: 0;
   padding: 28px 18px 24px;
   gap: 24px;
-  box-shadow: 6px 0 24px #243b3210;
+  box-shadow: 6px 0 24px var(--market-shadow);
   overflow-y: auto;
 }
 .app-shell .brand {
@@ -53,28 +53,28 @@ body {
 .app-shell .sidebar nav button,
 .app-shell .sidebar-footer > button,
 .app-shell .sidebar .live-badge {
-  color: #f0f3e8;
+  color: var(--market-paper);
   min-height: 46px;
   border-radius: 8px;
   background: transparent;
 }
 .app-shell .sidebar nav button:hover,
-.app-shell .sidebar-footer > button:hover { background: #365146; }
+.app-shell .sidebar-footer > button:hover { background: color-mix(in srgb, var(--market-surface) 10%, var(--market-ink)); }
 .app-shell .sidebar nav button[aria-current="page"],
 .app-shell .sidebar-footer > button[aria-current="page"] {
-  background: #edf0df;
+  background: var(--market-wash);
   color: var(--market-ink);
-  box-shadow: 0 3px 8px #13261d24;
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--market-ink) 14%, transparent);
 }
-.app-shell .sidebar .period-label { color: #d6dfcf; font-size: 13px; }
+.app-shell .sidebar .period-label { color: var(--market-line); font-size: 13px; }
 .app-shell .sidebar .period-label input {
-  background: #304b3e;
-  color: #fffef9;
-  border-color: #718775;
+  background: color-mix(in srgb, var(--market-surface) 6%, var(--market-ink));
+  color: var(--market-surface);
+  border-color: color-mix(in srgb, var(--market-surface) 35%, var(--market-ink));
   color-scheme: dark;
 }
-.app-shell .sidebar :focus-visible { outline-color: #e8c47c; }
-.app-shell .sidebar-footer { margin-top: auto; padding-top: 22px; border-top: 1px solid #506558; }
+.app-shell .sidebar :focus-visible { outline-color: var(--market-gold); }
+.app-shell .sidebar-footer { margin-top: auto; padding-top: 22px; border-top: 1px solid color-mix(in srgb, var(--market-surface) 20%, var(--market-ink)); }
 .app-shell .workspace { max-width: 1660px; padding: 32px 38px 56px; background: var(--market-paper); }
 .app-shell .app-body { background: var(--market-paper); }
 .app-shell .workspace-content > :first-child { margin-top: 0; }
@@ -82,25 +82,15 @@ body {
 .app-shell h2 { letter-spacing: -.015em; }
 .app-shell p { max-width: 75ch; }
 .app-shell .table-scroll, .app-shell .viz-table-wrap { background: var(--market-surface); border-radius: 10px; }
-.app-shell th { background: #edf0e5; color: var(--market-ink); }
+.app-shell th { background: color-mix(in srgb, var(--market-wash) 75%, var(--market-surface)); color: var(--market-ink); }
 .app-shell td { border-color: var(--market-line); }
-.app-shell tbody tr:hover { background: #f1f4e9; }
+.app-shell tbody tr:hover { background: var(--market-hover); }
 .app-shell summary { text-underline-offset: 4px; }
-.app-shell ::selection { background: #d8e6c5; color: #243b32; }
-.app-shell * { scrollbar-color: #83937c #eff1e7; }
+::selection { background: var(--market-selection); color: var(--market-ink); }
 .app-shell input, .app-shell textarea { caret-color: var(--market-action); }
 .app-shell button, .app-shell a { transition: background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out; }
-.app-shell .workspace button:focus-visible { outline: 3px solid #886222; outline-offset: 3px; }
-.app-shell .sales-control-desk .row-link { color: var(--market-action); }
-.app-shell .sales-control-desk .positive-bar { fill: var(--market-action); }
-.app-shell .control-desk {
-  --c-ink: var(--market-ink);
-  --c-blue: var(--market-action);
-  --c-muted: var(--market-muted);
-  --c-line: var(--market-line);
-  background: transparent;
-  padding-bottom: 24px;
-}
+.app-shell .workspace button:focus-visible { outline: 3px solid var(--market-focus); outline-offset: 3px; }
+.app-shell .control-desk { padding-bottom: 24px; }
 .app-shell .control-desk .c-heading { margin-bottom: 26px; padding-bottom: 22px; border-bottom: 1px solid var(--market-line); }
 .app-shell .control-desk .c-heading h1 { font-size: 2rem; }
 .app-shell .control-desk .c-matrix {
@@ -113,9 +103,9 @@ body {
 }
 .app-shell .control-desk .c-matrix > button { padding: 24px; gap: 12px; }
 .app-shell .control-desk .c-matrix > button:focus-visible { outline-offset: -3px; }
-.app-shell .control-desk .c-matrix > button:first-child { background: #e9efdf; padding-left: 24px; }
+.app-shell .control-desk .c-matrix > button:first-child { background: var(--market-wash); padding-left: 24px; }
 .app-shell .control-desk .c-matrix > button:last-child { padding-right: 24px; }
-.app-shell .control-desk .c-matrix > button:hover { background: #f0f3e6; }
+.app-shell .control-desk .c-matrix > button:hover { background: var(--market-hover); }
 .app-shell .control-desk .c-matrix > button > span { font-size: 13px; }
 .app-shell .control-desk .c-matrix strong { font-size: 1.85rem; letter-spacing: -.025em; }
 .app-shell .control-desk .c-matrix small { font-size: 12px; }
@@ -125,38 +115,18 @@ body {
 .app-shell .control-desk .c-ranking, .app-shell .control-desk .c-bridge { min-width: 0; }
 .app-shell .control-desk .c-text-action { color: var(--market-action); font-size: 13px; white-space: normal; text-align: left; }
 .app-shell .control-desk .c-evidence { padding-top: 22px; }
-.app-shell .control-desk .c-notice { background: #fff0d6; color: #694b17; border-radius: 10px; }
-.app-shell .viz-frame {
-  --viz-sales: #34644c;
-  --viz-contribution: #4c7963;
-  --viz-cost: #a58a57;
-  --viz-negative: #aa4a37;
-  --viz-unknown-fill: #f5ead5;
-  --viz-unknown-stroke: #927643;
-}
-.app-shell .viz-toggle button[aria-pressed="true"] { background: var(--market-ink); color: #fffef9; }
-.app-shell .viz-row-label, .app-shell .viz-row-value { color: var(--market-ink); }
+.app-shell .control-desk .c-notice { background: var(--market-notice-wash); color: var(--market-notice-ink); border-radius: 10px; }
 .app-shell .source-est { color: var(--market-ink); }
 .app-shell .est-head { padding-bottom: 24px; border-bottom: 1px solid var(--market-line); }
 .app-shell .est-kpis { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 0; margin-block: 24px; border-radius: 14px; overflow: hidden; background: var(--market-surface); box-shadow: var(--market-raised); }
 .app-shell .est-kpis .metric { border: 0; border-radius: 0; padding: 22px; border-right: 1px solid var(--market-line); background: transparent; min-width: 0; }
 .app-shell .est-kpis .metric:last-child { border-right: 0; }
-.app-shell .est-kpis .est-hero { background: #e9efdf; }
+.app-shell .est-kpis .est-hero { background: var(--market-wash); }
 .app-shell .est-kpis h3 { font-size: 13px; line-height: 1.5; margin: 0 0 12px; }
 .app-shell .est-kpis strong { color: var(--market-ink); font-size: 1.65rem; letter-spacing: -.025em; overflow-wrap: anywhere; }
 .app-shell .est-kpis p { font-size: 12px; margin-top: 12px; }
 .app-shell .est-chart { padding: 24px; background: var(--market-surface); border-radius: 14px; margin-block: 22px; box-shadow: var(--market-raised); }
-.app-shell .est-unknown { padding: 14px 18px; border-radius: 10px; background: #fff0d6; color: #694b17; }
-.app-shell .settings-page {
-  --glaze: var(--market-surface);
-  --grout-light: #edf0e4;
-  --ink: var(--market-ink);
-  --ink-soft: var(--market-muted);
-  --cobalt: #315c45;
-  --turquoise: #426c59;
-  --coral: #765d3b;
-  --saffron: #dfc38a;
-}
+.app-shell .est-unknown { padding: 14px 18px; border-radius: 10px; background: var(--market-notice-wash); color: var(--market-notice-ink); }
 .app-shell .tile-panel { gap: 18px; }
 .app-shell .tile { border-radius: 12px; box-shadow: var(--market-raised); }
 .app-shell .tile-band { background: var(--band); box-shadow: none; }
@@ -167,25 +137,24 @@ body {
 .welcome-page { background: var(--market-paper); color: var(--market-ink); padding: 0 5% 48px; }
 .welcome-page .masthead { max-width: 1420px; margin: auto; height: 104px; }
 .welcome-page .desk { max-width: 1420px; grid-template-columns: .9fr 1.1fr; min-height: 650px; gap: 28px; }
-.welcome-page .blue-stage { background: var(--market-ink); color: #fffef9; border-radius: 16px; padding: 48px; box-shadow: 0 18px 42px #243b3220; }
-.welcome-page .stage-top { color: #d5dfcb; }
+.welcome-page .blue-stage { background: var(--market-ink); color: var(--market-surface); border-radius: 16px; padding: 48px; box-shadow: 0 18px 42px color-mix(in srgb, var(--market-ink) 12.5%, transparent); }
+.welcome-page .stage-top { color: var(--market-line); }
 .welcome-page .blue-stage h1 { font-size: 3.7rem; line-height: 1.15; letter-spacing: -.03em; margin: 64px 0 40px; }
-.welcome-page .blue-stage h1 em { color: #e8c47c; }
-.welcome-page .stage-bottom > span:first-child { color: #d5dfcb; font-size: 14px; }
-.welcome-page .stage-seal { border-color: #819477; color: #e8c47c; }
+.welcome-page .blue-stage h1 em { color: var(--market-gold); }
+.welcome-page .stage-bottom > span:first-child { color: var(--market-line); font-size: 14px; }
+.welcome-page .stage-seal { color: var(--market-gold); }
 .welcome-page .launch { background: var(--market-surface); border-radius: 16px; padding: 44px 48px; box-shadow: var(--market-raised); }
 .welcome-page .launch h2 { font-size: 2rem; font-weight: 650; }
 .welcome-page .launch-intro p, .welcome-page .launch-links div span { color: var(--market-muted); font-size: 14px; }
-.welcome-page .primary { background: var(--market-action); border-radius: 10px; color: #fffef9; box-shadow: 0 4px 10px #243b321a; }
-.welcome-page .primary:hover { background: #244b36; }
-.welcome-page .launch-links button { color: var(--market-ink); padding: 18px 0; border-color: var(--market-line); }
-.welcome-page .launch-links button:hover { color: var(--market-action); background: #f2f5e9; }
+.welcome-page .primary { background: var(--market-action); border-radius: 10px; color: var(--market-surface); box-shadow: 0 4px 10px color-mix(in srgb, var(--market-ink) 10%, transparent); }
+.welcome-page .primary:hover { background: color-mix(in srgb, var(--market-action) 80%, var(--market-ink)); }
+.welcome-page .launch-links button { color: var(--market-ink); padding: 18px 0; }
+.welcome-page .launch-links button:hover { color: var(--market-action); background: var(--market-hover); }
 .welcome-page .launch-links strong { font-size: 15px; }
 .welcome-page .launch-foot { font-size: 12px; }
 .welcome-page .launch-foot .text-button { font-size: 12px; }
-.welcome-page .guide { background: #e9efdf; color: var(--market-ink); }
+.welcome-page .guide { background: var(--market-wash); color: var(--market-ink); }
 .welcome-page .text-button:hover { color: var(--market-action); }
-.welcome-page ::selection { background: #d8e6c5; color: var(--market-ink); }
 @media (max-width: 1200px) {
   .app-shell .workspace { padding-inline: 26px; }
   .app-shell .est-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -195,7 +164,6 @@ body {
   .welcome-page .blue-stage h1 { font-size: 3rem; }
 }
 @media (max-width: 800px) {
-  .app-shell, .app-shell.monthly-shell, .app-shell.page-desk-shell { display: block; }
   .app-shell .sidebar { height: auto; position: relative; padding: 18px; gap: 16px; }
   .app-shell .brand { width: 190px; }
   .app-shell .sidebar-footer { margin-top: 0; padding-top: 12px; }

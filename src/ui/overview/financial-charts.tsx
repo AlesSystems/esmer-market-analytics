@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
 import type { MonthlyDisplay, ReportProductsPage, ReportProductsRequest } from "../../reports/display";
-import { Bridge, ChartFrame, CompositionBar, DailyBars, RankBars, type BridgeStep, type ChartTable, type DailyDay, type RankRow } from "../charts";
-import { date, isZeroDecimal, money, percent } from "../format";
+import { Bridge, ChartFrame, CompositionBar, DailyBars, monthDates, RankBars, type BridgeStep, type ChartTable, type DailyDay, type RankRow } from "../charts";
+import { count, date, isZeroDecimal, money, percent } from "../format";
 
 /**
  * Chart wiring for the financial path. Every figure is a service string passed through money()/percent();
  * nothing here adds, subtracts or divides amounts. Null stays unknown and is never drawn as zero.
  */
 type V2 = Extract<MonthlyDisplay, { format: "monthly-report-v2" }>;
-export type ProductRow = ReportProductsPage["rows"][number];
+type ProductRow = ReportProductsPage["rows"][number];
 const amount = (value: string | null) => value === null ? "Hesaplanamıyor" : money(value);
 
-const calendar = (period: string) => {
-  const count = new Date(Date.UTC(Number(period.slice(0, 4)), Number(period.slice(5, 7)), 0)).getUTCDate();
-  return Array.from({ length: count }, (_, index) => `${period}-${String(index + 1).padStart(2, "0")}`);
-};
 const isV2 = (report: MonthlyDisplay): report is V2 => report.format === "monthly-report-v2";
 
 /**
@@ -23,10 +19,10 @@ const isV2 = (report: MonthlyDisplay): report is V2 => report.format === "monthl
  * sales.daily supplies the amount. v1 reports only know sales.daily, so an absent day is unknown.
  * Days outside the report window are out of range.
  */
-export function netSalesDays(report: MonthlyDisplay): DailyDay[] {
+function netSalesDays(report: MonthlyDisplay): DailyDay[] {
   const sales = report.sales, byDate = new Map(sales.daily.map(day => [day.date, day.netSales]));
   const profit = isV2(report) ? new Map(report.productProfit.daily.map(day => [day.date, day])) : null;
-  return calendar(report.context.period).map((day): DailyDay => {
+  return monthDates(report.context.period).map((day): DailyDay => {
     const outside = day < sales.from || day > sales.to || profit?.get(day)?.sourceCoverage === "unavailable";
     if (outside) return { date: day, segments: [], state: "out-of-range" };
     const value = (net: string | null): DailyDay => net === null ? { date: day, segments: [], state: "unknown" } : { date: day, segments: [{ key: "net", value: net }], state: "value" };
@@ -42,7 +38,7 @@ export function netSalesDays(report: MonthlyDisplay): DailyDay[] {
 }
 
 /** Daily covered gross profit: null trend is a gap, "empty" days carry the service's zero. */
-export function profitDays(report: V2): DailyDay[] {
+function profitDays(report: V2): DailyDay[] {
   return report.productProfit.daily.map((day): DailyDay => {
     if (day.sourceCoverage === "unavailable") return { date: day.date, segments: [], state: "out-of-range" };
     if (day.trend === null) return { date: day.date, segments: [], state: "unknown" };
@@ -127,8 +123,8 @@ export function CoverageBridge({ steps }: { steps: BridgeStep[] }) {
 
 /** Line counts only; the service already counted them. */
 export function LineCoverage({ covered, excluded }: { covered: number; excluded: number }) {
-  const table: ChartTable = { caption: "Kapsanan ve dışlanan satırlar", columns: [{ label: "Satır" }, { label: "Sayı", numeric: true }], rows: [["Kapsanan", covered.toLocaleString("tr-TR")], ["Dışlanan", excluded.toLocaleString("tr-TR")]] };
+  const table: ChartTable = { caption: "Kapsanan ve dışlanan satırlar", columns: [{ label: "Satır" }, { label: "Sayı", numeric: true }], rows: [["Kapsanan", count(covered)], ["Dışlanan", count(excluded)]] };
   return <ChartFrame title="Maliyet kapsamı" summary="Kapsanan ve dışlanan satır sayısı" table={table} headingLevel="h2" className="c-viz c-viz-comp">
-    <CompositionBar ariaLabel={`Satırların kapsanan ${covered.toLocaleString("tr-TR")}, dışlanan ${excluded.toLocaleString("tr-TR")}`} empty="Bu ay satır yok." parts={[{ key: "covered", label: "Maliyeti kapsanan satır", value: covered, color: "var(--viz-contribution)" }, { key: "excluded", label: "Dışlanan satır", value: excluded, color: "unknown" }]} />
+    <CompositionBar ariaLabel={`Satırların kapsanan ${count(covered)}, dışlanan ${count(excluded)}`} empty="Bu ay satır yok." parts={[{ key: "covered", label: "Maliyeti kapsanan satır", value: covered, color: "var(--viz-contribution)" }, { key: "excluded", label: "Dışlanan satır", value: excluded, color: "unknown" }]} />
   </ChartFrame>;
 }

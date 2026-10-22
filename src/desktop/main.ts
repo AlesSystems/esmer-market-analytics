@@ -218,7 +218,6 @@ app.whenReady().then(async () => {
             atomicWriteFile,
           );
           if (request.operation === "queryMonthly") return queryMonthly(request.payload.context);
-          if (request.operation === "openMonthly") return jobs.run(request.operation, job => requestService({...request, job}));
           return requestService(request);
         },
         {status: () => jobs.status(), cancel: request => jobs.cancel(request)},

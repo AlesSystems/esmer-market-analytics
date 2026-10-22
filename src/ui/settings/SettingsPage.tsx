@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { textSizes, type Availability, type ImportHistoryEntry, type RequestError, type TextSize } from "../../domain/contracts";
 import type { RecoveryStatus } from "../../recovery/contracts";
-import { date } from "../format";
+import { count, date } from "../format";
 import { liveErrors, type LiveConnection, type LiveState } from "./live";
 
 type Props = {
@@ -18,7 +18,6 @@ type Props = {
   claimFocus: () => boolean;
 };
 
-const count = (value: number) => value.toLocaleString("tr-TR");
 const moment = (value: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
 const day = (value: string) => Date.parse(`${value.slice(0, 10)}T00:00:00Z`);
 const DAY = 86_400_000;

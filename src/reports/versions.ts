@@ -34,10 +34,6 @@ export class ReportVersions {
     }
     return result;
   }
-  openDisplay(request: { period: string | null }, control?: OperationControl) {
-    const result = this.sales.open(request);
-    return result.status === "report" ? this.currentDisplay({ context: result.view.context }, control) : result;
-  }
   currentDisplay({ context }: { context: ReportContext }, control?: OperationControl) {
     return structuredClone(displayResult(this.calculate(context, control)));
   }
