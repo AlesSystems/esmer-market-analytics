@@ -79,7 +79,7 @@ The result carries the dataset/app revision, cutoff, mapping, separate cost and 
 These methods use the same sender, payload and preload rules as the requests above.
 
 - Expenses use `saveExpenseTemplate`, `previewExpenses`, `confirmExpenses`, `queryExpenses`, `correctExpense`, `restoreExpense`, `confirmExpenseCompleteness` and `queryOperating`. See the [expense contract](expense-completeness.md).
-- Monthly reports use `openSales` to resolve a period's context, then `queryMonthly`, `listReportVersions`, `readReportVersion`, `compareReportVersion`, `acceptReportVersion`, `exportReportVersion`, `readReportEvidence`, `readReportPurchasing`, `cancelOperation` and `getOperationStatus`. See the [report contract](reports.md).
+- Monthly reports use `queryMonthly`, `listReportVersions`, `readReportVersion`, `compareReportVersion`, `acceptReportVersion`, `exportReportVersion`, `readReportEvidence`, `readReportPurchasing`, `cancelOperation` and `getOperationStatus`. See the [report contract](reports.md).
 - Recovery uses `getRecoveryStatus`, `setupRecovery`, `backupNow`, `pinBackup`, `prepareRestore`, `confirmRestore` and `cancelRestore`. See the [recovery decision](../decisions/phase-9-recovery.md).
 - The isolated test connection uses `getLiveStatus`, `configureLiveSource`, `setLiveEnabled` and `refreshLiveSource`. Configuration defaults to disabled. See the [live-sync contract](live-sync.md).
 - Raw preview uses `querySourceWorkspace` and `readSourcePreview`. See the [source contract](source.md).

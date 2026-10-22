@@ -80,7 +80,7 @@ The calm typography, selected navigation, stable period control, and preservatio
 | --- | --- |
 | Open all five destinations | Successful |
 | `listReportVersions({period:"2025-10"})` | `status:"history"`, zero saved reports |
-| `openMonthly({period:"2025-10"})` (operation removed in #100) | `status:"unavailable"`, `code:"EMPTY_STORE"`, “Henüz veri içe aktarılmadı.” |
+| `openMonthly({period:"2025-10"})` | `status:"unavailable"`, `code:"EMPTY_STORE"`, “Henüz veri içe aktarılmadı.” |
 | `openSales({period:"2025-10"})` | Same `EMPTY_STORE` result |
 
 The rendered Reports page in this build says that new financial reports cannot be created and that there are no saved reports. It does not literally display the English word “unavailable”; that is the service result reproduced separately. No service crash was observed in this successful-history scenario.
