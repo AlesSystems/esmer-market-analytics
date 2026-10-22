@@ -110,6 +110,11 @@ export type DailyLayout = {
 };
 type DailyInput = { period: string; days: DailyDay[]; seriesKeys: string[]; width: number; plotHeight?: number; formatTick?: (value: number) => string; integerTicks?: boolean };
 
+/** Assigns palette hues to keys in a stable order, so a colour follows the key and never its count. */
+export const paletteColors = (keys: string[], palette: string[], order: (a: string, b: string) => number): Record<string, string> =>
+  Object.fromEntries(keys.toSorted(order).map((key, index) => [key, palette[index % palette.length]]));
+/** Splits count-sorted entries into shown head and folded rest; one slot goes to the rest bucket when it is needed. */
+export const foldRest = <T>(sorted: T[], slots: number) => sorted.length > slots ? { head: sorted.slice(0, slots - 1), rest: sorted.slice(slots - 1) } : { head: sorted, rest: [] as T[] };
 export const monthDates = (period: string): string[] => {
   const [year, month] = period.split("-").map(Number);
   const count = new Date(Date.UTC(year, month, 0)).getUTCDate();
