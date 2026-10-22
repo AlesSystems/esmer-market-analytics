@@ -34,7 +34,7 @@ describe("month bridge",()=>{
    {label:"Maliyeti bilinen satış",value:"430",kind:"total"},
    {label:"Mal maliyeti",value:"372.5",kind:"minus"},
    {label:"Brüt kâr",value:"57.5",kind:"total"},
-   {label:"Giderler",value:null,kind:"minus",detail:"girilmedi"},
+   {label:"Giderler",value:null,kind:"minus",detail:"eksik"},
    {label:"Net kâr",value:null,kind:"result",detail:"hesaplanamadı"},
   ]);
  });

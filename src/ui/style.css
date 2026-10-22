@@ -8,9 +8,9 @@
 @import "./reports/reports-control-desk.css";
 @import "./source-document-detail.css";
 @import "./overview/source-control-desk.css";
-@import "./welcome/welcome.css";
 @import "./charts/charts.css";
 @import "./owner-workspace.css";
+@import "./pages/pages.css";
 @source "./**/*.{ts,tsx}";
 @theme inline {
   --color-background: var(--background);

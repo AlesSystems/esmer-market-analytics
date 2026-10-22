@@ -7,7 +7,7 @@ import {SourceDailyCounts,SourceTypeCounts} from "./overview/SourceCountCharts";
 import {SourceEstimate} from "./SourceEstimate";
 import {useCallback,useContext,useEffect,useRef,useState} from "react";
 import type {SourceQuery,SourceWorkspaceResult} from "../source/workspace";
-import {AppShell,type Destination} from "./AppShell";
+import {EmbeddedScreen,type Destination} from "./pages/EmbeddedScreen";
 import {Button} from "./components/ui/button";
 import {Input} from "./components/ui/input";
 import {ExpensesWorkspace} from "./ExpensesWorkspace";
@@ -19,9 +19,8 @@ export type SourceView=Extract<SourceWorkspaceResult,{status:"source-workspace"}
 export const initialSourceQuery:SourceQuery={hash:null,period:null,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0};
 const sourceDate=(value:string)=>date(value.slice(0,10));
 export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceView;selectedMonth:string;onMonth:(month:string)=>void}) {
- const [rawCountsOpen,setRawCountsOpen]=useState(false);
  const [archiveOpen,setArchiveOpen]=useState(false),[rawSalesOpen,setRawSalesOpen]=useState(false);
- const archiveReceipt=useRef<ReturnReceipt|null>(null),estimateReceipt=useRef<ReturnReceipt|null>(null),productsHeading=useRef<HTMLHeadingElement>(null),reportHeading=useRef<HTMLHeadingElement>(null),estimateOrigin=useRef<"overview"|"versions"|"monthly">("overview"),summaryHeading=useRef<HTMLHeadingElement>(null),summaryReturn=useRef(false);
+ const archiveReceipt=useRef<ReturnReceipt|null>(null),estimateReceipt=useRef<ReturnReceipt|null>(null),productsHeading=useRef<HTMLHeadingElement>(null),reportHeading=useRef<HTMLHeadingElement>(null),estimateOrigin=useRef<"overview"|"versions"|"monthly">("overview"),summaryReturn=useRef(false);
  const [savedPeriod,setSavedPeriod]=useState<string|null>(null);
  const detailPeriod=useCallback((period:string|null)=>setSavedPeriod(period),[]);
  const frame=useContext(AppFrame),workspaceActive=!frame||frame.view==="workspace";
@@ -70,7 +69,6 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
  useEffect(()=>{if(returnPending.current&&!busy&&!error&&query.view!=="detail"&&view.document===null&&loadedQuery===JSON.stringify(query)){returnPending.current=false;restoreReturn(receipt.current,heading.current);}},[busy,error,query,view,loadedQuery]);
  function openProduct(id:string,button?:HTMLButtonElement){if(button){estimateReceipt.current=captureReturn(button);estimateOrigin.current=screen==="versions"?"versions":screen==="monthly"?"monthly":"overview";}visited.current.add("overview");setRawSalesOpen(true);setScreen("overview");setQuery(q=>({...q,view:"documents",scope:"all",productId:id,documentId:null,offset:0}));}
  function returnToProducts(){setRawSalesOpen(false);const origin=estimateOrigin.current;if(origin==="monthly"){summaryReturn.current=true;setScreen("monthly");setQuery(q=>({...q,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0}));return;}setScreen(origin);restoreReturn(estimateReceipt.current,origin==="versions"?reportHeading.current:productsHeading.current);}
- function summaryLoaded(){if(!summaryReturn.current)return;summaryReturn.current=false;restoreReturn(estimateReceipt.current,summaryHeading.current);}
  const prepared=view.sourceFormat==="sql-backup-estimate-v1"||view.sourceFormat==="sql-backup-estimate-v2",rawSales=rawSalesOpen||!prepared;
  const period=selectedMonth;
  const outside=period<view.from.slice(0,7)||period>view.to.slice(0,7);
@@ -81,15 +79,15 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
     const request = frame?.launchRequest;
     if (!workspaceActive || !request || consumedLaunch.current === request.sequence) return;
     consumedLaunch.current = request.sequence;
-    navigate(request.destination);
+    navigate(request.destination as Destination);
   }, [frame?.launchRequest, workspaceActive]);
- return <AppShell destination={screen} navigate={next=>{if(next===screen&&query.view==="detail")returnToList();else if(next!==screen)expenseNavigation.leave(()=>navigate(next));}} controls={<>{screen==="versions"&&savedPeriod?<span>Rapor dönemi {savedPeriod} · Kaydedilmiş sürüm</span>:<label className="period-label">Dönem<Input type="month" value={period} onChange={event=>{if(validSelectedMonth(event.target.value)){const next=event.target.value;expenseNavigation.leave(()=>onMonth(next));}}}/></label>}{!(screen==="versions"&&savedPeriod)&&<span>Yedek · {sourceDate(view.to)}</span>}</>}>
+ return <EmbeddedScreen destination={screen} navigate={next=>{if(next===screen&&query.view==="detail")returnToList();else if(next!==screen)expenseNavigation.leave(()=>navigate(next));}} controls={<>{screen==="versions"&&savedPeriod?<span>Rapor dönemi {savedPeriod} · Kaydedilmiş sürüm</span>:<label className="period-label">Dönem<Input type="month" value={period} onChange={event=>{if(validSelectedMonth(event.target.value)){const next=event.target.value;expenseNavigation.leave(()=>onMonth(next));}}}/></label>}{!(screen==="versions"&&savedPeriod)&&<span>Yedek · {sourceDate(view.to)}</span>}</>}>
  <main className={screen==="purchasing"?"source-purchasing-main":undefined} aria-busy={busy}>{sourceChangedNotice&&<p role="status">Kaynak sürümü değişti. Eski belge detayı kapatıldı; kayıt kimlikleri yeni kaynakta yeniden seçilmelidir.</p>}{screen!=="versions"&&header}{!view.counts.documents&&!outside&&screen!=="expenses"&&screen!=="versions"&&<p className="notice">Bu dönemde kaydedilmiş belge yok. Eksik veri sıfır satış anlamına gelmez.</p>}{error&&<p role="alert">{error} {documentMissing?<Button variant="outline" onClick={returnToList}>Belgelere dön</Button>:<Button variant="outline" onClick={()=>expenseNavigation.leave(()=>{savedFilters.current={};setQuery({...initialSourceQuery,period:selectedMonth});setScreen("monthly");setChanged(false);})}>Kaynağı yeniden aç</Button>}</p>}{busy&&<p role="status">Kaynak kayıtları yükleniyor…</p>}
  {visited.current.has("expenses")&&<div hidden={screen!=="expenses"}><ExpensesWorkspace visible={childActive&&screen==="expenses"} active={childActive&&screen==="expenses"} period={period} onPeriod={next=>expenseNavigation.leave(()=>onMonth(next))} embedded/></div>}
  {visited.current.has("versions")&&<div hidden={screen!=="versions"}><div hidden={archiveOpen}><SourceEstimate presentation="report" heading={<h1 ref={reportHeading} tabIndex={-1}>Raporlar</h1>} actions={<Button variant="outline" onClick={event=>{archiveReceipt.current=captureReturn(event.currentTarget);setArchiveOpen(true);}}>Önceki kaydedilmiş raporlar</Button>} active={childActive&&screen==="versions"&&!archiveOpen} hash={view.hash} period={period} onProduct={openProduct}/></div><div hidden={!archiveOpen}><Button variant="outline" onClick={()=>{setArchiveOpen(false);setSavedPeriod(null);restoreReturn(archiveReceipt.current,heading.current);}}>Güncel rapora dön</Button><SavedReports active={childActive&&screen==="versions"&&archiveOpen} onDetailPeriod={detailPeriod} period={period} onSourceSummary={()=>navigate("monthly")}/></div></div>}
  {visited.current.has("overview")&&prepared&&<div hidden={screen!=="overview"||rawSales||query.view==="detail"||busy||!!error||changed||loadedQuery!==JSON.stringify(query)||view.hash!==query.hash||view.period!==period}><SourceEstimate presentation="products" heading={<h1 ref={productsHeading} tabIndex={-1}>Satışlar</h1>} active={childActive&&screen==="overview"&&!rawSales&&query.view!=="detail"&&!busy&&!error&&!changed&&loadedQuery===JSON.stringify(query)&&view.hash===query.hash&&view.period===period} hash={view.hash} period={period} onProduct={openProduct}/></div>}
  {screen!=="expenses"&&screen!=="versions"&&!busy&&loadedQuery===JSON.stringify(query)&&view.hash===query.hash&&view.period===period&&!error&&!changed&&<>
- {screen==="monthly"?<>{!prepared&&<h1>Aylık Market Özeti</h1>}{prepared&&<SourceEstimate presentation="summary" heading={<h1 ref={summaryHeading} tabIndex={-1}>Aylık Market Özeti</h1>} onLoaded={summaryLoaded} active={childActive} hash={view.hash} period={period} onProduct={openProduct}/>}{prepared?<details open={rawCountsOpen} onToggle={event=>setRawCountsOpen(event.currentTarget.open)}><summary>Kaydedilmiş belge ve satır sayıları</summary>{countsDesk}</details>:countsDesk}</>:<>
+ {screen==="monthly"?<><h1>Veri ve kaynak</h1>{countsDesk}</>:<>
  {screen==="overview"&&prepared&&<Button hidden={query.view==="detail"} variant="outline" onClick={event=>{if(rawSalesOpen)returnToProducts();else{estimateReceipt.current=captureReturn(event.currentTarget);estimateOrigin.current="overview";setRawSalesOpen(true);}}}>{rawSalesOpen?estimateOrigin.current==="monthly"?"Özete dön":"Ürün tahminlerine dön":"Kaydedilmiş satış belgelerini aç"}</Button>}
  <div hidden={screen==="overview"&&!rawSales&&query.view!=="detail"} className={screen==="overview"?"sales-control-desk source-sales-desk":"purchasing-control-desk source-purchasing-desk"}><div className="page-heading"><h1 ref={heading} tabIndex={-1}>{screen==="purchasing"?"Alışlar ve maliyet":"Satışlar"}</h1><span>{screen==="purchasing"?"Alışla ilişkili kaynak kayıtları":"Satışla ilişkili kaynak kayıtları"}</span></div>{screen==="purchasing"&&query.view!=="detail"&&<Button variant="outline" onClick={()=>filter({view:"documents",scope:"purchasing",documentType:"1",productId:null})}>Faturalar</Button>}{screen==="overview"&&prepared&&rawSalesOpen&&<p className="notice">Tüm kaydedilmiş satırlar gösterilir; katkı hesabından dışlanan kayıtlar da bulunabilir.</p>}{screen==="purchasing"&&<p className="source-purchasing-note">Maliyet analizi henüz hazır değil; fatura ve irsaliye tutarları birleştirilmez.</p>}
  {(screen==="overview"||screen==="purchasing")&&query.view!=="detail"&&<><div className="metrics source-sales-metrics"><article className="metric"><h2>Belge kaydı</h2><strong>{outside?"Kapsam dışında":count(view.counts.documents)}</strong><p>Tüm durum kodları</p></article><article className="metric"><h2>Belge satırı</h2><strong>{outside?"Kapsam dışında":count(view.counts.lines)}</strong><p>Kaydedilmiş kaynak satırları</p></article><article className="metric"><h2>Ürün kayıt ID’si</h2><strong>{outside?"Kapsam dışında":count(view.counts.products)}</strong><p>Bu yedekte ürün adı yok</p></article></div></>}
@@ -101,5 +99,5 @@ export function SourceWorkspace({source,selectedMonth,onMonth}:{source:SourceVie
  </>}
 
  </main>
- </AppShell>;
+ </EmbeddedScreen>;
 }
