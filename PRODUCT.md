@@ -24,7 +24,7 @@ v1 is the profit-first estimate edition ([decision record](docs/decisions/issue-
 
 ## Operating Context
 
-The welcome page appears on every launch. `Özeti aç` opens Özet; Satışlar, Alışlar ve maliyet, Giderler and Raporlar open their existing pages directly. Ayarlar remains available from welcome. The sidebar `Karşılama` return preserves the remembered month and passes through existing expense draft protection.
+Launch opens Bu ay directly; there is no welcome page. The sidebar has four sections: Bu ay, Ürünler, Giderler and Rapor ve Excel. Ayarlar and the live-connection badge sit in the sidebar corner. Rapor ve Excel holds the monthly reports and Excel exports, Veri ve kaynak (source codes, record counts and raw documents) and Alış belgeleri. Switching sections preserves the remembered month and passes through existing expense draft protection. Without any imported data, Bu ay says so in one sentence and offers the package import in Ayarlar.
 
 - All dashboards read a local analytics store and remain usable offline.
 - The first release uses prepared analytics packages from authorized backup preparation. It must not require the owner to restore or administer the POS database.
