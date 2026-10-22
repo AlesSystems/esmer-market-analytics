@@ -8,7 +8,18 @@ The [golden oracle record](../evidence/golden-oracles.md) maps calculations to i
 
 ## Separate recorded-source estimates
 
-The user-authorized [V1 estimate contract](recorded-estimates.md) defines a separate assumption-based capability. It uses recorded amount and cost candidates, precision 200 and explicit exclusions. It does not change the validated population or financial meanings below, and it cannot enable operating results.
+The user-authorized [V1 estimate contract](recorded-estimates.md) defines a separate assumption-based capability. It uses recorded amount and cost candidates, precision 200 and explicit exclusions. It does not change the validated population or financial meanings below.
+
+The [profit-first estimate edition](../decisions/issue-98-profit-first-estimate-edition.md), approved on 2026-10-22, makes this estimate the v1 profit shown to the owner. Its primary terms are:
+
+| Term | Meaning |
+| --- | --- |
+| Satış | Candidate sale amount on the recorded `TOPLAM_KDV_MATRAHI` basis, unchanged. |
+| Tahmini brüt kâr | Covered sale contribution: covered sale amount minus candidate cost, unchanged formula. |
+| Marj | Tahmini brüt kâr divided by covered sale amount, over the same population, consistent with Covered gross margin below. Null when covered sale amount is zero or negative or no covered lines exist. Display may round to two decimals and never feeds amounts. |
+| Tahmini net kâr | Tahmini brüt kâr minus the total of the month's expenses the owner entered and marked complete in the [expense-completeness](expense-completeness.md) review, counted under the [expense contract](expense-completeness.md#operating-result)'s classification and KDV-treatment rules: excluded classifications (asset purchases, taxes, financing, owner contribution/withdrawal, transfers) stay out, and unknown treatment or nonzero unclassified values withhold the figure. If the month is not marked complete, no net figure appears and the missing-expenses text below applies. |
+
+Tahmini net kâr inherits the estimate's limits: returns' cost and uncovered sales stay excluded. It is distinct from the validated Operating result row below, which keeps its prerequisites for the validated financial pipeline after v1. Tahmini net kâr waives only the source prerequisites (full source coverage, reconciled sales, supported gross mapping, no excluded cost lines). It always requires owner-marked expense completeness and the expense classification rules. Quality stays `unverified-estimate`. Missing, zero or negative cost is never treated as zero, and all arithmetic stays deterministic decimal in the service layer.
 
 ## Population and meaning
 
@@ -29,7 +40,7 @@ The user-authorized [V1 estimate contract](recorded-estimates.md) defines a sepa
 
 The basket explanation is `Ortalama sepet, ayrı iade belgeleri hariç tamamlanmış satışların KDV hariç tutarının satış belgesi sayısına bölünmesidir.` A two-document sale total of 200 and separate return of 50 produce net sales 150, count 2, and basket 100.
 
-An unavailable operating-profit headline due to missing expenses uses the exact approved text:
+An unavailable operating-profit headline, or an unavailable Tahmini net kâr, due to missing expenses uses the exact approved text (exact copy for the estimate edition may be refined in [issue 106](https://github.com/AlesSystems/esmer-market-analytics/issues/106)):
 
 > Faaliyet kârı hesaplanamıyor — gider verileri eksik.
 
@@ -37,7 +48,7 @@ Unknown KDV treatment is not assumed recoverable or non-recoverable. A successfu
 
 ## Decimal and unit policy
 
-Money, quantity, multipliers, costs and source IDs are serialized as decimal/integer strings, without binary floating-point conversion. Retain original source precision. Financial arithmetic belongs outside the UI and must be deterministic for a pinned input and calculation version.
+Missing, zero or negative cost is never treated as zero, including in the estimate edition. Money, quantity, multipliers, costs and source IDs are serialized as decimal/integer strings, without binary floating-point conversion. Retain original source precision. Financial arithmetic belongs outside the UI and must be deterministic for a pinned input and calculation version.
 
 Source scale, intermediate precision, header/line rounding order, discount order and cost KDV basis remain **unresolved**. No global source precision or rounding policy is adopted in this phase. Any rounding/unit-conversion edge fixture declares a local synthetic assumption that applies only to that scenario. Display rounding must never alter stored source values. In particular, the audit's 0.01 comparison is an observed reconciliation check, not approval of a universal tolerance.
 
@@ -53,7 +64,7 @@ Fixtures use explicit date-only business dates. Their periods do not depend on t
 
 A calculation version and source snapshot identify the inputs. An accepted report also pins its app revision and retained output. A newer source correction creates a candidate revision without altering the accepted report. G08 and paired snapshots specify this behavior for later persistence implementation; Phase 2 does not implement activation or report storage.
 
-Historical estimates remain estimated after acceptance. Monthly `Açık / Geçici / Güvenilir` states cannot promote estimated profitability to exact or trusted profitability. Source reconciliation of sales does not certify real-world completeness.
+Historical estimates remain estimated after acceptance. Monthly `Açık / Geçici / Güvenilir` states cannot promote estimated profitability to exact or trusted profitability. Tahmini net kâr is likewise an estimate and never becomes the validated Operating result. Source reconciliation of sales does not certify real-world completeness.
 
 ## Formula release gate
 

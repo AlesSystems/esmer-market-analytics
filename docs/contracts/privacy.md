@@ -26,7 +26,7 @@ Known historical sensitive names include `MUSTERI_AD`, `VERGI_NUMARASI`, `EMAIL`
 | Source identity / snapshot | Lineage, snapshot, schema/mapping version, synthetic provenance, explicit cutoff and coverage | No backup path, connection string or credential. Private evidence uses opaque references outside Git. |
 | Document / line | Stable IDs, document kind, date, product/unit/decimal facts needed by a declared oracle | Explicit fixture keys only. Source raw mappings remain subject to revalidation. |
 | Conversion / return link | IDs and validated event relationship | No raw SQL, free text or unsupported settlement assertion. |
-| Product / category | Minimal identifiers and approved non-identifying product/category data | Product-level `STOK.CARI` is not accepted as supplier mapping. Display fields need separate raw-schema review. |
+| Product / category | Minimal identifiers and approved non-identifying product/category data | Product-level `STOK.CARI` is not accepted as supplier mapping. Display fields need separate raw-schema review; see [product catalogue columns (#99)](#product-catalogue-columns-99) for the approved estimate-package fields. |
 | Supplier | Counterparty ID proven to occur on a purchasing document | Shared counterparty-table membership alone is insufficient. No customer rows, contact/address/tax fields or unreviewed display names. |
 | App-owned fixture records | Synthetic expenses, adjustments, settings, audit entries and accepted report references | These represent preservation expectations, not extracted POS data. No employee-level fields. |
 
@@ -36,7 +36,7 @@ The historical audit evidences names such as `FIS.ID`, `FIS_DETAY.BELGE_TARIHIND
 
 The developer-only [source evidence collector](../operations/collect-source-evidence.md) has a separate aggregate-use allowlist. It may read document IDs, document types, raw document timestamps and currency references from `FIS`; line and parent/product IDs from `FIS_DETAY`; product IDs from `STOK`; and currency dictionary IDs/codes from `DOVIZ_AD`. IDs remain inside SQL aggregates and joins. The artifact contains counts, bounded type/currency groups and raw timestamp bounds, not document, product or counterparty records. Currency names outside the fixed recognized codes become `OTHER`.
 
-Catalog inspection is restricted to the collector's named column list, including selected quantity, multiplier, amount and historical-cost column types/scales. Catalog visibility does not authorize reading those monetary values. Customer fields, product display names, supplier records, staff records and free text remain excluded. This allowlist does not approve a real analytics package or source financial mapping.
+Catalog inspection is restricted to the collector's named column list, including selected quantity, multiplier, amount and historical-cost column types/scales. Catalog visibility does not authorize reading those monetary values. Customer fields, product display names, supplier records, staff records and free text remain excluded from the collector. This allowlist does not approve a real analytics package or source financial mapping.
 
 The fixture suite uses conspicuously fake private sentinels only as hostile input. Permitted outputs and snapshots must exclude both prohibited keys and sentinel values. Mutation tests add unknown/private fields at record boundaries and must fail with safe diagnostics rather than printing submitted values. Attack inputs are separate from valid analytics-shaped fixtures.
 
@@ -56,7 +56,7 @@ The authorized preview may extract the following fields from the disposable rest
 - `FIS_DETAY`: `ID`, `FIS`, `STOK`, `FIS_TURU`, `CARPAN`, `MIKTAR_FIS`, `TOPLAM_KDV_MATRAHI`, `TOPLAM_KDV`, `TOPLAM_OTV`, `TOPLAM_TEVKIF`.
 - `DOVIZ_AD`: `ID` and `AD` for the SQL join and fixed `CURRENCY` classification (`TRY`, `USD`, `OTHER` or null). Arbitrary currency display text is not exported.
 
-The package includes opaque source lineage and extraction identity, database GUID, numeric engine version, capture timestamp and selected source-date bounds. It contains no server locator, account name, password, customer/product/supplier display text or source file path. Use opaque identifiers for lineage and extraction identity.
+The package includes opaque source lineage and extraction identity, database GUID, numeric engine version, capture timestamp and selected source-date bounds. It contains no server locator, account name, password, customer/product/supplier display text or source file path. This preview allowlist stays unchanged; the #99 allowance below applies only to the new estimate package version. Use opaque identifiers for lineage and extraction identity.
 
 Prepared real packages, source snapshots, exact-value oracles and real screenshots stay outside Git and release assets. Public UI evidence uses generated rows. Import does not make private source material suitable for publication.
 
@@ -74,4 +74,12 @@ Private rows, decimal expectations and prepared packages remain outside Git and 
 
 The 2026-10-02 [estimate contract](recorded-estimates.md) adds exactly `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI`, as numeric text or null, to the separate `sql-backup-estimate-v1` package. It uses the retained authorized isolated evidence. This is an application-input allowance for a cost candidate, not a verified financial mapping or permission to broaden runtime SQL queries. Old `sql-backup-preview-v1` keeps its exact existing projection.
 
-Source identities and exact amounts may enter the owner's private local estimate and export. They remain excluded from Git, logs, synthetic screenshots and public release assets. The field does not carry product names or other free text. Unknown columns remain rejected.
+Source identities and exact amounts may enter the owner's private local estimate and export. They remain excluded from Git, logs, synthetic screenshots and public release assets. The field does not carry product names or other free text. `sql-backup-estimate-v1` keeps this exact projection; product catalogue text is allowed only in the newer package version below. Unknown columns remain rejected.
+
+## Product catalogue columns (#99)
+
+The owner approved [#99](https://github.com/AlesSystems/esmer-market-analytics/issues/99) on 2026-10-22. A new estimate package version may carry exactly these fields, read-only, as display text: product name, product group/category name and unit code (if available), from the stock master (`STOK`) and, if needed, its product-group dictionary. The #99 preparation allowlist fixes the exact tables and columns after catalog review.
+
+No supplier columns (including product-level `STOK.CARI`), customer, employee or other free-text columns are added. Unknown columns are still rejected. Earlier allowlists stay unchanged for their own packages.
+
+Product names are private source values. They stay out of Git, logs, public screenshots and release assets. Synthetic fixtures use generated names.

@@ -49,7 +49,7 @@ Product rows, daily buckets and the market summary partition the same R and C. S
 
 Cost coverage also carries covered/excluded counts and separate signed sales/return exposures, as in `GrossResult`. Zero-value excluded lines prevent full coverage even if the monetary percentage is 100. Cost coverage describes only R. Separate sales coverage carries unresolved source populations, reasons and counts, with amounts where their basis is known. Unknown exposure is null, never zero or a guessed TRY value. No overall sales-completeness percentage is invented from partial evidence.
 
-The summary's scope label is always `Seçili ay · tüm ürünler`. When sales coverage, period coverage and cost coverage are all complete, its value label can be `Tahmini brüt kâr`. If any is incomplete, use `Kapsanan tahmini brüt kâr` and `Tüm market kârı belirlenemiyor`. Even full coverage means complete for the declared source population, not proof that every real-world sale was recorded. Supplier returns do not enter customer-return quantities or gross contributions.
+The summary's scope label is always `Seçili ay · tüm ürünler`. When sales coverage, period coverage and cost coverage are all complete, its value label can be `Tahmini brüt kâr`. If any is incomplete, use `Kapsanan tahmini brüt kâr` and `Tüm market kârı belirlenemiyor`. Even full coverage means complete for the declared source population, not proof that every real-world sale was recorded. Supplier returns do not enter customer-return quantities or gross contributions. For the estimate edition, the [profit-first decision](../decisions/issue-98-profit-first-estimate-edition.md) replaces `Kapsanan` labels and beside-the-value caveats on primary screens with plain terms and one page trust chip; see [page controls](page-control-desks.md#profit-first-estimate-edition-2026-10-22).
 
 ## Cost, discounts and precision
 
@@ -89,7 +89,7 @@ A complete zero-activity day has a zero trend value with an empty-day marker. An
 The [static sketch](../diagrams/monthly-product-profit.html) uses conspicuously synthetic inputs. It is a planning artifact, not a replacement design system or working product screenshot.
 
 1. **Ay**, source cutoff, import time, coverage and report-version controls.
-2. Market-wide estimated gross result, covered sales/cost, coverage and exclusions. Keep uncertainty next to the number.
+2. Market-wide estimated gross result, covered sales/cost, coverage and exclusions. Keep uncertainty next to the number (validated reports only).
 3. **Günlük tahmini brüt kâr** for the selected month, with a zero baseline, signed values, gaps and a table alternative. Label covered scope when partial.
 4. **Ürün katkıları**, search and sortable columns for product, sold/returned/net quantities by unit, net sales, covered historical cost, covered profit and coverage.
 5. **Seçili ürün** followed by its transaction, original-sale and cost evidence. Show source IDs and calculation details on expansion.
