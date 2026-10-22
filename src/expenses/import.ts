@@ -8,6 +8,7 @@ import { classificationLabels, classifications, type CreateExpenseRequest, type 
 import { readExpenseWorkbook, decimalCell, dateCell, type Cell } from "./workbook";
 import { isExpense, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
 import { relevantExpenseRevision } from "./adjustments";
+import { groupExpenses } from "./groups";
 const hash = (s: string | Uint8Array) => createHash("sha256").update(s).digest("hex");
 const nullable = (cells: Cell[], index: number) => cells[index]?.value || null;
 function value(c: Cell[], batchId: string, row: number): ExpenseValue {
@@ -118,6 +119,6 @@ export class Expenses {
     const components = calculateExpenseComponents({ period, expenses: snapshot.app });
     const coverage = components.reasons.length ? "incomplete" : complete || Object.values(components.breakdownCoverage).includes("available") ? "available" : "missing";
     const summary: ExpensePeriod["summary"] = { expenses: coverage === "available" ? components.expenses : null, coverage, labour: components.breakdownCoverage.labour === "available" ? components.breakdown.labour : null, labourCoverage: components.breakdownCoverage.labour, reasons: components.reasons, excluded: components.excluded };
-    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, incurred: sum(current.filter(row => row.value.date.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
+    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, confirmation: confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.period === period ? complete ? "current" : "stale" : "none", ...groupExpenses(period, snapshot.app), incurred: sum(current.filter(row => row.value.date.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
   }
 }
