@@ -3,7 +3,7 @@ import { classificationLabels, type ExpenseRecord, type ExpenseValue } from "../
 import { count, date, money } from "./format";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
 /** The validated five hues. The "Diğer" rest bucket stays neutral (`--viz-cost`). */
-export const categoryPalette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--exp-violet)", "var(--exp-gold)"];
+export const categoryPalette = ["var(--viz-sales)", "var(--viz-contribution)", "var(--viz-accent-3)", "var(--viz-violet)", "var(--viz-gold)"];
 /** Shown categories take distinct hues in Turkish name order, so a colour follows the name and never the count. */
 export const categoryColors = (names: string[]): Record<string, string> =>
   paletteColors(names, categoryPalette, (a, b) => a.localeCompare(b, "tr"));

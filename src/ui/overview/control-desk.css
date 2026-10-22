@@ -1,6 +1,4 @@
-.control-desk{--c-ink:#182644;--c-blue:#2459d5;--c-muted:#5c6980;--c-line:#dce3ee;color:var(--c-ink);font-variant-numeric:tabular-nums;padding:0 0 64px;background:#fff;min-height:100%}
-.control-desk ::selection{background:#d7e3ff;color:#182644}
-.control-desk button:focus-visible{outline:3px solid #2459d5;outline-offset:4px}
+.control-desk{--c-ink:var(--market-ink);--c-blue:var(--market-action);--c-muted:var(--market-muted);--c-line:var(--market-line);color:var(--c-ink);font-variant-numeric:tabular-nums;padding:0 0 64px;background:transparent;min-height:100%}
 .control-desk h1{font-size:34px;line-height:1.15;letter-spacing:-.035em;margin:0 0 10px;font-weight:650}
 .control-desk h2{font-size:18px;letter-spacing:-.025em;font-weight:650;margin:0}
 .control-desk p{font-size:13px;line-height:1.6;color:var(--c-muted);margin:0}
@@ -11,14 +9,13 @@
 .control-desk .c-matrix>button{position:relative;text-align:left;background:none;border:0;border-right:1px solid var(--c-line);padding:22px 18px;display:flex;flex-direction:column;gap:11px;min-width:0}
 .control-desk .c-matrix>button:first-child{padding-left:0}
 .control-desk .c-matrix>button:last-child{border-right:0;padding-right:0}
-.control-desk .c-matrix>button:hover{background:#f3f6fc}
 .control-desk .c-matrix>button>span{font-size:12px;font-weight:600;min-height:18px}
 .control-desk .c-matrix strong{font-size:29px;letter-spacing:-.035em;font-weight:650;white-space:nowrap}
 .control-desk .c-matrix strong small{font-size:17px;font-weight:500}
 .control-desk .c-matrix em{font-size:11px;font-style:normal;color:var(--c-blue);display:flex;gap:5px;align-items:center;line-height:1.5}
 .control-desk .c-matrix em span,.control-desk .c-matrix .c-muted{color:var(--c-muted)}
 .control-desk .c-matrix .c-unavailable strong{font-size:18px;letter-spacing:-.02em;line-height:35px;white-space:normal}
-.control-desk .c-unavailable em{color:#755026}
+.control-desk .c-unavailable em{color:var(--market-warn-ink)}
 .control-desk .c-body{display:grid;grid-template-columns:minmax(0,1fr) 248px;gap:30px}
 .control-desk .c-main{min-width:0}
 .control-desk .c-section-heading{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:22px}
@@ -29,16 +26,16 @@
 .control-desk .c-chart-foot>span:last-child{margin-left:auto}
 .control-desk .c-ranking{padding-top:27px}
 .control-desk .c-categories>button{display:grid;grid-template-columns:minmax(115px,1fr) minmax(45px,.7fr) 100px 30px 18px;gap:13px;align-items:center;width:100%;border:0;border-top:1px solid var(--c-line);background:transparent;padding:13px 0;text-align:left;font-size:12px}
-.control-desk .c-categories>button:hover{background:#f3f6fc}
+.control-desk .c-categories>button:hover{background:var(--market-hover)}
 .control-desk .c-categories strong{text-align:right;font-weight:650}
 .control-desk .c-categories>button>span:nth-last-child(2){text-align:right;color:var(--c-muted);font-size:11px}
-.control-desk .category-track{height:4px;background:#edf1f7;display:block}
+.control-desk .category-track{height:4px;background:var(--market-hover);display:block}
 .control-desk .category-track i{height:100%;display:block;background:var(--c-blue)}
 .control-desk .c-evidence{border-left:1px solid var(--c-line);padding-left:24px}
 .control-desk .c-evidence h2{font-size:16px}
 .control-desk .c-evidence-intro{font-size:11px;margin-top:6px}
 .control-desk .c-proof-list>div{display:block;position:relative;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--c-line);padding:17px 20px 17px 0}
-.control-desk .c-proof-list>div:hover{background:#f3f6fc}
+.control-desk .c-proof-list>div:hover{background:var(--market-hover)}
 .control-desk .c-proof-list span{display:block;color:var(--c-muted);font-size:10px;margin-bottom:7px}
 .control-desk .c-proof-list strong{display:block;font-size:14px;font-weight:650;line-height:1.4}
 .control-desk .c-proof-list strong small{font-size:10px;font-weight:500}
@@ -96,7 +93,7 @@
 .control-desk .c-report-details .page-heading h2{font-size:24px}
 .control-desk .c-method{font-size:11px;margin-top:18px;overflow-wrap:anywhere}
 .control-desk .c-method p{font-size:11px;margin-top:8px}
-.control-desk .c-notice{padding:16px;background:#f3f6fc;margin-bottom:24px;font-size:13px}
+.control-desk .c-notice{padding:16px;margin-bottom:24px;font-size:13px}
 .control-desk .c-proof-list>div{overflow-wrap:anywhere}
 .control-desk summary{cursor:pointer}
 .control-desk :focus-visible{outline:3px solid var(--c-blue);outline-offset:4px}
