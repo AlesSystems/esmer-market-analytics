@@ -13,6 +13,8 @@ const rejections:[string,(s:Snap)=>void][]=[
  ["missing UNIT column",s=>{delete s.products![0].UNIT;}],["untrimmed NAME",s=>{s.products![0].NAME=" Süt";}],["empty NAME",s=>{s.products![0].NAME="";}],
  ["161 char NAME",s=>{s.products![0].NAME="a".repeat(161);}],["control char NAME",s=>{s.products![0].NAME="Süt\u0007";}],["control char CATEGORY",s=>{s.products![0].CATEGORY="a\u007fb";}],
  ["UNIT litre",s=>{s.products![0].UNIT="litre";}],["bad ID",s=>{s.products![0].ID="03";}],["duplicate ID",s=>{s.products!.push({...s.products![0]});}],
+ ["numeric NAME",s=>{(s.products![0] as Record<string,unknown>).NAME=5;}],["object CATEGORY",s=>{(s.products![0] as Record<string,unknown>).CATEGORY={};}],["UNIT ADET",s=>{s.products![0].UNIT="ADET";}],["UNIT Kg",s=>{s.products![0].UNIT="Kg";}],
+ ["NEL NAME",s=>{s.products![0].NAME="a\u0085b";}],["RLO NAME",s=>{s.products![0].NAME="a\u202eb";}],["line separator NAME",s=>{s.products![0].NAME="a\u2028b";}],
  ["unreferenced product",s=>{s.products!.push({ID:"999",NAME:"Yok",CATEGORY:null,UNIT:null});}],["products not array",s=>{(s as Record<string,unknown>).products={};}],
 ];
 test("v2 preview and estimate packages round trip product names",()=>{

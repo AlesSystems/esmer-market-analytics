@@ -161,7 +161,7 @@ export async function createLiveSqlFixture(path: string) {
       }
       throw new Error("READER_LOCK_BARRIER_TIMEOUT");
     };
-    return {config, execute: writer.query, waitForReaderLock, connectWriter: () => open(), readerQuery: async (sql: string) => {const reader = await open({...admin, user, password}); try {return await reader.query(sql);} finally {await reader.close(); connections.delete(reader);}}, close};
+    return {config, reader: user, execute: writer.query, waitForReaderLock, connectWriter: () => open(), readerQuery: async (sql: string) => {const reader = await open({...admin, user, password}); try {return await reader.query(sql);} finally {await reader.close(); connections.delete(reader);}}, close};
   } catch (error) {await close(); throw error;}
 }
 
