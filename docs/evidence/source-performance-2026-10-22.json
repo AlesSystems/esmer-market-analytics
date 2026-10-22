@@ -1,0 +1,196 @@
+{
+  "synthetic": true,
+  "node": "v24.15.0",
+  "platform": "darwin",
+  "os": "27.0.0",
+  "arch": "arm64",
+  "cpu": "Apple M4 Pro",
+  "samples": 3,
+  "coldCondition": "Store reopened against persisted SQLite; JS process and OS filesystem cache remain warm. Timings exclude import, store open, IPC and rendering.",
+  "shapes": [
+    {
+      "lines": 99999,
+      "products": 3529,
+      "bytes": 22957476,
+      "sourceHash": "75b09999e60b8022f8f806c0082d5ba665675319c7a4b05a45a0c060982da559",
+      "results": [
+        {
+          "sample": 1,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 697.31,
+          "total": 3529
+        },
+        {
+          "sample": 1,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 6.54,
+          "total": 3529
+        },
+        {
+          "sample": 1,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 6.3,
+          "total": 3529
+        },
+        {
+          "sample": 1,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 7.27,
+          "total": 1
+        },
+        {
+          "sample": 2,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 700.86,
+          "total": 3529
+        },
+        {
+          "sample": 2,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 6.58,
+          "total": 3529
+        },
+        {
+          "sample": 2,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 6.43,
+          "total": 3529
+        },
+        {
+          "sample": 2,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 6.86,
+          "total": 1
+        },
+        {
+          "sample": 3,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 670.03,
+          "total": 3529
+        },
+        {
+          "sample": 3,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 6.64,
+          "total": 3529
+        },
+        {
+          "sample": 3,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 6.38,
+          "total": 3529
+        },
+        {
+          "sample": 3,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 7.3,
+          "total": 1
+        }
+      ]
+    },
+    {
+      "lines": 99999,
+      "products": 99999,
+      "bytes": 23078308,
+      "sourceHash": "92ad369b5da3ad68d8b9dc6b70003bec5c3f31595ad3131c2708696ad8bcf198",
+      "results": [
+        {
+          "sample": 1,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 873.07,
+          "total": 99999
+        },
+        {
+          "sample": 1,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 7.7,
+          "total": 99999
+        },
+        {
+          "sample": 1,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 7.16,
+          "total": 99999
+        },
+        {
+          "sample": 1,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 11.09,
+          "total": 1
+        },
+        {
+          "sample": 2,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 850.03,
+          "total": 99999
+        },
+        {
+          "sample": 2,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 6.62,
+          "total": 99999
+        },
+        {
+          "sample": 2,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 6.38,
+          "total": 99999
+        },
+        {
+          "sample": 2,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 10.36,
+          "total": 1
+        },
+        {
+          "sample": 3,
+          "name": "cold-page",
+          "offset": 0,
+          "ms": 892.56,
+          "total": 99999
+        },
+        {
+          "sample": 3,
+          "name": "warm-page",
+          "offset": 50,
+          "ms": 6.93,
+          "total": 99999
+        },
+        {
+          "sample": 3,
+          "name": "warm-page",
+          "offset": 100,
+          "ms": 6.48,
+          "total": 99999
+        },
+        {
+          "sample": 3,
+          "name": "warm-exact-product",
+          "offset": 0,
+          "ms": 8.68,
+          "total": 1
+        }
+      ]
+    }
+  ]
+}
