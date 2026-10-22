@@ -15,7 +15,18 @@ export type Money=string;
 export type Pct=string|null;
 export type NetProfitReason="costUnknown"|"monthPartial"|"expensesMissing"|"expensesIncomplete"|"unknownTax"|"confirmationStale";
 export type MonthProfitTotals={sales:Money|null;knownCostSales:Money;cost:Money|null;grossProfit:Money|null;marginPct:Pct;costKnownPct:Pct;unknownCostSales:Money;unknownCostProducts:number;returns:Money|null;unknownSaleAmounts:number;unknownReturnAmounts:number;receipts:number;averageBasket:Money|null;expenses:Money|null;expensesComplete:boolean;netProfit:Money|null;netProfitReason:NetProfitReason|null};
-export type MonthProfitProduct={id:string;name:string|null;category:string|null;unit:ProductLabel["unit"];sales:Money|null;cost:Money|null;grossProfit:Money|null;marginPct:Pct;previousMarginPct:Pct;unitPrice:Money|null;unitCost:Money|null;quantity:string|null;history:{month:string;marginPct:Pct}[]};
+export type MonthProfitProduct={id:string;name:string|null;category:string|null;unit:ProductLabel["unit"];sales:Money|null;cost:Money|null;grossProfit:Money|null;marginPct:Pct;previousMarginPct:Pct;unitPrice:Money|null;unitCost:Money|null;quantity:string|null;history:{month:string;marginPct:Pct}[];
+ /** Margin now minus last month, in points (2 places, from unrounded margins); null when either is unknown. */
+ marginChangePoints:Pct;
+ /** Gross profit per unit over cost-known lines (2 places); null without a known quantity or cost. */
+ unitProfit:Money|null;
+ /** Share of the month's gross profit (2 places); null when unknown or the month's gross profit is not positive. */
+ profitSharePct:Pct;
+ /** 1-based rank by gross profit, highest first (ties by ID); null when gross profit is unknown. */
+ profitRank:number|null;
+ /** Filter membership, decided on unrounded values: margin < 0, margin < 10 %, the marginDrop and missingCost attention rules. */
+ flags:{loss:boolean;lowMargin10:boolean;marginDrop:boolean;missingCost:boolean};
+};
 /** Percent change (2 places) or margin points (2 places, from unrounded margins). */
 export type MonthProfitChanges={salesPct:Pct;grossProfitPct:Pct;marginPoints:Pct;netProfitPct:Pct};
 export type AttentionKind="loss"|"marginDrop"|"lowMarginHighVolume"|"missingCost";
@@ -35,6 +46,7 @@ export type MonthProfitUnavailable={status:"source-unavailable";code:"ESTIMATE_U
 export type MonthProfitResult={status:"month-profit";view:MonthProfitView}|MonthProfitUnavailable;
 export type MonthProfitExpenses={app:AppRecord[];history:AppRecord[]};
 export const ATTENTION={marginDropPoints:"1.5",lowMarginPct:"8",highVolumeRank:5} as const;
+export const PRODUCT_FILTERS={lowMarginPct:"10"} as const;
 const COST_REASONS=new Set(["QUANTITY","MULTIPLIER","COST_MISSING","COST_ZERO","COST_NEGATIVE"]);
 
 export function validMonthProfitRequest(value:unknown):value is MonthProfitRequest {
@@ -89,20 +101,30 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
  const window=Array.from({length:6},(_,i)=>shift(month,i-5)).filter(m=>covered(pkg,m));
  const months=new Map(window.map(m=>{let entry=cache.get(m);if(!entry){const estimate=calculateSourceEstimate(pkg,m,hash);entry={estimate,products:productsOf(estimate)};cache.set(m,entry);}return [m,entry];}));
  const current=months.get(month)!,prevMonth=shift(month,-1),prev=months.get(prevMonth);
+ const prevProducts=prev?.products;
+ const missing=(p:Product)=>p.lines.some(l=>l.reason!==null&&COST_REASONS.has(l.reason));
+ const totalGross=current.estimate.summary.contribution===null?null:new D(current.estimate.summary.contribution);
+ const ranked=[...current.products].filter(([,p])=>p.totals.contribution!==null).sort(([a,pa],[b,pb])=>new D(pb.totals.contribution!).comparedTo(pa.totals.contribution!)||byId(a,b)).map(([id])=>id);
  const products:MonthProfitProduct[]=[...current.products].map(([id,p])=>{
   const t=p.totals,known=new D(t.coveredSaleAmount??0),coveredLines=p.lines.filter(l=>l.reason===null);
   const quantity=coveredLines.length&&p.label.unit!==null?coveredLines.reduce((a,l)=>a.plus(quantities.get(l.lineId)!),new D(0)):null;
-  return {id,name:p.label.productName,category:p.label.categoryName,unit:p.label.unit,sales:t.candidateSaleAmount,cost:t.candidateCost,grossProfit:t.contribution,marginPct:pct(productMargin(p)),previousMarginPct:pct(productMargin(prev?.products.get(id))),unitPrice:quantity?.gt(0)?div2(known,quantity):null,unitCost:quantity?.gt(0)&&t.candidateCost!==null?div2(new D(t.candidateCost),quantity):null,quantity:quantity?.toFixed()??null,history:window.map(m=>({month:m,marginPct:pct(productMargin(months.get(m)!.products.get(id)))}))};
+  const now=productMargin(p),before=productMargin(prevProducts?.get(id)),gross=t.contribution===null?null:new D(t.contribution);
+  return {id,name:p.label.productName,category:p.label.categoryName,unit:p.label.unit,sales:t.candidateSaleAmount,cost:t.candidateCost,grossProfit:t.contribution,marginPct:pct(now),previousMarginPct:pct(before),unitPrice:quantity?.gt(0)?div2(known,quantity):null,unitCost:quantity?.gt(0)&&t.candidateCost!==null?div2(new D(t.candidateCost),quantity):null,quantity:quantity?.toFixed()??null,history:window.map(m=>({month:m,marginPct:pct(productMargin(months.get(m)!.products.get(id)))})),
+   marginChangePoints:now===null||before===null?null:pct(now.minus(before)),
+   unitProfit:quantity?.gt(0)&&gross!==null?div2(gross,quantity):null,
+   profitSharePct:gross===null||totalGross===null?null:pct(ratio(gross,totalGross)),
+   profitRank:gross===null?null:ranked.indexOf(id)+1,
+   flags:{loss:now?.lt(0)??false,lowMargin10:now?.lt(PRODUCT_FILTERS.lowMarginPct)??false,marginDrop:now!==null&&before!==null&&before.minus(now).gte(ATTENTION.marginDropPoints),missingCost:missing(p)}};
  }).sort((a,b)=>new D(b.sales??-1).comparedTo(a.sales??-1)||byId(a.id,b.id));
  const categories=new Map<string,{sales:Decimal;gross:Decimal|null;known:Decimal}>();
  for(const p of current.products.values()){const name=p.label.categoryName;if(name===null)continue;const c=categories.get(name)??{sales:new D(0),gross:null,known:new D(0)};c.sales=c.sales.plus(p.totals.candidateSaleAmount??0);if(p.totals.contribution!==null){c.gross=(c.gross??new D(0)).plus(p.totals.contribution);c.known=c.known.plus(p.totals.coveredSaleAmount??0);}categories.set(name,c);}
  const margins=new Map(products.map(p=>[p.id,{now:productMargin(current.products.get(p.id)),before:productMargin(prev?.products.get(p.id))}]));
  const flag=(kind:AttentionKind,test:(p:MonthProfitProduct,rank:number)=>boolean)=>products.flatMap((p,rank)=>test(p,rank)?[{kind,productId:p.id}]:[]);
  const attention=[
-  ...flag("loss",p=>margins.get(p.id)!.now?.lt(0)??false),
-  ...flag("marginDrop",p=>{const m=margins.get(p.id)!;return m.now!==null&&m.before!==null&&m.before.minus(m.now).gte(ATTENTION.marginDropPoints);}),
+  ...flag("loss",p=>p.flags.loss),
+  ...flag("marginDrop",p=>p.flags.marginDrop),
   ...flag("lowMarginHighVolume",(p,rank)=>rank<ATTENTION.highVolumeRank&&(margins.get(p.id)!.now?.lt(ATTENTION.lowMarginPct)??false)),
-  ...flag("missingCost",p=>current.products.get(p.id)!.lines.some(l=>l.reason!==null&&COST_REASONS.has(l.reason))),
+  ...flag("missingCost",p=>p.flags.missingCost),
  ];
  const totalsByMonth=new Map(window.map(m=>[m,monthTotals(pkg,months.get(m)!.estimate,months.get(m)!.products,expenses)]));
  const totals=totalsByMonth.get(month)!;
