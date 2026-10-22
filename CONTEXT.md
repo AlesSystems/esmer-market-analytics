@@ -4,6 +4,21 @@ Terms used when discussing the owner's local reports and their evidence. These d
 
 ## Language
 
+**Satış:** v1's sale amount on the recorded `TOPLAM_KDV_MATRAHI` basis. It is not verified revenue or KDV-exclusive net sales.
+_Avoid_: Kapsanan satış adayı, verified revenue
+
+**Tahmini brüt kâr:** v1's estimated gross profit: covered sale amount minus estimated cost at the last purchase price on the document date. Lines with missing, zero or negative cost are excluded, never counted as zero.
+_Avoid_: Katkı, verified profit
+
+**Marj:** Tahmini brüt kâr divided by the covered sale amount of the same population. Unavailable when that amount is zero or less, or no covered lines exist.
+_Avoid_: Margin over all sales
+
+**Tahmini net kâr:** Tahmini brüt kâr minus the expenses the owner entered and marked complete for the month, under the expense classification rules (asset purchases, taxes, financing, owner funds and transfers stay out). Not shown when expenses are not marked complete. It is not the validated operating result.
+_Avoid_: Faaliyet kârı, verified net profit
+
+**Trust chip:** The single per-page disclosure that figures are estimates, for example "Tahmini kâr · maliyeti bilinen satış %98,3". It opens a short explanation; detailed exclusion reasons live in Rapor.
+_Avoid_: Per-number caveats
+
 **Data cutoff (veri sonu):** The latest source business time represented by an imported dataset. It is different from the time the package was prepared or imported.
 _Avoid_: Live time, current data, last import time
 

@@ -2,7 +2,7 @@
 
 Private Turkish desktop analytics for one owner and one Esmer Market store in the TRNC/KKTC. The application uses Electron, TypeScript, React, a local Node service and SQLite on Windows.
 
-The local application includes sales, purchasing, Excel and manual expense entry, monthly reports, Excel export and encrypted recovery. v0.5 automatically uses imported source records across its pages, with one SQLite store and no financial/source view selector. Existing financial-only installations remain supported. Financial datasets still use synthetic mappings; prepared source packages support raw-record browsing and qualified product/day/month contribution estimates. These estimates disclose assumed source meanings, excluded returns and unsupported costs. They do not activate validated financial reports or establish whole-market profit.
+The local application includes sales, purchasing, Excel and manual expense entry, monthly reports, Excel export and encrypted recovery. v0.5 automatically uses imported source records across its pages, with one SQLite store and no financial/source view selector. Existing financial-only installations remain supported. Financial datasets still use synthetic mappings; prepared source packages support raw-record browsing and product/day/month profit estimates. Under the [profit-first decision](docs/decisions/issue-98-profit-first-estimate-edition.md), these estimates are v1's financial truth, disclosed once per page with a trust chip. They do not activate validated financial reports or establish verified profit.
 
 The optional isolated SQL test connection starts disabled. Imported records remain usable offline. Production rollout, validated real-source financial mapping and current-build Windows/recovery acceptance require separate evidence and direction. [The evidence index](docs/evidence/index.md) identifies current work and preserved historical receipts.
 
@@ -35,10 +35,11 @@ Inspect `package.json` for the current commands and locked dependencies. Optiona
 | [Historical database audit](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-audit.md) | Original source observations and their limits |
 | [Acceptance checklist](docs/superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md) | A01–A07 and later L01 proof requirements |
 | [Original implementation plan](docs/superpowers/plans/esmer-market-implementation-plan.md) | Phase dependencies and verification contracts |
-| [Recorded-source estimates](docs/contracts/recorded-estimates.md) | Current unverified contribution capability and exclusions |
+| [Recorded-source estimates](docs/contracts/recorded-estimates.md) | v1 estimated profit (Tahmini brüt kâr, Marj) and exclusions |
 | [Monthly product profit](docs/contracts/monthly-product-profit.md) | Covered financial gross-profit reporting contract |
 | [Expense contract](docs/contracts/expense-completeness.md) | Import, manual entry, provenance and completeness |
 | [Runtime decisions](docs/decisions/runtime.md) | Runtime and packaging choices |
+| [Profit-first estimate edition](docs/decisions/issue-98-profit-first-estimate-edition.md) | v1 re-baseline: estimate as financial truth, plain wording, trust chip, Tahmini net kâr |
 | [Known limitations](docs/operations/known-limitations-tr.md) | Turkish explanation of current limits |
 
 The foundation documents govern requirements. Later approved contracts describe bounded extensions. Original planning status and phase stop instructions are historical; use current source, tracker records and build-specific evidence for present work.
