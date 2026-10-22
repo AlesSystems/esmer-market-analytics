@@ -83,7 +83,7 @@ export function MonthPage({month,onMonth,coverage,availability,active,navigate,o
  const attention=v.attention.slice(0,8);
  const net=t.netProfit!==null?<strong>{money(t.netProfit)}</strong>:<>
   <strong className="is-unknown"><Unknown text="Hesaplanamadı"/></strong>
-  <p className="month-reason">{t.netProfitReason==="monthPartial"?`Ay henüz tamamlanmadı (${date(v.dataUntil)} tarihine kadar veri)`:reasons[t.netProfitReason??"expensesMissing"]}</p>
+  <p className="month-reason">{t.netProfitReason==="monthPartial"?`Ay henüz tamamlanmadı (${date(v.dataUntil)} tarihine kadar veri)`:t.netProfitReason===null?"Hesaplanamadı":reasons[t.netProfitReason]}</p>
   {t.netProfitReason&&toExpenses.has(t.netProfitReason)&&<Button variant="link" className="month-link" onClick={()=>navigate("expenses")}>Giderlere git</Button>}
  </>;
  const history=v.history;
@@ -99,7 +99,7 @@ export function MonthPage({month,onMonth,coverage,availability,active,navigate,o
    <article className="month-figure"><h2>Tahmini net kâr</h2>{net}{t.netProfit!==null&&c&&<Change value={c.netProfitPct} unit="pct"/>}</article>
   </section>
   <div className="month-grid">
-   <section className="month-panel"><ChartFrame headingLevel="h2" title="Satıştan net kâra" summary="Maliyeti bilinmeyen satış kenara ayrılır; kâra eklenmez."><Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/></ChartFrame></section>
+   <section className="month-panel"><ChartFrame headingLevel="h2" title="Satıştan net kâra" summary="Satıştan maliyet ve giderler düşülünce kalan"><Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/></ChartFrame></section>
    <section className="month-panel"><ChartFrame headingLevel="h2" title="Son altı ay brüt kâr" summary={history.length<6?`Paket yalnız ${history.length} ayı kapsıyor · altta ayın marjı`:"Altta ayın marjı"} table={{caption:"Aylara göre brüt kâr",columns:[{label:"Ay"},{label:"Satış",numeric:true},{label:"Brüt kâr",numeric:true},{label:"Marj",numeric:true}],rows:history.map(row=>[monthName(row.month),row.sales===null?"Bilinmiyor":money(row.sales),row.grossProfit===null?"Bilinmiyor":money(row.grossProfit),row.marginPct===null?"Bilinmiyor":`%${decimal(row.marginPct)}`])}}><MonthColumns history={history} month={v.month}/></ChartFrame></section>
    <section className="month-panel"><ChartFrame headingLevel="h2" title="En çok kazandıran ürünler" summary="Bu ay bıraktıkları tahmini brüt kâr · ürünü seçince Ürünler açılır"><RankBars rows={rankRows} color="var(--viz-contribution)" formatValue={money} ariaLabel="En çok kazandıran ürünler" empty="Kârı hesaplanabilen ürün yok."/></ChartFrame></section>
    <section className="month-panel month-attention" aria-labelledby="month-attention-title"><h2 id="month-attention-title">Dikkat edilecekler</h2>

@@ -16,14 +16,16 @@ export function wordMoney(value:string):string {
 const positive=(value:string)=>value.replace(/^-/,"");
 const whole=(value:string)=>format(Math.round(Number(positive(value))),0);
 
-export function monthSummary(month:string,t:{sales:string|null;grossProfit:string|null;marginPct:string|null}):string {
+export function monthSummary(month:string,t:{sales:string|null;grossProfit:string|null;marginPct:string|null;unknownCostSales?:string}):string {
  if(t.sales===null)return `${names[index(month)]} ayının satış tutarı bilinmiyor.`;
  const opening=`${locative[index(month)]} ${wordMoney(t.sales)} satış yaptınız`;
  if(t.grossProfit===null)return `${opening}; maliyetler bilinmediği için brüt kâr hesaplanamadı.`;
  const loss=t.grossProfit.startsWith("-");
  const gross=`${opening}; tahmini brüt ${loss?"zarar":"kâr"} ${wordMoney(positive(t.grossProfit))}`;
  if(t.marginPct===null)return `${gross}.`;
- return loss||t.marginPct.startsWith("-")?`${gross} — her 100 ₺'lik satışta ${whole(t.marginPct)} ₺ zarar.`:`${gross} — her 100 ₺'lik satıştan ${whole(t.marginPct)} ₺.`;
+ // The margin is over known-cost sales; say so whenever some sales have no cost.
+ const base=t.unknownCostSales!==undefined&&!/^-?0+(\.0+)?$/.test(t.unknownCostSales)?"maliyeti bilinen her":"her";
+ return loss||t.marginPct.startsWith("-")?`${gross} — ${base} 100 ₺'lik satışta ${whole(t.marginPct)} ₺ zarar.`:`${gross} — ${base} 100 ₺'lik satıştan ${whole(t.marginPct)} ₺.`;
 }
 
 type BridgeTotals={sales:string|null;knownCostSales:string;cost:string|null;grossProfit:string|null;unknownCostSales:string;unknownSaleAmounts:number;expenses:string|null;netProfit:string|null};

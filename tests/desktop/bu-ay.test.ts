@@ -27,7 +27,7 @@ test("Bu ay opens at launch with four sections, and an imported estimate package
   // First use selects the latest month in the package.
   await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
-  await expect(page.getByText("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — her 100 ₺'lik satıştan 13 ₺.",{exact:true})).toBeVisible();
+  await expect(page.getByText("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — maliyeti bilinen her 100 ₺'lik satıştan 13 ₺.",{exact:true})).toBeVisible();
   await expect(figure(page,"Satış").locator("strong")).toHaveText("480,00 ₺");
   await expect(figure(page,"Satış")).toContainText("▼ %5,88 önceki aya göre");
   await expect(figure(page,"Tahmini brüt kâr").locator("strong")).toHaveText("57,50 ₺");
