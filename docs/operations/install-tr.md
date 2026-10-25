@@ -14,7 +14,7 @@ Veri paketi, size hazırlanan aylık bir dosyadır (`.json`). Altan her ay hazı
 
 1. **Ayarlar** bölümünü açın, **Veri paketi** kutusuna girin.
 2. **Veri paketi içe aktar** deyin ve dosyayı seçin.
-3. "Veri paketi içe aktarıldı." yazısını bekleyin. **Bu ay** sayfasında rakamlar görünür.
+3. "Gerçek kaynak kayıtları içe aktarıldı." yazısını bekleyin. **Bu ay** sayfasında rakamlar görünür.
 
 ## Her ay yenileme
 

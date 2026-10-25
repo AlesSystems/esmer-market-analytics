@@ -89,7 +89,7 @@ Tick each item and note anything odd. Use the synthetic data below only.
    ```
 
    `work/` is git-ignored. Do not commit the package.
-3. Ayarlar > Veri paketi: "Veri paketi içe aktar", choose `synthetic-estimate.json`. Expect "Veri paketi içe aktarıldı."
+3. Ayarlar > Veri paketi: "Veri paketi içe aktar", choose `synthetic-estimate.json`. Expect "Gerçek kaynak kayıtları içe aktarıldı."
 4. Bu ay: the month figures and the trust chip load, no error text. Net profit is not shown until the month's expenses are marked complete (step 7).
 5. Ürünler: the product list loads. Open a product card, then Kaynak satırlar; rows appear (Satış documents only).
 6. Giderler: "Şablonu indir", fill the template with synthetic expenses, "Excel'den içe aktar". Expect the rows listed.
