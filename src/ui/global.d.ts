@@ -6,4 +6,3 @@ declare global {
     process?: unknown;
   }
 }
-declare module "*.md" { const text: string; export default text; }
