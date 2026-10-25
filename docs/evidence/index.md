@@ -55,6 +55,8 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 | UI workspaces | [Workspace contract](../contracts/page-control-desks.md), [overview](../../workstreams/ozet-control-desk/EVIDENCE.md), [source](../../workstreams/source-control-desk/EVIDENCE.md), [settings](../../workstreams/settings-page/evidence.md) |
 | Source layouts | [Document layout](source-document-layout.md), [filter layout](../../workstreams/source-filter-layout/evidence.md) |
 
+The per-phase Windows handoffs below are superseded by [the Windows v1 handoff](../operations/windows-v1-handoff.md) for the v1 release; they remain as history.
+
 ## Original phase evidence
 
 These are point-in-time records. Their branches, issue states, test counts and stop instructions describe the recorded phase. Use their tested build identities and limitations; use the current assigned task for authorization.
