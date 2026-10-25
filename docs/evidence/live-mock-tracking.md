@@ -71,6 +71,8 @@ On macOS, set `ESMER_EXECUTABLE` to the absolute packaged executable under `rele
 
 Set `ESMER_SQL_TEST_ADMIN` to enable engine tests and the SQL desktop journey. Also set `ESMER_SQL_POLL_PROOF=1` to run the packaged five-minute polling check. The poll proof waits for the real service schedule without replacing timers or renderer APIs. The ordinary SQL journey explicitly refreshes through the real IPC and waits for the renderer's normal status poll.
 
+> Historical: `live-sql-tracking`, `unavailable-states` and the other old-UI desktop journeys named in these receipts were tests of the old UI, removed in [#123](https://github.com/AlesSystems/esmer-market-analytics/pull/123). They no longer exist and are not current evidence.
+
 ## Open acceptance
 
 Windows packaging and desktop checks must run on Windows on this branch. macOS results do not satisfy them. Real-source mapping, historical costs, production permissions, representative load and capacity, and L01 rollout approval remain open.

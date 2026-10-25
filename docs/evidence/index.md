@@ -14,6 +14,8 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issues/98) re-baselined v1 ([decision record](../decisions/issue-98-profit-first-estimate-edition.md), [plan #111](https://github.com/AlesSystems/esmer-market-analytics/issues/111)). The recorded-source estimate is v1's financial truth. v1 gates: A06 = encrypted backup plus documented restore; A07 = one Windows smoke test, deferred to [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109); the two-second benchmark applies only to prepared packages above 100,000 rows. A02/A03 trusted profit and L01 are out of v1. No gate is passed by this change.
 
+Open gate: Large-package timing of the four v1 pages on Windows (2 s budget) has no current test; tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109).
+
 ## Later implementation evidence
 
 The October 22 [monthly data path receipt](2026-10-22-monthly-data-path.md) records `npm run prepare:month`, the column-allowlist and multi-month import checks, and synthetic SQL Edge size and import timings. The bounds stay at 100,000 rows and 32 MiB, so about three September-sized months fit in one package ([decision](../decisions/issue-101-monthly-window.md)).
