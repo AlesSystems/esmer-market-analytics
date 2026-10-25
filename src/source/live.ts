@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { ImportOutcome } from "../domain/contracts";
 import { canonical, readPackage, type Manifest } from "./package";
-import { readRawPackage } from "./raw-package";
+import { readRawPackage, type RawPackage } from "./raw-package";
 import { LIVE_ERROR_CODES, readLiveStatus, type LiveErrorCode, type LiveRefreshResult, type LiveStatus } from "./live-contracts";
 
 export const LIVE_POLL_MS = 5 * 60_000;
@@ -13,11 +13,21 @@ export function liveIdentity(manifest: Manifest): string {
 export function liveFingerprint(manifest: Manifest): string {
   return createHash("sha256").update(canonical({identity: liveIdentity(manifest), streams: manifest.streams})).digest("hex");
 }
+/**
+ * Identity of a raw package's source content: everything except the extraction id and capture instant, which differ on every read.
+ * Two reads of unchanged source data share it.
+ */
+export function rawFingerprint(pkg: RawPackage): string {
+  const {capturedAt: _capturedAt, ...snapshot} = pkg.snapshot;
+  return createHash("sha256").update(canonical({schemaVersion: pkg.schemaVersion, lineage: pkg.lineage, snapshot})).digest("hex");
+}
 type PreviewImport = {status: "preview-imported"; hash: string} | {status: "failed"; code: string} | {status: "cancelled"};
 type Options = {
   extract: (signal: AbortSignal) => Promise<Uint8Array>;
   importCandidate: (bytes: Uint8Array) => ImportOutcome;
   importPreview?: (bytes: Uint8Array) => PreviewImport;
+  /** The stored preview's hash and rawFingerprint, to report an unchanged read without rewriting it. */
+  activePreview?: () => {hash: string; fingerprint: string} | null;
   activeDataset: () => {datasetId: string; fingerprint: string; identity: string} | null;
   now?: () => number;
   persist?: (status: LiveStatus) => void;
@@ -94,7 +104,13 @@ export class LiveSynchronizer {
       void extraction.then(() => {if (this.sourceWork === extraction) this.sourceWork = undefined;}, () => {if (this.sourceWork === extraction) this.sourceWork = undefined;});
       const bytes = await Promise.race([extraction, interrupted]);
       if (signal.aborted || !this.enabled) return {status: "cancelled"};
-      if (readRawPackage(bytes)) {
+      const raw = readRawPackage(bytes);
+      if (raw) {
+        const stored = this.options.activePreview?.();
+        if (stored && stored.fingerprint === rawFingerprint(raw)) {
+          this.state = {...this.state, phase: "idle", error: null, lastSuccessAt: new Date(this.now()).toISOString(), lastDatasetId: stored.hash, lastRecord: "preview"};
+          this.save(); return {status: "unchanged", datasetId: stored.hash};
+        }
         const preview = this.options.importPreview?.(bytes);
         if (!preview || preview.status === "failed") throw new Error(preview?.code === "STORAGE_FULL" ? "STORAGE_FULL" : "INVALID_CANDIDATE");
         if (preview.status === "cancelled") return {status: "cancelled"};

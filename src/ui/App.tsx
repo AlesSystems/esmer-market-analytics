@@ -45,10 +45,13 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState<SelectedMonth | null>(null);
   const [preferencesReady, setPreferencesReady] = useState(false);
   const monthWrite = useRef(0);
+  // True once the owner picked (or had saved) a month. Until then the month follows the newest month of the loaded source.
+  const monthChosen = useRef(false);
   const [monthSaveError, setMonthSaveError] = useState("");
-  useEffect(() => { let active = true; window.esmer.getPreferences().then(result => { if (active && result.status === "preferences") setSelectedMonth(result.preferences.selectedMonth ?? null); }).catch(() => {if(active)setMonthSaveError("Dönem tercihi okunamadı; dönem seçimini yeniden kaydedin.");}).finally(() => { if (active) setPreferencesReady(true); }); return () => { active = false; }; }, []);
+  useEffect(() => { let active = true; window.esmer.getPreferences().then(result => { if (active && result.status === "preferences") { monthChosen.current = !!result.preferences.selectedMonth; setSelectedMonth(result.preferences.selectedMonth ?? null); } }).catch(() => {if(active)setMonthSaveError("Dönem tercihi okunamadı; dönem seçimini yeniden kaydedin.");}).finally(() => { if (active) setPreferencesReady(true); }); return () => { active = false; }; }, []);
   const selectMonth = useCallback((month: string) => {
     if(!validSelectedMonth(month))return;
+    monthChosen.current = true;
     const write = ++monthWrite.current;
     setSelectedMonth(month); setMonthSaveError("");
     void window.esmer.setPreferences({selectedMonth: month}).then(result => { if (write === monthWrite.current && result.status !== "preferences") setMonthSaveError("Dönem bu oturumda seçildi; yeniden açılış için kaydedilemedi."); }).catch(() => {if(write===monthWrite.current)setMonthSaveError("Dönem bu oturumda seçildi; yeniden açılış için kaydedilemedi.");});
@@ -99,7 +102,7 @@ function App() {
     let active = true;
     window.esmer.querySourceWorkspace({ ...initialSourceQuery }).then(value => {
       if (!active) return;
-      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); if (selectedMonth === null) selectMonth(value.period); setResolution({ status: "resolved" }); return; }
+      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); if (!monthChosen.current && validSelectedMonth(value.period)) setSelectedMonth(value.period); setResolution({ status: "resolved" }); return; }
       setCoverage(null);
       if (value.status !== "source-empty") { setResolution({ status: "failed", message: value.message }); return; }
       setResolution({ status: "resolved" });

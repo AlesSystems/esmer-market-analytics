@@ -4,7 +4,7 @@ Related: [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14),
 
 ## Delivery boundary
 
-This implementation provides a read-only SQL transport, candidate synchronization controller, protected desktop configuration and local fallback. It is an **isolated connection preview**. A successful read publishes `sql-backup-preview-v1` through `writeRawPackage` and `importSourcePreview`. It does not activate a financial dataset. (`openSales` was removed in this change.) The [source contract](source.md) still has no approved real financial mapping. No real data is relabelled synthetic. This does not complete #14 or #26.
+This implementation provides a read-only SQL transport, candidate synchronization controller, protected desktop configuration and local fallback. It is an **isolated connection preview**. A successful read publishes the same `sql-backup-estimate-v2` package `npm run prepare:month` writes (see [Live refresh package](#live-refresh-package)) through `importSourcePreview`. It does not activate a financial dataset. (`openSales` was removed in this change.) The [source contract](source.md) still has no approved real financial mapping. No real data is relabelled synthetic. This does not complete #14 or #26.
 
 Synthetic packages exercise successful activation through the existing package validator and atomic store import. Actual SQL tests exercise coherent reads and the packaged application's rejection/fallback path. These are separate evidence claims.
 
@@ -38,6 +38,19 @@ The existing store owns staging, reconciliation, atomic activation, retention an
 The controller polls five minutes after completion, admits only one extraction, and retries after delayed cleanup without accumulating work. Refresh has a 60-second deadline. An idle state becomes stale more than 15 minutes after its last successful check; failures become stale immediately. Restarted enabled configuration with readable prior status starts stale and requires a fresh check. Missing or invalid status starts with no successful check recorded; enabling it reports only that the connection is open. Status distinguishes last successful source check from local data cutoff. Configuration defaults disabled.
 
 Desktop main owns native configuration selection and OS `safeStorage` encryption. Configuration lives outside SQLite/recovery archives. Unavailable encryption and Linux `basic_text` fail closed. The renderer can only request status, native configuration, enable/disable and refresh; it never supplies arbitrary SQL, server addresses, paths or credentials. Sanitized status is durably stored separately; persistence failure is visible and cannot turn a committed import into a fictitious failure.
+
+## Live refresh package
+
+Before: `refreshLiveSource` extracted without cost (`extractSqlServer(config, signal)`) and wrote a `sql-backup-preview-v1/v2` package with `writeRawPackage` for the connection's whole from/to range. `source_preview` therefore had no cost column and Bu ay could not estimate profit after a live refresh.
+
+Now: one data path, two ways in. Live refresh calls `prepareMonthlyEstimate(config, month, 6, signal, {clamp: true})`, the function behind `npm run prepare:month`, and stores its `sql-backup-estimate-v2` bytes with `importSourcePreview`. Both paths extract with `{cost: true}`, shrink the window to the 100,000-row / 32 MiB bounds by dropping the oldest month, and read the same `MonthProfitView`.
+
+- **Month.** `latestLiveMonth` picks the month of the earlier of the connection's `to` and today (local date). It is an error (`WINDOW_OUTSIDE_CONFIG`) when the connection starts after that date.
+- **Window.** Up to six months ending at that month, cut to the connection's from/to (`clamp`). `prepare:month` keeps its strict rule that the window lies inside the file's bound.
+- **Differences between the paths.** Only `source.hash` (it covers the random extraction id) and `source.extractedAt` (capture instant) differ for the same source data; the integration test `live-month-view` asserts every other `MonthProfitView` field equal.
+- **No change.** Raw packages compare by `rawFingerprint` (everything except extraction id and capture instant) against the stored preview. An identical read returns `unchanged` and does not rewrite `source_preview`. A failed refresh leaves the preview, expenses, settings and audit history untouched.
+- **Analysis packages.** The `readPackage`/`importCandidate` branch of `LiveSynchronizer` is no longer reachable from the service (extraction yields raw packages only). It stays because the controller's fingerprint, source-change and fallback tests (`live-failure`, `live-reconciliation`) still exercise it.
+- **Ayarlar.** After "Şimdi yenile" the app reloads availability; Bu ay follows the newest month of the loaded source until the owner picks a month (a saved or picked month is never overridden).
 
 ## Remaining obligations
 

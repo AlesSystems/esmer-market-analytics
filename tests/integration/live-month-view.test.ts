@@ -19,7 +19,7 @@ vi.mock("../../src/source/sql-server", async importOriginal => {
     const headers = source.headers.filter(inside), ids = new Set(headers.map(row => row.ID));
     const lines = source.lines.filter(row => ids.has(row.FIS));
     const stoks = new Set(lines.map(row => row.STOK));
-    return {...source, from: config.from, to: config.to, headers, lines, products: source.products?.filter(row => stoks.has(row.ID))};
+    return {...source, from: config.from, to: config.to, headers, lines, ...source.products ? {products: source.products.filter(row => stoks.has(row.ID))} : {}};
   }};
 });
 
