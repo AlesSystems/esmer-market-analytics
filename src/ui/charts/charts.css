@@ -31,7 +31,6 @@
 .viz-frame .viz-table .viz-num{text-align:right}
 
 /* daily columns */
-.viz-daily{min-width:0}
 .viz-plot{position:relative;min-width:0;border-radius:6px}
 .viz-plot svg{display:block;max-width:100%;overflow:visible}
 .viz-tick{fill:var(--viz-muted);font-size:11px;font-variant-numeric:tabular-nums}
