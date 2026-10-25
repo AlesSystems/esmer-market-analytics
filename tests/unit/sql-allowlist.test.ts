@@ -6,7 +6,8 @@ const allowed: Record<string, Record<string, string[]>> = {
   f: {FIS: ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM", "FIS_TARIHI"]},
   l: {FIS_DETAY: ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"]},
   d: {DOVIZ_AD: ["ID", "AD"]},
-  s: {STOK: ["ID", "AD", "STOK_GRUP", "STOK_BIRIM"]},
+  s: {STOK: ["ID", "AD", "STOK_GRUP"]},
+  b: {STOK_STOK_BIRIM: ["STOK", "STOK_BIRIM", "VARSAYILAN"]},
   g: {STOK_GRUP: ["ID", "AD"]},
   u: {STOK_BIRIM: ["ID", "AD"]},
 };
@@ -65,5 +66,10 @@ test("reader guard rejects privileged or writable accounts on every read table",
   const {guard} = sourceQueries({cost: true});
   expect(guard).toContain("IS_SRVROLEMEMBER('sysadmin')");
   expect(guard).toContain("IS_MEMBER('db_owner')");
-  for (const table of ["FIS", "FIS_DETAY", "DOVIZ_AD", "STOK", "STOK_GRUP", "STOK_BIRIM"]) for (const permission of ["INSERT", "UPDATE", "DELETE", "ALTER", "CONTROL"]) expect(guard).toContain(`HAS_PERMS_BY_NAME('dbo.${table}','OBJECT','${permission}')`);
+  for (const table of ["FIS", "FIS_DETAY", "DOVIZ_AD", "STOK", "STOK_GRUP", "STOK_STOK_BIRIM", "STOK_BIRIM"]) for (const permission of ["INSERT", "UPDATE", "DELETE", "ALTER", "CONTROL"]) expect(guard).toContain(`HAS_PERMS_BY_NAME('dbo.${table}','OBJECT','${permission}')`);
+});
+
+test("every paged query is planned for its own cursor", () => {
+  const queries = sourceQueries({cost: true});
+  for (const stream of ["headers", "lines", "products"] as const) expect(queries[stream]).toMatch(/ ORDER BY [a-z]\.ID OPTION \(RECOMPILE\)$/);
 });
