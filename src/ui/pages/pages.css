@@ -53,7 +53,7 @@
 .products-page { display: grid; gap: 14px; }
 .products-page h1, .products-note { margin: 0; }
 .products-note { color: var(--market-muted); font-size: 13px; }
-.products-page tr.is-selected { background: var(--market-selection); outline: 2px solid var(--market-action); outline-offset: -2px; }
+.products-page tr.is-selected, .products-page tr[aria-current="true"] { background: var(--market-selection); outline: 2px solid var(--market-action); outline-offset: -2px; }
 
 .reports-page { display: grid; gap: 12px; min-width: 0; }
 .app-shell .reports-head h1 { font-size: 1.5rem; }
@@ -76,4 +76,49 @@
   .month-figure:first-child { border-top: 0; }
   .app-shell .month-alert { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kind" "name" "figure"; }
   .month-lead { font-size: 1.1rem; }
+}
+
+.products-page .month-eyebrow { display: none; }
+.products-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.products-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.products-search { max-width: 18rem; }
+.products-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); gap: 20px; align-items: start; }
+.products-list { min-width: 0; }
+.products-table { width: 100%; font-variant-numeric: tabular-nums; }
+.products-table tbody tr { cursor: pointer; }
+.products-table tbody tr:focus-visible { outline: 2px solid var(--market-focus); outline-offset: -2px; }
+.products-table th.number, .products-table td.number { text-align: right; }
+.products-sort { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; font-weight: 650; }
+.products-sort:focus-visible { outline: 2px solid var(--market-focus); outline-offset: 2px; }
+.products-table th[aria-sort="ascending"] .products-sort::after { content: "▲" / ""; font-size: 10px; }
+.products-table th[aria-sort="descending"] .products-sort::after { content: "▼" / ""; font-size: 10px; }
+.product-card[hidden] { display: none; }
+.product-name, .product-category { display: block; }
+.product-name { font-weight: 650; }
+.product-open { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.product-open:hover { text-decoration: underline; }
+.product-category { font-size: 12px; color: var(--market-muted); }
+.products-table .is-down { color: var(--market-negative); }
+.products-table .is-up { color: var(--market-positive); }
+.product-card { display: grid; gap: 14px; min-width: 0; padding: 20px 22px; background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); position: sticky; top: 16px; }
+.product-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.product-card-head h2, .product-card p { margin: 0; }
+.product-card-category { font-size: 12.5px; color: var(--market-muted); }
+.product-card-margin { font-size: 2.2rem; font-weight: 750; letter-spacing: -.03em; line-height: 1.1; }
+.product-card-margin.is-loss { color: var(--market-negative); }
+.product-card-note, .product-card-missing { padding: 10px 12px; border-radius: 8px; background: var(--market-warn-wash); color: var(--market-warn-ink); font-size: 13px; }
+.product-card-facts { display: grid; gap: 0; margin: 0; }
+.product-card-facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--market-line); }
+.product-card-facts dt { color: var(--market-muted); font-size: 13px; }
+.product-card-facts dd { margin: 0; font-weight: 650; text-align: right; }
+.product-margin-path { fill: none; stroke: var(--viz-contribution); stroke-width: 2; }
+.product-margin-point { fill: var(--viz-contribution); }
+.product-margin-point.is-current { stroke: var(--market-surface); stroke-width: 2; }
+.product-source { display: grid; gap: 14px; }
+.product-source-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.product-source-head h2, .product-source-note { margin: 0; }
+.product-source-note { color: var(--market-muted); font-size: 13px; }
+@media (max-width: 1180px) {
+  .products-layout { grid-template-columns: minmax(0, 1fr); }
+  .product-card { position: static; }
 }
