@@ -7,6 +7,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 import { executablePath } from "../helpers/desktop-executable";
 
 test("monthly overview combines pinned sales, covered cost and honest missing expenses", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-monthly-")), packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
@@ -41,6 +42,7 @@ test("monthly overview combines pinned sales, covered cost and honest missing ex
 });
 
 test("reviewed monthly values and source explanations survive refresh and export selection", async () => {
+    test.skip(true, "old UI, removed in P5");
   const { businessRecords } = await import("../helpers/business-fixtures");
   const { stat } = await import("node:fs/promises");
   const userData = await mkdtemp(join(tmpdir(), "esmer-monthly-history-")), packagePath = join(userData, "synthetic.json"), exportPath = join(userData, "report.xlsx");

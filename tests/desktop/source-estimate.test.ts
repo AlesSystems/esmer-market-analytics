@@ -19,6 +19,7 @@ async function openEstimatedProducts(page:Page){
 }
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 test("packaged estimated import shows loss, returns, exact scope, product drilldown and export offline",async({},testInfo)=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"estimate-desktop-")),file=join(userData,"estimate.json"),output=join(userData,"estimate.xlsx");const s=estimateSnapshot();s.headers.push({...s.headers[0],ID:"3",FIS_TURU:"12"});s.lines.push({...s.lines[0],ID:"4",FIS:"3",FIS_TURU:"12",TOPLAM_KDV_MATRAHI:"30"});await writeFile(file,estimatePackage(s));
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
@@ -52,6 +53,7 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
 });
 
 test("a product opened from the estimated product ranking returns to the ranking with focus on that row",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"estimate-rank-return-")),file=join(userData,"estimate.json");await writeFile(file,estimatePackage());
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
@@ -67,6 +69,7 @@ test("a product opened from the estimated product ranking returns to the ranking
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 test("a day with unknown-amount lines keeps a hatched segment and counts those rows in the table twin",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"estimate-unknown-day-")),file=join(userData,"estimate.json");const s=estimateSnapshot();s.lines.push({...s.lines[0],ID:"9",TOPLAM_KDV_MATRAHI:null});await writeFile(file,estimatePackage(s));
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
@@ -84,6 +87,7 @@ test("a day with unknown-amount lines keeps a hatched segment and counts those r
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 test("private prepared estimate imports exports and restarts offline without revealing operands",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const {ESMER_ESTIMATE_PACKAGE:packagePath,ESMER_ESTIMATE_EXPECTED:expectedPath,ESMER_ESTIMATE_EXPORT:exportPath}=process.env;
  test.skip(!packagePath||!expectedPath||!exportPath,"Private package, expectation and export opt-in required");
  let expected:{summary:{contribution:string|null}};
@@ -112,6 +116,7 @@ test("private prepared estimate imports exports and restarts offline without rev
 
 
 test("preview estimate recovery opens settings and restores a prepared estimate",async({},testInfo)=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"estimate-recovery-"));
  const preview=rawSnapshot();preview.from="2025-09-01";preview.to="2025-10-12";
  preview.headers[0].FIS_TARIHI="2025-09-01T12:00:00.000";

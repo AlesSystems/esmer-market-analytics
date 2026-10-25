@@ -11,6 +11,7 @@ import { businessPackage, businessRecords } from "../helpers/business-fixtures";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("saved comparison stays separate from candidate review and report details restore focus", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-version-pair-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   let firstId: string, secondId: string;

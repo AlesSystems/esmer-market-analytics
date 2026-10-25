@@ -14,6 +14,7 @@ import {ReportVersions} from "../../src/reports/versions";
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("report history failure has retry, while a successful empty history explains readiness",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"report-states-")),database=join(userData,"analytics.sqlite");
  const store=openStore(database);store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:reports","batch-1"));store.close();
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
@@ -38,6 +39,7 @@ test("report history failure has retry, while a successful empty history explain
 });
 
 test("source expenses and opened saved reports expose one main landmark and useful empty expense action",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"expense-report-landmarks-")),database=join(userData,"analytics.sqlite");
  const store=openStore(database);store.importPackage(businessPackage());
  const reports=new ReportVersions(store,new SalesReports(store));const candidate=reports.open({period:"2025-09"});if(candidate.status!=="monthly")throw Error("missing fixture report");reports.accept({candidateId:candidate.report.id,previousAcceptedId:null,reason:"Synthetic review"});

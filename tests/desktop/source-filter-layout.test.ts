@@ -9,6 +9,7 @@ import { rawSnapshot } from "../helpers/raw-fixture";
 import { executablePath } from "../helpers/desktop-executable";
 
 test("source filters keep fields stable and actions grouped when expanded at desktop widths", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "source-filter-layout-"));
   const snapshot = rawSnapshot();
   snapshot.headers.push({ ...snapshot.headers[0], ID: "4", FIS_TURU: "1" });

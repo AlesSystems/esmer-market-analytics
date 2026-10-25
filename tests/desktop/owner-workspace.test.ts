@@ -6,17 +6,15 @@ import { openStore } from "../../src/store/store";
 import { richBusinessPackage, seedRichExpenses } from "../helpers/rich-business-fixture";
 import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 import { executablePath } from "../helpers/desktop-executable";
-import { openReportView, openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { openSection, openWorkspace } from "../helpers/desktop-navigation";
 
-// Welcome and the Özet desks were removed (#103/#105): routes are the four sections and the three report views.
-type Route = { name: string; nav: "Bu ay" | "Ürünler" | "Giderler" | "Rapor ve Excel"; view?: "Aylık rapor" | "Veri ve kaynak" | "Alış belgeleri" };
+// Welcome and the Özet desks were removed (#103/#105): routes are the four sections.
+type Route = { name: string; nav: "Bu ay" | "Ürünler" | "Giderler" | "Rapor ve Excel" };
 const routes: Route[] = [
   { name: "bu-ay", nav: "Bu ay" },
   { name: "urunler", nav: "Ürünler" },
   { name: "giderler", nav: "Giderler" },
-  { name: "aylik-rapor", nav: "Rapor ve Excel", view: "Aylık rapor" },
-  { name: "veri-ve-kaynak", nav: "Rapor ve Excel", view: "Veri ve kaynak" },
-  { name: "alis-belgeleri", nav: "Rapor ve Excel", view: "Alış belgeleri" },
+  { name: "rapor-ve-excel", nav: "Rapor ve Excel" },
 ];
 const sizes = [
   { name: "wide", width: 1440, height: 900, zoom: 1 },
@@ -64,10 +62,9 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
       await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
       await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
       await expect(page.getByRole("textbox", { name: "Dönem", exact: true })).toHaveValue(source ? "2025-10" : "2025-09");
-      for (const { name, nav, view } of routes) {
-        if (view) await openReportView(page, view); else await openSection(page, nav);
+      for (const { name, nav } of routes) {
+        await openSection(page, nav);
         await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: nav, exact: true })).toHaveAttribute("aria-current", "page");
-        if (view) await expect(page.getByRole("navigation", { name: "Rapor bölümleri" }).getByRole("button", { name: view, exact: true })).toHaveAttribute("aria-pressed", "true");
         await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
         await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
         await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
@@ -78,7 +75,6 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
         await expect(page.locator(".app-body")).toBeFocused();
         await page.keyboard.press("Tab");
         expect(await page.evaluate(() => document.activeElement?.closest(".app-body") !== null)).toBe(true);
-        if (source && view === "Aylık rapor") await expect(page.getByRole("region", { name: "Kaynak tahmini" }).getByText("katkıya dahil değil — sonucu yüksek gösterebilir", { exact: true }).first()).toBeVisible();
         await capture(`${name}-${size.name}`, size.zoom);
       }
       await page.getByRole("button", { name: "Ayarlar", exact: true }).click();

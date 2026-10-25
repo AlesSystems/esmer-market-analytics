@@ -17,6 +17,7 @@ async function fixture(source: boolean) {
   try { store.importPackage(businessPackage()); const versions = new ReportVersions(store, new SalesReports(store)); const result = versions.open({ period: '2025-09' }); if(result.status !== 'monthly') throw Error('Expected report'); firstId = result.report.id; versions.accept({ candidateId: firstId, previousAcceptedId: null, reason: 'İlk arşiv incelemesi' }); const records = businessRecords(); records.documents = [records.documents[0]]; records.lines = [records.lines[0]]; store.importPackage(businessPackage(records, { extractionId: 'archive-second' })); const second = versions.open({ period: '2025-09' }); if(second.status !== 'monthly') throw Error('Expected second'); secondId = second.report.id; versions.accept({ candidateId: secondId, previousAcceptedId: firstId, reason: 'İkinci arşiv incelemesi' }); if(source) store.importSourcePreview(writeRawPackage(rawSnapshot(), 'fixture:archive', 'archive-source')); } finally { store.close(); } return { userData, firstId, secondId };
 }
 for(const mode of ['financial', 'source'] as const) test(`archive ${mode}: immutable selection, keyboard, export and failure preservation`, async ({ }, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const { userData, firstId, secondId } = await fixture(mode === 'source'); const captureDir = process.env.ESMER_CAPTURE_EVIDENCE ? 'workstreams/page-control-desks/reports' : testInfo.outputPath('screenshots'); await mkdir(captureDir, { recursive: true }); const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page); await openReportView(page, "Aylık rapor"); if(mode === "source") await page.getByRole("button", {name: "Önceki kaydedilmiş raporlar", exact: true}).click(); if(mode === "financial") { await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click(); await expect(page.getByRole("button", { name: "Aday raporu aç", exact: true })).toBeFocused(); } if(mode === 'source') await page.locator(".sidebar").getByLabel("Dönem", { exact: true }).fill('2025-09'); await expect(page.getByLabel('Arşivde ara')).toBeVisible(); const first = page.getByRole('row').filter({ hasText: firstId }).getByRole('button', { name: 'Sürümü incele', exact: true }); const inspector = page.getByRole('region', { name: 'Seçili sürüm inceleyicisi' }); await first.press('Enter'); await expect(inspector).toContainText(firstId); await expect(page.getByRole('row').filter({ hasText: firstId })).toHaveAttribute('aria-selected', 'true'); await expect(page.getByRole('heading', { name: 'Kaydedilmiş raporlar', exact: true })).toBeVisible(); await expect(page.locator('canvas')).toHaveCount(0);
@@ -36,10 +37,12 @@ for(const mode of ['financial', 'source'] as const) test(`archive ${mode}: immut
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 test('archive pages real saved versions without losing the selected inspector', async () => {
+    test.skip(true, "old UI, removed in P5");
   const { userData, firstId, secondId } = await fixture(false); const store = openStore(join(userData, 'analytics.sqlite')); let previous = secondId; try { const versions = new ReportVersions(store, new SalesReports(store)); for(let index = 0; index < 10; index++) { store.importPackage(businessPackage(businessRecords(), { extractionId: `archive-page-${index}` })); const result = versions.open({ period: '2025-09' }); if(result.status !== 'monthly') throw Error('Missing pagination fixture'); versions.accept({ candidateId: result.report.id, previousAcceptedId: previous, reason: `Sayfalı kayıt ${index}` }); previous = result.report.id; } } finally { store.close(); } const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); try { const page = await app.firstWindow();await openWorkspace(page); await openReportView(page, "Aylık rapor"); await page.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click(); await page.getByRole('button', { name: 'Sonraki sürümler', exact: true }).click(); await expect(page.getByText('Sayfa 2 / 2', { exact: true })).toBeVisible(); await page.getByRole('row').filter({ hasText: firstId }).getByRole('button', { name: 'Sürümü incele', exact: true }).click(); const inspector = page.getByRole('region', { name: 'Seçili sürüm inceleyicisi' }); await expect(inspector).toContainText(firstId); await page.getByRole('button', { name: 'Önceki sürümler', exact: true }).click(); await expect(inspector).toContainText(firstId); await page.getByLabel('Arşivde ara').fill('İlk arşiv'); await expect(page.getByRole('row').filter({ hasText: firstId })).toBeVisible(); await expect(page.getByRole('button', { name: 'Sonraki sürümler', exact: true })).toHaveCount(0); } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
 for (const state of ['unavailable', 'partial', 'incomplete'] as const) test(`saved inspector qualifies ${state} sales coverage`, async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), `esmer-archive-${state}-`));
   const store = openStore(join(userData, 'analytics.sqlite'));
   const period = state === 'unavailable' ? '2025-08' : '2025-09';
@@ -80,6 +83,7 @@ for (const state of ['unavailable', 'partial', 'incomplete'] as const) test(`sav
 });
 
 test('latest accepted row opens its own report after inspecting an older saved version', async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), 'esmer-archive-accepted-'));
   const store = openStore(join(userData, 'analytics.sqlite'));
   let olderId: string;

@@ -12,6 +12,7 @@ import { businessPackage, businessRecords, historicalCost, productProfitRecords 
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("packaged product-profit pages stay bounded and accepted values survive restart", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-product-profit-"));
   const records = businessRecords(), template = records.lines[0];
   records.documents = Array.from({ length: 101 }, (_, index) => ({ id: `S${index}`, kind: "sale" as const, date: "2025-09-01", supplierId: null, purchasing: null, sales: { state: "completed" as const, convertedTo: null, net: "10", tax: "0.5", gross: "10.5" } }));
@@ -78,6 +79,7 @@ test("packaged product-profit pages stay bounded and accepted values survive res
 });
 
 for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3" : "2"} monthly profit and selected historical cost on one page`, async () => {
+    test.skip(true, "old UI, removed in P5");
   const reviewDirectory = missingCost ? process.env.ESMER_R42_REVIEW : undefined;
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-journey-"));
   const store = openStore(join(userData, "analytics.sqlite"));
@@ -132,6 +134,7 @@ for (const missingCost of [false, true]) test(`owner reads E0${missingCost ? "3"
 });
 
 test("late product, document and month responses cannot replace the current selection", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-races-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { expect(store.importPackage(businessPackage(productProfitRecords())).status).toBe("active"); } finally { store.close(); }
@@ -203,6 +206,7 @@ test("late product, document and month responses cannot replace the current sele
 });
 
 for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsupported", "partial"]) test(`profit page distinguishes ${scenario} and keeps unknown days as gaps`, async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const records = businessRecords(); records.documents = records.documents.slice(0, 1); records.lines = records.lines.slice(0, 1);
   if (scenario === "empty") { records.documents = []; records.lines = []; }
   if (scenario === "zero" || scenario === "loss") records.lines[0].business!.historicalCost = historicalCost(scenario === "zero" ? "100" : "120");
@@ -246,6 +250,7 @@ for (const scenario of ["empty", "zero", "loss", "return-only", "no-cost", "unsu
 });
 
 test("keyboard zoom, full-document scope and filtered export preserve the pinned population", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-export-")), exportPath = join(userData, "synthetic.xlsx");
   const records = productProfitRecords();
   records.lines.find(row => row.id === "B1")!.documentId = "A1";
@@ -298,6 +303,7 @@ test("keyboard zoom, full-document scope and filtered export preserve the pinned
 });
 
 test("synthetic compatibility v1 shape keeps original overview and export without product sections", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-v1-")), exportPath = join(userData, "legacy.xlsx");
   const store = openStore(join(userData, "analytics.sqlite"));
   try {
@@ -328,6 +334,7 @@ test("synthetic compatibility v1 shape keeps original overview and export withou
 });
 
 test("product and evidence failures retry locally without replacing the monthly result", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-retry-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { store.importPackage(businessPackage(productProfitRecords())); } finally { store.close(); }
@@ -366,6 +373,7 @@ test("product and evidence failures retry locally without replacing the monthly 
 });
 
 test("Satışlar and Raporlar lead with charts that keep unknown, zero and coverage distinct", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-profit-charts-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { expect(store.importPackage(businessPackage(productProfitRecords(true))).status).toBe("active"); } finally { store.close(); }

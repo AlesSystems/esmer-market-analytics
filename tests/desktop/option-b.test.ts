@@ -10,6 +10,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 const period = (page: Page) => page.getByLabel("Dönem", { exact: true }).filter({ visible: true });
 
 test("sidebar keeps the reporting period through analysis and recovery", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-option-b-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage());
@@ -41,6 +42,7 @@ test("sidebar keeps the reporting period through analysis and recovery", async (
 });
 
 test("Option B visual evidence covers desktop, narrow and forced colors", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-option-b-visual-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage());

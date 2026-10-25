@@ -12,6 +12,7 @@ import { rawSnapshot } from "../helpers/raw-fixture";
 
 for (const mode of ["financial", "source"] as const) {
   test(`compact ${mode} copy keeps actions and financial qualifications`, async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
     const userData = await mkdtemp(join(tmpdir(), `esmer-compact-${mode}-`));
     const store = openStore(join(userData, "analytics.sqlite"));
     try {

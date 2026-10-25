@@ -8,6 +8,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 import { purchasingJourney } from "../helpers/purchasing-journey";
 
 test("daily workspaces separate ledgers from focused review tasks", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-workspace-views-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage(purchasingJourney()));

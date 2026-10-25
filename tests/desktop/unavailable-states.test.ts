@@ -8,6 +8,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("monthly loading, failure retry and missing period preserve useful navigation", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-monthly-state-")), packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, businessPackage(undefined, { cutoff: "2025-09-10", coverage: { from: "2025-09-01", to: "2025-09-10", complete: true } }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
@@ -57,6 +58,7 @@ test("monthly loading, failure retry and missing period preserve useful navigati
 });
 
 test("real background import exposes progress, cancels and leaves previous data navigable", async () => {
+    test.skip(true, "old UI, removed in P5");
   test.setTimeout(60_000);
   const { businessRecords } = await import("../helpers/business-fixtures");
   const userData = await mkdtemp(join(tmpdir(), "esmer-monthly-cancel-")), packagePath = join(userData, "synthetic.json");

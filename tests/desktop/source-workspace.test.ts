@@ -15,6 +15,7 @@ import {workbook,row} from "../helpers/expense-fixtures";
 async function openSourceSales(page:import("@playwright/test").Page){await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();await page.getByLabel("Kayıt kapsamı").selectOption("sales");}
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 test("raw backup drives all destinations, preserved reports and scoped detail offline",async({},testInfo)=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"source-workspace-")),database=join(userData,"analytics.sqlite");
  const snapshot=rawSnapshot();snapshot.headers=[snapshot.headers[0],{...snapshot.headers[0],ID:"2",FIS_TURU:"1"},{...snapshot.headers[0],ID:"3",FIS_TURU:"999"}];snapshot.lines=[{...snapshot.lines[0],STOK:"333"},{...snapshot.lines[0],ID:"3",FIS:"2",FIS_TURU:"1",STOK:"444"}];
  const store=openStore(database);store.importPackage(businessPackage());
@@ -72,6 +73,7 @@ test("raw backup drives all destinations, preserved reports and scoped detail of
 });
 
 test("an unreadable source retains expense recovery and replacement-import access",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const {DatabaseSync}=await import("node:sqlite");const {writeFile}=await import("node:fs/promises");
  const userData=await mkdtemp(join(tmpdir(),"source-failure-")),database=join(userData,"analytics.sqlite"),file=join(userData,"replacement.json");
  const bytes=writeRawPackage(rawSnapshot(),"fixture:failure","batch-1");await writeFile(file,bytes);

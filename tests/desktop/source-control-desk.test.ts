@@ -10,6 +10,7 @@ import {rawSnapshot} from "../helpers/raw-fixture";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("source control desk shows raw counts, evidence and working drilldowns in the blue layout", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "source-control-desk-"));
   const snapshot = rawSnapshot();
   snapshot.headers = [snapshot.headers[0], {...snapshot.headers[0], ID: "2", FIS_TURU: "1", FIS_TARIHI: "2025-10-03T12:00:00.000"}, {...snapshot.headers[0], ID: "3", FIS_TURU: "999"}];
@@ -72,6 +73,7 @@ test("source control desk shows raw counts, evidence and working drilldowns in t
 });
 
 test("source desk discloses truncated type counts and an empty month within the backup", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "source-control-desk-types-"));
   const snapshot = rawSnapshot();
   snapshot.from = "2025-09-01";

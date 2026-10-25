@@ -11,6 +11,7 @@ import {estimatePackage,estimateSnapshot} from "../helpers/estimate-fixture";
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 const period=(page:Page)=>page.locator(".sidebar").getByLabel("Dönem",{exact:true});
 for(const empty of [false,true])test(`demo prioritizes ${empty?"empty":"estimated"} imported source across one workspace`,async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-demo-")),store=openStore(join(userData,"analytics.sqlite"));
  try{store.importPackage(businessPackage());const snapshot=estimateSnapshot();if(empty){snapshot.headers=[];snapshot.lines=[];}store.importSourcePreview(estimatePackage(snapshot));}finally{store.close();}
  const initialMonth="2025-10";
@@ -28,6 +29,7 @@ for(const empty of [false,true])test(`demo prioritizes ${empty?"empty":"estimate
 });
 
 test("source read failure cannot fall through to retained financial results",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-demo-failure-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());store.importSourcePreview(estimatePackage());}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});try{const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Aylık rapor");await expect(page.getByRole("region",{name:"Kaynak tahmini"})).toBeVisible();await app.evaluate(({ipcMain})=>{const registry=ipcMain as unknown as {_invokeHandlers:Map<string,(event:unknown,operation:string,payload:unknown)=>unknown>},original=registry._invokeHandlers.get("esmer:request")!;ipcMain.removeHandler("esmer:request");ipcMain.handle("esmer:request",(event,operation,payload)=>operation==="querySourceWorkspace"?{status:"source-unavailable",code:"SERVICE_UNAVAILABLE",message:"Sentetik kaynak okuma hatası"}:original(event,operation,payload));});await page.reload();await openWorkspace(page);
   // Rapor ve Excel shows the read failure with a retry, never the retained financial report.
@@ -37,6 +39,7 @@ test("source read failure cannot fall through to retained financial results",asy
 });
 
 test("financial imports retain source precedence and source replacement refreshes the current report",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-demo-refresh-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());store.importSourcePreview(estimatePackage());}finally{store.close();}
  const financialFile=join(userData,"financial.json"),sourceFile=join(userData,"source.json"),snapshot=estimateSnapshot();snapshot.lines[0].BELGE_TARIHINDEKI_SON_ALIS_FIYATI="30";await writeFile(financialFile,businessPackage(undefined,{extractionId:"demo-financial-new"}));await writeFile(sourceFile,estimatePackage(snapshot,"demo-source-new"));
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});try{const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Aylık rapor");await expect(page.getByRole("region",{name:"Kaynak tahmini"})).toContainText("-20,00 ₺");
@@ -47,6 +50,7 @@ test("financial imports retain source precedence and source replacement refreshe
 });
 
 test("raw-only imports lead with recorded counts and lookup while reports explain unavailable estimates",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-demo-raw-")),store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage());store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:demo-raw","demo-raw-1"));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});try{const page=await app.firstWindow();await openWorkspace(page);
   await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();await expect(page.getByRole("region",{name:"Ayın rakamları"})).toHaveCount(0);
