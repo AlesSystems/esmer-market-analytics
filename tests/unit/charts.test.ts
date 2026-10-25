@@ -1,27 +1,15 @@
-import { createElement as h, Fragment } from "react";
+import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import {
-  bridgeLayout, compactMoney, dailyLayout, describeDay, formatShare, niceTicks, rankLayout, shares, toNumber,
-  type DailyDay,
+  bridgeLayout, compactMoney, niceTicks, rankLayout, toNumber,
 } from "../../src/ui/charts/geometry";
 import { Bridge } from "../../src/ui/charts/Bridge";
 import { ChartFrame } from "../../src/ui/charts/ChartFrame";
-import { CompositionBar } from "../../src/ui/charts/CompositionBar";
-import { DailyBars } from "../../src/ui/charts/DailyBars";
 import { EstimateBadge } from "../../src/ui/charts/EstimateBadge";
 import { RankBars } from "../../src/ui/charts/RankBars";
 
 const money = (value: string) => `${value.replace(".", ",")} ₺`;
-const series = [
-  { key: "cost", label: "Maliyet", color: "var(--viz-cost)" },
-  { key: "contribution", label: "Katkı", color: "var(--viz-contribution)" },
-];
-const day = (n: number, segments: DailyDay["segments"], extra: Partial<DailyDay> = {}): DailyDay =>
-  ({ date: `2026-10-${String(n).padStart(2, "0")}`, segments, state: "value", ...extra });
-const layoutOf = (days: DailyDay[], width = 720) => dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width });
-const layoutDays: DailyDay[] = [day(1, [{ key: "cost", value: "100" }], { negative: "40", negativeUnknown: true })];
-const allMarks = (layout: ReturnType<typeof layoutOf>) => layout.columns.flatMap((column) => column.marks);
 
 describe("compact money and numbers", () => {
   test("uses Turkish compact units and tr-TR separators", () => {
@@ -53,138 +41,6 @@ describe("compact money and numbers", () => {
     expect(wide.max).toBeGreaterThanOrEqual(7300000);
     expect(wide.ticks[0]).toBe(0);
     expect(Object.is(niceTicks(-10, 10).ticks.find((tick) => tick === 0), 0)).toBe(true);
-  });
-
-  test("shares and formatShare", () => {
-    expect(shares([1, 3]).map((part) => part)).toEqual([25, 75]);
-    expect(shares([0, 0])).toEqual([0, 0]);
-    expect(formatShare(12.34)).toBe("%12,3");
-    expect(formatShare(100)).toBe("%100");
-  });
-});
-
-describe("daily layout", () => {
-  test("stacks positive segments from the baseline and rounds only the far end", () => {
-    const layout = layoutOf([day(1, [{ key: "cost", value: "100" }, { key: "contribution", value: "50" }])]);
-    const [cost, contribution] = layout.columns[0].marks;
-    expect(cost.key).toBe("cost");
-    expect(cost.y + cost.h).toBeCloseTo(layout.zeroY, 5);
-    expect(cost.round).toBeNull();
-    expect(contribution.round).toBe("top");
-    expect(contribution.y + contribution.h).toBeLessThan(cost.y);
-    expect(cost.y - (contribution.y + contribution.h)).toBeCloseTo(2, 5);
-    expect(cost.w).toBeLessThanOrEqual(24);
-    expect(layout.ticks.some((tick) => tick.value === 0 && tick.y === layout.zeroY)).toBe(true);
-  });
-
-  test("builds a calendar of every day in the period and marks absent days out of range", () => {
-    const layout = layoutOf([day(1, [{ key: "cost", value: "10" }])]);
-    expect(layout.columns).toHaveLength(31);
-    expect(layout.columns[1].state).toBe("out-of-range");
-    expect(layout.columns[1].ghost).not.toBeNull();
-    expect(layout.columns[1].marks).toEqual([]);
-    expect(layout.columns.filter((column) => column.dayLabel).map((column) => column.dayLabel)).toEqual(["1", "5", "10", "15", "20", "25", "30"]);
-    expect(layout.columns[3].weekend).toBe(true);
-    expect(layout.columns[0].weekend).toBe(false);
-  });
-
-  test("null and unknown days become hatched ghosts and never a zero-height mark", () => {
-    const layout = layoutOf([
-      day(1, [{ key: "cost", value: "100" }]),
-      day(2, [], { state: "unknown" }),
-      day(3, [{ key: "cost", value: null }, { key: "contribution", value: null }]),
-      day(4, [{ key: "cost", value: "100" }, { key: "contribution", value: null }]),
-      day(5, [{ key: "cost", value: "0.00" }]),
-    ]);
-    expect(layout.columns[1].state).toBe("unknown");
-    expect(layout.columns[1].ghost).toMatchObject({ y: layout.top, h: layout.plotH });
-    expect(layout.columns[2].state).toBe("unknown");
-    expect(layout.columns[2].ghost).not.toBeNull();
-    expect(layout.columns[2].marks).toEqual([]);
-    const partial = layout.columns[3];
-    expect(partial.state).toBe("value");
-    expect(partial.marks.map((mark) => [mark.key, mark.kind])).toEqual([["cost", "value"], ["contribution", "unknown"]]);
-    expect(layout.columns[4].marks).toEqual([]);
-    for (const mark of allMarks(layout)) expect(mark.h).toBeGreaterThan(0);
-  });
-
-  test("draws negatives below the baseline with a rounded far end and extends the scale", () => {
-    const layout = layoutOf([
-      day(1, [{ key: "cost", value: "100" }], { negative: "40" }),
-      day(2, [{ key: "cost", value: "-30" }]),
-      day(3, [{ key: "cost", value: "10" }], { negative: null }),
-    ]);
-    const [positive, returns] = layout.columns[0].marks;
-    expect(positive.y + positive.h).toBeLessThanOrEqual(layout.zeroY + 0.0001);
-    expect(returns.key).toBe("negative");
-    expect(returns.y).toBeGreaterThanOrEqual(layout.zeroY);
-    expect(returns.round).toBe("bottom");
-    expect(layout.ticks.some((tick) => tick.value < 0)).toBe(true);
-    const signed = layout.columns[1].marks[0];
-    expect(signed.y).toBeGreaterThanOrEqual(layout.zeroY);
-    const unknownReturns = layout.columns[2].marks.find((mark) => mark.kind === "unknown");
-    expect(unknownReturns).toBeDefined();
-    expect(unknownReturns!.y).toBeGreaterThanOrEqual(layout.zeroY);
-    expect(unknownReturns!.h).toBeGreaterThan(0);
-  });
-
-  test("a known return bar with unknown-amount rows keeps a hatched stub below it", () => {
-    const layout = layoutOf([
-      day(1, [{ key: "cost", value: "100" }], { negative: "40", negativeUnknown: true }),
-      day(2, [{ key: "cost", value: "100" }], { negative: "40" }),
-      day(3, [{ key: "cost", value: "10" }], { negative: "0", negativeUnknown: true }),
-    ]);
-    const marks = layout.columns[0].marks;
-    const known = marks.find((mark) => mark.key === "negative" && mark.kind === "value")!;
-    const stub = marks.find((mark) => mark.key === "negative" && mark.kind === "unknown")!;
-    expect(stub).toBeDefined();
-    expect(stub.y).toBeGreaterThanOrEqual(known.y + known.h);
-    expect(stub.y + stub.h).toBeLessThanOrEqual(layout.top + layout.plotH + layout.belowPad + 0.0001);
-    expect(layout.columns[1].marks.some((mark) => mark.kind === "unknown")).toBe(false);
-    expect(layout.columns[2].marks.some((mark) => mark.key === "negative" && mark.kind === "unknown")).toBe(true);
-    expect(describeDay(layoutDays[0], series, money).rows.some((row) => row.unknown && row.key.startsWith("negative"))).toBe(true);
-  });
-
-  test("integer ticks never use a fractional step, so count axes cannot repeat a label", () => {
-    expect(niceTicks(0, 1).ticks).toEqual([0, 0.5, 1]);
-    expect(niceTicks(0, 1, 3, { integer: true })).toEqual({ ticks: [0, 1], min: 0, max: 1 });
-    expect(niceTicks(0, 2, 3, { integer: true }).ticks).toEqual([0, 1, 2]);
-    expect(niceTicks(0, 7, 3, { integer: true }).ticks.every(Number.isInteger)).toBe(true);
-    expect(niceTicks(0, 0, 3, { integer: true }).ticks).toEqual([0]);
-    const layout = dailyLayout({ period: "2026-10", days: [day(1, [{ key: "documents", value: "1" }])], seriesKeys: ["documents"], width: 720, integerTicks: true, formatTick: (value) => String(Math.round(value)) });
-    const labels = layout.ticks.map((tick) => tick.label);
-    expect(new Set(labels).size).toBe(labels.length);
-    expect(labels).toEqual(["0", "1"]);
-  });
-
-  test("all-unknown input keeps a valid zero-only axis", () => {
-    const layout = layoutOf([day(1, [], { state: "unknown" })]);
-    expect(layout.ticks.map((tick) => tick.value)).toEqual([0]);
-    expect(Number.isFinite(layout.zeroY)).toBe(true);
-  });
-
-  test("columns shrink with the container but bars stay thin and gapped", () => {
-    const wide = layoutOf([day(1, [{ key: "cost", value: "10" }])], 1100);
-    const narrow = layoutOf([day(1, [{ key: "cost", value: "10" }])], 440);
-    expect(wide.columns[0].barW).toBe(24);
-    expect(narrow.columns[0].barW).toBeLessThan(wide.columns[0].barW);
-    expect(narrow.columns[0].barW).toBeGreaterThanOrEqual(3);
-    expect(narrow.left + narrow.plotW).toBeLessThanOrEqual(440);
-  });
-
-  test("describeDay lists every segment and names unknown or out-of-range states", () => {
-    const labels = { cost: "Maliyet", contribution: "Katkı" };
-    const info = describeDay(
-      day(4, [{ key: "cost", value: "100.00" }, { key: "contribution", value: null }], { negative: "5.00" }),
-      series, money, "İade");
-    expect(info.heading).toBe("04.10.2026");
-    expect(info.rows).toEqual([
-      { key: "cost", label: labels.cost, color: "var(--viz-cost)", text: "100,00 ₺", unknown: false },
-      { key: "contribution", label: labels.contribution, color: "var(--viz-contribution)", text: "Bilinmiyor", unknown: true },
-      { key: "negative", label: "İade", color: "var(--viz-negative)", text: "5,00 ₺", unknown: false },
-    ]);
-    expect(describeDay(day(5, [], { state: "unknown" }), series, money).rows).toEqual([{ key: "state", label: "", color: "unknown", text: "Bilinmiyor", unknown: true }]);
-    expect(describeDay(day(6, [], { state: "out-of-range" }), series, money).rows[0].text).toBe("Kapsam dışı");
   });
 });
 
@@ -268,55 +124,6 @@ describe("rendering", () => {
     expect(two).toContain("Bilinmiyor");
   });
 
-  test("DailyBars is one focusable labelled interactive group, hatches unknown days and gives unique pattern ids", () => {
-    const props = {
-      period: "2026-10",
-      days: [day(1, [{ key: "cost", value: "100.00" }, { key: "contribution", value: "50.00" }]), day(2, [], { state: "unknown" })],
-      series,
-      formatValue: money,
-      ariaLabel: "Ekim 2026 günlük satış",
-    };
-    const markup = renderToStaticMarkup(h(Fragment, null, h(DailyBars, props), h(DailyBars, props)));
-    expect(markup).toContain('role="group"');
-    expect(markup).toContain('aria-roledescription="grafik"');
-    expect(markup).not.toContain('role="img"');
-    expect(markup).toContain('aria-label="Ekim 2026 günlük satış"');
-    expect(markup).toContain('tabindex="0"');
-    expect(markup).toContain('data-state="unknown"');
-    expect(markup).toContain('data-state="out-of-range"');
-    expect(markup).not.toContain("NaN");
-    expect(markup).not.toMatch(/height="0(\.0+)?"/);
-    const ids = [...markup.matchAll(/<pattern[^>]*id="([^"]+)"/g)].map((match) => match[1]);
-    expect(ids).toHaveLength(2);
-    expect(new Set(ids).size).toBe(2);
-    expect(markup).toContain(`url(#${ids[0]})`);
-    expect(markup).toContain("0 ₺");
-  });
-
-  test("a known zero day gets a visible baseline marker, distinct from unknown and out-of-range days", () => {
-    const days = [day(1, [{ key: "cost", value: "0" }, { key: "contribution", value: "0.00" }]), day(2, [{ key: "cost", value: "10" }, { key: "contribution", value: "5" }]), day(3, [], { state: "unknown" })];
-    const layout = dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width: 720 });
-    expect(layout.columns.map((column) => column.zero)).toEqual([true, false, false, ...Array(28).fill(false)]);
-    const markup = renderToStaticMarkup(h(DailyBars, { period: "2026-10", days, series, formatValue: money }));
-    expect(markup.match(/class="viz-zero-marker"/g)).toHaveLength(1);
-  });
-  test("count charts can replace the currency tick labels", () => {
-    const days = [day(1, [{ key: "cost", value: "1200" }, { key: "contribution", value: "300" }])];
-    const layout = dailyLayout({ period: "2026-10", days, seriesKeys: ["cost", "contribution"], width: 720, formatTick: (n) => n.toLocaleString("tr-TR") });
-    expect(layout.ticks.map((tick) => tick.label).join(" ")).not.toContain("₺");
-    expect(dailyLayout({ period: "2026-10", days, seriesKeys: ["cost"], width: 720 }).ticks.some((tick) => tick.label.includes("₺"))).toBe(true);
-    expect(renderToStaticMarkup(h(DailyBars, { period: "2026-10", days, series, formatValue: money, formatTick: String }))).not.toMatch(/class="viz-tick"[^>]*>[^<]*₺/);
-  });
-  test("DailyBars summarises counts when no aria label is passed and shows caller empty text", () => {
-    const markup = renderToStaticMarkup(h(DailyBars, {
-      period: "2026-10", days: [day(1, [{ key: "cost", value: "10" }]), day(2, [], { state: "unknown" })], series, formatValue: money,
-    }));
-    expect(markup).toMatch(/aria-label="[^"]*Ekim 2026[^"]*1 gün[^"]*1 gün bilinmiyor[^"]*"/);
-    const empty = renderToStaticMarkup(h(DailyBars, { period: "2026-10", days: [], series, formatValue: money, empty: "Bu ay için gün yok." }));
-    expect(empty).toContain("Bu ay için gün yok.");
-    expect(empty).not.toContain("<svg");
-  });
-
   test("RankBars passes the clicked button to onSelect and renders focusKey as data-focus-key", () => {
     const rows = [{ id: "a", label: "Ürün A", value: "10", focusKey: "rank-a", onSelect: () => undefined }, { id: "b", label: "Ürün B", value: "5" }];
     const markup = renderToStaticMarkup(h(RankBars, { rows, color: "red", formatValue: money }));
@@ -368,24 +175,6 @@ describe("rendering", () => {
     expect(markup).toContain('data-state="unknown"');
     expect(markup).toContain("<ol");
     expect(renderToStaticMarkup(h(Bridge, { steps: [], formatValue: money, empty: "Adım yok." }))).toContain("Adım yok.");
-  });
-
-  test("CompositionBar sizes parts by value, gaps them, and lists value plus percent", () => {
-    const markup = renderToStaticMarkup(h(CompositionBar, {
-      formatValue: (value: number) => `${value} satır`,
-      parts: [
-        { key: "covered", label: "Kapsanan", value: 75, color: "var(--viz-contribution)" },
-        { key: "excluded", label: "Kapsam dışı", value: 25, color: "unknown" },
-        { key: "none", label: "Yok", value: 0, color: "var(--viz-cost)" },
-      ],
-    }));
-    expect(markup).toContain('role="img"');
-    expect(markup).toContain("%75");
-    expect(markup).toContain("%25");
-    expect(markup).toContain("75 satır");
-    expect(markup).toContain("viz-hatch");
-    expect(markup.match(/viz-comp-part/g)!.length).toBe(2);
-    expect(renderToStaticMarkup(h(CompositionBar, { parts: [], formatValue: String, empty: "Dağılım yok." }))).toContain("Dağılım yok.");
   });
 
   test("EstimateBadge is a details disclosure with the fixed chip text", () => {

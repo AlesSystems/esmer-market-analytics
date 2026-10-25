@@ -3,10 +3,8 @@ import type {Availability,RequestError} from "../domain/contracts";
 /** The four sidebar sections, in order. Each one owns exactly one page component in src/ui/pages. */
 export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","Giderler"],["reports","Rapor ve Excel"]] as const;
 export type Section=typeof sections[number][0];
-/** Rapor ve Excel sub-views. */
-export type ReportView="report"|"data"|"invoices";
 /** Optional state carried by a navigation, e.g. the product to open on Ürünler. */
-export type NavigationState={productId?:string;reportView?:ReportView};
+export type NavigationState={productId?:string};
 export type Coverage={from:string;to:string};
 
 /** Every page receives these props and nothing else. */

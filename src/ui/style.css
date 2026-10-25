@@ -1,13 +1,8 @@
-@import "./purchasing/control-desk.css";
 @import "tailwindcss";
 @import "./settings/settings.css";
 @import "./branding.css";
-@import "./overview/control-desk.css";
-@import "./sales/sales-control-desk.css";
 @import "./expenses-control-desk.css";
-@import "./reports/reports-control-desk.css";
 @import "./source-document-detail.css";
-@import "./overview/source-control-desk.css";
 @import "./charts/charts.css";
 @import "./owner-workspace.css";
 @import "./pages/pages.css";

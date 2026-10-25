@@ -1,1 +1,0 @@
-export const salesReasonLabels: Record<string, string> = { VOID: "İptal edilmiş belge", CONVERTED: "Dönüştürülmüş belge; iki kez sayılmaz", CONVERSION_CONFLICT: "Belge dönüşüm ilişkisi çözümlenemedi", UNKNOWN_MEANING: "Satır anlamı veya birimi bilinmiyor", NO_LINES: "Belge satırları eksik", NOT_SALES: "Satış işlemi değil" };

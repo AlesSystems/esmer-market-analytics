@@ -8,9 +8,10 @@ import {date,decimal} from "../format";
 import {typeLabel} from "../source-fields";
 import {useMonthProfit} from "./month-profit-data";
 import {monthName} from "./month-summary";
+import {initialSourceQuery} from "../source-query";
 
 type Workspace=Extract<SourceWorkspaceResult,{status:"source-workspace"}>;
-const base:SourceQuery={hash:null,period:null,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0};
+const base:SourceQuery=initialSourceQuery;
 const PAGE=50;
 
 /** Kaynak belgeler: the package's recorded documents for the month, opening the existing detail view. `availability` changes when the source changes. */

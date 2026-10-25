@@ -91,7 +91,7 @@ export function MonthPage({month,onMonth,coverage,availability,active,navigate,o
  const history=v.history;
  return <main className="month-page" aria-busy={loading}>
   <header className="month-head"><div><p className="month-eyebrow">Bu ay</p><h1>{monthName(v.month)}</h1></div>
-   <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p><Button variant="link" className="month-link" onClick={()=>navigate("reports",{reportView:"report"})}>Ayrıntılar Rapor ve Excel’de</Button></EstimateBadge>
+   <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p><Button variant="link" className="month-link" onClick={()=>navigate("reports")}>Ayrıntılar Rapor ve Excel’de</Button></EstimateBadge>
   </header>
   <p className="month-lead">{monthSummary(v.month,t)}</p>
   <section className="month-figures" aria-label="Ayın rakamları">

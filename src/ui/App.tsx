@@ -1,6 +1,6 @@
 import { validSelectedMonth, type SelectedMonth } from "../domain/month";
 import { ExpenseNavigationProvider, useExpenseNavigation } from "./expense-navigation";
-import { initialSourceQuery } from "./SourceWorkspace";
+import { initialSourceQuery } from "./source-query";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";

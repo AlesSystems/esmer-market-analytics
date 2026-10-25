@@ -72,14 +72,6 @@
 .viz-row-value--unknown{font-weight:500;color:var(--viz-muted)}
 
 /* composition */
-.viz-comp-bar{display:flex;gap:2px;height:12px;overflow:hidden;border-radius:4px}
-.viz-comp-part{flex:1 1 0;min-width:3px}
-.viz-comp-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 22px;margin:14px 0 0;padding:0;list-style:none;font-size:12px}
-.viz-comp-legend li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;gap:4px 8px;color:var(--viz-muted)}
-.viz-comp-legend .viz-swatch{align-self:center}
-.viz-comp-label{overflow-wrap:anywhere}
-.viz-comp-legend strong{font-weight:650;color:var(--viz-ink)}
-.viz-comp-share{min-width:3.6em;text-align:right}
 
 /* estimate disclosure */
 .viz-estimate{display:block;margin:0;padding:0;border:0;font-size:12px}
@@ -101,13 +93,12 @@
 .viz-row>.viz-row-value{grid-area:value}
 .viz-row>.viz-track{grid-area:track}
 .viz-head{margin-bottom:10px}
-.viz-comp-legend{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){
 .viz-frame .viz-toggle button,.viz-estimate>summary::after{transition:none}
 }
 @media(forced-colors:active){
-.viz-bar,.viz-comp-part,.viz-swatch{forced-color-adjust:none}
+.viz-bar,.viz-swatch{forced-color-adjust:none}
 .viz-hatch{border:1px dashed CanvasText}
 .viz-frame .viz-toggle button[aria-pressed="true"]{border:2px solid Highlight}
 .viz-estimate>summary,.viz-estimate-body{border:1px solid CanvasText}

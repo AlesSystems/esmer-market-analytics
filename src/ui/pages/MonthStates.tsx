@@ -7,7 +7,7 @@ import {monthName} from "./month-summary";
 
 /** The one trust chip on a month-profit page. Same words as Bu ay. */
 export function TrustChip({navigate}:Pick<PageProps,"navigate">) {
- return <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p><Button variant="link" className="month-link" onClick={()=>navigate("reports",{reportView:"report"})}>Ayrıntılar Rapor ve Excel’de</Button></EstimateBadge>;
+ return <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p><Button variant="link" className="month-link" onClick={()=>navigate("reports")}>Ayrıntılar Rapor ve Excel’de</Button></EstimateBadge>;
 }
 
 /** ESTIMATE_UNAVAILABLE and MONTH_NOT_COVERED, worded and handled as on Bu ay. `purpose` completes "…içe aktarınca bu sayfa …". */
