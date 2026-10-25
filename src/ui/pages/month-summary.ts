@@ -9,9 +9,15 @@ const format=(value:number,digits:number)=>new Intl.NumberFormat("tr-TR",{maximu
 /** "1,97 milyon ₺", "296 bin ₺", "57,5 ₺". */
 export function wordMoney(value:string):string {
  const number=Number(value),abs=Math.abs(number),sign=number<0?"-":"";
- if(abs>=1e6)return `${sign}${format(abs/1e6,2)} milyon ₺`;
+ // Pick the unit after rounding: 999.960 is "1 milyon", not "1.000 bin".
+ if(abs>=1e6||Math.round(abs/100)/10>=1000)return `${sign}${format(abs/1e6,2)} milyon ₺`;
  if(abs>=1e3)return `${sign}${format(abs/1e3,1)} bin ₺`;
  return `${sign}${format(abs,2)} ₺`;
+}
+/** "%13,37"; a negative value reads "-%10,00" (the sign goes before the percent mark). */
+export function percentText(value:string):string {
+ const abs=value.replace(/^-/,""),[integer,fraction=""]=abs.split(".");
+ return `${value.startsWith("-")?"-":""}%${integer.replace(/\B(?=(\d{3})+(?!\d))/g,".")}${fraction?`,${fraction}`:""}`;
 }
 const positive=(value:string)=>value.replace(/^-/,"");
 const whole=(value:string)=>format(Math.round(Number(positive(value))),0);

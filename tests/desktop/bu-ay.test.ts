@@ -29,9 +29,9 @@ test("Bu ay opens at launch with four sections, and an imported estimate package
   await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
   await expect(page.getByText("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — maliyeti bilinen her 100 ₺'lik satıştan 13 ₺.",{exact:true})).toBeVisible();
   await expect(figure(page,"Satış").locator("strong")).toHaveText("480,00 ₺");
-  await expect(figure(page,"Satış")).toContainText("▼ %5,88 önceki aya göre");
+  await expect(figure(page,"Satış")).toContainText("Önceki ayla karşılaştırılamıyor");
   await expect(figure(page,"Tahmini brüt kâr").locator("strong")).toHaveText("57,50 ₺");
-  await expect(figure(page,"Tahmini brüt kâr")).toContainText("▼ %43,63 önceki aya göre");
+  await expect(figure(page,"Tahmini brüt kâr")).toContainText("Önceki ayla karşılaştırılamıyor");
   await expect(figure(page,"Marj").locator("strong")).toHaveText("%13,37");
   await expect(figure(page,"Marj")).toContainText("▼ 6,63 puan önceki aya göre");
   await expect(figure(page,"Tahmini net kâr")).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
@@ -44,7 +44,7 @@ test("Bu ay opens at launch with four sections, and an imported estimate package
    "Marjı düştüSütMarj %31,50 → %30,00",
    "Marjı düştüŞekerMarj %40,00 → %20,00",
    "Çok satıyor ama marjı düşükÇaySatış 200,00 ₺ · marj %5,00",
-   "Çok satıyor ama marjı düşükEkmekSatış 40,00 ₺ · marj %-10,00",
+   "Çok satıyor ama marjı düşükEkmekSatış 40,00 ₺ · marj -%10,00",
    "Maliyeti eksikPeynirSatış 50,00 ₺ · maliyet kaydı yok",
   ]);
   await attention.first().click();
