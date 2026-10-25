@@ -6,7 +6,7 @@ import type {MonthProfitView,NetProfitReason} from "./month-profit";
 const text=(value:unknown):Cell=>value===null||value===undefined?null:{type:String,value:String(value)};
 const reasons:Record<NetProfitReason,string>={
  costUnknown:"Maliyetler bilinmediği için hesaplanamadı",monthPartial:"Ay henüz tamamlanmadı",expensesMissing:"Bu ayın giderleri girilmedi",
- expensesIncomplete:"Bu ayın giderleri tamamlanmadı",unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
+ expensesIncomplete:"Bu ayın giderleri tamamlanmadı",expensesBlocked:"Bazı gider satırları net kârı engelliyor",unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
 };
 const UNKNOWN="Bilinmiyor";
 const SUBTOTAL="bilinen alt toplam";
