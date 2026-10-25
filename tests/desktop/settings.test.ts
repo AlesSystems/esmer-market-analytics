@@ -29,12 +29,24 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     await expect(page.getByRole("heading", { name: "Ayarlar", level: 1 })).toBeFocused();
     await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("navigation", { name: "Ana gezinme" }).locator("[aria-current]")).toHaveCount(0);
-    for (const name of ["Etkin veriler", "Veri içe aktarma", "Canlı bağlantı", "Yedekleme ve kurtarma", "Görünüm", "Hakkında"])
-      await expect(page.getByRole("region", { name, exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Veri içe aktarma" }).getByRole("button", { name: "Veri paketi içe aktar", exact: true })).toBeVisible();
+    const tiles = ["Veri paketi", "Yedekleme ve geri yükleme", "Görünüm", "Canlı bağlantı", "Hakkında"];
+    await expect(page.locator(".settings-page section.tile")).toHaveCount(tiles.length);
+    for (const name of tiles) await expect(page.getByRole("region", { name, exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Etkin veriler" })).toHaveCount(0);
+    await expect(page.getByText("İçe aktarma geçmişi")).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Veri paketi" })).toContainText("01.09.2025");
+    await expect(page.getByRole("region", { name: "Veri paketi" }).getByRole("button", { name: "Veri paketi içe aktar", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("button", { name: "SQL kaynağını içe aktar", exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Hakkında" })).toContainText(`Sürüm ${version}`);
+    const about = page.getByRole("region", { name: "Hakkında" });
+    await expect(about).toContainText(`Sürüm ${version}`);
+    await about.getByRole("button", { name: "Bilinen sınırlar", exact: true }).click();
+    expect(await page.locator(".limitations li, .limitations tbody tr").count()).toBeGreaterThan(0);
+    await expect(page.locator(".limitations")).toContainText("Tahmin doğrulanmış kâr değildir");
+    await about.getByRole("button", { name: "Bilinen sınırlar", exact: true }).click();
     await expect(page.getByRole("radio", { name: "Normal", exact: true })).toBeChecked();
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1024, 768));
+    await page.waitForTimeout(600);
+    expect(await page.evaluate(() => { for (let node: Element | null = document.querySelector(".settings-page"); node; node = node.parentElement) if (node.scrollHeight > node.clientHeight + 1) return `${node.className} ${node.scrollHeight}>${node.clientHeight}`; return ""; })).toBe("");
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1280, 1040));
     await page.waitForTimeout(1200);
     await capture(app, "test-results/settings-desktop.png");
