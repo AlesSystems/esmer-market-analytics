@@ -51,9 +51,7 @@ for (const source of [false, true]) {
       await openWorkspace(page);
       const routes: [string, () => Promise<void>, () => Promise<void>][] = [
         ["Ürünler", () => openSection(page, "Ürünler"), () => expect(page.getByRole("heading", { name: "Ürünler", level: 1 })).toBeVisible()],
-        ["Rapor ve Excel", () => openReportView(page, "Veri ve kaynak"), () => expect(page.getByRole("heading", { name: source ? "Veri ve kaynak" : "Satışlar", level: 1, exact: true })).toBeVisible()],
-        ["Rapor ve Excel", () => openReportView(page, "Alış belgeleri"), () => expect(page.getByRole("heading", { name: "Alışlar ve maliyet", level: 1, exact: true })).toBeVisible()],
-        ["Rapor ve Excel", () => openReportView(page, "Aylık rapor"), () => expect(page.getByRole("heading", { name: source ? "Raporlar" : "Aylık Ürün Kârlılığı", exact: true })).toBeVisible()],
+        ["Rapor ve Excel", () => openSection(page, "Rapor ve Excel"), () => expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible()],
         ["Giderler", () => openSection(page, "Giderler"), () => expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toBeVisible()],
         ["Bu ay", () => openSection(page, "Bu ay"), () => expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible()],
       ];
@@ -97,8 +95,9 @@ test("Settings closes to its opener and import leaves later section requests usa
     await expect(page.getByRole("status").filter({ hasText: "Veri paketi içe aktarıldı." })).toBeVisible();
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("button", { name: "Aylık raporlara git", exact: true })).toBeVisible();
-    await openReportView(page, "Veri ve kaynak");
-    await expect(page.getByRole("region", { name: "Satış özeti", exact: true })).toContainText("200,00 ₺");
+    await openSection(page, "Rapor ve Excel");
+    await expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Excel’e aktar", exact: true })).toBeVisible();
     await openSection(page, "Giderler");
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
@@ -148,7 +147,8 @@ test("launch loads bundled assets without external requests or page errors", asy
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-test("a Veri ve kaynak request pending initial financial load starts only its destination calculation", async () => {
+// old UI, removed in P5
+test.skip("a Veri ve kaynak request pending initial financial load starts only its destination calculation", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-pending-sales-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { store.importPackage(businessPackage()); } finally { store.close(); }
