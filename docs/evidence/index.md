@@ -20,6 +20,8 @@ Open gate: Owner approval for live reading of the historical-cost column (#110) 
 
 ## Later implementation evidence
 
+The October 25 [first real package receipt](2026-10-25-first-real-package.md) records the first `prepare:month` package from the restored backup (September–October 2025), the unit-link and paging fixes it required, and exact matches between the packaged app and independent SQL totals for the month, one product and one day.
+
 The October 22 [monthly data path receipt](2026-10-22-monthly-data-path.md) records `npm run prepare:month`, the column-allowlist and multi-month import checks, and synthetic SQL Edge size and import timings. The bounds stay at 100,000 rows and 32 MiB, so about three September-sized months fit in one package ([decision](../decisions/issue-101-monthly-window.md)).
 
 The October 22 [merged-main app and CI receipt](2026-10-22-main-verification.md) records 614 passing Mac tests, the merged issue/PR inventory, and GitHub billing blocking Windows CI before execution.
