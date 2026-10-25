@@ -104,7 +104,8 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
  const prevProducts=prev?.products;
  const missing=(p:Product)=>p.lines.some(l=>l.reason!==null&&COST_REASONS.has(l.reason));
  const totalGross=current.estimate.summary.contribution===null?null:new D(current.estimate.summary.contribution);
- const ranked=[...current.products].filter(([,p])=>p.totals.contribution!==null).sort(([a,pa],[b,pb])=>new D(pb.totals.contribution!).comparedTo(pa.totals.contribution!)||byId(a,b)).map(([id])=>id);
+ const ranked=[...current.products].filter(([,p])=>p.totals.contribution!==null).map(([id,p])=>({id,gross:new D(p.totals.contribution!)})).sort((a,b)=>b.gross.comparedTo(a.gross)||byId(a.id,b.id)).map(r=>r.id);
+ const rankOf=new Map(ranked.map((id,i)=>[id,i+1]));
  const products:MonthProfitProduct[]=[...current.products].map(([id,p])=>{
   const t=p.totals,known=new D(t.coveredSaleAmount??0),coveredLines=p.lines.filter(l=>l.reason===null);
   const quantity=coveredLines.length&&p.label.unit!==null?coveredLines.reduce((a,l)=>a.plus(quantities.get(l.lineId)!),new D(0)):null;
@@ -113,9 +114,9 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
    marginChangePoints:now===null||before===null?null:pct(now.minus(before)),
    unitProfit:quantity?.gt(0)&&gross!==null?div2(gross,quantity):null,
    profitSharePct:gross===null||totalGross===null?null:pct(ratio(gross,totalGross)),
-   profitRank:gross===null?null:ranked.indexOf(id)+1,
+   profitRank:gross===null?null:rankOf.get(id)!,
    flags:{loss:now?.lt(0)??false,lowMargin10:now?.lt(PRODUCT_FILTERS.lowMarginPct)??false,marginDrop:now!==null&&before!==null&&before.minus(now).gte(ATTENTION.marginDropPoints),missingCost:missing(p)}};
- }).sort((a,b)=>new D(b.sales??-1).comparedTo(a.sales??-1)||byId(a.id,b.id));
+ }).map(p=>({p,sales:new D(p.sales??-1)})).sort((a,b)=>b.sales.comparedTo(a.sales)||byId(a.p.id,b.p.id)).map(r=>r.p);
  const categories=new Map<string,{sales:Decimal;gross:Decimal|null;known:Decimal}>();
  for(const p of current.products.values()){const name=p.label.categoryName;if(name===null)continue;const c=categories.get(name)??{sales:new D(0),gross:null,known:new D(0)};c.sales=c.sales.plus(p.totals.candidateSaleAmount??0);if(p.totals.contribution!==null){c.gross=(c.gross??new D(0)).plus(p.totals.contribution);c.known=c.known.plus(p.totals.coveredSaleAmount??0);}categories.set(name,c);}
  const margins=new Map(products.map(p=>[p.id,{now:productMargin(current.products.get(p.id)),before:productMargin(prev?.products.get(p.id))}]));

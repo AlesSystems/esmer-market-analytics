@@ -95,6 +95,8 @@
 .product-card[hidden] { display: none; }
 .product-name, .product-category { display: block; }
 .product-name { font-weight: 650; }
+.product-open { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.product-open:hover { text-decoration: underline; }
 .product-category { font-size: 12px; color: var(--market-muted); }
 .products-table .is-down { color: var(--market-negative); }
 .products-table .is-up { color: var(--market-positive); }

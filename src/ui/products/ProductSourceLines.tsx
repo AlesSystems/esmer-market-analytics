@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from "react";
 import type {SourceQuery,SourceWorkspaceResult} from "../../source/workspace";
 import {Button} from "../components/ui/button";
 import {SourceDocumentDetail} from "../SourceDocumentDetail";
-import {date,decimal} from "../format";
+import {date,money} from "../format";
 import {typeLabel} from "../source-fields";
 import {monthName} from "../pages/month-summary";
 
@@ -16,7 +16,7 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
  const heading=useRef<HTMLHeadingElement>(null),returnTo=useRef<string|null>(null);
  useEffect(()=>{
   let live=true;setBusy(true);setError("");
-  const query:SourceQuery={hash,period:month,view:documentId===null?"documents":"detail",scope:"sales",documentType:null,productId,documentId,offset:documentId===null?offset:0};
+  const query:SourceQuery={hash,period:month,view:documentId===null?"documents":"detail",scope:"sales",documentType:"11",productId,documentId,offset:documentId===null?offset:0};
   window.esmer.querySourceWorkspace(query).then(result=>{if(!live)return;if(result.status==="source-workspace")setView(result);else{setView(null);setError(result.status==="source-unavailable"&&result.code==="SOURCE_CHANGED"?"Veri paketi değişti. Ürünlere dönüp yeniden açın.":"Kaynak satırları okunamadı.");}})
    .catch(()=>{if(live){setView(null);setError("Yerel hizmete ulaşılamadı.");}})
    .finally(()=>{if(live)setBusy(false);});
@@ -34,7 +34,7 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
    <h2 id="product-source-title" ref={heading} tabIndex={-1}>{name} · kaynak satırlar · {monthName(month)}</h2>
    <Button variant="outline" onClick={onBack}>Ürünlere dön</Button>
   </div>
-  <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Tutarlar kaynakta kaydedildiği gibidir; doğrulanmadı.</p>
+  <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Belge toplamı KDV dahil, belgenin tamamının tutarıdır; kâr tahmini bu ürünün satır tutarlarından hesaplanır. Tutarlar kaynakta kaydedildiği gibidir; doğrulanmadı.</p>
   {error&&<div role="alert" className="month-state"><p>{error}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
   {busy&&!view&&<p role="status">Kaynak satırları yükleniyor…</p>}
   {detail?<>
@@ -43,12 +43,12 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
   </>:view&&documentId===null&&view.document===null&&<>
    {view.total===0?<p className="viz-empty">Bu ay bu ürünü içeren satış belgesi kaydı yok.</p>:<div className="table-scroll"><table className="product-source-table">
     <caption className="sr-only">Bu ürünün geçtiği satış belgeleri</caption>
-    <thead><tr><th scope="col">Belge</th><th scope="col">Tarih</th><th scope="col">Belge türü</th><th scope="col" className="number">Belge tutarı</th></tr></thead>
+    <thead><tr><th scope="col">Belge</th><th scope="col">Tarih</th><th scope="col">Belge türü</th><th scope="col" className="number">Belge toplamı (KDV dahil)</th></tr></thead>
     <tbody>{view.documents.map(row=><tr key={row.ID}>
      <td><Button variant="link" data-focus-key={`product-source-${row.ID}`} onClick={()=>setDocumentId(row.ID!)}>{row.ID}</Button></td>
      <td>{row.FIS_TARIHI?date(row.FIS_TARIHI.slice(0,10)):"—"}</td>
      <td>{typeLabel(row.FIS_TURU)}</td>
-     <td className="number">{row.GENELTOPLAM?decimal(row.GENELTOPLAM.replace(/(\.\d*?)0+$/,"$1").replace(/\.$/,"")):"—"}</td>
+     <td className="number">{row.GENELTOPLAM?money(row.GENELTOPLAM):"—"}</td>
     </tr>)}</tbody>
    </table></div>}
    {view.total>PAGE&&<nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" disabled={busy||offset===0} onClick={()=>setOffset(Math.max(0,offset-PAGE))}>Önceki belgeler</Button><span role="status">{offset+1}–{Math.min(offset+PAGE,view.total)} / {view.total}</span><Button variant="outline" disabled={busy||offset+PAGE>=view.total} onClick={()=>setOffset(offset+PAGE)}>Sonraki belgeler</Button></nav>}
