@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { openStore } from "../../src/store/store";
+import { Expenses } from "../../src/expenses/import";
 import { readPackage } from "../../src/source/package";
 import { richBusinessPackage, richBusinessRecords, seedRichExpenses } from "../helpers/rich-business-fixture";
 
@@ -20,6 +21,6 @@ test("rich business fixture imports active and seeds its expenses", () => {
   try {
     expect(store.importPackage(richBusinessPackage())).toMatchObject({ status: "active" });
     seedRichExpenses(store);
-    expect(store.expenseBatches().length).toBeGreaterThan(0);
+    expect(new Expenses(store).query({ period: "2025-09" }).rows.length).toBeGreaterThan(0);
   } finally { store.close(); }
 });

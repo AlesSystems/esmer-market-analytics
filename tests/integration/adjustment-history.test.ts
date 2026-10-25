@@ -73,8 +73,7 @@ test("schema v4 legacy evidence migrates unchanged and remains an unsupported ex
 });
 test("every expense IPC checks sender and exact payload before service or native dialog", async () => {
   const service = vi.fn().mockResolvedValue({ status: "saved" }), availability = vi.fn();
-  const context = { sessionId: "session", datasetId: "dataset", appRevision: 0, calculationVersion: "v1", period: "2026-01" };
-  const operations: Record<string, unknown> = { saveExpenseTemplate: null, previewExpenses: null, confirmExpenses: { previewId: "preview", keepCandidateRows: [] }, queryExpenses: { period: "2026-01" }, correctExpense: {}, restoreExpense: { entityId: "record", expectedRevision: 1, restoreRevision: null, reason: "İptal" }, confirmExpenseCompleteness: { period: "2026-01", reviewedRevision: 0, complete: true, reason: "İncelendi" }, queryOperating: { context } };
+  const operations: Record<string, unknown> = { saveExpenseTemplate: null, previewExpenses: null, confirmExpenses: { previewId: "preview", keepCandidateRows: [] }, queryExpenses: { period: "2026-01" }, correctExpense: {}, restoreExpense: { entityId: "record", expectedRevision: 1, restoreRevision: null, reason: "İptal" }, confirmExpenseCompleteness: { period: "2026-01", reviewedRevision: 0, complete: true, reason: "İncelendi" } };
   for (const [operation, payload] of Object.entries(operations)) {
     expect(await handleRequest(false, operation, payload, availability, undefined, service)).toMatchObject({ code: "UNTRUSTED_SENDER" });
     expect(await handleRequest(true, operation, { ...(payload ?? {}), sql: "SELECT 1" }, availability, undefined, service)).toMatchObject({ code: "INVALID_PAYLOAD" });
