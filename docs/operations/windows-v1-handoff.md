@@ -21,15 +21,17 @@ git --version
 
 ## Build
 
-Run separately in PowerShell. Replace `v1.0.0` with the release tag or commit you were given. Stop at the first failure and record it.
+Run separately in PowerShell. Replace `v1.0.0` with the release tag or commit you were given. The v1.0.0 tag points at the merge commit of the release PR on main. Stop at the first failure and record it.
 
 ```powershell
 git clone https://github.com/AlesSystems/esmer-market-analytics.git
 Set-Location esmer-market-analytics
+git fetch --tags
 git checkout v1.0.0
 git rev-parse HEAD
 npm ci
 npm run typecheck
+npm run lint
 npm run test:unit
 npm run test:integration
 npm run package:win
@@ -57,9 +59,9 @@ No separate SHA256 sums file is produced. Take the hashes from `distribution-ins
 Get-FileHash -Algorithm SHA256 'release\Esmer Market Analytics Setup 1.0.0.exe', 'release\Esmer Market Analytics 1.0.0.exe'
 ```
 
-## Optional: packaged desktop tests
+## Required: packaged desktop tests
 
-Playwright tests against the unpacked build. The CI step sets `ESMER_EXECUTABLE` exactly like this:
+Run this after `npm run package:win`; it is required for closing #109. Playwright tests against the unpacked build. The CI step sets `ESMER_EXECUTABLE` exactly like this:
 
 ```powershell
 $env:ESMER_EXECUTABLE = Join-Path (Get-Location) 'release/win-unpacked/Esmer Market Analytics.exe'
@@ -77,25 +79,17 @@ Tick each item and note anything odd. Use the synthetic data below only.
 
    ```powershell
    New-Item -ItemType Directory -Force work\v1-smoke | Out-Null
-   @'
-   import { build } from "esbuild";
-   import { writeFile } from "node:fs/promises";
-   const c = await build({ entryPoints: ["tests/helpers/rich-estimate-fixture.ts"], bundle: true, platform: "node", format: "esm", write: false });
-   const m = await import(`data:text/javascript;base64,${Buffer.from(c.outputFiles[0].text).toString("base64")}`);
-   await writeFile(process.argv[2], m.richEstimatePackage(), { flag: "wx" });
-   console.log("SYNTHETIC_ONLY estimate package written");
-   '@ | Set-Content -Encoding utf8 work\v1-smoke\make-package.mjs
-   node work\v1-smoke\make-package.mjs work\v1-smoke\synthetic-estimate.json
+   node tools\make-synthetic-estimate.ts work\v1-smoke\synthetic-estimate.json
    ```
 
    `work/` is git-ignored. Do not commit the package.
 3. Ayarlar > Veri paketi: "Veri paketi içe aktar", choose `synthetic-estimate.json`. Expect "Gerçek kaynak kayıtları içe aktarıldı."
 4. Bu ay: the month figures and the trust chip load, no error text. Net profit is not shown until the month's expenses are marked complete (step 7).
 5. Ürünler: the product list loads. Open a product card, then Kaynak satırlar; rows appear (Satış documents only).
-6. Giderler: "Şablonu indir", fill the template with synthetic expenses, "Excel'den içe aktar". Expect the rows listed.
+6. Giderler: "Şablonu indir", fill the template with synthetic expenses, "Excel’den içe aktar". Expect the rows listed.
 7. Giderler: "Bu ayın giderleri tamam" and confirm.
 8. Bu ay again: net profit now appears.
-9. Rapor ve Excel: "Excel'e aktar", save the file, open it in Excel; figures match Bu ay.
+9. Rapor ve Excel: "Excel’e aktar", save the file, open it in Excel; figures match Bu ay.
 10. Ayarlar: five tiles (Veri paketi, Yedekleme ve kurtarma, Görünüm, Canlı bağlantı, Hakkında). Open Hakkında and check the "Bilinen sınırlar" list matches [known-limitations-tr.md](known-limitations-tr.md). Leave Canlı bağlantı off; it needs a SQL source and is out of scope for this test.
 11. Display scaling: repeat a pass of steps 4 to 10 at Windows scaling 125 % and 150 % (Settings > System > Display). Look for clipped text, overlapping controls, unreachable buttons.
 12. Backup and restore ([recovery-tr.md](recovery-tr.md)): set up backup to a folder on a separate disk or USB stick, save the key file elsewhere, confirm "Son doğrulanan yedek". Then restore into a fresh state (uninstall and reinstall, or a second Windows user) and check expenses and the complete mark returned.
@@ -114,4 +108,4 @@ Write a new file `docs/evidence/<date>-windows-v1-smoke.md` (do not overwrite ol
 - Screenshots (synthetic data only; no key files, no paths revealing personal data).
 - What was not tested (live SQL, production source, owner install).
 
-Commit the file as `docs: Windows v1 smoke-test receipt`, open a PR, and close [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109) only if every step passed. Update the two open rows in [known-limitations-tr.md](known-limitations-tr.md) ("Windows derlemesi ve duman testi bekliyor") to `düzeltildi`. If a step fails, leave #109 open and record the failure.
+Commit the file as `docs: Windows v1 smoke-test receipt`, open a PR, and close [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109) only if every step passed. After a passing smoke test, update the row "Windows derlemesi ve duman testi bekliyor" in [known-limitations-tr.md](known-limitations-tr.md) from `açık` to `düzeltildi`. The row "Windows CI çalışmıyor" stays `açık`. If a step fails, leave #109 open and record the failure.
