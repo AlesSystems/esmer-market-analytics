@@ -10,11 +10,15 @@ import { richEstimateSnapshot } from "../helpers/rich-estimate-fixture";
 // The fake extraction honours the requested window like the real read does and always carries cost.
 let source: SqlSnapshot = monthProfitSnapshot();
 let failing = false;
+let maxSpanDays = Infinity;
+const windows: string[] = [];
 vi.mock("../../src/source/sql-server", async importOriginal => {
   const original = await importOriginal<typeof import("../../src/source/sql-server")>();
   return {...original, extractSqlServer: async (config: {from: string; to: string}, _signal?: AbortSignal, options?: {cost?: boolean}) => {
     if (failing) throw new Error("SOURCE_UNAVAILABLE");
     if (!options?.cost) throw new Error("COST_REQUIRED");
+    windows.push(`${config.from}..${config.to}`);
+    if ((Date.parse(config.to) - Date.parse(config.from)) / 864e5 + 1 > maxSpanDays) throw new Error("SOURCE_REJECTED", {cause: "SIZE_LIMIT"});
     const inside = (row: {FIS_TARIHI?: unknown}) => String(row.FIS_TARIHI).slice(0, 10) >= config.from && String(row.FIS_TARIHI).slice(0, 10) <= config.to;
     const headers = source.headers.filter(inside), ids = new Set(headers.map(row => row.ID));
     const lines = source.lines.filter(row => ids.has(row.FIS));
@@ -26,7 +30,7 @@ vi.mock("../../src/source/sql-server", async importOriginal => {
 const config = () => parseSqlServerConfig({server: "localhost", port: 14333, database: "fixture", user: "reader", password: "synthetic", scope: "isolated-copy", lineage: "fixture", expectedDatabaseId: "f51ae321-96f0-4bdf-9497-6b106180ff25", from: "2025-08-01", to: "2025-10-31"});
 const today = "2026-10-25";
 const controllers: LiveSynchronizer[] = [];
-afterEach(async () => { failing = false; source = monthProfitSnapshot(); await Promise.all(controllers.splice(0).map(controller => controller.close())); });
+afterEach(async () => { failing = false; maxSpanDays = Infinity; windows.length = 0; source = monthProfitSnapshot(); await Promise.all(controllers.splice(0).map(controller => controller.close())); });
 function live(store: ReturnType<typeof openStore>, snapshotConfig = config()) {
   const controller = new LiveSynchronizer({
     extract: signal => prepareLiveEstimate(snapshotConfig, signal, today),
@@ -91,5 +95,56 @@ test("timing of a fake six-month live refresh", async () => {
     expect(await live(store, wide).refresh()).toMatchObject({status: "active"});
     console.info(`LIVE_REFRESH_FAKE_6_MONTHS ms=${Math.round(performance.now() - started)} lines=${source.lines.length}`);
     expect(view(store, "2025-10").month).toBe("2025-10");
+  } finally { store.close(); }
+});
+
+test("a configured end after today is cut at today so the current month is partial and profit is withheld", async () => {
+  const store = openStore(":memory:");
+  try {
+    const future = parseSqlServerConfig({...config(), lineage: "future-end", from: "2025-08-01", to: "2027-12-31"});
+    const controller = new LiveSynchronizer({
+      extract: signal => prepareLiveEstimate(future, signal, "2025-10-20"),
+      importCandidate: () => { throw new Error("financial import"); },
+      importPreview: bytes => store.importSourcePreview(bytes),
+      activePreview: () => store.sourcePreviewState(),
+      activeDataset: () => null,
+    });
+    controllers.push(controller); controller.enable();
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const current = view(store, "2025-10");
+    expect(current.source.to).toBe("2025-10-20");
+    expect(current.dataUntil).toBe("2025-10-20");
+    expect(current.totals.netProfit).toBeNull();
+    expect(current.totals.netProfitReason).toBe("monthPartial");
+    expect(current.changes).toMatchObject({salesPct: null, grossProfitPct: null, netProfitPct: null});
+  } finally { store.close(); }
+});
+
+test("a live refresh starts from the span that worked before and reports a one-month overflow with its own code", async () => {
+  const connection = parseSqlServerConfig({...config(), lineage: "size-shrink", from: "2025-05-01", to: "2025-10-31"});
+  maxSpanDays = 70;
+  await prepareLiveEstimate(connection, undefined, today);
+  const firstRun = windows.length;
+  expect(firstRun).toBeGreaterThan(1);
+  windows.length = 0;
+  await prepareLiveEstimate(connection, undefined, today);
+  expect(windows).toHaveLength(1);
+  // A changed connection starts from six months again.
+  windows.length = 0;
+  await prepareLiveEstimate(parseSqlServerConfig({...config(), lineage: "size-shrink-2", from: "2025-05-01", to: "2025-10-31"}), undefined, today);
+  expect(windows).toHaveLength(firstRun);
+  maxSpanDays = 10;
+  await expect(prepareLiveEstimate(parseSqlServerConfig({...config(), lineage: "size-one", from: "2025-05-01", to: "2025-10-31"}), undefined, today)).rejects.toThrow("SOURCE_TOO_LARGE");
+});
+
+test("a change of cost alone replaces the stored preview", async () => {
+  const store = openStore(":memory:");
+  try {
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const lines = source.lines.map(row => row.ID === "1011" ? {...row, BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "999.5"} : row);
+    expect(lines).not.toEqual(source.lines);
+    source = {...source, lines};
+    expect(await controller.refresh()).toMatchObject({status: "active"});
   } finally { store.close(); }
 });

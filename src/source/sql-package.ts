@@ -41,16 +41,27 @@ export async function prepareMonthlyEstimate(config: SqlServerConfig, month: str
       const bytes = writeRawEstimatePackage(snapshot, config.lineage, randomUUID());
       return {bytes, ...window, counts: {headers: snapshot.headers.length, lines: snapshot.lines.length, products: snapshot.products?.length ?? 0}};
     } catch (error) {
-      if (span === 1 || !sizeLimit(error)) throw error;
+      if (!sizeLimit(error)) throw error;
+      if (span === 1) throw options.clamp ? new Error("SOURCE_TOO_LARGE") : error;
     }
   }
 }
 
+// The window span (months) the last live refresh managed to read, per connection. A refresh starts from it instead of retrying sizes that already exceeded the package bounds.
+let remembered: {key: string; span: number} | undefined;
+const connectionKey = (config: SqlServerConfig) => JSON.stringify([config.server, config.port, config.database, config.user, config.password, config.trustServerCertificate, config.scope, config.lineage, config.expectedDatabaseId, config.from, config.to]);
+
 /**
  * Live refresh: the same estimate package `npm run prepare:month` writes, for the newest month inside the
- * connection's bound that is not after today (local date).
+ * connection's bound that is not after today (local date). The window ends no later than today, so the current
+ * month is a partial month. Starts from the span that worked last time for this connection.
  */
 export async function prepareLiveEstimate(config: SqlServerConfig, signal?: AbortSignal, today = localDate()): Promise<Uint8Array> {
   const month = latestLiveMonth(config, today);
-  return (await prepareMonthlyEstimate(config, month, MAX_MONTHS, signal, {clamp: true})).bytes;
+  const bound = {...config, to: config.to < today ? config.to : today};
+  const key = connectionKey(config);
+  const start = remembered?.key === key ? remembered.span : MAX_MONTHS;
+  const prepared = await prepareMonthlyEstimate(bound, month, start, signal, {clamp: true});
+  remembered = {key, span: prepared.months};
+  return prepared.bytes;
 }
