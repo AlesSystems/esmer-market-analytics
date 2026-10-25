@@ -19,7 +19,8 @@ Veri paketi, size hazırlanan aylık bir dosyadır (`.json`). Altan her ay hazı
 ## Her ay yenileme
 
 - **Paketle:** Altan yeni ayın dosyasını verir. Aynı yoldan içe aktarın. Yeni paket eskisinin yerini alır. Giderleriniz, ayarlarınız ve kayıtlı raporlarınız silinmez.
-- **Canlı bağlantı ile:** Ayarlar içindeki **Canlı bağlantı** açıksa uygulama veriyi doğrudan okur. Bu seçenek kapalı gelir. Açmak için Altan'ın yardımı gerekir.
+- **Canlı bağlantı ile:** Ayarlar içindeki **Canlı bağlantı** kutusunda **Şimdi yenile** uygulamanın kaynağı yalnızca okuyarak o ayın tahminini yeniden hazırlamasını sağlar. Bağlantıyı kapatmak veya değiştirmek için aynı kutudaki **Bağlantı ayarı** bölümünü açın. Bu seçenek kapalı gelir ve kurulumu için Altan'ın yardımı gerekir. Canlı okuma maliyet sütununu da okur; üretimde kullanımı için Eralp'in onayı beklenir.
+- Eski türde (analiz) paketler artık kabul edilmez: "Bu paket türü artık desteklenmiyor." Son geçerli verileriniz korunur. Altan'dan yeni aylık paket isteyin.
 
 Rakamlar kayıtlı satıştan yapılan bir **tahmindir**; kesinleşmiş kâr değildir.
 
