@@ -1,0 +1,2047 @@
+{
+  "v1": {
+    "calculationVersion": "monthly-calc-v1",
+    "evidence": [
+      "package:24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+      "esmer-market:monthly-v1"
+    ],
+    "id": "legacy-v1-fixture",
+    "output": {
+      "report": {
+        "appEvidence": [],
+        "calculations": {
+          "costs": "synthetic-cost-calc-v1",
+          "operating": "synthetic-operating-calc-v1",
+          "purchasing": "synthetic-purchasing-calc-v1",
+          "report": "monthly-calc-v1",
+          "sales": "synthetic-sales-calc-v1"
+        },
+        "context": {
+          "appRevision": 0,
+          "calculationVersion": "synthetic-sales-calc-v1",
+          "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+          "period": "2025-09",
+          "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+        },
+        "format": "monthly-report-v1",
+        "id": "legacy-v1-fixture",
+        "operating": {
+          "calculationVersion": "synthetic-operating-calc-v1",
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "expenseRecords": [],
+          "expenseRevision": 0,
+          "gross": {
+            "confidence": "estimated",
+            "costCoveragePercent": "50",
+            "covered": [
+              {
+                "cost": "60",
+                "documentId": "S1",
+                "evidence": "historical-evidence",
+                "lineId": "L1",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": null,
+                "unit": "piece"
+              }
+            ],
+            "coveredCost": "60",
+            "coveredGrossProfit": "40",
+            "coveredMarginPercent": "40",
+            "coveredSales": "100",
+            "excluded": [
+              {
+                "cost": null,
+                "documentId": "S2",
+                "evidence": null,
+                "lineId": "L2",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": "MISSING_COST",
+                "unit": "piece"
+              }
+            ],
+            "exposures": {
+              "coveredReturns": "0",
+              "coveredSales": "100",
+              "excludedReturns": "0",
+              "excludedSales": "100"
+            },
+            "method": "historical-last-purchase-estimate",
+            "status": "ready",
+            "warnings": [
+              "MISSING_COST"
+            ]
+          },
+          "grossCalculationVersion": "synthetic-cost-calc-v1",
+          "result": {
+            "breakdown": {
+              "labour": "0",
+              "operatingExpense": "0",
+              "separateLoss": "0"
+            },
+            "breakdownCoverage": {
+              "labour": "missing",
+              "operatingExpense": "missing",
+              "separateLoss": "missing"
+            },
+            "excluded": [],
+            "expenses": "0",
+            "headline": "Faaliyet kârı hesaplanamıyor — gider verileri eksik.",
+            "payments": "0",
+            "reasons": [
+              "EXPENSES_INCOMPLETE",
+              "GROSS_INCOMPLETE"
+            ],
+            "status": "unavailable",
+            "value": null
+          },
+          "stale": false,
+          "status": "operating"
+        },
+        "purchasing": {
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "costCalculationVersion": "synthetic-cost-calc-v1",
+          "coverage": "complete",
+          "cutoff": "2025-09-30",
+          "evidence": {
+            "documents": [
+              {
+                "date": "2025-09-01",
+                "id": "S1",
+                "kind": "sale",
+                "purchasing": null,
+                "sales": {
+                  "convertedTo": null,
+                  "gross": "105",
+                  "net": "100",
+                  "state": "completed",
+                  "tax": "5"
+                },
+                "supplierId": null
+              },
+              {
+                "date": "2025-09-01",
+                "id": "S2",
+                "kind": "sale",
+                "purchasing": null,
+                "sales": {
+                  "convertedTo": null,
+                  "gross": "105",
+                  "net": "100",
+                  "state": "completed",
+                  "tax": "5"
+                },
+                "supplierId": null
+              }
+            ],
+            "lines": [
+              {
+                "business": {
+                  "historicalCost": {
+                    "documentedZero": false,
+                    "evidence": "historical-evidence",
+                    "originalSaleLineId": null,
+                    "taxBasis": "net",
+                    "unit": "piece",
+                    "unitCost": "60"
+                  },
+                  "inventory": null
+                },
+                "cost": null,
+                "documentId": "S1",
+                "id": "L1",
+                "net": "100",
+                "quantity": "1",
+                "sales": {
+                  "categoryId": "drinks",
+                  "categoryName": "İçecekler",
+                  "discountRate": "0",
+                  "gross": "105",
+                  "meaning": "known",
+                  "productId": "water",
+                  "productName": "İçme suyu",
+                  "tax": "5",
+                  "taxRate": "5",
+                  "unit": "piece",
+                  "unitNet": "100"
+                }
+              },
+              {
+                "business": {
+                  "historicalCost": null,
+                  "inventory": null
+                },
+                "cost": null,
+                "documentId": "S2",
+                "id": "L2",
+                "net": "100",
+                "quantity": "1",
+                "sales": {
+                  "categoryId": "drinks",
+                  "categoryName": "İçecekler",
+                  "discountRate": "0",
+                  "gross": "105",
+                  "meaning": "known",
+                  "productId": "water",
+                  "productName": "İçme suyu",
+                  "tax": "5",
+                  "taxRate": "5",
+                  "unit": "piece",
+                  "unitNet": "100"
+                }
+              }
+            ]
+          },
+          "extractionId": "business-1",
+          "from": "2025-09-01",
+          "gross": {
+            "confidence": "estimated",
+            "costCoveragePercent": "50",
+            "covered": [
+              {
+                "cost": "60",
+                "documentId": "S1",
+                "evidence": "historical-evidence",
+                "lineId": "L1",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": null,
+                "unit": "piece"
+              }
+            ],
+            "coveredCost": "60",
+            "coveredGrossProfit": "40",
+            "coveredMarginPercent": "40",
+            "coveredSales": "100",
+            "excluded": [
+              {
+                "cost": null,
+                "documentId": "S2",
+                "evidence": null,
+                "lineId": "L2",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": "MISSING_COST",
+                "unit": "piece"
+              }
+            ],
+            "exposures": {
+              "coveredReturns": "0",
+              "coveredSales": "100",
+              "excludedReturns": "0",
+              "excludedSales": "100"
+            },
+            "method": "historical-last-purchase-estimate",
+            "status": "ready",
+            "warnings": [
+              "MISSING_COST"
+            ]
+          },
+          "lineage": "business-fixture",
+          "mappingVersion": "synthetic-business-v1",
+          "purchasing": {
+            "exclusions": [],
+            "history": [],
+            "inventory": [],
+            "replacements": [],
+            "status": "ready",
+            "supplierReturns": [],
+            "warnings": [
+              "INVENTORY_UNAVAILABLE",
+              "SPARSE_WASTE_RECORDING"
+            ]
+          },
+          "purchasingCalculationVersion": "synthetic-purchasing-calc-v1",
+          "stale": false,
+          "to": "2025-09-30"
+        },
+        "review": {
+          "acceptedAt": "2025-10-01T00:00:00.000Z",
+          "previousAcceptedId": null,
+          "reason": "Sentetik eski sürüm"
+        },
+        "rules": {
+          "artifact": "esmer-market:monthly-v1",
+          "conventions": [
+            "Sales: signed customer returns; completed sale-document basket denominator",
+            "Comparisons: matched covered days; positive denominators only",
+            "Cost: covered historical last-purchase estimate, no replacement fallback",
+            "Operating: incurred date, classified costs, reviewed completeness",
+            "Percentages: 2 decimal places; source and calculation values retain precision"
+          ],
+          "decimalPrecision": 100,
+          "rounding": "ROUND_HALF_UP"
+        },
+        "sales": {
+          "categories": [
+            {
+              "id": "drinks",
+              "name": "İçecekler",
+              "netSales": "200",
+              "previousMonthChange": null,
+              "quantities": {
+                "kg": "0",
+                "piece": "2"
+              },
+              "share": "100"
+            }
+          ],
+          "comparisons": {
+            "month": {
+              "available": false,
+              "basketChange": null,
+              "currentFrom": "2025-09-01",
+              "currentTo": "2025-09-30",
+              "from": "2025-08-01",
+              "netChange": null,
+              "netSales": null,
+              "quantityChange": {
+                "kg": null,
+                "piece": null
+              },
+              "to": "2025-08-31",
+              "transactionChange": null
+            },
+            "year": {
+              "available": false,
+              "basketChange": null,
+              "currentFrom": "2025-09-01",
+              "currentTo": "2025-09-30",
+              "from": "2024-09-01",
+              "netChange": null,
+              "netSales": null,
+              "quantityChange": {
+                "kg": null,
+                "piece": null
+              },
+              "to": "2024-09-30",
+              "transactionChange": null
+            }
+          },
+          "complete": true,
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "coverage": "complete",
+          "cutoff": "2025-09-30",
+          "daily": [
+            {
+              "date": "2025-09-01",
+              "height": "100",
+              "negative": false,
+              "netSales": "200"
+            }
+          ],
+          "exclusions": [],
+          "extractedAt": "2025-10-01T00:00:00.000Z",
+          "filters": {
+            "categoryId": null,
+            "kind": "all",
+            "productId": null,
+            "search": ""
+          },
+          "from": "2025-09-01",
+          "importedAt": "2026-10-25T18:21:20.660Z",
+          "mappingVersion": "synthetic-business-v1",
+          "metrics": {
+            "averageBasket": "100",
+            "basketNumerator": "200",
+            "gross": "210",
+            "netSales": "200",
+            "quantities": {
+              "kg": "0",
+              "piece": "2"
+            },
+            "saleDocumentCount": 2,
+            "tax": "10"
+          },
+          "products": [
+            {
+              "categoryId": "drinks",
+              "id": "water",
+              "name": "İçme suyu",
+              "netSales": "200",
+              "previousMonthChange": null,
+              "quantities": {
+                "kg": "0",
+                "piece": "2"
+              },
+              "share": "100"
+            }
+          ],
+          "stale": false,
+          "to": "2025-09-30",
+          "transactions": [
+            {
+              "date": "2025-09-01",
+              "documentId": "S1",
+              "gross": "105",
+              "kind": "sale",
+              "net": "100",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "tax": "5"
+              },
+              "scopeNet": "100",
+              "tax": "5"
+            },
+            {
+              "date": "2025-09-01",
+              "documentId": "S2",
+              "gross": "105",
+              "kind": "sale",
+              "net": "100",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "tax": "5"
+              },
+              "scopeNet": "100",
+              "tax": "5"
+            }
+          ],
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "MISSING_COST"
+          ]
+        },
+        "salesEvidence": {
+          "components": [
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "date": "2025-09-01",
+              "documentId": "S1",
+              "expectedTax": "5",
+              "gross": "105",
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L1",
+              "net": "100",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            },
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "date": "2025-09-01",
+              "documentId": "S2",
+              "expectedTax": "5",
+              "gross": "105",
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L2",
+              "net": "100",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            }
+          ],
+          "documents": [
+            {
+              "date": "2025-09-01",
+              "id": "S1",
+              "kind": "sale",
+              "purchasing": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "supplierId": null
+            },
+            {
+              "date": "2025-09-01",
+              "id": "S2",
+              "kind": "sale",
+              "purchasing": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "supplierId": null
+            }
+          ],
+          "lines": [
+            {
+              "business": {
+                "historicalCost": {
+                  "documentedZero": false,
+                  "evidence": "historical-evidence",
+                  "originalSaleLineId": null,
+                  "taxBasis": "net",
+                  "unit": "piece",
+                  "unitCost": "60"
+                },
+                "inventory": null
+              },
+              "cost": null,
+              "documentId": "S1",
+              "id": "L1",
+              "net": "100",
+              "quantity": "1",
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              }
+            },
+            {
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              },
+              "cost": null,
+              "documentId": "S2",
+              "id": "L2",
+              "net": "100",
+              "quantity": "1",
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              }
+            }
+          ]
+        },
+        "state": "provisional"
+      }
+    },
+    "pin": {
+      "appRevision": 0,
+      "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13"
+    }
+  },
+  "v2": {
+    "calculationVersion": "monthly-report-calc-v2",
+    "evidence": [
+      "package:24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+      "esmer-market:monthly-v2"
+    ],
+    "id": "5963914e-49ed-489d-892c-37f4aa165676",
+    "output": {
+      "report": {
+        "appEvidence": [],
+        "calculations": {
+          "costs": "synthetic-cost-calc-v1",
+          "operating": "synthetic-operating-calc-v1",
+          "purchasing": "synthetic-purchasing-calc-v1",
+          "report": "monthly-report-calc-v2",
+          "sales": "synthetic-sales-calc-v1"
+        },
+        "context": {
+          "appRevision": 0,
+          "calculationVersion": "synthetic-sales-calc-v1",
+          "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+          "period": "2025-09",
+          "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+        },
+        "format": "monthly-report-v2",
+        "id": "5963914e-49ed-489d-892c-37f4aa165676",
+        "operating": {
+          "calculationVersion": "synthetic-operating-calc-v1",
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "expenseRecords": [],
+          "expenseRevision": 0,
+          "gross": {
+            "confidence": "estimated",
+            "costCoveragePercent": "50",
+            "covered": [
+              {
+                "cost": "60",
+                "documentId": "S1",
+                "evidence": "historical-evidence",
+                "lineId": "L1",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": null,
+                "unit": "piece"
+              }
+            ],
+            "coveredCost": "60",
+            "coveredGrossProfit": "40",
+            "coveredMarginPercent": "40",
+            "coveredSales": "100",
+            "excluded": [
+              {
+                "cost": null,
+                "documentId": "S2",
+                "evidence": null,
+                "lineId": "L2",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": "MISSING_COST",
+                "unit": "piece"
+              }
+            ],
+            "exposures": {
+              "coveredReturns": "0",
+              "coveredSales": "100",
+              "excludedReturns": "0",
+              "excludedSales": "100"
+            },
+            "method": "historical-last-purchase-estimate",
+            "status": "ready",
+            "warnings": [
+              "MISSING_COST"
+            ]
+          },
+          "grossCalculationVersion": "synthetic-cost-calc-v1",
+          "result": {
+            "breakdown": {
+              "labour": "0",
+              "operatingExpense": "0",
+              "separateLoss": "0"
+            },
+            "breakdownCoverage": {
+              "labour": "missing",
+              "operatingExpense": "missing",
+              "separateLoss": "missing"
+            },
+            "excluded": [],
+            "expenses": "0",
+            "headline": "Faaliyet kârı hesaplanamıyor — gider verileri eksik.",
+            "payments": "0",
+            "reasons": [
+              "EXPENSES_INCOMPLETE",
+              "GROSS_INCOMPLETE"
+            ],
+            "status": "unavailable",
+            "value": null
+          },
+          "stale": false,
+          "status": "operating"
+        },
+        "productProfit": {
+          "daily": [
+            {
+              "costCoveragePercent": "50",
+              "coveredCost": "60",
+              "coveredCount": 1,
+              "coveredGrossProfit": "40",
+              "coveredMarginPercent": "40",
+              "coveredSales": "100",
+              "date": "2025-09-01",
+              "excludedCount": 1,
+              "exclusionReasons": [
+                "MISSING_COST"
+              ],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "100",
+                "excludedReturns": "0",
+                "excludedSales": "100"
+              },
+              "netSales": "200",
+              "quantities": [
+                {
+                  "net": "2",
+                  "returned": "0",
+                  "sold": "2",
+                  "unit": "piece"
+                }
+              ],
+              "sourceCoverage": "complete",
+              "status": "ready",
+              "trend": "40"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-02",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-03",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-04",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-05",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-06",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-07",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-08",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-09",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-10",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-11",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-12",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-13",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-14",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-15",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-16",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-17",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-18",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-19",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-20",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-21",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-22",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-23",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-24",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-25",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-26",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-27",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-28",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-29",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            },
+            {
+              "costCoveragePercent": null,
+              "coveredCost": null,
+              "coveredCount": 0,
+              "coveredGrossProfit": null,
+              "coveredMarginPercent": null,
+              "coveredSales": "0",
+              "date": "2025-09-30",
+              "excludedCount": 0,
+              "exclusionReasons": [],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "0",
+                "excludedReturns": "0",
+                "excludedSales": "0"
+              },
+              "netSales": "0",
+              "quantities": [],
+              "sourceCoverage": "complete",
+              "status": "empty",
+              "trend": "0"
+            }
+          ],
+          "lineage": "business-fixture",
+          "lines": [
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "cost": "60",
+              "costEvidence": "historical-evidence",
+              "costReason": null,
+              "date": "2025-09-01",
+              "documentId": "S1",
+              "expectedTax": "5",
+              "gross": "105",
+              "historicalUnitCost": "60",
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L1",
+              "net": "100",
+              "originalSaleLineId": null,
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            },
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "cost": null,
+              "costEvidence": null,
+              "costReason": "MISSING_COST",
+              "date": "2025-09-01",
+              "documentId": "S2",
+              "expectedTax": "5",
+              "gross": "105",
+              "historicalUnitCost": null,
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L2",
+              "net": "100",
+              "originalSaleLineId": null,
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            }
+          ],
+          "period": "2025-09",
+          "products": [
+            {
+              "costCoveragePercent": "50",
+              "coveredCost": "60",
+              "coveredCount": 1,
+              "coveredGrossProfit": "40",
+              "coveredMarginPercent": "40",
+              "coveredSales": "100",
+              "displayName": "İçme suyu",
+              "displayStatus": "approved",
+              "excludedCount": 1,
+              "exclusionReasons": [
+                "MISSING_COST"
+              ],
+              "exposures": {
+                "coveredReturns": "0",
+                "coveredSales": "100",
+                "excludedReturns": "0",
+                "excludedSales": "100"
+              },
+              "netSales": "200",
+              "productId": "water",
+              "quantities": [
+                {
+                  "net": "2",
+                  "returned": "0",
+                  "sold": "2",
+                  "unit": "piece"
+                }
+              ]
+            }
+          ],
+          "sourceExclusions": [],
+          "summary": {
+            "costCoveragePercent": "50",
+            "coveredCost": "60",
+            "coveredCount": 1,
+            "coveredGrossProfit": "40",
+            "coveredMarginPercent": "40",
+            "coveredSales": "100",
+            "excludedCount": 1,
+            "exclusionReasons": [
+              "MISSING_COST"
+            ],
+            "exposures": {
+              "coveredReturns": "0",
+              "coveredSales": "100",
+              "excludedReturns": "0",
+              "excludedSales": "100"
+            },
+            "netSales": "200",
+            "periodCoverage": {
+              "complete": true,
+              "from": "2025-09-01",
+              "to": "2025-09-30"
+            },
+            "quantities": [
+              {
+                "net": "2",
+                "returned": "0",
+                "sold": "2",
+                "unit": "piece"
+              }
+            ],
+            "salesCoverage": {
+              "complete": true,
+              "exposure": "0",
+              "unresolvedCount": 0
+            },
+            "scope": "covered",
+            "status": "ready",
+            "warnings": [
+              "MISSING_COST"
+            ]
+          },
+          "version": "monthly-product-profit-v1"
+        },
+        "purchasing": {
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "costCalculationVersion": "synthetic-cost-calc-v1",
+          "coverage": "complete",
+          "cutoff": "2025-09-30",
+          "evidence": {
+            "documents": [
+              {
+                "date": "2025-09-01",
+                "id": "S1",
+                "kind": "sale",
+                "purchasing": null,
+                "sales": {
+                  "convertedTo": null,
+                  "gross": "105",
+                  "net": "100",
+                  "state": "completed",
+                  "tax": "5"
+                },
+                "supplierId": null
+              },
+              {
+                "date": "2025-09-01",
+                "id": "S2",
+                "kind": "sale",
+                "purchasing": null,
+                "sales": {
+                  "convertedTo": null,
+                  "gross": "105",
+                  "net": "100",
+                  "state": "completed",
+                  "tax": "5"
+                },
+                "supplierId": null
+              }
+            ],
+            "lines": [
+              {
+                "business": {
+                  "historicalCost": {
+                    "documentedZero": false,
+                    "evidence": "historical-evidence",
+                    "originalSaleLineId": null,
+                    "taxBasis": "net",
+                    "unit": "piece",
+                    "unitCost": "60"
+                  },
+                  "inventory": null
+                },
+                "cost": null,
+                "documentId": "S1",
+                "id": "L1",
+                "net": "100",
+                "quantity": "1",
+                "sales": {
+                  "categoryId": "drinks",
+                  "categoryName": "İçecekler",
+                  "discountRate": "0",
+                  "gross": "105",
+                  "meaning": "known",
+                  "productId": "water",
+                  "productName": "İçme suyu",
+                  "tax": "5",
+                  "taxRate": "5",
+                  "unit": "piece",
+                  "unitNet": "100"
+                }
+              },
+              {
+                "business": {
+                  "historicalCost": null,
+                  "inventory": null
+                },
+                "cost": null,
+                "documentId": "S2",
+                "id": "L2",
+                "net": "100",
+                "quantity": "1",
+                "sales": {
+                  "categoryId": "drinks",
+                  "categoryName": "İçecekler",
+                  "discountRate": "0",
+                  "gross": "105",
+                  "meaning": "known",
+                  "productId": "water",
+                  "productName": "İçme suyu",
+                  "tax": "5",
+                  "taxRate": "5",
+                  "unit": "piece",
+                  "unitNet": "100"
+                }
+              }
+            ]
+          },
+          "extractionId": "business-1",
+          "from": "2025-09-01",
+          "gross": {
+            "confidence": "estimated",
+            "costCoveragePercent": "50",
+            "covered": [
+              {
+                "cost": "60",
+                "documentId": "S1",
+                "evidence": "historical-evidence",
+                "lineId": "L1",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": null,
+                "unit": "piece"
+              }
+            ],
+            "coveredCost": "60",
+            "coveredGrossProfit": "40",
+            "coveredMarginPercent": "40",
+            "coveredSales": "100",
+            "excluded": [
+              {
+                "cost": null,
+                "documentId": "S2",
+                "evidence": null,
+                "lineId": "L2",
+                "net": "100",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "quantity": "1",
+                "reason": "MISSING_COST",
+                "unit": "piece"
+              }
+            ],
+            "exposures": {
+              "coveredReturns": "0",
+              "coveredSales": "100",
+              "excludedReturns": "0",
+              "excludedSales": "100"
+            },
+            "method": "historical-last-purchase-estimate",
+            "status": "ready",
+            "warnings": [
+              "MISSING_COST"
+            ]
+          },
+          "lineage": "business-fixture",
+          "mappingVersion": "synthetic-business-v1",
+          "purchasing": {
+            "exclusions": [],
+            "history": [],
+            "inventory": [],
+            "replacements": [],
+            "status": "ready",
+            "supplierReturns": [],
+            "warnings": [
+              "INVENTORY_UNAVAILABLE",
+              "SPARSE_WASTE_RECORDING"
+            ]
+          },
+          "purchasingCalculationVersion": "synthetic-purchasing-calc-v1",
+          "stale": false,
+          "to": "2025-09-30"
+        },
+        "review": {
+          "acceptedAt": "2026-10-25T18:21:20.672Z",
+          "previousAcceptedId": "legacy-v1-fixture",
+          "reason": "Yeni sentetik sürüm"
+        },
+        "rules": {
+          "artifact": "esmer-market:monthly-v2",
+          "conventions": [
+            "Sales: signed customer returns; completed sale-document basket denominator",
+            "Comparisons: matched covered days; positive denominators only",
+            "Cost: covered historical last-purchase estimate, no replacement fallback",
+            "Operating: incurred date, classified costs, reviewed completeness",
+            "Percentages: 2 decimal places; source and calculation values retain precision"
+          ],
+          "decimalPrecision": 100,
+          "rounding": "ROUND_HALF_UP"
+        },
+        "sales": {
+          "categories": [
+            {
+              "id": "drinks",
+              "name": "İçecekler",
+              "netSales": "200",
+              "previousMonthChange": null,
+              "quantities": {
+                "kg": "0",
+                "piece": "2"
+              },
+              "share": "100"
+            }
+          ],
+          "comparisons": {
+            "month": {
+              "available": false,
+              "basketChange": null,
+              "currentFrom": "2025-09-01",
+              "currentTo": "2025-09-30",
+              "from": "2025-08-01",
+              "netChange": null,
+              "netSales": null,
+              "quantityChange": {
+                "kg": null,
+                "piece": null
+              },
+              "to": "2025-08-31",
+              "transactionChange": null
+            },
+            "year": {
+              "available": false,
+              "basketChange": null,
+              "currentFrom": "2025-09-01",
+              "currentTo": "2025-09-30",
+              "from": "2024-09-01",
+              "netChange": null,
+              "netSales": null,
+              "quantityChange": {
+                "kg": null,
+                "piece": null
+              },
+              "to": "2024-09-30",
+              "transactionChange": null
+            }
+          },
+          "complete": true,
+          "context": {
+            "appRevision": 0,
+            "calculationVersion": "synthetic-sales-calc-v1",
+            "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13",
+            "period": "2025-09",
+            "sessionId": "a84ffb89-3b72-4319-9d98-2e6bff2af864"
+          },
+          "coverage": "complete",
+          "cutoff": "2025-09-30",
+          "daily": [
+            {
+              "date": "2025-09-01",
+              "height": "100",
+              "negative": false,
+              "netSales": "200"
+            }
+          ],
+          "exclusions": [],
+          "extractedAt": "2025-10-01T00:00:00.000Z",
+          "filters": {
+            "categoryId": null,
+            "kind": "all",
+            "productId": null,
+            "search": ""
+          },
+          "from": "2025-09-01",
+          "importedAt": "2026-10-25T18:21:20.660Z",
+          "mappingVersion": "synthetic-business-v1",
+          "metrics": {
+            "averageBasket": "100",
+            "basketNumerator": "200",
+            "gross": "210",
+            "netSales": "200",
+            "quantities": {
+              "kg": "0",
+              "piece": "2"
+            },
+            "saleDocumentCount": 2,
+            "tax": "10"
+          },
+          "products": [
+            {
+              "categoryId": "drinks",
+              "id": "water",
+              "name": "İçme suyu",
+              "netSales": "200",
+              "previousMonthChange": null,
+              "quantities": {
+                "kg": "0",
+                "piece": "2"
+              },
+              "share": "100"
+            }
+          ],
+          "stale": false,
+          "to": "2025-09-30",
+          "transactions": [
+            {
+              "date": "2025-09-01",
+              "documentId": "S1",
+              "gross": "105",
+              "kind": "sale",
+              "net": "100",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "tax": "5"
+              },
+              "scopeNet": "100",
+              "tax": "5"
+            },
+            {
+              "date": "2025-09-01",
+              "documentId": "S2",
+              "gross": "105",
+              "kind": "sale",
+              "net": "100",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "tax": "5"
+              },
+              "scopeNet": "100",
+              "tax": "5"
+            }
+          ],
+          "warnings": [
+            "SYNTHETIC_ONLY",
+            "MISSING_COST"
+          ]
+        },
+        "salesEvidence": {
+          "components": [
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "date": "2025-09-01",
+              "documentId": "S1",
+              "expectedTax": "5",
+              "gross": "105",
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L1",
+              "net": "100",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            },
+            {
+              "categoryId": "drinks",
+              "categoryName": "İçecekler",
+              "date": "2025-09-01",
+              "documentId": "S2",
+              "expectedTax": "5",
+              "gross": "105",
+              "input": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              },
+              "kind": "sale",
+              "lineId": "L2",
+              "net": "100",
+              "productId": "water",
+              "productName": "İçme suyu",
+              "quantity": "1",
+              "reconciled": true,
+              "recorded": {
+                "gross": "105",
+                "net": "100",
+                "quantity": "1",
+                "tax": "5"
+              },
+              "tax": "5",
+              "unit": "piece"
+            }
+          ],
+          "documents": [
+            {
+              "date": "2025-09-01",
+              "id": "S1",
+              "kind": "sale",
+              "purchasing": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "supplierId": null
+            },
+            {
+              "date": "2025-09-01",
+              "id": "S2",
+              "kind": "sale",
+              "purchasing": null,
+              "sales": {
+                "convertedTo": null,
+                "gross": "105",
+                "net": "100",
+                "state": "completed",
+                "tax": "5"
+              },
+              "supplierId": null
+            }
+          ],
+          "lines": [
+            {
+              "business": {
+                "historicalCost": {
+                  "documentedZero": false,
+                  "evidence": "historical-evidence",
+                  "originalSaleLineId": null,
+                  "taxBasis": "net",
+                  "unit": "piece",
+                  "unitCost": "60"
+                },
+                "inventory": null
+              },
+              "cost": null,
+              "documentId": "S1",
+              "id": "L1",
+              "net": "100",
+              "quantity": "1",
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              }
+            },
+            {
+              "business": {
+                "historicalCost": null,
+                "inventory": null
+              },
+              "cost": null,
+              "documentId": "S2",
+              "id": "L2",
+              "net": "100",
+              "quantity": "1",
+              "sales": {
+                "categoryId": "drinks",
+                "categoryName": "İçecekler",
+                "discountRate": "0",
+                "gross": "105",
+                "meaning": "known",
+                "productId": "water",
+                "productName": "İçme suyu",
+                "tax": "5",
+                "taxRate": "5",
+                "unit": "piece",
+                "unitNet": "100"
+              }
+            }
+          ]
+        },
+        "state": "provisional"
+      }
+    },
+    "pin": {
+      "appRevision": 0,
+      "datasetId": "24c82b6fe8f8e97872403c885360ff2b091fa6eba492c092d239498eacda2d13"
+    }
+  }
+}
