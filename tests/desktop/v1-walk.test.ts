@@ -1,22 +1,24 @@
 import {test,expect,_electron as electron} from "@playwright/test";
-import {mkdtemp,mkdir,rm,writeFile,stat} from "node:fs/promises";
+import {mkdtemp,mkdir,rm,writeFile,readFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join,resolve} from "node:path";
+import {readSheet} from "read-excel-file/node";
 import {executablePath} from "../helpers/desktop-executable";
 import {openWorkspace,openSection,importPackage} from "../helpers/desktop-navigation";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
 
-// #108: the v1 owner walk on the packaged app, synthetic data only. Screenshots go to docs/evidence/one-ui/.
-test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",async()=>{
+// #108: the v1 owner walk on the packaged app, synthetic data only. Screenshots go to the test output dir; ESMER_CAPTURE_WALK=1 writes them to docs/evidence/one-ui/.
+const lira=(text:string)=>Number(text.replace(/[^\d,-]/g,"").replace(",","."));
+test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",async({},testInfo)=>{
  test.setTimeout(240_000);
- const shots=resolve("docs/evidence/one-ui");await mkdir(shots,{recursive:true});
+ const capture=process.env.ESMER_CAPTURE_WALK==="1",shots=capture?resolve("docs/evidence/one-ui"):testInfo.outputPath();await mkdir(shots,{recursive:true});
  const userData=await mkdtemp(join(tmpdir(),"v1-walk-")),file=join(userData,"synthetic-estimate.json"),output=join(userData,"rapor.xlsx");
  await writeFile(file,richEstimatePackage());
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   const page=await app.firstWindow();await openWorkspace(page);
   await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setContentSize(1440,900));
-  const shoot=async(name:string)=>{await page.locator(".app-body").focus();await page.waitForTimeout(700);await page.screenshot({path:join(shots,`v1-walk-${name}.png`)});};
+  const shoot=async(name:string)=>{await page.locator(".app-body").focus();await expect(page.locator(".app-body h1").first()).toBeAttached();await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:join(shots,`v1-walk-${name}.png`)});};
   // Import the synthetic package through Ayarlar.
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
   await importPackage(page);
@@ -58,7 +60,11 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",
   await expect(page.getByRole("heading",{name:"Onaylandı",exact:true})).toBeVisible();
   // Bu ay now carries the net profit (Ekim 2025 is a full month in the fixture).
   await openSection(page,"Bu ay");
-  await expect(page.getByText("143.100,00 ₺").first()).toBeVisible();
+  const tile=(name:string)=>page.locator(".month-figure").filter({has:page.getByRole("heading",{name,exact:true,level:2})}).locator("strong").first();
+  await expect(tile("Tahmini net kâr")).not.toContainText("Hesaplanamadı");
+  const gross=lira(await tile("Tahmini brüt kâr").innerText()),net=lira(await tile("Tahmini net kâr").innerText());
+  expect(Number.isFinite(gross)).toBe(true);
+  expect(net).toBeCloseTo(gross-1000,2);
   await expect(page.getByText("Bazı gider satırları net kârı engelliyor")).toHaveCount(0);
   await shoot("bu-ay-net");
   // Rapor ve Excel: export to a stubbed save path.
@@ -67,7 +73,9 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",
   await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);
   await page.getByRole("button",{name:"Excel’e aktar",exact:true}).click();
   await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.",{exact:true})).toBeVisible();
-  expect((await stat(output)).size).toBeGreaterThan(0);
+  const summary=await readSheet(await readFile(output),"Özet"),cell=(label:string)=>Number(summary.find(r=>r[0]===label)?.[1]);
+  expect(cell("Tahmini brüt kâr")).toBeCloseTo(gross,2);
+  expect(cell("Tahmini net kâr")).toBeCloseTo(net,2);
   await shoot("rapor-ve-excel");
   // Ayarlar: five tiles, then Bilinen sınırlar.
   await page.getByRole("button",{name:"Ayarlar",exact:true}).click();
@@ -76,5 +84,5 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",
   await page.getByRole("button",{name:"Bilinen sınırlar",exact:true}).click();
   await expect(page.getByRole("region",{name:"Bilinen sınırlar"})).toBeVisible();
   await shoot("ayarlar");
- }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true,maxRetries:5});}
 });
