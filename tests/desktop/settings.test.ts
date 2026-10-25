@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
 import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
+// Launch opens Bu ay (#103/#105); data import, SQL and recovery are reached through Ayarlar.
 import { openStore } from "../../src/store/store";
 
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin"
@@ -20,7 +21,7 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
     await expect(page.getByText("İşlemler", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Bağlantı ayarları", { exact: true })).toHaveCount(0);
 
@@ -47,13 +48,13 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
     await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
     await app.close();
 
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
     await openSettings(page);
     await expect(page.getByRole("radio", { name: "Büyük", exact: true })).toBeChecked();
@@ -82,9 +83,10 @@ test("a SQL import that cannot reach its source opens Ayarlar with the reason", 
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, sourceFile);
-    await page.getByRole("button", { name: "SQL kaynağını içe aktar", exact: true }).click();
+    await openSettings(page);
+    await page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("button", { name: "SQL kaynağını içe aktar", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Ayarlar", level: 1 })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("alert")).toHaveText("Kaynağa ulaşılamadı.", { timeout: 30_000 });
     await expect(page.getByRole("region", { name: "Canlı bağlantı" })).toContainText("Henüz geçerli yerel veri yok.");

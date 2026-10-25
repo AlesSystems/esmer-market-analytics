@@ -2,7 +2,7 @@ import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { businessPackage } from "../helpers/business-fixtures";
 import { purchasingJourney } from "../helpers/purchasing-journey";
 import { openStore } from "../../src/store/store";
@@ -15,7 +15,7 @@ test("purchasing inspection selects actual excluded cost evidence with plain key
  try {
   const page = await app.firstWindow();await openWorkspace(page);
   await app.evaluate(({ dialog }, file) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] }); }, path);
-  await importPackage(page); await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await importPackage(page); await openReportView(page, "Alış belgeleri");
   await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
   const inspector = page.getByRole("region", { name: "Maliyet kapsamı incelemesi" });
   await expect(inspector).toBeVisible();
@@ -28,7 +28,7 @@ test("purchasing inspection selects actual excluded cost evidence with plain key
   await inspector.getByRole("button", { name: /Satırı incele/ }).first().press("Enter");
   await expect(page.getByRole("region", { name: "Seçilen maliyet kanıtı" })).toContainText("Maliyet kanıtı eksik");
   await page.getByText("Bu sayı nasıl oluştu?", { exact: true }).press("Enter");
-  await expect(page.getByText("1 kapsanan / 1 dışlanan satır", { exact: false })).toBeVisible();
+  await expect(page.getByText("1 kapsanan / 1 dışlanan satır · Tutar kapsamı", { exact: false })).toBeVisible();
   await page.getByRole("button", { name: "Alış geçmişi", exact: true }).press("Enter");
   await page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true }).press("Enter");
   await expect(page.getByRole("button", { name: "Tedarikçi iadeleri", exact: true })).toHaveAttribute("aria-pressed", "true");
@@ -46,8 +46,7 @@ test("source purchasing remains raw evidence with keyboard controls without deco
  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
  try {
   const page = await app.firstWindow();await openWorkspace(page);
-  await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await openReportView(page, "Alış belgeleri");
   await expect(page.locator("canvas")).toHaveCount(0);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/purchasing/source-desktop.png" : testInfo.outputPath("source-desktop.png"), fullPage: true });
@@ -77,8 +76,8 @@ test("purchasing leads with cost coverage and replacement-cost charts that keep 
  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
  try {
   const page = await app.firstWindow();await openWorkspace(page);
-  await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
-  await page.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+  await page.locator(".sidebar").getByLabel("Dönem", { exact: true }).fill("2025-09");
+  await openReportView(page, "Alış belgeleri");
   await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true, level: 1 })).toBeVisible();
   const coverage = page.getByRole("img", { name: /Maliyeti kapsanan/ });
   await expect(coverage).toBeVisible();

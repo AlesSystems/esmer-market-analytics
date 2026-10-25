@@ -6,17 +6,17 @@ import { openStore } from "../../src/store/store";
 import { savePreferences } from "../../src/desktop/preferences";
 import { richBusinessPackage, seedRichExpenses } from "../helpers/rich-business-fixture";
 import { executablePath } from "../helpers/desktop-executable";
+import { openReportView, openWorkspace } from "../helpers/desktop-navigation";
 
-test("identical monthly preload reads and summary to sales navigation complete without busy",async()=>{
+test("identical monthly preload reads and Bu ay to sales navigation complete without busy",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"esmer-monthly-read-")),store=openStore(join(userData,"analytics.sqlite"));
  try {store.importPackage(richBusinessPackage());seedRichExpenses(store);}finally{store.close();}
  await savePreferences(userData,{selectedMonth:"2025-09",textSize:"normal"});
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
   const page=await app.firstWindow();
-  await expect(page.getByRole("heading",{name:"Marketinize bir bütün olarak bakın."})).toBeVisible();
-  await page.getByRole("button",{name:"Özeti aç",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Ay bir bakışta",exact:true})).toBeVisible();
+  await openWorkspace(page);
+  await expect(page.getByLabel("Dönem",{exact:true}).filter({visible:true})).toHaveValue("2025-09");
   await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
   const results=await page.evaluate(async()=>{
    const opened=await window.esmer.openSales({period:"2025-09"});
@@ -26,9 +26,9 @@ test("identical monthly preload reads and summary to sales navigation complete w
   expect(results).toMatchObject([{status:"monthly"},{status:"monthly"}]);
   expect(results[0]).toEqual(results[1]);
   await page.reload();
-  await page.getByRole("button",{name:"Özeti aç",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Ay bir bakışta",exact:true})).toBeVisible();
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Satışlar",exact:true}).click();
+  await openWorkspace(page);
+  await expect(page.getByLabel("Dönem",{exact:true}).filter({visible:true})).toHaveValue("2025-09");
+  await openReportView(page,"Veri ve kaynak");
   await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
   await expect(page.getByText("Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.",{exact:true})).toHaveCount(0);
   const chart=page.locator(".c-viz-profit:visible");

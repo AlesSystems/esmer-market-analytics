@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve, relative, isAbsolute } from "node:path";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { readRawPackage, writeRawPackage } from "../../src/source/raw-package";
-import {importPackage, openWorkspace } from "../helpers/desktop-navigation";
+import {importPackage, openWorkspace, openReportView } from "../helpers/desktop-navigation";
 
 test.use({trace: "off", video: "off", screenshot: "off"});
 
@@ -28,10 +28,13 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
   let app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
   try {
     let page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading",{name:"Henüz mali rapor verisi yok"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
     await app.evaluate(({dialog},path) => {dialog.showOpenDialog = async () => ({canceled:false,filePaths:[path]});},sourceFile);
     await importPackage(page);
-    await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+    // A raw preview is not an estimate package: Bu ay still asks for one, the records open under Veri ve kaynak.
+    await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
+    await openReportView(page,"Veri ve kaynak");
+    await expect(page.getByRole("heading",{name:"Veri ve kaynak",exact:true})).toBeVisible();
     const status = await page.evaluate(() => window.esmer.getAvailability());
     expect(status.status === "ready" && status.store === "empty").toBe(true);
     const countsMatch = await page.evaluate(async expected => {
@@ -46,12 +49,16 @@ for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : 
       await expect(page.getByText("51–60 / 60",{exact:true}).first()).toBeVisible();
       await writeFile(sourceFile,writeRawPackage(rawSnapshot(),"fixture:raw","batch-2"));
       await importPackage(page);
+      await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
+      await openReportView(page,"Veri ve kaynak");
+      await page.getByRole("button",{name:"Tüm kaynak belgeleri",exact:true}).click();
       await expect(page.getByRole("heading",{name:"Satışlar",exact:true})).toBeVisible();
       await expect(page.getByText("1–1 / 1",{exact:true}).first()).toBeVisible();
     }
     await app.close();
     app = await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]}); page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading",{name:"Aylık Market Özeti",exact:true})).toBeVisible();
+    await openReportView(page,"Veri ve kaynak");
+    await expect(page.getByRole("heading",{name:"Veri ve kaynak",exact:true})).toBeVisible();
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status:"live", live:{phase:"disabled"}});
   } finally {await app.close().catch(() => {}); await rm(userData,{recursive:true,force:true});}
 });

@@ -1,4 +1,5 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openReportView, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+// Recovery is reached through Ayarlar; after restore the app returns to Bu ay and reports live in Rapor ve Excel (#103/#105).
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { readSheet } from "read-excel-file/node";
@@ -58,6 +59,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
       dialog.showMessageBox = async () => ({response: 0, checkboxChecked: false});
     }, {backupPath, keyPath});
     const restored = await app.firstWindow();await openWorkspace(restored);
+    await openSettings(restored);
     await restored.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
     await restored.getByRole("button", {name: "Yedek ve anahtar seç"}).click();
     await expect(restored.getByRole("heading", {name: "Geri yükleme önizlemesi"})).toBeVisible();
@@ -67,11 +69,12 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(restored.locator(".brand")).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
-    await expect(restored.getByRole("heading", { name: "Verileriniz bu bilgisayarda hazır", exact: true })).toBeVisible();
-    await restored.getByLabel("Dönem", { exact: true }).fill("2025-09");
-    await expect(restored.getByRole("heading", {name: "Ay bir bakışta"})).toBeVisible();
+    await expect(restored.getByRole("navigation", {name: "Ana gezinme"}).getByRole("button", {name: "Bu ay", exact: true})).toHaveAttribute("aria-current", "page");
+    await expect(restored.getByRole("button", {name: "Aylık raporlara git", exact: true})).toBeVisible();
+    await restored.getByRole("textbox", {name: "Dönem", exact: true}).fill("2025-09");
+    await expect(restored.getByRole("textbox", {name: "Dönem", exact: true})).toHaveValue("2025-09");
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
-    await restored.getByRole("button", {name: "Raporlar"}).click();
+    await openReportView(restored, "Aylık rapor");
     await restored.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
     await restored.getByRole("button", {name: "Kaydedilmiş sürümü aç"}).click();
     await expect(restored.locator(".monthly-amount")).toHaveText("40,00 ₺");

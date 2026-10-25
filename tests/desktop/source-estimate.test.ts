@@ -1,4 +1,5 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, importPackage, openReportView } from "../helpers/desktop-navigation";
+import type {Page} from "@playwright/test";
 import {test,expect,_electron as electron} from "@playwright/test";
 import {mkdtemp,rm,writeFile,readFile,mkdir} from "node:fs/promises";
 import {tmpdir} from "node:os";
@@ -7,24 +8,32 @@ import {estimateSnapshot,estimatePackage} from "../helpers/estimate-fixture";
 import {rawSnapshot} from "../helpers/raw-fixture";
 import {writeRawPackage,writeRawEstimatePackage} from "../../src/source/raw-package";
 import {money} from "../../src/ui/format";
+/** Sidebar month picker (the embedded workspaces keep their own). */
+const month=(page:Page)=>page.locator(".sidebar").getByLabel("Dönem",{exact:true});
+/** Veri ve kaynak → source sales documents → the estimated product presentation (ranking and product table). */
+async function openEstimatedProducts(page:Page){
+ await openReportView(page,"Veri ve kaynak");
+ await page.getByRole("region",{name:"Kaynak kayıt göstergeleri",exact:true}).getByRole("button",{name:/Belge kaydı/}).click();
+ await page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Satışlar",level:1})).toBeVisible();
+}
 const executablePath=process.env.ESMER_EXECUTABLE??(process.platform==="darwin"?resolve(`release/mac${process.arch==="arm64"?"-arm64":""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`):process.platform==="win32"?resolve("release/win-unpacked/Esmer Market Analytics.exe"):resolve("release/linux-unpacked/esmer-market-analytics"));
 test("packaged estimated import shows loss, returns, exact scope, product drilldown and export offline",async({},testInfo)=>{
  const userData=await mkdtemp(join(tmpdir(),"estimate-desktop-")),file=join(userData,"estimate.json"),output=join(userData,"estimate.xlsx");const s=estimateSnapshot();s.headers.push({...s.headers[0],ID:"3",FIS_TURU:"12"});s.lines.push({...s.lines[0],ID:"4",FIS:"3",FIS_TURU:"12",TOPLAM_KDV_MATRAHI:"30"});await writeFile(file,estimatePackage(s));
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  let page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  let page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await importPackage(page);
+  await openReportView(page,"Aylık rapor");
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"});await expect(estimate.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();await expect(estimate.getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("-30,00 ₺",{exact:true}).first()).toBeVisible();await expect(estimate.getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
   await expect(page.locator(".viz-estimate")).toHaveCount(1);
-  await expect(estimate.getByRole("list",{name:"Satıştan katkıya köprü"})).toBeVisible();
   await expect(estimate.getByRole("group",{name:/günlük grafik/})).toBeVisible();
   await expect(estimate.getByRole("group",{name:/günlük grafik/}).locator('g[data-date="2025-10-20"] rect[data-state="out-of-range"]')).toHaveCount(1);
-  await expect(estimate.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"})).toBeVisible();
   await expect(estimate.getByText("Maliyet kapsamı",{exact:true}).first()).toBeVisible();
   await expect(estimate.getByText("katkıya dahil değil — sonucu yüksek gösterebilir",{exact:true})).toBeVisible();
   const screenshot=testInfo.outputPath("source-estimate.png");await page.screenshot({path:screenshot});
   const evidence=resolve("workstreams/estimated-v1/evidence");await mkdir(evidence,{recursive:true});if(process.env.ESMER_CAPTURE_EVIDENCE)await writeFile(join(evidence,"source-estimate.png"),await readFile(screenshot));
-  await page.getByRole("button",{name:"Satışlar",exact:true}).click();await page.getByLabel("Ürün kayıt ID’siyle ara",{exact:true}).fill("3");await page.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await page.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
-  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({webContents})=>{webContents.getAllWebContents().find(w=>w.getType()==="window")?.setZoomFactor(1.25);});
+  await openEstimatedProducts(page);await expect(estimate.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"})).toBeVisible();await estimate.getByRole("textbox",{name:"Ürün kayıt ID’siyle ara",exact:true}).fill("3");await estimate.getByRole("button",{name:"Tahmini ürünü ara",exact:true}).click();await expect(estimate.getByRole("button",{name:"Ürün #3",exact:true})).toBeVisible();await estimate.getByRole("button",{name:"Tüm tahmini ürünler",exact:true}).click();
+  await openReportView(page,"Aylık rapor");await app.evaluate(({webContents})=>{webContents.getAllWebContents().find(w=>w.getType()==="window")?.setZoomFactor(1.25);});
   await app.evaluate(({BrowserWindow})=>{BrowserWindow.getAllWindows()[0].setSize(680,800);});
   await estimate.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth)).toBe(true);
@@ -37,23 +46,23 @@ test("packaged estimated import shows loss, returns, exact scope, product drilld
   await estimate.getByText("Tahmin yöntemi ve kaynak sürümü",{exact:true}).click();
   await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setSize(1180,1000);window.webContents.setZoomFactor(1);});
   await page.getByRole("button",{name:"Ürün #3",exact:true}).click();await page.getByRole("button",{name:"1",exact:true}).click();await expect(page.getByRole("heading",{name:"Kaynak belge 1",exact:true})).toBeVisible();await expect(page.getByRole("columnheader",{name:"Tarihsel alış maliyeti adayı · doğrulanmadı",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);const exportButton=page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true});await exportButton.focus();await page.keyboard.press("Enter");await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();expect((await readFile(output)).byteLength).toBeGreaterThan(1000);
-  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await page.getByLabel("Dönem",{exact:true}).fill("2025-11");await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();
+  await openReportView(page,"Aylık rapor");await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);const exportButton=page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true});await exportButton.focus();await page.keyboard.press("Enter");await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();expect((await readFile(output)).byteLength).toBeGreaterThan(1000);
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Aylık rapor");await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();await month(page).fill("2025-11");await expect(page.getByRole("region",{name:"Kaynak tahmini"}).getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
-test("a product opened from the Özet ranking returns to Özet with focus on that row",async()=>{
+test("a product opened from the estimated product ranking returns to the ranking with focus on that row",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"estimate-rank-return-")),file=join(userData,"estimate.json");await writeFile(file,estimatePackage());
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await importPackage(page);
+  await openEstimatedProducts(page);
   const ranking=page.getByRole("list",{name:"Ürünlere göre tahmini satış katkısı sıralaması"});await expect(ranking).toBeVisible();
   const row=ranking.getByRole("button").first();await expect(row).toHaveAttribute("data-focus-key",/./);const key=await row.getAttribute("data-focus-key");
   await row.click();
-  await expect(page.getByRole("button",{name:"Özete dön",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Özete dön",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Aylık Market Özeti",level:1})).toBeVisible();
-  await expect(page.getByRole("heading",{name:"Satışlar",level:1})).toHaveCount(0);
+  await expect(ranking).toBeHidden();
+  await page.getByRole("button",{name:"Ürün tahminlerine dön",exact:true}).click();
+  await expect(ranking).toBeVisible();
   await expect(page.locator(`[data-focus-key="${key}"]`)).toBeFocused();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
@@ -61,13 +70,14 @@ test("a day with unknown-amount lines keeps a hatched segment and counts those r
  const userData=await mkdtemp(join(tmpdir(),"estimate-unknown-day-")),file=join(userData,"estimate.json");const s=estimateSnapshot();s.lines.push({...s.lines[0],ID:"9",TOPLAM_KDV_MATRAHI:null});await writeFile(file,estimatePackage(s));
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
-  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);await importPackage(page);
+  await openReportView(page,"Aylık rapor");
   const estimate=page.getByRole("region",{name:"Kaynak tahmini"}),chart=estimate.getByRole("group",{name:/günlük grafik/}),day=chart.locator('g[data-date="2025-10-01"]');
   await expect(day.locator('[data-key="unknownAmount"][data-state="unknown"]')).toHaveCount(1);
   await expect(day.locator('[data-state="value"]').first()).toBeVisible();
   await expect(chart.locator('g[data-date="2025-10-02"] [data-key="unknownAmount"]')).toHaveCount(0);
   await expect(estimate.locator(".viz-legend .viz-hatch").first()).toBeVisible();
-  await estimate.locator(".est-chart").filter({hasText:"Günlük tahmini katkı"}).getByRole("button",{name:"Tablo",exact:true}).click();
+  await estimate.locator(".est-chart").filter({hasText:"Günlük tahminler"}).getByRole("button",{name:"Tablo",exact:true}).click();
   const table=estimate.getByRole("table",{name:"Günlük tahminler"});
   await expect(table.getByRole("columnheader",{name:"Tutarı bilinmeyen satır",exact:true})).toBeVisible();
   await expect(table.getByRole("row").filter({hasText:"01.10.2025"}).getByRole("cell").last()).toHaveText("1");
@@ -85,7 +95,7 @@ test("private prepared estimate imports exports and restarts offline without rev
  try{
   let page=await app.firstWindow();await openWorkspace(page);
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},packagePath!);
-  await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  await importPackage(page);await openReportView(page,"Aylık rapor");
   const matches=async()=>{
    const region=page.getByRole("region",{name:"Kaynak tahmini"});
    await expect(region.getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();
@@ -93,10 +103,10 @@ test("private prepared estimate imports exports and restarts offline without rev
   };
   await expect.poll(matches).toBe(true);
   await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},exportPath!);
-  await page.getByRole("button",{name:"Raporlar",exact:true}).click();await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).click();
+  await openReportView(page,"Aylık rapor");await page.getByRole("button",{name:"Tahmini Excel olarak kaydet",exact:true}).click();
   await expect(page.getByText("Doğrulanmamış tahmin kaydedildi.",{exact:true})).toBeVisible();
   let exported=false;try{exported=(await readFile(exportPath!)).byteLength>1000;}catch{exported=false;}expect(exported).toBe(true);
-  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);await expect.poll(matches).toBe(true);
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Aylık rapor");await expect.poll(matches).toBe(true);
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
@@ -120,7 +130,7 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   const recovery=()=>region().getByRole("button",{name:"Veri paketi içe aktarmaya git",exact:true});
   const openRecovery=async()=>{await recovery().focus();await page.keyboard.press("Enter");await expect(page.getByRole("heading",{name:"Ayarlar",exact:true})).toBeFocused();};
   const importChosen=async()=>page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
-  await choose(previewFile);await importChosen();await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await choose(previewFile);await importPackage(page);await month(page).fill("2025-09");await openReportView(page,"Aylık rapor");
   await expect(recovery()).toBeVisible();
   await expect(region().getByText("Tahmin için maliyet adayı içeren veri paketi seçin.",{exact:true})).toBeVisible();
   await recovery().scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath("estimate-recovery.png")});
@@ -136,14 +146,16 @@ test("preview estimate recovery opens settings and restores a prepared estimate"
   await expect(page.getByRole("button",{name:"Veri paketi içe aktar",exact:true})).toBeEnabled();
   await page.getByRole("button",{name:"Ayarları kapat",exact:true}).click();await expect(recovery()).toBeVisible();
   await openRecovery();await choose(preparedFile);await importChosen();
+  // A successful import returns to Bu ay; the report keeps the chosen month.
+  await openReportView(page,"Aylık rapor");
   await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
-  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-09");await expect(recovery()).toHaveCount(0);
+  await expect(month(page)).toHaveValue("2025-09");await expect(recovery()).toHaveCount(0);
   await expect(region().getByText("Doğrulanmamış tahmin — net kâr değildir.",{exact:false})).toBeVisible();
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();await openWorkspace(page);
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
-  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await choose(previewFile);await importChosen();await page.getByRole("button",{name:"Raporlar",exact:true}).click();
+  await month(page).fill("2025-09");await openReportView(page,"Aylık rapor");await expect(region().getByText("-20,00 ₺",{exact:true}).first()).toBeVisible();
+  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await choose(previewFile);await importChosen();await openReportView(page,"Aylık rapor");
   await expect(recovery()).toBeVisible();await expect(region().getByText("-20,00 ₺",{exact:true})).toHaveCount(0);
-  await openRecovery();await choose(missingFile);await importChosen();
+  await openRecovery();await choose(missingFile);await importChosen();await openReportView(page,"Aylık rapor");
   await expect(region().getByRole("heading",{name:"Tahmini satış katkısı (kapsanan satırlar)",exact:true})).toBeVisible();
   await expect(region().getByText("Bilinmiyor",{exact:true}).first()).toBeVisible();await region().getByText("Maliyet kapsamı ve dışlanan satırlar",{exact:true}).click();await expect(region().getByText("Maliyet eksik: 1",{exact:true})).toBeVisible();await expect(recovery()).toHaveCount(0);
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}

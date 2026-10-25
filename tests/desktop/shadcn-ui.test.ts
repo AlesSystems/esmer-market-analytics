@@ -4,7 +4,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
-import {importPackage, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openReportView, openSection, openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { monthlyUiExpected, representativeMonthPackage, stressMonthPackage } from "../helpers/shadcn-fixtures";
 
@@ -15,9 +15,9 @@ test("forced colors keeps a keyboard focus outline on actions and period input",
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("heading", { name: "Ay bir bakışta", exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await page.emulateMedia({ forcedColors: "active" });
-    for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByLabel("Dönem", { exact: true })]) {
+    for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByLabel("Dönem", { exact: true }).filter({ visible: true })]) {
       await control.focus();
       await control.press("Tab");
       await page.keyboard.press("Shift+Tab");
@@ -93,9 +93,9 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await page.setViewportSize({ width: 1440, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
+    await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-09");
     await expect(page.locator(".data-status")).toContainText("30.09.2025");
     const overview = page.getByRole("region", { name: "Aylık göstergeler" });
     await expect(overview).toContainText(monthlyUiExpected.netSales);
@@ -128,9 +128,9 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
     await expect(evidence).toBeFocused();
     await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Özet", exact: true }).click();
-    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openSection(page, "Bu ay");
+    await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-09");
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
   } finally {
     await app.close();
@@ -146,7 +146,7 @@ test("long Turkish labels and a large amount remain usable in a paginated narrow
     await page.setViewportSize({ width: 453, height: 900 });
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Tüm ürünler", exact: true }).click();
@@ -175,11 +175,11 @@ test("packaged visual journey retains every destination and important desktop st
   try {
     const page = await app.firstWindow();await openWorkspace(page);
     await page.setViewportSize({ width: 1440, height: 900 });
-    await expect(page.getByRole("heading", { name: "Henüz mali rapor verisi yok" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("empty-1440.png"));
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
     const dismiss = page.getByRole("button", { name: "Bildirimi kapat" });
     if (await dismiss.isVisible()) await dismiss.click();
@@ -198,7 +198,7 @@ test("packaged visual journey retains every destination and important desktop st
     expect((focus.kind !== "none" && focus.width >= 2) || /\b3px\b/.test(focus.shadow), "keyboard focus has a visible outline or ring").toBe(true);
 
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
-    await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Satış Özeti", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("sales-summary.png"));
@@ -218,7 +218,7 @@ test("packaged visual journey retains every destination and important desktop st
     await page.getByRole("button", { name: "Satışlara dön", exact: true }).click();
     await expect(page.getByRole("button", { name: "UI01", exact: true })).toBeFocused();
 
-    await nav.getByRole("button", { name: "Alışlar ve maliyet", exact: true }).click();
+    await openReportView(page, "Alış belgeleri");
     await page.getByText("Maliyet kapsamı, alış geçmişi ve diğer araçlar", { exact: true }).click();
     await expect(page.getByRole("heading", { name: "Alışlar ve maliyet", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("purchasing-history.png"));
@@ -244,7 +244,7 @@ test("packaged visual journey retains every destination and important desktop st
     await expect(page.getByRole("region", { name: "Excel önizlemesi" })).toBeVisible();
     await capture(page, testInfo.outputPath("expenses-preview.png"));
 
-    await nav.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Raporlar", exact: true })).toBeVisible();
     await capture(page, testInfo.outputPath("reports-list.png"));
 
@@ -259,26 +259,26 @@ test("packaged visual journey retains every destination and important desktop st
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await capture(page, testInfo.outputPath("recovery.png"));
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
-    await nav.getByRole("button", { name: "Özet", exact: true }).click();
+    await openSection(page, "Bu ay");
 
     for (const width of [680, 453]) {
       await page.setViewportSize({ width, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `document overflow at ${width}px`).toBe(true);
-      await expect(page.getByRole("button", { name: /Kayıtlı giderler/ })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
       await capture(page, testInfo.outputPath(`overview-${width}.png`), true);
     }
-    for (const [destination, file] of [["Satışlar", "sales-summary-453.png"], ["Alışlar ve maliyet", "purchasing-history-453.png"], ["Giderler", "expenses-records-453.png"], ["Raporlar", "reports-list-453.png"]] as const) {
-      await nav.getByRole("button", { name: destination, exact: true }).click();
+    for (const [destination, file] of [["Veri ve kaynak", "sales-summary-453.png"], ["Alış belgeleri", "purchasing-history-453.png"], ["Giderler", "expenses-records-453.png"], ["Aylık rapor", "reports-list-453.png"]] as const) {
+      if (destination === "Giderler") await openSection(page, "Giderler"); else await openReportView(page, destination);
       await expect(page.locator('[aria-busy="true"]').filter({ visible: true })).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `document overflow in ${destination} at 453px`).toBe(true);
       await capture(page, testInfo.outputPath(file), true);
     }
-    await nav.getByRole("button", { name: "Satışlar", exact: true }).click();
+    await openReportView(page, "Veri ve kaynak");
     await page.getByText("İşlemler ve satış dağılımı", { exact: true }).click();
     await page.getByRole("button", { name: "Tüm işlemleri göster", exact: true }).click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "document overflow around the narrow transaction table").toBe(true);
     await capture(page, testInfo.outputPath("sales-transactions-453.png"), true);
-    await nav.getByRole("button", { name: "Özet", exact: true }).click();
+    await openSection(page, "Bu ay");
     await page.emulateMedia({ forcedColors: "active", reducedMotion: "reduce" });
     await capture(page, testInfo.outputPath("forced-colors-reduced-motion.png"), true);
     await page.emulateMedia({ forcedColors: "none", reducedMotion: "no-preference" });
@@ -286,9 +286,9 @@ test("packaged visual journey retains every destination and important desktop st
     await page.route(/^https?:\/\//, route => { externalRequests.push(route.request().url()); return route.abort(); });
     await page.context().setOffline(true);
     await page.reload();await openWorkspace(page);
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("heading", { name: "Aylık Ürün Kârlılığı", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Raporlar", exact: true }).click();
+    await openReportView(page, "Aylık rapor");
     await expect(page.getByRole("region", { name: "Aylık göstergeler" })).toContainText(monthlyUiExpected.netSales);
     expect(externalRequests).toEqual([]);
     await capture(page, testInfo.outputPath("offline-reload.png"), true);

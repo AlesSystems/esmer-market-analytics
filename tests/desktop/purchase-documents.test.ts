@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView, openSection } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -13,7 +13,7 @@ test("complete invoice list preserves empty documents and returns to page and ke
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
-  const page=await app.firstWindow();await openWorkspace(page);await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Alış belgeleri");
   await expect(page.getByRole("heading",{name:"Faturalar",exact:true})).toBeVisible();
   await expect(page.getByRole("heading",{name:"Son alışlar",exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Sonraki 50 kayıt",exact:true}).click();
@@ -26,10 +26,10 @@ test("complete invoice list preserves empty documents and returns to page and ke
   await expect(page.getByRole("region",{name:"Fatura ayrıntıları",exact:true})).toContainText("Fatura numarası mevcut değil");
   await expect(page.getByRole("region",{name:"Fatura ayrıntıları",exact:true})).toContainText("Tedarikçi bilgisi mevcut değil");
   await expect(page.getByRole("region",{name:"Fatura ayrıntıları",exact:true})).toContainText("saklanan satırı yok");
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  await page.getByRole("button",{name:"Faturalara dön",exact:true}).click();
   await expect(row).toBeFocused();expect(await table.evaluate(element=>({x:element.scrollLeft,y:element.scrollTop}))).toEqual(scroll);await expect(page.getByText("51–56 / 56",{exact:true})).toBeVisible();
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Satışlar",exact:true}).click();
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  await openReportView(page,"Veri ve kaynak");
+  await openReportView(page,"Alış belgeleri");
   await expect(page.getByText("51–56 / 56",{exact:true})).toBeVisible();
  } finally {await app.close();await rm(userData,{recursive:true,force:true});}
 });
@@ -39,12 +39,14 @@ test("hidden purchasing detail never handles another page Escape key", async () 
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try {
-  const page=await app.firstWindow();await openWorkspace(page);await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();
+  const page=await app.firstWindow();await openWorkspace(page);await openReportView(page,"Alış belgeleri");
   await page.getByRole("button",{name:"P1",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Giderler",exact:true}).click();
+  // Leaving the section closes the page; its detail must not handle Giderler's Escape key.
+  await openSection(page,"Giderler");
   const button=page.getByRole("button",{name:"Gider ekle",exact:true});await button.focus();const scroll=await page.evaluate(()=>({x:scrollX,y:scrollY}));await page.keyboard.press("Escape");await expect(button).toBeFocused();expect(await page.evaluate(()=>({x:scrollX,y:scrollY}))).toEqual(scroll);
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+  await openReportView(page,"Alış belgeleri");await page.getByRole("button",{name:"P1",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+  // Ayarlar overlays the page; Escape there leaves the hidden detail open.
   await page.getByRole("button",{name:"Ayarlar",exact:true}).click();await expect(page.getByRole("heading",{name:"Ayarlar",exact:true})).toBeVisible();await page.keyboard.press("Escape");
-  await page.getByRole("navigation",{name:"Ana gezinme"}).getByRole("button",{name:"Alışlar ve maliyet",exact:true}).click();await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
+  await openSection(page,"Rapor ve Excel");await expect(page.getByRole("heading",{name:"Maliyet ve alış kaynak detayı",exact:true})).toBeVisible();
  } finally {await app.close();await rm(userData,{recursive:true,force:true});}
 });

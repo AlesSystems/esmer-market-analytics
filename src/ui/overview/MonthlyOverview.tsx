@@ -6,7 +6,6 @@ import { date, money, percent, quantity } from "../format";
 import { OperatingSummary } from "../OperatingSummary";
 import { purchasingWarningLabels } from "../purchasing/PurchasingWorkspace";
 import { ReportEvidence } from "./ReportEvidence";
-import { ControlDesk } from "./ControlDesk";
 import { MonthlyProfitPage } from "./MonthlyProfitPage";
 
 function FigureStatus({ label, children }: { label: string; children: ReactNode }) {
@@ -16,7 +15,6 @@ function FigureStatus({ label, children }: { label: string; children: ReactNode 
 type Props = { report: MonthlyDisplay; refresh: () => void; onSales?: (categoryId?: string) => void; onExpenses?: () => void; onPurchasing?: () => void; embedded?: boolean; onReport?: () => void; onProduct?: (id: string) => void; salesOnly?: boolean; onParentBack?: (back: (() => void) | null) => void; active?: boolean; initialProductId?: string };
 
 export function MonthlyOverview(props: Props) {
-  if (!props.embedded && !props.salesOnly) return <ControlDesk {...props} />;
   return props.report.format === "monthly-report-v2" ? <MonthlyProfitPage key={props.report.id} {...props} report={props.report} /> : <LegacyMonthlyOverview {...props} />;
 }
 

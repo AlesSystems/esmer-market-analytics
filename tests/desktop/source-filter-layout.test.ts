@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, openReportView } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,9 +21,13 @@ test("source filters keep fields stable and actions grouped when expanded at des
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Aylık Market Özeti", exact: true })).toBeVisible();
     for (const destination of ["Satışlar", "Alışlar ve maliyet"]) {
-      await page.getByRole("button", { name: destination, exact: true }).click();
+      // Satışlar: Veri ve kaynak → all source documents narrowed to sales type codes; Alışlar ve maliyet: Alış belgeleri.
+      if (destination === "Satışlar") {
+        await openReportView(page, "Veri ve kaynak");
+        await page.getByRole("button", { name: "Tüm kaynak belgeleri", exact: true }).click();
+        await page.getByLabel("Kayıt kapsamı").selectOption("sales");
+      } else await openReportView(page, "Alış belgeleri");
       await expect(page.getByRole("heading", { name: destination, exact: true })).toBeVisible();
       for (const { width, zoom } of [{ width: 1440, zoom: 1 }, { width: 1120, zoom: 1 }, { width: 680, zoom: 1 }, { width: 390, zoom: 1 }, { width: 680, zoom: 1.3 }]) {
         await app.evaluate(({ BrowserWindow }, size) => {

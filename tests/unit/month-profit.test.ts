@@ -2,7 +2,7 @@ import {expect,test} from "vitest";
 import {readRawPackage,type RawPackage} from "../../src/source/raw-package";
 import type {AppRecord} from "../../src/store/revisions";
 import type {ExpenseValue} from "../../src/expenses/contracts";
-import {buildMonthProfit,type MonthProfitView} from "../../src/source/month-profit";
+import {buildMonthProfit,monthChanges,type MonthProfitTotals,type MonthProfitView} from "../../src/source/month-profit";
 import {monthProfitPackage,monthProfitSnapshot} from "../helpers/month-profit-fixture";
 import {writeRawEstimatePackage} from "../../src/source/raw-package";
 import type {SqlSnapshot} from "../../src/source/sql-server";
@@ -117,4 +117,29 @@ test("thresholds compare unrounded margins: a 1.495-point drop is not flagged, 7
  expect(v.products.find(p=>p.id==="1")).toMatchObject({marginPct:"30.00",previousMarginPct:"31.50"});
  expect(v.products.find(p=>p.id==="4")).toMatchObject({marginPct:"8.00"});
  expect(v.attention).toEqual([{kind:"loss",productId:"3"},{kind:"marginDrop",productId:"5"},{kind:"lowMarginHighVolume",productId:"4"},{kind:"lowMarginHighVolume",productId:"3"},{kind:"missingCost",productId:"2"}]);
+});
+
+test("changes against the previous month come from the service as rounded decimal strings",()=>{
+ // October is loaded only to 20.10: amounts are not comparable with a full September, the margin ratio still is (13.3720.. vs 20 -> -6.6279.. points).
+ expect(view("2025-10").changes).toEqual({salesPct:null,grossProfitPct:null,marginPoints:"-6.63",netProfitPct:null});
+ // Full October: sales 480 vs 510 -> -5.882..%; gross 57.5 vs 102 -> -43.627..%.
+ expect(view("2025-10",undefined,fullOctober()).changes).toEqual({salesPct:"-5.88",grossProfitPct:"-43.63",marginPoints:"-6.63",netProfitPct:null});
+ // September vs August: 510 vs 100 -> 410 %; 102 vs 20 -> 410 %; margin 20 vs 20 -> 0 points.
+ expect(view("2025-09").changes).toEqual({salesPct:"410.00",grossProfitPct:"410.00",marginPoints:"0.00",netProfitPct:null});
+ expect(view("2025-08").changes).toBeNull();
+});
+
+test("margin points subtract unrounded margins, then round once",()=>{
+ // 13.375 % vs 20.004 %: unrounded -6.629 -> -6.63. Rounding first (13.38 - 20.00) would give -6.62.
+ const t=(gross:string)=>({sales:"100",knownCostSales:"100",grossProfit:gross,netProfit:null} as MonthProfitTotals);
+ expect(monthChanges(t("13.375"),t("20.004"))).toEqual({salesPct:"0.00",grossProfitPct:"-33.14",marginPoints:"-6.63",netProfitPct:null});
+});
+
+test("net profit change needs both months' net profit and a positive previous base",()=>{
+ // Sep full month with 20 expenses confirmed: net 102-20=82; Oct full month with 30 expenses: net 57.5-30=27.5 -> (27.5-82)/82 = -66.4634..%.
+ const sep=expense(5,"rent-sep",{date:"2025-09-05",net:"20",tax:"0",gross:"20"});
+ const sepOk={...confirm(6,5),entityId:"expense-complete:2025-09",value:{period:"2025-09",reviewedRevision:5,complete:true,reason:"Ay tamam",evidence:"owner-review"}} as AppRecord;
+ const v=view("2025-10",{app:[rent,labour,sep,confirm(3,2),sepOk],history:[rent,labour,sep]},fullOctober());
+ expect(v.previous).toMatchObject({netProfit:"82"});expect(v.totals).toMatchObject({netProfit:"27.5"});
+ expect(v.changes).toMatchObject({netProfitPct:"-66.46"});
 });
