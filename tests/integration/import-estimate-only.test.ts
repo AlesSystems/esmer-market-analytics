@@ -8,10 +8,12 @@ import { openStore } from "../../src/store/store";
 import { Expenses } from "../../src/expenses/import";
 import type { ServiceResponse } from "../../src/domain/contracts";
 import { businessPackage, businessRecords } from "../helpers/business-fixtures";
+import { writeRawPackage } from "../../src/source/raw-package";
+import { rawSnapshot } from "../helpers/raw-fixture";
 import { estimatePackage } from "../helpers/estimate-fixture";
 import { workbook, row } from "../helpers/expense-fixtures";
 
-test("importPackage accepts only estimate packages and keeps the last valid dataset and expenses", async () => {
+test("importPackage accepts only recorded-source packages and keeps the last valid dataset and expenses", async () => {
   const directory = await mkdtemp(join(tmpdir(), "import-estimate-only-"));
   const databasePath = join(directory, "analytics.sqlite");
   const seeded = openStore(databasePath);
@@ -35,10 +37,12 @@ test("importPackage accepts only estimate packages and keeps the last valid data
     worker.postMessage({ id: requestId, operation, ...extra });
   });
   try {
-    expect(await request("importPackage", { bytes: businessPackage(records, { extractionId: "analysis-again" }) })).toEqual({ status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor." });
+    expect(await request("importPackage", { bytes: businessPackage(records, { extractionId: "analysis-again" }) })).toEqual({ status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor. Son geçerli veriler korundu." });
     expect(await request("getAvailability")).toMatchObject({ status: "ready", store: "loaded", dataset: before.availability.status === "ready" && before.availability.store === "loaded" ? before.availability.dataset : undefined });
     expect(await request("queryExpenses", { payload: { period: "2025-09" } })).toEqual(before.expenses);
     expect(await request("importPackage", { bytes: estimatePackage(undefined, "estimate-2") })).toMatchObject({ status: "preview-imported" });
+    expect(await request("queryExpenses", { payload: { period: "2025-09" } })).toEqual(before.expenses);
+    expect(await request("importPackage", { bytes: writeRawPackage(rawSnapshot(), "fixture:preview", "preview-1") })).toMatchObject({ status: "preview-imported" });
     expect(await request("queryExpenses", { payload: { period: "2025-09" } })).toEqual(before.expenses);
     await worker.terminate();
     const after = openStore(databasePath);

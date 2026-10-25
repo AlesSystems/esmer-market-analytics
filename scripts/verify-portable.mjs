@@ -34,7 +34,8 @@ for (let path = profile; path.startsWith(repo + sep); path = dirname(path)) {
 const expectedArchive = createHash('sha256').update(await readFile(join(release, 'win-unpacked/resources/app.asar'))).digest('hex');
 const wrapperHash = createHash('sha256').update(await readFile(exe)).digest('hex');
 const database = join(profile, 'analytics.sqlite');
-const tables = ['datasets', 'package_history', 'import_batches', 'source_suppliers', 'source_documents', 'source_lines', 'active_dataset', 'rollback_dataset', 'app_revisions', 'adjustment_targets', 'expense_batches', 'report_versions', 'evidence_references'];
+// report_versions and evidence_references are omitted: the app no longer creates accepted reports, so they are always empty here.
+const tables = ['datasets', 'package_history', 'import_batches', 'source_suppliers', 'source_documents', 'source_lines', 'active_dataset', 'rollback_dataset', 'app_revisions', 'adjustment_targets', 'expense_batches'];
 const hash = value => createHash('sha256').update(value).digest('hex');
 function capture() {
   const db = new DatabaseSync(database, { readOnly: true });

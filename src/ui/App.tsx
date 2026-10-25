@@ -24,7 +24,7 @@ const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", messag
 function importMessage(result: ImportOutcome | RequestError | JobOutcome): string {
   switch (result.status) {
     case "busy": return "Başka bir işlem sürüyor. Tamamlandığında yeniden deneyin.";
-    case "preview-imported": return "Gerçek kaynak kayıtları içe aktarıldı. Mali raporlar değiştirilmedi.";
+    case "preview-imported": return "Gerçek kaynak kayıtları içe aktarıldı.";
     case "active": return "Veri paketi içe aktarıldı.";
     case "unchanged": return "Bu veri paketi zaten etkin. Veriler değiştirilmedi.";
     case "historical": return "Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.";

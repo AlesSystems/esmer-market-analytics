@@ -17,7 +17,8 @@ const reusePhase8 = process.env.ESMER_LIFECYCLE_REUSE_PHASE8 === "1";
 function storedBusinessData(path: string) {
   const database = new DatabaseSync(path, { readOnly: true });
   try {
-    const tables = ["datasets", "package_history", "import_batches", "source_suppliers", "source_documents", "source_lines", "active_dataset", "rollback_dataset", "app_revisions", "adjustment_targets", "report_versions", "evidence_references", "expense_batches"];
+    // report_versions and evidence_references are omitted: the app no longer creates accepted reports, so the tables stay empty here (restore of old reports is covered by tests/integration/recovery-accepted-reports.test.ts).
+    const tables = ["datasets", "package_history", "import_batches", "source_suppliers", "source_documents", "source_lines", "active_dataset", "rollback_dataset", "app_revisions", "adjustment_targets", "expense_batches"];
     const records = Object.fromEntries(tables.map(table => [table, database.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()]));
     return { records };
   } finally { database.close(); }

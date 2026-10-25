@@ -168,7 +168,7 @@ app.whenReady().then(async () => {
         () => requestService({ operation: "getAvailability" }),
         () => jobs.run("importPackage", async job => {
           try {
-            const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Analiz veri paketi", extensions: ["json"] }] });
+            const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Veri paketi", extensions: ["json"] }] });
             if (selected.canceled || selected.filePaths.length !== 1 || Atomics.load(new Int32Array(job.cancellation), 0)) return { status: "cancelled" } as const;
             jobs.progress(job.id, "reading-file", 0, 1);
             const bytes = await readPackageFile(selected.filePaths[0]);

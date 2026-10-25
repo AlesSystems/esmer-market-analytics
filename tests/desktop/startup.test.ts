@@ -259,7 +259,7 @@ test("packaged app imports an estimate package through native selection, rejects
     await page.screenshot({ path: "test-results/phase-4-imported.png" });
     await writeFile(packagePath, businessPackage());
     await importPackage(page);
-    await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor.");
+    await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor. Son geçerli veriler korundu.");
     expect(await workspace(page)).toEqual(imported);
     await writeFile(packagePath, "invalid package");
     await importPackage(page);
@@ -301,7 +301,7 @@ for (const loaded of [false, true]) {
       await writeFile(packagePath, businessPackage());
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
       await importPackage(page);
-      await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor.");
+      await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor. Son geçerli veriler korundu.");
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array) });
     } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
   });

@@ -182,7 +182,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     }
     else if (request.operation === "importPackage") {
       if (liveChanging || live?.isBusy()) { parentPort?.postMessage({id: request.id, result: {status: "busy"}}); return; }
-      if (!readRawPackage(request.bytes)) { result = readPackage(request.bytes).ok ? {status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor."} : importOutcome({status: "failed", code: "INVALID_PACKAGE"}); }
+      if (!readRawPackage(request.bytes)) { result = readPackage(request.bytes).ok ? {status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor. Son geçerli veriler korundu."} : importOutcome({status: "failed", code: "INVALID_PACKAGE"}); }
       else {
         const preview = store.importSourcePreview(request.bytes, control);
         result = preview.status === "preview-imported" ? preview : importOutcome(preview);
