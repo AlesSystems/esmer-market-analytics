@@ -66,9 +66,9 @@ for (const source of [false, true]) {
         await expect(nav(page).getByRole("button", { name, exact: true })).toHaveAttribute("aria-current", "page");
         await check();
       }
-      await page.getByLabel("Dönem", { exact: true }).fill("2025-11");
+      await page.getByLabel("Dönem", { exact: true }).filter({ visible: true }).fill("2025-11");
       await openSection(page, "Giderler");
-      await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-11");
+      await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-11");
       await page.locator("#expense-manual").click();
       await page.getByLabel("Kategori", { exact: true }).fill("Sentetik taslak");
       await openSection(page, "Bu ay");
@@ -156,7 +156,7 @@ test("a Veri ve kaynak request pending initial financial load starts only its de
   try {
     const page = await app.firstWindow();
     await openWorkspace(page);
-    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2025-09");
+    await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-09");
     await app.evaluate(({ ipcMain }) => {
       const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
       const original = registry._invokeHandlers.get("esmer:request")!;
