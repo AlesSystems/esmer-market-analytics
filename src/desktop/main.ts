@@ -56,6 +56,7 @@ function serviceUnavailable() {
   pending.clear(); worker = undefined;
 }
 function requestService(request:{operation:"readMonthProfit";payload:MonthProfitRequest}):Promise<MonthProfitResult>;
+function requestService(request:{operation:"exportMonthProfit";payload:MonthProfitRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request:{operation:"querySourceEstimate";payload:EstimateRequest}):Promise<EstimateResult>;
 function requestService(request:{operation:"exportSourceEstimate";payload:EstimateExportRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request: {operation:"querySourceWorkspace";payload:SourceQuery}): Promise<SourceWorkspaceResult>;
@@ -344,6 +345,11 @@ app.whenReady().then(async () => {
         )},
         preferences,
         payload=>requestService({operation:"readMonthProfit",payload}),
+        payload=>saveReportExport(
+          ()=>requestService({operation:"exportMonthProfit",payload}),
+          ()=>dialog.showSaveDialog(window,{title:"Ayın kâr tahminini Excel olarak kaydet",defaultPath:`Esmer-${payload.month}-kar-tahmini.xlsx`,filters:[{name:"Excel çalışma kitabı",extensions:["xlsx"]}]}),
+          atomicWriteFile,
+        ),
       );
     },
   );

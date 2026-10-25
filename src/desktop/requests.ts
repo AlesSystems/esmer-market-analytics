@@ -101,6 +101,7 @@ export async function handleRequest(
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
   preferences?: {get: () => Promise<PreferencesResult>; set: (request: PreferencesPatch) => Promise<PreferencesResult>},
   monthProfit?: (request: MonthProfitRequest) => Promise<MonthProfitResult>,
+  monthProfitExport?: (request: MonthProfitRequest) => Promise<ReportExportResult>,
 ): Promise<MonthProfitResult | PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
@@ -116,6 +117,10 @@ export async function handleRequest(
   if (operation === "readMonthProfit" && monthProfit) {
     if (!validMonthProfitRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
     return monthProfit(payload);
+  }
+  if (operation === "exportMonthProfit" && monthProfitExport) {
+    if (!validMonthProfitRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    return monthProfitExport(payload);
   }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {
     if(!validEstimateRequest(payload,operation === "exportSourceEstimate"))return {status:"rejected",code:"INVALID_PAYLOAD",message:"İstek geçerli değil."};
