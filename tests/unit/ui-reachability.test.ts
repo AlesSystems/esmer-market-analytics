@@ -9,7 +9,10 @@ const ambient = ["global.d.ts"];
 /** Files owned by the expenses workstream that are not reachable yet; shrink this list, never grow it. */
 const allowlist: string[] = [];
 
-const specifier = /^[ \t]*(?:import|export)\s[^;"'`]*?from\s*["']([^"']+)["']|^[ \t]*import\s*["']([^"']+)["']|@import\s*["']([^"']+)["']/gm;
+/** Static `import … from`, side-effect `import "x"`, `export … from` and CSS `@import "x"` / `@import url("x")`.
+ * Dynamic `import()` is NOT supported: it would hide modules from this walk, so the test below fails if one appears in src/ui. */
+const specifier = /^[ \t]*(?:import|export)\s[^;"'`]*?from\s*["']([^"']+)["']|^[ \t]*import\s*["']([^"']+)["']|@import\s*(?:url\(\s*)?["']([^"']+)["']/gm;
+const stripBlockComments = (text: string) => text.replace(/\/\*[\s\S]*?\*\//g, "");
 
 function resolveModule(from: string, spec: string): string | null {
   if (!spec.startsWith(".")) return null;
@@ -35,7 +38,7 @@ describe("src/ui reachability", () => {
       if (seen.has(file)) continue;
       seen.add(file);
       if (/\.(tsx?|css)$/.test(file))
-        for (const match of readFileSync(file, "utf8").matchAll(specifier)) {
+        for (const match of stripBlockComments(readFileSync(file, "utf8")).matchAll(specifier)) {
           const next = resolveModule(file, match[1] ?? match[2] ?? match[3]);
           if (next) queue.push(next);
         }
@@ -43,5 +46,11 @@ describe("src/ui reachability", () => {
     const dead = walk(root).map(file => relative(root, file)).filter(file =>
       !seen.has(join(root, file)) && !ambient.includes(file) && !allowlist.includes(file)).sort();
     expect(dead).toEqual([]);
+  });
+
+  it("uses no dynamic import() that the reachability walk could not see", () => {
+    const dynamic = walk(root).filter(file => /\.tsx?$/.test(file) && /\bimport\s*\(/.test(stripBlockComments(readFileSync(file, "utf8"))))
+      .map(file => relative(root, file));
+    expect(dynamic).toEqual([]);
   });
 });
