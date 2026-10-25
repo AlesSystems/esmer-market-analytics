@@ -1,5 +1,6 @@
 import { validSelectedMonth, type SelectedMonth } from "../domain/month";
 import { ExpenseNavigationProvider, useExpenseNavigation } from "./expense-navigation";
+import { followedMonth } from "./month-follow";
 import { initialSourceQuery } from "./source-query";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -44,14 +45,16 @@ function App() {
   const expenseNavigation = useExpenseNavigation();
   const [selectedMonth, setSelectedMonth] = useState<SelectedMonth | null>(null);
   const [preferencesReady, setPreferencesReady] = useState(false);
+  const selectedMonthRef = useRef<SelectedMonth | null>(null);
+  selectedMonthRef.current = selectedMonth;
   const monthWrite = useRef(0);
-  // True once the owner picked a month, or one saved before this session was loaded. Until then the month follows the newest month of the loaded source.
+  // True once the owner picked a month, or one saved before this session was loaded (or saved preferences could not be read). Until then the month follows the newest month of the loaded source for this session only; that month is never saved.
   const monthChosen = useRef(false);
   const [monthSaveError, setMonthSaveError] = useState("");
-  useEffect(() => { let active = true; window.esmer.getPreferences().then(result => { if (active && result.status === "preferences") { monthChosen.current = !!result.preferences.selectedMonth; setSelectedMonth(result.preferences.selectedMonth ?? null); } }).catch(() => {if(active)setMonthSaveError("Dönem tercihi okunamadı; dönem seçimini yeniden kaydedin.");}).finally(() => { if (active) setPreferencesReady(true); }); return () => { active = false; }; }, []);
-  const selectMonth = useCallback((month: string, automatic = false) => {
+  useEffect(() => { let active = true; window.esmer.getPreferences().then(result => { if (active && result.status === "preferences") { monthChosen.current = !!result.preferences.selectedMonth; setSelectedMonth(result.preferences.selectedMonth ?? null); } }).catch(() => {if(active){monthChosen.current=true;setMonthSaveError("Dönem tercihi okunamadı; dönem seçimini yeniden kaydedin.");}}).finally(() => { if (active) setPreferencesReady(true); }); return () => { active = false; }; }, []);
+  const selectMonth = useCallback((month: string) => {
     if(!validSelectedMonth(month))return;
-    if (!automatic) monthChosen.current = true;
+    monthChosen.current = true;
     const write = ++monthWrite.current;
     setSelectedMonth(month); setMonthSaveError("");
     void window.esmer.setPreferences({selectedMonth: month}).then(result => { if (write === monthWrite.current && result.status !== "preferences") setMonthSaveError("Dönem bu oturumda seçildi; yeniden açılış için kaydedilemedi."); }).catch(() => {if(write===monthWrite.current)setMonthSaveError("Dönem bu oturumda seçildi; yeniden açılış için kaydedilemedi.");});
@@ -102,7 +105,7 @@ function App() {
     let active = true;
     window.esmer.querySourceWorkspace({ ...initialSourceQuery }).then(value => {
       if (!active) return;
-      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); if (!monthChosen.current && validSelectedMonth(value.period)) selectMonth(value.period, true); setResolution({ status: "resolved" }); return; }
+      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); const next = followedMonth({ chosen: monthChosen.current, current: selectedMonthRef.current, latest: value.period, draftOpen: expenseNavigation.busy() }); if (next) { selectedMonthRef.current = next; setSelectedMonth(next); } setResolution({ status: "resolved" }); return; }
       setCoverage(null);
       if (value.status !== "source-empty") { setResolution({ status: "failed", message: value.message }); return; }
       setResolution({ status: "resolved" });

@@ -59,7 +59,7 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     await openSettings(page);
     await page.getByRole("radio", { name: "Büyük", exact: true }).check();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
-    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large", selectedMonth: "2025-10" });
+    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large" });
     await page.getByRole("region", { name: "Yedekleme ve kurtarma", exact: true }).getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
