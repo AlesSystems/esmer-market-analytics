@@ -2,11 +2,10 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import {
-  bridgeLayout, compactMoney, formatShare, niceTicks, rankLayout, shares, toNumber,
+  bridgeLayout, compactMoney, niceTicks, rankLayout, toNumber,
 } from "../../src/ui/charts/geometry";
 import { Bridge } from "../../src/ui/charts/Bridge";
 import { ChartFrame } from "../../src/ui/charts/ChartFrame";
-import { CompositionBar } from "../../src/ui/charts/CompositionBar";
 import { EstimateBadge } from "../../src/ui/charts/EstimateBadge";
 import { RankBars } from "../../src/ui/charts/RankBars";
 
@@ -42,13 +41,6 @@ describe("compact money and numbers", () => {
     expect(wide.max).toBeGreaterThanOrEqual(7300000);
     expect(wide.ticks[0]).toBe(0);
     expect(Object.is(niceTicks(-10, 10).ticks.find((tick) => tick === 0), 0)).toBe(true);
-  });
-
-  test("shares and formatShare", () => {
-    expect(shares([1, 3]).map((part) => part)).toEqual([25, 75]);
-    expect(shares([0, 0])).toEqual([0, 0]);
-    expect(formatShare(12.34)).toBe("%12,3");
-    expect(formatShare(100)).toBe("%100");
   });
 });
 
@@ -183,24 +175,6 @@ describe("rendering", () => {
     expect(markup).toContain('data-state="unknown"');
     expect(markup).toContain("<ol");
     expect(renderToStaticMarkup(h(Bridge, { steps: [], formatValue: money, empty: "Adım yok." }))).toContain("Adım yok.");
-  });
-
-  test("CompositionBar sizes parts by value, gaps them, and lists value plus percent", () => {
-    const markup = renderToStaticMarkup(h(CompositionBar, {
-      formatValue: (value: number) => `${value} satır`,
-      parts: [
-        { key: "covered", label: "Kapsanan", value: 75, color: "var(--viz-contribution)" },
-        { key: "excluded", label: "Kapsam dışı", value: 25, color: "unknown" },
-        { key: "none", label: "Yok", value: 0, color: "var(--viz-cost)" },
-      ],
-    }));
-    expect(markup).toContain('role="img"');
-    expect(markup).toContain("%75");
-    expect(markup).toContain("%25");
-    expect(markup).toContain("75 satır");
-    expect(markup).toContain("viz-hatch");
-    expect(markup.match(/viz-comp-part/g)!.length).toBe(2);
-    expect(renderToStaticMarkup(h(CompositionBar, { parts: [], formatValue: String, empty: "Dağılım yok." }))).toContain("Dağılım yok.");
   });
 
   test("EstimateBadge is a details disclosure with the fixed chip text", () => {

@@ -50,12 +50,6 @@ export function niceTicks(min: number, max: number, intervals = 3, options: { in
   return { ticks: Array.from({ length: count + 1 }, (_, index) => clean(start + index * step)), min: clean(start), max: clean(end) };
 }
 
-export const shares = (values: number[]): number[] => {
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return values.map((value) => total > 0 ? (value / total) * 100 : 0);
-};
-export const formatShare = (value: number) => `%${compactNumber(value, 1)}`;
-
 /** SVG path for a bar whose far end is rounded and whose baseline end is square. */
 export function roundedBarPath(x: number, y: number, w: number, h: number, round: "top" | "bottom"): string {
   const r = Math.max(0, Math.min(RADIUS, w / 2, h));
@@ -65,12 +59,6 @@ export function roundedBarPath(x: number, y: number, w: number, h: number, round
 }
 
 /* ── Daily columns ─────────────────────────────────────────────── */
-
-/** Assigns palette hues to keys in a stable order, so a colour follows the key and never its count. */
-export const paletteColors = (keys: string[], palette: string[], order: (a: string, b: string) => number): Record<string, string> =>
-  Object.fromEntries(keys.toSorted(order).map((key, index) => [key, palette[index % palette.length]]));
-/** Splits count-sorted entries into shown head and folded rest; one slot goes to the rest bucket when it is needed. */
-export const foldRest = <T>(sorted: T[], slots: number) => sorted.length > slots ? { head: sorted.slice(0, slots - 1), rest: sorted.slice(slots - 1) } : { head: sorted, rest: [] as T[] };
 export type Span = { left: number; width: number; negative: boolean; kind: "value" | "unknown" };
 const UNKNOWN_STUB = 8;
 
