@@ -40,7 +40,7 @@ Inspect `package.json` for the current commands and locked dependencies. Optiona
 | [Expense contract](docs/contracts/expense-completeness.md) | Import, manual entry, provenance and completeness |
 | [Runtime decisions](docs/decisions/runtime.md) | Runtime and packaging choices |
 | [Profit-first estimate edition](docs/decisions/issue-98-profit-first-estimate-edition.md) | v1 re-baseline: estimate as financial truth, plain wording, trust chip, Tahmini net kâr |
-| [Known limitations](docs/operations/known-limitations-tr.md) | Turkish explanation of current limits |
+| [Known limitations](docs/operations/known-limitations-tr.md) | Trackable list of v1 limits and open items (Turkish) |
 
 The foundation documents govern requirements. Later approved contracts describe bounded extensions. Original planning status and phase stop instructions are historical; use current source, tracker records and build-specific evidence for present work.
 
