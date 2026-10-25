@@ -9,7 +9,7 @@ const ambient = ["global.d.ts"];
 /** Files owned by the expenses workstream that are not reachable yet; shrink this list, never grow it. */
 const allowlist: string[] = [];
 
-const specifier = /(?:import|export)\s[^"'`;]*?from\s*["']([^"']+)["']|import\s*["']([^"']+)["']|@import\s*["']([^"']+)["']/g;
+const specifier = /^[ \t]*(?:import|export)\s[^;"'`]*?from\s*["']([^"']+)["']|^[ \t]*import\s*["']([^"']+)["']|@import\s*["']([^"']+)["']/gm;
 
 function resolveModule(from: string, spec: string): string | null {
   if (!spec.startsWith(".")) return null;
