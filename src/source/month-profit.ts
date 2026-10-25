@@ -42,6 +42,8 @@ export type MonthProfitView={
  attention:{kind:AttentionKind;productId:string}[];
 };
 export type MonthProfitRequest={month:string};
+/** Pins the export to the source the user is viewing: a different loaded source answers SOURCE_CHANGED. */
+export type MonthProfitExportRequest={month:string;hash:string};
 export type MonthProfitUnavailable={status:"source-unavailable";code:"ESTIMATE_UNAVAILABLE"|"MONTH_NOT_COVERED"|"SOURCE_CHANGED";message:string};
 export type MonthProfitResult={status:"month-profit";view:MonthProfitView}|MonthProfitUnavailable;
 export type MonthProfitExpenses={app:AppRecord[];history:AppRecord[]};
@@ -51,6 +53,9 @@ const COST_REASONS=new Set(["QUANTITY","MULTIPLIER","COST_MISSING","COST_ZERO","
 
 export function validMonthProfitRequest(value:unknown):value is MonthProfitRequest {
  return !!value&&typeof value==="object"&&!Array.isArray(value)&&Object.keys(value).join()==="month"&&validSelectedMonth((value as {month:unknown}).month);
+}
+export function validMonthProfitExportRequest(value:unknown):value is MonthProfitExportRequest {
+ return !!value&&typeof value==="object"&&!Array.isArray(value)&&Object.keys(value).sort().join()==="hash,month"&&validSelectedMonth((value as {month:unknown}).month)&&typeof (value as {hash:unknown}).hash==="string"&&/^[0-9a-f]{64}$/.test((value as {hash:string}).hash);
 }
 const shift=(month:string,by:number)=>{const d=new Date(`${month}-01T00:00:00Z`);d.setUTCMonth(d.getUTCMonth()+by);return d.toISOString().slice(0,7);};
 const lastDay=(month:string)=>{const d=new Date(`${shift(month,1)}-01T00:00:00Z`);d.setUTCDate(0);return d.toISOString().slice(0,10);};

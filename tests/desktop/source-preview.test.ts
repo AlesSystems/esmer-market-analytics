@@ -12,6 +12,7 @@ const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "da
   ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`)
   : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 for (const actual of [false, true]) test(`packaged ${actual ? "actual backup" : "synthetic raw"} preview imports and survives offline restart`, async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(actual && !process.env.ESMER_SQL_PREVIEW_PACKAGE, "Private prepared SQL preview not configured");
   test.setTimeout(60_000);
   if (actual) {

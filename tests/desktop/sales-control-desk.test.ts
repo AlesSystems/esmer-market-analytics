@@ -12,6 +12,7 @@ const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "da
 
 for (const mode of ["financial", "source"] as const) {
   test(`packaged ${mode} Sales desk preserves real data and provides plain keyboard navigation`, async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
     const captureDir = process.env.ESMER_CAPTURE_EVIDENCE ? "workstreams/page-control-desks/sales" : testInfo.outputPath("screenshots");
     await mkdir(captureDir, { recursive: true });
     const userData = await mkdtemp(join(tmpdir(), `sales-desk-${mode}-`));

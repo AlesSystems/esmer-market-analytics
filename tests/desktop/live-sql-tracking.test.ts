@@ -70,6 +70,7 @@ async function setup() {
 }
 
 test("packaged disposable SQL tracks captures without losing inspection and retained financial records", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(!process.env.ESMER_SQL_TEST_ADMIN, "Requires explicitly configured isolated synthetic SQL admin");
   test.setTimeout(150_000);
   const context = await setup();

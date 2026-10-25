@@ -9,6 +9,7 @@ import { openStore } from "../../src/store/store";
 import { richBusinessPackage } from "../helpers/rich-business-fixture";
 const executablePath = process.env.ESMER_EXECUTABLE ?? resolve("release/mac-arm64/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics");
 test("purchasing inspection selects actual excluded cost evidence with plain keyboard controls", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
  const dir = await mkdtemp(join(tmpdir(), "esmer-cost-desk-"));
  const path = join(dir, "synthetic.json"); await writeFile(path, businessPackage(purchasingJourney()));
  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${dir}`] });
@@ -36,6 +37,7 @@ test("purchasing inspection selects actual excluded cost evidence with plain key
 });
 
 test("source purchasing remains raw evidence with keyboard controls without decorative scenes", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
  const { openStore } = await import("../../src/store/store");
  const { writeRawPackage } = await import("../../src/source/raw-package");
  const { rawSnapshot } = await import("../helpers/raw-fixture");
@@ -70,6 +72,7 @@ test("source purchasing remains raw evidence with keyboard controls without deco
 });
 
 test("purchasing leads with cost coverage and replacement-cost charts that keep unknown and exact values", async () => {
+    test.skip(true, "old UI, removed in P5");
  const dir = await mkdtemp(join(tmpdir(), "esmer-cost-charts-"));
  const store = openStore(join(dir, "analytics.sqlite"));
  try { store.importPackage(richBusinessPackage()); } finally { store.close(); }

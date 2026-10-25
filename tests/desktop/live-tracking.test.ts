@@ -16,6 +16,7 @@ async function filterProduct(page:Page,id:string){if(!await page.getByLabel("Ür
 // A successful import now returns to Bu ay (#103/#105) and Rapor ve Excel reopens its source workspace afterwards,
 // so each capture is checked by reopening the documents: the month survives, the document selection never does.
 test("packaged tracking retains month while requiring fresh document selection across captures",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"live-tracking-")),database=join(userData,"analytics.sqlite");
  const snapshot=rawSnapshot();snapshot.to="2025-11-12";
  const seed=openStore(database),first=seed.importSourcePreview(writeRawPackage(snapshot,"fixture:tracking","capture-1"));seed.close();

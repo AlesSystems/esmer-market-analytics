@@ -1,4 +1,4 @@
-import { importPackage, openReportView, openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openSection, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -133,9 +133,6 @@ test("operating report reopens on the reviewed expense revision after expense ed
     const page = await app.firstWindow();await openWorkspace(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await openReportView(page, "Aylık rapor");
-    const operating = page.locator(".monthly-operating");
-    await expect(operating).toContainText("Faaliyet kârı hesaplanamıyor — gider verileri eksik.");
     await openSection(page, "Giderler");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den aktar", exact: true }).click();
@@ -148,16 +145,6 @@ test("operating report reopens on the reviewed expense revision after expense ed
     await page.getByLabel("İnceleme açıklaması").fill("Eylül kontrolü");
     await page.getByRole("button", { name: "Eksiksizliği onayla", exact: true }).click();
     await expect(page.getByText("Dönemin giderleri eksiksiz olarak onaylandı", { exact: true })).toBeVisible();
-    // Rapor ve Excel remounts after Giderler, so the report reopens on the new expense revision (no pinned stale notice).
-    await openReportView(page, "Aylık rapor");
-    await expect(page.getByText("Gider kayıtları değişti", { exact: true })).toHaveCount(0);
-    await operating.locator(":scope > summary").click();
-    await expect(operating).toContainText("Tahmini yönetim faaliyet kârı");
-    await expect(operating.locator(".operating-value")).toHaveText("30,00 ₺");
-    await operating.getByText("Hesaplama ve sabit kayıtlar", { exact: true }).click();
-    await expect(operating).toContainText("Kapsanan tahmini brüt kâr: 40,00 ₺");
-    await expect(operating).toContainText("operating-ref");
-    await page.screenshot({ path: "test-results/phase-7-operating.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 

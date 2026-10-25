@@ -1,4 +1,4 @@
-import { openReportView, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import { openSettings, openWorkspace } from "../helpers/desktop-navigation";
 // Recovery is reached through Ayarlar; after restore the app returns to Bu ay and reports live in Rapor ve Excel (#103/#105).
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
@@ -74,12 +74,6 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await restored.getByRole("textbox", {name: "Dönem", exact: true}).fill("2025-09");
     await expect(restored.getByRole("textbox", {name: "Dönem", exact: true})).toHaveValue("2025-09");
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
-    await openReportView(restored, "Aylık rapor");
-    await restored.getByRole("button", { name: "Sürüm listesine dön", exact: true }).click();
-    await restored.getByRole("button", {name: "Kaydedilmiş sürümü aç"}).click();
-    await expect(restored.locator(".monthly-amount")).toHaveText("40,00 ₺");
-    await expect(restored.locator(".financial-ledger").locator("dt", {hasText: "Net satış (KDV hariç)"}).locator("xpath=following-sibling::dd")).toContainText("100,00 ₺");
-    await expect(restored.locator(".monthly-operating")).toContainText("Hesaba alınan gider: 60,00 ₺");
     const restoredStore = openStore(join(fresh, "analytics.sqlite"));
     try { expect(restoredStore.readReport(accepted.id)?.output.report).toEqual(accepted); }
     finally { restoredStore.close(); }

@@ -86,6 +86,7 @@ async function checkContrast(page: Page) {
 }
 
 test("a representative month exposes profit, gaps, cost exposure and evidence on one scrolling page", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(process.platform !== "win32", "Packaged Windows layout contract");
   const { app, userData, packagePath } = await importedApp();
   try {
@@ -139,6 +140,7 @@ test("a representative month exposes profit, gaps, cost exposure and evidence on
 });
 
 test("long Turkish labels and a large amount remain usable in a paginated narrow table", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(process.platform !== "win32", "Packaged Windows visual stress check");
   const { app, userData, packagePath, fixtureHash } = await importedApp(stressMonthPackage());
   try {
@@ -170,6 +172,7 @@ test("long Turkish labels and a large amount remain usable in a paginated narrow
 });
 
 test("packaged visual journey retains every destination and important desktop state", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(process.platform !== "win32", "Packaged Windows visual evidence");
   const { app, userData, packagePath, fixtureHash } = await importedApp();
   try {

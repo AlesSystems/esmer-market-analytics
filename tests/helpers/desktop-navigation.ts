@@ -20,7 +20,7 @@ export async function openSection(page: Page, name: "Bu ay" | "Ürünler" | "Gid
   await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true }).click();
 }
 
-/** Rapor ve Excel sub-views: "Aylık rapor" (reports and Excel), "Veri ve kaynak" (records and sales), "Alış belgeleri" (purchasing). */
+/** The old Rapor tabs were removed in P5; tests that call this are skipped as old UI. Former sub-views: "Aylık rapor" (reports and Excel), "Veri ve kaynak" (records and sales), "Alış belgeleri" (purchasing). */
 export async function openReportView(page: Page, name: "Aylık rapor" | "Veri ve kaynak" | "Alış belgeleri") {
   await openSection(page, "Rapor ve Excel");
   await page.getByRole("navigation", { name: "Rapor bölümleri" }).getByRole("button", { name, exact: true }).click();

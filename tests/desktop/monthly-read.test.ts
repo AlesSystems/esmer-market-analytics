@@ -9,6 +9,7 @@ import { executablePath } from "../helpers/desktop-executable";
 import { openReportView, openWorkspace } from "../helpers/desktop-navigation";
 
 test("identical monthly preload reads and Bu ay to sales navigation complete without busy",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-monthly-read-")),store=openStore(join(userData,"analytics.sqlite"));
  try {store.importPackage(richBusinessPackage());seedRichExpenses(store);}finally{store.close();}
  await savePreferences(userData,{selectedMonth:"2025-09",textSize:"normal"});

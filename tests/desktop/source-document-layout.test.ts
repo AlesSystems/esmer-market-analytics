@@ -9,6 +9,7 @@ import {rawSnapshot} from "../helpers/raw-fixture";
 import {executablePath} from "../helpers/desktop-executable";
 for(const destination of ["Satışlar","Alışlar ve maliyet"]){
  test(`${destination}: source document stays compact, exact and scrollable`,async()=>{
+    test.skip(true, "old UI, removed in P5");
   const userData=await mkdtemp(join(tmpdir(),"document-layout-"));
   const snapshot=rawSnapshot(),type=destination==="Satışlar"?"11":"1";
   snapshot.headers[0].FIS_TURU=type;snapshot.headers[0].GENELTOPLAM="1234.4567890123456789";

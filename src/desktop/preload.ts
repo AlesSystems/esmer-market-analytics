@@ -45,6 +45,7 @@ const api: DesktopApi = {
   inspectSales: request => ipcRenderer.invoke("esmer:request", "inspectSales", request),
   readMonthProfit: request => ipcRenderer.invoke("esmer:request","readMonthProfit",request),
   querySourceEstimate: request => ipcRenderer.invoke("esmer:request","querySourceEstimate",request),
+  exportMonthProfit: request => ipcRenderer.invoke("esmer:request","exportMonthProfit",request),
   exportSourceEstimate: request => ipcRenderer.invoke("esmer:request","exportSourceEstimate",request),
   querySourceWorkspace: request => ipcRenderer.invoke("esmer:request", "querySourceWorkspace", request),
   readSourcePreview: request => ipcRenderer.invoke("esmer:request", "readSourcePreview", request),

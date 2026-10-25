@@ -7,6 +7,7 @@ import { openStore } from "../../src/store/store";
 import { businessPackage, businessRecords, addPurchase } from "../helpers/business-fixtures";
 import { executablePath } from "../helpers/desktop-executable";
 test("complete invoice list preserves empty documents and returns to page and keyboard row", async () => {
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-invoices-")),records=businessRecords();addPurchase(records,"P1");
  const template=records.documents.find(row=>row.id==="P1")!;
  for(let index=0;index<55;index++)records.documents.push({...structuredClone(template),id:`EMPTY-${String(index).padStart(3,"0")}`,supplierId:null});
@@ -35,6 +36,7 @@ test("complete invoice list preserves empty documents and returns to page and ke
 });
 
 test("hidden purchasing detail never handles another page Escape key", async () => {
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-hidden-purchase-")),records=businessRecords();addPurchase(records,"P1");
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});

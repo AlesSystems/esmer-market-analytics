@@ -19,6 +19,17 @@ test("store reads the active estimate package and expense records for one month"
  }finally{store.close();}
 });
 
+test("a pinned month export answers SOURCE_CHANGED for another source hash and the month view for the loaded one",()=>{
+ const store=openStore(":memory:");try{
+  expect(store.readMonthProfitPinned({month:"2025-10",hash:"0".repeat(64)})).toMatchObject({status:"source-unavailable",code:"ESTIMATE_UNAVAILABLE"});
+  store.importSourcePreview(monthProfitPackage());
+  const read=store.readMonthProfit({month:"2025-10"});if(read.status!=="month-profit")throw Error("NO_VIEW");
+  expect(store.readMonthProfitPinned({month:"2025-10",hash:read.view.source.hash})).toEqual(read);
+  expect(()=>store.readMonthProfitPinned({month:"2025-10",hash:"0".repeat(64)})).toThrow("SOURCE_CHANGED");
+  expect(()=>store.readMonthProfitPinned({month:"2025-10"} as never)).toThrow("INVALID_PAYLOAD");
+ }finally{store.close();}
+});
+
 test("named readMonthProfit IPC denies sender, extra keys and bad months before calling the service",async()=>{
  let called=0;const service=async()=>{called++;return {status:"source-unavailable" as const,code:"ESTIMATE_UNAVAILABLE" as const,message:"fixture"};};
  const run=(trusted:boolean,payload:unknown)=>handleRequest(trusted,"readMonthProfit",payload,async()=>({status:"ready",store:"empty",liveConnection:"disabled"}),undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,service);

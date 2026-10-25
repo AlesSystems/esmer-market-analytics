@@ -91,6 +91,17 @@ test("real worker rejects unknown work, observes shared cancellation, and stays 
   } finally { await worker.terminate(); await rm(dir, {recursive: true, force: true}); }
 });
 
+test("export passes MONTH_NOT_COVERED, SOURCE_CHANGED and a busy restore through with their own messages", async () => {
+  const select = vi.fn(), write = vi.fn();
+  const notCovered = {status: "source-unavailable", code: "MONTH_NOT_COVERED", message: "Seçili ay kaynak paketinin kapsamı dışında."} as const;
+  const changed = {status: "source-unavailable", code: "SOURCE_CHANGED", message: "Kaynak sürümü değişti. Yeni sürümü açın."} as const;
+  expect(await saveReportExport(async () => notCovered, select, write)).toEqual(notCovered);
+  expect(await saveReportExport(async () => changed, select, write)).toEqual(changed);
+  expect(await saveReportExport(async () => ({status: "recovery-failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."}) as never, select, write))
+    .toEqual({status: "failed", code: "RESTORE_BUSY", message: "Geri yükleme sürüyor. İşlem tamamlanınca yeniden deneyin."});
+  expect(select).not.toHaveBeenCalled();
+});
+
 test("failed export generation and cancelled save never write a destination", async () => {
   const select = vi.fn().mockResolvedValue({canceled: true});
   const write = vi.fn();

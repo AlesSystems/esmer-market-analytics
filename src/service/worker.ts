@@ -1,6 +1,7 @@
 import {validEstimateRequest} from "../source/estimate";
 import {validMonthProfitRequest} from "../source/month-profit";
 import {excelSourceEstimate} from "../source/estimate-export";
+import {excelMonthProfit} from "../source/month-profit-export";
 import {validSourceQuery} from "../source/workspace";
 import { readPackage } from "../source/package";
 import { readRawPackage, validSourcePreviewRequest } from "../source/raw-package";
@@ -161,7 +162,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       }
       parentPort?.postMessage({id: request.id, result: liveResult()}); return;
     }
-    const known = ["readMonthProfit", "querySourceEstimate", "exportSourceEstimate", "querySourceWorkspace", "readSourcePreview", "createExpense", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchaseDocuments", "inspectPurchaseDocument", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
+    const known = ["readMonthProfit", "exportMonthProfit", "querySourceEstimate", "exportSourceEstimate", "querySourceWorkspace", "readSourcePreview", "createExpense", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness", "queryOperating", "getAvailability", "queryPurchaseDocuments", "inspectPurchaseDocument", "queryPurchasing", "openSales", "querySales", "inspectSales", "importPackage", ...monthlyOperations];
     if (!known.includes(request.operation)) throw new Error("UNKNOWN_OPERATION");
     if (!store) throw new Error("SERVICE_UNAVAILABLE");
     if (monthlyOperations.includes(request.operation) && (!("payload" in request) || !validMonthlyRequest(request.operation, request.payload))) throw new Error("INVALID_PAYLOAD");
@@ -194,6 +195,10 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     else if(request.operation === "readMonthProfit") {
       if(!validMonthProfitRequest(request.payload))throw Error("INVALID_PAYLOAD");
       result=store.readMonthProfit(request.payload);
+    }
+    else if(request.operation === "exportMonthProfit") {
+      const read=store.readMonthProfitPinned(request.payload);
+      result=read.status==="month-profit"?{status:"export",bytes:await excelMonthProfit(read.view)}:read;
     }
     else if(request.operation === "querySourceEstimate") {
       if(!validEstimateRequest(request.payload))throw Error("INVALID_PAYLOAD");

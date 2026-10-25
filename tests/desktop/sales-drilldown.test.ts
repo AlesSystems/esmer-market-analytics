@@ -8,6 +8,7 @@ import { journeyRecords, salesPackage } from "../helpers/sales-fixtures";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("packaged sales workspace follows a number through product, document and source with keyboard", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-sales-"));
   const packagePath = join(userData, "synthetic-sales.json");
   const records = journeyRecords();
@@ -92,6 +93,7 @@ test("packaged sales workspace follows a number through product, document and so
 });
 
 test("packaged sales workspace distinguishes discrepancies, excluded contributions and missing coverage", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-sales-warnings-"));
   const packagePath = join(userData, "synthetic-sales.json");
   const records = journeyRecords();

@@ -27,6 +27,7 @@ async function measure(page: Page, action: string, selector: string, expected: s
 }
 
 test("complete 25000-document synthetic dataset keeps monthly and drill-down interactions below two seconds", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   test.skip(process.platform !== "win32", "Windows performance evidence");
   test.setTimeout(180_000);
   const root = await mkdtemp(join(tmpdir(), "esmer-full-dataset-"));

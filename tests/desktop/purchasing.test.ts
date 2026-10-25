@@ -7,6 +7,7 @@ import { salesPackage } from "../helpers/sales-fixtures";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("legacy sales remain usable while purchasing evidence is explicitly unavailable", async () => {
+    test.skip(true, "old UI, removed in P5");
   const userData = await mkdtemp(join(tmpdir(), "esmer-purchasing-")), packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, salesPackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
@@ -25,6 +26,7 @@ test("legacy sales remain usable while purchasing evidence is explicitly unavail
 });
 
 test("purchasing shows covered estimates and follows converted return evidence without assuming settlement", async () => {
+    test.skip(true, "old UI, removed in P5");
   const { purchasingJourney } = await import("../helpers/purchasing-journey");
   const { businessPackage } = await import("../helpers/business-fixtures");
   const userData = await mkdtemp(join(tmpdir(), "esmer-business-")), packagePath = join(userData, "synthetic.json");
@@ -88,6 +90,7 @@ test("purchasing shows covered estimates and follows converted return evidence w
 });
 
 test("customer return evidence opens its original sale from the prior month and restores focus", async () => {
+    test.skip(true, "old UI, removed in P5");
   const { businessRecords, businessPackage } = await import("../helpers/business-fixtures");
   const records = businessRecords();
   records.documents[0].date = "2025-08-15";
@@ -120,6 +123,7 @@ test("customer return evidence opens its original sale from the prior month and 
 });
 
 test("purchasing distinguishes partial source coverage from a period with no source data", async () => {
+    test.skip(true, "old UI, removed in P5");
   const { purchasingJourney } = await import("../helpers/purchasing-journey");
   const { businessPackage } = await import("../helpers/business-fixtures");
   const userData = await mkdtemp(join(tmpdir(), "esmer-purchasing-coverage-")), packagePath = join(userData, "synthetic.json");

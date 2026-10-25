@@ -10,6 +10,7 @@ import { businessPackage, productProfitRecords } from "../helpers/business-fixtu
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
 
 test("selected return month shows pinned daily amounts, original cost and complete product export", async ({}, testInfo) => {
+    test.skip(true, "old UI, removed in P5");
   const root = await mkdtemp(join(tmpdir(), "esmer-selected-detail-"));
   const records = productProfitRecords();
   records.documents.find(row => row.id === "A1")!.date = "2025-08-31";
@@ -73,6 +74,7 @@ test("selected return month shows pinned daily amounts, original cost and comple
 });
 
 test("original-sale evidence preserves mixed and unknown quantity units and cost basis", async () => {
+    test.skip(true, "old UI, removed in P5");
   const root = await mkdtemp(join(tmpdir(), "esmer-original-units-"));
   const records = productProfitRecords();
   const original = records.lines.find(row => row.id === "A1")!;

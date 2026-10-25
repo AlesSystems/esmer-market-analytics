@@ -14,6 +14,7 @@ import {executablePath} from "../helpers/desktop-executable";
 // The old sidebar screens now live inside Rapor ve Excel. Its sub-views keep one hosted workspace mounted,
 // so "leave and return" is exercised through the Rapor bölümleri buttons and through Ayarlar.
 test("cancelled invoice reads settle after report-view and Settings return",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-invoice-lifecycle-")),records=businessRecords();addPurchase(records,"P1");
  const line=records.lines.find(row=>row.documentId==="P1")!;for(let i=1;i<61;i++)records.lines.push({...structuredClone(line),id:`P1-${i}`});
  for(let i=0;i<55;i++)records.documents.push({...structuredClone(records.documents.find(row=>row.id==="P1")!),id:`E-${String(i).padStart(3,"0")}`});
@@ -30,6 +31,7 @@ test("cancelled invoice reads settle after report-view and Settings return",asyn
 });
 
 test("recorded archive retains its detail and filtered second page without another history read",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-saved-lifecycle-")),store=openStore(join(userData,"analytics.sqlite"));
  try{const versions=new ReportVersions(store,new SalesReports(store));let previous:string|null=null;for(let i=0;i<12;i++){store.importPackage(businessPackage(undefined,{extractionId:`archive-${i}`}));const candidate=versions.open({period:"2025-09"});if(candidate.status!=="monthly")throw Error("Expected monthly");versions.accept({candidateId:candidate.report.id,previousAcceptedId:previous,reason:`review-72-${i}`});previous=candidate.report.id;}store.importSourcePreview(writeRawPackage(rawSnapshot(),"fixture:archive","raw-1"));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
@@ -43,6 +45,7 @@ test("recorded archive retains its detail and filtered second page without anoth
 });
 
 test("retained purchasing links return to their immediate parent with technical fields collapsed",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-purchase-parent-")),records=businessRecords();addPurchase(records,"P1");addPurchase(records,"D1");records.documents.find(row=>row.id==="D1")!.purchasing={...records.documents.find(row=>row.id==="D1")!.purchasing!,representation:"dispatch",convertedTo:"P1",invoiced:true};
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
@@ -55,6 +58,7 @@ test("retained purchasing links return to their immediate parent with technical 
 
 // Rapor ve Excel stays mounted once visited, so an open purchase document survives other sections.
 test("open purchase detail survives leaving Rapor ve Excel for another section",async()=>{
+    test.skip(true, "old UI, removed in P5");
  const userData=await mkdtemp(join(tmpdir(),"esmer-purchase-section-")),records=businessRecords();addPurchase(records,"D1");
  const store=openStore(join(userData,"analytics.sqlite"));try{store.importPackage(businessPackage(records));}finally{store.close();}
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});

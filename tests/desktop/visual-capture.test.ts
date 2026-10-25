@@ -6,14 +6,14 @@ import {openStore} from "../../src/store/store";
 import {businessPackage} from "../helpers/business-fixtures";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
 import {richBusinessPackage, seedRichExpenses} from "../helpers/rich-business-fixture";
-import {openReportView, openSection, openWorkspace} from "../helpers/desktop-navigation";
+import {openSection, openWorkspace} from "../helpers/desktop-navigation";
 import {executablePath} from "../helpers/desktop-executable";
 
 const output = process.env.ESMER_CAPTURE_VISUAL;
 type Capture = {name: string; open: (page: Page) => Promise<void>};
 const pages: Capture[] = [
   ...(["Bu ay", "Ürünler", "Giderler"] as const).map(name => ({name, open: (page: Page) => openSection(page, name)})),
-  ...(["Aylık rapor", "Veri ve kaynak", "Alış belgeleri"] as const).map(name => ({name: `Rapor ve Excel ${name}`, open: (page: Page) => openReportView(page, name)})),
+  {name: "Rapor ve Excel", open: (page: Page) => openSection(page, "Rapor ve Excel")},
 ];
 const profiles = [{name: "source", source: true, rich: false, month: "2025-10"}, {name: "financial", source: false, rich: false, month: null}, {name: "financial-rich", source: false, rich: true, month: "2025-09"}];
 

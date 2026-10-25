@@ -1,5 +1,5 @@
 import type {EstimateRequest,EstimateExportRequest,EstimateResult} from "../source/estimate";
-import type {MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
+import type {MonthProfitExportRequest,MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
 import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import type { LiveStatus } from "../source/live-contracts";
@@ -11,7 +11,7 @@ import type { ReportRequestMap, ReportResponse, ReportHistoryResult, ReportDiffe
 import type { RecoveryResult, RecoveryServiceRequest } from "../recovery/contracts";
 export type OperationStatus = { status: "idle" } | { status: "operation"; id: number; operation: "importPackage" | "queryMonthly"; phase: string; completed: number; total: number; cancelling: boolean };
 export type JobOutcome = { status: "busy" } | { status: "cancelled" };
-export type ReportExportResult = Extract<EstimateResult,{status:"source-unavailable"}> | SalesFailure | { status: "saved" } | { status: "cancelled" } | { status: "failed"; code: "REPORT_EXPORT_FAILED"; message: string };
+export type ReportExportResult = Extract<EstimateResult,{status:"source-unavailable"}> | SalesFailure | { status: "saved" } | { status: "cancelled" } | {status:"source-unavailable";code:"MONTH_NOT_COVERED";message:string} | { status: "failed"; code: "REPORT_EXPORT_FAILED"|"RESTORE_BUSY"; message: string };
 export type ReportServiceRequest = { [K in keyof ReportRequestMap]: { operation: K; payload: ReportRequestMap[K] } }[keyof ReportRequestMap];
 export type ImportErrorCode = "INVALID_PACKAGE" | "IMPORT_FAILED" | "STORAGE_FULL" | "INTERRUPTED" | "INVALID_CANDIDATE";
 export type DatasetMetadata = { datasetId: string; cutoff: string; extractedAt: string; counts: { documents: number; lines: number; suppliers: number }; warnings: string[] };
@@ -42,6 +42,7 @@ export interface DesktopApi {
   setPreferences(request: PreferencesPatch): Promise<PreferencesResult | RequestError>;
   readMonthProfit(request:MonthProfitRequest):Promise<MonthProfitResult|RequestError|{status:"unavailable";message:string}>;
   querySourceEstimate(request:EstimateRequest):Promise<EstimateResult|RequestError|{status:"unavailable";message:string}>;
+  exportMonthProfit(request:MonthProfitExportRequest):Promise<ReportExportResult|RequestError>;
   exportSourceEstimate(request:EstimateExportRequest):Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>|RequestError>;
   querySourceWorkspace(request: SourceQuery): Promise<SourceWorkspaceResult | RequestError | {status:"unavailable";message:string}>;
   readSourcePreview(request: SourcePreviewRequest): Promise<SourcePreviewResult | RequestError | {status: "unavailable"; message: string}>;
@@ -89,7 +90,7 @@ export interface DesktopApi {
   importPackage(): Promise<ImportOutcome | JobOutcome | RequestError>;
 }
 export type ExpenseServiceRequest = { [K in Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">]: { operation: K; payload: ExpenseRequests[K] } }[Exclude<keyof ExpenseRequests, "saveExpenseTemplate" | "previewExpenses">] | { operation: "previewExpenses"; bytes: Uint8Array };
-export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"readMonthProfit";payload:MonthProfitRequest}|{operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest} | {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest} | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
+export type ServiceRequest = { id: number; job?: { id: number; cancellation: SharedArrayBuffer } } & ({operation:"readMonthProfit";payload:MonthProfitRequest}|{operation:"exportMonthProfit";payload:MonthProfitExportRequest}|{operation:"querySourceEstimate";payload:EstimateRequest}|{operation:"exportSourceEstimate";payload:EstimateExportRequest}|{operation:"querySourceWorkspace";payload:SourceQuery} | { operation: "readSourcePreview"; payload: SourcePreviewRequest } | LiveServiceRequest | ReportServiceRequest | ExpenseServiceRequest | RecoveryServiceRequest | {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest} | {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest} | { operation: "queryPurchasing"; payload: QueryPurchasingRequest } | { operation: "getAvailability" } | { operation: "importPackage"; bytes: Uint8Array } | { operation: "openSales"; payload: OpenSalesRequest } | { operation: "querySales"; payload: QuerySalesRequest } | { operation: "inspectSales"; payload: InspectSalesRequest });
 export type ServiceResponse = { id: number; result: MonthProfitResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | { status: "export"; bytes: Uint8Array } | ReportExportResult | JobOutcome | RequestError | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | SalesReportResult | SalesDetailResult | RecoveryResult };
 
 export type ServiceProgress = { jobId: number; phase: string; completed: number; total: number };
