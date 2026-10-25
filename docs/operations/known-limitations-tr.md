@@ -19,3 +19,4 @@ Bu liste uygulamanın bilinen sınırlarını ve açık işlerini tek yerde izle
 | açık | Canlı SQL yenilemesi üretimde doğrulanmadı | Month view not verified against production; access needs Eralp's permission. | [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) |
 | açık | Sahip kurulumu yapılmadı | Owner installation not done. | [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) |
 | açık | Kurtarma ayrı temiz bilgisayarda kabul edilmedi | Recovery not yet accepted on a separate clean machine. | — |
+| açık | Elektrik kesintisinde dosya kalıcılığı kanıtlanmadı | Durability of Windows directory changes on power loss is not proven. | — |
