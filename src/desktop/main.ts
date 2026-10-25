@@ -1,20 +1,16 @@
 import type {MonthProfitExportRequest,MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
-import type {EstimateRequest,EstimateExportRequest,EstimateResult} from "../source/estimate";
 import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
-import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
 import { loadLiveConfig, readLiveConfigFile, saveLiveConfig, type SavedLiveConfig } from "./live-config";
 import type { LiveResult, LiveServiceRequest } from "../domain/contracts";
 import { OperationJobs } from "./jobs";
-import { createMonthlyRead } from "./monthly-read";
 import { saveReportExport } from "./report-export";
 import { atomicWriteFile } from "./atomic-file";
 import { loadPreferences, preferencesService } from "./preferences";
 import { textSizes } from "../domain/contracts";
-import type { ReportServiceRequest, JobOutcome, RequestError, ServiceProgress } from "../domain/contracts";
-import type { ReportResponse } from "../reports/contracts";
+import type { ServiceProgress } from "../domain/contracts";
 import { expenseTemplate } from "../expenses/template";
 import { MAX_EXPENSE_BYTES } from "../expenses/workbook";
-import type { ExpenseResult, OperatingReportResult } from "../expenses/contracts";
+import type { ExpenseResult } from "../expenses/contracts";
 import type { ExpenseServiceRequest } from "../domain/contracts";
 import { app, BrowserWindow, ipcMain, protocol, session, dialog } from "electron";
 import { readFile, writeFile } from "node:fs/promises";
@@ -22,7 +18,6 @@ import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { APP_URL, handleRequest } from "./requests";
 import type { Availability, ImportOutcome, ServiceRequest, ServiceResponse } from "../domain/contracts";
-import type { PurchaseDocumentsRequest, PurchaseDocumentRequest, PurchaseDocumentsResult, PurchaseDocumentResult, QueryPurchasingRequest, PurchasingReportResult, OpenSalesRequest, QuerySalesRequest, InspectSalesRequest, SalesReportResult, SalesDetailResult } from "../reports/contracts";
 import { readPackageFile } from "./package-file";
 import { loadRecoveryConfig, outsideUserData, saveRecoveryConfig, restoreRecoveryConfig, validRecoveryLocations, readRecoveryKeyFile } from "./recovery-config";
 import { generateRecoveryKey, encodeRecoveryKey } from "../recovery/keys";
@@ -49,7 +44,6 @@ let restoring = false;
 let nativeRecoveryBusy = false;
 let requestId = 0;
 const jobs = new OperationJobs();
-const queryMonthly = createMonthlyRead(context => jobs.run("queryMonthly", job => requestService({operation:"queryMonthly",payload:{context},job})));
 const pending = new Map<number, (result: ServiceResponse["result"]) => void>();
 function serviceUnavailable() {
   for (const resolve of pending.values()) resolve(unavailable);
@@ -57,21 +51,10 @@ function serviceUnavailable() {
 }
 function requestService(request:{operation:"readMonthProfit";payload:MonthProfitRequest}):Promise<MonthProfitResult>;
 function requestService(request:{operation:"exportMonthProfit";payload:MonthProfitExportRequest}):Promise<ServiceResponse["result"]>;
-function requestService(request:{operation:"querySourceEstimate";payload:EstimateRequest}):Promise<EstimateResult>;
-function requestService(request:{operation:"exportSourceEstimate";payload:EstimateExportRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request: {operation:"querySourceWorkspace";payload:SourceQuery}): Promise<SourceWorkspaceResult>;
-function requestService(request: {operation: "readSourcePreview"; payload: SourcePreviewRequest}): Promise<SourcePreviewResult>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "getAvailability" }>, "id">): Promise<Availability>;
 function requestService(request: Omit<Extract<ServiceRequest, { operation: "importPackage" }>, "id">): Promise<ImportOutcome>;
-function requestService(request: Exclude<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}> & {job?: ServiceRequest["job"]}): Promise<ReportResponse | JobOutcome | RequestError>;
-function requestService(request: Extract<ReportServiceRequest, {operation: "exportReportVersion" | "exportReportProduct"}>): Promise<ServiceResponse["result"]>;
-function requestService(request: {operation: "queryPurchaseDocuments"; payload: PurchaseDocumentsRequest}): Promise<PurchaseDocumentsResult>;
-function requestService(request: {operation: "inspectPurchaseDocument"; payload: PurchaseDocumentRequest}): Promise<PurchaseDocumentResult>;
-function requestService(request: { operation: "queryPurchasing"; payload: QueryPurchasingRequest }): Promise<PurchasingReportResult>;
-function requestService(request: { operation: "openSales"; payload: OpenSalesRequest }): Promise<SalesReportResult>;
-function requestService(request: { operation: "querySales"; payload: QuerySalesRequest }): Promise<SalesReportResult>;
-function requestService(request: { operation: "inspectSales"; payload: InspectSalesRequest }): Promise<SalesDetailResult>;
-function requestService(request: ExpenseServiceRequest): Promise<ExpenseResult | OperatingReportResult>;
+function requestService(request: ExpenseServiceRequest): Promise<ExpenseResult>;
 function requestService(request: RecoveryServiceRequest): Promise<RecoveryResult>;
 function requestService(request: LiveServiceRequest): Promise<LiveResult>;
 function requestService(request: Omit<ServiceRequest, "id">): Promise<ServiceResponse["result"]> {
@@ -185,7 +168,7 @@ app.whenReady().then(async () => {
         () => requestService({ operation: "getAvailability" }),
         () => jobs.run("importPackage", async job => {
           try {
-            const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Analiz veri paketi", extensions: ["json"] }] });
+            const selected = await dialog.showOpenDialog(window, { title: "Hazırlanmış veri paketini seçin", properties: ["openFile"], filters: [{ name: "Veri paketi", extensions: ["json"] }] });
             if (selected.canceled || selected.filePaths.length !== 1 || Atomics.load(new Int32Array(job.cancellation), 0)) return { status: "cancelled" } as const;
             jobs.progress(job.id, "reading-file", 0, 1);
             const bytes = await readPackageFile(selected.filePaths[0]);
@@ -196,7 +179,6 @@ app.whenReady().then(async () => {
             return { status: "failed", code: "INVALID_PACKAGE", message: "Veri paketi okunamadı veya boyutu sınırı aşıyor. Son geçerli veriler korundu." } as const;
           }
         }),
-        { purchaseDocuments: payload => requestService({operation: "queryPurchaseDocuments", payload}), purchaseDocument: payload => requestService({operation: "inspectPurchaseDocument", payload}), purchasing: payload => requestService({ operation: "queryPurchasing", payload }), open: payload => requestService({ operation: "openSales", payload }), query: payload => requestService({ operation: "querySales", payload }), inspect: payload => requestService({ operation: "inspectSales", payload }) },
         async (operation, payload) => {
           try {
             if (operation === "saveExpenseTemplate") {
@@ -212,16 +194,6 @@ app.whenReady().then(async () => {
             }
             return requestService({ operation, payload } as ExpenseServiceRequest);
           } catch { return { status: "failed", code: "EXPENSE_FILE_FAILED", message: "Gider dosyası okunamadı veya kaydedilemedi. En fazla 4 MB boyutunda bir Excel dosyası kullanın." }; }
-        },
-        async (operation, payload) => {
-          const request = {operation, payload} as ReportServiceRequest;
-          if (request.operation === "exportReportVersion" || request.operation === "exportReportProduct") return saveReportExport(
-            () => requestService(request),
-            () => dialog.showSaveDialog(window, {title: request.operation === "exportReportProduct" ? "Seçili ürünü Excel olarak kaydet" : "Tüm ay raporunu Excel olarak kaydet", defaultPath: request.operation === "exportReportProduct" ? "Esmer-secilen-urun.xlsx" : "Esmer-aylik-rapor.xlsx", filters: [{name: "Excel çalışma kitabı", extensions: ["xlsx"]}]}),
-            atomicWriteFile,
-          );
-          if (request.operation === "queryMonthly") return queryMonthly(request.payload.context);
-          return requestService(request);
         },
         {status: () => jobs.status(), cancel: request => jobs.cancel(request)},
         async (operation, payload) => {
@@ -336,13 +308,7 @@ app.whenReady().then(async () => {
           } catch { liveConfigError = true; return failure(); }
           finally { nativeLiveBusy = false; }
         },
-        payload => requestService({operation: "readSourcePreview", payload}),
         payload => requestService({operation:"querySourceWorkspace",payload}),
-        {query:payload=>requestService({operation:"querySourceEstimate",payload}),export:payload=>saveReportExport(
-          ()=>requestService({operation:"exportSourceEstimate",payload}),
-          ()=>dialog.showSaveDialog(window,{title:"Doğrulanmamış tahmini Excel olarak kaydet",defaultPath:"Esmer-tahmini-katki.xlsx",filters:[{name:"Excel çalışma kitabı",extensions:["xlsx"]}]}),
-          atomicWriteFile,
-        )},
         preferences,
         payload=>requestService({operation:"readMonthProfit",payload}),
         payload=>saveReportExport(

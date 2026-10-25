@@ -1,8 +1,8 @@
-import {createSourceEstimateQuery,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
+import {createSourceEstimateQuery,validEstimateRequest,type EstimateRequest} from "../source/estimate";
 import {buildMonthProfit,validMonthProfitRequest,validMonthProfitExportRequest,type MonthProfitExportRequest,type MonthEstimateCache,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
-import type { OperationControl, ReportSummary } from "../reports/contracts";
+import type { OperationControl } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
 import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
@@ -98,13 +98,6 @@ class AnalyticsStore {
       this.estimateCache={json,hash,query:createSourceEstimateQuery(pkg,hash)};
     }
     return this.estimateCache.query(request);
-  }
-  sourceEstimateForExport(request:EstimateExportRequest) {
-    if(!validEstimateRequest(request,true))throw Error("INVALID_PAYLOAD");
-    const source=this.sourcePackage();
-    if(!source)throw Error("ESTIMATE_UNAVAILABLE");
-    if(source.hash!==request.hash)throw Error("SOURCE_CHANGED");
-    return calculateSourceEstimate(source.pkg,request.period,source.hash);
   }
   /** The month view for an export pinned to the viewed source hash; a different loaded source throws SOURCE_CHANGED. */
   readMonthProfitPinned(request:MonthProfitExportRequest):MonthProfitResult {
@@ -331,16 +324,6 @@ class AnalyticsStore {
       const insert = this.db.prepare("INSERT INTO evidence_references(report_id,identity) VALUES(?,?)");
       for (const identity of report.evidence) insert.run(report.id, identity);
     });
-  }
-  listMonthlyReports(period: string): ReportSummary[] {
-    return this.db.prepare(`SELECT id, dataset_id AS datasetId, COALESCE(app_revision,0) AS appRevision,
-      json_extract(content_json,'$.output.report.context.period') AS period,
-      json_extract(content_json,'$.output.report.sales.cutoff') AS cutoff,
-      json_extract(content_json,'$.output.report.review.acceptedAt') AS acceptedAt,
-      json_extract(content_json,'$.output.report.review.reason') AS reason
-      FROM report_versions WHERE json_extract(content_json,'$.output.report.format') IN ('monthly-report-v1','monthly-report-v2')
-      AND json_extract(content_json,'$.output.report.context.period')=?
-      AND json_extract(content_json,'$.output.report.review.acceptedAt') IS NOT NULL ORDER BY rowid DESC`).all(period) as ReportSummary[];
   }
   readReport(id: string): AcceptedReport {
     const row = this.db.prepare("SELECT content_json FROM report_versions WHERE id=?").get(id);

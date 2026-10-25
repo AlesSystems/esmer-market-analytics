@@ -22,7 +22,7 @@ const sizes = [
   { name: "zoom200", width: 1440, height: 1000, zoom: 2 },
 ];
 
-for (const source of [false, true]) test(`owner workspace renders ${source ? "source" : "financial"} routes with keyboard and zoom`, async ({}, testInfo) => {
+for (const source of [true]) test(`owner workspace renders ${source ? "source" : "financial"} routes with keyboard and zoom`, async ({}, testInfo) => {
   test.setTimeout(120_000);
   const userData = await mkdtemp(join(tmpdir(), "esmer-owner-workspace-"));
   const store = openStore(join(userData, "analytics.sqlite"));

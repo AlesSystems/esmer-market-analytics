@@ -1,5 +1,7 @@
 # Profile a synthetic import
 
+> Removed: `tools/profile-import.ts` was deleted in this change, so the commands below no longer run. Kept as a historical record only.
+
 Use this developer command to measure the existing local import APIs before proposing a package or persistence change. It creates its own synthetic data and temporary SQLite stores. It accepts no source path, credentials, or connection parameters.
 
 Use Node 24 as required by `package.json`, and install the locked dependencies with `npm ci`. Run these commands from the repository root in PowerShell.

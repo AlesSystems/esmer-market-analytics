@@ -9,12 +9,12 @@ import { generateRecoveryKey } from "../../src/recovery/keys";
 import { populateRecoveryStore } from "../helpers/recovery-fixtures";
 import type { ServiceResponse } from "../../src/domain/contracts";
 
-test("worker serializes recovery previews, drains an admitted export and gates requests during restore",async()=>{
+test("worker serializes recovery previews, drains an admitted request and gates requests during restore",async()=>{
   const directory=await mkdtemp(join(tmpdir(),"recovery-worker-"));
   const databasePath=join(directory,"analytics.sqlite"),destination=join(directory,"external"),key=generateRecoveryKey();
   await mkdir(destination);
   const recovery=await Recovery.open(databasePath,{destination,key});
-  const report=await populateRecoveryStore(recovery.store!);await recovery.backupNow();
+  const populated=await populateRecoveryStore(recovery.store!);await recovery.backupNow();
   const backupPath=join(destination,`${recovery.status().backups[0].id}.esmerbackup`);await recovery.close();
   const script=join(directory,"worker.cjs");await build({entryPoints:[resolve("src/service/worker.ts")],outfile:script,bundle:true,platform:"node",format:"cjs",target:"node24"});
   const worker=new Worker(script,{workerData:{databasePath}});let id=0;
@@ -31,13 +31,13 @@ test("worker serializes recovery previews, drains an admitted export and gates r
     expect(preview.status).toBe("restore-preview");expect(duplicate).toMatchObject({status:"recovery-failed",code:"RECOVERY_BUSY"});
     if(preview.status!=="restore-preview")throw new Error("NO_PREVIEW");
     completed.length=0;
-    const exported=request("exportReportVersion",{reportId:report.id});
+    const exported=request("queryExpenses",{period:"2025-09"});
     const restored=request("confirmRestore",{token:preview.token});
     const blocked=request("getAvailability");
     expect(await blocked).toMatchObject({status:"recovery-failed",code:"RECOVERY_BUSY"});
-    expect((await exported).status).toBe("export");expect(await restored).toEqual({status:"restored"});
-    expect(completed.indexOf("exportReportVersion")).toBeLessThan(completed.indexOf("confirmRestore"));
+    expect((await exported)).toEqual(populated.expenses);expect(await restored).toEqual({status:"restored"});
+    expect(completed.indexOf("queryExpenses")).toBeLessThan(completed.indexOf("confirmRestore"));
     expect(await request("getAvailability")).toMatchObject({status:"ready"});
-    expect(await request("readReportVersion",{reportId:report.id})).toMatchObject({status:"monthly",report:{id:report.id}});
+    expect(await request("queryExpenses",{period:"2025-09"})).toEqual(populated.expenses);
   }finally{await worker.terminate();await rm(directory,{recursive:true,force:true});}
 });

@@ -60,26 +60,15 @@ The `esmer://app` protocol serves bundled, allowlisted UI assets. Network reques
 
 Desktop tests launch the actual packaged application. The import test substitutes the native dialog's selected path inside Electron's main process, then exercises the normal preload, validated IPC, bounded file read, worker and SQLite path. This substitution does not expose a test-only production API. Separate real native-dialog and package lifecycle checks are recorded in the [Windows evidence](../evidence/windows-phase-4.md), with limitations and remaining checks. The [Windows handoff](../operations/windows-phase-4-handoff.md) remains the procedure.
 
-## Sales report requests
+## Removed report requests
 
-`openSales` starts an explicitly requested report period, or the latest imported period when no month is selected. The worker holds one immutable snapshot and returns a report context. `querySales` takes that context and category/product/search/type filters. `inspectSales` takes the same context and filters plus a document ID. It returns full-document evidence and the selected scope's contribution.
-
-The request guard validates exact keys, bounded identifiers and search text, date/month shape and the version context. The worker rejects a stale context instead of falling back to current data. A new report replaces the previous session. Imports update availability while navigation continues on its existing context until explicit refresh.
-
-Report results contain projected metrics and evidence only. They contain no database path, private app-owned records or raw snapshot. Calculations run in the service worker. Legacy sparse mappings return an explanation that sales semantics are unavailable; synthetic sales results remain visibly synthetic. Report errors are safe Turkish messages, including empty/unsupported data, stale contexts and unavailable service.
-
-## Phase 6 purchasing read
-
-`queryPurchasing({ context })` reads costs, purchases, supplier returns, and supported inventory observations from the existing pinned sales session. It validates the trusted sender and exact context shape before service invocation. The renderer cannot submit paths, SQL, table names, credentials, or operational transactions. A stale or altered session context is rejected.
-
-The result carries the dataset/app revision, cutoff, mapping, separate cost and purchasing calculation versions, coverage, warnings, and source evidence for displayed contributions. All financial calculations remain in the service. Supplier/product controls filter display rows without recomputing amounts. Explicit refresh replaces the session; imports alone cannot change an open report's historical cost or replacement price.
+The sales, purchasing, monthly report, report version/export and `queryOperating` operations (`openSales`, `querySales`, `inspectSales`, `queryPurchasing`, `queryPurchaseDocuments`, `inspectPurchaseDocument`, `queryMonthly`, `listReportVersions`, `readReportVersion`, `compareReportVersion`, `acceptReportVersion`, `exportReportVersion`, `readReportEvidence`, `readReportProducts`, `readReportProduct`, `readReportProductDependency`, `exportReportProduct`, `readReportPurchasing`, `queryOperating`, `readSourcePreview`, `querySourceEstimate`, `exportSourceEstimate`) were removed in this change; the validator rejects them as `UNKNOWN_OPERATION`.
 
 ## Later named requests
 
 These methods use the same sender, payload and preload rules as the requests above.
 
-- Expenses use `saveExpenseTemplate`, `previewExpenses`, `confirmExpenses`, `queryExpenses`, `correctExpense`, `restoreExpense`, `confirmExpenseCompleteness` and `queryOperating`. See the [expense contract](expense-completeness.md).
-- Monthly reports use `queryMonthly`, `listReportVersions`, `readReportVersion`, `compareReportVersion`, `acceptReportVersion`, `exportReportVersion`, `readReportEvidence`, `readReportPurchasing`, `cancelOperation` and `getOperationStatus`. See the [report contract](reports.md).
+- Expenses use `saveExpenseTemplate`, `previewExpenses`, `confirmExpenses`, `queryExpenses`, `correctExpense`, `restoreExpense` and `confirmExpenseCompleteness`. See the [expense contract](expense-completeness.md).
 - Recovery uses `getRecoveryStatus`, `setupRecovery`, `backupNow`, `pinBackup`, `prepareRestore`, `confirmRestore` and `cancelRestore`. See the [recovery decision](../decisions/phase-9-recovery.md).
 - The isolated test connection uses `getLiveStatus`, `configureLiveSource`, `setLiveEnabled` and `refreshLiveSource`. Configuration defaults to disabled. See the [live-sync contract](live-sync.md).
-- Raw preview uses `querySourceWorkspace` and `readSourcePreview`. See the [source contract](source.md).
+- Raw preview uses `querySourceWorkspace` (`readSourcePreview` was removed in this change). See the [source contract](source.md).

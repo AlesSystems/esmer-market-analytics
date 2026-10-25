@@ -6,6 +6,8 @@ import { Worker } from "node:worker_threads";
 import { build } from "esbuild";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { salesPackage } from "../helpers/sales-fixtures";
+import { estimatePackage } from "../helpers/estimate-fixture";
+import { openStore } from "../../src/store/store";
 import { writeRawPackage } from "../../src/source/raw-package";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import type { ServiceResponse } from "../../src/domain/contracts";
@@ -24,6 +26,7 @@ test("worker keeps local reports available during source waits, rejects overlapp
       return readFile(join(dirname(workerData.databasePath),"candidate.json"));
     }`);
   await build({entryPoints: [resolve("src/service/worker.ts")], outfile: script, bundle: true, platform: "node", format: "cjs", target: "node24", plugins: [{name: "test-source", setup(builder) {builder.onResolve({filter: /source\/sql-package$/}, () => ({path: fixture}));}}]});
+  { const seeded = openStore(join(directory, "analytics.sqlite")); try { expect(seeded.importPackage(salesPackage()).status).toBe("active"); } finally { seeded.close(); } }
   let worker = new Worker(script, {workerData: {databasePath: join(directory, "analytics.sqlite")}}), id = 0;
   const request = (operation: string, fields: object = {}) => new Promise<ServiceResponse["result"]>((resolveResult, reject) => {
     const requestId = ++id;
@@ -35,7 +38,6 @@ test("worker keeps local reports available during source waits, rejects overlapp
     expect(await request("getLiveStatus")).toMatchObject({status: "live", configured: false, live: {phase: "disabled"}});
     expect(await request("setLiveEnabled", {payload: {enabled: true, sql: "secret"}})).toMatchObject({code: "INVALID_PAYLOAD"});
     expect(await request("configureLiveSource", {payload: {config: {...config, scope: "production"}, enabled: true}})).toMatchObject({code: "INVALID_PAYLOAD"});
-    expect(await request("importPackage", {bytes: salesPackage()})).toMatchObject({status: "active"});
     expect(await request("configureLiveSource", {payload: {config, enabled: false}})).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
     expect(await request("refreshLiveSource")).toMatchObject({live: {phase: "disabled", lastAttemptAt: null}});
     expect(await request("setLiveEnabled", {payload: {enabled: true}})).toMatchObject({live: {phase: "idle"}});
@@ -43,8 +45,7 @@ test("worker keeps local reports available during source waits, rejects overlapp
     const refresh = request("refreshLiveSource");
     expect(await request("getLiveStatus")).toMatchObject({live: {phase: "refreshing"}});
     expect(await request("getAvailability")).toMatchObject({status: "ready", store: "loaded", liveConnection: "enabled"});
-    expect(await request("openSales", {payload: {period: "2025-09"}})).toMatchObject({status: "report"});
-    expect(await request("importPackage", {bytes: salesPackage(undefined, {extractionId: "overlap"})})).toEqual({status: "busy"});
+    expect(await request("importPackage", {bytes: estimatePackage(undefined, "overlap")})).toEqual({status: "busy"});
     expect(await request("refreshLiveSource")).toEqual({status: "busy"});
     const expenses = await request("previewExpenses", {bytes: expenseBytes});
     if (expenses.status !== "preview") throw new Error("NO_EXPENSE_PREVIEW");
@@ -93,6 +94,7 @@ test("worker stores a raw SQL preview without replacing the financial report", a
     import {dirname,join} from "node:path";
     export async function prepareSqlCandidate() { return readFile(join(dirname(workerData.databasePath),"preview.json")); }`);
   await build({entryPoints: [resolve("src/service/worker.ts")], outfile: script, bundle: true, platform: "node", format: "cjs", target: "node24", plugins: [{name: "test-source", setup(builder) {builder.onResolve({filter: /source\/sql-package$/}, () => ({path: fixture}));}}]});
+  { const seeded = openStore(join(directory, "analytics.sqlite")); try { expect(seeded.importPackage(salesPackage()).status).toBe("active"); } finally { seeded.close(); } }
   const worker = new Worker(script, {workerData: {databasePath: join(directory, "analytics.sqlite"), liveConfig: config, liveEnabled: true}});
   let id = 0;
   const request = (operation: string, fields: object = {}) => new Promise<ServiceResponse["result"]>((resolveResult, reject) => {
@@ -103,12 +105,13 @@ test("worker stores a raw SQL preview without replacing the financial report", a
   });
   const sourceQuery = {hash: null, period: null, view: "overview", scope: "all", documentType: null, productId: null, documentId: null, offset: 0};
   try {
-    expect(await request("importPackage", {bytes: salesPackage()})).toMatchObject({status: "active"});
+    const loaded = await request("getAvailability");
+    expect(loaded).toMatchObject({status: "ready", store: "loaded"});
     expect(await request("setLiveEnabled", {payload: {enabled: true}})).toMatchObject({live: {phase: "idle"}});
     expect(await request("refreshLiveSource")).toMatchObject({live: {phase: "idle", lastRecord: "preview"}});
     expect(await request("querySourceWorkspace", {payload: sourceQuery})).toMatchObject({status: "source-workspace", counts: {documents: 1, lines: 1}});
     expect(await request("refreshLiveSource")).toMatchObject({live: {phase: "idle", lastRecord: "preview"}});
     expect(await request("querySourceWorkspace", {payload: sourceQuery})).toMatchObject({counts: {documents: 1, lines: 1}});
-    expect(await request("openSales", {payload: {period: "2025-09"}})).toMatchObject({status: "report"});
+    expect(await request("getAvailability")).toMatchObject({status: "ready", store: "loaded", dataset: (loaded as {dataset: unknown}).dataset});
   } finally {await worker.terminate(); await rm(directory, {recursive: true, force: true});}
 });

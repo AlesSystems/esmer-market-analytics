@@ -6,8 +6,8 @@ import { handleRequest } from "../../src/desktop/requests";
 import { loadPreferences, preferencesService, savePreferences, validPreferences } from "../../src/desktop/preferences";
 import type { Preferences } from "../../src/domain/contracts";
 
-const invoke = (trusted: boolean, operation: string, payload: unknown, preferences: Parameters<typeof handleRequest>[14]) =>
-  handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, preferences);
+const invoke = (trusted: boolean, operation: string, payload: unknown, preferences: Parameters<typeof handleRequest>[10]) =>
+  handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, undefined, undefined, preferences);
 
 test("preference operations accept only trusted exact payloads", async () => {
   const preferences = {get: vi.fn().mockResolvedValue({status: "preferences", preferences: {textSize: "normal"}}), set: vi.fn()};

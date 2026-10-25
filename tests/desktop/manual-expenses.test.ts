@@ -168,7 +168,7 @@ test("a payment outside the displayed incurred month offers the payment month wi
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-02" }))).toMatchObject({ incurred: "0", payments: "75" });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
-for (const host of ["source", "sales"] as const) test(`leaving Giderler keeps a manual draft until the owner discards it in ${host}`, async () => {
+for (const host of ["source"] as const) test(`leaving Giderler keeps a manual draft until the owner discards it in ${host}`, async () => {
   const userData = await mkdtemp(join(tmpdir(), `esmer-manual-leave-${host}-`)), store = openStore(join(userData, "analytics.sqlite"));
   if (host === "source") store.importSourcePreview(writeRawPackage(rawSnapshot(), "fixture:manual-leave", "manual-leave-host")); else store.importPackage(businessPackage()); store.close();
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });

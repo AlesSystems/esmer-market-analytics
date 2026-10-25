@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
+import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
 // Launch opens Bu ay (#103/#105); data import, SQL and recovery are reached through Ayarlar.
 import { openStore } from "../../src/store/store";
@@ -16,12 +17,12 @@ const zoom = (app: ElectronApplication) => app.evaluate(({ BrowserWindow }) => B
 test("Ayarlar owns data import, live connection, recovery and a persisted text size", async () => {
   test.setTimeout(60_000);
   const userData = await mkdtemp(join(tmpdir(), "esmer-settings-"));
-  const store = openStore(join(userData, "analytics.sqlite")); store.importPackage(businessPackage()); store.close();
+  const store = openStore(join(userData, "analytics.sqlite")); store.importPackage(businessPackage()); store.importSourcePreview(richEstimatePackage()); store.close();
   const { version } = JSON.parse(await readFile("package.json", "utf8"));
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     let page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ekim 2025", level: 1 })).toBeVisible();
     await expect(page.getByText("İşlemler", { exact: true })).toHaveCount(0);
     await expect(page.getByText("Bağlantı ayarları", { exact: true })).toHaveCount(0);
 
@@ -34,7 +35,7 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     for (const name of tiles) await expect(page.getByRole("region", { name, exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Etkin veriler" })).toHaveCount(0);
     await expect(page.getByText("İçe aktarma geçmişi")).toHaveCount(0);
-    await expect(page.getByRole("region", { name: "Veri paketi" })).toContainText("30.09.2025");
+    await expect(page.getByRole("region", { name: "Veri paketi" })).toContainText("31.10.2025");
     await expect(page.getByRole("region", { name: "Veri paketi" }).getByRole("button", { name: "Veri paketi içe aktar", exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("button", { name: "SQL kaynağını içe aktar", exact: true })).toBeVisible();
     const about = page.getByRole("region", { name: "Hakkında" });
@@ -58,17 +59,17 @@ test("Ayarlar owns data import, live connection, recovery and a persisted text s
     await openSettings(page);
     await page.getByRole("radio", { name: "Büyük", exact: true }).check();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
-    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large", selectedMonth: "2025-09" });
+    expect(JSON.parse(await readFile(join(userData, "preferences.json"), "utf8"))).toEqual({ textSize: "large", selectedMonth: "2025-10" });
     await page.getByRole("region", { name: "Yedekleme ve kurtarma", exact: true }).getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ekim 2025", level: 1 })).toBeVisible();
     await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
     await app.close();
 
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
     page = await app.firstWindow();await openWorkspace(page);
-    await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ekim 2025", level: 1 })).toBeVisible();
     await expect.poll(() => zoom(app)).toBeCloseTo(1.15);
     await openSettings(page);
     await expect(page.getByRole("radio", { name: "Büyük", exact: true })).toBeChecked();

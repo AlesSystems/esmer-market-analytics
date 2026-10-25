@@ -5,7 +5,6 @@ import { readPackage } from "../../src/source/package";
 import { readRawPackage } from "../../src/source/raw-package";
 import { LiveSynchronizer } from "../../src/source/live";
 import { openStore } from "../../src/store/store";
-import { SalesReports } from "../../src/reports/query";
 vi.mock("../../src/source/sql-server", async importOriginal => {
   const original = await importOriginal<typeof import("../../src/source/sql-server")>();
   const { rawSnapshot: snapshot } = await import("../helpers/raw-fixture");
@@ -24,7 +23,6 @@ test("a successful SQL read becomes a source preview and not a financial package
   const store = openStore(":memory:");
   try {
     expect(store.importSourcePreview(bytes)).toMatchObject({ status: "preview-imported" });
-    expect(new SalesReports(store).open({ period: "2025-10" })).toMatchObject({ status: "unavailable", code: "UNSUPPORTED_MAPPING", message: "Yedek kayıtları yüklendi; mali rapor için doğrulanmış satış verisi henüz hazır değil." });
   } finally { store.close(); }
 });
 
@@ -48,6 +46,5 @@ test("a live preview stays stored when the financial dataset is absent and a rep
     fail = true;
     expect(await controller.refresh()).toMatchObject({ status: "failed", code: "SOURCE_UNAVAILABLE" });
     expect(store.readSourcePreview({ stream: "headers", offset: 0 })).toMatchObject({ counts: { headers: 1, lines: 1 } });
-    expect(new SalesReports(store).open({ period: "2025-10" })).toMatchObject({ code: "UNSUPPORTED_MAPPING" });
   } finally { await controller.close(); store.close(); }
 });

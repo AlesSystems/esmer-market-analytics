@@ -32,7 +32,7 @@ test("a pinned month export answers SOURCE_CHANGED for another source hash and t
 
 test("named readMonthProfit IPC denies sender, extra keys and bad months before calling the service",async()=>{
  let called=0;const service=async()=>{called++;return {status:"source-unavailable" as const,code:"ESTIMATE_UNAVAILABLE" as const,message:"fixture"};};
- const run=(trusted:boolean,payload:unknown)=>handleRequest(trusted,"readMonthProfit",payload,async()=>({status:"ready",store:"empty",liveConnection:"disabled"}),undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,service);
+ const run=(trusted:boolean,payload:unknown)=>handleRequest(trusted,"readMonthProfit",payload,async()=>({status:"ready",store:"empty",liveConnection:"disabled"}),undefined,undefined,undefined,undefined,undefined,undefined,undefined,service);
  expect(await run(false,{month:"2025-10"})).toMatchObject({code:"UNTRUSTED_SENDER"});
  for(const payload of [{month:"2025-10",sql:"SELECT"},{month:"2025-13"},{month:"2025-1"},{month:202510},{},null,"2025-10",[]])expect(await run(true,payload)).toMatchObject({code:"INVALID_PAYLOAD"});
  expect(called).toBe(0);

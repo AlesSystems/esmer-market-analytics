@@ -33,22 +33,16 @@ for (let path = profile; path.startsWith(repo + sep); path = dirname(path)) {
 }
 const expectedArchive = createHash('sha256').update(await readFile(join(release, 'win-unpacked/resources/app.asar'))).digest('hex');
 const wrapperHash = createHash('sha256').update(await readFile(exe)).digest('hex');
-const phase8 = profile === join(repo, 'work/windows-phase-8/lifecycle/synthetic-profile');
-const acceptedId = phase8
-  ? JSON.parse(await readFile(join(dirname(profile), 'monthly-expected.json'), 'utf8')).monthlyId
-  : (await readFile(join(profile, 'synthetic-accepted-id.txt'), 'utf8')).trim();
-assert.ok(acceptedId, 'Expected synthetic accepted report missing');
 const database = join(profile, 'analytics.sqlite');
-const tables = ['datasets', 'package_history', 'import_batches', 'source_suppliers', 'source_documents', 'source_lines', 'active_dataset', 'rollback_dataset', 'app_revisions', 'adjustment_targets', 'expense_batches', 'report_versions', 'evidence_references'];
+// report_versions and evidence_references are omitted: the app no longer creates accepted reports, so they are always empty here.
+const tables = ['datasets', 'package_history', 'import_batches', 'source_suppliers', 'source_documents', 'source_lines', 'active_dataset', 'rollback_dataset', 'app_revisions', 'adjustment_targets', 'expense_batches'];
 const hash = value => createHash('sha256').update(value).digest('hex');
 function capture() {
   const db = new DatabaseSync(database, { readOnly: true });
   try {
     const schema = db.prepare('PRAGMA user_version').get().user_version;
     const businessHash = hash(JSON.stringify(tables.map(table => [table, db.prepare(`SELECT * FROM ${table} ORDER BY rowid`).all()])));
-    const stored = db.prepare('SELECT content_json FROM report_versions WHERE id=?').get(acceptedId);
-    assert.ok(stored, 'Accepted report missing from profile');
-    return { schema, businessHash, acceptedHash: hash(stored.content_json) };
+    return { schema, businessHash };
   } finally { db.close(); }
 }
 const baseline = capture();
@@ -100,14 +94,8 @@ for (let launch = 1; launch <= 2; launch++) {
     await expect(page.getByRole('button', { name: 'Raporlar', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Ayarlar', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Veri paketi içe aktar', exact: true })).toBeVisible();
-    const report = await page.evaluate(id => window.esmer.readReportVersion({ reportId: id }), acceptedId);
-    assert.equal(report.status, 'monthly');
-    assert.equal(report.report.id, acceptedId);
-    assert.equal(report.report.context.period, '2025-09');
-    assert.ok(report.report.review?.acceptedAt);
-    assert.equal(report.report.sales.metrics.netSales, '100');
-    assert.equal(report.report.purchasing.gross.coveredGrossProfit, '40');
-    assert.equal(report.report.operating.result.expenses, phase8 ? '50' : '60');
+    const expenses = await page.evaluate(() => window.esmer.queryExpenses({ period: '2025-09' }));
+    assert.ok(Array.isArray(expenses.rows) && expenses.rows.length > 0, 'Expected the retained synthetic expenses');
     await page.close();
     const exitDeadline = Date.now() + 15_000;
     while (child.exitCode === null) {
@@ -116,7 +104,7 @@ for (let launch = 1; launch <= 2; launch++) {
     }
     assert.equal(child.exitCode, 0);
     assert.deepEqual(capture(), baseline, 'Portable launch changed accepted or app-owned records');
-    runs.push({ launch, processPath, runningArchiveHash, exitCode: child.exitCode, profilePreserved: true, acceptedReportPreserved: true, developerRuntimeInChildPath: false });
+    runs.push({ launch, processPath, runningArchiveHash, exitCode: child.exitCode, profilePreserved: true, appRecordsPreserved: true, developerRuntimeInChildPath: false });
   } finally {
     if (browser) for (const context of browser.contexts()) for (const page of context.pages()) await page.close().catch(() => undefined);
     if (browser) await browser.close().catch(() => undefined);

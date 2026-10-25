@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { openStore } from "../../src/store/store";
-import { SalesReports } from "../../src/reports/query";
+import { Expenses } from "../../src/expenses/import";
 import { readPackage } from "../../src/source/package";
 import { richBusinessPackage, richBusinessRecords, seedRichExpenses } from "../helpers/rich-business-fixture";
 
@@ -16,33 +16,11 @@ test("rich business fixture is deterministic and reads back as a valid package",
   }
 });
 
-test("rich business fixture imports active and builds a populated September report", () => {
+test("rich business fixture imports active and seeds its expenses", () => {
   const store = openStore(":memory:");
   try {
     expect(store.importPackage(richBusinessPackage())).toMatchObject({ status: "active" });
     seedRichExpenses(store);
-    const reports = new SalesReports(store), opened = reports.open({ period: "2025-09" });
-    if (opened.status !== "report") throw new Error("Expected sales report");
-    const monthly = reports.monthly(opened.view.context);
-    if (monthly.status !== "monthly" || monthly.report.format !== "monthly-report-v2") throw new Error("Expected monthly report");
-    const { productProfit, sales, purchasing, operating } = monthly.report;
-    expect(productProfit.products.length).toBeGreaterThanOrEqual(25);
-    expect(productProfit.daily.filter(day => day.netSales !== null && day.coveredCount + day.excludedCount > 0).length).toBeGreaterThanOrEqual(28);
-    expect(sales.daily.filter(day => Number(day.netSales) > 0).length).toBeGreaterThanOrEqual(28);
-    expect(productProfit.summary.excludedCount).toBeGreaterThan(0);
-    expect(productProfit.summary.exposures.excludedSales).not.toBe("0");
-    expect(Number(productProfit.summary.coveredGrossProfit)).toBeGreaterThan(0);
-    expect(Number(productProfit.summary.costCoveragePercent)).toBeGreaterThan(85);
-    expect(sales.complete).toBe(true);
-    expect(sales.metrics.saleDocumentCount).toBeGreaterThan(600);
-    expect(productProfit.lines.filter(line => line.kind === "customer-return").length).toBeGreaterThan(10);
-    expect(Number(productProfit.summary.exposures.coveredReturns)).toBeLessThan(0);
-    expect(productProfit.lines.filter(line => line.costReason === "RETURN_ATTRIBUTION")).toEqual([]);
-    expect(sales.categories.length).toBeGreaterThanOrEqual(6);
-    expect(purchasing.purchasing.history.length).toBeGreaterThan(30);
-    expect(new Set(purchasing.purchasing.history.map(row => row.supplierName))).toEqual(new Set(["Toptancı A", "Toptancı B", "Toptancı C"]));
-    expect(purchasing.purchasing.exclusions).toEqual([]);
-    expect(operating.status).toBe("operating");
-    if (operating.status === "operating") { expect(operating.expenseRecords).toHaveLength(8); expect(operating.result.status).toBe("unavailable"); }
+    expect(new Expenses(store).query({ period: "2025-09" }).rows.length).toBeGreaterThan(0);
   } finally { store.close(); }
 });
