@@ -2,6 +2,7 @@ import {createSourceEstimateQuery,validEstimateRequest,type EstimateRequest} fro
 import {buildMonthProfit,validMonthProfitRequest,validMonthProfitExportRequest,type MonthProfitExportRequest,type MonthEstimateCache,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
+import { rawFingerprint } from "../source/live";
 import type { OperationControl } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
 import { isExpense, validFields, fieldKeys } from "../expenses/validation";
@@ -72,6 +73,14 @@ class AnalyticsStore {
         return {status: "preview-imported", hash: digest};
       });
     } catch (error) { return error instanceof Error && error.message === "CANCELLED" ? {status: "cancelled"} : {status: "failed", code: importErrorCode(error)}; }
+  }
+  /** Hash and content fingerprint (see rawFingerprint) of the stored source preview, or null without one. */
+  sourcePreviewState(): {hash: string; fingerprint: string} | null {
+    // A stored preview that no longer decodes counts as none, so a fresh live read can replace it.
+    try {
+      const source = this.sourcePackage();
+      return source ? {hash: source.hash, fingerprint: rawFingerprint(source.pkg)} : null;
+    } catch { return null; }
   }
   querySourceWorkspace(request: SourceQuery): SourceWorkspaceResult {
     if (!validSourceQuery(request)) throw new Error("INVALID_PAYLOAD");

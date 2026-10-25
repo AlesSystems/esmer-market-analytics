@@ -1,0 +1,197 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
+import { afterEach, expect, test, vi } from "vitest";
+import { LiveSynchronizer, rawFingerprint } from "../../src/source/live";
+import { MAX_MONTHS, prepareLiveEstimate, prepareMonthlyEstimate } from "../../src/source/sql-package";
+import { parseSqlServerConfig, type SqlSnapshot } from "../../src/source/sql-server";
+import { readRawPackage } from "../../src/source/raw-package";
+import { openStore } from "../../src/store/store";
+import { monthProfitSnapshot } from "../helpers/month-profit-fixture";
+import { richEstimateSnapshot } from "../helpers/rich-estimate-fixture";
+
+// The fake extraction honours the requested window like the real read does and always carries cost.
+let source: SqlSnapshot = monthProfitSnapshot();
+let failing = false;
+let maxSpanDays = Infinity;
+const windows: string[] = [];
+vi.mock("../../src/source/sql-server", async importOriginal => {
+  const original = await importOriginal<typeof import("../../src/source/sql-server")>();
+  return {...original, extractSqlServer: async (config: {from: string; to: string}, _signal?: AbortSignal, options?: {cost?: boolean}) => {
+    if (failing) throw new Error("SOURCE_UNAVAILABLE");
+    if (!options?.cost) throw new Error("COST_REQUIRED");
+    windows.push(`${config.from}..${config.to}`);
+    if ((Date.parse(config.to) - Date.parse(config.from)) / 864e5 + 1 > maxSpanDays) throw new Error("SOURCE_REJECTED", {cause: "SIZE_LIMIT"});
+    const inside = (row: {FIS_TARIHI?: unknown}) => String(row.FIS_TARIHI).slice(0, 10) >= config.from && String(row.FIS_TARIHI).slice(0, 10) <= config.to;
+    const headers = source.headers.filter(inside), ids = new Set(headers.map(row => row.ID));
+    const lines = source.lines.filter(row => ids.has(row.FIS));
+    const stoks = new Set(lines.map(row => row.STOK));
+    return {...source, from: config.from, to: config.to, headers, lines, ...source.products ? {products: source.products.filter(row => stoks.has(row.ID))} : {}};
+  }};
+});
+
+const config = () => parseSqlServerConfig({server: "localhost", port: 14333, database: "fixture", user: "reader", password: "synthetic", scope: "isolated-copy", lineage: "fixture", expectedDatabaseId: "f51ae321-96f0-4bdf-9497-6b106180ff25", from: "2025-08-01", to: "2025-10-31"});
+const today = "2026-10-25";
+const controllers: LiveSynchronizer[] = [];
+afterEach(async () => { failing = false; maxSpanDays = Infinity; windows.length = 0; source = monthProfitSnapshot(); await Promise.all(controllers.splice(0).map(controller => controller.close())); });
+function live(store: ReturnType<typeof openStore>, snapshotConfig = config()) {
+  const controller = new LiveSynchronizer({
+    extract: signal => prepareLiveEstimate(snapshotConfig, signal, today),
+    importCandidate: () => { throw new Error("financial import"); },
+    importPreview: bytes => store.importSourcePreview(bytes),
+    activePreview: () => store.sourcePreviewState(),
+    activeDataset: () => null,
+  });
+  controllers.push(controller); controller.enable();
+  return controller;
+}
+const view = (store: ReturnType<typeof openStore>, month: string) => { const read = store.readMonthProfit({month}); if (read.status !== "month-profit") throw new Error(`NO_VIEW ${read.status}`); return read.view; };
+// source.hash covers the random extraction id and source.extractedAt the capture instant; both differ per extraction by design.
+const withoutIdentity = (value: ReturnType<typeof view>) => ({...value, source: {...value.source, hash: "-", extractedAt: "-"}});
+
+test("live refresh and prepare-month packages give identical month views", async () => {
+  const packageStore = openStore(":memory:"), liveStore = openStore(":memory:");
+  try {
+    const prepared = await prepareMonthlyEstimate(config(), "2025-10", MAX_MONTHS, undefined, {clamp: true});
+    expect(readRawPackage(prepared.bytes)?.schemaVersion).toBe("sql-backup-estimate-v2");
+    expect(packageStore.importSourcePreview(prepared.bytes).status).toBe("preview-imported");
+    expect(await live(liveStore).refresh()).toMatchObject({status: "active"});
+    for (const month of ["2025-10", "2025-09", "2025-08"]) expect(withoutIdentity(view(liveStore, month))).toEqual(withoutIdentity(view(packageStore, month)));
+    expect(view(liveStore, "2025-10").totals).toMatchObject({sales: "480", grossProfit: "57.5"});
+  } finally { packageStore.close(); liveStore.close(); }
+});
+
+test("a failed live refresh keeps the previous month view and expenses", async () => {
+  const store = openStore(":memory:");
+  try {
+    store.appendRevision({kind: "expense", entityId: "expense", value: {net: "7", date: "2025-10-02", reason: "Synthetic", evidence: "fixture:expense"}});
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const before = view(store, "2025-10"), expenses = store.readSnapshot();
+    failing = true;
+    expect(await controller.refresh()).toEqual({status: "failed", code: "SOURCE_UNAVAILABLE"});
+    expect(view(store, "2025-10")).toEqual(before);
+    expect(store.readSnapshot()).toEqual(expenses);
+  } finally { store.close(); }
+});
+
+test("refreshing identical source data reports no change and changed data replaces the preview", async () => {
+  const store = openStore(":memory:");
+  try {
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const first = view(store, "2025-10");
+    expect(await controller.refresh()).toMatchObject({status: "unchanged", datasetId: first.source.hash});
+    expect(view(store, "2025-10")).toEqual(first);
+    source = {...source, capturedAt: "2026-01-01T00:00:00.000Z", lines: source.lines.map(row => row.ID === "1011" ? {...row, TOPLAM_KDV_MATRAHI: "110"} : row)};
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    expect(view(store, "2025-10").totals.sales).toBe("490");
+  } finally { store.close(); }
+});
+
+test("timing of a fake six-month live refresh", async () => {
+  source = richEstimateSnapshot();
+  const store = openStore(":memory:");
+  try {
+    const wide = parseSqlServerConfig({...config(), from: "2025-05-01", to: "2025-10-31"});
+    const started = performance.now();
+    expect(await live(store, wide).refresh()).toMatchObject({status: "active"});
+    console.info(`LIVE_REFRESH_FAKE_6_MONTHS ms=${Math.round(performance.now() - started)} lines=${source.lines.length}`);
+    expect(view(store, "2025-10").month).toBe("2025-10");
+  } finally { store.close(); }
+});
+
+test("a configured end after today is cut at today so the current month is partial and profit is withheld", async () => {
+  const store = openStore(":memory:");
+  try {
+    const future = parseSqlServerConfig({...config(), lineage: "future-end", from: "2025-08-01", to: "2027-12-31"});
+    const controller = new LiveSynchronizer({
+      extract: signal => prepareLiveEstimate(future, signal, "2025-10-20"),
+      importCandidate: () => { throw new Error("financial import"); },
+      importPreview: bytes => store.importSourcePreview(bytes),
+      activePreview: () => store.sourcePreviewState(),
+      activeDataset: () => null,
+    });
+    controllers.push(controller); controller.enable();
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const current = view(store, "2025-10");
+    expect(current.source.to).toBe("2025-10-20");
+    expect(current.dataUntil).toBe("2025-10-20");
+    expect(current.totals.netProfit).toBeNull();
+    expect(current.totals.netProfitReason).toBe("monthPartial");
+    expect(current.changes).toMatchObject({salesPct: null, grossProfitPct: null, netProfitPct: null});
+  } finally { store.close(); }
+});
+
+test("a live refresh starts from the span that worked before and reports a one-month overflow with its own code", async () => {
+  const connection = parseSqlServerConfig({...config(), lineage: "size-shrink", from: "2025-05-01", to: "2025-10-31"});
+  maxSpanDays = 70;
+  await prepareLiveEstimate(connection, undefined, today);
+  const firstRun = windows.length;
+  expect(firstRun).toBeGreaterThan(1);
+  windows.length = 0;
+  await prepareLiveEstimate(connection, undefined, today);
+  expect(windows).toHaveLength(1);
+  // A changed connection starts from six months again.
+  windows.length = 0;
+  await prepareLiveEstimate(parseSqlServerConfig({...config(), lineage: "size-shrink-2", from: "2025-05-01", to: "2025-10-31"}), undefined, today);
+  expect(windows).toHaveLength(firstRun);
+  maxSpanDays = 10;
+  await expect(prepareLiveEstimate(parseSqlServerConfig({...config(), lineage: "size-one", from: "2025-05-01", to: "2025-10-31"}), undefined, today)).rejects.toThrow("SOURCE_TOO_LARGE");
+});
+
+test("a change of cost alone replaces the stored preview", async () => {
+  const store = openStore(":memory:");
+  try {
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const lines = source.lines.map(row => row.ID === "1011" ? {...row, BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "999.5"} : row);
+    expect(lines).not.toEqual(source.lines);
+    source = {...source, lines};
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+  } finally { store.close(); }
+});
+
+test("a corrupt stored preview reads as none and a fresh live read replaces it", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "esmer-corrupt-")), file = join(directory, "store.sqlite");
+  try {
+    let store = openStore(file);
+    expect(await live(store).refresh()).toMatchObject({status: "active"});
+    store.close();
+    const raw = new DatabaseSync(file);
+    raw.prepare("UPDATE source_preview SET package_json = ? WHERE singleton = 1").run("{\"not\":\"a package\"}");
+    raw.close();
+    store = openStore(file);
+    expect(store.sourcePreviewState()).toBeNull();
+    expect(await live(store).refresh()).toMatchObject({status: "active"});
+    expect(store.sourcePreviewState()).not.toBeNull();
+    expect(view(store, "2025-10").totals.sales).toBe("480");
+    store.close();
+  } finally { rmSync(directory, {recursive: true, force: true}); }
+});
+
+test("an unchanged-looking read with a different stored schema version imports instead of reporting unchanged", async () => {
+  const store = openStore(":memory:");
+  try {
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const state = store.sourcePreviewState()!;
+    const stale = new LiveSynchronizer({
+      extract: signal => prepareLiveEstimate(config(), signal, today),
+      importCandidate: () => { throw new Error("financial import"); },
+      importPreview: bytes => store.importSourcePreview(bytes),
+      activePreview: () => ({...state, fingerprint: "a-v1-package-fingerprint"}),
+      activeDataset: () => null,
+    });
+    controllers.push(stale); stale.enable();
+    expect(await stale.refresh()).toMatchObject({status: "active"});
+  } finally { store.close(); }
+});
+
+test("the content fingerprint differs by schema version and by cost alone", async () => {
+  const pkg = readRawPackage((await prepareMonthlyEstimate(config(), "2025-10", 1)).bytes)!;
+  expect(rawFingerprint({...pkg, schemaVersion: "sql-backup-estimate-v1"} as typeof pkg)).not.toBe(rawFingerprint(pkg));
+  const lines = pkg.snapshot.lines.map((row, index) => index === 0 ? {...row, BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "123.45"} : row);
+  expect(rawFingerprint({...pkg, snapshot: {...pkg.snapshot, lines}} as typeof pkg)).not.toBe(rawFingerprint(pkg));
+});

@@ -16,6 +16,8 @@ On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issue
 
 Open gate: Large-package timing of the four v1 pages on Windows (2 s budget) has no current test; tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109).
 
+Open gate: Owner approval for live reading of the historical-cost column (#110) — open
+
 ## Later implementation evidence
 
 The October 22 [monthly data path receipt](2026-10-22-monthly-data-path.md) records `npm run prepare:month`, the column-allowlist and multi-month import checks, and synthetic SQL Edge size and import timings. The bounds stay at 100,000 rows and 32 MiB, so about three September-sized months fit in one package ([decision](../decisions/issue-101-monthly-window.md)).

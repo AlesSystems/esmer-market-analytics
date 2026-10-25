@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { extractSqlServer, type SqlSnapshot } from "../../src/source/sql-server";
-import { prepareSqlCandidate } from "../../src/source/sql-package";
+import { prepareLiveEstimate } from "../../src/source/sql-package";
 import { readRawPackage, writeRawEstimatePackage, writeRawPackage } from "../../src/source/raw-package";
 import { openStore } from "../../src/store/store";
 import { createLiveSqlFixture, syntheticHeader } from "../helpers/live-sql-fixture";
@@ -76,7 +76,7 @@ isolated("product names, categories and classified units come only from granted 
     for (const sql of ["SELECT CARI FROM dbo.STOK", "SELECT TEDARIKCI_AD FROM dbo.STOK", "SELECT ORTALAMA_MALIYET FROM dbo.STOK", "SELECT SORUMLU FROM dbo.STOK_GRUP", "SELECT CARPAN FROM dbo.STOK_BIRIM", "UPDATE dbo.STOK SET AD=AD WHERE 1=0"]) await expect(fixture.readerQuery(sql)).rejects.toThrow(/^FIXTURE_QUERY_REJECTED$/);
     expect(await fixture.readerQuery("SELECT ID,AD,STOK_GRUP,STOK_BIRIM FROM dbo.STOK WHERE ID=101")).toHaveLength(1);
 
-    expect(readRawPackage(await prepareSqlCandidate(fixture.config))?.schemaVersion).toBe("sql-backup-preview-v2");
+    expect(readRawPackage(await prepareLiveEstimate(fixture.config, undefined, fixture.config.to))?.schemaVersion).toBe("sql-backup-estimate-v2");
 
     const byId = new Map(expectedProducts.map(row => [row.ID, row]));
     const current = estimateProducts(snapshot);

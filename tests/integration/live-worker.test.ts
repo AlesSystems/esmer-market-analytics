@@ -16,11 +16,11 @@ const config = {server: "localhost", port: 1433, database: "fixture", user: "rea
 test("worker keeps local reports available during source waits, rejects overlapping imports and preserves fallback after failure", async () => {
   const directory = await mkdtemp(join(tmpdir(), "live-worker-"));
   const script = join(directory, "worker.cjs"), fixture = join(directory, "extractor.ts");
-  await writeFile(join(directory, "candidate.json"), salesPackage());
+  await writeFile(join(directory, "candidate.json"), estimatePackage());
   await writeFile(fixture, `import {readFile} from "node:fs/promises";
     import {workerData} from "node:worker_threads";
     import {dirname,join} from "node:path";
-    export async function prepareSqlCandidate(config,signal) {
+    export async function prepareLiveEstimate(config,signal) {
       await new Promise((resolve,reject)=>{ const timer=setTimeout(resolve,300); signal.addEventListener("abort",()=>{clearTimeout(timer);reject(new Error("INTERRUPTED"));},{once:true}); });
       if(config.database==="fail") throw new Error("password=fixture-password host=localhost");
       return readFile(join(dirname(workerData.databasePath),"candidate.json"));
@@ -92,7 +92,7 @@ test("worker stores a raw SQL preview without replacing the financial report", a
   await writeFile(fixture, `import {readFile} from "node:fs/promises";
     import {workerData} from "node:worker_threads";
     import {dirname,join} from "node:path";
-    export async function prepareSqlCandidate() { return readFile(join(dirname(workerData.databasePath),"preview.json")); }`);
+    export async function prepareLiveEstimate() { return readFile(join(dirname(workerData.databasePath),"preview.json")); }`);
   await build({entryPoints: [resolve("src/service/worker.ts")], outfile: script, bundle: true, platform: "node", format: "cjs", target: "node24", plugins: [{name: "test-source", setup(builder) {builder.onResolve({filter: /source\/sql-package$/}, () => ({path: fixture}));}}]});
   { const seeded = openStore(join(directory, "analytics.sqlite")); try { expect(seeded.importPackage(salesPackage()).status).toBe("active"); } finally { seeded.close(); } }
   const worker = new Worker(script, {workerData: {databasePath: join(directory, "analytics.sqlite"), liveConfig: config, liveEnabled: true}});

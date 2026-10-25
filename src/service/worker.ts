@@ -7,7 +7,7 @@ import { readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync
 import { dirname, join } from "node:path";
 import { LiveSynchronizer, liveFingerprint, liveIdentity } from "../source/live";
 import { parseSqlServerConfig, type SqlServerConfig } from "../source/sql-server";
-import { prepareSqlCandidate } from "../source/sql-package";
+import { prepareLiveEstimate } from "../source/sql-package";
 import type { LiveStatus } from "../source/live-contracts";
 import type { LiveResult } from "../domain/contracts";
 import { liveOperations, validLiveRequest } from "../desktop/requests";
@@ -32,7 +32,8 @@ function liveResult(): LiveResult {
 }
 function createLive(initialStatus?: unknown) {
   live = new LiveSynchronizer({
-    extract: signal => { if (!liveConfig) throw new Error("SOURCE_UNAVAILABLE"); return prepareSqlCandidate(liveConfig, signal); },
+    extract: signal => { if (!liveConfig) throw new Error("SOURCE_UNAVAILABLE"); return prepareLiveEstimate(liveConfig, signal); },
+    activePreview: () => (!store || restoring || liveChanging ? null : store.sourcePreviewState()),
     activeDataset: () => { const active = store?.activeManifest(); return active ? {datasetId: active.datasetId, fingerprint: liveFingerprint(active.metadata), identity: liveIdentity(active.metadata)} : null; },
     importCandidate: bytes => {
       if (!store || restoring || liveChanging) throw new Error("INTERRUPTED");

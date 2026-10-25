@@ -6,6 +6,8 @@ Bu sürüm yalnızca izole test bağlantısını dener. Başarılı SQL okuması
 
 1. Yetkili yedeğin ayrı, atılabilir bir kopyasını kullanın. Üretime bağlanmayın. Orijinal yedeği veya durdurulmuş kaynak konteynerini değiştirmeyin.
 2. Test yöneticisi yalnızca kopyada, [okuma sözleşmesindeki](../contracts/live-sync.md) sütunlara erişebilen ayrı bir kullanıcı hazırlamalıdır. Yönetici hesabını uygulamaya vermeyin. Yazma/DDL ret testleri yalnızca bu kopyada çalıştırılır.
+   - Canlı tahmin, okuma sözleşmesindeki sütunlara ek olarak `FIS_DETAY.BELGE_TARIHINDEKI_SON_ALIS_FIYATI` (belge tarihindeki son alış fiyatı) sütununu okur. Bu nedenle canlı okuyucu girişinin bu sütunda SELECT iznine sahip olması gerekir; başka ek izin verilmez.
+   - İşletmeci 2026-10-25 tarihinde (tek arayüz planı, karar D2) üretim verisinin canlı salt okunur SQL ile geleceğine karar verdi. Bu sütunun üretimde okunması için Eralp'in açık onayı gerekir ve #110 kaydında tutulur. Bu onay henüz verilmemiştir; onay verilene kadar üretim kaynağına bağlanmayın.
 3. Kaynağın `database_guid` değerini ve incelenecek tarih aralığını kaydedin. JSON bağlantı dosyasını Git ve paylaşım klasörleri dışında, yalnızca kendi hesabınızın okuyabildiği bir yerde hazırlayın:
 
 ```json
