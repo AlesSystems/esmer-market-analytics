@@ -1,6 +1,7 @@
 import {validMonthProfitRequest} from "../source/month-profit";
 import {excelMonthProfit} from "../source/month-profit-export";
 import {validSourceQuery} from "../source/workspace";
+import { readPackage } from "../source/package";
 import { readRawPackage } from "../source/raw-package";
 import { readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -181,7 +182,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
     }
     else if (request.operation === "importPackage") {
       if (liveChanging || live?.isBusy()) { parentPort?.postMessage({id: request.id, result: {status: "busy"}}); return; }
-      if (!readRawPackage(request.bytes)) { result = {status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor."}; }
+      if (!readRawPackage(request.bytes)) { result = readPackage(request.bytes).ok ? {status: "failed", code: "INVALID_PACKAGE", message: "Bu paket türü artık desteklenmiyor."} : importOutcome({status: "failed", code: "INVALID_PACKAGE"}); }
       else {
         const preview = store.importSourcePreview(request.bytes, control);
         result = preview.status === "preview-imported" ? preview : importOutcome(preview);

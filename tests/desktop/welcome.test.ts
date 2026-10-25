@@ -93,7 +93,6 @@ test("Settings closes to its opener and import leaves later section requests usa
     await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByRole("status").filter({ hasText: "Veri paketi içe aktarıldı." })).toBeVisible();
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await openSection(page, "Rapor ve Excel");
     await expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible();

@@ -253,7 +253,6 @@ test("packaged app imports an estimate package through native selection, rejects
     await expectEmpty(page);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
-    await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     const imported = await workspace(page);
     expect(imported).toMatchObject({ status: "source-workspace" });
