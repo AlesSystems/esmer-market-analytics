@@ -34,7 +34,7 @@ test("Ürünler sorts every column with nulls last, filters from service flags a
   await expect(page.locator(".products-table thead th")).toHaveText(["Ürün","Satış","Maliyet","Kâr","Marj","Önceki aya göre"]);
   // Default: profit, highest first; unknown profit last.
   await expect(header(page,"Kâr")).toHaveAttribute("aria-sort","descending");
-  expect(await order(page)).toEqual(["1","4","5","7","3","2"]);
+  await expect.poll(()=>order(page)).toEqual(["1","4","5","7","3","2"]);
   const row=(id:string)=>page.locator(`.products-table tr[data-product="${id}"]`);
   await expect(row("1").locator("td")).toHaveText(["SütSüt ürünleri","150,00 ₺","105,00 ₺","45,00 ₺","%30,00","−1,50 puan"]);
   await expect(row("2").locator("td")).toHaveText(["PeynirSüt ürünleri","50,00 ₺","Bilinmiyor","Bilinmiyor","Bilinmiyor","Bilinmiyor"].map(text=>text==="Bilinmiyor"?"—Bilinmiyor":text));
@@ -57,24 +57,24 @@ test("Ürünler sorts every column with nulls last, filters from service flags a
   await header(page,"Kâr").getByRole("button").click();
   await expect(header(page,"Kâr")).toHaveAttribute("aria-sort","descending");
   // Quick filters: one row of toggle buttons; membership comes from the service flags.
-  await expect(filters(page).getByRole("button")).toHaveText(["Tümü","Zarar edenler","Marjı %10 altı","Marjı düşenler","Maliyeti eksik"]);
-  for(const [name,ids] of [["Zarar edenler",["3"]],["Marjı %10 altı",["4","7","3"]],["Marjı düşenler",["1","5"]],["Maliyeti eksik",["2"]],["Tümü",["1","4","5","7","3","2"]]] as const){
+  await expect(filters(page).getByRole("button")).toHaveText(["Tümü","Zarar edenler","Marjı %10’un altında","Marjı düşenler","Maliyeti eksik"]);
+  for(const [name,ids] of [["Zarar edenler",["3"]],["Marjı %10’un altında",["4","7","3"]],["Marjı düşenler",["1","5"]],["Maliyeti eksik",["2"]],["Tümü",["1","4","5","7","3","2"]]] as const){
    await filters(page).getByRole("button",{name,exact:true}).click();
    await expect(filters(page).getByRole("button",{name,exact:true})).toHaveAttribute("aria-pressed","true");
    expect(await order(page),name).toEqual(ids);
   }
   const search=page.getByRole("searchbox",{name:"Ürün ara"});
-  await search.fill("pey");expect(await order(page)).toEqual(["2"]);
-  await search.fill("ŞEKER");expect(await order(page)).toEqual(["5"]);
-  await search.fill("7");expect(await order(page)).toEqual(["7"]);
-  await search.fill("#3");expect(await order(page)).toEqual(["3"]);
-  await search.fill("yok böyle");expect(await order(page)).toEqual([]);
+  await search.fill("pey");await expect.poll(()=>order(page)).toEqual(["2"]);
+  await search.fill("ŞEKER");await expect.poll(()=>order(page)).toEqual(["5"]);
+  await search.fill("7");await expect.poll(()=>order(page)).toEqual(["7"]);
+  await search.fill("#3");await expect.poll(()=>order(page)).toEqual(["3"]);
+  await search.fill("yok böyle");await expect.poll(()=>order(page)).toEqual([]);
   await expect(page.getByText("Aramaya uyan ürün yok.",{exact:true})).toBeVisible();
   await search.fill("");
   await filters(page).getByRole("button",{name:"Zarar edenler",exact:true}).click();await search.fill("süt");
   await expect(page.getByText("Aramaya uyan ürün yok.",{exact:true})).toBeVisible();
   await page.getByRole("button",{name:"Aramayı ve süzgeci temizle",exact:true}).click();
-  expect(await order(page)).toEqual(["1","4","5","7","3","2"]);
+  await expect.poll(()=>order(page)).toEqual(["1","4","5","7","3","2"]);
   await expect(search).toHaveValue("");
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
@@ -84,6 +84,8 @@ test("the product card shows literal figures, a gap-aware margin line and the mi
  try{
   await openSection(page,"Ürünler");
   await expect(card(page)).toContainText("Ayrıntı için tablodan bir ürün seçin.");
+  await page.locator('.products-table tr[data-product="4"]').getByRole("button",{name:"Çay",exact:true}).click();
+  await expect(card(page).getByRole("heading",{name:"Çay",level:2})).toBeFocused();
   await page.locator('.products-table tr[data-product="1"]').click();
   await expect(page.locator('.products-table tr[data-product="1"]')).toHaveAttribute("aria-current","true");
   await expect(card(page).getByRole("heading",{name:"Süt",level:2})).toBeVisible();
@@ -100,17 +102,18 @@ test("the product card shows literal figures, a gap-aware margin line and the mi
   await page.keyboard.press("ArrowDown");await page.keyboard.press("ArrowDown");await page.keyboard.press("ArrowDown");await page.keyboard.press("ArrowDown");await page.keyboard.press("ArrowDown");
   await expect(page.locator('.products-table tr[data-product="2"]')).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(card(page).getByRole("heading",{name:"Peynir",level:2})).toBeVisible();
+  await expect(card(page).getByRole("heading",{name:"Peynir",level:2})).toBeFocused();
   await expect(card(page)).toContainText("Bu ürünün maliyeti bilinmiyor; kâr hesaplanamadı.");
   await expect(fact(page,"Satış")).toHaveText("50,00 ₺");
   await expect(card(page).locator(".product-card-margin")).toHaveCount(0);
   await expect(fact(page,"Birim kâr")).toHaveCount(0);
+  await page.locator('.products-table tr[data-product="2"]').focus();
   await page.keyboard.press("ArrowUp");
   await expect(page.locator('.products-table tr[data-product="3"]')).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(card(page).getByRole("heading",{name:"Ekmek",level:2})).toBeVisible();
   await expect(card(page)).toContainText("Her 100 ₺ satışta 10,00 ₺ zarar.");
-  for(const [name,value] of [["Birim kâr","-1,00 ₺"],["Toplam kârdaki payı","%-6,96 · 5. sıra"]] as const)await expect(fact(page,name),name).toHaveText(value);
+  for(const [name,value] of [["Birim kâr","-1,00 ₺"],["Toplam kârdaki payı","-%6,96 · 5. sıra"]] as const)await expect(fact(page,name),name).toHaveText(value);
   // Narrow layout: the card stacks under the table and Escape closes it, returning focus to the row.
   await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setContentSize(900,760));
   await page.locator('.products-table tr[data-product="3"]').focus();await page.keyboard.press("Enter");
@@ -120,6 +123,11 @@ test("the product card shows literal figures, a gap-aware margin line and the mi
   await page.keyboard.press("Escape");
   await expect(card(page)).toBeHidden();
   await expect(page.locator('.products-table tr[data-product="3"]')).toBeFocused();
+  // Closing a card whose row a filter has since hidden moves focus to the search box.
+  await page.locator('.products-table tr[data-product="3"]').focus();await page.keyboard.press("Enter");
+  await page.getByRole("searchbox",{name:"Ürün ara"}).fill("süt");
+  await card(page).getByRole("button",{name:"Kartı kapat",exact:true}).click();
+  await expect(page.getByRole("searchbox",{name:"Ürün ara"})).toBeFocused();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
 
@@ -142,9 +150,9 @@ test("Bu ay attention opens the product card; Kaynak satırlar and back keep sea
   await filters(page).getByRole("button",{name:"Marjı düşenler",exact:true}).click();
   await page.getByRole("searchbox",{name:"Ürün ara"}).fill("e");
   await header(page,"Satış").getByRole("button").click();
-  expect(await order(page)).toEqual(["5"]);
+  await expect.poll(()=>order(page)).toEqual(["5"]);
   await page.getByRole("searchbox",{name:"Ürün ara"}).fill("");
-  expect(await order(page)).toEqual(["1","5"]);
+  await expect.poll(()=>order(page)).toEqual(["1","5"]);
   await page.locator('.products-table tr[data-product="1"]').click();
   const open=card(page).getByRole("button",{name:"Kaynak satırlar",exact:true});
   await open.scrollIntoViewIfNeeded();
@@ -154,7 +162,8 @@ test("Bu ay attention opens the product card; Kaynak satırlar and back keep sea
   await expect(page.getByRole("heading",{name:"Süt · kaynak satırlar · Ekim 2025",level:2})).toBeVisible();
   await expect(page.locator(".products-table")).toBeHidden();
   const docs=page.getByRole("table",{name:"Bu ürünün geçtiği satış belgeleri"});
-  await expect(docs.locator("tbody tr")).toHaveCount(3);
+  await expect(docs.getByRole("columnheader",{name:"Belge toplamı (KDV dahil)"})).toBeVisible();
+  await expect(docs.locator("tbody tr")).toHaveCount(2);
   await docs.getByRole("button",{name:"101",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Kaynak belge 101"})).toBeVisible();
   await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
@@ -163,7 +172,7 @@ test("Bu ay attention opens the product card; Kaynak satırlar and back keep sea
   await expect(page.locator(".products-table")).toBeVisible();
   await expect(filters(page).getByRole("button",{name:"Marjı düşenler",exact:true})).toHaveAttribute("aria-pressed","true");
   await expect(header(page,"Satış")).toHaveAttribute("aria-sort","descending");
-  expect(await order(page)).toEqual(["1","5"]);
+  await expect.poll(()=>order(page)).toEqual(["1","5"]);
   await expect(card(page).getByRole("button",{name:"Kaynak satırlar",exact:true})).toBeFocused();
   await expect.poll(()=>page.evaluate(()=>window.scrollY)).toBe(scrollY);
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}

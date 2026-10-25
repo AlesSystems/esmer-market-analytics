@@ -177,3 +177,9 @@ test("margin change points and the 10 % flag use unrounded margins",()=>{
  expect(by["1"].flags.marginDrop).toBe(false);
  expect(by["7"]).toMatchObject({marginPct:"10.00",flags:{lowMargin10:true}});
 });
+
+test("profit rank is 1..n by gross profit descending, ties by ID, and absent without a gross profit",()=>{
+ const products=view("2025-10").products,known=products.filter(p=>p.grossProfit!==null).sort((a,b)=>Number(b.grossProfit)-Number(a.grossProfit)||Number(a.id)-Number(b.id));
+ expect(known.map(p=>p.profitRank)).toEqual(known.map((_,i)=>i+1));
+ expect(products.filter(p=>p.grossProfit===null).map(p=>p.profitRank)).toEqual([null]);
+});
