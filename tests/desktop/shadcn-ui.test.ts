@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { importPackage, openWorkspace } from "../helpers/desktop-navigation";
-import { representativeMonthPackage } from "../helpers/shadcn-fixtures";
+import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 
 
 test("forced colors keeps a keyboard focus outline on actions and period input", async ({}, testInfo) => {
@@ -35,7 +35,7 @@ test("forced colors keeps a keyboard focus outline on actions and period input",
   }
 });
 
-async function importedApp(bytes = representativeMonthPackage()) {
+async function importedApp(bytes = richEstimatePackage()) {
   const userData = await mkdtemp(join(tmpdir(), "esmer-shadcn-ui-"));
   const packagePath = join(userData, "representative-month.json");
   await writeFile(packagePath, bytes);

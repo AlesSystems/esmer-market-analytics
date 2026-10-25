@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
+import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
 // Launch opens Bu ay (#103/#105); data import, SQL and recovery are reached through Ayarlar.
 import { openStore } from "../../src/store/store";
@@ -16,7 +17,7 @@ const zoom = (app: ElectronApplication) => app.evaluate(({ BrowserWindow }) => B
 test("Ayarlar owns data import, live connection, recovery and a persisted text size", async () => {
   test.setTimeout(60_000);
   const userData = await mkdtemp(join(tmpdir(), "esmer-settings-"));
-  const store = openStore(join(userData, "analytics.sqlite")); store.importPackage(businessPackage()); store.close();
+  const store = openStore(join(userData, "analytics.sqlite")); store.importPackage(businessPackage()); store.importSourcePreview(richEstimatePackage()); store.close();
   const { version } = JSON.parse(await readFile("package.json", "utf8"));
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {

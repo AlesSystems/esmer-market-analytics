@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { executablePath } from "../helpers/desktop-executable";
 import { openStore } from "../../src/store/store";
 import { businessPackage } from "../helpers/business-fixtures";
+import { estimatePackage } from "../helpers/estimate-fixture";
 import { writeRawPackage } from "../../src/source/raw-package";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { writeFile } from "node:fs/promises";
@@ -81,7 +82,7 @@ for (const source of [false, true]) {
 test("Settings closes to its opener and import leaves later section requests usable", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-import-"));
   const packagePath = join(userData, "synthetic.json");
-  await writeFile(packagePath, businessPackage());
+  await writeFile(packagePath, estimatePackage());
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
@@ -94,7 +95,6 @@ test("Settings closes to its opener and import leaves later section requests usa
     await importPackage(page);
     await expect(page.getByRole("status").filter({ hasText: "Veri paketi içe aktarıldı." })).toBeVisible();
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("button", { name: "Aylık raporlara git", exact: true })).toBeVisible();
     await openSection(page, "Rapor ve Excel");
     await expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Excel’e aktar", exact: true })).toBeVisible();

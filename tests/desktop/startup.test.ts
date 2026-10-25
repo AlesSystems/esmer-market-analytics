@@ -4,6 +4,8 @@ import { mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/prom
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { sourcePackage } from "../helpers/store-fixtures";
+import { businessPackage } from "../helpers/business-fixtures";
+import { estimatePackage } from "../helpers/estimate-fixture";
 import { openStore } from "../../src/store/store";
 import { DatabaseSync } from "node:sqlite";
 const executablePath =
@@ -23,13 +25,6 @@ async function expectEmpty(page: Page) {
 async function expectLoaded(page: Page) {
   await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Aylık raporlara git", exact: true })).toBeVisible();
-}
-async function expectSettingsDataset(page: Page, loaded: boolean) {
-  await openSettings(page);
-  const active = page.getByRole("region", { name: "Veri paketi", exact: true });
-  if (loaded) await expect(active).toContainText("02.02.2025");
-  else await expect(active).toContainText("Henüz yok");
-  await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
 }
 test("empty packaged app starts offline without login or renderer privileges", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-desktop-"));
@@ -248,10 +243,11 @@ test("empty packaged app starts offline without login or renderer privileges", a
   }
 });
 
-test("packaged app imports through native selection, preserves data after failed import and restarts offline", async () => {
+test("packaged app imports an estimate package through native selection, rejects other packages and restarts offline", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-import-"));
-  const packagePath = join(userData, "synthetic.json"); await writeFile(packagePath, sourcePackage("b"));
+  const packagePath = join(userData, "synthetic.json"); await writeFile(packagePath, estimatePackage());
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  const workspace = (page: Page) => page.evaluate(() => window.esmer.querySourceWorkspace({ hash: null, period: null, view: "overview", scope: "all", documentType: null, productId: null, documentId: null, offset: 0 }));
   try {
     let page = await app.firstWindow();await openWorkspace(page);
     await expectEmpty(page);
@@ -259,28 +255,26 @@ test("packaged app imports through native selection, preserves data after failed
     await importPackage(page);
     await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
-    await expectLoaded(page);
-    await expectSettingsDataset(page, true);
-    const availability = await page.evaluate(() => window.esmer.getAvailability());
-    expect(availability).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled", dataset: { cutoff: "2025-02-02", counts: { documents: 2, lines: 2, suppliers: 0 }, warnings: ["SYNTHETIC_ONLY"] } });
+    const imported = await workspace(page);
+    expect(imported).toMatchObject({ status: "source-workspace" });
     await page.screenshot({ path: "test-results/phase-4-imported.png" });
+    await writeFile(packagePath, businessPackage());
     await importPackage(page);
-    await expect(page.getByText("Bu veri paketi zaten etkin. Veriler değiştirilmedi.")).toBeVisible();
+    await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor.");
+    expect(await workspace(page)).toEqual(imported);
     await writeFile(packagePath, "invalid package");
     await importPackage(page);
     await expect(page.getByRole("alert")).toHaveText("Veri paketi geçersiz. Son geçerli veriler korundu.");
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
+    expect(await workspace(page)).toEqual(imported);
     await page.screenshot({ path: "test-results/phase-4-import-failed.png" });
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await importPackage(page);
     await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
+    expect(await workspace(page)).toEqual(imported);
     await app.close();
     app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();await openWorkspace(page);
-    await expectLoaded(page);
-    await expectSettingsDataset(page, true);
-    expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...availability, recentImports: expect.any(Array), lastImportError: "INVALID_PACKAGE" });
-    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: Object.keys(window.esmer).sort() }))).toEqual({ node: "undefined", process: "undefined", api: ["backupNow", "cancelOperation", "cancelRestore", "configureLiveSource", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "createExpense", "exportMonthProfit", "getAvailability", "getLiveStatus", "getOperationStatus", "getPreferences", "getRecoveryStatus", "importPackage", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "querySourceWorkspace", "readMonthProfit", "refreshLiveSource", "restoreExpense", "saveExpenseTemplate", "setLiveEnabled", "setPreferences", "setupRecovery"] });
+    expect(await workspace(page)).toEqual(imported);
+    expect(await page.evaluate(() => ({ node: typeof window.require, process: typeof window.process, api: ["backupNow", "cancelOperation", "cancelRestore", "configureLiveSource", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "createExpense", "exportMonthProfit", "getAvailability", "getLiveStatus", "getOperationStatus", "getPreferences", "getRecoveryStatus", "importPackage", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "querySourceWorkspace", "readMonthProfit", "refreshLiveSource", "restoreExpense", "saveExpenseTemplate", "setLiveEnabled", "setPreferences", "setupRecovery"] }))).toEqual({ node: "undefined", process: "undefined", api: ["backupNow", "cancelOperation", "cancelRestore", "configureLiveSource", "confirmExpenseCompleteness", "confirmExpenses", "confirmRestore", "correctExpense", "createExpense", "exportMonthProfit", "getAvailability", "getLiveStatus", "getOperationStatus", "getPreferences", "getRecoveryStatus", "importPackage", "pinBackup", "prepareRestore", "previewExpenses", "queryExpenses", "querySourceWorkspace", "readMonthProfit", "refreshLiveSource", "restoreExpense", "saveExpenseTemplate", "setLiveEnabled", "setPreferences", "setupRecovery"] });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -305,21 +299,11 @@ for (const loaded of [false, true]) {
       await importPackage(page);
       await expect(page.getByText("İçe aktarma iptal edildi.")).toBeVisible();
       await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
-      if (loaded) {
-        await writeFile(packagePath, sourcePackage("a", "earlier-lineage"));
-        await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
-        await importPackage(page);
-        await expect(page.getByText("Bu paket daha önce kullanılmış. Etkin veriler eski sürüme döndürülmedi.")).toBeVisible();
-        await expect(page.getByRole("alert")).toContainText("Önceki içe aktarma yarıda kaldı.");
-        expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array), lastImportError: "INTERRUPTED" });
-        await writeFile(packagePath, sourcePackage("b"));
-      }
+      await writeFile(packagePath, businessPackage());
       await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
       await importPackage(page);
-      await expect(page.getByText("Veri paketi içe aktarıldı.", { exact: true })).toBeVisible();
-      await expect(page.getByRole("alert")).toHaveCount(0);
-      await expectLoaded(page);
-      expect(await page.evaluate(() => window.esmer.getAvailability())).not.toHaveProperty("lastImportError");
+      await expect(page.getByRole("alert")).toHaveText("Bu paket türü artık desteklenmiyor.");
+      expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ ...before, recentImports: expect.any(Array) });
     } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
   });
 }
