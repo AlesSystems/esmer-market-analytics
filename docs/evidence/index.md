@@ -55,6 +55,8 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 | UI workspaces | [Workspace contract](../contracts/page-control-desks.md), [overview](../../workstreams/ozet-control-desk/EVIDENCE.md), [source](../../workstreams/source-control-desk/EVIDENCE.md), [settings](../../workstreams/settings-page/evidence.md) |
 | Source layouts | [Document layout](source-document-layout.md), [filter layout](../../workstreams/source-filter-layout/evidence.md) |
 
+The per-phase Windows handoffs below are superseded by [the Windows v1 handoff](../operations/windows-v1-handoff.md) for the v1 release; they remain as history.
+
 ## Original phase evidence
 
 These are point-in-time records. Their branches, issue states, test counts and stop instructions describe the recorded phase. Use their tested build identities and limitations; use the current assigned task for authorization.
@@ -71,6 +73,8 @@ These are point-in-time records. Their branches, issue states, test counts and s
 | 8. Reports and export | [Local receipt](phase-8-local.md) | [Windows receipt](windows-phase-8.md), [performance follow-up](windows-phase-8-performance.md) | [Handoff](../operations/windows-phase-8-handoff.md), [report contract](../contracts/reports.md) |
 | 9. Recovery | [Local receipt](phase-9-local.md) | Later [Phase 10 recovery boundary](phase-10-windows-recovery-files.md) | [Handoff](../operations/windows-phase-9-handoff.md), [decision](../decisions/phase-9-recovery.md), [Turkish procedure](../operations/recovery-tr.md) |
 | 10. Release preview | [Release matrix](release-acceptance.md) | [Windows receipt](windows-acceptance.md), [command proof](phase-10-proof.json), [performance samples](phase-10-performance.json) | [Licences](licences.md), [install procedure](../operations/install-tr.md) |
+
+- [v1.0.0 release record (macOS)](2026-10-25-v1-release.md) and [Windows v1 handoff](../operations/windows-v1-handoff.md); Windows acceptance remains open.
 
 ## Source and capacity evidence
 
