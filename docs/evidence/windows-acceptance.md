@@ -20,6 +20,8 @@ The first lifecycle worker run used a stale packaged Phase 8 worker against a ne
 
 `tests/desktop/full-dataset.test.ts` imports every row in the generated 25,000-document/25,000-line synthetic package into a local store, then launches three fresh packaged processes. It asserts literal 2,500,000 TRY sales and the missing-expenses explanation. It measures first sales navigation, transactions, next page, one receipt, monthly return and warm navigation, including content readiness plus two frames. Startup and initial monthly calculation are recorded separately. OS filesystem caches are not cleared. [All samples](phase-10-performance.json) remain available, including the slowest run.
 
+> Historical: `full-dataset.test.ts` and the other desktop tests named here were tests of the old UI, removed in [#123](https://github.com/AlesSystems/esmer-market-analytics/pull/123). They no longer exist and are not current evidence.
+
 The ordinary response requirement is below 2,000 ms. This bounded workload passes. The test filename does not mean the historical 529,001 documents and 1,873,553 source lines were imported. Current package limits are 32 MiB and 100,000 total records per package, and accepted mappings are synthetic only. The real full-data gate remains open. Existing `unavailable-states.test.ts` separately proves real background import progress, navigation, cancellation and preservation of the previous dataset.
 
 ![Synthetic monthly overview without expenses](phase-10-monthly.png)

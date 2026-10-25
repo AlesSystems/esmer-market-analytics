@@ -14,6 +14,8 @@ The historical source audit reported business data from 18 January 2022 through 
 
 The no-expense reveal is verified with synthetic data by `monthly-overview.test.ts` and the complete synthetic workload test. Sales and eligible covered estimates remain visible; the operating headline states that expenses are missing. No owner's completeness confirmation was fabricated. [The Turkish walkthrough](../operations/reveal-tr.md) covers sales traceability, costs, returns, expense preview, Excel, and recovery, with [known limitations](../operations/known-limitations-tr.md).
 
+> Historical: `monthly-overview.test.ts` and the desktop tests behind this claim were tests of the old UI, removed in [#123](https://github.com/AlesSystems/esmer-market-analytics/pull/123). They no longer exist and are not current evidence.
+
 ## Acceptance matrix
 
 Item numbers follow the checkbox order in the [foundation acceptance checklist](../superpowers/specs/2026-09-04-esmer-market-rebuild-acceptance.md). `Synthetic` means passing application evidence on synthetic inputs only. It does not pass the whole release gate. `Open` requires the specified external or platform proof. Referenced tests were run in the Windows suite listed in the linked evidence.

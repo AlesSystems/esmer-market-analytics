@@ -36,6 +36,12 @@ test("Bu ay opens at launch with four sections, and an imported estimate package
   await expect(figure(page,"Marj")).toContainText("▼ 6,63 puan önceki aya göre");
   await expect(figure(page,"Tahmini net kâr")).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
   await expect(page.locator(".viz-estimate")).toHaveCount(1);
+  // The trust chip leads to Rapor ve Excel.
+  await page.locator(".viz-estimate summary").click();
+  await page.getByRole("button",{name:"Ayrıntılar Rapor ve Excel’de",exact:true}).click();
+  await expect(nav.getByRole("button",{name:"Rapor ve Excel",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("heading",{name:"Rapor ve Excel",level:1})).toBeVisible();
+  await nav.getByRole("button",{name:"Bu ay",exact:true}).click();
   await expect(page.getByRole("list",{name:"Satıştan net kâra köprü"}).locator('li[data-state="unknown"]')).toHaveCount(3);
   await expect(page.getByRole("list",{name:"En çok kazandıran ürünler"}).getByRole("button").first()).toContainText("Süt");
   const attention=page.getByRole("list",{name:"Dikkat edilecek ürünler"}).getByRole("button");

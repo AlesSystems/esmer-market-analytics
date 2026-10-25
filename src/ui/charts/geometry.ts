@@ -34,15 +34,14 @@ export function compactMoney(value: number | string): string {
 }
 
 /** Round ticks covering [min, max]; step is 1, 2 or 5 times a power of ten and zero is always a tick when inside the domain. */
-export function niceTicks(min: number, max: number, intervals = 3, options: { integer?: boolean } = {}): { ticks: number[]; min: number; max: number } {
+export function niceTicks(min: number, max: number, intervals = 3): { ticks: number[]; min: number; max: number } {
   if (min === 0 && max === 0) return { ticks: [0], min: 0, max: 1 };
   if (!(max > min)) max = min + 1;
   const raw = (max - min) / intervals;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
   const ratio = raw / magnitude;
   const nice = (ratio <= 1 ? 1 : ratio <= 2 ? 2 : ratio <= 5 ? 5 : 10) * magnitude;
-  /** Count axes use whole steps only, so rounded tick labels cannot repeat. */
-  const step = options.integer ? Math.max(1, nice) : nice;
+  const step = nice;
   const start = Math.floor(min / step) * step;
   const end = Math.ceil(max / step) * step;
   const count = Math.round((end - start) / step);
