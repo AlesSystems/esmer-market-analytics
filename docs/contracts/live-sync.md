@@ -4,7 +4,7 @@ Related: [#14](https://github.com/AlesSystems/esmer-market-analytics/issues/14),
 
 ## Delivery boundary
 
-This implementation provides a read-only SQL transport, candidate synchronization controller, protected desktop configuration and local fallback. It is an **isolated connection preview**. A successful read publishes `sql-backup-preview-v1` through `writeRawPackage` and `importSourcePreview`. It does not activate a financial dataset. `openSales` on that preview stays `UNSUPPORTED_MAPPING`. The [source contract](source.md) still has no approved real financial mapping. No real data is relabelled synthetic. This does not complete #14 or #26.
+This implementation provides a read-only SQL transport, candidate synchronization controller, protected desktop configuration and local fallback. It is an **isolated connection preview**. A successful read publishes `sql-backup-preview-v1` through `writeRawPackage` and `importSourcePreview`. It does not activate a financial dataset. (`openSales` was removed in this change.) The [source contract](source.md) still has no approved real financial mapping. No real data is relabelled synthetic. This does not complete #14 or #26.
 
 Synthetic packages exercise successful activation through the existing package validator and atomic store import. Actual SQL tests exercise coherent reads and the packaged application's rejection/fallback path. These are separate evidence claims.
 
