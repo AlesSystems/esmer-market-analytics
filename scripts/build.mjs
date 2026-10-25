@@ -26,6 +26,7 @@ await build({
   bundle: true,
   platform: "browser",
   minify: true,
+  loader: { ".md": "text" },
   define: { "process.env.NODE_ENV": '"production"', "process.env.APP_VERSION": JSON.stringify(version) },
 });
 await copyFile("src/ui/index.html", "dist/ui/index.html");

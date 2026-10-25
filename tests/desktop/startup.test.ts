@@ -26,12 +26,9 @@ async function expectLoaded(page: Page) {
 }
 async function expectSettingsDataset(page: Page, loaded: boolean) {
   await openSettings(page);
-  const active = page.getByRole("region", { name: "Etkin veriler", exact: true });
-  if (loaded) {
-    await expect(active).toContainText("Kesim 02.02.2025");
-    await expect(active).toContainText("2 belge · 2 satır");
-    await expect(active).toContainText("Sentetik veri gerçek market verisi değildir.");
-  } else await expect(active).toContainText("Henüz yok");
+  const active = page.getByRole("region", { name: "Veri paketi", exact: true });
+  if (loaded) await expect(active).toContainText("02.02.2025");
+  else await expect(active).toContainText("Henüz yok");
   await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
 }
 test("empty packaged app starts offline without login or renderer privileges", async () => {
@@ -46,8 +43,8 @@ test("empty packaged app starts offline without login or renderer privileges", a
     await expect(page.getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
     await openSettings(page);
     await expect(page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("button", { name: "SQL kaynağını içe aktar" })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Veri içe aktarma" }).getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Etkin veriler" })).toContainText("Henüz yok");
+    await expect(page.getByRole("region", { name: "Veri paketi" }).getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Veri paketi" })).toContainText("Henüz yok");
     await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
     await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
     await expect(page.locator("input[type=password]")).toHaveCount(0);

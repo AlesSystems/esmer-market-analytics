@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 const root = resolve(__dirname, "../../src/ui");
 const entries = [join(root, "App.tsx"), join(root, "style.css")];
 /** Ambient declarations are never imported. */
-const ambient = ["global.d.ts"];
+const ambient = ["global.d.ts", "markdown.d.ts"];
 /** Files owned by the expenses workstream that are not reachable yet; shrink this list, never grow it. */
 const allowlist: string[] = [];
 
