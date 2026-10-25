@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { RecoveryStatus } from "../../recovery/contracts";
 import { textSizes, type Availability, type RequestError, type TextSize } from "../../domain/contracts";
 import { date } from "../format";
 import { liveErrors, type LiveConnection, type LiveState } from "./live";
 import { limitations } from "./limitations-data";
+import type { Limitation } from "./limitations";
 
 type Props = {
   availability?: Availability | RequestError;
   source?: { from: string; to: string };
-  sourceResolution?: { status: "pending" | "resolved" } | { status: "failed"; message: string };
+  sourceResolution: { status: "pending" | "resolved" } | { status: "failed"; message: string };
   live: LiveConnection;
   importing: boolean;
   sqlImporting: boolean;
@@ -21,6 +23,8 @@ type Props = {
 const moment = (value: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
 const sizeLabels: Record<TextSize, string> = { normal: "Normal", large: "Büyük", larger: "Çok büyük" };
 const liveTitles: Record<LiveState, string> = { off: "Bağlantı kapalı", on: "Bağlantı açık", checking: "Kaynak kontrol ediliyor…", stale: "Güncellik doğrulanamadı", unknown: "Durum okunamadı" };
+const importFailures: Record<string, string> = { INTERRUPTED: "İşlem yarıda kaldı.", STORAGE_FULL: "Disk alanı yetersiz.", INVALID_PACKAGE: "Paket geçerli değil.", INVALID_CANDIDATE: "Paket verileri doğrulanamadı." };
+const recoveryTitles: Record<RecoveryStatus["state"], string> = { "setup-required": "Kurulum bekliyor", pending: "Yedek sırada", running: "Yedek alınıyor", ready: "Hazır", failed: "Dikkat gerekiyor" };
 const importStates: Record<string, string> = { active: "İçe aktarıldı", failed: "Tamamlanamadı", cancelled: "Etkin veri değiştirilmedi" };
 
 const badgeLabels: Record<LiveState, string> = { off: "Canlı bağlantı kapalı", on: "Canlı bağlantı açık", checking: "Canlı kaynak kontrol ediliyor…", stale: "Canlı kaynak doğrulanamadı", unknown: "Bağlantı durumu okunamadı" };
@@ -47,14 +51,15 @@ function ImportTile({ availability, resolution, source, importing, sqlImporting,
   const result = !ready ? "—" : last ? `${importStates[last.state] ?? "Hazırlanıyor"} · ${date(last.createdAt)}` : "Henüz içe aktarma yok";
   return <Tile glaze="cobalt" name="Veri paketi" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : resolution.status !== "resolved" ? "unknown" : dataset || source ? "ready" : "empty"}>
     {resolution.status !== "resolved" ? <p role={resolution.status === "failed" ? "alert" : "status"}>{resolution.status === "failed" ? resolution.message : "Kaynak durumu kontrol ediliyor…"}</p> : <dl className="tile-facts">
-      <div><dt>Etkin aylar</dt><dd>{range}</dd></div>
+      <div><dt>Veri kapsamı</dt><dd>{range}</dd></div>
       <div><dt>Son içe aktarma</dt><dd>{result}</dd></div>
     </dl>}
+    {resolution.status === "resolved" && last?.state === "failed" && <p className="tile-warning">{importFailures[last.errorCode ?? ""] ?? "Paket içe aktarılamadı."} Mevcut veriler korundu.</p>}
     <div className="tile-actions"><button type="button" className="tile-action primary" disabled={importing || sqlImporting} onClick={onImportPackage}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button></div>
   </Tile>;
 }
 
-function LiveTile({ live, hasData, sqlImporting, onImportSql }: { live: LiveConnection; hasData: boolean; sqlImporting: boolean; onImportSql: () => void }) {
+function LiveTile({ live, hasData, cutoff, sqlImporting, onImportSql }: { live: LiveConnection; hasData: boolean; cutoff?: string; sqlImporting: boolean; onImportSql: () => void }) {
   const state = live.status;
   const busy = live.busy || sqlImporting || live.state === "checking";
   const enabled = live.state === "on" || live.state === "stale" || live.state === "checking";
@@ -62,9 +67,11 @@ function LiveTile({ live, hasData, sqlImporting, onImportSql }: { live: LiveConn
   return <Tile glaze="turquoise" name="Canlı bağlantı" line="Kaynağı yalnızca okur." seal={live.state} status={<span role="status">{liveTitles[live.state]}</span>}>
     <dl className="tile-facts">
       <div><dt>Son yenileme</dt><dd>{state?.live.lastSuccessAt ? moment(state.live.lastSuccessAt) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
+      <div><dt>Son geçerli veri</dt><dd>{cutoff ? date(cutoff) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
     </dl>
     {live.state === "stale" && <p className="tile-warning">{hasData ? "Son geçerli yerel veriler kullanılıyor." : "Henüz geçerli yerel veri yok."}</p>}
     {state?.live.phase === "stale" && state.live.error && <p role="alert">{liveErrors[state.live.error]}</p>}
+    {state?.live.persistenceError && <p role="alert">Kontrol geçmişi kaydedilemedi. Yeniden açılışta kaynak tekrar doğrulanmalıdır.</p>}
     {state?.configurationError && <p role="alert">Bağlantı ayarı kaydedilemedi veya açılamadı. Bağlantıyı yeniden kurun.</p>}
     {live.state === "unknown" && !outcome && <p role="alert">Bağlantı durumu okunamadı. Yerel raporlar kullanılabilir.</p>}
     {outcome && "message" in outcome && <p role="alert">{outcome.message}</p>}
@@ -74,21 +81,38 @@ function LiveTile({ live, hasData, sqlImporting, onImportSql }: { live: LiveConn
       {state?.configured && !enabled && <button type="button" className="tile-action primary" disabled={busy} onClick={() => void live.run(() => window.esmer.setLiveEnabled({ enabled: true }))}>Bağlan</button>}
       {enabled && <button type="button" className="tile-action primary" disabled={busy} onClick={() => void live.run(() => window.esmer.refreshLiveSource())}>Şimdi yenile</button>}
     </div>
+    {state?.configured && <details className="tile-history tile-connection">
+      <summary>Bağlantı ayarı</summary>
+      <div className="tile-actions">
+        {enabled && <button type="button" className="tile-action" disabled={live.busy || sqlImporting} onClick={() => void live.run(() => window.esmer.setLiveEnabled({ enabled: false }))}>Bağlantıyı kapat</button>}
+        <button type="button" className="tile-action quiet" disabled={busy} onClick={() => void live.run(() => window.esmer.configureLiveSource())}>Bağlantıyı değiştir</button>
+      </div>
+    </details>}
   </Tile>;
 }
 
 function BackupTile({ onRecovery }: { onRecovery: () => void }) {
-  return <Tile glaze="coral" name="Yedekleme ve geri yükleme" line="Şifreli yedek alın veya bir yedeği geri yükleyin." seal="ready">
+  const [status, setStatus] = useState<RecoveryStatus>();
+  useEffect(() => { let active = true; window.esmer.getRecoveryStatus().then(value => { if (active && value.status === "recovery") setStatus(value); }).catch(() => undefined); return () => { active = false; }; }, []);
+  const latest = status?.backups[0];
+  const line = !status ? "Durum okunuyor…" : status.state === "setup-required" ? "Yedekleme henüz kurulmadı." : latest ? `Son yedek: ${moment(latest.createdAt)}` : "Henüz yedek yok.";
+  return <Tile glaze="coral" name="Yedekleme ve kurtarma" line="Şifreli yedek al, yedekten geri yükle." seal={status?.state === "setup-required" || !status ? "unknown" : status.state}>
+    <p className="tile-quiet">{status && status.state !== "setup-required" ? `${recoveryTitles[status.state]}. ${line}` : line}</p>
     <div className="tile-actions"><button type="button" className="tile-action primary" onClick={onRecovery}>Yedekleme ve kurtarma</button></div>
   </Tile>;
 }
 
 function AboutTile() {
   const [open, setOpen] = useState(false);
-  const rows = limitations();
+  const [rows, setRows] = useState<Limitation[]>();
+  const [failed, setFailed] = useState(false);
+  function toggle() {
+    if (!open && !rows && !failed) { try { setRows(limitations()); } catch { setFailed(true); } }
+    setOpen(value => !value);
+  }
   return <Tile glaze="ink" name="Hakkında" line={`Esmer Market Analytics · Sürüm ${process.env.APP_VERSION}`} seal="ready">
-    <div className="tile-actions"><button type="button" className="tile-action" aria-expanded={open} aria-controls="limitations" onClick={() => setOpen(value => !value)}>Bilinen sınırlar</button></div>
-    {open && <ul id="limitations" className="limitations">{rows.map((row, index) => <li key={index} data-status={row.status}><span>{row.status}</span>{row.limit}</li>)}</ul>}
+    <div className="tile-actions"><button type="button" className="tile-action" aria-expanded={open} aria-controls={open ? "limitations" : undefined} onClick={toggle}>Bilinen sınırlar</button></div>
+    {open && (failed ? <p role="alert">Sınırlar listesi okunamadı.</p> : <ul id="limitations" className="limitations" tabIndex={0} role="region" aria-label="Bilinen sınırlar">{rows?.map((row, index) => <li key={index} data-status={row.status}><span>{row.status}</span>{row.limit}</li>)}</ul>)}
   </Tile>;
 }
 
@@ -123,8 +147,9 @@ function DisplayTile() {
   </Tile>;
 }
 
-export function SettingsPage({ availability, source, sourceResolution = { status: "resolved" }, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
+export function SettingsPage({ availability, source, sourceResolution, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
+  const liveCutoff = live.status?.cutoff ?? (availability?.status === "ready" && availability.store === "loaded" ? availability.dataset.cutoff : source?.to);
   useEffect(() => { if (claimFocus()) heading.current?.focus(); }, [claimFocus]);
   return <main className="settings-page" aria-busy={importing || sqlImporting}>
     <div className="settings-heading">
@@ -135,7 +160,7 @@ export function SettingsPage({ availability, source, sourceResolution = { status
       <ImportTile availability={availability} resolution={sourceResolution} source={source} importing={importing} sqlImporting={sqlImporting} onImportPackage={onImportPackage} />
       <BackupTile onRecovery={onRecovery} />
       <DisplayTile />
-      <LiveTile live={live} hasData={!!source || (availability?.status === "ready" && availability.store === "loaded")} sqlImporting={sqlImporting} onImportSql={onImportSql} />
+      <LiveTile live={live} cutoff={liveCutoff} hasData={!!source || (availability?.status === "ready" && availability.store === "loaded")} sqlImporting={sqlImporting} onImportSql={onImportSql} />
       <AboutTile />
     </div>
   </main>;

@@ -26,7 +26,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     let page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", {name: "Bu ay", level: 1})).toBeVisible();
     await openSettings(page);
-    await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toHaveCount(0);
+    await expect(page.getByRole("button", {name: "Bağlantıyı değiştir", exact: true})).toHaveCount(0);
     await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);
     await page.getByRole("button", {name: "SQL kaynağını içe aktar", exact: true}).click();
     const configured = Boolean(process.env.ESMER_SQL_TEST_CONFIG);
@@ -41,19 +41,23 @@ test("packaged SQL connection preserves local reports and encrypts configuration
       await page.getByRole("button", {name: "Şimdi yenile", exact: true}).click();
       await expect(page.getByText("Kaynağa ulaşılamadı.", {exact: true})).toBeVisible({timeout: 30_000});
     }
-    await expect(page.getByRole("button", {name: "Test bağlantısını ayarla", exact: true})).toHaveCount(0);
+    await expect(page.locator("details button", {hasText: "Bağlantıyı değiştir"})).toHaveCount(1);
     await expect(page.getByRole("region", {name: "Canlı bağlantı"})).not.toContainText("izole");
     const status = await page.evaluate(() => window.esmer.getLiveStatus());
     expect(JSON.stringify(status)).not.toContain(config.password);
     expect((await readFile(join(userData, "live-source.enc"))).includes(Buffer.from(config.password))).toBe(false);
     await page.screenshot({path: "test-results/live-fallback.png", fullPage: true});
-    await expect(page.getByRole("button", {name: "Bağlantıyı kapat", exact: true})).toHaveCount(0);
+    const liveTile = page.getByRole("region", {name: "Canlı bağlantı"});
+    await liveTile.getByText("Bağlantı ayarı", {exact: true}).click();
+    await expect(liveTile.getByRole("button", {name: "Bağlantıyı değiştir", exact: true})).toBeVisible();
+    await liveTile.getByRole("button", {name: "Bağlantıyı kapat", exact: true}).click();
+    await expect.poll(() => page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
     await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     page = await app.firstWindow();await openWorkspace(page);
     await openSettings(page);
-    expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true});
+    expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
     await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));
