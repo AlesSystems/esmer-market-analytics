@@ -18,7 +18,8 @@ export function liveFingerprint(manifest: Manifest): string {
  * Two reads of unchanged source data share it.
  */
 export function rawFingerprint(pkg: RawPackage): string {
-  const {capturedAt: _capturedAt, ...snapshot} = pkg.snapshot;
+  const snapshot: Record<string, unknown> = {...pkg.snapshot};
+  delete snapshot.capturedAt;
   return createHash("sha256").update(canonical({schemaVersion: pkg.schemaVersion, lineage: pkg.lineage, snapshot})).digest("hex");
 }
 type PreviewImport = {status: "preview-imported"; hash: string} | {status: "failed"; code: string} | {status: "cancelled"};
