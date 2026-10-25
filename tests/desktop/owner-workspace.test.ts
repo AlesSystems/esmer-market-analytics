@@ -66,6 +66,8 @@ for (const source of [false, true]) test(`owner workspace renders ${source ? "so
         await openSection(page, nav);
         await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: nav, exact: true })).toHaveAttribute("aria-current", "page");
         await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
+        await expect(page.locator("h1:visible")).toHaveCount(1);
+        await expect(page.locator("canvas:visible")).toHaveCount(0);
         await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
         await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
