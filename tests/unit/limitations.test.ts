@@ -22,4 +22,15 @@ describe("known limitations table", () => {
   test("rejects an unknown status", () => {
     expect(() => parseLimitations("| Durum | Sınır | Not | Konu |\n| --- | --- | --- | --- |\n| belki | A | B | — |")).toThrow();
   });
+  test("splits on unescaped pipes only and unescapes \\|", () => {
+    const [row] = parseLimitations("| Durum | Sınır | Not | Konu |\n| --- | --- | --- | --- |\n| açık | A \\| B | C | D |");
+    expect(row).toEqual({ status: "açık", limit: "A | B", note: "C", topic: "D" });
+  });
+  test("reads CRLF files", () => {
+    expect(parseLimitations("# Başlık\r\n\r\n| Durum | Sınır | Not | Konu |\r\n| --- | --- | --- | --- |\r\n| düzeltildi | A | B | C |\r\n")).toHaveLength(1);
+  });
+  test("ignores a second table later in the file", () => {
+    const rows = parseLimitations("| Durum | Sınır | Not | Konu |\n| --- | --- | --- | --- |\n| açık | A | B | C |\n\nMetin\n\n| Ad | Değer |\n| --- | --- |\n| x | y |");
+    expect(rows).toHaveLength(1);
+  });
 });
