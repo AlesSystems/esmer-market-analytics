@@ -76,8 +76,11 @@ class AnalyticsStore {
   }
   /** Hash and content fingerprint (see rawFingerprint) of the stored source preview, or null without one. */
   sourcePreviewState(): {hash: string; fingerprint: string} | null {
-    const source = this.sourcePackage();
-    return source ? {hash: source.hash, fingerprint: rawFingerprint(source.pkg)} : null;
+    // A stored preview that no longer decodes counts as none, so a fresh live read can replace it.
+    try {
+      const source = this.sourcePackage();
+      return source ? {hash: source.hash, fingerprint: rawFingerprint(source.pkg)} : null;
+    } catch { return null; }
   }
   querySourceWorkspace(request: SourceQuery): SourceWorkspaceResult {
     if (!validSourceQuery(request)) throw new Error("INVALID_PAYLOAD");

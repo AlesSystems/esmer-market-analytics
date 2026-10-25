@@ -1,5 +1,9 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { afterEach, expect, test, vi } from "vitest";
-import { LiveSynchronizer } from "../../src/source/live";
+import { LiveSynchronizer, rawFingerprint } from "../../src/source/live";
 import { MAX_MONTHS, prepareLiveEstimate, prepareMonthlyEstimate } from "../../src/source/sql-package";
 import { parseSqlServerConfig, type SqlSnapshot } from "../../src/source/sql-server";
 import { readRawPackage } from "../../src/source/raw-package";
@@ -147,4 +151,47 @@ test("a change of cost alone replaces the stored preview", async () => {
     source = {...source, lines};
     expect(await controller.refresh()).toMatchObject({status: "active"});
   } finally { store.close(); }
+});
+
+test("a corrupt stored preview reads as none and a fresh live read replaces it", async () => {
+  const directory = mkdtempSync(join(tmpdir(), "esmer-corrupt-")), file = join(directory, "store.sqlite");
+  try {
+    let store = openStore(file);
+    expect(await live(store).refresh()).toMatchObject({status: "active"});
+    store.close();
+    const raw = new DatabaseSync(file);
+    raw.prepare("UPDATE source_preview SET package_json = ? WHERE singleton = 1").run("{\"not\":\"a package\"}");
+    raw.close();
+    store = openStore(file);
+    expect(store.sourcePreviewState()).toBeNull();
+    expect(await live(store).refresh()).toMatchObject({status: "active"});
+    expect(store.sourcePreviewState()).not.toBeNull();
+    expect(view(store, "2025-10").totals.sales).toBe("480");
+    store.close();
+  } finally { rmSync(directory, {recursive: true, force: true}); }
+});
+
+test("an unchanged-looking read with a different stored schema version imports instead of reporting unchanged", async () => {
+  const store = openStore(":memory:");
+  try {
+    const controller = live(store);
+    expect(await controller.refresh()).toMatchObject({status: "active"});
+    const state = store.sourcePreviewState()!;
+    const stale = new LiveSynchronizer({
+      extract: signal => prepareLiveEstimate(config(), signal, today),
+      importCandidate: () => { throw new Error("financial import"); },
+      importPreview: bytes => store.importSourcePreview(bytes),
+      activePreview: () => ({...state, fingerprint: "a-v1-package-fingerprint"}),
+      activeDataset: () => null,
+    });
+    controllers.push(stale); stale.enable();
+    expect(await stale.refresh()).toMatchObject({status: "active"});
+  } finally { store.close(); }
+});
+
+test("the content fingerprint differs by schema version and by cost alone", async () => {
+  const pkg = readRawPackage((await prepareMonthlyEstimate(config(), "2025-10", 1)).bytes)!;
+  expect(rawFingerprint({...pkg, schemaVersion: "sql-backup-estimate-v1"} as typeof pkg)).not.toBe(rawFingerprint(pkg));
+  const lines = pkg.snapshot.lines.map((row, index) => index === 0 ? {...row, BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "123.45"} : row);
+  expect(rawFingerprint({...pkg, snapshot: {...pkg.snapshot, lines}} as typeof pkg)).not.toBe(rawFingerprint(pkg));
 });

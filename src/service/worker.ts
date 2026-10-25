@@ -33,7 +33,7 @@ function liveResult(): LiveResult {
 function createLive(initialStatus?: unknown) {
   live = new LiveSynchronizer({
     extract: signal => { if (!liveConfig) throw new Error("SOURCE_UNAVAILABLE"); return prepareLiveEstimate(liveConfig, signal); },
-    activePreview: () => store?.sourcePreviewState() ?? null,
+    activePreview: () => (!store || restoring || liveChanging ? null : store.sourcePreviewState()),
     activeDataset: () => { const active = store?.activeManifest(); return active ? {datasetId: active.datasetId, fingerprint: liveFingerprint(active.metadata), identity: liveIdentity(active.metadata)} : null; },
     importCandidate: bytes => {
       if (!store || restoring || liveChanging) throw new Error("INTERRUPTED");
