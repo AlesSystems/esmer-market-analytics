@@ -53,7 +53,7 @@ test("unknown sale and return amounts are exported with their counts and a bilin
 
 test("named exportMonthProfit IPC denies sender, extra keys and bad months before calling the service",async()=>{
  let called=0;const service=async()=>{called++;return {status:"cancelled" as const};};
- const hash="a".repeat(64);const run=(trusted:boolean,payload:unknown)=>handleRequest(trusted,"exportMonthProfit",payload,async()=>({status:"ready",store:"empty",liveConnection:"disabled"}),undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,service);
+ const hash="a".repeat(64);const run=(trusted:boolean,payload:unknown)=>handleRequest(trusted,"exportMonthProfit",payload,async()=>({status:"ready",store:"empty",liveConnection:"disabled"}),undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,service);
  expect(await run(false,{month:"2025-10",hash})).toMatchObject({code:"UNTRUSTED_SENDER"});
  for(const payload of [{month:"2025-10"},{month:"2025-10",hash:"abc"},{month:"2025-10",hash:1},{hash},{month:"2025-10",hash,path:"/tmp/x"},{month:"2025-13",hash},{month:"2025-1",hash},{month:202510,hash},{},null,"2025-10",[]])expect(await run(true,payload)).toMatchObject({code:"INVALID_PAYLOAD"});
  expect(called).toBe(0);

@@ -6,7 +6,6 @@ import { openStore } from "../../src/store/store";
 import { Expenses } from "../../src/expenses/import";
 import { isExpense, fieldKeys } from "../../src/expenses/validation";
 import type { ExpenseFields } from "../../src/expenses/contracts";
-import { SalesReports } from "../../src/reports/query";
 import { businessPackage, businessRecords } from "../helpers/business-fixtures";
 import { workbook, row } from "../helpers/expense-fixtures";
 import { handleRequest } from "../../src/desktop/requests";
@@ -46,30 +45,20 @@ test("failed mid-batch write rolls back history and ledger; successful retry sur
     expect(new Expenses(store).preview(bytes).alreadyImported).toBe(true);
   } finally { store.close(); rmSync(directory, { recursive: true, force: true }); }
 });
-test("operating reports pin expense history and accepted results across edits and source refresh", async () => {
+test("accepted results and expense completeness stay pinned across edits and source refresh", async () => {
   const store = openStore(":memory:"), expenses = new Expenses(store);
   const records = businessRecords(); records.documents = [records.documents[0]]; records.lines = [records.lines[0]];
   store.importPackage(businessPackage(records));
   const p = expenses.preview(await workbook([[...row.slice(0, 1), "15.09.2025", "01.10.2025", ...row.slice(3)]]));
   expenses.confirm({ previewId: p.previewId, keepCandidateRows: [] });
   store.confirmExpensesComplete({ period: "2025-09", reviewedRevision: 1, complete: true, reason: "İncelendi" });
-  const reports = new SalesReports(store), opened = reports.open({ period: "2025-09" });
-  if (opened.status !== "report") throw new Error("Expected report");
-  const before = reports.operating({ context: opened.view.context });
-  expect(before.status).toBe("operating");
-  if (before.status !== "operating") throw new Error("Expected operating");
-  expect(before.result.status).toBe("estimated");
-  store.acceptReport({ id: "accepted-expense", pin: store.readSnapshot().pin, calculationVersion: before.calculationVersion, evidence: ["synthetic-acceptance"], output: { result: before.result } });
+  const result = { status: "estimated", expenses: expenses.query({ period: "2025-09" }).rows.length };
+  store.acceptReport({ id: "accepted-expense", pin: store.readSnapshot().pin, calculationVersion: "synthetic-v1", evidence: ["synthetic-acceptance"], output: { result } });
   const original = expenses.query({ period: "2025-09" }).rows[0];
   store.changeExpense({ entityId: original.entityId, expectedRevision: original.revision, replacement: { ...fields(original.value), date: "2025-10-15" }, reason: "Dönem değişti" });
-  expect(reports.operating({ context: opened.view.context })).toMatchObject({ stale: true, result: before.result, expenseRevision: before.expenseRevision });
   store.importPackage(businessPackage(records, { extractionId: "business-next" }));
-  expect(reports.operating({ context: opened.view.context })).toMatchObject({ result: before.result });
-  expect(store.readReport("accepted-expense").output).toEqual({ result: before.result });
+  expect(store.readReport("accepted-expense").output).toEqual({ result: result });
   expect(expenses.query({ period: "2025-09" }).complete).toBe(false);
-  const next = reports.open({ period: "2025-09" });
-  if (next.status !== "report") throw new Error("Expected report");
-  expect(reports.operating({ context: next.view.context })).toMatchObject({ result: { value: null } });
   store.close();
 });
 test("schema v4 legacy evidence migrates unchanged and remains an unsupported expense", () => {
@@ -87,11 +76,11 @@ test("every expense IPC checks sender and exact payload before service or native
   const context = { sessionId: "session", datasetId: "dataset", appRevision: 0, calculationVersion: "v1", period: "2026-01" };
   const operations: Record<string, unknown> = { saveExpenseTemplate: null, previewExpenses: null, confirmExpenses: { previewId: "preview", keepCandidateRows: [] }, queryExpenses: { period: "2026-01" }, correctExpense: {}, restoreExpense: { entityId: "record", expectedRevision: 1, restoreRevision: null, reason: "İptal" }, confirmExpenseCompleteness: { period: "2026-01", reviewedRevision: 0, complete: true, reason: "İncelendi" }, queryOperating: { context } };
   for (const [operation, payload] of Object.entries(operations)) {
-    expect(await handleRequest(false, operation, payload, availability, undefined, undefined, service)).toMatchObject({ code: "UNTRUSTED_SENDER" });
-    expect(await handleRequest(true, operation, { ...(payload ?? {}), sql: "SELECT 1" }, availability, undefined, undefined, service)).toMatchObject({ code: "INVALID_PAYLOAD" });
+    expect(await handleRequest(false, operation, payload, availability, undefined, service)).toMatchObject({ code: "UNTRUSTED_SENDER" });
+    expect(await handleRequest(true, operation, { ...(payload ?? {}), sql: "SELECT 1" }, availability, undefined, service)).toMatchObject({ code: "INVALID_PAYLOAD" });
   }
   expect(service).not.toHaveBeenCalled();
-  for (const [operation, payload] of Object.entries(operations).filter(([operation]) => operation !== "correctExpense")) expect(await handleRequest(true, operation, payload, availability, undefined, undefined, service)).toEqual({ status: "saved" });
+  for (const [operation, payload] of Object.entries(operations).filter(([operation]) => operation !== "correctExpense")) expect(await handleRequest(true, operation, payload, availability, undefined, service)).toEqual({ status: "saved" });
 });
 test("loss evidence cannot be duplicated by correction or restoration across periods", async () => {
   const store = openStore(":memory:"), expenses = new Expenses(store);

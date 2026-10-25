@@ -3,7 +3,7 @@ import { handleRequest } from "../../src/desktop/requests";
 
 test("live operations accept only trusted named commands without connection data", async () => {
   const live = vi.fn().mockResolvedValue({status: "live", configured: false});
-  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, undefined, undefined, live);
+  const invoke = (trusted: boolean, operation: string, payload: unknown) => handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, live);
   expect(await invoke(false, "configureLiveSource", null)).toMatchObject({code: "UNTRUSTED_SENDER"});
   for (const [operation, payload] of [["configureLiveSource", {password: "secret"}], ["refreshLiveSource", {sql: "SELECT"}], ["getLiveStatus", {}], ["setLiveEnabled", {enabled: true, server: "host"}], ["setLiveEnabled", {enabled: 1}]]) {
     expect(await invoke(true, operation as string, payload)).toMatchObject({code: "INVALID_PAYLOAD"});

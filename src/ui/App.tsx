@@ -97,17 +97,11 @@ function App() {
   useEffect(() => {
     if (!preferencesReady || availability?.status !== "ready") return;
     let active = true;
-    window.esmer.querySourceWorkspace({ ...initialSourceQuery }).then(async value => {
+    window.esmer.querySourceWorkspace({ ...initialSourceQuery }).then(value => {
       if (!active) return;
       if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); if (selectedMonth === null) selectMonth(value.period); setResolution({ status: "resolved" }); return; }
       setCoverage(null);
       if (value.status !== "source-empty") { setResolution({ status: "failed", message: value.message }); return; }
-      // Resolve only after the dataset month is known, so pages never read today's month first.
-      if (selectedMonth === null && availability.store === "loaded") {
-        const sales = await window.esmer.openSales({ period: null }).catch(() => undefined);
-        if (!active) return;
-        if (sales?.status === "report" && monthWrite.current === 0) selectMonth(sales.view.context.period);
-      }
       setResolution({ status: "resolved" });
     }).catch(() => { if (active) { setCoverage(null); setResolution({ status: "failed", message: "Kaynak kayıtları okunamadı." }); } });
     return () => { active = false; };

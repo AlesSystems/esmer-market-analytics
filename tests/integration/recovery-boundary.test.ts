@@ -15,7 +15,7 @@ vi.mock("electron", () => ({safeStorage: {
 test("recovery requests accept only trusted named operations and exact renderer payloads", async () => {
   const recovery = vi.fn().mockResolvedValue({ status: "recovery", state: "setup-required", lastVerifiedAt: null, backups: [] });
   const invoke = (trusted: boolean, operation: string, payload: unknown) =>
-    handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, undefined, undefined, recovery);
+    handleRequest(trusted, operation, payload, vi.fn(), undefined, undefined, undefined, recovery);
 
   expect(await invoke(false, "setupRecovery", null)).toMatchObject({ code: "UNTRUSTED_SENDER" });
   for (const [operation, payload] of [
