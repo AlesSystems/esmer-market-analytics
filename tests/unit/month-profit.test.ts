@@ -120,8 +120,10 @@ test("thresholds compare unrounded margins: a 1.495-point drop is not flagged, 7
 });
 
 test("changes against the previous month come from the service as rounded decimal strings",()=>{
- // Sales 480 vs 510 -> -5.882..%; gross 57.5 vs 102 -> -43.627..%; margin 13.3720.. vs 20 -> -6.6279.. points; net unknown.
- expect(view("2025-10").changes).toEqual({salesPct:"-5.88",grossProfitPct:"-43.63",marginPoints:"-6.63",netProfitPct:null});
+ // October is loaded only to 20.10: amounts are not comparable with a full September, the margin ratio still is (13.3720.. vs 20 -> -6.6279.. points).
+ expect(view("2025-10").changes).toEqual({salesPct:null,grossProfitPct:null,marginPoints:"-6.63",netProfitPct:null});
+ // Full October: sales 480 vs 510 -> -5.882..%; gross 57.5 vs 102 -> -43.627..%.
+ expect(view("2025-10",undefined,fullOctober()).changes).toEqual({salesPct:"-5.88",grossProfitPct:"-43.63",marginPoints:"-6.63",netProfitPct:null});
  // September vs August: 510 vs 100 -> 410 %; 102 vs 20 -> 410 %; margin 20 vs 20 -> 0 points.
  expect(view("2025-09").changes).toEqual({salesPct:"410.00",grossProfitPct:"410.00",marginPoints:"0.00",netProfitPct:null});
  expect(view("2025-08").changes).toBeNull();

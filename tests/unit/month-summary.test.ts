@@ -1,5 +1,5 @@
 import {expect,test} from "vitest";
-import {monthSummary,wordMoney,monthName} from "../../src/ui/pages/month-summary";
+import {monthSummary,wordMoney,monthName,percentText} from "../../src/ui/pages/month-summary";
 
 const totals={sales:"1970000",grossProfit:"296000.4",marginPct:"15.03"};
 
@@ -31,4 +31,15 @@ test("word money and month names",()=>{
  expect(wordMoney("0")).toBe("0 ₺");
  expect(wordMoney("-2500000")).toBe("-2,5 milyon ₺");
  expect(monthName("2026-01")).toBe("Ocak 2026");
+});
+
+test("the money unit is chosen after rounding",()=>{
+ expect(wordMoney("999960")).toBe("1 milyon ₺");
+ expect(wordMoney("-999960")).toBe("-1 milyon ₺");
+ expect(wordMoney("296000")).toBe("296 bin ₺");
+});
+
+test("a negative percentage puts the sign before the percent mark",()=>{
+ expect(percentText("-10.00")).toBe("-%10,00");
+ expect(percentText("13.37")).toBe("%13,37");
 });
