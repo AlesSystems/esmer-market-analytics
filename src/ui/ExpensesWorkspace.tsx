@@ -52,7 +52,7 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
     return false;
   }
   useEffect(() => { if (!active) { if (task === "manual" && !busy && !localStorage.getItem(pendingExpenseKey)) setTask("records"); return; } if (!visible) return; if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active, visible]);
-  async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false) {
+  async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false, focusId?: string) {
     navigation.protect({ dirty: false, locked: true });
     setBusy(true); setError(""); setMessage("");
     try {
@@ -61,11 +61,11 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
       if (result.status === "preview") { setPreview(result); setKeep([]); opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); return; }
       if (result.status === "cancelled") { setMessage("İşlem iptal edildi. Kayıtlar değiştirilmedi."); return; }
       setMessage(result.status === "already-imported" ? "Bu Excel dosyası zaten içe aktarılmış. Kayıtlar değiştirilmedi." : success);
-      if (mutation) { setPreview(undefined); setKeep([]); returnToRecords(); await load(); onChange?.(); }
+      if (mutation) { setPreview(undefined); setKeep([]); if (!focusId) returnToRecords(); await load(); onChange?.(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
     } catch { setError(failed); }
     finally { navigation.protect({ dirty: false, locked: false }); setBusy(false); }
   }
-  const confirm = (complete: boolean) => { if (view) void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete, reason: complete ? "Bu ayın giderleri tamam" : "Onay kaldırıldı" }), complete ? "Bu ayın giderleri onaylandı." : "Onay kaldırıldı.", true); };
+  const confirm = (complete: boolean) => { if (view) void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete, reason: complete ? "Bu ayın giderleri tamam" : "Onay kaldırıldı" }), complete ? "Bu ayın giderleri onaylandı." : "Onay kaldırıldı.", true, "expense-confirm-action"); };
   const importExcel = () => void run(() => window.esmer.previewExpenses(), "");
   const saveTemplate = () => void run(() => window.esmer.saveExpenseTemplate(), "Excel şablonu kaydedildi.");
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
@@ -89,9 +89,9 @@ export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod
       <div className="expense-month">
         <section className="expense-groups" aria-labelledby="expense-groups-title">
           <h2 id="expense-groups-title">Bu ayın giderleri</h2>
-          {!view.groups.some(group => group.count) && !view.attention.length ? <div className="expense-empty"><p><strong>Bu ay için gider girilmedi.</strong></p><p>Excel şablonunu indirin, ayın giderlerini doldurun ve “Excel’den içe aktar” ile yükleyin. Personel için yalnızca aylık toplamı girin.</p></div>
-            : <dl className="expense-group-list">{view.groups.map(group => <div key={group.key} data-group={group.key}><dt>{groupLabels[group.key]}<small>{group.count ? `${group.count.toLocaleString("tr-TR")} satır` : "satır yok"}</small></dt><dd>{group.amount === null ? <span className="expense-blocked">Eksik</span> : money(group.amount)}</dd></div>)}<div className="expense-group-total"><dt>Toplam</dt><dd>{view.summary.expenses === null ? <span className="expense-blocked">Eksik</span> : money(view.summary.expenses)}</dd></div></dl>}
-          {view.attention.length > 0 && <div className="expense-attention" role="group" aria-labelledby="expense-attention-title"><h3 id="expense-attention-title">Düzeltilmesi gereken satırlar</h3><ul>{view.attention.map(item => { const row = view.rows.find(candidate => candidate.entityId === item.entityId); const id = `expense-fix-${item.entityId}`; return <li key={item.entityId}><span><strong>{item.category}</strong> · {date(item.date)} · {attentionText[item.reason]}</span>{row && <Button variant="outline" id={id} disabled={busy} onClick={() => open(row, id)}>Düzelt</Button>}</li>; })}</ul></div>}
+          {!view.groups.some(group => group.count) && !view.attention.length ? <div className="expense-empty"><p><strong>{view.rows.length > 0 ? `Bu ay sayılan gider yok · ${view.rows.length.toLocaleString("tr-TR")} kayıt toplam dışında veya geri alınmış.` : "Bu ay için gider girilmedi."}</strong></p>{view.rows.length === 0 && <p>Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p>}<p>Excel şablonunu indirin, ayın giderlerini doldurun ve “Excel’den içe aktar” ile yükleyin. Personel için yalnızca aylık toplamı girin.</p></div>
+            : <dl className="expense-group-list">{view.groups.map(group => <div key={group.key} data-group={group.key}><dt>{groupLabels[group.key]}<small>{group.count ? `${group.count.toLocaleString("tr-TR")} satır` : "satır yok"}</small></dt><dd>{group.count === 0 ? "Girilmedi" : group.amount === null ? <span className="expense-blocked">Eksik</span> : money(group.amount)}</dd></div>)}<div className="expense-group-total"><dt>Toplam</dt><dd>{view.summary.expenses === null ? <span className="expense-blocked">Eksik</span> : money(view.summary.expenses)}</dd></div></dl>}
+          {view.attention.length > 0 && <div className="expense-attention" role="group" aria-labelledby="expense-attention-title"><h3 id="expense-attention-title">Düzeltilmesi gereken satırlar</h3><ul>{view.attention.map(item => { const row = view.rows.find(candidate => candidate.entityId === item.entityId); const id = `expense-fix-${item.entityId}`; return <li key={item.entityId}><span><strong>{item.category}</strong> · {date(item.date)} · {attentionText[item.reason]}</span>{row && item.reason !== "legacy" && <Button variant="outline" id={id} disabled={busy} onClick={() => open(row, id)}>Düzelt</Button>}</li>; })}</ul></div>}
           <ConfirmBlock view={view} busy={busy} confirm={confirm} />
         </section>
         {!embedded && <NetProfitPanel profit={profit} onMonthPage={onMonthPage} />}
@@ -116,7 +116,7 @@ function ConfirmBlock({ view, busy, confirm }: { view: ExpensePeriod; busy: bool
   return <div className="expense-confirm" data-state={state} role="group" aria-labelledby="expense-confirm-title">
     <div><h3 id="expense-confirm-title">{confirmationState(state)}</h3>
       <p>{state === "current" ? "Bu ayın giderlerini tamam olarak onayladınız. Bir gider değişirse onay yeniden istenir." : state === "stale" ? "Onaydan sonra giderler değişti. Kontrol edip yeniden onaylayın." : "Bu ayın tüm giderleri girildiyse onaylayın. Net kâr ancak onaydan sonra hesaplanır."}</p></div>
-    {state === "current" ? <Button variant="link" disabled={busy} onClick={() => confirm(false)}>Onayı kaldır</Button> : <Button disabled={busy} onClick={() => confirm(true)}>Bu ayın giderleri tamam</Button>}
+    {state === "current" ? <Button variant="link" id="expense-confirm-action" disabled={busy} onClick={() => confirm(false)}>Onayı kaldır</Button> : <Button id="expense-confirm-action" disabled={busy} onClick={() => confirm(true)}>Bu ayın giderleri tamam</Button>}
   </div>;
 }
 
@@ -152,7 +152,7 @@ function TemplateHelp() {
   return <details className="expense-help"><summary>Excel şablonu nasıl doldurulur?</summary><p>Tek sayfayı ve sütun başlıklarını koruyun. Formül veya ek sütun eklemeyin.</p><dl className="evidence"><dt>Kategori</dt><dd>Kira için “Kira”, elektrik ve su için “Elektrik” veya “Su” yazın. Diğer giderler “Diğer” altında toplanır.</dd><dt>Sınıflandırma</dt><dd>{classifications.map(item => classificationLabels[item]).join("; ")}</dd><dt>Personel</dt><dd>“İşçilik” sınıfıyla yalnızca aylık toplamı girin; kişi veya bordro bilgisi eklemeyin. İşçilik dönemi gider ayıyla aynı olmalı (örnek: 2026-01).</dd><dt>KDV işlemi</dt><dd>İndirilebilir; İndirilemez; Bilinmiyor. İlk ikisinde KDV kanıtı zorunlu. “Bilinmiyor” net kârı durdurur.</dd><dt>Tarih ve tutar</dt><dd>Gider tarihi: 15.01.2026 veya 2026-01-15. Tutar: 1250,50. Net ile KDV toplamı brüte eşit olmalı.</dd><dt>Referanslar</dt><dd>Kişisel bilgi yerine kısa kod kullanın (harf, rakam, nokta, alt çizgi, iki nokta, kısa çizgi).</dd><dt>Stok kaybı</dt><dd>Kayıp kanıtı ve Kayıp işlemi (Ayrı gider veya Maliyete dahil) zorunlu.</dd></dl></details>;
 }
 
-function ExpenseEditor({ row, history, busy, close, run }: { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean) => Promise<void> }) {
+function ExpenseEditor({ row, history, busy, close, run }: { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean, focusId?: string) => Promise<void> }) {
   const original = currentValue(row);
   const [fields, setFields] = useState<ExpenseFields | null>(original ? { date: original.date, paymentDate: original.paymentDate, category: original.category, classification: original.classification, net: original.net, tax: original.tax, gross: original.gross, taxTreatment: original.taxTreatment, taxEvidence: original.taxEvidence, supportingReference: original.supportingReference, sourceReference: original.sourceReference, labourPeriod: original.labourPeriod, loss: original.loss } : null);
   const [reason, setReason] = useState("");

@@ -12,6 +12,7 @@ export function netReasonText(reason: NetProfitReason, dataUntil: string): strin
     case "monthPartial": return `Ay henüz bitmedi; veri ${date(dataUntil)} tarihine kadar.`;
     case "expensesMissing": return "Bu ayın giderleri henüz girilmedi.";
     case "expensesIncomplete": return "Giderler girildi ama “Bu ayın giderleri tamam” onayı verilmedi.";
+    case "expensesBlocked": return "Onaylandı ama bazı gider satırları net kârı engelliyor; işaretli satırları düzeltin.";
     case "unknownTax": return "Bir giderin KDV durumu bilinmiyor; aşağıdaki satırı düzeltin.";
     case "confirmationStale": return "Onaydan sonra giderler değişti; yeniden onaylayın.";
   }
@@ -25,4 +26,5 @@ export const attentionText: Record<ExpensePeriod["attention"][number]["reason"],
   unknownTax: "KDV durumu bilinmiyor",
   unclassified: "Gider türü seçilmemiş",
   lossReview: "Stok kaybı kanıtı eksik",
+  legacy: "Eski biçimli kayıt; yeniden girilmeli",
 };

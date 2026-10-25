@@ -60,7 +60,7 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.getByRole("button", { name: "İncele / düzelt" }).click();
     await page.getByLabel("Değişiklik gerekçesi").fill("Kontrol için geri alma");
     await page.getByRole("button", { name: "Gideri geri al", exact: true }).click();
-    await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Bu ay sayılan gider yok · 1 kayıt toplam dışında veya geri alınmış.", { exact: true })).toBeVisible();
     await expect(page.getByText("Tüm kayıtlar (1)", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "İncele / düzelt" }).click();
     await page.getByLabel("Değişiklik gerekçesi").fill("İlk belgeyi geri yükle");

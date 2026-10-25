@@ -8,9 +8,10 @@ export type ExpenseGroupKey = typeof expenseGroupKeys[number];
 /** A display group of the month's counted expenses. `amount` is null when a line in the group blocks the total (unknown KDV or loss review). */
 export type ExpenseGroup = { key: ExpenseGroupKey; amount: string | null; count: number };
 /** A line that blocks net profit and needs the owner's attention. */
-export type ExpenseAttention = { entityId: string; category: string; date: string; reason: "unknownTax" | "unclassified" | "lossReview" };
+export type ExpenseAttention = { entityId: string; category: string; date: string; reason: "unknownTax" | "unclassified" | "lossReview" | "legacy" };
 
-const words = (text: string) => text.toLocaleLowerCase("tr").split(/[^a-zçğıöşü]+/u).filter(Boolean);
+const fold = (text: string) => text.toLocaleLowerCase("tr").replace(/ı/g, "i").replace(/ç/g, "c").replace(/ş/g, "s").replace(/ğ/g, "g").replace(/ö/g, "o").replace(/ü/g, "u");
+const words = (text: string) => fold(text).split(/[^a-z]+/u).filter(Boolean);
 /**
  * Display-only mapping onto the stored model. Labour is aggregate staff cost. The model has no rent or utility class:
  * those are operating expenses, told apart by the category text the owner wrote ("Kira", "Elektrik", "Su").
@@ -31,7 +32,12 @@ export function groupExpenses(period: string, app: AppRecord[]): { groups: Expen
   const totals = new Map<ExpenseGroupKey, { amount: InstanceType<typeof Exact> | null; count: number }>(expenseGroupKeys.map(key => [key, { amount: new Exact(0), count: 0 }]));
   const attention: ExpenseAttention[] = [], losses = new Set<string>();
   for (const record of app) {
-    if (record.kind !== "expense" || !isExpense(record.value)) continue;
+    if (record.kind !== "expense") continue;
+    if (!isExpense(record.value)) {
+      const legacy = record.value as { date: string; category?: string; voided?: boolean };
+      if (legacy.date.startsWith(period) && !legacy.voided) attention.push({ entityId: record.entityId, category: legacy.category ?? "Eski kayıt", date: legacy.date, reason: "legacy" });
+      continue;
+    }
     const v = record.value;
     if (v.voided || !v.date.startsWith(period)) continue;
     const line = { entityId: record.entityId, category: v.category, date: v.date };

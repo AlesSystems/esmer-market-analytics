@@ -69,6 +69,10 @@ test("net profit: confirmed complete month subtracts counted expenses (recoverab
 test("net profit: unconfirmed month shows expenses but withholds net",()=>{
  expect(view("2025-10",{app:[rent,labour],history:[rent,labour]},fullOctober()).totals).toMatchObject({expenses:"30",expensesComplete:false,netProfit:null,netProfitReason:"expensesIncomplete"});
 });
+test("net profit: confirmed month with a still-blocking line says expensesBlocked, not expensesIncomplete",()=>{
+ const unclassified={...rent,revision:2,entityId:"unclassified",value:{...rent.value,classification:"unclassified",gross:"40",net:"40"}} as typeof rent;
+ expect(view("2025-10",{app:[rent,unclassified,confirm(3,2)],history:[rent,unclassified]},fullOctober()).totals).toMatchObject({netProfit:null,netProfitReason:"expensesBlocked"});
+});
 test("net profit: unknown tax treatment blocks the net figure even when confirmed",()=>{
  const unknown=expense(2,"labour",{...labour.value as ExpenseValue,taxTreatment:"unknown",taxEvidence:null});
  expect(view("2025-10",{app:[rent,unknown,confirm(3,2)],history:[rent,unknown]},fullOctober()).totals).toMatchObject({expenses:null,expensesComplete:true,netProfit:null,netProfitReason:"unknownTax"});

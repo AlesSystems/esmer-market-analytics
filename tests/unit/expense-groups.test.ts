@@ -18,6 +18,9 @@ test("display groups read the stored classification and the category text", () =
   expect(displayGroup("operating-expense", "Elektrik")).toBe("utilities");
   expect(displayGroup("operating-expense", "Elektrik/su")).toBe("utilities");
   expect(displayGroup("operating-expense", "Su faturası")).toBe("utilities");
+  expect(displayGroup("operating-expense", "KIRA")).toBe("rent");
+  expect(displayGroup("operating-expense", "ELEKTRİK")).toBe("utilities");
+  expect(displayGroup("operating-expense", "ELEKTRIK")).toBe("utilities");
   expect(displayGroup("operating-expense", "Sucuk alımı")).toBe("other");
   expect(displayGroup("operating-expense", "Kırtasiye")).toBe("other");
   expect(displayGroup("inventory-loss", "Bozulan ürün")).toBe("other");
@@ -60,4 +63,9 @@ test("an unknown-tax line blocks its group and is named", () => {
     { entityId: "b", category: "Elektrik", date: "2025-09-12", reason: "unknownTax" },
     { entityId: "c", category: "Belirsiz", date: "2025-09-05", reason: "unclassified" },
   ]);
+});
+
+test("a legacy-format record in the month needs attention", () => {
+  const legacy = { kind: "expense", entityId: "old", value: { date: "2025-09-03", net: "50", reason: "Legacy", evidence: "legacy" }, revision: ++revision } as unknown as AppRecord;
+  expect(groupExpenses("2025-09", [legacy]).attention).toEqual([{ entityId: "old", category: "Eski kayıt", date: "2025-09-03", reason: "legacy" }]);
 });
