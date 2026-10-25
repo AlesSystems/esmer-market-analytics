@@ -24,30 +24,33 @@ export function parseSqlServerConfig(value: unknown): SqlServerConfig {
 const headerColumns = ["ID", "FIS_TURU", "DOVIZ_AD", "DURUM", "AKTIF", "SATIR_TOPLAM", "SATIR_ISKONTO_TOPLAM", "FIS_ISKONTO_TOPLAM", "KDV_TOPLAM", "OTV_TOPLAM", "TEFKIFAT_TOPLAM", "GENELTOPLAM"];
 const lineColumns = ["ID", "FIS", "STOK", "FIS_TURU", "CARPAN", "MIKTAR_FIS", "TOPLAM_KDV_MATRAHI", "TOPLAM_KDV", "TOPLAM_OTV", "TOPLAM_TEVKIF"];
 export const productColumns = ["ID", "NAME", "CATEGORY", "UNIT"] as const;
-// Product catalogue physical names. They follow the observed FK/dictionary convention (FIS.DOVIZ_AD -> DOVIZ_AD.AD, FIS_DETAY.STOK_BIRIM -> STOK_BIRIM),
-// but STOK.AD, STOK.STOK_GRUP, STOK_GRUP.AD and STOK.STOK_BIRIM are UNVERIFIED against the private source catalog; if absent the query fails closed (SOURCE_REJECTED).
+// Product catalogue physical names, checked against the restored source catalog on 2026-10-25. STOK has no unit column:
+// a product's unit is its single VARSAYILAN link in STOK_STOK_BIRIM; none or several give no unit. A missing column fails closed (SOURCE_REJECTED).
 // Only these columns may be selected (no STOK.CARI or other supplier/customer columns).
-const catalog = {product: "STOK", name: "AD", group: "STOK_GRUP", groupName: "AD", unit: "STOK_BIRIM", unitName: "AD"} as const;
+const catalog = {product: "STOK", name: "AD", group: "STOK_GRUP", groupName: "AD", unitLink: "STOK_STOK_BIRIM", unit: "STOK_BIRIM", unitName: "AD"} as const;
 const unitName = `UPPER(LTRIM(RTRIM(u.[${catalog.unitName}])))`;
-const productSql = `SELECT TOP (256) CONVERT(varchar(20),s.ID) AS ID, CASE WHEN LEN(LTRIM(RTRIM(s.[${catalog.name}])))<=160 THEN CONVERT(nvarchar(160),LTRIM(RTRIM(s.[${catalog.name}]))) END AS NAME, CASE WHEN LEN(LTRIM(RTRIM(g.[${catalog.groupName}])))<=160 THEN CONVERT(nvarchar(160),LTRIM(RTRIM(g.[${catalog.groupName}]))) END AS CATEGORY, CASE WHEN u.ID IS NULL THEN NULL WHEN NULLIF(LTRIM(RTRIM(u.[${catalog.unitName}])),N'') IS NULL THEN NULL WHEN ${unitName} IN (N'ADET',N'AD') THEN 'adet' WHEN ${unitName} IN (N'KG',N'KILO',N'KİLO',N'KILOGRAM',N'KİLOGRAM') THEN 'kg' ELSE 'other' END AS UNIT FROM dbo.${catalog.product} s LEFT JOIN dbo.${catalog.group} g ON g.ID=s.[${catalog.group}] LEFT JOIN dbo.${catalog.unit} u ON u.ID=s.[${catalog.unit}] WHERE s.ID IN (SELECT l.STOK FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE RANGE) AND (@cursor IS NULL OR s.ID>CONVERT(bigint,@cursor)) ORDER BY s.ID`;
+const productSql = `SELECT TOP (256) CONVERT(varchar(20),s.ID) AS ID, CASE WHEN LEN(LTRIM(RTRIM(s.[${catalog.name}])))<=160 THEN CONVERT(nvarchar(160),LTRIM(RTRIM(s.[${catalog.name}]))) END AS NAME, CASE WHEN LEN(LTRIM(RTRIM(g.[${catalog.groupName}])))<=160 THEN CONVERT(nvarchar(160),LTRIM(RTRIM(g.[${catalog.groupName}]))) END AS CATEGORY, CASE WHEN u.ID IS NULL THEN NULL WHEN NULLIF(LTRIM(RTRIM(u.[${catalog.unitName}])),N'') IS NULL THEN NULL WHEN ${unitName} IN (N'ADET',N'AD') THEN 'adet' WHEN ${unitName} IN (N'KG',N'KILO',N'KİLO',N'KILOGRAM',N'KİLOGRAM') THEN 'kg' ELSE 'other' END AS UNIT FROM dbo.${catalog.product} s LEFT JOIN dbo.${catalog.group} g ON g.ID=s.[${catalog.group}] LEFT JOIN dbo.${catalog.unit} u ON u.ID=(SELECT CASE WHEN COUNT(b.[${catalog.product}])=1 THEN MAX(b.[${catalog.unit}]) END FROM dbo.${catalog.unitLink} b WHERE b.[${catalog.product}]=s.ID AND b.VARSAYILAN=1) WHERE s.ID IN (SELECT l.STOK FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE RANGE) AND (@cursor IS NULL OR s.ID>CONVERT(bigint,@cursor)) ORDER BY s.ID`;
 const unsafeLabel = /[\u0000-\u001f\u007f-\u009f\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]/;
 const label = (v: string | null) => { const t = v?.trim(); return !t || t.length > 160 || unsafeLabel.test(t) ? null : t; };
-const guardTables = ["FIS", "FIS_DETAY", "DOVIZ_AD", catalog.product, catalog.group, catalog.unit];
+const guardTables = ["FIS", "FIS_DETAY", "DOVIZ_AD", catalog.product, catalog.group, catalog.unitLink, catalog.unit];
 const guard = `IF ISNULL(IS_SRVROLEMEMBER('sysadmin'),1) <> 0 OR ISNULL(IS_MEMBER('db_owner'),1) <> 0 OR ISNULL(HAS_PERMS_BY_NAME(NULL,NULL,'CONTROL SERVER'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;
 ${["CONTROL", "ALTER", "CREATE TABLE", "EXECUTE"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME(DB_NAME(),'DATABASE','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
 ${guardTables.map(t => `IF EXISTS (SELECT 1 FROM sys.fn_my_permissions('dbo.${t}','OBJECT') WHERE permission_name IN ('INSERT','UPDATE','DELETE','ALTER','CONTROL','TAKE OWNERSHIP')) THROW 51000,'SOURCE_REJECTED',1;`).join("\n")}
 ${guardTables.flatMap(t => ["CONTROL", "ALTER", "INSERT", "UPDATE", "DELETE", "TAKE OWNERSHIP"].map(p => `IF ISNULL(HAS_PERMS_BY_NAME('dbo.${t}','OBJECT','${p}'),1) <> 0 THROW 51000,'SOURCE_REJECTED',1;`)).join("\n")}`;
 const range = "f.FIS_TARIHI >= CONVERT(datetime,REPLACE(@from,'-',''),112) AND f.FIS_TARIHI < DATEADD(day,1,CONVERT(datetime,REPLACE(@to,'-',''),112))";
 const costColumn = "BELGE_TARIHINDEKI_SON_ALIS_FIYATI";
+// Plans each page for its own window and cursor. A cached plan for `@cursor IS NULL OR ID > @cursor` cannot seek, so on the
+// restored source (1.9M lines) every page rescanned FIS_DETAY and one month of pages overran the 60 s deadline.
+const perPagePlan = " OPTION (RECOMPILE)";
 export type ExtractOptions = { cost?: boolean };
 /** The only SQL the extractor sends. `cost` adds exactly the approved historical-cost candidate for estimate packages. */
 export function sourceQueries(options: ExtractOptions = {}) {
   const lineSelect = [...lineColumns, ...options.cost ? [costColumn] : []];
   return {
     guard,
-    headers: `SELECT TOP (256) ${headerColumns.map(c => `CONVERT(varchar(80),f.[${c}]) AS [${c}]`).join(",")}, CONVERT(varchar(23),f.FIS_TARIHI,126) AS FIS_TARIHI, CASE WHEN d.AD='TRY' THEN 'TRY' WHEN d.AD='USD' THEN 'USD' WHEN d.ID IS NULL THEN NULL ELSE 'OTHER' END AS CURRENCY FROM dbo.FIS f LEFT JOIN dbo.DOVIZ_AD d ON d.ID=f.DOVIZ_AD WHERE ${range} AND (@cursor IS NULL OR f.ID>CONVERT(bigint,@cursor)) ORDER BY f.ID`,
-    lines: `SELECT TOP (256) ${lineSelect.map(c => `CONVERT(varchar(80),l.[${c}]) AS [${c}]`).join(",")} FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE ${range} AND (@cursor IS NULL OR l.ID>CONVERT(bigint,@cursor)) ORDER BY l.ID`,
-    products: productSql.replace("RANGE", range),
+    headers: `SELECT TOP (256) ${headerColumns.map(c => `CONVERT(varchar(80),f.[${c}]) AS [${c}]`).join(",")}, CONVERT(varchar(23),f.FIS_TARIHI,126) AS FIS_TARIHI, CASE WHEN d.AD='TRY' THEN 'TRY' WHEN d.AD='USD' THEN 'USD' WHEN d.ID IS NULL THEN NULL ELSE 'OTHER' END AS CURRENCY FROM dbo.FIS f LEFT JOIN dbo.DOVIZ_AD d ON d.ID=f.DOVIZ_AD WHERE ${range} AND (@cursor IS NULL OR f.ID>CONVERT(bigint,@cursor)) ORDER BY f.ID${perPagePlan}`,
+    lines: `SELECT TOP (256) ${lineSelect.map(c => `CONVERT(varchar(80),l.[${c}]) AS [${c}]`).join(",")} FROM dbo.FIS_DETAY l JOIN dbo.FIS f ON f.ID=l.FIS WHERE ${range} AND (@cursor IS NULL OR l.ID>CONVERT(bigint,@cursor)) ORDER BY l.ID${perPagePlan}`,
+    products: productSql.replace("RANGE", range) + perPagePlan,
   };
 }
 
