@@ -1,16 +1,21 @@
-# Önizlemenin bilinen sınırları
+# Bilinen sınırlar (v1)
 
-0.2.0 bir geliştirme önizlemesidir. Gerçek market verileriyle ilk sürüm kabulü tamamlanmamıştır. [Kabul kaydı](../evidence/release-acceptance.md) açık kontrolleri gösterir.
+Bu liste uygulamanın bilinen sınırlarını ve açık işlerini tek yerde izler. Bir durumu güncellemek için ilgili satırdaki `Durum` değerini `açık`, `v1 için kabul` veya `düzeltildi` olarak değiştirin.
 
-- Doğrulanmış mali veri yolu yalnızca sentetik eşlemeyi kabul eder. İzole SQL paketi ham kayıtları gösterebilir. Ayrı `sql-backup-estimate-v1` paketi ürün, gün ve ay için tahmini brüt kâr ve marj sağlar. 22 Ekim 2026 kararıyla ([#98](../decisions/issue-98-profit-first-estimate-edition.md)) bu tahmin v1'in mali sonucudur; doğrulanmış kâr değildir. Bu tahmin kaynak anlamlarını doğrulamaz veya mali rapor veri setini etkinleştirmez. [Tahmin sözleşmesi](../contracts/recorded-estimates.md) kapsamı ve varsayımları açıklar.
-- Tahmini brüt kâr yalnızca maliyeti bilinen satış satırlarını kullanır. İadelerin kâra etkisi ve desteklenmeyen maliyetler dışarıda kalır. İadelerin ekonomik etkisi sonuçtan eksik olduğu için tahmin yüksek görünebilir. Kaynak paketi değişince uygulamadaki tahmin değişir; kabul edilmiş mali rapor sürümü oluşturmaz. Excel çıktısı dışarıda saklanabilir.
-- Eski denetim 12 Ekim 2025'e kadar kayıtlar bildirmiştir. Ekim ayı ve son gün kısmi kapsamdadır. Bu tarih, önizlemeye gerçek veri yüklendiği anlamına gelmez. Yeni işlem uydurulmaz.
-- Tarihsel maliyet son alış fiyatına dayanan tahmindir. Ağırlıklı ortalama stok maliyeti veya doğrulanmış net kâr değildir. Güncel yerine koyma maliyeti ayrı gösterilir.
-- Eksik maliyet sıfır değildir. Gider kanıtı ve sahibinin tamlık onayı olmadan faaliyet kârı hesaplanmaz. Tahmini net kâr, tahmini brüt kârdan sahibinin tamamlandı olarak işaretlediği ayın giderleri düşülerek bulunur; giderler tamamlanmadan gösterilmez. Excel aktarımı ve elle kayıt aynı doğrulama ve geçmiş kurallarını kullanır. Başarılı kayıt tamlık onayı sayılmaz. Ürün brüt sonucu giderlerden önce değerlendirilir; ayrı faaliyet sonucu kendi koşullarına bağlıdır.
-- Tedarikçi iade belgesi ödemenin veya ürün değişiminin gerçekleştiğini tek başına kanıtlamaz. Müşteri iadeleri ayrı değerlendirilir.
-- 25.000 belgeli sentetik paketteki ölçümler tam market geçmişinin performansını kanıtlamaz. Geçerli paket sınırları 32 MiB ve paket başına toplam 100.000 kayıttır. Tarihsel denetimdeki yaklaşık 1,87 milyon satır bu sürümde doğrulanmış değildir.
-- Windows kurtarma testleri aynı bilgisayarda ayrı sentetik profiller kullanır. Ayrı temiz bilgisayar ve bağımsız ortamla kurtarma kabulü açık kalır. Windows dizin değişikliklerinin elektrik kesintisinde kalıcılığı kanıtlanmamıştır.
-- Kurucu ve taşınabilir dosya imzasızdır. Windows yayıncı uyarısı gösterebilir. Taşınabilir uygulama aynı hesapta kurulu uygulamayla aynı veri klasörünü kullanır.
-- Canlı market bağlantısı kapalı başlar. İsteğe bağlı izole test bağlantısı mali kayıtları etkinleştirmez. Bu önizleme vergi beyannamesi, bordro, müşteri analizi veya satış sistemi değildir. KKTC vergi kuralları hakkında varsayım yapmaz.
-
-[Güncel kanıt dizini](../evidence/index.md) sonraki testleri ve açık kontrolleri gösterir. Eski işlerin kapatılması yeni Windows, bağımsız kurtarma veya doğrulanmış mali kaynak kanıtı sağlamaz. Gerçek kaynak doğrulaması ve kurulum yönlendirmesi ayrıca gereklidir. Bu çalışma Eralp'e ulaşmaz veya onun bilgisayarına yazılım kurmaz.
+| Durum | Sınır | Not | Konu |
+| --- | --- | --- | --- |
+| v1 için kabul | Tahmin doğrulanmış kâr değildir | Estimate from recorded source; not verified profit. See decision record. | [#98](https://github.com/AlesSystems/esmer-market-analytics/issues/98) |
+| v1 için kabul | Eksik maliyet kâra dahil edilmez | Missing cost is excluded from gross profit and never treated as zero. | — |
+| v1 için kabul | İadeler kâra dahil değildir | Returns are not in profit; shown separately, so the estimate can look high. | — |
+| v1 için kabul | Kısmi son ay tutarla karşılaştırılmaz | Partial last month is not compared in amounts. | — |
+| v1 için kabul | Tarihsel maliyet son alış fiyatıdır | Last purchase price, not weighted average stock cost. | — |
+| v1 için kabul | Net kâr için ay giderleri tamamlanmalı | Net profit shows only after the owner marks the month's expenses complete. | [#106](https://github.com/AlesSystems/esmer-market-analytics/issues/106) |
+| v1 için kabul | Paket sınırı 100.000 satır / 32 MiB | Package caps; about three September-sized months fit. | — |
+| v1 için kabul | Kaynak satırlar yalnızca Satış belgeleri | Only Satış documents; document totals include KDV. | [#104](https://github.com/AlesSystems/esmer-market-analytics/issues/104) |
+| v1 için kabul | Vergi, bordro, müşteri analizi, satış sistemi değil | Not a tax, payroll, customer-analysis or POS system. | — |
+| v1 için kabul | Kurucu imzasız | Unsigned installer shows a Windows publisher warning. | [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109) |
+| açık | Windows derlemesi ve duman testi bekliyor | Build and smoke test pending on a real Windows host. | [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109) |
+| açık | Windows CI çalışmıyor | Blocked by GitHub billing before execution. | — |
+| açık | Canlı SQL yenilemesi üretimde doğrulanmadı | Month view not verified against production; access needs Eralp's permission. | [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) |
+| açık | Sahip kurulumu yapılmadı | Owner installation not done. | [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) |
+| açık | Kurtarma ayrı temiz bilgisayarda kabul edilmedi | Recovery not yet accepted on a separate clean machine. | — |
