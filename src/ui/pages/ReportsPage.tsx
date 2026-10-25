@@ -13,39 +13,65 @@ type Workspace=Extract<SourceWorkspaceResult,{status:"source-workspace"}>;
 const base:SourceQuery={hash:null,period:null,view:"overview",scope:"all",documentType:null,productId:null,documentId:null,offset:0};
 const PAGE=50;
 
-/** Kaynak belgeler: the package's recorded documents for the month, opening the existing detail view. */
-function SourceDocuments({month,onClose}:{month:string;onClose:()=>void}) {
+/** Kaynak belgeler: the package's recorded documents for the month, opening the existing detail view. `availability` changes when the source changes. */
+function SourceDocuments({month,availability,onClose}:{month:string;availability:unknown;onClose:()=>void}) {
  const [list,setList]=useState<Workspace>();
  const [detail,setDetail]=useState<Workspace>();
  const [offset,setOffset]=useState(0);
  const [message,setMessage]=useState("");
  const [attempt,setAttempt]=useState(0);
- const receipt=useRef<ReturnReceipt|null>(null),heading=useRef<HTMLHeadingElement>(null);
+ const receipt=useRef<ReturnReceipt|null>(null),heading=useRef<HTMLHeadingElement>(null),detailBox=useRef<HTMLDivElement>(null);
+ const previous=useRef<HTMLButtonElement>(null),next=useRef<HTMLButtonElement>(null);
+ const listHash=useRef<string|null>(null),pagerFocus=useRef<"previous"|"next"|null>(null),focusHeading=useRef(true);
  const read=(query:SourceQuery)=>window.esmer.querySourceWorkspace(query);
+ // A new month or source starts the list again: nothing of the old source stays open.
+ useEffect(()=>{setList(undefined);setDetail(undefined);setOffset(0);setMessage("");listHash.current=null;pagerFocus.current=null;focusHeading.current=true;},[month,availability]);
  useEffect(()=>{
   let live=true;setMessage("");
   (async()=>{
-   const first=await read({...base,period:month});
-   if(first.status==="source-empty"){if(live){setList(undefined);setMessage("Bu pakette kaynak belge yok.");}return;}
-   if(first.status!=="source-workspace"){if(live)setMessage(first.message);return;}
-   const page=await read({...base,view:"documents",period:month,hash:first.hash,offset});
+   // Paging stays on the source the list was opened on; a changed source answers SOURCE_CHANGED.
+   const pinned=offset>0?listHash.current:null;
+   let hash=pinned;
+   if(hash===null){
+    const first=await read({...base,period:month});
+    if(first.status==="source-empty"){if(live){setList(undefined);setMessage("Bu pakette kaynak belge yok.");}return;}
+    if(first.status!=="source-workspace"){if(live)setMessage(first.message);return;}
+    hash=first.hash;
+   }
+   const page=await read({...base,view:"documents",period:month,hash,offset});
    if(!live)return;
-   if(page.status==="source-workspace"){setList(page);return;}
+   if(page.status==="source-workspace"){listHash.current=page.hash;setList(page);return;}
+   if(page.status==="source-unavailable"&&page.code==="SOURCE_CHANGED"){listHash.current=null;setList(undefined);setDetail(undefined);if(offset!==0)setOffset(0);else setAttempt(value=>value+1);return;}
    setMessage(page.status==="source-empty"?"Bu pakette kaynak belge yok.":page.message);
   })().catch(()=>{if(live)setMessage("Kaynak belgeler okunamadı.");});
   return()=>{live=false;};
- },[month,offset,attempt]);
+ },[month,availability,offset,attempt]);
+ useEffect(()=>{
+  if(!list||detail)return;
+  if(focusHeading.current){focusHeading.current=false;heading.current?.focus();return;}
+  const wanted=pagerFocus.current;if(!wanted)return;pagerFocus.current=null;
+  const own=wanted==="previous"?previous.current:next.current,other=wanted==="previous"?next.current:previous.current;
+  if(own&&!own.disabled)own.focus();else if(other&&!other.disabled)other.focus();else heading.current?.focus();
+ },[list,detail]);
+ useEffect(()=>{
+  if(!detail)return;
+  const title=detailBox.current?.querySelector("h2");
+  if(title instanceof HTMLElement){title.tabIndex=-1;title.focus();}
+ },[detail]);
  function open(id:string,button:HTMLButtonElement){
   if(!list)return;receipt.current=captureReturn(button);setMessage("");
   read({...base,view:"detail",period:month,hash:list.hash,documentId:id}).then(value=>{
-   if(value.status==="source-workspace")setDetail(value);else setMessage(value.status==="source-empty"?"Bu pakette kaynak belge yok.":value.message);
+   if(value.status==="source-workspace")setDetail(value);
+   else if(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED"){listHash.current=null;setList(undefined);if(offset!==0)setOffset(0);else setAttempt(count=>count+1);}
+   else setMessage(value.status==="source-empty"?"Bu pakette kaynak belge yok.":value.message);
   }).catch(()=>setMessage("Belge okunamadı."));
  }
  function back(){setDetail(undefined);restoreReturn(receipt.current,heading.current);}
+ function page(to:number,button:"previous"|"next"){pagerFocus.current=button;setOffset(to);}
  return <section className="month-state" aria-label="Kaynak belgeler">
   {detail?<>
    <Button variant="outline" onClick={back}>Belgelere dön</Button>
-   <SourceDocumentDetail key={detail.document?.ID} document={detail.document} lines={detail.lines}/>
+   <div ref={detailBox}><SourceDocumentDetail key={detail.document?.ID} document={detail.document} lines={detail.lines}/></div>
   </>:<>
    <div className="reports-head"><h2 ref={heading} tabIndex={-1}>Kaynak belgeler</h2><Button variant="outline" onClick={onClose}>Rapora dön</Button></div>
    <p>{monthName(month)} için veri paketindeki kayıtlı belgeler. Tutarlar kaynak kaydındandır ve doğrulanmamıştır.</p>
@@ -54,7 +80,7 @@ function SourceDocuments({month,onClose}:{month:string;onClose:()=>void}) {
    {list&&(list.total===0?<p role="status">Bu ay için kaynak belge yok.</p>:<>
     <div className="table-scroll" tabIndex={0} aria-label="Kaynak belgeler tablosu"><table><thead><tr><th>Belge kayıt ID’si</th><th>Kaynak tarihi</th><th>Belge türü</th><th>Belge tutarı</th><th>Para birimi</th></tr></thead>
      <tbody>{list.documents.map(row=><tr key={row.ID}><td><Button variant="link" data-focus-key={`report-document-${list.hash}-${row.ID}`} aria-label={`Belgeyi aç ${row.ID}`} onClick={event=>open(row.ID!,event.currentTarget)}>{row.ID}</Button></td><td>{row.FIS_TARIHI?date(row.FIS_TARIHI.slice(0,10)):"—"}</td><td>{typeLabel(row.FIS_TURU)}</td><td className="number">{row.GENELTOPLAM?decimal(row.GENELTOPLAM):"—"}</td><td>{row.CURRENCY??"Bilinmiyor"}</td></tr>)}</tbody></table></div>
-    <nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" disabled={list.offset===0} onClick={()=>setOffset(Math.max(0,list.offset-PAGE))}>Önceki belgeler</Button><span role="status">{`${list.offset+1}–${Math.min(list.offset+PAGE,list.total)} / ${list.total}`}</span><Button variant="outline" disabled={list.offset+PAGE>=list.total} onClick={()=>setOffset(list.offset+PAGE)}>Sonraki belgeler</Button></nav>
+    <nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" ref={previous} disabled={list.offset===0} onClick={()=>page(Math.max(0,list.offset-PAGE),"previous")}>Önceki belgeler</Button><span role="status">{`${list.offset+1}–${Math.min(list.offset+PAGE,list.total)} / ${list.total}`}</span><Button variant="outline" ref={next} disabled={list.offset+PAGE>=list.total} onClick={()=>page(list.offset+PAGE,"next")}>Sonraki belgeler</Button></nav>
    </>)}
   </>}
  </section>;
@@ -62,13 +88,13 @@ function SourceDocuments({month,onClose}:{month:string;onClose:()=>void}) {
 
 /** Rapor ve Excel: a method note, the month's Excel export and the source documents. The shell's Dönem drives `month`. */
 export function ReportsPage({month,availability,active,openSettings}:PageProps) {
- const {read,loading}=useMonthProfit(month,active,availability);
+ const {read,loading,retry}=useMonthProfit(month,active,availability);
  const [documents,setDocuments]=useState(false);
  const [exporting,setExporting]=useState(false);
  const [message,setMessage]=useState("");
  const opener=useRef<HTMLButtonElement>(null);
  const sequence=useRef(0);
- useEffect(()=>{sequence.current++;setMessage("");setDocuments(false);},[month]);
+ useEffect(()=>{sequence.current++;setMessage("");setExporting(false);setDocuments(false);},[month,availability]);
  const view=read&&month&&read.month===month&&"result" in read&&read.result.status==="month-profit"?read.result.view:null;
  const reason=!month?"Önce bir ay seçilmeli."
   :!read||read.month!==month?"Bu ayın rakamları yükleniyor."
@@ -77,11 +103,12 @@ export function ReportsPage({month,availability,active,openSettings}:PageProps) 
  async function exportMonth(){
   if(!month||!view)return;const id=++sequence.current;setExporting(true);setMessage("");
   try{
-   const value=await window.esmer.exportMonthProfit({month});if(id!==sequence.current)return;
+   // Pinned to the source the numbers on screen came from.
+   const value=await window.esmer.exportMonthProfit({month,hash:view.source.hash});if(id!==sequence.current)return;
    if(value.status==="saved")setMessage("Doğrulanmamış tahmin Excel dosyasına kaydedildi.");
-   else if(value.status!=="cancelled")setMessage(value.message);
+   else if(value.status!=="cancelled"){setMessage(value.message);if(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED")retry();}
   }catch{if(id===sequence.current)setMessage("Excel dosyası kaydedilemedi.");}
-  finally{if(id===sequence.current)setExporting(false);}
+  finally{setExporting(false);}
  }
  function closeDocuments(){setDocuments(false);requestAnimationFrame(()=>opener.current?.focus());}
  return <main className="reports-page">
@@ -101,6 +128,6 @@ export function ReportsPage({month,availability,active,openSettings}:PageProps) 
    {reason&&<p id="export-reason">{reason}</p>}
    {message&&<p role="status">{message}</p>}
   </section>}
-  {documents&&month&&<SourceDocuments month={month} onClose={closeDocuments}/>}
+  {documents&&month&&<SourceDocuments month={month} availability={availability} onClose={closeDocuments}/>}
  </main>;
 }

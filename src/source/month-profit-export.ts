@@ -9,7 +9,19 @@ const reasons:Record<NetProfitReason,string>={
  expensesIncomplete:"Bu ayın giderleri tamamlanmadı",unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
 };
 const UNKNOWN="Bilinmiyor";
-const line=(label:string,value:string|number|null,note:string|null=null):Row=>[text(label),text(value),text(value===null?note??UNKNOWN:note)];
+const SUBTOTAL="bilinen alt toplam";
+const isZero=(value:string|null)=>value!==null&&/^-?0+(\.0+)?$/.test(value);
+const line=(label:string,value:string|number|null,note:string|null=null,subtotal=false):Row=>[text(label),text(value),text(value===null?note??UNKNOWN:subtotal?SUBTOTAL:note)];
+
+/** Same wording as the product card on Ürünler. */
+function productNote(p:MonthProfitView["products"][number]):string|null{
+ const notes:string[]=[];
+ if(p.cost===null)notes.push("Maliyet bilinmiyor");
+ else if(p.flags.missingCost)notes.push("Bazı satışlarının maliyeti bilinmiyor; kâr yalnız maliyeti bilinen satışlardan hesaplandı");
+ if(p.marginPct===null&&p.cost!==null)notes.push("Marj hesaplanamadı");
+ if(p.unitPrice===null||p.unitCost===null)notes.push("Birim değerleri bilinmiyor");
+ return notes.length?notes.join("; "):null;
+}
 
 export async function excelMonthProfit(view:MonthProfitView):Promise<Buffer> {
  const t=view.totals;
@@ -18,11 +30,11 @@ export async function excelMonthProfit(view:MonthProfitView):Promise<Buffer> {
  const netNote=t.netProfitReason===null?null:reasons[t.netProfitReason];
  const sections:[string,Row[]][]=[
   ["Özet",[[text("Gösterge"),text("Değer"),text("Not")],
-   line("Satış",t.sales),line("Maliyeti bilinen satış",t.knownCostSales),line("Tahmini maliyet",t.cost),line("Tahmini brüt kâr",t.grossProfit),line("Marj (%)",t.marginPct),line("Maliyeti bilinen satış (%)",t.costKnownPct),
-   line("Maliyeti bilinmeyen satış",t.unknownCostSales),line("Maliyeti bilinmeyen ürün",t.unknownCostProducts),line("İadeler",t.returns),line("Fiş sayısı",t.receipts),line("Ortalama sepet",t.averageBasket),
+   line("Satış",t.sales,null,t.unknownSaleAmounts>0),line("Maliyeti bilinen satış",t.knownCostSales),line("Tahmini maliyet",t.cost),line("Tahmini brüt kâr",t.grossProfit),line("Marj (%)",t.marginPct),line("Maliyeti bilinen satış (%)",t.costKnownPct),
+   line("Maliyeti bilinmeyen satış",t.unknownSaleAmounts>0&&isZero(t.unknownCostSales)?null:t.unknownCostSales,null,t.unknownSaleAmounts>0),line("Maliyeti bilinmeyen ürün",t.unknownCostProducts),line("İadeler",t.returns,null,t.unknownReturnAmounts>0),line("Tutarı bilinmeyen satış satırı",String(t.unknownSaleAmounts)),line("Tutarı bilinmeyen iade satırı",String(t.unknownReturnAmounts)),line("Fiş sayısı",t.receipts),line("Ortalama sepet",t.averageBasket),
    line("Giderler",t.expenses),line("Tahmini net kâr",t.netProfit,netNote)]],
   ["Ürünler",[[text("Ürün"),text("Kategori"),text("Satış"),text("Maliyet"),text("Brüt kâr"),text("Marj (%)"),text("Miktar"),text("Birim"),text("Birim satış fiyatı"),text("Birim maliyet"),text("Not")],
-   ...view.products.map((p):Row=>[text(p.name??`Ürün #${p.id}`),text(p.category),text(p.sales),text(p.cost),text(p.grossProfit),text(p.marginPct),text(p.quantity),text(p.unit),text(p.unitPrice),text(p.unitCost),text(p.cost===null?"Maliyet bilinmiyor":null)])]],
+   ...view.products.map((p):Row=>[text(p.name??`Ürün #${p.id}`),text(p.category),text(p.sales),text(p.cost),text(p.grossProfit),text(p.marginPct),text(p.quantity),text(p.unit),text(p.unitPrice),text(p.unitCost),text(productNote(p))])]],
   ["Giderler",[[text("Gösterge"),text("Değer"),text("Not")],
    line("Giderler toplamı",t.expenses),
    line("Gider onayı",t.expensesComplete?"Onaylı":"Onaylanmadı"),

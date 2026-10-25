@@ -1,5 +1,5 @@
 import {createSourceEstimateQuery,calculateSourceEstimate,validEstimateRequest,type EstimateRequest,type EstimateExportRequest} from "../source/estimate";
-import {buildMonthProfit,validMonthProfitRequest,type MonthEstimateCache,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
+import {buildMonthProfit,validMonthProfitRequest,validMonthProfitExportRequest,type MonthProfitExportRequest,type MonthEstimateCache,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {querySource, validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { OperationControl, ReportSummary } from "../reports/contracts";
@@ -105,6 +105,13 @@ class AnalyticsStore {
     if(!source)throw Error("ESTIMATE_UNAVAILABLE");
     if(source.hash!==request.hash)throw Error("SOURCE_CHANGED");
     return calculateSourceEstimate(source.pkg,request.period,source.hash);
+  }
+  /** The month view for an export pinned to the viewed source hash; a different loaded source throws SOURCE_CHANGED. */
+  readMonthProfitPinned(request:MonthProfitExportRequest):MonthProfitResult {
+    if(!validMonthProfitExportRequest(request))throw Error("INVALID_PAYLOAD");
+    const read=this.readMonthProfit({month:request.month});
+    if(read.status==="month-profit"&&read.view.source.hash!==request.hash)throw Error("SOURCE_CHANGED");
+    return read;
   }
   readMonthProfit(request:MonthProfitRequest):MonthProfitResult {
     if(!validMonthProfitRequest(request))throw Error("INVALID_PAYLOAD");

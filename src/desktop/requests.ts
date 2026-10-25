@@ -1,6 +1,6 @@
 import {validSelectedMonth} from "../domain/month";
 import {validEstimateRequest,type EstimateRequest,type EstimateExportRequest,type EstimateResult} from "../source/estimate";
-import {validMonthProfitRequest,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
+import {validMonthProfitRequest,validMonthProfitExportRequest,type MonthProfitExportRequest,type MonthProfitRequest,type MonthProfitResult} from "../source/month-profit";
 import {validSourceQuery, type SourceQuery, type SourceWorkspaceResult} from "../source/workspace";
 import { validSourcePreviewRequest, type SourcePreviewRequest, type SourcePreviewResult } from "../source/raw-package";
 import type { LiveResult, PreferencesPatch, PreferencesResult } from "../domain/contracts";
@@ -101,7 +101,7 @@ export async function handleRequest(
   sourceEstimate?: {query:(request:EstimateRequest)=>Promise<EstimateResult>;export:(request:EstimateExportRequest)=>Promise<ReportExportResult|Extract<EstimateResult,{status:"source-unavailable"}>>},
   preferences?: {get: () => Promise<PreferencesResult>; set: (request: PreferencesPatch) => Promise<PreferencesResult>},
   monthProfit?: (request: MonthProfitRequest) => Promise<MonthProfitResult>,
-  monthProfitExport?: (request: MonthProfitRequest) => Promise<ReportExportResult>,
+  monthProfitExport?: (request: MonthProfitExportRequest) => Promise<ReportExportResult>,
 ): Promise<MonthProfitResult | PreferencesResult | EstimateResult | SourceWorkspaceResult | SourcePreviewResult | LiveResult | ReportResponse | ReportExportResult | JobOutcome | OperationStatus | {status: "cancelling"} | ExpenseResult | OperatingReportResult | PurchaseDocumentsResult | PurchaseDocumentResult | PurchasingReportResult | Availability | ImportOutcome | RequestError | SalesReportResult | SalesDetailResult | import("../recovery/contracts").RecoveryResult> {
   if (!trustedSender)
     return {
@@ -119,7 +119,7 @@ export async function handleRequest(
     return monthProfit(payload);
   }
   if (operation === "exportMonthProfit" && monthProfitExport) {
-    if (!validMonthProfitRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
+    if (!validMonthProfitExportRequest(payload)) return {status: "rejected", code: "INVALID_PAYLOAD", message: "İstek geçerli değil."};
     return monthProfitExport(payload);
   }
   if ((operation === "querySourceEstimate" || operation === "exportSourceEstimate") && sourceEstimate) {

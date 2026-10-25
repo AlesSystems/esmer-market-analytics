@@ -197,8 +197,7 @@ parentPort?.on("message", async (request: ServiceRequest) => {
       result=store.readMonthProfit(request.payload);
     }
     else if(request.operation === "exportMonthProfit") {
-      if(!validMonthProfitRequest(request.payload))throw Error("INVALID_PAYLOAD");
-      const read=store.readMonthProfit(request.payload);
+      const read=store.readMonthProfitPinned(request.payload);
       result=read.status==="month-profit"?{status:"export",bytes:await excelMonthProfit(read.view)}:read;
     }
     else if(request.operation === "querySourceEstimate") {

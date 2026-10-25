@@ -1,4 +1,4 @@
-import type {MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
+import type {MonthProfitExportRequest,MonthProfitRequest,MonthProfitResult} from "../source/month-profit";
 import type {EstimateRequest,EstimateExportRequest,EstimateResult} from "../source/estimate";
 import type {SourceQuery, SourceWorkspaceResult} from "../source/workspace";
 import type { SourcePreviewRequest, SourcePreviewResult } from "../source/raw-package";
@@ -56,7 +56,7 @@ function serviceUnavailable() {
   pending.clear(); worker = undefined;
 }
 function requestService(request:{operation:"readMonthProfit";payload:MonthProfitRequest}):Promise<MonthProfitResult>;
-function requestService(request:{operation:"exportMonthProfit";payload:MonthProfitRequest}):Promise<ServiceResponse["result"]>;
+function requestService(request:{operation:"exportMonthProfit";payload:MonthProfitExportRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request:{operation:"querySourceEstimate";payload:EstimateRequest}):Promise<EstimateResult>;
 function requestService(request:{operation:"exportSourceEstimate";payload:EstimateExportRequest}):Promise<ServiceResponse["result"]>;
 function requestService(request: {operation:"querySourceWorkspace";payload:SourceQuery}): Promise<SourceWorkspaceResult>;
