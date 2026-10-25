@@ -3,8 +3,6 @@ import type { openStore } from "../../src/store/store";
 import { Expenses } from "../../src/expenses/import";
 import { fieldKeys } from "../../src/expenses/validation";
 import type { ExpenseFields } from "../../src/expenses/contracts";
-import { SalesReports } from "../../src/reports/query";
-import { ReportVersions } from "../../src/reports/versions";
 import { businessPackage, businessRecords } from "./business-fixtures";
 import { workbook, row } from "./expense-fixtures";
 
@@ -26,16 +24,9 @@ export async function populateRecoveryStore(store: ReturnType<typeof openStore>)
   const target = { datasetId: store.readPin().datasetId!, kind: "line" as const, sourceId: records.lines[0].id };
   store.appendRevision({ kind: "adjustment", entityId: "adjustment-1", value: { net: "5", target, reversed: false, evidence: "fixture:adjustment", reason: "Sentetik düzeltme" } });
   store.appendRevision({ kind: "adjustment", entityId: "adjustment-1", value: { net: "5", target, reversed: true, evidence: "fixture:adjustment", reason: "Sentetik geri alma" } });
-  const versions = new ReportVersions(store, new SalesReports(store));
-  const opened = versions.open({ period: "2025-09" });
-  if (opened.status !== "monthly") throw new Error("Expected monthly report");
-  expect(opened.report.sales.metrics.netSales).toBe("100");
-  expect(opened.report.purchasing.gross.coveredGrossProfit).toBe("40");
-  expect(opened.report.operating.result.expenses).toBe("60");
-  versions.accept({ candidateId: opened.report.id, previousAcceptedId: null, reason: "Sentetik kurtarma kontrolü" });
-  const accepted = versions.selected(opened.report.id);
+  expect(expenses.query({ period: "2025-09" }).rows).toHaveLength(1);
   const changed = businessRecords(); changed.documents = []; changed.lines = [];
   expect(store.importPackage(businessPackage(changed, { extractionId: "recovery-deletion" })).status).toBe("active");
-  expect(versions.selected(accepted.id)).toEqual(accepted);
-  return accepted;
+  const pin = store.readPin();
+  return { datasetId: pin.datasetId!, appRevision: pin.appRevision, expenses: expenses.query({ period: "2025-09" }) };
 }

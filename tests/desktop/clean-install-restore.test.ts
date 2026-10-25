@@ -1,8 +1,7 @@
 import { openSettings, openWorkspace } from "../helpers/desktop-navigation";
-// Recovery is reached through Ayarlar; after restore the app returns to Bu ay and reports live in Rapor ve Excel (#103/#105).
+// Recovery is reached through Ayarlar; after restore the app returns to Bu ay and the restored expenses stay readable.
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
-import { readSheet } from "read-excel-file/node";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { openStore } from "../../src/store/store";
@@ -16,7 +15,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
   const {mkdir} = await import("node:fs/promises");
   await Promise.all([mkdir(original), mkdir(fresh), mkdir(destination)]);
   const store = openStore(join(original, "analytics.sqlite"));
-  const accepted = await populateRecoveryStore(store);
+  const populated = await populateRecoveryStore(store);
   store.close();
   let app = await electron.launch({executablePath, args: [`--user-data-dir=${original}`]});
   try {
@@ -75,15 +74,9 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(restored.getByRole("textbox", {name: "Dönem", exact: true})).toHaveValue("2025-09");
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
     const restoredStore = openStore(join(fresh, "analytics.sqlite"));
-    try { expect(restoredStore.readReport(accepted.id)?.output.report).toEqual(accepted); }
+    try { expect(restoredStore.readPin()).toMatchObject({datasetId: populated.datasetId, appRevision: populated.appRevision}); }
     finally { restoredStore.close(); }
-    const displayed = await restored.evaluate(reportId => window.esmer.readReportVersion({reportId}), accepted.id);
-    expect(displayed).toMatchObject({status: "monthly", report: {sales: {metrics: {netSales: "100"}}, purchasing: {gross: {coveredGrossProfit: "40"}}, operating: {result: {expenses: "60"}}}});
-    const excelPath = join(root, "restored-report.xlsx");
-    await app.evaluate(({dialog}, filePath) => { dialog.showSaveDialog = async () => ({canceled: false, filePath}); }, excelPath);
-    expect(await restored.evaluate(reportId => window.esmer.exportReportVersion({reportId}), accepted.id)).toMatchObject({status: "saved"});
-    const summary = await readSheet(await readFile(excelPath), "Özet");
-    expect(summary.flat()).toContain(accepted.id);
-    expect(summary.flat()).toContain(100);
+    // The restored expenses are readable through the kept operation and equal the pre-loss records.
+    expect(await restored.evaluate(() => window.esmer.queryExpenses({period: "2025-09"}))).toEqual(JSON.parse(JSON.stringify(populated.expenses)));
   } finally { await app.close(); await rm(root, {recursive: true, force: true}); }
 });

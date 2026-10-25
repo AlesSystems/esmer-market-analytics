@@ -1,4 +1,3 @@
-import type { SalesLine } from "../source/package";
 import type { SalesComponent, SalesDocumentResult, SalesExclusion } from "../analytics/sales";
 export type ReportContext = { sessionId: string; datasetId: string; appRevision: number; calculationVersion: string; period: string };
 export type SalesFilters = { categoryId: string | null; productId: string | null; search: string; kind: "all" | "sale" | "customer-return" };
@@ -7,24 +6,10 @@ export type Comparison = { currentFrom: string; currentTo: string; from: string;
 export type Breakdown = { id: string; name: string; categoryId?: string; netSales: string; share: string | null; previousMonthChange: string | null; quantities: { piece: string; kg: string } };
 export type Transaction = SalesDocumentResult & { scopeNet: string };
 export type SalesView = { context: ReportContext; cutoff: string; importedAt: string | null; extractedAt: string; mappingVersion: string; from: string; to: string; coverage: "complete" | "partial" | "unavailable"; stale: boolean; complete: boolean; filters: SalesFilters; metrics: ReportMetrics; comparisons: { month: Comparison; year: Comparison }; categories: Breakdown[]; products: Breakdown[]; daily: { date: string; netSales: string; height: string; negative: boolean }[]; transactions: Transaction[]; exclusions: SalesExclusion[]; warnings: string[] };
-export type SalesDetail = { context: ReportContext; cutoff: string; lineage: string; importedAt: string | null; extractionId: string; mappingVersion: string; documentId: string; date: string; kind: string; state: string; scopeNet: string; totals: { net: string; tax: string; gross: string }; recorded: { net: string; tax: string; gross: string } | null; reconciled: boolean; exclusion: string | null; lines: (SalesComponent & { matchesScope: boolean })[]; excludedLines: { lineId: string; quantity: string; net: string; productName: string; reason: string; input: SalesLine | null }[] };
 export type SalesFailure = { status: "unavailable"; code: "EMPTY_STORE" | "UNSUPPORTED_MAPPING" | "STALE_CONTEXT" | "NOT_FOUND" | "UNSUPPORTED_ADJUSTMENTS" | "SERVICE_UNAVAILABLE" | "REPORT_NOT_FOUND" | "PRODUCT_PROFIT_UNAVAILABLE" | "INCOMPARABLE_REPORTS" | "REVIEW_CONFLICT" | "REPORT_TOO_LARGE" | "INVALID_REVIEW" | "EXCEL_ROW_LIMIT" | "EXCEL_COLUMN_LIMIT" | "EXCEL_CELL_LIMIT" | "UNSUPPORTED_PROJECTION_VERSION" | "MISSING_STORED_FACTS"; message: string };
-export type SalesReportResult = { status: "report"; view: SalesView } | SalesFailure;
-export type SalesDetailResult = { status: "detail"; detail: SalesDetail } | SalesFailure;
-export type OpenSalesRequest = { period: string | null };
-export type QuerySalesRequest = { context: ReportContext; filters: SalesFilters };
-export type InspectSalesRequest = QuerySalesRequest & { documentId: string };
-export const emptySalesFilters: SalesFilters = { categoryId: null, productId: null, search: "", kind: "all" };
 
-export type QueryPurchasingRequest = { context: ReportContext };
-export type PurchasingView = { coverage: "complete" | "partial" | "unavailable"; costCalculationVersion: string; purchasingCalculationVersion: string; context: ReportContext; cutoff: string; lineage: string; extractionId: string; mappingVersion: string; from: string; to: string; stale: boolean; evidence: { documents: import("../source/package").DocumentRecord[]; lines: import("../source/package").LineRecord[] }; gross: import("../analytics/costs").GrossResult; purchasing: import("../analytics/purchasing").PurchasingResult };
-export type PurchasingReportResult = { status: "purchasing"; view: PurchasingView } | SalesFailure;
+export type PurchasingView = { coverage: "complete" | "partial" | "unavailable"; costCalculationVersion: string; purchasingCalculationVersion: string; context: ReportContext; cutoff: string; lineage: string; extractionId: string; mappingVersion: string; from: string; to: string; stale: boolean; evidence: { documents: import("../source/package").DocumentRecord[]; lines: import("../source/package").LineRecord[] }; gross: import("../analytics/costs").GrossResult; purchasing: Record<string, unknown> };
 
-export type PurchaseDocumentsRequest = {context: ReportContext; search: string; offset: number};
-export type PurchaseDocumentRequest = {context: ReportContext; documentId: string; offset: number};
-export type PurchaseDocumentRow = {id: string; date: string; representation: "invoice" | "dispatch" | "unknown"; supplierName: string | null; recorded: {net: string; tax: string; gross: string} | null; lineCount: number; recognition: "calculated" | "unsupported" | "unknown"; reasons: string[]};
-export type PurchaseDocumentsResult = {status: "purchase-documents"; context: ReportContext; documents: PurchaseDocumentRow[]; total: number; offset: number} | SalesFailure;
-export type PurchaseDocumentResult = {status: "purchase-document"; context: ReportContext; document: PurchaseDocumentRow; lines: import("../source/package").LineRecord[]; total: number; offset: number; linkedDocuments: PurchaseDocumentRow[]} | SalesFailure;
 
 export type OperationControl = { checkCancelled?: () => void; onProgress?: (phase: string, completed: number, total: number) => void };
 type MonthlyBase = {
@@ -42,22 +27,4 @@ type MonthlyBase = {
 export type MonthlyReportV1 = MonthlyBase & { format: "monthly-report-v1" };
 export type MonthlyReportV2 = MonthlyBase & { format: "monthly-report-v2"; productProfit: import("../analytics/product-profit").ProductProfit };
 export type MonthlyReport = MonthlyReportV1 | MonthlyReportV2;
-export type MonthlyResult = { status: "monthly"; report: MonthlyReport } | SalesFailure;
 export type ReportSummary = { cutoff: string; id: string; period: string; datasetId: string; appRevision: number; acceptedAt: string; reason: string };
-export type ReportHistoryResult = { status: "history"; reports: ReportSummary[] };
-export type ReportDifference = { status: "difference"; candidateId: string; acceptedId: string; changes: { path: string; before: string | number | boolean | null; after: string | number | boolean | null; delta: string | null }[] };
-export type ReportRequestMap = {
-  queryMonthly: { context: ReportContext };
-  listReportVersions: { period: string };
-  readReportVersion: { reportId: string };
-  compareReportVersion: { candidateId: string; acceptedId: string };
-  acceptReportVersion: { candidateId: string; previousAcceptedId: string | null; reason: string };
-  exportReportVersion: { reportId: string };
-  readReportEvidence: import("./display").ReportEvidenceRequest;
-  readReportProducts: import("./display").ReportProductsRequest;
-  readReportPurchasing: { reportId: string };
-  readReportProduct: { reportId: string; productId: string };
-  readReportProductDependency: { reportId: string; productId: string; returnLineId: string; offset: number };
-  exportReportProduct: { reportId: string; productId: string };
-};
-export type ReportResponse = import("./display").MonthlyDisplayResult | import("./display").ReportEvidencePage | import("./display").ReportProductsPage | PurchasingReportResult | ReportHistoryResult | ReportDifference | import("./product-detail").ProductDetailResult | import("./product-detail").ProductDependencyResult;
