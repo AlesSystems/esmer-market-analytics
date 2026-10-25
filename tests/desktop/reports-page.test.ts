@@ -112,7 +112,7 @@ test("Kaynak belgeler pages, returns to the opened row, reloads on SOURCE_CHANGE
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
-test("Rapor ve Excel without a package says so and leads to Ayarlar",async()=>{
+test("Rapor ve Excel without a package says a data package is needed",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"reports-empty-"));
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
