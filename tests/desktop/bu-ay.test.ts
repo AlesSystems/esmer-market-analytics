@@ -49,7 +49,7 @@ test("Bu ay opens at launch with four sections, and an imported estimate package
   ]);
   await attention.first().click();
   await expect(page.getByRole("heading",{name:"Ürünler",level:1})).toBeVisible();
-  await expect(page.locator('tr[data-product="3"]')).toHaveAttribute("aria-selected","true");
+  await expect(page.locator('tr[data-product="3"]')).toHaveAttribute("aria-current","true");
   await expect(page.locator('tr[data-product="3"]')).toBeFocused();
   // A full month without expenses: net profit names the missing step and leads to Giderler.
   await page.getByRole("button",{name:"Bu ay",exact:true}).click();
