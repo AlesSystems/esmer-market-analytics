@@ -10,7 +10,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 import { writeRawPackage } from "../../src/source/raw-package";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { writeFile } from "node:fs/promises";
-import { importPackage, openReportView, openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openSection, openWorkspace } from "../helpers/desktop-navigation";
 
 const nav = (page: Page) => page.getByRole("navigation", { name: "Ana gezinme" });
 
@@ -147,42 +147,6 @@ test("launch loads bundled assets without external requests or page errors", asy
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-// old UI, removed in P5
-test.skip("a Veri ve kaynak request pending initial financial load starts only its destination calculation", async () => {
-  const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-pending-sales-"));
-  const store = openStore(join(userData, "analytics.sqlite"));
-  try { store.importPackage(businessPackage()); } finally { store.close(); }
-  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
-  try {
-    const page = await app.firstWindow();
-    await openWorkspace(page);
-    await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-09");
-    await app.evaluate(({ ipcMain }) => {
-      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> };
-      const original = registry._invokeHandlers.get("esmer:request")!;
-      ipcMain.removeHandler("esmer:request");
-      ipcMain.handle("esmer:request", async (event, operation, payload) => {
-        const result = await original(event, operation, payload);
-        if (operation === "openSales" && !Reflect.get(globalThis, "welcomeSalesHeld")) { Reflect.set(globalThis, "welcomeSalesHeld", true); return new Promise(resolve => Reflect.set(globalThis, "releaseWelcomeSales", () => resolve(result))); }
-        if (operation === "queryMonthly") Reflect.set(globalThis, "welcomeMonthlyReads", (Reflect.get(globalThis, "welcomeMonthlyReads") ?? 0) + 1);
-        return result;
-      });
-    });
-    await page.reload();
-    await openWorkspace(page);
-    await openReportView(page, "Veri ve kaynak");
-    await expect(page.getByRole("region", { name: "Satış özeti", exact: true })).toHaveCount(0);
-    await expect.poll(() => app.evaluate(() => typeof Reflect.get(globalThis, "releaseWelcomeSales"))).toBe("function");
-    await app.evaluate(() => Reflect.get(globalThis, "releaseWelcomeSales")());
-    await expect(page.getByRole("heading", { name: "Satışlar", exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Satış özeti", exact: true })).toContainText("200,00 ₺");
-    await expect(page.getByRole("alert")).toHaveCount(0);
-    expect(await app.evaluate(() => Reflect.get(globalThis, "welcomeMonthlyReads"))).toBe(1);
-  } finally {
-    await app.evaluate(() => Reflect.get(globalThis, "releaseWelcomeSales")?.()).catch(() => {});
-    await app.close(); await rm(userData, { recursive: true, force: true });
-  }
-});
 
 test("empty profile expense return restores Bu ay navigation and readiness", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-empty-return-"));
