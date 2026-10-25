@@ -39,17 +39,17 @@ function Tile({ glaze, name, line, seal, status, className = "", children }: { g
   </section>;
 }
 
-function ImportTile({ availability, source, importing, sqlImporting, onImportPackage }: { availability?: Availability | RequestError; source?: { from: string; to: string }; importing: boolean; sqlImporting: boolean; onImportPackage: () => void }) {
+function ImportTile({ availability, resolution, source, importing, sqlImporting, onImportPackage }: { availability?: Availability | RequestError; resolution: NonNullable<Props["sourceResolution"]>; source?: { from: string; to: string }; importing: boolean; sqlImporting: boolean; onImportPackage: () => void }) {
   const ready = availability?.status === "ready" ? availability : undefined;
   const dataset = ready?.store === "loaded" ? ready.dataset : undefined;
   const last = ready?.recentImports?.[0];
   const range = source ? `${date(source.from)}–${date(source.to)}` : dataset ? `Kesim ${date(dataset.cutoff)}` : !availability ? "Yükleniyor…" : ready ? "Henüz yok" : "Okunamadı";
   const result = !ready ? "—" : last ? `${importStates[last.state] ?? "Hazırlanıyor"} · ${date(last.createdAt)}` : "Henüz içe aktarma yok";
-  return <Tile glaze="cobalt" name="Veri paketi" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : dataset || source ? "ready" : "empty"}>
-    <dl className="tile-facts">
+  return <Tile glaze="cobalt" name="Veri paketi" line="Başarısız içe aktarma mevcut verileri korur." seal={importing ? "checking" : resolution.status !== "resolved" ? "unknown" : dataset || source ? "ready" : "empty"}>
+    {resolution.status !== "resolved" ? <p role={resolution.status === "failed" ? "alert" : "status"}>{resolution.status === "failed" ? resolution.message : "Kaynak durumu kontrol ediliyor…"}</p> : <dl className="tile-facts">
       <div><dt>Etkin aylar</dt><dd>{range}</dd></div>
       <div><dt>Son içe aktarma</dt><dd>{result}</dd></div>
-    </dl>
+    </dl>}
     <div className="tile-actions"><button type="button" className="tile-action primary" disabled={importing || sqlImporting} onClick={onImportPackage}>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}</button></div>
   </Tile>;
 }
@@ -123,7 +123,7 @@ function DisplayTile() {
   </Tile>;
 }
 
-export function SettingsPage({ availability, source, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
+export function SettingsPage({ availability, source, sourceResolution = { status: "resolved" }, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { if (claimFocus()) heading.current?.focus(); }, [claimFocus]);
   return <main className="settings-page" aria-busy={importing || sqlImporting}>
@@ -132,7 +132,7 @@ export function SettingsPage({ availability, source, live, importing, sqlImporti
       <button type="button" className="tile-action" onClick={onClose}>Ayarları kapat</button>
     </div>
     <div className="tile-panel">
-      <ImportTile availability={availability} source={source} importing={importing} sqlImporting={sqlImporting} onImportPackage={onImportPackage} />
+      <ImportTile availability={availability} resolution={sourceResolution} source={source} importing={importing} sqlImporting={sqlImporting} onImportPackage={onImportPackage} />
       <BackupTile onRecovery={onRecovery} />
       <DisplayTile />
       <LiveTile live={live} hasData={!!source || (availability?.status === "ready" && availability.store === "loaded")} sqlImporting={sqlImporting} onImportSql={onImportSql} />

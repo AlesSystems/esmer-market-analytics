@@ -105,3 +105,28 @@ test("a SQL import that cannot reach its source opens Ayarlar with the reason", 
     await page.screenshot({ path: "test-results/settings-sql-unreachable.png", fullPage: true, animations: "disabled" });
   } finally { await app.close().catch(() => {}); await rm(userData, { recursive: true, force: true }); }
 });
+
+for (const failure of [false, true]) test(`pending initial source ${failure ? "failure" : "success"} never shows the Veri paketi tile as ready`, async () => {
+  test.setTimeout(60_000);
+  const userData = await mkdtemp(join(tmpdir(), "esmer-settings-pending-"));
+  const store = openStore(join(userData, "analytics.sqlite")); store.importPackage(businessPackage()); store.close();
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow(); await openWorkspace(page);
+    await app.evaluate(({ ipcMain }, failed) => {
+      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, operation: string, payload: unknown) => unknown> }, original = registry._invokeHandlers.get("esmer:request")!;
+      ipcMain.removeHandler("esmer:request");
+      ipcMain.handle("esmer:request", async (event, operation, payload) => { const result = await original(event, operation, payload); return operation === "querySourceWorkspace" ? new Promise(resolve => Reflect.set(globalThis, "releaseInitialSource", () => resolve(failed ? { status: "source-unavailable", code: "SERVICE_UNAVAILABLE", message: "Sentetik kaynak hatası" } : result))) : result; });
+    }, failure);
+    await page.reload(); await openWorkspace(page);
+    await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
+    const tile = page.getByRole("region", { name: "Veri paketi", exact: true });
+    await expect(tile.getByRole("status").getByText("Kaynak durumu kontrol ediliyor…", { exact: true })).toBeVisible();
+    await expect(tile.getByText("Etkin aylar", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Veri paketi içe aktar", exact: true })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true })).toBeEnabled();
+    await app.evaluate(() => Reflect.get(globalThis, "releaseInitialSource")?.());
+    if (failure) { await expect(tile.getByRole("alert").getByText("Sentetik kaynak hatası", { exact: true })).toBeVisible(); await expect(tile.getByText("Etkin aylar", { exact: true })).toHaveCount(0); await expect(tile).toHaveAttribute("data-state", "unknown"); }
+    else await expect(tile.getByText("Etkin aylar", { exact: true })).toBeVisible();
+  } finally { await app.evaluate(() => Reflect.get(globalThis, "releaseInitialSource")?.()).catch(() => {}); await app.close().catch(() => {}); await rm(userData, { recursive: true, force: true }); }
+});
