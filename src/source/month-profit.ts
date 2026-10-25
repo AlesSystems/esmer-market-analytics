@@ -13,7 +13,7 @@ const D=Decimal.clone({precision:200,rounding:Decimal.ROUND_HALF_UP});
 export const MONTH_PROFIT_VERSION="month-profit-v1";
 export type Money=string;
 export type Pct=string|null;
-export type NetProfitReason="costUnknown"|"monthPartial"|"expensesMissing"|"expensesIncomplete"|"unknownTax"|"confirmationStale";
+export type NetProfitReason="costUnknown"|"monthPartial"|"expensesMissing"|"expensesIncomplete"|"expensesBlocked"|"unknownTax"|"confirmationStale";
 export type MonthProfitTotals={sales:Money|null;knownCostSales:Money;cost:Money|null;grossProfit:Money|null;marginPct:Pct;costKnownPct:Pct;unknownCostSales:Money;unknownCostProducts:number;returns:Money|null;unknownSaleAmounts:number;unknownReturnAmounts:number;receipts:number;averageBasket:Money|null;expenses:Money|null;expensesComplete:boolean;netProfit:Money|null;netProfitReason:NetProfitReason|null};
 export type MonthProfitProduct={id:string;name:string|null;category:string|null;unit:ProductLabel["unit"];sales:Money|null;cost:Money|null;grossProfit:Money|null;marginPct:Pct;previousMarginPct:Pct;unitPrice:Money|null;unitCost:Money|null;quantity:string|null;history:{month:string;marginPct:Pct}[];
  /** Margin now minus last month, in points (2 places, from unrounded margins); null when either is unknown. */
@@ -80,7 +80,7 @@ function netProfit(month:string,grossProfit:string|null,partial:boolean,expenses
  const confirmed=confirmation?.kind==="confirmation"&&confirmation.value.complete&&confirmation.value.period===month;
  const complete=confirmed&&confirmation.value.reviewedRevision===relevantExpenseRevision(expenses.history,month);
  const anyAvailable=Object.values(components.breakdownCoverage).includes("available");
- const reason:NetProfitReason|null=grossProfit===null?"costUnknown":partial?"monthPartial":components.reasons.includes("UNKNOWN_TAX")?"unknownTax":confirmed&&!complete?"confirmationStale":!confirmed&&!anyAvailable&&!components.reasons.length?"expensesMissing":!complete||components.reasons.length?"expensesIncomplete":null;
+ const reason:NetProfitReason|null=grossProfit===null?"costUnknown":partial?"monthPartial":components.reasons.includes("UNKNOWN_TAX")?"unknownTax":confirmed&&!complete?"confirmationStale":!confirmed&&!anyAvailable&&!components.reasons.length?"expensesMissing":!complete?"expensesIncomplete":components.reasons.length?"expensesBlocked":null;
  const value=components.reasons.length||!complete&&!anyAvailable?null:components.expenses;
  return {expenses:value,expensesComplete:complete,netProfit:reason===null&&grossProfit!==null?new D(grossProfit).minus(components.expenses).toFixed():null,netProfitReason:reason};
 }

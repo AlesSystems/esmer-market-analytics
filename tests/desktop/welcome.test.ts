@@ -52,7 +52,7 @@ for (const source of [false, true]) {
       const routes: [string, () => Promise<void>, () => Promise<void>][] = [
         ["Ürünler", () => openSection(page, "Ürünler"), () => expect(page.getByRole("heading", { name: "Ürünler", level: 1 })).toBeVisible()],
         ["Rapor ve Excel", () => openSection(page, "Rapor ve Excel"), () => expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible()],
-        ["Giderler", () => openSection(page, "Giderler"), () => expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toBeVisible()],
+        ["Giderler", () => openSection(page, "Giderler"), () => expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toBeVisible()],
         ["Bu ay", () => openSection(page, "Bu ay"), () => expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible()],
       ];
       for (const [name, open, check] of routes) {
@@ -190,10 +190,10 @@ test("empty profile expense return restores Bu ay navigation and readiness", asy
   try {
     const page = await app.firstWindow();
     await openSection(page, "Giderler");
-    await expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toBeVisible();
     await openSection(page, "Bu ay");
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Gider ekle", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toHaveCount(0);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

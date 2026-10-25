@@ -25,10 +25,11 @@ const reasons:Record<NetProfitReason,string>={
  monthPartial:"Ay henüz tamamlanmadı",
  expensesMissing:"Bu ayın giderleri girilmedi",
  expensesIncomplete:"Bu ayın giderleri tamamlanmadı",
+ expensesBlocked:"Bazı gider satırları net kârı engelliyor",
  unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",
  confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
 };
-const toExpenses=new Set<NetProfitReason>(["expensesMissing","expensesIncomplete","unknownTax","confirmationStale"]);
+const toExpenses=new Set<NetProfitReason>(["expensesMissing","expensesIncomplete","expensesBlocked","unknownTax","confirmationStale"]);
 
 const attentionTitles:Record<AttentionKind,string>={loss:"Zarar ediyor",marginDrop:"Marjı düştü",lowMarginHighVolume:"Çok satıyor ama marjı düşük",missingCost:"Maliyeti eksik"};
 function attentionFigure(kind:AttentionKind,p:MonthProfitProduct):string {

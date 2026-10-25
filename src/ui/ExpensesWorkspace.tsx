@@ -1,101 +1,158 @@
-type ExpenseTask = "records" | "manual" | "import" | "completeness";
-import { ExpenseCategoryChart, LargestExpensesChart } from "./ExpenseCharts";
+type ExpenseTask = "records" | "manual" | "import";
 import { ManualExpenseEntry, pendingExpenseKey } from "./ManualExpenseEntry";
 import { useExpenseNavigation } from "./expense-navigation";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { classifications, classificationLabels, type ExpenseFields, type ExpensePeriod, type ExpensePreview, type ExpenseRecord, type ExpenseResult, type ExpenseValue } from "../expenses/contracts";
 import type { RequestError } from "../domain/contracts";
 import { date, money } from "./format";
+import { attentionText, confirmationState, groupLabels, netReasonText } from "./expenses/copy";
+import { useMonthProfit } from "./pages/month-profit-data";
+import { monthName } from "./pages/month-summary";
 const failed = "Yerel hizmete ulaşılamadı. Yeniden deneyin.";
 const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
+const recordId = (entityId: string) => `expense-record-${entityId}`;
 
-export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod, active = true, visible = true }: {visible?:boolean;active?: boolean; period: string; onPeriod?: (period: string) => void; onChange?: () => void; embedded?: boolean }) {
+/** Giderler for one month: Excel import first, the four monthly groups, one "tamam" confirmation and the month's estimated net profit. */
+export function ExpensesWorkspace({ period, onChange, embedded = false, onPeriod, onMonthPage, active = true, visible = true }: { visible?: boolean; active?: boolean; period: string; onPeriod?: (period: string) => void; onMonthPage?: () => void; onChange?: () => void; embedded?: boolean }) {
   const navigation = useExpenseNavigation();
   const [savedPeriod, setSavedPeriod] = useState<{ incurred: string; payment: string | null; related: string }>();
-  const [savedEntity, setSavedEntity] = useState<string>();
   const [task, setTask] = useState<ExpenseTask>("records");
   const opener = useRef<() => void>(() => undefined);
   const restoreFocus = useRef(false);
-  const [summaryOpen, setSummaryOpen] = useState(false);
   const taskTitle = useRef<HTMLHeadingElement>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [storedView, setView] = useState<ExpensePeriod>();
-  const view=storedView?.period===period?storedView:undefined;
+  const view = storedView?.period === period ? storedView : undefined;
   const [preview, setPreview] = useState<ExpensePreview>();
   const [keep, setKeep] = useState<number[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<ExpenseRecord>();
-  const [reviewed, setReviewed] = useState(false);
-  const [reviewReason, setReviewReason] = useState("");
+  const [recordsOpen, setRecordsOpen] = useState(false);
   const generation = useRef(0);
+  const profit = useMonthProfit(period, active && visible && !embedded, view);
   function returnToRecords() { setTask("records"); setSelected(undefined); restoreFocus.current = true; }
-  useEffect(() => { if (visible && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading,visible]);
-  useEffect(() => { if (visible && task !== "records") taskTitle.current?.focus(); }, [task,visible]);
+  function open(row: ExpenseRecord, focusBack: string) { opener.current = () => document.getElementById(focusBack)?.focus(); setSelected(row); }
+  useEffect(() => { if (visible && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading, visible]);
+  useEffect(() => { if (visible && task !== "records") taskTitle.current?.focus(); }, [task, visible]);
   async function load(): Promise<boolean> {
     const id = ++generation.current;
     setLoading(true); setLoadError("");
     try {
       const result = await window.esmer.queryExpenses({ period });
       if (id !== generation.current) return false;
-      if (result.status === "expenses") { setView(result); setReviewed(false); return true; }
+      if (result.status === "expenses") { setView(result); return true; }
       else if ("message" in result) setLoadError(result.message);
     } catch { if (id === generation.current) setLoadError(failed); }
     finally { if (id === generation.current) setLoading(false); }
     return false;
   }
-  useEffect(() => { if(!active){if(task==="manual"&&!busy&&!localStorage.getItem(pendingExpenseKey))setTask("records");return;} if(!visible)return; if(view?.period===period)return; restoreFocus.current = false; setSummaryOpen(false); setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); setReviewed(false); void load(); return () => { ++generation.current; }; }, [period,active,visible]);
-  async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false) {
-    navigation.protect({dirty:false,locked:true});
+  useEffect(() => { if (!active) { if (task === "manual" && !busy && !localStorage.getItem(pendingExpenseKey)) setTask("records"); return; } if (!visible) return; if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active, visible]);
+  async function run(action: () => Promise<ExpenseResult | RequestError>, success: string, mutation = false, focusId?: string) {
+    navigation.protect({ dirty: false, locked: true });
     setBusy(true); setError(""); setMessage("");
     try {
       const result = await action();
       if (result.status === "failed" || result.status === "unavailable" || result.status === "rejected") { setError(result.message); return; }
-      if (result.status === "preview") { setPreview(result); setKeep([]); return; }
+      if (result.status === "preview") { setPreview(result); setKeep([]); opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); return; }
       if (result.status === "cancelled") { setMessage("İşlem iptal edildi. Kayıtlar değiştirilmedi."); return; }
-      setMessage(result.status === "already-imported" ? "Bu çalışma kitabı zaten içe aktarılmış. Kayıtlar değiştirilmedi." : result.status === "imported" && preview ? `${success} Paket: ${preview.batchId}` : success);
-      if (mutation) { setPreview(undefined);setKeep([]);returnToRecords(); await load(); onChange?.(); }
+      setMessage(result.status === "already-imported" ? "Bu Excel dosyası zaten içe aktarılmış. Kayıtlar değiştirilmedi." : success);
+      if (mutation) { setPreview(undefined); setKeep([]); if (!focusId) returnToRecords(); await load(); onChange?.(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
     } catch { setError(failed); }
-    finally { navigation.protect({dirty:false,locked:false});setBusy(false); }
+    finally { navigation.protect({ dirty: false, locked: false }); setBusy(false); }
   }
+  const confirm = (complete: boolean) => { if (view) void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete, reason: complete ? "Bu ayın giderleri tamam" : "Onay kaldırıldı" }), complete ? "Bu ayın giderleri onaylandı." : "Onay kaldırıldı.", true, "expense-confirm-action"); };
+  const importExcel = () => void run(() => window.esmer.previewExpenses(), "");
+  const saveTemplate = () => void run(() => window.esmer.saveExpenseTemplate(), "Excel şablonu kaydedildi.");
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
   const Container = embedded ? "section" : "main";
+  const records = task === "records" && !selected;
   return <Container className="expenses-workspace" aria-busy={busy}>
-    <div className="page-heading"><h1>Giderler</h1>{task === "records" && !selected ? <div className="expense-actions"><Button variant="default" id="expense-import" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); setMessage(""); }}>Excel’den aktar</Button><Button variant="outline" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}>Gider ekle</Button><Button variant="outline" id="expense-completeness" disabled={busy || !view} onClick={() => { opener.current = () => document.getElementById("expense-completeness")?.focus(); setTask("completeness"); setMessage(""); }}>Giderlerin eksiksizliğini incele</Button></div> : <Button variant="outline" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Kayıtlara dön</Button>}</div>
+    <header className="expenses-head"><div><h1>Giderler</h1><p className="expenses-month">{monthName(period)}</p></div>
+      {records ? <div className="expense-actions"><Button id="expense-import" disabled={busy} onClick={importExcel}>Excel’den içe aktar</Button><Button variant="outline" disabled={busy} onClick={saveTemplate}>Şablonu indir</Button><Button variant="ghost" className="expense-quiet" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}>Elle ekle</Button></div>
+        : <Button variant="outline" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Giderlere dön</Button>}
+    </header>
 
-    {task === "manual" && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { onChange?.(); if (!current) return; setSavedEntity(result.entityId); setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi. Dönemin giderlerini yeniden inceleyin."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
-    {savedPeriod && task === "records" && <p className="notice">Giderin oluşma dönemi: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme dönemi: {savedPeriod.payment}</>}.{onPeriod && <Button variant="link" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>İlgili aya git</Button>}</p>}
-    {task === "import" && <section className="workspace-task" aria-label="Gider içe aktarma"><h2 ref={taskTitle} tabIndex={-1}>{preview ? "2. Önizle ve hataları düzelt" : "1. Şablonu indir / dosya seç"}</h2><p>İşçilik yalnızca aylık toplam olarak girilir; kişi veya bordro bilgisi eklemeyin.</p><div className="expense-actions"><Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.saveExpenseTemplate(), "Gider şablonu kaydedildi.")}>Şablonu kaydet</Button><Button variant="default" disabled={busy} onClick={() => void run(() => window.esmer.previewExpenses(), "")}>Excel seç</Button></div>
-    <details className="expense-help"><summary>Excel şablonu nasıl doldurulur?</summary><p>Tek sayfayı ve sütun başlıklarını koruyun. Yalnızca sabit değerler kullanın; formül ve ek sütun eklemeyin.</p><dl className="evidence"><dt>Sınıflandırma seçenekleri</dt><dd>{classifications.map(item => classificationLabels[item]).join("; ")}</dd><dt>KDV işlemi</dt><dd>İndirilebilir; İndirilemez; Bilinmiyor. İlk iki seçenek için KDV kanıtı zorunludur; sıfır KDV tutarı tek başına kanıt değildir.</dd><dt>Tarih ve tutar</dt><dd>Gider tarihi zorunludur: 15.01.2026 veya 2026-01-15. Ödeme tarihini yalnızca biliniyorsa girin. Net, KDV ve brüt tutarları negatif olmayan değerlerle girin (örnek: 1250,50); net ve KDV toplamı brüte eşit olmalıdır.</dd><dt>Kayıt ve kanıt referansları</dt><dd>Kategori zorunludur. Kayıt referansı tüm çalışma kitaplarında aynı gideri tanımlar; bir referansı farklı gider için kullanmayın. Referans ve kanıt alanlarında kişisel bilgi yerine 1–128 karakterlik kod kullanın: Latin harfleri, rakam, nokta, alt çizgi, iki nokta veya kısa çizgi; ilk karakter harf veya rakam olmalıdır.</dd><dt>İşçilik</dt><dd>Yalnızca aylık toplam girin. İşçilik dönemi, gider tarihinin ayıyla aynı olmalıdır (örnek: 2026-01). Diğer sınıflarda bu alanı boş bırakın.</dd><dt>Stok kaybı</dt><dd>Kayıp kanıtı ve Kayıp işlemi zorunludur. Kabul edilen işlemler: Ayrı gider; Maliyete dahil. Aynı kayıp kanıtını tekrar kullanmayın. Diğer sınıflarda kayıp alanlarını boş bırakın.</dd></dl></details>
-    </section>}
-    {busy && <p role="status">İşlem sürüyor…</p>}{message && <p className="notice" role="status">{message}{task === "records" && savedEntity && view?.rows.some(row => row.entityId === savedEntity) && <Button variant="link" onClick={() => { opener.current = () => document.getElementById(`expense-record-${savedEntity}`)?.focus(); setSelected(view.rows.find(row => row.entityId === savedEntity)); }}>Kaydı incele</Button>}</p>}{error && <p className="notice warning" role="alert">{error}</p>}
-    {task === "import" && preview && <section className="block expense-section" aria-label="Excel önizlemesi"><div className="section-heading"><h2>Excel önizlemesi</h2><Button variant="outline" disabled={busy} onClick={() => { setPreview(undefined); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }}>Önizlemeyi kapat</Button></div><p>{preview.rows.length} satır · Etkilenen dönemler: {[...new Set(preview.rows.flatMap(row => row.value ? [row.value.date.slice(0, 7)] : []))].join(", ") || "Belirlenemiyor"}</p><p className="caption">Paket: {preview.batchId}</p><p>Önizleme henüz kayıt oluşturmaz. Tek bir geçersiz satır bile varsa çalışma kitabının tamamı düzeltilmelidir.</p>{preview.alreadyImported && <p className="notice">Bu çalışma kitabı zaten içe aktarılmış.</p>}{preview.errors.map((item, i) => <p role="alert" key={i}>{item}</p>)}<div className="table-scroll" tabIndex={0} aria-label="Önizleme satırları"><table><thead><tr><th>Satır / tarih</th><th>Kategori / sınıf</th><th className="number">Net / KDV / brüt</th><th>İnceleme</th></tr></thead><tbody>{preview.rows.map(row => <tr key={row.row}><td>{row.row}{row.value && <small>{date(row.value.date)}</small>}</td><td>{row.value?.category ?? "Geçersiz satır"}{row.value && <small>{classificationLabels[row.value.classification]}</small>}</td><td className="number">{row.value ? <>{money(row.value.net)}<small>{money(row.value.tax)} / {money(row.value.gross)}</small></> : "—"}</td><td>{row.errors.map((item, i) => <p key={i} role="alert">{item}</p>)}{row.alreadyPresent ? "Önceden kaydedilmiş" : row.duplicates.length > 0 ? <label className="expense-check"><input type="checkbox" disabled={busy} checked={keep.includes(row.row)} onChange={event => setKeep(event.target.checked ? [...keep, row.row] : keep.filter(id => id !== row.row))} />Satır {row.row}: benzer kayda rağmen ayrı gider olarak ekle</label> : row.errors.length === 0 ? "İçe aktarılabilir" : null}</td></tr>)}</tbody></table></div><p className="caption">Benzer tarih ve tutar tek başına mükerrer olduğunu kanıtlamaz. Her benzer satırı ayrı gider olarak açıkça onaylayın veya çalışma kitabından çıkarıp yeniden seçin. İçe aktarma giderlerin eksiksiz olduğunu onaylamaz.</p><h3>3. İçe aktarmayı onayla</h3><Button variant="default" disabled={busy || !!invalid || preview.alreadyImported || !preview.rows.length || preview.rows.some(row => !row.alreadyPresent && row.duplicates.length > 0 && !keep.includes(row.row))} onClick={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Dönem eksiksizliği ayrıca onaylanmalıdır.", true)}>İçe aktarmayı onayla</Button></section>}
+    {task === "manual" && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { onChange?.(); if (!current) return; setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
+    {savedPeriod && records && <p className="notice">Gider ayı: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme ayı: {savedPeriod.payment}</>}.{onPeriod && <Button variant="link" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>O aya git</Button>}</p>}
+    {busy && <p role="status" className="expense-busy">İşlem sürüyor…</p>}
+    {message && <p className="notice" role="status">{message}</p>}
+    {error && <p className="notice warning" role="alert">{error}</p>}
+    {task === "import" && preview && <ImportPreview preview={preview} keep={keep} setKeep={setKeep} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); returnToRecords(); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
     {loadError && <div className="notice warning" role="alert"><span>{loadError}</span><Button variant="outline" disabled={loading} onClick={() => void load()}>Giderleri yeniden yükle</Button></div>}
-    {loading && <p role="status">Giderler yükleniyor…</p>}
-    {view && <>
-      {task === "records" && !selected && <>
-      <div className={`notice expense-status ${view.complete ? "" : "warning"}`}><strong>{view.complete ? "Dönemin giderleri eksiksiz olarak onaylandı" : "Faaliyet kârı hesaplanamıyor — gider verileri eksik."}</strong><span>{view.complete ? "Tamlık onaylı" : "Tamlık onay bekliyor"}{view.rows.length > 0 && " · her değişiklikten sonra yeniden inceleyin"}</span></div>
-      {!view.rows.length && <section className="block expense-section empty-state"><h2>Bu dönemde gider kaydı yok.</h2><p>Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p><Button variant="outline" disabled={busy} onClick={() => void run(() => window.esmer.saveExpenseTemplate(), "Gider şablonu kaydedildi.")}>Şablonu kaydet</Button></section>}
-      {view.rows.length > 0 && <section className="metrics expense-summary" aria-label="Gider göstergeleri"><article className="metric"><h2>Kayıtlı giderler</h2><strong>{view.summary.expenses === null ? "Hesaplanamıyor" : money(view.summary.expenses)}</strong><Button variant="ghost" className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.coverage === "missing" ? "Kanıt eksik · gider kaydı yok" : view.summary.coverage === "incomplete" ? "Kanıt eksik" : view.complete ? "İncelenmiş kayıtlar" : "Kayıtlı tutar · tamlık onaysız"}</Button></article><article className="metric"><h2>İşçilik</h2><strong>{view.summary.labour === null ? "Hesaplanamıyor" : money(view.summary.labour)}</strong><Button variant="ghost" className="metric-status" onClick={() => setSummaryOpen(true)}>{view.summary.labourCoverage === "missing" ? "Kanıt eksik · toplam verilmedi" : view.summary.labourCoverage === "incomplete" ? "Kanıt eksik" : "Kayıtlı aylık toplam"}</Button></article><article className="metric"><h2>Kayıt sayısı</h2><strong>{view.rows.length.toLocaleString("tr-TR")}</strong><p>{view.rows.filter(row => currentValue(row)?.voided).length.toLocaleString("tr-TR")} geri alınmış kayıt dahil</p></article></section>}
-      {view.rows.length > 0 && <div className="expense-charts"><ExpenseCategoryChart rows={view.rows} /><LargestExpensesChart rows={view.rows} onSelect={row => { opener.current = () => document.getElementById(`expense-record-${row.entityId}`)?.focus(); setSelected(row); }} /></div>}
-      <details className="block expense-help" open={summaryOpen} onToggle={event => setSummaryOpen(event.currentTarget.open)}><summary>Gider hesabı ve kapsamı</summary><p>{period} döneminin oluşma tarihine göre sınıflandırılmış faaliyet gideri, işçilik ve maliyette yer almayan ayrı stok kaybı kayıtları kapsanır. KDV işlemi kanıtına göre net veya brüt tutar kullanılır.</p><p>{view.complete ? "Bu gider revizyonunun dönem tamlığı onaylanmıştır; bu onay kârı kesinleştirmez." : "Dönem tamlığı onaylanmamıştır; gösterilen kayıtlı tutar dönemin tüm giderlerini temsil etmeyebilir."}</p>{view.summary.reasons.length > 0 && <ul className="warnings">{view.summary.reasons.map(reason => <li key={reason}>{({ UNKNOWN_TAX: "KDV işlemi veya kanıtı eksik.", LEGACY_EXPENSE: "Eski gider kaydının sınıflandırma ve KDV kanıtları eksik.", UNCLASSIFIED: "Sınıflandırılmamış hareket var.", LOSS_REVIEW: "Stok kaybı kanıtı incelenmeli." } as Record<string, string>)[reason] ?? "Gider hesabının kanıtı eksik."}</li>)}</ul>}{view.summary.excluded.length > 0 && <><h3>Gider toplamı dışında</h3><ul>{view.summary.excluded.map(item => <li key={item.entityId}>{item.classification === "already-in-cost" ? "Maliyette yer alan stok kaybı" : classificationLabels[item.classification as keyof typeof classificationLabels]} · {money(item.amount)}</li>)}</ul></>}
-      <dl className="expense-totals"><div><dt>Oluşma tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.incurred)}</dd></div><div><dt>Ödeme tarihine göre kayıtlı brüt hareketler</dt><dd>{money(view.payments)}</dd></div></dl><p className="caption">Oluşma tarihi ile ödeme tarihi ayrıdır. Bu toplamlar faaliyet sonucundan ayrı kayıt toplamlarıdır; işletme sahibinin katkısı gibi gider olmayan hareketleri de içerir. Kayıtlı toplamın sıfır olması dönemde gider olmadığı anlamına gelmez.</p>
+    {loading && !view && <p role="status">Giderler yükleniyor…</p>}
+    {view && records && <>
+      <div className="expense-month">
+        <section className="expense-groups" aria-labelledby="expense-groups-title">
+          <h2 id="expense-groups-title">Bu ayın giderleri</h2>
+          {!view.groups.some(group => group.count) && !view.attention.length ? <div className="expense-empty"><p><strong>{view.rows.length > 0 ? `Bu ay sayılan gider yok · ${view.rows.length.toLocaleString("tr-TR")} kayıt toplam dışında veya geri alınmış.` : "Bu ay için gider girilmedi."}</strong></p>{view.rows.length === 0 && <p>Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p>}<p>Excel şablonunu indirin, ayın giderlerini doldurun ve “Excel’den içe aktar” ile yükleyin. Personel için yalnızca aylık toplamı girin.</p></div>
+            : <dl className="expense-group-list">{view.groups.map(group => <div key={group.key} data-group={group.key}><dt>{groupLabels[group.key]}<small>{group.count ? `${group.count.toLocaleString("tr-TR")} satır` : "satır yok"}</small></dt><dd>{group.count === 0 ? "Girilmedi" : group.amount === null ? <span className="expense-blocked">Eksik</span> : money(group.amount)}</dd></div>)}<div className="expense-group-total"><dt>Toplam</dt><dd>{view.summary.expenses === null ? <span className="expense-blocked">Eksik</span> : money(view.summary.expenses)}</dd></div></dl>}
+          {view.attention.length > 0 && <div className="expense-attention" role="group" aria-labelledby="expense-attention-title"><h3 id="expense-attention-title">Düzeltilmesi gereken satırlar</h3><ul>{view.attention.map(item => { const row = view.rows.find(candidate => candidate.entityId === item.entityId); const id = `expense-fix-${item.entityId}`; return <li key={item.entityId}><span><strong>{item.category}</strong> · {date(item.date)} · {attentionText[item.reason]}</span>{row && item.reason !== "legacy" && <Button variant="outline" id={id} disabled={busy} onClick={() => open(row, id)}>Düzelt</Button>}</li>; })}</ul></div>}
+          <ConfirmBlock view={view} busy={busy} confirm={confirm} />
+        </section>
+        {!embedded && <NetProfitPanel profit={profit} onMonthPage={onMonthPage} />}
+      </div>
+      <details className="expense-more" open={recordsOpen} onToggle={event => setRecordsOpen(event.currentTarget.open)}><summary>Tüm kayıtlar ({view.rows.length.toLocaleString("tr-TR")})</summary>
+        {view.rows.length === 0 ? <p className="caption">Bu ay için kayıt yok.</p> : <div className="table-scroll" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih</th><th>Kategori</th><th className="number">Tutar</th><th>Durum</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => { const value = currentValue(row); return <tr key={row.entityId}><td>{date(row.value.date)}<small>{value?.paymentDate ? `Ödeme ${date(value.paymentDate)}` : "Ödeme tarihi yok"}</small></td><td>{value?.category ?? "Eski kayıt"}<small>{value && classificationLabels[value.classification]}</small></td><td className="number">{money(value ? value.gross : row.value.net)}<small>{value ? `net ${money(value.net)} · KDV ${money(value.tax)}` : "yalnızca net"}</small></td><td>{value?.voided ? "Geri alındı" : "Geçerli"}<small>{value && "kind" in value.origin ? "Elle girildi" : "Excel"} · sürüm {row.revision}</small></td><td><Button variant="link" id={recordId(row.entityId)} disabled={busy} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</Button></td></tr>; })}</tbody></table></div>}
       </details>
-      {view.rows.length > 0 && <section className="block expense-section expense-records"><h2>Dönem kayıtları</h2><div className="table-scroll" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih / ödeme</th><th>Kategori / sınıf</th><th className="number">Net / KDV / brüt</th><th>Durum</th><th>İşlem</th></tr></thead><tbody>{view.rows.map(row => { const value = currentValue(row); return <tr key={row.entityId}><td>{date(row.value.date)}<small>{value?.paymentDate ? date(value.paymentDate) : "Ödeme tarihi yok"}</small></td><td>{value?.category ?? "Eski kayıt"}<small>{value && classificationLabels[value.classification]}</small></td><td className="number">{money(row.value.net)}<small>{value ? `${money(value.tax)} / ${money(value.gross)}` : "KDV / brüt kanıtı yok"}</small></td><td>{value?.voided ? "Geri alınmış" : "Etkin"}<small>{value && "kind" in value.origin && "Elle girildi · "}Sürüm {row.revision}</small></td><td><Button variant="link" id={`expense-record-${row.entityId}`} disabled={busy} onClick={() => { opener.current = () => document.getElementById(`expense-record-${row.entityId}`)?.focus(); setSelected(row); }}>İncele / düzelt</Button></td></tr>; })}</tbody></table></div></section>}
-      <details><summary>İçe aktarma geçmişi ({view.batches.length})</summary><ul>{view.batches.map(batch => <li key={batch.batchId}>{date(batch.createdAt)} · {batch.count} kayıt · sürümler {batch.firstRevision}–{batch.lastRevision}<small>{batch.batchId}</small></li>)}</ul></details>
-      </>}
-      {selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} />}
-      {task === "completeness" && <section className="block expense-section workspace-task"><h2 ref={taskTitle} tabIndex={-1}>Dönem eksiksizlik incelemesi</h2><p><strong>{period}</strong> · Gider revizyonu {view.expenseRevision}</p><p>Kaydedilen giderleri ve ödeme tarihlerini kontrol edin. Onay yalnızca bu gider sürümü için geçerlidir.</p><label className="expense-check"><input type="checkbox" checked={reviewed} disabled={busy} onChange={event => setReviewed(event.target.checked)} />Bu dönemin giderlerini inceledim ve eksiksiz olduğunu onaylıyorum</label><label className="expense-reason">İnceleme açıklaması<Input value={reviewReason} maxLength={500} onChange={event => setReviewReason(event.target.value)} /></label><div className="expense-actions"><Button variant="default" disabled={busy || !reviewed || !reviewReason.trim()} onClick={() => void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete: true, reason: reviewReason }), "Dönem eksiksizliği onaylandı.", true)}>Eksiksizliği onayla</Button><Button variant="outline" disabled={busy || !view.complete || !reviewReason.trim()} onClick={() => void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete: false, reason: reviewReason }), "Eksiksizlik onayı kaldırıldı.", true)}>Eksiksizlik onayını kaldır</Button></div></section>}
-
+      <details className="expense-more"><summary>Hesap ayrıntıları ve içe aktarma geçmişi</summary>
+        <p>Toplam, gider tarihine göre bu aya düşen giderlerdir. İndirilebilir KDV’li giderlerde net, diğerlerinde brüt tutar sayılır. Varlık alımı, vergi, kredi, işletme sahibinin katkı ve çekişleri ile transferler gider toplamına girmez.</p>
+        {view.summary.excluded.length > 0 && <><h3>Gider toplamı dışında</h3><ul>{view.summary.excluded.map(item => <li key={item.entityId}>{item.classification === "already-in-cost" ? "Maliyette yer alan stok kaybı" : classificationLabels[item.classification as keyof typeof classificationLabels]} · {money(item.amount)}</li>)}</ul></>}
+        <dl className="expense-totals"><div><dt>Gider tarihine göre kayıtlı brüt</dt><dd>{money(view.incurred)}</dd></div><div><dt>Ödeme tarihine göre kayıtlı brüt</dt><dd>{money(view.payments)}</dd></div></dl>
+        <h3>İçe aktarma geçmişi ({view.batches.length.toLocaleString("tr-TR")})</h3>{view.batches.length ? <ul>{view.batches.map(batch => <li key={batch.batchId}>{date(batch.createdAt)} · {batch.count} kayıt · sürümler {batch.firstRevision}–{batch.lastRevision}<small>{batch.batchId}</small></li>)}</ul> : <p className="caption">Henüz içe aktarma yok.</p>}
+        <TemplateHelp />
+      </details>
     </>}
+    {view && selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} />}
   </Container>;
 }
 
-function ExpenseEditor({ row, history, busy, close, run }: { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean) => Promise<void> }) {
+function ConfirmBlock({ view, busy, confirm }: { view: ExpensePeriod; busy: boolean; confirm: (complete: boolean) => void }) {
+  const state = view.confirmation;
+  return <div className="expense-confirm" data-state={state} role="group" aria-labelledby="expense-confirm-title">
+    <div><h3 id="expense-confirm-title">{confirmationState(state)}</h3>
+      <p>{state === "current" ? "Bu ayın giderlerini tamam olarak onayladınız. Bir gider değişirse onay yeniden istenir." : state === "stale" ? "Onaydan sonra giderler değişti. Kontrol edip yeniden onaylayın." : "Bu ayın tüm giderleri girildiyse onaylayın. Net kâr ancak onaydan sonra hesaplanır."}</p></div>
+    {state === "current" ? <Button variant="link" id="expense-confirm-action" disabled={busy} onClick={() => confirm(false)}>Onayı kaldır</Button> : <Button id="expense-confirm-action" disabled={busy} onClick={() => confirm(true)}>Bu ayın giderleri tamam</Button>}
+  </div>;
+}
+
+function NetProfitPanel({ profit, onMonthPage }: { profit: ReturnType<typeof useMonthProfit>; onMonthPage?: () => void }) {
+  const read = profit.read;
+  let body;
+  if (!read) body = <p role="status">Hesaplanıyor…</p>;
+  else if ("failed" in read) body = <p role="alert">{read.failed} <Button variant="link" onClick={profit.retry}>Yeniden dene</Button></p>;
+  else if (read.result.status !== "month-profit") body = <p>{read.result.message}</p>;
+  else {
+    const view = read.result.view, t = view.totals;
+    body = <><dl className="expense-net-list">
+      <div><dt>Tahmini brüt kâr</dt><dd>{t.grossProfit === null ? "Bilinmiyor" : money(t.grossProfit)}</dd></div>
+      <div><dt>Giderler</dt><dd>{t.expenses === null ? "Eksik" : money(t.expenses)}</dd></div>
+      <div className="expense-net-result"><dt>Tahmini net kâr</dt><dd>{t.netProfit === null ? <span className="expense-blocked">Hesaplanamadı</span> : money(t.netProfit)}</dd></div>
+    </dl>{t.netProfit === null && t.netProfitReason && <p className="expense-net-reason" data-reason={t.netProfitReason}>{netReasonText(t.netProfitReason, view.dataUntil)}</p>}</>;
+  }
+  return <aside className="expense-net" aria-labelledby="expense-net-title" aria-busy={profit.loading}><h2 id="expense-net-title">Bu ayın net kârı</h2>{body}{onMonthPage && <Button variant="link" onClick={onMonthPage}>Bu aya dön</Button>}</aside>;
+}
+
+function ImportPreview({ preview, keep, setKeep, busy, invalid, title, close, confirm }: { preview: ExpensePreview; keep: number[]; setKeep: (rows: number[]) => void; busy: boolean; invalid: boolean; title: RefObject<HTMLHeadingElement | null>; close: () => void; confirm: () => void }) {
+  const blocked = busy || invalid || preview.alreadyImported || !preview.rows.length || preview.rows.some(row => !row.alreadyPresent && row.duplicates.length > 0 && !keep.includes(row.row));
+  return <section className="block expense-section" aria-label="Excel önizlemesi"><div className="section-heading"><h2 ref={title} tabIndex={-1}>Excel önizlemesi</h2><Button variant="outline" disabled={busy} onClick={close}>Önizlemeyi kapat</Button></div>
+    <p>{preview.rows.length.toLocaleString("tr-TR")} satır · Aylar: {[...new Set(preview.rows.flatMap(row => row.value ? [row.value.date.slice(0, 7)] : []))].join(", ") || "Belirlenemiyor"}</p>
+    <p className="caption">Henüz hiçbir şey kaydedilmedi. Hatalı satır varsa Excel dosyasını düzeltip yeniden seçin.</p>
+    {preview.alreadyImported && <p className="notice">Bu Excel dosyası zaten içe aktarılmış.</p>}{preview.errors.map((item, i) => <p role="alert" key={i}>{item}</p>)}
+    <div className="table-scroll" tabIndex={0} aria-label="Önizleme satırları"><table><thead><tr><th>Satır / tarih</th><th>Kategori / tür</th><th className="number">Brüt tutar</th><th>Durum</th></tr></thead><tbody>{preview.rows.map(row => <tr key={row.row}><td>{row.row}{row.value && <small>{date(row.value.date)}</small>}</td><td>{row.value?.category ?? "Geçersiz satır"}{row.value && <small>{classificationLabels[row.value.classification]}</small>}</td><td className="number">{row.value ? <>{money(row.value.gross)}<small>net {money(row.value.net)} · KDV {money(row.value.tax)}</small></> : "—"}</td><td>{row.errors.map((item, i) => <p key={i} role="alert">{item}</p>)}{row.alreadyPresent ? "Önceden kaydedilmiş" : row.duplicates.length > 0 ? <label className="expense-check"><input type="checkbox" disabled={busy} checked={keep.includes(row.row)} onChange={event => setKeep(event.target.checked ? [...keep, row.row] : keep.filter(id => id !== row.row))} />Satır {row.row}: benzer kayıt var, yine de ayrı gider olarak ekle</label> : row.errors.length === 0 ? "Hazır" : null}</td></tr>)}</tbody></table></div>
+    <Button disabled={blocked} onClick={confirm}>İçe aktar</Button>
+  </section>;
+}
+
+function TemplateHelp() {
+  return <details className="expense-help"><summary>Excel şablonu nasıl doldurulur?</summary><p>Tek sayfayı ve sütun başlıklarını koruyun. Formül veya ek sütun eklemeyin.</p><dl className="evidence"><dt>Kategori</dt><dd>Kira için “Kira”, elektrik ve su için “Elektrik” veya “Su” yazın. Diğer giderler “Diğer” altında toplanır.</dd><dt>Sınıflandırma</dt><dd>{classifications.map(item => classificationLabels[item]).join("; ")}</dd><dt>Personel</dt><dd>“İşçilik” sınıfıyla yalnızca aylık toplamı girin; kişi veya bordro bilgisi eklemeyin. İşçilik dönemi gider ayıyla aynı olmalı (örnek: 2026-01).</dd><dt>KDV işlemi</dt><dd>İndirilebilir; İndirilemez; Bilinmiyor. İlk ikisinde KDV kanıtı zorunlu. “Bilinmiyor” net kârı durdurur.</dd><dt>Tarih ve tutar</dt><dd>Gider tarihi: 15.01.2026 veya 2026-01-15. Tutar: 1250,50. Net ile KDV toplamı brüte eşit olmalı.</dd><dt>Referanslar</dt><dd>Kişisel bilgi yerine kısa kod kullanın (harf, rakam, nokta, alt çizgi, iki nokta, kısa çizgi).</dd><dt>Stok kaybı</dt><dd>Kayıp kanıtı ve Kayıp işlemi (Ayrı gider veya Maliyete dahil) zorunlu.</dd></dl></details>;
+}
+
+function ExpenseEditor({ row, history, busy, close, run }: { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean, focusId?: string) => Promise<void> }) {
   const original = currentValue(row);
   const [fields, setFields] = useState<ExpenseFields | null>(original ? { date: original.date, paymentDate: original.paymentDate, category: original.category, classification: original.classification, net: original.net, tax: original.tax, gross: original.gross, taxTreatment: original.taxTreatment, taxEvidence: original.taxEvidence, supportingReference: original.supportingReference, sourceReference: original.sourceReference, labourPeriod: original.labourPeriod, loss: original.loss } : null);
   const [reason, setReason] = useState("");
