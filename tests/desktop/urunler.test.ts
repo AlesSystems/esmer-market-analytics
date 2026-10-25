@@ -85,7 +85,7 @@ test("the product card shows literal figures, a gap-aware margin line and the mi
   await openSection(page,"Ürünler");
   await expect(card(page)).toContainText("Ayrıntı için tablodan bir ürün seçin.");
   await page.locator('.products-table tr[data-product="1"]').click();
-  await expect(page.locator('.products-table tr[data-product="1"]')).toHaveAttribute("aria-selected","true");
+  await expect(page.locator('.products-table tr[data-product="1"]')).toHaveAttribute("aria-current","true");
   await expect(card(page).getByRole("heading",{name:"Süt",level:2})).toBeVisible();
   await expect(card(page).locator(".product-card-margin")).toHaveText("%30,00");
   await expect(card(page)).toContainText("Her 100 ₺ satışta 30,00 ₺ brüt kâr. Eylül 2025: %31,50.");
@@ -128,7 +128,7 @@ test("Bu ay attention opens the product card; Kaynak satırlar and back keep sea
  try{
   await page.getByRole("list",{name:"Dikkat edilecek ürünler"}).getByRole("button").nth(2).click();
   await expect(page.getByRole("heading",{name:"Ürünler",level:1})).toBeVisible();
-  await expect(page.locator('.products-table tr[data-product="5"]')).toHaveAttribute("aria-selected","true");
+  await expect(page.locator('.products-table tr[data-product="5"]')).toHaveAttribute("aria-current","true");
   await expect(page.locator('.products-table tr[data-product="5"]')).toBeFocused();
   await expect(card(page).getByRole("heading",{name:"Şeker",level:2})).toBeVisible();
   await expect(fact(page,"Toplam kârdaki payı")).toHaveText("%10,43 · 3. sıra");
