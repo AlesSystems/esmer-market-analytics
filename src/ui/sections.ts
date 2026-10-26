@@ -5,7 +5,7 @@ export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","G
 export type Section=typeof sections[number][0];
 /** Optional state carried by a navigation, e.g. the product to open on Ürünler. */
 export type NavigationState={productId?:string};
-export type Coverage={from:string;to:string};
+export type Coverage={from:string;to:string;last:string|null};
 
 /** Every page receives these props and nothing else. */
 export type PageProps={

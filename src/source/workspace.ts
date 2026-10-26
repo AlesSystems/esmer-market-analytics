@@ -3,7 +3,7 @@ import type {RawPackage} from "./raw-package";
 import type {SqlRow} from "./sql-server";
 export type SourceQuery = {hash:string|null;period:string|null;view:"overview"|"documents"|"products"|"detail";scope:"all"|"sales"|"purchasing";documentType:string|null;productId:string|null;documentId:string|null;offset:number};
 export type SourceWorkspaceResult = {status:"source-empty"}|{status:"source-unavailable";code:"SOURCE_CHANGED"|"NOT_FOUND";message:string}|{
- status:"source-workspace";sourceFormat:RawPackage["schemaVersion"];hash:string;period:string;from:string;to:string;extractedAt:string;lineage:string;extractionId:string;databaseId:string;
+ status:"source-workspace";sourceFormat:RawPackage["schemaVersion"];hash:string;period:string;from:string;to:string;lastDocumentDate:string|null;extractedAt:string;lineage:string;extractionId:string;databaseId:string;
  counts:{documents:number;lines:number;products:number;emptyDocuments:number};typeTotal:number;types:{code:string;documents:number}[];days:{date:string;documents:number}[];
  documents:SqlRow[];products:{id:string;documents:number;lines:number}[];lines:SqlRow[];document:SqlRow|null;total:number;offset:number;
 };
@@ -41,7 +41,7 @@ export function querySource(pkg:RawPackage,hash:string,request:SourceQuery):Sour
  const detailLines=request.view==="detail"?snapshot.lines.filter(row=>row.FIS===request.documentId):[];
  const total=request.view==="products"?productGroups.size:request.view==="detail"?detailLines.length:headers.length;
  const offset=total===0?0:Math.min(request.offset,Math.floor((total-1)/50)*50);
- return {status:"source-workspace",sourceFormat:pkg.schemaVersion,hash,period,from:snapshot.from,to:snapshot.to,extractedAt:snapshot.capturedAt,lineage:pkg.lineage,extractionId:pkg.extractionId,databaseId:snapshot.databaseId,
+ return {status:"source-workspace",sourceFormat:pkg.schemaVersion,hash,period,from:snapshot.from,to:snapshot.to,lastDocumentDate:latest?latest.slice(0,10):null,extractedAt:snapshot.capturedAt,lineage:pkg.lineage,extractionId:pkg.extractionId,databaseId:snapshot.databaseId,
  counts:{documents:headers.length,lines:lines.length,products:productGroups.size,emptyDocuments:headers.filter(row=>!lineHeaders.has(row.ID)).length},
  typeTotal:types.size,types:[...types].sort(([a],[b])=>numeric(a,b)).slice(0,50).map(([code,documents])=>({code,documents})),days:[...days].sort(([a],[b])=>a.localeCompare(b)).map(([date,documents])=>({date,documents})),
  documents:request.view==="documents"?headers.sort((a,b)=>b.FIS_TARIHI!.localeCompare(a.FIS_TARIHI!)||numeric(a.ID!,b.ID!)).slice(offset,offset+50):[],

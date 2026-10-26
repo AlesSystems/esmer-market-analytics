@@ -5,10 +5,11 @@ import { date } from "../format";
 import { liveErrors, type LiveConnection, type LiveState } from "./live";
 import { limitations } from "./limitations-data";
 import type { Limitation } from "./limitations";
+import type { Coverage } from "../sections";
 
 type Props = {
   availability?: Availability | RequestError;
-  source?: { from: string; to: string };
+  source?: Coverage;
   sourceResolution: { status: "pending" | "resolved" } | { status: "failed"; message: string };
   live: LiveConnection;
   importing: boolean;
@@ -66,7 +67,7 @@ function LiveTile({ live, hasData, cutoff, sqlImporting, onImportSql }: { live: 
   const outcome = live.outcome;
   return <Tile glaze="turquoise" name="Canlı bağlantı" line="Kaynağı yalnızca okur." seal={live.state} status={<span role="status">{liveTitles[live.state]}</span>}>
     <dl className="tile-facts">
-      <div><dt>Son yenileme</dt><dd>{state?.live.lastSuccessAt ? moment(state.live.lastSuccessAt) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
+      <div><dt>Son yenileme</dt><dd>{busy ? "Yenileniyor…" : state?.live.lastSuccessAt ? moment(state.live.lastSuccessAt) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
       <div><dt>Son geçerli veri</dt><dd>{cutoff ? date(cutoff) : state ? "Henüz yok" : "Okunamadı"}</dd></div>
     </dl>
     {live.state === "stale" && <p className="tile-warning">{hasData ? "Son geçerli yerel veriler kullanılıyor." : "Henüz geçerli yerel veri yok."}</p>}
@@ -149,7 +150,7 @@ function DisplayTile() {
 
 export function SettingsPage({ availability, source, sourceResolution, live, importing, sqlImporting, onImportPackage, onImportSql, onRecovery, onClose, claimFocus }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
-  const liveCutoff = live.status?.cutoff ?? (availability?.status === "ready" && availability.store === "loaded" ? availability.dataset.cutoff : source?.to);
+  const liveCutoff = source?.last ?? live.status?.cutoff ?? (availability?.status === "ready" && availability.store === "loaded" ? availability.dataset.cutoff : undefined);
   useEffect(() => { if (claimFocus()) heading.current?.focus(); }, [claimFocus]);
   return <main className="settings-page" aria-busy={importing || sqlImporting}>
     <div className="settings-heading">
