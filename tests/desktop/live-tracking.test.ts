@@ -25,6 +25,6 @@ test("packaged stale status acknowledges retained raw-only source records",async
   await page.getByRole("button",{name:"SQL kaynağını içe aktar",exact:true}).click();
   await expect(page.getByText("Kaynağa ulaşılamadı.",{exact:true})).toBeVisible({timeout:15000});
   await expect(page.getByText("Son geçerli yerel veriler kullanılıyor.",{exact:true})).toBeVisible();
-  await expect(page.getByRole("region",{name:"Canlı bağlantı",exact:true}).getByText("12.10.2025",{exact:true})).toBeVisible();
+  await expect(page.getByRole("region",{name:"Canlı bağlantı",exact:true}).getByText("01.10.2025",{exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });

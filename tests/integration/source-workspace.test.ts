@@ -55,12 +55,12 @@ test("type summaries disclose truncation while all source codes remain queryable
  const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:raw","batch-1"));const result=store.querySourceWorkspace(request());if(result.status!=="source-workspace")throw Error("missing");expect(result.typeTotal).toBe(60);expect(result.types).toHaveLength(50);const page=store.querySourceWorkspace(request({hash:result.hash,period:result.period,view:"documents",documentType:"60"}));expect(page.status==="source-workspace"&&page.documents.map(row=>row.ID)).toEqual(["60"]);}finally{store.close();}
 });
 
-test("raw first-use month follows dated records rather than extraction boundary", () => {
+test("raw first-use month and last document date follow dated records rather than extraction boundary", () => {
  const snapshot=rawSnapshot(); snapshot.to="2025-11-30";
  const result=querySource({schemaVersion:"sql-backup-preview-v1",provenance:"isolated-sql-backup",sourceReconciled:false,sha256:"0".repeat(64),lineage:"fixture:raw",extractionId:"batch-1",snapshot},"0".repeat(64),request());
- expect(result).toMatchObject({status:"source-workspace",period:"2025-10"});
+ expect(result).toMatchObject({status:"source-workspace",period:"2025-10",to:"2025-11-30",lastDocumentDate:"2025-10-01"});
 });
 
-test("an imported empty source remains present and selects its declared end month",()=>{const snapshot=rawSnapshot();snapshot.headers=[];snapshot.lines=[];const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:empty","empty-1"));expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",period:"2025-10",counts:{documents:0,lines:0}});}finally{store.close();}});
+test("an imported empty source remains present and selects its declared end month",()=>{const snapshot=rawSnapshot();snapshot.headers=[];snapshot.lines=[];const store=openStore(":memory:");try{store.importSourcePreview(writeRawPackage(snapshot,"fixture:empty","empty-1"));expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",period:"2025-10",counts:{documents:0,lines:0},lastDocumentDate:null});}finally{store.close();}});
 
 test("prepared estimate source reports its validated format",()=>{const store=openStore(":memory:");try{store.importSourcePreview(estimatePackage());expect(store.querySourceWorkspace(request())).toMatchObject({status:"source-workspace",sourceFormat:"sql-backup-estimate-v1"});}finally{store.close();}});
