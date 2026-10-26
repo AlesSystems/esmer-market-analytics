@@ -13,11 +13,12 @@ Kapsam ve sınır kararı: [aylık paket kararı](../decisions/issue-101-monthly
    - `FIS`: [önizleme izin listesindeki](../contracts/privacy.md#isolated-backup-record-preview-allowlist) sütunlar.
    - `FIS_DETAY`: önizleme sütunları ve `BELGE_TARIHINDEKI_SON_ALIS_FIYATI`.
    - `DOVIZ_AD`: `ID`, `AD`.
-   - `STOK`: `ID`, `AD`, `STOK_GRUP`, `STOK_BIRIM`.
+   - `STOK`: `ID`, `AD`, `STOK_GRUP`.
+   - `STOK_STOK_BIRIM`: `STOK`, `STOK_BIRIM`, `VARSAYILAN`. Ürünün birimi, varsayılan olarak işaretli tek birimidir.
    - `STOK_GRUP` ve `STOK_BIRIM`: `ID`, `AD`.
 
    Müşteri, tedarikçi (`STOK.CARI` dahil) ve personel sütunlarına izin vermeyin. `sa`, `dbo` veya yazma yetkili hesap reddedilir.
-3. Bağlantı dosyasını depo dışında tutun. `scope` değeri `isolated-copy` olmalıdır. `expectedDatabaseId` geri yüklenen veritabanının GUID'idir. `from` ve `to` okunabilecek en geniş tarih aralığıdır. Bunu bir kez geniş yazın, örneğin bütün yıl: `"from": "2025-01-01"`, `"to": "2025-12-31"`. Komut bu aralığın dışına çıkmaz; seçilen aylar aralığın içinde kalmalıdır. macOS'te dosya izni `0600` olmalıdır.
+3. Bağlantı dosyasını depo dışında tutun. `scope` değeri `isolated-copy` olmalıdır. `expectedDatabaseId` geri yüklenen veritabanının GUID'idir. `from` ve `to` okunabilecek en geniş tarih aralığıdır. Bunu bir kez geniş yazın, örneğin bütün yıl: `"from": "2025-01-01"`, `"to": "2025-12-31"`. Komut bu aralığın dışına çıkmaz; seçilen aylar aralığın içinde kalmalıdır. `to`, seçilen ayın son gününü de kapsamalıdır; yedek ay ortasında bitse bile (örneğin 12 Ekim) `"to": "2025-10-31"` yazın. macOS'te dosya izni `0600` olmalıdır.
 4. Depo klasöründe komutu çalıştırın:
 
    ```sh
@@ -37,7 +38,7 @@ Kapsam ve sınır kararı: [aylık paket kararı](../decisions/issue-101-monthly
 
 ## Hata olursa
 
-- `SOURCE_REJECTED`: hesap fazla yetkili, bir sütun eksik, okuma izni yok veya tek ay bile 100.000 satır ya da 32 MiB sınırını aşıyor. Ürün sütunu adları gerçek şemada doğrulanmamıştır. Eksikse paket yazılmaz.
+- `SOURCE_REJECTED`: hesap fazla yetkili, bir sütun eksik, okuma izni yok veya tek ay bile 100.000 satır ya da 32 MiB sınırını aşıyor. Ürün sütunu adları 25 Ekim 2026'da geri yüklenen yedekte doğrulandı. Eksikse paket yazılmaz.
 - `SOURCE_CHANGED`: `expectedDatabaseId` geri yüklenen veritabanıyla eşleşmiyor.
 - `SOURCE_UNAVAILABLE` veya `SOURCE_TIMEOUT`: sunucuya ulaşılamadı veya okuma 60 saniyeyi aştı.
 - `OUTPUT_EXISTS`: çıktı dosyası zaten var. Başka bir ad seçin.
