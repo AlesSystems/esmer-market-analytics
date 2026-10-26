@@ -21,13 +21,13 @@ git --version
 
 ## Build
 
-Run separately in PowerShell. Replace `v1.0.0` with the release tag or commit you were given. The v1.0.0 tag points at the merge commit of the release PR on main. Stop at the first failure and record it.
+Run separately in PowerShell. Replace `v1.0.1` with the release tag or commit you were given. The v1.0.1 tag points at the merge commit of the release PR on main. Stop at the first failure and record it.
 
 ```powershell
 git clone https://github.com/AlesSystems/esmer-market-analytics.git
 Set-Location esmer-market-analytics
 git fetch --tags
-git checkout v1.0.0
+git checkout v1.0.1
 git rev-parse HEAD
 npm ci
 npm run typecheck
@@ -45,7 +45,7 @@ npm run package:win
 4. `tools/release-inventory.ts`, which inventories `release/win-unpacked` into `release/release-inventory.json` and fails on prohibited files (databases, backups, spreadsheets, credentials, key material).
 5. `scripts/verify-distributions.mjs`, which unpacks the installer and the portable exe with 7-Zip, checks that both payloads equal the inspected `win-unpacked` files, and writes `release/distribution-inspection.json`. It prints `DISTRIBUTIONS_MATCH_INSPECTED_PAYLOAD` on success.
 
-Output in `release/` (`<version>` is the `package.json` version, expected `1.0.0`):
+Output in `release/` (`<version>` is the `package.json` version, expected `1.0.1`):
 
 - `Esmer Market Analytics Setup <version>.exe` (NSIS installer)
 - `Esmer Market Analytics <version>.exe` (portable)
@@ -56,7 +56,7 @@ Output in `release/` (`<version>` is the `package.json` version, expected `1.0.0
 No separate SHA256 sums file is produced. Take the hashes from `distribution-inspection.json`, and confirm them yourself:
 
 ```powershell
-Get-FileHash -Algorithm SHA256 'release\Esmer Market Analytics Setup 1.0.0.exe', 'release\Esmer Market Analytics 1.0.0.exe'
+Get-FileHash -Algorithm SHA256 'release\Esmer Market Analytics Setup 1.0.1.exe', 'release\Esmer Market Analytics 1.0.1.exe'
 ```
 
 ## Required: packaged desktop tests

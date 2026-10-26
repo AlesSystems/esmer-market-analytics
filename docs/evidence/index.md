@@ -77,6 +77,7 @@ These are point-in-time records. Their branches, issue states, test counts and s
 | 10. Release preview | [Release matrix](release-acceptance.md) | [Windows receipt](windows-acceptance.md), [command proof](phase-10-proof.json), [performance samples](phase-10-performance.json) | [Licences](licences.md), [install procedure](../operations/install-tr.md) |
 
 - [v1.0.0 release record (macOS)](2026-10-25-v1-release.md) and [Windows v1 handoff](../operations/windows-v1-handoff.md); Windows acceptance remains open.
+- v1.0.1 adds the real-source fixes from the [first real package](2026-10-25-first-real-package.md) (#129) to v1.0.0. It is the build to take through the Windows handoff; Windows acceptance remains open.
 
 ## Source and capacity evidence
 
