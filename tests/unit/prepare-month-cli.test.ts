@@ -1,11 +1,12 @@
 import { execFile } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { promisify } from "node:util";
 import { afterEach, beforeEach, expect, test } from "vitest";
 
-const tool = new URL("../../tools/prepare-month.ts", import.meta.url).pathname;
+const tool = fileURLToPath(new URL("../../tools/prepare-month.ts", import.meta.url));
 let dir = "";
 beforeEach(async () => { dir = await mkdtemp(join(tmpdir(), "prepare-month-")); });
 afterEach(async () => { await rm(dir, {recursive: true, force: true}); });

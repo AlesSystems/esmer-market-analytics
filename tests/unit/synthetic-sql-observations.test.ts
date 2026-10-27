@@ -1,3 +1,6 @@
+import { mkdtemp, mkdir, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { expect, test } from "vitest";
 import { assertConfigOutsideRepo, assertDropTarget, baselineExpected, checkExpected, pathIsInsideRepo, scenarioExpected } from "../../tools/synthetic-sql/observations";
 
@@ -65,8 +68,13 @@ test("scenario observations describe the row changes a refresh must see", () => 
 });
 
 test("a reader config path inside the repository throws", async () => {
-  await expect(assertConfigOutsideRepo("/tmp/esmer-reader.json", "/Users/altanesmer/repo")).resolves.toBeUndefined();
-  await expect(assertConfigOutsideRepo("/Users/altanesmer/repo/tools/reader.json", "/Users/altanesmer/repo")).rejects.toThrow(/^UNSAFE_CONFIG_PATH$/);
+  const base = await mkdtemp(join(tmpdir(), "esmer-config-"));
+  try {
+    const repo = join(base, "repo");
+    await mkdir(join(repo, "tools"), {recursive: true});
+    await expect(assertConfigOutsideRepo(join(base, "esmer-reader.json"), repo)).resolves.toBeUndefined();
+    await expect(assertConfigOutsideRepo(join(repo, "tools", "reader.json"), repo)).rejects.toThrow(/^UNSAFE_CONFIG_PATH$/);
+  } finally { await rm(base, {recursive: true, force: true}); }
 });
 
 test("checkExpected rejects a line linked to the wrong parent", () => {

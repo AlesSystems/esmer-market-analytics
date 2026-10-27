@@ -8,10 +8,21 @@ import { inspectRelease, inspectMacRelease } from "../../tools/release-inventory
 const roots: string[] = [];
 afterEach(async () => { for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true }); });
 
+// Windows can refuse to rename a directory whose files a scanner still holds open.
+async function renameWithRetry(from: string, to: string) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await rename(from, to); }
+    catch (error) {
+      if (attempt >= 10 || (error as NodeJS.ErrnoException).code !== "EPERM") throw error;
+      await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
+    }
+  }
+}
+
 async function macFixture() {
   const release = await fixture();
   await mkdir(join(release, "Contents", "MacOS"), {recursive:true});
-  await rename(join(release, "resources"), join(release, "Contents", "Resources"));
+  await renameWithRetry(join(release, "resources"), join(release, "Contents", "Resources"));
   await writeFile(join(release, "Contents", "Info.plist"), "synthetic plist");
   await writeFile(join(release, "Contents", "MacOS", "Esmer Market Analytics"), "synthetic executable");
   const framework = join(release, "Contents", "Frameworks", "Electron Framework.framework", "Versions", "A");
