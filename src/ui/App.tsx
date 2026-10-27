@@ -105,7 +105,7 @@ function App() {
     let active = true;
     window.esmer.querySourceWorkspace({ ...initialSourceQuery }).then(value => {
       if (!active) return;
-      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10) }); const next = followedMonth({ chosen: monthChosen.current, current: selectedMonthRef.current, latest: value.period, draftOpen: expenseNavigation.busy() }); if (next) { selectedMonthRef.current = next; setSelectedMonth(next); } setResolution({ status: "resolved" }); return; }
+      if (value.status === "source-workspace") { setCoverage({ from: value.from.slice(0, 10), to: value.to.slice(0, 10), last: value.lastDocumentDate }); const next = followedMonth({ chosen: monthChosen.current, current: selectedMonthRef.current, latest: value.period, draftOpen: expenseNavigation.busy() }); if (next) { selectedMonthRef.current = next; setSelectedMonth(next); } setResolution({ status: "resolved" }); return; }
       setCoverage(null);
       if (value.status !== "source-empty") { setResolution({ status: "failed", message: value.message }); return; }
       setResolution({ status: "resolved" });

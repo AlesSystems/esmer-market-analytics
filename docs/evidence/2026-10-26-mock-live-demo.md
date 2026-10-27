@@ -38,6 +38,8 @@ Figures were compared with the same independent SQL aggregates as the [first rea
 - "Son geçerli veri" shows 31.10.2025, the end of the connection range, although sales documents end on 2025-10-12. The figures are correct; the label can suggest a complete month.
 - "Son yenileme" updates when the read is recorded, before the import finishes; **Şimdi yenile** stays disabled until the import completes.
 
+Both are fixed in [#132](https://github.com/AlesSystems/esmer-market-analytics/pull/132). "Son geçerli veri" now shows the date of the newest source document. "Son yenileme" shows "Yenileniyor…" while the tile is busy. A worker probe with a synthetic package did not reproduce an early `lastSuccessAt`, so the second fix is in the tile only. A real-source run has not rechecked either fix yet.
+
 ## After the demo
 
 The copy was stopped; its data volume is kept. Demo user data, results and the Excel export were deleted.
