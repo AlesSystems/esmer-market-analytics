@@ -10,7 +10,7 @@ import { businessPackage } from "../helpers/business-fixtures";
 import { estimatePackage } from "../helpers/estimate-fixture";
 import { openStore } from "../../src/store/store";
 import { DatabaseSync } from "node:sqlite";
-// Electron reports long Windows paths; fs.promises.realpath keeps the 8.3 short form of the runner profile.
+// Electron echoes the 8.3 short form of the runner profile; compare both sides through the native realpath.
 const realpath = promisify(realpathCallback.native);
 const executablePath =
   process.env.ESMER_EXECUTABLE ??
@@ -72,7 +72,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
         await readFile(join("node_modules/electron/dist", notice), "utf8"),
       );
     }
-    expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
+    expect(await realpath(await app.evaluate(({ app }) => app.getPath("userData")))).toBe(
       await realpath(userData),
     );
     const runtime = await app.evaluate(async ({ app }) => {
@@ -238,7 +238,7 @@ test("empty packaged app starts offline without login or renderer privileges", a
       store: "empty",
       liveConnection: "disabled",
     });
-    expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(
+    expect(await realpath(await app.evaluate(({ app }) => app.getPath("userData")))).toBe(
       await realpath(userData),
     );
   } finally {

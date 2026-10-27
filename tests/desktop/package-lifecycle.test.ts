@@ -8,7 +8,7 @@ import { join, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { openStore } from "../../src/store/store";
 import { populateRecoveryStore } from "../helpers/recovery-fixtures";
-// Electron reports long Windows paths; fs.promises.realpath keeps the 8.3 short form of the runner profile.
+// Electron echoes the 8.3 short form of the runner profile; compare both sides through the native realpath.
 const realpath = promisify(realpathCallback.native);
 
 const defaultExecutable = resolve("release/win-unpacked/Esmer Market Analytics.exe");
@@ -56,7 +56,7 @@ test("packaged Windows profile retains app-owned history across launch and resta
       app = await electron.launch({ executablePath, args: [`--user-data-dir=${profile}`] });
       const page = await app.firstWindow();await openWorkspace(page);
       expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
-      expect(await app.evaluate(({ app }) => app.getPath("userData"))).toBe(actualProfile);
+      expect(await realpath(await app.evaluate(({ app }) => app.getPath("userData")))).toBe(actualProfile);
       await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Rapor ve Excel", exact: true })).toBeVisible();
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled" });
       const expenses = await page.evaluate(() => window.esmer.queryExpenses({ period: "2025-09" }));
