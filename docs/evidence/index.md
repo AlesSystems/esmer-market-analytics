@@ -2,9 +2,9 @@
 
 ## Current capabilities and open gates
 
-Reviewed on 2026-10-05 against `main` at `ff21492`, after [PR #68](https://github.com/AlesSystems/esmer-market-analytics/pull/68). This index points to existing receipts; the documentation review ran no application, Windows or source tests.
+Updated on 2026-10-27 against `main` at `6c11ed44510aa8b687f1279e01b220711a738185`, after [PR #134](https://github.com/AlesSystems/esmer-market-analytics/pull/134). The app version is **1.0.1**. This index distinguishes build-specific evidence from the remaining acceptance checks.
 
-The application includes synthetic financial reporting, isolated raw-record browsing, separately labelled recorded-source contribution estimates, Excel and manual expense entry, Excel export and encrypted recovery. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
+The app opens Bu ay, with Ürünler, Giderler, Rapor ve Excel and Ayarlar. It includes recorded-source profit estimates, source-document browsing, Excel and manual expense entry, Excel export and encrypted recovery. Existing synthetic financial datasets remain supported. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
 
 [Recorded-source estimates](../contracts/recorded-estimates.md) have real arithmetic reconciliation over retained authorized September 2025 operands. The source meanings remain assumptions. Return contribution, unsupported costs and unknown amounts stay explicit. Estimates are transient and cannot become accepted financial-report versions.
 
@@ -14,15 +14,27 @@ The original A01–A07 and L01 proof requirements remain in [the acceptance chec
 
 On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issues/98) re-baselined v1 ([decision record](../decisions/issue-98-profit-first-estimate-edition.md), [plan #111](https://github.com/AlesSystems/esmer-market-analytics/issues/111)). The recorded-source estimate is v1's financial truth. v1 gates: A06 = encrypted backup plus documented restore; A07 = one Windows smoke test, deferred to [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109); the two-second benchmark applies only to prepared packages above 100,000 rows. A02/A03 trusted profit and L01 are out of v1. No gate is passed by this change.
 
-Open gate: Large-package timing of the four v1 pages on Windows (2 s budget) has no current test; tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109).
+### Windows CI and remaining acceptance
 
-Open gate: Owner approval for live reading of the historical-cost column (#110) — open
+[Windows validation run 40494227677](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/40494227677) passed on 2026-10-27 for main `6c11ed4`, app version 1.0.1. Typecheck, lint, 171 unit tests, 302 integration tests, Windows distribution inspection and 48 packaged desktop tests passed. There were 29 integration and four desktop skips. The [build-specific receipt](2026-10-27-windows-ci.md) records their scope and evidence retention. The earlier GitHub billing block no longer describes current CI.
+
+| Check | Current evidence | Remaining acceptance |
+| --- | --- | --- |
+| Windows build and automated workflows | NSIS and portable payloads inspected; packaged app tested on Windows Server 2025 CI | Manual install, launch, Turkish UI and Excel checks, native 125% and 150% display scaling, and uninstall on the intended Windows 10 or 11 configuration. Use the [Windows v1 handoff](../operations/windows-v1-handoff.md). A07 smoke acceptance remains open. |
+| Encrypted recovery | Windows packaged test created an encrypted backup, deleted the original profile and restored into a fresh profile on the same runner | Follow the [restore procedure](../operations/recovery-tr.md). Independent recovery on a separate clean Windows machine, without the original OS credential store, remains post-v1 under #98. The automated test does not prove that exercise. |
+| Performance | No current Windows full-dataset benchmark is recorded | Under #98, the two-second benchmark applies only if prepared packages exceed 100,000 rows. Current caps are 100,000 rows and 32 MiB, so this is a conditional post-v1 check, not a failed v1 benchmark. |
+| Production source and owner handoff | Restored-backup package and mock-live checks passed on Mac | Eralp's acceptance, permission for the specific production source and historical-cost column, production connection validation, and owner installation remain separately directed. L01 is outside v1. |
+| Financial meaning | Independent reconciliation supports the declared estimate formula | Verified real-source financial semantics remain post-v1. Arithmetic matches do not establish verified profit. |
+
+[#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109) and [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) are closed in GitHub as of this review. Their closure does not supply the missing acceptance evidence or authorize production access. The checks above remain open until their required receipts exist.
 
 ## Later implementation evidence
 
+The October 27 [Windows CI receipt](2026-10-27-windows-ci.md) records the first successful main Windows validation after the test-path and packaging fixes in #133 and #134. Use its exact commit for the remaining Windows handoff; the `v1.0.1` tag predates these fixes. CI built distributions but did not publish a new release or retain the executables in its evidence artifact.
+
 The October 25 [first real package receipt](2026-10-25-first-real-package.md) records the first `prepare:month` package from the restored backup (September–October 2025), the unit-link and paging fixes it required, and exact matches between the packaged app and independent SQL totals for the month, one product and one day.
 
-The October 26 [mock live demo receipt](2026-10-26-mock-live-demo.md) records live refresh in the packaged v1.0.1 Mac app against the restored backup, standing in for the live server, with the same 15 exact matches. Live SQL Server, #109 and #110 remain open.
+The October 26 [mock live demo receipt](2026-10-26-mock-live-demo.md) records live refresh in the packaged v1.0.1 Mac app against the restored backup, standing in for the live server, with the same 15 exact matches. Production SQL validation and the manual Windows and owner acceptance checks remain open despite tracker closure.
 
 The October 22 [monthly data path receipt](2026-10-22-monthly-data-path.md) records `npm run prepare:month`, the column-allowlist and multi-month import checks, and synthetic SQL Edge size and import timings. The bounds stay at 100,000 rows and 32 MiB, so about three September-sized months fit in one package ([decision](../decisions/issue-101-monthly-window.md)).
 
@@ -79,7 +91,7 @@ These are point-in-time records. Their branches, issue states, test counts and s
 | 10. Release preview | [Release matrix](release-acceptance.md) | [Windows receipt](windows-acceptance.md), [command proof](phase-10-proof.json), [performance samples](phase-10-performance.json) | [Licences](licences.md), [install procedure](../operations/install-tr.md) |
 
 - [v1.0.0 release record (macOS)](2026-10-25-v1-release.md) and [Windows v1 handoff](../operations/windows-v1-handoff.md); Windows acceptance remains open.
-- v1.0.1 adds the real-source fixes from the [first real package](2026-10-25-first-real-package.md) (#129) to v1.0.0. It is the build to take through the Windows handoff; Windows acceptance remains open.
+- v1.0.1 adds the real-source fixes from the [first real package](2026-10-25-first-real-package.md) (#129) to v1.0.0. Later main `6c11ed4` retains version 1.0.1 and includes the successful Windows CI fixes. Use that commit for the [Windows handoff](../operations/windows-v1-handoff.md); manual acceptance remains open.
 
 ## Source and capacity evidence
 
