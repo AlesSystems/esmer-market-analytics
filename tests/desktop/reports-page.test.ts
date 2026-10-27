@@ -36,6 +36,7 @@ async function intercept(app:ElectronApplication,body:string){
 const importFile=async(app:ElectronApplication,page:Page,file:string)=>{
  await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
  await importPackage(page);
+ await expect(page.getByRole("heading",{name:"Ayarlar",exact:true,level:1})).toBeHidden(); // a slow import closes Ayarlar and returns to Bu ay
 };
 
 test("Rapor ve Excel exports the month to Excel and opens a source document and returns focus to its row",async()=>{
@@ -47,6 +48,7 @@ test("Rapor ve Excel exports the month to Excel and opens a source document and 
   await expect(page.getByRole("button",{name:"Excel’e aktar",exact:true})).toBeDisabled();
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
   await importPackage(page);
+  await expect(page.getByRole("heading",{name:"Ayarlar",exact:true,level:1})).toBeHidden();
   await openSection(page,"Rapor ve Excel");
   await expect(page.getByRole("heading",{name:"Rapor ve Excel",level:1})).toBeVisible();
   await expect(page.getByRole("tab")).toHaveCount(0);

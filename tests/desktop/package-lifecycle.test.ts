@@ -1,11 +1,15 @@
+import { realpath as realpathCallback } from "node:fs";
+import { promisify } from "node:util";
 import { openWorkspace } from "../helpers/desktop-navigation";
 import { expect, test, _electron as electron } from "@playwright/test";
-import { mkdtemp, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { openStore } from "../../src/store/store";
 import { populateRecoveryStore } from "../helpers/recovery-fixtures";
+// Electron reports long Windows paths; fs.promises.realpath keeps the 8.3 short form of the runner profile.
+const realpath = promisify(realpathCallback.native);
 
 const defaultExecutable = resolve("release/win-unpacked/Esmer Market Analytics.exe");
 const executablePath = process.env.ESMER_EXECUTABLE ?? defaultExecutable;

@@ -1,6 +1,8 @@
+import { realpath as realpathCallback } from "node:fs";
+import { promisify } from "node:util";
 import {importPackage, openSettings, openWorkspace } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
-import { mkdtemp, readFile, realpath, rename, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { sourcePackage } from "../helpers/store-fixtures";
@@ -8,6 +10,8 @@ import { businessPackage } from "../helpers/business-fixtures";
 import { estimatePackage } from "../helpers/estimate-fixture";
 import { openStore } from "../../src/store/store";
 import { DatabaseSync } from "node:sqlite";
+// Electron reports long Windows paths; fs.promises.realpath keeps the 8.3 short form of the runner profile.
+const realpath = promisify(realpathCallback.native);
 const executablePath =
   process.env.ESMER_EXECUTABLE ??
   (process.platform === "darwin"
