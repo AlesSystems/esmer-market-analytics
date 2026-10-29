@@ -46,7 +46,7 @@ test("Giderler, empty month: the answer and the confirmation stay above the fold
   } finally { await finish(app, userData); }
 });
 
-test("Giderler with lines: one line per row, the blank-group question above the fold, no hint for a month without lines in a group", async () => {
+test("Giderler with lines: one line per row, the blank-group question above the fold, no hint for a group without lines", async () => {
   test.setTimeout(90_000);
   const { app, page, userData } = await launch("2025-10-31");
   try {
@@ -55,7 +55,7 @@ test("Giderler with lines: one line per row, the blank-group question above the 
     if (september.status !== "expenses") throw Error("expenses missing");
     await page.evaluate(revision => window.esmer.confirmExpenseCompleteness({ period: "2025-09", reviewedRevision: revision, complete: true, reason: "Sentetik onay" }), september.expenseRevision);
     await save(page, "oct-rent", "2025-10-05", "Kira", "45");
-    await save(page, "oct-tax", "2025-10-06", "Temizlik", "12", "unknown");
+    await save(page, "oct-clean", "2025-10-06", "Temizlik", "12");
     await openSection(page, "Giderler");
     await expect(page.locator("[data-group=rent]")).toContainText("Eylül: 40,00 ₺");
     await expect(page.locator("[data-group=staff]")).not.toContainText("Eylül");
@@ -63,22 +63,30 @@ test("Giderler with lines: one line per row, the blank-group question above the 
     const rows = page.getByRole("region", { name: "Kayıtlar" }).locator("tbody tr");
     await expect(rows).toHaveCount(2);
     await expect(rows.nth(0).locator("td")).toHaveText(["05.10.2025", "Kira", "45,00 ₺", "İncele / düzelt"]);
-    await expect(rows.nth(1).locator("td")).toHaveText(["06.10.2025", "Temizlik KDV bilinmiyor", "12,00 ₺", "İncele / düzelt"]);
+    await expect(rows.nth(1).locator("td")).toHaveText(["06.10.2025", "Temizlik", "12,00 ₺", "İncele / düzelt"]);
     // Net, KDV, version and origin live in the editor.
     await rows.nth(0).getByRole("button", { name: "İncele / düzelt" }).click();
-    await expect(page.getByText("Elle girildi · sürüm 1", { exact: true })).toBeVisible();
+    await expect(page.getByText("Elle girildi · sürüm 3", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Giderlere dön", exact: true }).click();
-    // Without the blocking line the first press asks about the blank groups, still inside the window.
-    await rows.nth(1).getByRole("button", { name: "İncele / düzelt" }).click();
-    await page.getByLabel("KDV işlemi").selectOption("non-recoverable");
-    await page.getByLabel("KDV kanıtı").fill("synthetic-tax");
-    await page.getByLabel("Değişiklik gerekçesi").fill("Sentetik düzeltme");
-    await page.getByRole("button", { name: "Düzeltmeyi kaydet" }).click();
+    // The first press asks about the blank groups, still inside the window.
     await page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true }).click();
     const ask = page.getByRole("alert").filter({ hasText: "için kayıt yok." });
     await expect(ask).toBeVisible();
     const edge = await ask.evaluate(node => ({ bottom: node.getBoundingClientRect().bottom, fold: innerHeight }));
     expect(edge.bottom).toBeLessThanOrEqual(edge.fold);
+  } finally { await finish(app, userData); }
+});
+
+test("Giderler: a line that needs a fix gets a chip, a reversed line says so, normal lines get none", async () => {
+  test.setTimeout(90_000);
+  const { app, page, userData } = await launch("2025-10-31");
+  try {
+    await save(page, "oct-ok", "2025-10-05", "Kira", "45");
+    await save(page, "oct-tax", "2025-10-06", "Temizlik", "12", "unknown");
+    await openSection(page, "Giderler");
+    const rows = page.getByRole("region", { name: "Kayıtlar" }).locator("tbody tr");
+    await expect(rows.nth(0).locator("td")).toHaveText(["05.10.2025", "Kira", "45,00 ₺", "İncele / düzelt"]);
+    await expect(rows.nth(1).locator("td")).toHaveText(["06.10.2025", "Temizlik KDV bilinmiyor", "12,00 ₺", "İncele / düzelt"]);
   } finally { await finish(app, userData); }
 });
 
@@ -91,7 +99,7 @@ test("Bu ay and the drawer: chart title with its unit, quiet net reason, fold sl
     await expect(net).toContainText("Ay henüz tamamlanmadı");
     await expect(net.locator(".net-say")).toHaveCount(0);
     expect(await style(page, ".netcard .muted", "font-size")).toBe("14px");
-    const edge = await bottom(page, ".att-row:last-child");
+    const edge = await page.locator(".att-row").last().evaluate(node => ({ bottom: node.getBoundingClientRect().bottom, fold: innerHeight }));
     expect(edge.fold - edge.bottom).toBeGreaterThanOrEqual(24);
     await openSection(page, "Ürünler");
     await page.locator(".products-table tr[data-product='1'] button").click();

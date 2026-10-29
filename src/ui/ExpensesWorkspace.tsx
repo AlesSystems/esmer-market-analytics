@@ -176,7 +176,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
             const value = currentValue(row), fix = view.attention.find(item => item.entityId === row.entityId);
             return <tr key={row.entityId}>
               <td>{date(row.value.date)}</td>
-              <td>{value?.category ?? "Eski kayıt"}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
+              <td>{value?.category ?? "Eski kayıt"}{" "}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
               <td className="number">{money(value ? value.gross : row.value.net)}</td>
               <td className="number"><button type="button" className="link" id={recordId(row.entityId)} disabled={locked} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</button></td>
             </tr>;

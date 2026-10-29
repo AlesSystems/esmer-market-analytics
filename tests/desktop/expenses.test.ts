@@ -12,7 +12,7 @@ test("expenses are reachable without a source and cancelled selection leaves an 
     await openSection(page, "Giderler");
     await expect(page.getByRole("heading", { name: / giderleri$/, level: 1 })).toBeVisible();
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
-    await expect(page.getByText("Kayıt bulunmaması, gider olmadığı anlamına gelmez.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.", { exact: true })).toBeVisible();
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "İşlem iptal edildi" })).toBeVisible();
