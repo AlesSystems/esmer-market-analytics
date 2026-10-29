@@ -1,4 +1,4 @@
-import { openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import { monthLabel, openSettingsItem, openWorkspace, setMonth } from "../helpers/desktop-navigation";
 // Recovery is reached through Ayarlar; after restore the app returns to Bu ay and the restored expenses stay readable.
 import { expect, test, _electron as electron } from "@playwright/test";
 import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
@@ -39,14 +39,13 @@ test("packaged recovery restores a real encrypted backup after original user dat
       })).toBe(true);
     }
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-    await page.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
+    await openSettingsItem(page, /^Yedekle \/ Geri yükle/);
     await page.getByRole("button", {name: "Yedeklemeyi kur"}).click();
     await expect(page.getByText("Kurtarma anahtarı doğrulandı ve yedekleme kuruldu.")).toBeVisible();
     await expect.poll(async () => (await readdir(destination)).filter(name => name.endsWith(".esmerbackup")).length).toBeGreaterThan(0);
     await page.screenshot({path: "test-results/phase-9-recovery-1120.png", fullPage: true});
     await page.setViewportSize({width: 680, height: 720});
-    await expect(page.locator(".brand")).toBeVisible();
+    await expect(page.locator(".topbar .logo")).toBeVisible();
     await page.screenshot({path: "test-results/phase-9-recovery-680.png", fullPage: true});
     expect((await readFile(keyPath)).length).toBeGreaterThan(50);
     await app.close();
@@ -58,20 +57,18 @@ test("packaged recovery restores a real encrypted backup after original user dat
       dialog.showMessageBox = async () => ({response: 0, checkboxChecked: false});
     }, {backupPath, keyPath});
     const restored = await app.firstWindow();await openWorkspace(restored);
-    await openSettings(restored);
-    await restored.getByRole("button", {name: "Yedekleme ve kurtarma"}).click();
+    await openSettingsItem(restored, /^Yedekle \/ Geri yükle/);
     await restored.getByRole("button", {name: "Yedek ve anahtar seç"}).click();
     await expect(restored.getByRole("heading", {name: "Geri yükleme önizlemesi"})).toBeVisible();
     await expect(restored.getByText(/Veri kesim tarihi: 30\.09\.2025/)).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-1120.png", fullPage: true});
     await restored.setViewportSize({width: 680, height: 720});
-    await expect(restored.locator(".brand")).toBeVisible();
+    await expect(restored.locator(".topbar .logo")).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
     await expect(restored.getByRole("navigation", {name: "Ana gezinme"}).getByRole("button", {name: "Bu ay", exact: true})).toHaveAttribute("aria-current", "page");
-    await expect(restored.getByRole("button", {name: "Aylık raporlara git", exact: true})).toBeVisible();
-    await restored.getByRole("textbox", {name: "Dönem", exact: true}).fill("2025-09");
-    await expect(restored.getByRole("textbox", {name: "Dönem", exact: true})).toHaveValue("2025-09");
+    await setMonth(restored, "2025-09");
+    await expect(monthLabel(restored)).toHaveAttribute("data-month", "2025-09");
     expect(await restored.evaluate(() => window.esmer.getAvailability())).toMatchObject({status: "ready", store: "loaded"});
     const restoredStore = openStore(join(fresh, "analytics.sqlite"));
     try { expect(restoredStore.readPin()).toMatchObject({datasetId: populated.datasetId, appRevision: populated.appRevision}); }

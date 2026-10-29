@@ -1,4 +1,4 @@
-import { openWorkspace } from "../helpers/desktop-navigation";
+import { openWorkspace, setMonth } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -60,8 +60,8 @@ test("expense groups show unknown totals as Eksik, never zero, and an empty mont
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();await openWorkspace(page);
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-09");
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await setMonth(page, "2025-09");
     const groups = page.getByRole("region", { name: "Bu ayın giderleri" }).filter({ visible: true });
     await expect(groups).toBeVisible();
     await expect(groups.locator(".expense-group-total dd")).toHaveText("Eksik");
@@ -70,7 +70,7 @@ test("expense groups show unknown totals as Eksik, never zero, and an empty mont
     await expect(page.getByText("Tüm kayıtlar (8)", { exact: true })).toBeVisible();
     await expect(page.locator("canvas")).toHaveCount(0);
     for (const width of [1440, 1120, 680, 390]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-08");
+    await setMonth(page, "2025-08");
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Elle ekle", exact: true }).filter({ visible: true })).toBeVisible();

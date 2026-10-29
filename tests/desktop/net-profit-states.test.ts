@@ -3,7 +3,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { executablePath } from "../helpers/desktop-executable";
-import { openWorkspace, openSection, importPackage } from "../helpers/desktop-navigation";
+import { openWorkspace, openSection, importPackage, setMonth } from "../helpers/desktop-navigation";
 import { monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { writeRawEstimatePackage } from "../../src/source/raw-package";
 
@@ -13,7 +13,6 @@ test("Giderler net profit panel: hidden before the confirmation, shown after it,
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow(); await openWorkspace(page);
-    await page.getByRole("button", { name: "Veri paketi içe aktar", exact: true }).click();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, file);
     await importPackage(page);
     await expect(page.getByRole("heading", { name: "Ekim 2025", level: 1 })).toBeVisible();
@@ -23,7 +22,7 @@ test("Giderler net profit panel: hidden before the confirmation, shown after it,
     await expect(page.getByText("Kayıt bulunmaması, gider olmadığı anlamına gelmez.", { exact: true })).toBeVisible();
     const save = (requestId: string, category: string, net: string) => page.evaluate(({ requestId, category, net }) => window.esmer.createExpense({ action: "save", requestId, duplicateReview: null, fields: { date: "2025-10-05", paymentDate: null, category, classification: "operating-expense", net, tax: "0", gross: net, taxTreatment: "non-recoverable", taxEvidence: "synthetic-tax", supportingReference: null, sourceReference: null, labourPeriod: null, loss: null } } as never), { requestId, category, net });
     await save("net-state-1", "Kira", "10");
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-09"); await page.getByLabel("Dönem", { exact: true }).fill("2025-10");
+    await setMonth(page, "2025-09"); await setMonth(page, "2025-10");
     // Unconfirmed: expenses are entered but no net figure is shown.
     await expect(panel.getByText("Hesaplanamadı", { exact: true })).toBeVisible();
     await expect(panel.getByText(/onayı verilmedi/)).toBeVisible();
@@ -35,7 +34,7 @@ test("Giderler net profit panel: hidden before the confirmation, shown after it,
     await expect(page.getByRole("button", { name: "Onayı kaldır", exact: true })).toBeFocused();
     // An edit after the confirmation: stale state, and the old net figure is gone.
     await save("net-state-2", "Elektrik", "5");
-    await page.getByLabel("Dönem", { exact: true }).fill("2025-09"); await page.getByLabel("Dönem", { exact: true }).fill("2025-10");
+    await setMonth(page, "2025-09"); await setMonth(page, "2025-10");
     await expect(page.getByRole("heading", { name: "Onay eskidi", exact: true })).toBeVisible();
     await expect(panel.getByText("47,50 ₺", { exact: true })).toHaveCount(0);
     await expect(panel.getByText("Onaydan sonra giderler değişti; yeniden onaylayın.", { exact: true })).toBeVisible();

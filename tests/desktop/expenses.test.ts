@@ -1,4 +1,4 @@
-import { importPackage, openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, openSection, openWorkspace, setMonth } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -35,7 +35,7 @@ test("expense workbook review, correction, reversal, history restoration and own
   try {
     const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
+    await setMonth(page, "2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, templatePath);
     await page.getByRole("button", { name: "Şablonu indir", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "Excel şablonu kaydedildi." })).toBeVisible();
@@ -75,7 +75,7 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.screenshot({ path: "test-results/phase-7-expenses-history.png", fullPage: true });
     await page.setViewportSize({ width: 680, height: 720 });
     await page.screenshot({ path: "test-results/phase-7-expenses-small.png", fullPage: true });
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-02");
+    await setMonth(page, "2026-02");
     await page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true }).click();
     await expect(page.locator(".expense-totals > div").first()).toContainText("0,00 ₺");
     await expect(page.locator(".expense-totals > div").nth(1)).toContainText("50,00 ₺");
@@ -94,7 +94,7 @@ test("invalid rows block a whole workbook and duplicate candidates require expli
   try {
     const page = await app.firstWindow();await openWorkspace(page);
     await page.getByRole("button", { name: "Giderler", exact: true }).click();
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
+    await setMonth(page, "2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
     await expect(page.getByRole("button", { name: "İçe aktar", exact: true })).toBeDisabled();

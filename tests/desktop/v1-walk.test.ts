@@ -4,12 +4,12 @@ import {tmpdir} from "node:os";
 import {join,resolve} from "node:path";
 import {readSheet} from "read-excel-file/node";
 import {executablePath} from "../helpers/desktop-executable";
-import {openWorkspace,openSection,importPackage} from "../helpers/desktop-navigation";
+import {openWorkspace,openSection,importPackage,openSettings,settingsMenu} from "../helpers/desktop-navigation";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
 
 // #108: the v1 owner walk on the packaged app, synthetic data only. Screenshots go to the test output dir; ESMER_CAPTURE_WALK=1 writes them to docs/evidence/one-ui/.
 const lira=(text:string)=>Number(text.replace(/[^\d,-]/g,"").replace(",","."));
-test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",async({},testInfo)=>{
+test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},testInfo)=>{
  test.setTimeout(240_000);
  const capture=process.env.ESMER_CAPTURE_WALK==="1",shots=capture?resolve("docs/evidence/one-ui"):testInfo.outputPath();await mkdir(shots,{recursive:true});
  const userData=await mkdtemp(join(tmpdir(),"v1-walk-")),file=join(userData,"synthetic-estimate.json"),output=join(userData,"rapor.xlsx");
@@ -19,7 +19,7 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",
   const page=await app.firstWindow();await openWorkspace(page);
   await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setContentSize(1440,900));
   const shoot=async(name:string)=>{await page.locator(".app-body").focus();await expect(page.locator(".app-body h1").first()).toBeAttached();await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:join(shots,`v1-walk-${name}.png`)});};
-  // Import the synthetic package through Ayarlar.
+  // Import the synthetic package through the gear menu.
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
   await importPackage(page);
   await expect(page.getByText("Gerçek kaynak kayıtları içe aktarıldı.",{exact:true})).toBeVisible();
@@ -67,21 +67,17 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Rapor ve Excel, Ayarlar",
   expect(net).toBeCloseTo(gross-1000,2);
   await expect(page.getByText("Bazı gider satırları net kârı engelliyor")).toHaveCount(0);
   await shoot("bu-ay-net");
-  // Rapor ve Excel: export to a stubbed save path.
-  await openSection(page,"Rapor ve Excel");
-  await expect(page.getByRole("heading",{name:"Rapor ve Excel",level:1})).toBeVisible();
+  // Excel'e aktar in the header: export to a stubbed save path.
   await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);
   await page.getByRole("button",{name:"Excel’e aktar",exact:true}).click();
   await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.",{exact:true})).toBeVisible();
   const summary=await readSheet(await readFile(output),"Özet"),cell=(label:string)=>Number(summary.find(r=>r[0]===label)?.[1]);
   expect(cell("Tahmini brüt kâr")).toBeCloseTo(gross,2);
   expect(cell("Tahmini net kâr")).toBeCloseTo(net,2);
-  await shoot("rapor-ve-excel");
-  // Ayarlar: five tiles, then Bilinen sınırlar.
-  await page.getByRole("button",{name:"Ayarlar",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Ayarlar",exact:true,level:1})).toBeVisible();
-  for(const name of ["Veri paketi","Yedekleme ve kurtarma","Görünüm","Canlı bağlantı","Hakkında"])await expect(page.getByText(name,{exact:true}).first()).toBeVisible();
-  await page.getByRole("button",{name:"Bilinen sınırlar",exact:true}).click();
+  // The gear menu: its items, then Hakkında ve bilinen sınırlar.
+  await openSettings(page);
+  for(const name of [/^Veri paketi içe aktar/,/^Yedekle \/ Geri yükle/,/^Canlı bağlantı/,/^Kaynak belgeler/,/^Hakkında ve bilinen sınırlar/])await expect(settingsMenu(page).getByRole("button",{name})).toBeVisible();
+  await settingsMenu(page).getByRole("button",{name:/^Hakkında ve bilinen sınırlar/}).click();
   await expect(page.getByRole("region",{name:"Bilinen sınırlar"})).toBeVisible();
   await shoot("ayarlar");
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true,maxRetries:5});}

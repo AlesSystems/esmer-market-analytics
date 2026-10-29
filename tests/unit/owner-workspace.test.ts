@@ -6,16 +6,22 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { AppShell } from "../../src/ui/AppShell";
 
-test("keyboard skip action moves focus directly into the owner workspace", async () => {
+test("the top bar holds the logo, three tabs, the controls and the gear; the skip action moves focus into the workspace", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   const host = document.createElement("div"); document.body.append(host);
   const root = createRoot(host);
-  await act(async () => root.render(h(AppShell, { section: "month", navigate: () => undefined, children: h("h1", null, "Sentetik çalışma alanı") })));
+  await act(async () => root.render(h(AppShell, { section: "products", navigate: () => undefined, controls: h("span", { id: "controls" }, "kontroller"), menu: h("span", { id: "menu" }, "menü"), children: h("h1", null, "Sentetik çalışma alanı") })));
   const skip = host.querySelector<HTMLButtonElement>(".skip-workspace")!;
   expect(skip.textContent).toBe("İçeriğe geç");
   await act(async () => skip.click());
   expect(document.activeElement).toBe(host.querySelector(".app-body"));
-  expect(host.querySelector('[aria-current="page"]')?.textContent).toBe("Bu ay");
+  const bar = host.querySelector("header.topbar")!;
+  expect(bar.querySelector("img")?.getAttribute("alt")).toBe("Esmer Market");
+  const nav = bar.querySelector('nav[aria-label="Ana gezinme"]')!;
+  expect([...nav.querySelectorAll("button")].map(button => button.textContent)).toEqual(["Bu ay", "Ürünler", "Giderler"]);
+  expect([...nav.querySelectorAll("[aria-current]")].map(button => button.textContent)).toEqual(["Ürünler"]);
+  expect(bar.querySelector("#controls")?.textContent).toBe("kontroller");
+  expect(bar.querySelector("#menu")?.textContent).toBe("menü");
   await act(async () => root.unmount()); host.remove();
 });
 

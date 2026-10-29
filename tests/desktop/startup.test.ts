@@ -1,6 +1,6 @@
 import { realpath as realpathCallback } from "node:fs";
 import { promisify } from "node:util";
-import {importPackage, openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import {importPackage, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron, type Page } from "@playwright/test";
 import { mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,14 +21,12 @@ const executablePath =
     : process.platform === "win32"
       ? resolve("release/win-unpacked/Esmer Market Analytics.exe")
       : resolve("release/linux-unpacked/esmer-market-analytics"));
-// The start screen moved: launch opens Bu ay; import, SQL and the active dataset summary live in Ayarlar.
+// The start screen moved: launch opens Bu ay; import, SQL and the active dataset summary live in the gear menu.
 async function expectEmpty(page: Page) {
   await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Aylık raporlara git", exact: true })).toHaveCount(0);
 }
 async function expectLoaded(page: Page) {
   await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Aylık raporlara git", exact: true })).toBeVisible();
 }
 test("empty packaged app starts offline without login or renderer privileges", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-desktop-"));
@@ -41,11 +39,11 @@ test("empty packaged app starts offline without login or renderer privileges", a
     await expectEmpty(page);
     await expect(page.getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
     await openSettings(page);
+    await expect(settingsMenu(page).getByRole("button", { name: /^Veri paketi içe aktar/ })).toContainText("Henüz veri paketi yok");
+    await expect(settingsMenu(page).getByRole("button", { name: /^Canlı bağlantı/ })).toContainText("Bağlantı kapalı");
+    await settingsMenu(page).getByRole("button", { name: /^Canlı bağlantı/ }).click();
     await expect(page.getByRole("region", { name: "Canlı bağlantı" }).getByRole("button", { name: "SQL kaynağını içe aktar" })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Veri paketi" }).getByRole("button", { name: "Veri paketi içe aktar" })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Veri paketi" })).toContainText("Henüz yok");
-    await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
-    await expect(page.getByText("Canlı bağlantı kapalı")).toBeVisible();
+    await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
     await expect(page.locator("input[type=password]")).toHaveCount(0);
     expect(
       await page.evaluate(() => ({
@@ -231,7 +229,9 @@ test("empty packaged app starts offline without login or renderer privileges", a
     });
     const reopened = await app.firstWindow();await openWorkspace(reopened);
     await expectEmpty(reopened);
-    await expect(reopened.getByText("Canlı bağlantı kapalı")).toBeVisible();
+    await openSettings(reopened);
+    await expect(settingsMenu(reopened).getByRole("button", { name: /^Canlı bağlantı/ })).toContainText("Bağlantı kapalı");
+    await reopened.keyboard.press("Escape");
     await expect(reopened.locator("input[type=password]")).toHaveCount(0);
     expect(await reopened.evaluate(() => window.esmer.getAvailability())).toEqual({
       status: "ready",

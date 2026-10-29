@@ -6,15 +6,14 @@ import { openStore } from "../../src/store/store";
 import { richBusinessPackage, seedRichExpenses } from "../helpers/rich-business-fixture";
 import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 import { executablePath } from "../helpers/desktop-executable";
-import { openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { monthLabel, openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
 
-// Welcome and the Özet desks were removed (#103/#105): routes are the four sections.
-type Route = { name: string; nav: "Bu ay" | "Ürünler" | "Giderler" | "Rapor ve Excel" };
+// Routes are the three top tabs.
+type Route = { name: string; nav: "Bu ay" | "Ürünler" | "Giderler" };
 const routes: Route[] = [
   { name: "bu-ay", nav: "Bu ay" },
   { name: "urunler", nav: "Ürünler" },
   { name: "giderler", nav: "Giderler" },
-  { name: "rapor-ve-excel", nav: "Rapor ve Excel" },
 ];
 const sizes = [
   { name: "wide", width: 1440, height: 900, zoom: 1 },
@@ -61,7 +60,7 @@ for (const source of [true]) test(`owner workspace renders ${source ? "source" :
       await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
       await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
       await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
-      await expect(page.getByRole("textbox", { name: "Dönem", exact: true })).toHaveValue(source ? "2025-10" : "2025-09");
+      await expect(monthLabel(page)).toHaveAttribute("data-month", source ? "2025-10" : "2025-09");
       for (const { name, nav } of routes) {
         await openSection(page, nav);
         await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: nav, exact: true })).toHaveAttribute("aria-current", "page");
@@ -79,12 +78,13 @@ for (const source of [true]) test(`owner workspace renders ${source ? "source" :
         expect(await page.evaluate(() => document.activeElement?.closest(".app-body") !== null)).toBe(true);
         await capture(`${name}-${size.name}`, size.zoom);
       }
-      await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-      await expect(page.getByRole("heading", { name: "Ayarlar", exact: true, level: 1 })).toBeVisible();
+      await openSettings(page);
       await expect(page.getByRole("radio", { name: "Normal", exact: true })).toBeEnabled();
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await capture(`settings-${size.name}`, size.zoom);
-      await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
+      await page.keyboard.press("Escape");
+      await expect(settingsMenu(page)).toBeHidden();
+      await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
     }
     await page.emulateMedia({ reducedMotion: "reduce" });
     const home = page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true });

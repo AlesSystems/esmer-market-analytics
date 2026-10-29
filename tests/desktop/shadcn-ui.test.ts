@@ -8,7 +8,7 @@ import { importPackage, openWorkspace } from "../helpers/desktop-navigation";
 import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 
 
-test("forced colors keeps a keyboard focus outline on actions and period input", async ({}, testInfo) => {
+test("forced colors keeps a keyboard focus outline on tabs and the month stepper", async ({}, testInfo) => {
   const { app, userData, packagePath } = await importedApp();
   try {
     const page = await app.firstWindow();await openWorkspace(page);
@@ -16,7 +16,7 @@ test("forced colors keeps a keyboard focus outline on actions and period input",
     await importPackage(page);
     await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await page.emulateMedia({ forcedColors: "active" });
-    for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByLabel("Dönem", { exact: true }).filter({ visible: true })]) {
+    for (const control of [page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true }), page.getByRole("group", { name: "Dönem", exact: true }).getByRole("button", { name: "Önceki ay", exact: true })]) {
       await control.focus();
       await control.press("Tab");
       await page.keyboard.press("Shift+Tab");
