@@ -137,12 +137,12 @@ components:
   card-hero:
     backgroundColor: "{colors.card}"
     rounded: "{rounded.xl}"
-    padding: "28px 32px 22px"
-  inset-tile:
-    backgroundColor: "{colors.page}"
+    padding: "22px 28px 16px"
+  fact-column:
+    padding: "10px 20px"
+  fact-column-missing:
     rounded: "{rounded.lg}"
-    padding: "16px 18px 14px"
-  inset-tile-missing:
+
     backgroundColor: "{colors.warn-wash}"
     textColor: "{colors.warn}"
   input-search:
@@ -211,7 +211,7 @@ A cool neutral page and white cards, one azure, and three signal colours kept fo
 - **Chart Azure** (`chart-bar`, #5b97d9): past-month bars, margin bars and the bridge totals; the current month takes the full azure.
 
 ### Neutral
-- **Cool Page** (`page`, #f5f7fa): the app background, table header ground, inset tiles and the drawer's fact blocks.
+- **Cool Page** (`page`, #f5f7fa): the app background, table header ground and quiet notes.
 - **Card White** (`card`, #ffffff): top bar, cards, menus, drawer, popovers.
 - **Counter Ink** (`ink`, #18212e): headings, figures, body on cards.
 - **Soft Ink** (`ink-muted`, #5b6472): supporting text, table headers, inactive tabs and labels.
@@ -241,7 +241,7 @@ A cool neutral page and white cards, one azure, and three signal colours kept fo
 ### Hierarchy
 - **Hero** (700, 3.5rem / 56px, 1.05, -0.03em): the single gross-profit figure on Bu ay; the kuruş part is set at .5em in soft ink. 2.75rem under 560px.
 - **Net** (700, 2.25rem / 36px, 1.15, -0.02em): Tahmini net kâr.
-- **Headline** (700, 1.75rem / 28px, 1.2, -0.02em): page and overlay `h1`, the drawer product name; expense group amounts scale between 1.125rem and 1.75rem with their tile.
+- **Headline** (700, 1.75rem / 28px, 1.2, -0.02em): page and overlay `h1`, the drawer product name; expense group amounts scale between 1.125rem and 1.75rem with their column.
 - **Lead** (500, 1.25rem / 20px, 1.4): the one-sentence answer under which the hero figure sits; also the net-same line at 700.
 - **Title** (700, 1.125rem / 18px, 1.35, -0.01em): card `h2`, drawer facts values.
 - **Body** (400, 1rem / 16px, 1.5; 1.6 in paragraphs): table cells in the ledger, rows, forms. Paragraphs run at most about 64–84ch.
@@ -254,11 +254,11 @@ A cool neutral page and white cards, one azure, and three signal colours kept fo
 
 ## Layout
 
-A sticky 64px top bar (logo, three tabs, then month stepper, "Excel’e aktar" and the gear) over a single centred workspace, 1248px max, 24px side padding, 28px top and 56px bottom. Pages are two-column grids of cards with a 20px gap: Bu ay is 7fr / 5fr (hero and attention left; net and six-month bars right); Giderler stacks full-width cards with a four-up tile grid of group totals; Ürünler is one full-width ledger card.
+A sticky 64px top bar (logo, three tabs, then month stepper, "Excel’e aktar" and the gear) over a single centred workspace, 1248px max, 24px side padding, 28px top and 56px bottom. Pages are two-column grids of cards with a 20px gap: Bu ay is 7fr / 5fr (hero and attention left; net and six-month bars right); Giderler stacks full-width cards with four group totals as columns divided by hairlines; Ürünler is one full-width ledger card.
 
-Spacing runs on a 4/8/12/20/28 rhythm: card padding 24–28px, tile padding 16–18px, control gaps 8–14px. Cards never nest; inset tiles on the page tone sit inside them. The drawer is a non-modal push panel (440px) that gives the workspace room instead of covering it; below 760px it starts at the top of the window.
+Spacing runs on a 4/8/12/20/28 rhythm: card padding 24–28px, fact-column padding 10–20px, control gaps 8–14px. Cards never nest and nothing tile-shaped sits inside one: facts are columns separated by 1px hairlines. The drawer is a non-modal push panel (440px) that gives the workspace room instead of covering it; below 760px it starts at the top of the window.
 
-Responsive: under 1360px with the drawer open the ledger drops its margin-bar column and the toolbar re-flows; under 1060px the top bar buttons collapse to icons; under 920px the Bu ay columns stack (hero, net, chart) and the attention detail column hides, Giderler tiles go two-up; under 760px the tabs wrap onto a second 48px row; under 560px tiles go single-column and padding shrinks. Wide tables scroll inside their card.
+Responsive: under 1360px with the drawer open the ledger drops its margin-bar column and the toolbar re-flows; under 1060px the top bar buttons collapse to icons; under 920px the Bu ay columns stack (hero, net, chart) and the attention detail column hides, Giderler columns go two-up; under 760px the tabs wrap onto a second 48px row; under 560px columns stack and padding shrinks. Wide tables scroll inside their card.
 
 ## Elevation & Depth
 
@@ -275,7 +275,7 @@ Tonal layering with ambient shadow. The page is the lowest tone, cards are white
 
 ## Shapes
 
-Gently rounded and consistent: cards 14px, popover menu 14px, inset tiles and notes 12px, buttons, inputs, steppers and segmented wells 10px, selected segment thumbs and menu rows 8px, small chips 999px, bars, the tab underline and margin-bar fills 3px (`bar`), bridge bars 4px. Corners are always rounded, never sharp, and never a pill except chips. Quantitative marks are flat 2D: rounded-rectangle bars with a 3px radius, a 2.5px azure line with white-filled dots, a dashed outline for an empty month, and an amber hatch for an unknown amount.
+Gently rounded and consistent: cards 14px, popover menu 14px, notes and the amber missing column 12px, buttons, inputs, steppers and segmented wells 10px, selected segment thumbs and menu rows 8px, small chips 999px, bars, the tab underline and margin-bar fills 3px (`bar`), bridge bars 4px. Corners are always rounded, never sharp, and never a pill except chips. Quantitative marks are flat 2D: rounded-rectangle bars with a 3px radius, a 2.5px azure line with white-filled dots, a dashed outline for an empty month, and an amber hatch for an unknown amount.
 
 ## Components
 
@@ -285,7 +285,8 @@ Gently rounded and consistent: cards 14px, popover menu 14px, inset tiles and no
 - **Month stepper:** soft-fill 40px group, chevron steps (34px) and a 112px bold label; a step beyond the data range stays visible but is aria-disabled in mute.
 
 ### Buttons
-- **Primary** (`btn btn-primary`): azure, white text, 44px, 10px radius, 16px/600, a 1px azure-tinted shadow; hover deep azure. One per view.
+- **Primary** (`btn btn-primary`): azure, white text, 44px, 10px radius, 16px/600, a 1px azure-tinted shadow; hover deep azure. One per view. Giderler's "Excel’den içe aktar" is the primary while the month has no lines and secondary afterwards; "Elle ekle" and "Şablonu indir" are links.
+- The shared `Button` component only renders these classes (`primary`, `secondary`, `link`); there is no second button system, and form controls take the field style below.
 - **Secondary** (`btn btn-secondary`): white with an inset 1px edge ring; hover hover-fill with field-edge ring.
 - **Top-bar button** (`btn-top`): 40px; below 1060px it collapses to an icon.
 - **Link** (`link`): azure 16px/600 text button, underline on hover; inline variant underlines at 40% azure.
@@ -297,8 +298,8 @@ Gently rounded and consistent: cards 14px, popover menu 14px, inset tiles and no
 - **Popover:** white, 12px radius, popover shadow, 14px text; Escape closes and returns focus to the trigger.
 
 ### Cards / containers
-- **Card:** white, 14px radius, card shadow, 24px 28px padding; `h2` with a 12px margin. The Bu ay hero card is 28px 32px.
-- **Inset tile:** page-tone block, 12px radius, 16px 18px padding, used for Giderler group totals and the drawer's three facts. A missing group becomes an amber tile with an amber hairline above its hint.
+- **Card:** white, 14px radius, card shadow, 24px 28px padding; `h2` with a 12px margin. The Bu ay hero card is 22px 28px 16px.
+- **Fact columns:** side-by-side figures divided by 1px hairlines, no fill, 10px 20px padding, used for Giderler group totals and the drawer's three facts. A missing group becomes an amber wash column (12px radius) with an amber hairline above its hint.
 - **State panel:** card shape, 640px max, for loading, empty and unavailable messages with a primary or outline action.
 - **Note:** a soft card strip; the warning variant is amber wash with no shadow.
 
@@ -310,7 +311,7 @@ Gently rounded and consistent: cards 14px, popover menu 14px, inset tiles and no
 
 ### Inputs / fields
 - **Search:** 46px, 10px radius, 1px field-edge border, 16px text, a leading search icon and a trailing clear button; focus turns the border azure with a 2px azure outline.
-- **Form fields** (expense forms): 44px, field-edge border, 10px radius; hover darkens to soft ink; focus azure; invalid red border plus red message text.
+- **Form fields** (every input, select and textarea): 44px, field-edge border, 10px radius; hover darkens to soft ink; focus azure; invalid red border plus red message text.
 - **Segmented control:** a track-tone well of 36px buttons, selected shown as a white raised thumb with azure text and the count in azure. Used for the product filter and for text size.
 
 ### Navigation
@@ -319,7 +320,7 @@ Gently rounded and consistent: cards 14px, popover menu 14px, inset tiles and no
 - **Overlay page:** replaces the workspace under the same top bar with an "Ana sayfaya dön" secondary button, an `h1` and 640px panels.
 
 ### Product drawer
-A white, 440px right push panel under the top bar. Sticky head with category, product name in Headline, and a close icon; body has a lead sentence, three inset fact tiles (sale price, purchase cost, margin), conditional notes (red wash for a loss, page-tone for missing cost), a six-month margin line, and an outline "Kaynak satırlar" button.
+A white, 440px right push panel under the top bar. Sticky head with category, product name in Headline, and a close icon; body has a lead sentence, three fact columns (sale price, purchase cost, margin), conditional notes (red wash for a loss, page-tone for missing cost), a six-month margin line, and an outline "Kaynak satırlar" button.
 
 ### Charts
 Six-month gross-profit bars (past months chart azure, current month full azure, negative red, empty months a dashed outline with the zero line dashed in field-edge) and a margin line; the bridge in the "Nasıl hesaplandı?" popover is a labelled row list with a horizontal track, azure total bars, grey minus bars and the amber hatch for unknown.
