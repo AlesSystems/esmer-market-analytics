@@ -137,7 +137,7 @@ components:
   card-hero:
     backgroundColor: "{colors.card}"
     rounded: "{rounded.xl}"
-    padding: "22px 28px 16px"
+    padding: "20px 28px 12px"
   fact-column:
     padding: "10px 20px"
   fact-column-missing:
@@ -298,7 +298,7 @@ Gently rounded and consistent: cards 14px, popover menu 14px, notes and the ambe
 - **Popover:** white, 12px radius, popover shadow, 14px text; Escape closes and returns focus to the trigger.
 
 ### Cards / containers
-- **Card:** white, 14px radius, card shadow, 24px 28px padding; `h2` with a 12px margin. The Bu ay hero card is 22px 28px 16px.
+- **Card:** white, 14px radius, card shadow, 24px 28px padding; `h2` with a 12px margin. The Bu ay hero card is 20px 28px 12px.
 - **Fact columns:** side-by-side figures divided by 1px hairlines, no fill, 10px 20px padding, used for Giderler group totals and the drawer's three facts. A missing group becomes an amber wash column (12px radius) with an amber hairline above its hint.
 - **State panel:** card shape, 640px max, for loading, empty and unavailable messages with a primary or outline action.
 - **Note:** a soft card strip; the warning variant is amber wash with no shadow.
