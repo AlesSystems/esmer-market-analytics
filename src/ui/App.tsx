@@ -1,6 +1,6 @@
 import { validSelectedMonth, type SelectedMonth } from "../domain/month";
 import { ExpenseNavigationProvider, useExpenseNavigation } from "./expense-navigation";
-import { followedMonth } from "./month-follow";
+import { followedMonth, localMonth } from "./month-follow";
 import { initialSourceQuery } from "./source-query";
 import { Button } from "./components/ui/button";
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
@@ -159,7 +159,7 @@ function App() {
   const onMonth = useCallback((month: string) => { if (validSelectedMonth(month)) expenseNavigation.leave(() => selectMonth(month)); }, [expenseNavigation.leave, selectMonth]);
   const Page = pages[section];
   // Without any data there is no latest month to pick; pages read the current month until data arrives, without remembering it.
-  const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? new Date().toISOString().slice(0, 7) : null);
+  const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? localMonth(new Date()) : null);
   const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
   if (ready) lastReady.current = ready;
   const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
