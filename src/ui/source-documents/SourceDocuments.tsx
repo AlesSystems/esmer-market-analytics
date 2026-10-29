@@ -1,13 +1,11 @@
 import {useEffect,useRef,useState} from "react";
-import type {PageProps} from "../sections";
 import type {SourceQuery,SourceWorkspaceResult} from "../../source/workspace";
 import {Button} from "../components/ui/button";
 import {SourceDocumentDetail} from "../SourceDocumentDetail";
 import {captureReturn,restoreReturn,type ReturnReceipt} from "../navigation-receipt";
 import {date,decimal} from "../format";
 import {typeLabel} from "../source-fields";
-import {useMonthProfit} from "./month-profit-data";
-import {monthName} from "./month-summary";
+import {monthName} from "../pages/month-summary";
 import {initialSourceQuery} from "../source-query";
 
 type Workspace=Extract<SourceWorkspaceResult,{status:"source-workspace"}>;
@@ -15,7 +13,7 @@ const base:SourceQuery=initialSourceQuery;
 const PAGE=50;
 
 /** Kaynak belgeler: the package's recorded documents for the month, opening the existing detail view. `availability` changes when the source changes. */
-function SourceDocuments({month,availability,onClose}:{month:string;availability:unknown;onClose:()=>void}) {
+export function SourceDocuments({month,availability,onClose}:{month:string;availability:unknown;onClose:()=>void}) {
  const [list,setList]=useState<Workspace>();
  const [detail,setDetail]=useState<Workspace>();
  const [offset,setOffset]=useState(0);
@@ -69,12 +67,13 @@ function SourceDocuments({month,availability,onClose}:{month:string;availability
  }
  function back(){setDetail(undefined);restoreReturn(receipt.current,heading.current);}
  function page(to:number,button:"previous"|"next"){pagerFocus.current=button;setOffset(to);}
- return <section className="month-state" aria-label="Kaynak belgeler">
+ return <main className="overlay-page" aria-label="Kaynak belgeler">
+  <nav aria-label="Sayfa gezinmesi"><Button variant="outline" onClick={onClose}>Ana sayfaya dön</Button></nav>
   {detail?<>
    <Button variant="outline" onClick={back}>Belgelere dön</Button>
    <div ref={detailBox}><SourceDocumentDetail key={detail.document?.ID} document={detail.document} lines={detail.lines}/></div>
   </>:<>
-   <div className="reports-head"><h2 ref={heading} tabIndex={-1}>Kaynak belgeler</h2><Button variant="outline" onClick={onClose}>Rapora dön</Button></div>
+   <h1 ref={heading} tabIndex={-1}>Kaynak belgeler</h1>
    <p>{monthName(month)} için veri paketindeki kayıtlı belgeler. Tutarlar kaynak kaydındandır ve doğrulanmamıştır.</p>
    {message&&<div role="alert"><p>{message}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
    {!list&&!message&&<p role="status">Belgeler yükleniyor…</p>}
@@ -84,51 +83,6 @@ function SourceDocuments({month,availability,onClose}:{month:string;availability
     <nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" ref={previous} disabled={list.offset===0} onClick={()=>page(Math.max(0,list.offset-PAGE),"previous")}>Önceki belgeler</Button><span role="status">{`${list.offset+1}–${Math.min(list.offset+PAGE,list.total)} / ${list.total}`}</span><Button variant="outline" ref={next} disabled={list.offset+PAGE>=list.total} onClick={()=>page(list.offset+PAGE,"next")}>Sonraki belgeler</Button></nav>
    </>)}
   </>}
- </section>;
-}
-
-/** Rapor ve Excel: a method note, the month's Excel export and the source documents. The shell's Dönem drives `month`. */
-export function ReportsPage({month,availability,active,openSettings}:PageProps) {
- const {read,loading,retry}=useMonthProfit(month,active,availability);
- const [documents,setDocuments]=useState(false);
- const [exporting,setExporting]=useState(false);
- const [message,setMessage]=useState("");
- const opener=useRef<HTMLButtonElement>(null);
- const sequence=useRef(0);
- useEffect(()=>{sequence.current++;setMessage("");setExporting(false);setDocuments(false);},[month,availability]);
- const view=read&&month&&read.month===month&&"result" in read&&read.result.status==="month-profit"?read.result.view:null;
- const reason=!month?"Önce bir ay seçilmeli."
-  :!read||read.month!==month?"Bu ayın rakamları yükleniyor."
-  :"failed" in read?"Bu ayın rakamları okunamadı."
-  :read.result.status==="source-unavailable"?read.result.message:null;
- async function exportMonth(){
-  if(!month||!view)return;const id=++sequence.current;setExporting(true);setMessage("");
-  try{
-   // Pinned to the source the numbers on screen came from.
-   const value=await window.esmer.exportMonthProfit({month,hash:view.source.hash});if(id!==sequence.current)return;
-   if(value.status==="saved")setMessage("Doğrulanmamış tahmin Excel dosyasına kaydedildi.");
-   else if(value.status!=="cancelled"){setMessage(value.message);if(value.status==="source-unavailable"&&value.code==="SOURCE_CHANGED")retry();}
-  }catch{if(id===sequence.current)setMessage("Excel dosyası kaydedilemedi.");}
-  finally{setExporting(false);}
- }
- function closeDocuments(){setDocuments(false);requestAnimationFrame(()=>opener.current?.focus());}
- return <main className="reports-page">
-  <div className="reports-head"><h1>Rapor ve Excel</h1></div>
-  <section className="month-state" aria-label="Yöntem notu">
-   <h2>Bu rakamlar tahmindir</h2>
-   <p>Doğrulanmış kâr değildir. Satış, veri paketindeki kayıtlı satış tutarıdır; maliyet belge tarihindeki son alış fiyatından tahmin edilir. İadeler kâra dahil değildir. Tahmini net kâr, ayın giderleri girilip tamamlandı olarak onaylandıktan sonra hesaplanır.</p>
-  </section>
-  {read&&"result" in read&&read.result.status==="source-unavailable"&&read.result.code==="ESTIMATE_UNAVAILABLE"&&<div className="month-state"><h2>Kâr tahmini için veri paketi gerekiyor</h2><p>Maliyet bilgisi içeren bir veri paketi içe aktarınca Excel dosyası ve kaynak belgeler burada açılır.</p><Button onClick={openSettings}>Veri paketi içe aktar</Button></div>}
-  {!documents&&<section className="month-state" aria-label="Excel’e aktar">
-   <h2>{month?monthName(month):"Seçili ay"}</h2>
-   <p>Özet, Ürünler ve Giderler sayfalarıyla bu ayın tahminini Excel dosyası olarak kaydeder. Bilinmeyen değerler boş bırakılır, sıfır yazılmaz.</p>
-   <div className="month-state-actions">
-    <Button onClick={exportMonth} disabled={!view||exporting||loading&&!view} aria-describedby={reason?"export-reason":undefined}>{exporting?"Excel hazırlanıyor…":"Excel’e aktar"}</Button>
-    <Button variant="outline" ref={opener} disabled={!month} onClick={()=>setDocuments(true)}>Kaynak belgeleri aç</Button>
-   </div>
-   {reason&&<p id="export-reason">{reason}</p>}
-   {message&&<p role="status">{message}</p>}
-  </section>}
-  {documents&&month&&<SourceDocuments month={month} availability={availability} onClose={closeDocuments}/>}
  </main>;
 }
+

@@ -1,4 +1,4 @@
-import {useEffect,useState} from "react";
+import {createContext,createElement,useContext,useEffect,useState,type ReactNode} from "react";
 import type {MonthProfitResult} from "../../source/month-profit";
 
 export type MonthProfitRead=({month:string;result:MonthProfitResult}|{month:string;failed:string})&{revision?:unknown};
@@ -18,4 +18,17 @@ export function useMonthProfit(month:string|null,active:boolean,revision:unknown
  },[month,active,attempt,revision]);
  /** An answer read under an older expense revision is dropped, so a stale net profit never sits next to the new state. */
  return {read:read&&read.revision===revision?read:undefined,loading,retry:()=>setAttempt(value=>value+1)};
+}
+
+export type MonthProfitState=ReturnType<typeof useMonthProfit>;
+const Context=createContext<MonthProfitState|null>(null);
+/** One read of the selected month for Bu ay, Ürünler and the Excel button, instead of one per page. */
+export function MonthProfitProvider({month,active,revision,children}:{month:string|null;active:boolean;revision:unknown;children:ReactNode}){
+ const state=useMonthProfit(month,active,revision);
+ return createElement(Context.Provider,{value:state},children);
+}
+export function useMonthProfitContext():MonthProfitState{
+ const state=useContext(Context);
+ if(!state)throw new Error("MonthProfitProvider missing");
+ return state;
 }

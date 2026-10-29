@@ -4,7 +4,7 @@ import type {PageProps} from "../sections";
 import {Button} from "../components/ui/button";
 import {Bridge,ChartFrame,EstimateBadge,RankBars,niceTicks,type RankRow} from "../charts";
 import {date,decimal,money} from "../format";
-import {useMonthProfit} from "./month-profit-data";
+import {useMonthProfitContext} from "./month-profit-data";
 import {monthBridgeSteps,monthName,monthShort,monthSummary,percentText,wordMoney} from "./month-summary";
 
 /** Display helpers. Strings from the service pass through; null is an explicit unknown, never zero. */
@@ -66,8 +66,8 @@ function Shell({month,children,busy=false}:{month:string|null;children:ReactNode
  return <main className="month-page" aria-busy={busy}><header className="month-head"><div><p className="month-eyebrow">Bu ay</p><h1>{month?monthName(month):"Bu ay"}</h1></div></header>{children}</main>;
 }
 
-export function MonthPage({month,onMonth,coverage,availability,active,navigate,openSettings}:PageProps) {
- const {read,loading,retry}=useMonthProfit(month,active,availability);
+export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PageProps) {
+ const {read,loading,retry}=useMonthProfitContext();
  if(!month)return <Shell month={null}><p role="status">Veriler hazırlanıyor…</p></Shell>;
  if(!read)return <Shell month={month} busy><p role="status">Bu ayın rakamları yükleniyor…</p></Shell>;
  if("failed" in read)return <Shell month={month} busy={loading}><div className="month-state" role="alert"><p>Bu ayın rakamları okunamadı. {read.failed}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
@@ -75,8 +75,8 @@ export function MonthPage({month,onMonth,coverage,availability,active,navigate,o
  if(result.status==="source-unavailable"){
   const shown=read.month;
   if(result.code==="SOURCE_CHANGED")return <Shell month={shown} busy={loading}><div className="month-state" role="alert"><p>Bu ayın rakamları okunamadı. {result.message}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
-  return <Shell month={result.code==="ESTIMATE_UNAVAILABLE"?null:shown} busy={loading}>{result.code==="ESTIMATE_UNAVAILABLE"?<div className="month-state"><h2>Kâr tahmini için veri paketi gerekiyor</h2><p>Maliyet bilgisi içeren bir veri paketi içe aktarınca bu sayfa ayın satışını, kârını ve dikkat edilecek ürünleri gösterir.</p><div className="month-state-actions"><Button onClick={openSettings}>Veri paketi içe aktar</Button>{availability?.status==="ready"&&availability.store==="loaded"&&<Button variant="outline" onClick={()=>navigate("reports")}>Aylık raporlara git</Button>}</div></div>
-   :<div className="month-state"><h2>{monthName(shown)} için veri yok</h2><p>{coverage?`Veri paketi ${date(coverage.from)} – ${date(coverage.to)} arasını kapsıyor. Bu aralıktan bir ay seçin.`:"Bu ay veri paketinin dışında. Kenar çubuğundaki Dönem alanından başka bir ay seçin."}</p>{coverage&&<div className="month-state-actions"><Button variant="outline" onClick={()=>onMonth(coverage.to.slice(0,7))}>Son aya git ({monthName(coverage.to.slice(0,7))})</Button></div>}</div>}</Shell>;
+  return <Shell month={result.code==="ESTIMATE_UNAVAILABLE"?null:shown} busy={loading}>{result.code==="ESTIMATE_UNAVAILABLE"?<div className="month-state"><h2>Kâr tahmini için veri paketi gerekiyor</h2><p>Maliyet bilgisi içeren bir veri paketi içe aktarınca bu sayfa ayın satışını, kârını ve dikkat edilecek ürünleri gösterir.</p><div className="month-state-actions"><Button onClick={importPackage}>Veri paketi içe aktar</Button></div></div>
+   :<div className="month-state"><h2>{monthName(shown)} için veri yok</h2><p>{coverage?`Veri paketi ${date(coverage.from)} – ${date(coverage.to)} arasını kapsıyor. Bu aralıktan bir ay seçin.`:"Bu ay veri paketinin dışında. Üstteki ay okuyla başka bir ay seçin."}</p>{coverage&&<div className="month-state-actions"><Button variant="outline" onClick={()=>onMonth(coverage.to.slice(0,7))}>Son aya git ({monthName(coverage.to.slice(0,7))})</Button></div>}</div>}</Shell>;
  }
  const v=result.view,t=v.totals,c=v.changes;
  const byId=new Map(v.products.map(p=>[p.id,p]));
@@ -91,7 +91,7 @@ export function MonthPage({month,onMonth,coverage,availability,active,navigate,o
  const history=v.history;
  return <main className="month-page" aria-busy={loading}>
   <header className="month-head"><div><p className="month-eyebrow">Bu ay</p><h1>{monthName(v.month)}</h1></div>
-   <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p><Button variant="link" className="month-link" onClick={()=>navigate("reports")}>Ayrıntılar Rapor ve Excel’de</Button></EstimateBadge>
+   <EstimateBadge label="Tahmini"><p>Son alış fiyatıyla tahmin · iadeler kâra dahil değil.</p></EstimateBadge>
   </header>
   <p className="month-lead">{monthSummary(v.month,t)}</p>
   <section className="month-figures" aria-label="Ayın rakamları">

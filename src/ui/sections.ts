@@ -1,7 +1,7 @@
 import type {Availability,RequestError} from "../domain/contracts";
 
-/** The four sidebar sections, in order. Each one owns exactly one page component in src/ui/pages. */
-export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","Giderler"],["reports","Rapor ve Excel"]] as const;
+/** The three top tabs, in order. Each one owns exactly one page component in src/ui/pages. */
+export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","Giderler"]] as const;
 export type Section=typeof sections[number][0];
 /** Optional state carried by a navigation, e.g. the product to open on Ürünler. */
 export type NavigationState={productId?:string};
@@ -22,8 +22,8 @@ export type PageProps={
  state:NavigationState;
  /** Opens another section (guarded by expense draft protection). */
  navigate:(section:Section,state?:NavigationState)=>void;
- openSettings:()=>void;
- openRecovery:()=>void;
+ /** Starts the data package import (guarded by expense draft protection). */
+ importPackage:()=>void;
  /** Re-reads availability and the data range after a change made from a page. */
  refresh:()=>void;
 };

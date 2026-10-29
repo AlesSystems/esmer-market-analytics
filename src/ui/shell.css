@@ -1,0 +1,100 @@
+/* Top bar, month stepper, gear menu, shared buttons and full-page views. Tokens live in theme.css. */
+.ico { width: 1.15em; height: 1.15em; flex: none; }
+.app-shell { min-height: 100vh; }
+.app-body { min-width: 0; }
+.app-body:focus { outline: none; }
+.workspace { background: var(--page); max-width: 1248px; margin: 0 auto; padding: 28px 24px 56px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+.topbar { position: sticky; top: 0; z-index: 40; background: var(--card); border-bottom: 1px solid var(--line); }
+.topbar-in { max-width: 1248px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; gap: 28px; }
+.logo { height: 30px; width: auto; display: block; flex: none; }
+.tabs { display: flex; align-self: stretch; gap: 4px; }
+.tab { position: relative; border: 0; background: none; padding: 0 14px; color: var(--ink-2); font-size: var(--t-md); font-weight: 600; white-space: nowrap; }
+.tab:hover, .tab[aria-current="page"] { color: var(--ink); }
+.tab[aria-current="page"]::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--accent); }
+.tab:focus-visible { outline-offset: -6px; border-radius: 10px; }
+.topbar-tools { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+.month-stepper { display: flex; align-items: center; height: 40px; border-radius: 10px; background: var(--soft); padding: 3px; }
+.month-step { width: 34px; height: 34px; border: 0; border-radius: 8px; background: none; color: var(--ink); display: grid; place-items: center; }
+.month-step:hover { background: var(--card); box-shadow: 0 1px 2px rgb(16 24 40 / .1); }
+.month-step[aria-disabled="true"] { color: var(--mute); cursor: default; background: none; box-shadow: none; }
+.month-label { min-width: 112px; text-align: center; font-weight: 700; white-space: nowrap; }
+
+.icon-btn { width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; color: var(--ink-2); display: grid; place-items: center; flex: none; }
+.icon-btn:hover, .icon-btn[aria-expanded="true"] { background: var(--soft); color: var(--ink); }
+.icon-btn .ico { width: 22px; height: 22px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 10px; font-size: var(--t-md); font-weight: 600; white-space: nowrap; }
+.btn-primary { background: var(--accent); color: var(--card); box-shadow: 0 1px 2px rgb(11 107 203 / .25); }
+.btn-primary:hover { background: var(--accent-h); }
+.btn-secondary { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--edge); }
+.btn-secondary:hover { background: var(--hover); box-shadow: inset 0 0 0 1px var(--field); }
+.btn-top { height: 40px; padding: 0 14px; }
+.btn:disabled { opacity: .5; }
+.link { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 4px 2px; color: var(--accent); font-size: var(--t-md); font-weight: 600; border-radius: 6px; text-underline-offset: 3px; white-space: nowrap; }
+.link:hover { text-decoration: underline; color: var(--accent-h); }
+.link .ico { width: 1em; height: 1em; }
+
+.toast { position: fixed; z-index: 50; top: 72px; right: 24px; display: flex; align-items: center; gap: 14px; max-width: min(460px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 12px; background: var(--card); color: var(--ink); box-shadow: var(--shadow-pop); font-size: var(--t-sm); }
+.toast-close { border: 0; background: none; min-height: 0; padding: 2px 6px; color: var(--accent); font-weight: 600; }
+
+.gear-wrap { position: relative; }
+.menu { position: absolute; z-index: 45; top: calc(100% + 10px); right: 0; width: 352px; max-width: calc(100vw - 24px); max-height: calc(100vh - 88px); overflow-y: auto; background: var(--card); border-radius: 14px; box-shadow: var(--shadow-pop); padding: 8px; }
+.menu-list { list-style: none; padding: 0; margin: 0; }
+.menu-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0; border-radius: 10px; background: none; text-align: left; font-size: var(--t-md); font-weight: 600; color: var(--ink); }
+.menu-item:hover:not(:disabled) { background: var(--hover); }
+.menu-item > .ico:first-child { color: var(--ink-2); width: 20px; height: 20px; }
+.menu-item small { font-size: var(--t-sm); font-weight: 400; color: var(--ink-2); }
+.menu-item > span { flex: 1; min-width: 0; }
+.menu-go { color: var(--ink-2); }
+.menu-size { padding: 10px 12px; margin: 2px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.menu-back { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; padding: 8px 10px; border-radius: 10px; font-size: var(--t-md); font-weight: 700; color: var(--ink); text-align: left; }
+.menu-back:hover { background: var(--hover); }
+.size-choice { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.size-choice legend { display: flex; align-items: center; gap: 12px; padding: 0; margin-bottom: 8px; font-weight: 600; }
+.size-choice legend .ico { color: var(--ink-2); width: 20px; height: 20px; }
+.segmented { display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--track); }
+.segmented label { position: relative; flex: 1; display: grid; place-items: center; height: 34px; border-radius: 8px; color: var(--ink-2); font-size: var(--t-sm); font-weight: 600; white-space: nowrap; cursor: pointer; }
+.segmented label:hover { color: var(--ink); }
+.segmented label:has(input:checked) { background: var(--card); color: var(--accent); box-shadow: 0 1px 2px rgb(16 24 40 / .1), 0 2px 6px rgb(16 24 40 / .05); }
+.segmented label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.segmented input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; }
+.size-choice:disabled .segmented label { opacity: .5; cursor: progress; }
+.about-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; padding: 8px 12px 14px; margin: 0; }
+.about-facts dd { font-weight: 600; }
+.limitations { margin: 0; padding: 12px; list-style: none; max-height: 240px; overflow: auto; font-size: var(--t-sm); display: grid; gap: 6px; border-top: 1px solid var(--line); }
+.limitations li { display: flex; gap: 8px; align-items: baseline; color: var(--ink); }
+.limitations li span { flex: none; min-width: 7.5em; font-weight: 600; color: var(--ink-2); }
+.limitations li[data-status="açık"] span { color: var(--warn); }
+
+.overlay-page { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.overlay-page > nav { display: flex; }
+.overlay-page h1:focus { outline: none; }
+.panel { display: grid; gap: 16px; max-width: 640px; padding: 24px 28px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
+.panel-status { font-weight: 600; color: var(--ink); }
+.panel-warning { padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); }
+.panel-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.panel-more { margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 14px 24px; margin: 0; }
+.facts dd { margin-top: 3px; font-size: var(--t-lg); font-weight: 600; overflow-wrap: anywhere; }
+
+.import-outcome { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+
+@media (max-width: 1060px) {
+  .topbar-in { gap: 18px; }
+  .tab { padding: 0 10px; }
+  .hide-narrow { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .btn-top { width: 40px; padding: 0; }
+}
+@media (max-width: 760px) {
+  .topbar-in { height: auto; flex-wrap: wrap; row-gap: 0; padding-top: 10px; }
+  .tabs { order: 3; width: 100%; height: 48px; }
+}
+@media (forced-colors: active) {
+  .tab[aria-current="page"] { border-bottom: 3px solid Highlight; }
+  .tab[aria-current="page"]::after { display: none; }
+  .menu, .toast, .panel, .btn-secondary, .month-stepper { border: 1px solid CanvasText; }
+  .segmented label:has(input:checked) { border: 2px solid Highlight; }
+}

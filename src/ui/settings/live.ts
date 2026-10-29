@@ -17,6 +17,7 @@ const failed = { status: "live-failed", code: "LIVE_UNAVAILABLE", message: "Bağ
 
 export type LiveStatusResult = Extract<LiveResult, { status: "live" }>;
 export type LiveState = "off" | "on" | "checking" | "stale" | "unknown";
+export const liveTitles: Record<LiveState, string> = { off: "Bağlantı kapalı", on: "Bağlantı açık", checking: "Kaynak kontrol ediliyor…", stale: "Güncellik doğrulanamadı", unknown: "Durum okunamadı" };
 export type LiveConnection = {
   status?: LiveStatusResult;
   outcome?: Exclude<LiveResult, LiveStatusResult> | RequestError;

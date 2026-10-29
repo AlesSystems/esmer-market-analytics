@@ -9,7 +9,7 @@ import {ProductCard,Unknown,amount,percent} from "../products/ProductCard";
 import {ProductSourceLines} from "../products/ProductSourceLines";
 import {defaultSort,nextSort,productName,quickFilters,searchIndex,visibleProducts,type QuickFilter,type Sort,type SortKey} from "../products/product-rows";
 import {MonthUnavailable,TrustChip} from "./MonthStates";
-import {useMonthProfit} from "./month-profit-data";
+import {useMonthProfitContext} from "./month-profit-data";
 import {monthName} from "./month-summary";
 
 const columns:[SortKey,string,boolean][]=[["name","Ürün",false],["sales","Satış",true],["cost","Maliyet",true],["grossProfit","Kâr",true],["marginPct","Marj",true],["marginChangePoints","Önceki aya göre",true]];
@@ -25,8 +25,8 @@ function Shell({busy=false,children,chip}:{busy?:boolean;children:React.ReactNod
  return <main className="products-page" aria-busy={busy}><header className="month-head"><div><p className="month-eyebrow">Ürünler</p><h1>Ürünler</h1></div>{chip}</header>{children}</main>;
 }
 
-export function ProductsPage({month,onMonth,coverage,active,availability,state,navigate,openSettings}:PageProps) {
- const {read,loading,retry}=useMonthProfit(month,active,availability);
+export function ProductsPage({month,onMonth,coverage,state,importPackage}:PageProps) {
+ const {read,loading,retry}=useMonthProfitContext();
  const [sort,setSort]=useState<Sort>(defaultSort),[filter,setFilter]=useState<QuickFilter>("all"),[query,setQuery]=useState("");
  const [selected,setSelected]=useState<{id:string;name:string|null}|null>(state.productId?{id:state.productId,name:null}:null);
  const [source,setSource]=useState(false),[dismissed,setDismissed]=useState(false);
@@ -83,7 +83,7 @@ export function ProductsPage({month,onMonth,coverage,active,availability,state,n
   const result=read.result;
   const code=result.status==="source-unavailable"?result.code as string:"";
   if(code&&code!=="MONTH_NOT_COVERED"&&code!=="ESTIMATE_UNAVAILABLE")return <Shell busy={loading}><div className="month-state" role="alert"><p>Ürünler okunamadı. Veri paketi değişmiş olabilir.</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
-  return <Shell busy={loading}>{result.status==="source-unavailable"&&<MonthUnavailable result={result} month={read.month} purpose="ayın ürünlerini ve kârlarını gösterir" coverage={coverage} availability={availability} onMonth={onMonth} navigate={navigate} openSettings={openSettings}/>}</Shell>;
+  return <Shell busy={loading}>{result.status==="source-unavailable"&&<MonthUnavailable result={result} month={read.month} purpose="ayın ürünlerini ve kârlarını gösterir" coverage={coverage} onMonth={onMonth} importPackage={importPackage}/>}</Shell>;
  }
  if(source&&chosen)return <main className="products-page" aria-busy={loading}><ProductSourceLines key={`${view.source.hash}|${view.month}|${chosen.id}`} hash={view.source.hash} month={view.month} productId={chosen.id} name={productName(chosen)} onBack={()=>setSource(false)}/></main>;
 
@@ -92,7 +92,7 @@ export function ProductsPage({month,onMonth,coverage,active,availability,state,n
   <td><button type="button" className="product-name product-open" onClick={event=>{event.stopPropagation();open(p.id);}}>{productName(p)}</button>{p.category&&<span className="product-category">{p.category}</span>}</td>
   <td className="number">{amount(p.sales)}</td><td className="number">{amount(p.cost)}</td><td className="number">{amount(p.grossProfit)}</td><td className="number">{percent(p.marginPct)}</td><td className="number"><PointsChange value={p.marginChangePoints}/></td>
  </tr>;
- return <Shell busy={loading} chip={<TrustChip navigate={navigate}/>}>
+ return <Shell busy={loading} chip={<TrustChip/>}>
   <p className="products-note">{monthName(view.month)} · {view.products.length} ürün</p>
   <div className="products-tools">
    <div role="group" aria-label="Hızlı süzgeçler" className="products-filters">{quickFilters.map(([key,label])=><Button key={key} variant={filter===key?"default":"outline"} aria-pressed={filter===key} onClick={()=>setFilter(key)}>{label}</Button>)}</div>
