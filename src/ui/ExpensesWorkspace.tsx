@@ -5,10 +5,10 @@ import { ExpenseEditor, currentValue, type Run } from "./expenses/ExpenseEditor"
 import { ImportPreview } from "./expenses/ImportPreview";
 import { MonthDetails } from "./expenses/MonthDetails";
 import { AlertIcon, ArrowRightIcon, CheckIcon, DownloadIcon, PlusIcon, UploadIcon } from "./icons";
-import { classificationLabels, type ExpensePeriod, type ExpensePreview, type ExpenseRecord } from "../expenses/contracts";
+import { type ExpensePeriod, type ExpensePreview, type ExpenseRecord } from "../expenses/contracts";
 import type { ExpenseGroupKey } from "../expenses/groups";
 import { date, money } from "./format";
-import { attentionText, blankSentence, confirmPlan, confirmReason, groupLabels, statusText } from "./expenses/copy";
+import { attentionChip, attentionText, blankSentence, confirmPlan, confirmReason, groupLabels, statusText } from "./expenses/copy";
 import { AppFrame } from "./frame";
 import { stepMonth } from "./month-step";
 import { monthName } from "./pages/month-summary";
@@ -100,13 +100,13 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   const hint = (key: ExpenseGroupKey) => {
     const group = hintView?.groups.find(item => item.key === key);
     if (!group) return null;
-    if (group.count === 0) return `${hintName}: kayıt yok`;
+    if (group.count === 0) return null;
     return group.amount === null ? null : `${hintName}: ${money(group.amount)}`;
   };
   const why = !plan ? null : manual ? "Önce elle ekleme formunu kapatın." : plan.blocked ? "Önce işaretli satırları düzeltin." : null;
   return <main className="gider" aria-busy={busy}>
     <header className="g-head">
-      <div><h1>{monthName(period)} giderleri</h1><p className="g-say" aria-live="polite">{view && showMonth ? statusText(view) : ""}</p></div>
+      <div><h1 className="sr-only">{monthName(period)} giderleri</h1><p className="g-say" aria-live="polite">{view && showMonth ? statusText(view) : ""}</p></div>
       {!showMonth && <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Giderlere dön</button>}
     </header>
     {savedPeriod && showMonth && <p className="g-note">Gider ayı: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme ayı: {savedPeriod.payment}</>}.{onPeriod && <button type="button" className="link link-inline" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>O aya git</button>}</p>}
@@ -120,7 +120,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
       {view && plan && <section className="card g-main" aria-labelledby="g-main-title">
         <div className="g-card-head"><h2 id="g-main-title">Aylık toplamlar</h2>
           <div className="g-links">
-            <button type="button" className="link" id="expense-import" disabled={locked} onClick={importExcel}><UploadIcon />Excel’den içe aktar</button>
+            <button type="button" className={`btn ${plan.lines || plan.state === "current" ? "btn-secondary" : "btn-primary"}`} id="expense-import" disabled={locked} onClick={importExcel}><UploadIcon />Excel’den içe aktar</button>
             <button type="button" className="link" disabled={locked} onClick={saveTemplate}><DownloadIcon />Şablonu indir</button>
           </div>
         </div>
@@ -135,7 +135,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
         })}</ul>
         {!plan.lines && plan.state !== "current" && <div className="g-empty">{view.rows.length > 0
           ? <p>Bu ay sayılan gider yok · {view.rows.length.toLocaleString("tr-TR")} kayıt toplam dışında veya geri alınmış.</p>
-          : <><p>Kayıt bulunmaması, gider olmadığı anlamına gelmez.</p><p>Excel şablonunu indirin, ayın giderlerini doldurun ve “Excel’den içe aktar” ile yükleyin. Personel için yalnızca aylık toplamı girin.</p></>}</div>}
+          : <p>Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.</p>}</div>}
         {view.attention.length > 0 && <div className="g-attn" role="group" aria-labelledby="g-attn-title"><h3 id="g-attn-title">Düzeltilmesi gereken satırlar</h3><ul>{view.attention.map(item => {
           const row = view.rows.find(candidate => candidate.entityId === item.entityId), id = `expense-fix-${item.entityId}`;
           return <li key={item.entityId}><span><strong>{item.category}</strong> · {date(item.date)} · {attentionText[item.reason]}</span>{row && item.reason !== "legacy" && <button type="button" className="link" id={id} aria-label={`${item.category} satırını düzelt`} disabled={locked} onClick={() => open(row, id)}>Düzelt</button>}</li>;
@@ -167,19 +167,18 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
       </section>}
       <section className="card g-recs" aria-labelledby="g-recs-title">
         <div className="g-card-head"><h2 id="g-recs-title">Kayıtlar</h2>
-          {!manual && <button type="button" className="btn btn-secondary" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}><PlusIcon />Elle ekle</button>}
+          {!manual && <button type="button" className="link" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}><PlusIcon />Elle ekle</button>}
         </div>
         <p className="g-muted">Excel’den ya da elle girilen her satır burada. Toplamlar bu satırlardan hesaplanır.</p>
         {manual && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { if (!current) return; setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
         {!view ? null : view.rows.length === 0 ? <p className="g-none">Bu ay için kayıt yok.</p>
-          : <div className="table-scroll g-table" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih</th><th>Kategori</th><th className="number">Tutar</th><th>Durum</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => {
-            const value = currentValue(row);
+          : <div className="table-scroll g-table" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih</th><th>Kategori</th><th className="number">Tutar</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => {
+            const value = currentValue(row), fix = view.attention.find(item => item.entityId === row.entityId);
             return <tr key={row.entityId}>
-              <td>{date(row.value.date)}<small>{value?.paymentDate ? `Ödeme ${date(value.paymentDate)}` : "Ödeme tarihi yok"}</small></td>
-              <td>{value?.category ?? "Eski kayıt"}<small>{value && classificationLabels[value.classification]}</small></td>
-              <td className="number">{money(value ? value.gross : row.value.net)}<small>{value ? `net ${money(value.net)} · KDV ${money(value.tax)}` : "yalnızca net"}</small></td>
-              <td>{value?.voided ? <span className="g-void">Geri alındı</span> : "Geçerli"}<small>{value && "kind" in value.origin ? "Elle girildi" : "Excel"} · sürüm {row.revision}</small></td>
-              <td><button type="button" className="link" id={recordId(row.entityId)} disabled={locked} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</button></td>
+              <td>{date(row.value.date)}</td>
+              <td>{value?.category ?? "Eski kayıt"}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
+              <td className="number">{money(value ? value.gross : row.value.net)}</td>
+              <td className="number"><button type="button" className="link" id={recordId(row.entityId)} disabled={locked} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</button></td>
             </tr>;
           })}</tbody></table></div>}
       </section>

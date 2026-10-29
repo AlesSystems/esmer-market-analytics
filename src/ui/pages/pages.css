@@ -8,7 +8,7 @@
 
 .ay { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
 .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-.hero { padding: 28px 32px 22px; }
+.hero { padding: 22px 28px 16px; }
 /* While another month loads the layout stays, the figures do not. */
 .is-loading .hero { min-height: 300px; }
 .is-loading .netcard { min-height: 132px; }
@@ -34,7 +34,7 @@
 .att { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
 .att .h3 { margin: 0 0 4px; }
 .att ul { margin: 0; padding: 0; list-style: none; }
-.att-row { width: calc(100% + 16px); margin: 0 -8px; display: grid; grid-template-columns: auto minmax(0, auto) minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 8px; border: 0; border-radius: 8px; background: none; text-align: left; font-size: var(--t-md); color: var(--ink); }
+.att-row { width: calc(100% + 16px); margin: 0 -8px; display: grid; grid-template-columns: auto minmax(0, auto) minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 8px; background: none; text-align: left; font-size: var(--t-md); color: var(--ink); }
 .att-row:hover { background: var(--hover); }
 .att-i { width: 20px; height: 20px; }
 .att-row.is-loss .att-i { color: var(--loss); }
@@ -82,7 +82,7 @@
   .att-x { display: none; }
 }
 @media (max-width: 560px) {
-  .hero { padding: 22px 20px 18px; }
+  .hero { padding: 20px 20px 14px; }
   .hero-num { font-size: calc(var(--base) * 2.75); }
 }
 @media (forced-colors: active) {
@@ -139,6 +139,7 @@ th.num .sort { flex-direction: row-reverse; }
 .rchip { display: inline-flex; align-items: center; height: 22px; margin-left: 6px; padding: 0 8px; border-radius: 999px; font-size: calc(var(--base) * .8125); font-weight: 700; vertical-align: 1px; }
 .rchip.is-loss { background: var(--loss-bg); color: var(--loss); }
 .rchip.is-drop { background: var(--warn-bg); color: var(--warn); }
+.rchip.is-void { background: var(--soft); color: var(--ink-2); }
 .products-table .bar-cell { width: 210px; padding: 0 24px 0 10px; }
 .mbar { display: block; height: 6px; max-width: 140px; border-radius: 3px; background: var(--track); overflow: hidden; }
 .mbar i { display: block; height: 100%; border-radius: 3px; background: var(--bar); }
@@ -154,8 +155,9 @@ th.num .sort { flex-direction: row-reverse; }
 .dr-head p { margin-top: 2px; }
 .dr-body { display: grid; gap: 14px; padding: 18px 28px 40px; }
 .dr-say { font-size: var(--t-lg); color: var(--ink); }
-.dr-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; }
-.dr-facts > div { background: var(--page); border-radius: 12px; padding: 12px 12px 10px; min-width: 0; }
+.dr-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+.dr-facts > div { padding: 2px 12px 2px 14px; min-width: 0; border-left: 1px solid var(--line); }
+.dr-facts > div:first-child { padding-left: 0; border-left: 0; }
 .dr-facts dt { font-weight: 500; }
 .dr-facts dd { font-size: var(--t-lg); font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
 .dr-facts dd.per { font-size: var(--t-sm); font-weight: 500; color: var(--ink-2); letter-spacing: 0; white-space: normal; }

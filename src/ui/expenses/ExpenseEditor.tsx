@@ -19,6 +19,7 @@ export function ExpenseEditor({ row, history, busy, close, run }: { row: Expense
   const textField = (key: "date" | "paymentDate" | "category" | "net" | "tax" | "gross" | "taxEvidence" | "supportingReference" | "sourceReference" | "labourPeriod", label: string, type = "text") => <label>{label}<Input type={type} readOnly={key === "sourceReference"} inputMode={decimal(key) ? "decimal" : undefined} value={(decimal(key) ? fields?.[key]?.replace(".", ",") : fields?.[key]) ?? ""} onChange={event => update(key, (decimal(key) ? event.target.value.replace(",", ".") : event.target.value) || (["date", "category", "net", "tax", "gross"].includes(key) ? "" : null))} /></label>;
   return <section className="card g-task" aria-label="Gider düzeltmesi">
     <div className="g-card-head"><h2 ref={title} tabIndex={-1}>Gideri incele ve düzelt</h2></div>
+    <p className="g-muted">{original ? ("kind" in original.origin ? "Elle girildi" : "Excel") : "Eski kayıt"} · sürüm {row.revision}</p>
     <p>Her değişiklik yeni bir sürüm oluşturur. İlk kayıt ve önceki sürümler korunur.</p>
     {fields && <form onSubmit={event => { event.preventDefault(); void run(() => window.esmer.correctExpense({ entityId: row.entityId, expectedRevision: row.revision, reason, replacement: fields }), "Düzeltme kaydedildi. Dönemi yeniden inceleyin.", true); }}>
       <fieldset disabled={busy} className="g-fields"><legend>Gider bilgileri</legend>

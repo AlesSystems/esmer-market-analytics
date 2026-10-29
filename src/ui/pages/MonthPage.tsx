@@ -36,10 +36,10 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const {read,loading,retry}=useMonthProfitContext();
  if(!month)return <Shell title="Bu ay"><p role="status">Veriler hazırlanıyor…</p></Shell>;
  if(!read)return <Shell title={monthName(month)} busy><div className="ay is-loading"><div className="col"><section className="card hero" aria-label="Ayın özeti"><p className="muted" role="status">Bu ayın rakamları yükleniyor…</p></section></div><div className="col"><section className="card netcard" aria-hidden="true"/><section className="card chart" aria-hidden="true"/></div></div></Shell>;
- if("failed" in read)return <Shell title={monthName(read.month)} busy={loading}><div className="state" role="alert"><p>Bu ayın rakamları okunamadı. {read.failed}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
+ if("failed" in read)return <Shell title={monthName(read.month)} busy={loading}><div className="state" role="alert"><p>Bu ayın rakamları okunamadı. {read.failed}</p><Button variant="secondary" onClick={retry}>Yeniden dene</Button></div></Shell>;
  const result=read.result;
  if(result.status==="source-unavailable"){
-  if(result.code==="SOURCE_CHANGED")return <Shell title={monthName(read.month)} busy={loading}><div className="state" role="alert"><p>Bu ayın rakamları okunamadı. {result.message}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
+  if(result.code==="SOURCE_CHANGED")return <Shell title={monthName(read.month)} busy={loading}><div className="state" role="alert"><p>Bu ayın rakamları okunamadı. {result.message}</p><Button variant="secondary" onClick={retry}>Yeniden dene</Button></div></Shell>;
   return <Shell title={result.code==="ESTIMATE_UNAVAILABLE"?"Bu ay":monthName(read.month)} busy={loading}><MonthUnavailable result={result} month={read.month} purpose="ayın satışını, kârını ve dikkat edilecek ürünleri gösterir" coverage={coverage} onMonth={onMonth} importPackage={importPackage}/></Shell>;
  }
  const v=result.view,t=v.totals,c=v.changes;
@@ -77,12 +77,12 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
    </div>
    <div className="col">
     {net.kind==="missing"
-     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p>{net.toExpenses&&<button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button>}</section>
+     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v.dataUntil)}</p>}</section>
      :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2>
        {net.kind==="same"?<p className="net-same">Brüt kârla aynı</p>:<Amount value={t.netProfit!} className={`net${t.netProfit!.startsWith("-")?" is-neg":""}`}/>}
        <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
     <section className="card chart" aria-labelledby="chart-title">
-     <h2 id="chart-title">Son 6 ay brüt kâr</h2>
+     <h2 id="chart-title">Son 6 ay brüt kâr (₺)</h2>
      {v.history.length<6&&<p className="muted">Paket yalnız {v.history.length} ayı kapsıyor.</p>}
      <MonthBars history={v.history} month={v.month}/>
     </section>

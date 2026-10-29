@@ -10,6 +10,14 @@ export const attentionText: Record<ExpensePeriod["attention"][number]["reason"],
   legacy: "Eski biçimli kayıt; yeniden girilmeli",
 };
 
+/** The same reasons as a short chip beside the line. */
+export const attentionChip: Record<ExpensePeriod["attention"][number]["reason"], string> = {
+  unknownTax: "KDV bilinmiyor",
+  unclassified: "Tür seçilmemiş",
+  lossReview: "Kanıt eksik",
+  legacy: "Eski biçim",
+};
+
 type Month = Pick<ExpensePeriod, "groups" | "attention" | "confirmation">;
 /** What confirming this month means. Reads only the counts the service returned. */
 export type ConfirmPlan = {
