@@ -26,7 +26,7 @@ export function RankBars({ rows, color, formatValue, max, ariaLabel = "Sıralama
   if (rows.length === 0) return <p className="viz-empty">{empty}</p>;
   const layout = rankLayout(rows, max);
   return (
-    <ul className="viz-rows" aria-label={ariaLabel} style={{ "--viz-bar": color } as CSSProperties}>
+    <ul className="viz-rows" aria-label={ariaLabel} style={{ "--row-bar": color } as CSSProperties}>
       {rows.map((row, index) => {
         const span = layout.rows[index];
         const unknown = span.kind === "unknown";

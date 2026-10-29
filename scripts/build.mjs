@@ -48,16 +48,11 @@ await copyFile("node_modules/tailwindcss/LICENSE", "dist/licences/tailwindcss-LI
 await mkdir("dist/ui/assets", { recursive: true });
 await copyFile("src/ui/assets/esmer-market-logo.png", "dist/ui/assets/esmer-market-logo.png");
 for (const subset of ["latin", "latin-ext"]) {
-  const filename = `manrope-${subset}-wght-normal.woff2`;
-  await copyFile(`node_modules/@fontsource-variable/manrope/files/${filename}`, `dist/ui/assets/${filename}`);
+  const filename = `figtree-${subset}-wght-normal.woff2`;
+  await copyFile(`node_modules/@fontsource-variable/figtree/files/${filename}`, `dist/ui/assets/${filename}`);
 }
-await copyFile("node_modules/@fontsource-variable/manrope/LICENSE", "dist/licences/manrope-LICENSE");
+await copyFile("node_modules/@fontsource-variable/figtree/LICENSE", "dist/licences/figtree-LICENSE");
 for (const dependency of ["scheduler", "react"]) {
   await copyFile(`node_modules/${dependency}/LICENSE`, `dist/licences/${dependency}-LICENSE`);
 }
 
-for (const subset of ["latin", "latin-ext"]) {
-  const filename = `newsreader-${subset}-wght-italic.woff2`;
-  await copyFile(`node_modules/@fontsource-variable/newsreader/files/${filename}`, `dist/ui/assets/${filename}`);
-}
-await copyFile("node_modules/@fontsource-variable/newsreader/LICENSE", "dist/licences/newsreader-LICENSE");

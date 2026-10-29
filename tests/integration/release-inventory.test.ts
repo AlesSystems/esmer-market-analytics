@@ -89,12 +89,12 @@ async function fixture(extraPath?: string, content = "synthetic", currentBuild =
   await writeFile(join(app, "package.json"), JSON.stringify({ name: "esmer-market-analytics", version: "0.1.0" }));
   await writeFile(join(app, "dist", "desktop", "main.cjs"), "console.log('synthetic');");
   if (currentBuild) {
-    for (const path of ["dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/manrope-latin-ext-wght-normal.woff2", "dist/ui/assets/manrope-latin-wght-normal.woff2", "dist/ui/assets/newsreader-latin-ext-wght-italic.woff2", "dist/ui/assets/newsreader-latin-wght-italic.woff2"]) {
+    for (const path of ["dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/figtree-latin-ext-wght-normal.woff2", "dist/ui/assets/figtree-latin-wght-normal.woff2"]) {
       await mkdir(join(app, path, ".."), { recursive: true });
       await writeFile(join(app, path), "synthetic build asset");
     }
     await mkdir(join(release, "resources", "licences"), { recursive: true });
-    for (const name of ["LICENSE", "LICENSES.chromium.html", "shadcn-LICENSE", "tailwindcss-LICENSE", "manrope-LICENSE", "newsreader-LICENSE", "scheduler-LICENSE", "react-LICENSE"]) {
+    for (const name of ["LICENSE", "LICENSES.chromium.html", "shadcn-LICENSE", "tailwindcss-LICENSE", "figtree-LICENSE", "scheduler-LICENSE", "react-LICENSE"]) {
       await writeFile(join(release, "resources", "licences", name), "synthetic dependency notice");
     }
   }
@@ -145,9 +145,9 @@ test("reviewed SQL library credential modules remain scanned for secrets and can
 test("release inspection admits the current build assets and notices while inventorying their content", async () => {
   const result = await inspectRelease(await fixture(undefined, "synthetic", true));
   expect(result.archiveFiles.map(file => file.path)).toEqual([
-    "dist/desktop/main.cjs", "dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/manrope-latin-ext-wght-normal.woff2", "dist/ui/assets/manrope-latin-wght-normal.woff2", "dist/ui/assets/newsreader-latin-ext-wght-italic.woff2", "dist/ui/assets/newsreader-latin-wght-italic.woff2", "package.json",
+    "dist/desktop/main.cjs", "dist/ui/app.css", "dist/ui/assets/esmer-market-logo.png", "dist/ui/assets/figtree-latin-ext-wght-normal.woff2", "dist/ui/assets/figtree-latin-wght-normal.woff2", "package.json",
   ]);
-  expect(result.files).toHaveLength(9);
+  expect(result.files).toHaveLength(8);
   expect(result.violations).toEqual([]);
 });
 
@@ -158,22 +158,22 @@ test("build asset and notice admission stays exact and scans allowed files for s
     "distribution:resources/licences/unreviewed-LICENSE", "archive:dist/ui/assets/unreviewed-logo.png",
   ]);
   const secret = await fixture("dist/ui/assets/esmer-market-logo.png", "-----BEGIN PRIVATE KEY-----", true);
-  await writeFile(join(secret, "resources", "licences", "manrope-LICENSE"), "-----BEGIN PRIVATE KEY-----");
+  await writeFile(join(secret, "resources", "licences", "figtree-LICENSE"), "-----BEGIN PRIVATE KEY-----");
   expect((await inspectRelease(secret)).violations).toEqual([
-    "content:resources/licences/manrope-LICENSE", "content:dist/ui/assets/esmer-market-logo.png",
+    "content:resources/licences/figtree-LICENSE", "content:dist/ui/assets/esmer-market-logo.png",
   ]);
 });
 
 
-test("Newsreader admission accepts only bundled subsets and keeps font and licence content scanned", async () => {
+test("Figtree admission accepts only bundled subsets and keeps font and licence content scanned", async () => {
   expect((await inspectRelease(await fixture(undefined, "synthetic", true))).violations).toEqual([]);
-  const unreviewed = await fixture("dist/ui/assets/newsreader-vietnamese-wght-italic.woff2", "synthetic", true);
-  expect((await inspectRelease(unreviewed)).violations).toEqual(["archive:dist/ui/assets/newsreader-vietnamese-wght-italic.woff2"]);
-  for (const path of ["dist/ui/assets/newsreader-latin-wght-italic.woff2", "dist/ui/assets/newsreader-latin-ext-wght-italic.woff2"]) {
+  const unreviewed = await fixture("dist/ui/assets/figtree-vietnamese-wght-normal.woff2", "synthetic", true);
+  expect((await inspectRelease(unreviewed)).violations).toEqual(["archive:dist/ui/assets/figtree-vietnamese-wght-normal.woff2"]);
+  for (const path of ["dist/ui/assets/figtree-latin-wght-normal.woff2", "dist/ui/assets/figtree-latin-ext-wght-normal.woff2"]) {
     const secret = await fixture(path, "-----BEGIN PRIVATE KEY-----", true);
-    await writeFile(join(secret, "resources", "licences", "newsreader-LICENSE"), "-----BEGIN PRIVATE KEY-----");
+    await writeFile(join(secret, "resources", "licences", "figtree-LICENSE"), "-----BEGIN PRIVATE KEY-----");
     expect((await inspectRelease(secret)).violations).toEqual([
-      "content:resources/licences/newsreader-LICENSE", `content:${path}`,
+      "content:resources/licences/figtree-LICENSE", `content:${path}`,
     ]);
   }
 });

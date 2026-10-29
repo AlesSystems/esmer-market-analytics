@@ -2,58 +2,58 @@
 .app-shell .sidebar-corner { display: flex; flex-direction: column; gap: 4px; }
 .app-shell .sidebar-corner .live-badge { min-height: 36px; font-size: 12px; text-align: left; padding: 6px 10px; }
 
-.month-page { display: grid; gap: 22px; color: var(--market-ink); font-variant-numeric: tabular-nums; }
+.month-page { display: grid; gap: 22px; color: var(--ink); font-variant-numeric: tabular-nums; }
 .month-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .month-head h1 { margin: 0; }
-.month-eyebrow { margin: 0 0 4px; font-size: 13px; font-weight: 650; color: var(--market-muted); letter-spacing: .02em; }
+.month-eyebrow { margin: 0 0 4px; font-size: 13px; font-weight: 650; color: var(--ink-2); letter-spacing: .02em; }
 .month-head .viz-estimate { position: relative; }
-.month-head .viz-estimate-body { position: absolute; right: 0; z-index: 5; width: min(340px, calc(100vw - 48px)); box-shadow: var(--market-raised); }
+.month-head .viz-estimate-body { position: absolute; right: 0; z-index: 5; width: min(340px, calc(100vw - 48px)); box-shadow: var(--shadow); }
 .month-lead { margin: 0; font-size: 1.3rem; line-height: 1.5; letter-spacing: -.01em; max-width: 62ch; text-wrap: pretty; }
 
-.month-figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); overflow: hidden; }
-.month-figure { display: grid; align-content: start; gap: 6px; padding: 20px 22px; border-left: 1px solid var(--market-line); min-width: 0; }
+.month-figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.month-figure { display: grid; align-content: start; gap: 6px; padding: 20px 22px; border-left: 1px solid var(--line); min-width: 0; }
 .month-figure:first-child { border-left: 0; }
-.month-figure.is-hero { background: var(--market-wash); }
-.month-figure h2 { margin: 0; font-size: 13px; font-weight: 650; color: var(--market-muted); letter-spacing: 0; }
+.month-figure.is-hero { background: var(--soft); }
+.month-figure h2 { margin: 0; font-size: 13px; font-weight: 650; color: var(--ink-2); letter-spacing: 0; }
 .month-figure strong { font-size: 1.75rem; line-height: 1.15; font-weight: 750; letter-spacing: -.03em; overflow-wrap: anywhere; }
-.month-figure strong.is-unknown { color: var(--market-muted); font-weight: 600; }
-.month-change { margin: 0; font-size: 12.5px; color: var(--market-muted); }
-.month-change b { font-weight: 700; color: var(--market-ink); }
-.month-change.is-up b { color: var(--market-positive); }
-.month-change.is-down b { color: var(--market-negative); }
-.month-reason { margin: 0; font-size: 13px; line-height: 1.45; color: var(--market-ink); }
-.app-shell .month-link { height: auto; min-height: 0; padding: 0; justify-content: flex-start; color: var(--market-action); font-weight: 650; text-decoration: underline; text-underline-offset: 3px; white-space: normal; text-align: left; }
+.month-figure strong.is-unknown { color: var(--ink-2); font-weight: 600; }
+.month-change { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.month-change b { font-weight: 700; color: var(--ink); }
+.month-change.is-up b { color: var(--gain); }
+.month-change.is-down b { color: var(--loss); }
+.month-reason { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink); }
+.app-shell .month-link { height: auto; min-height: 0; padding: 0; justify-content: flex-start; color: var(--accent); font-weight: 650; text-decoration: underline; text-underline-offset: 3px; white-space: normal; text-align: left; }
 
 .month-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.month-panel { min-width: 0; padding: 20px 22px; background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); }
+.month-panel { min-width: 0; padding: 20px 22px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
 .month-panel > h2 { margin: 0 0 12px; font-size: 16px; font-weight: 650; letter-spacing: -.02em; }
 
 .month-columns { display: block; overflow: visible; }
-.month-col { fill: color-mix(in srgb, var(--viz-contribution) 45%, var(--market-surface)); }
-.month-col.is-current { fill: var(--viz-contribution); }
-.month-col.is-negative { fill: var(--viz-negative); }
-.month-col--unknown { fill: var(--viz-unknown-fill); stroke: var(--viz-unknown-stroke); stroke-dasharray: 3 2; }
-.month-col-value { fill: var(--market-ink); font-size: 11.5px; font-weight: 700; }
-.month-columns .viz-tick.is-current { fill: var(--market-ink); font-weight: 700; }
+.month-col { fill: color-mix(in srgb, var(--bar) 45%, var(--card)); }
+.month-col.is-current { fill: var(--bar); }
+.month-col.is-negative { fill: var(--loss); }
+.month-col--unknown { fill: var(--warn-bg); stroke: var(--warn); stroke-dasharray: 3 2; }
+.month-col-value { fill: var(--ink); font-size: 11.5px; font-weight: 700; }
+.month-columns .viz-tick.is-current { fill: var(--ink); font-weight: 700; }
 
 .month-attention ul { margin: 0; padding: 0; list-style: none; }
-.month-attention li + li { border-top: 1px solid var(--market-line); }
+.month-attention li + li { border-top: 1px solid var(--line); }
 .app-shell .month-alert { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); grid-template-areas: "kind name" "kind figure"; gap: 2px 14px; width: 100%; padding: 10px 6px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; border-radius: 6px; }
-.app-shell .month-alert:hover { background: var(--market-hover); }
-.month-alert-kind { grid-area: kind; align-self: start; justify-self: start; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--market-warn-wash); color: var(--market-warn-ink); }
-.month-alert[data-kind="loss"] .month-alert-kind { background: color-mix(in srgb, var(--market-negative) 10%, var(--market-surface)); color: var(--market-negative); }
-.month-alert[data-kind="missingCost"] .month-alert-kind { background: var(--market-wash); color: var(--market-muted); }
+.app-shell .month-alert:hover { background: var(--hover); }
+.month-alert-kind { grid-area: kind; align-self: start; justify-self: start; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--warn-bg); color: var(--warn); }
+.month-alert[data-kind="loss"] .month-alert-kind { background: color-mix(in srgb, var(--loss) 10%, var(--card)); color: var(--loss); }
+.month-alert[data-kind="missingCost"] .month-alert-kind { background: var(--soft); color: var(--ink-2); }
 .month-alert-name { grid-area: name; font-weight: 650; }
-.month-alert-figure { grid-area: figure; font-size: 13px; color: var(--market-muted); }
+.month-alert-figure { grid-area: figure; font-size: 13px; color: var(--ink-2); }
 
-.month-state { display: grid; gap: 10px; justify-items: start; padding: 24px; background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); }
+.month-state { display: grid; gap: 10px; justify-items: start; padding: 24px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); }
 .month-state h2, .month-state p { margin: 0; }
 .month-state-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .products-page { display: grid; gap: 14px; }
 .products-page h1, .products-note { margin: 0; }
-.products-note { color: var(--market-muted); font-size: 13px; }
-.products-page tr.is-selected, .products-page tr[aria-current="true"] { background: var(--market-selection); outline: 2px solid var(--market-action); outline-offset: -2px; }
+.products-note { color: var(--ink-2); font-size: 13px; }
+.products-page tr.is-selected, .products-page tr[aria-current="true"] { background: var(--accent-50); outline: 2px solid var(--accent); outline-offset: -2px; }
 
 .reports-page { display: grid; gap: 12px; min-width: 0; }
 .app-shell .reports-head h1 { font-size: 1.5rem; }
@@ -64,12 +64,12 @@
 @media (max-width: 1180px) {
   .month-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .month-figure:nth-child(3) { border-left: 0; }
-  .month-figure:nth-child(n+3) { border-top: 1px solid var(--market-line); }
+  .month-figure:nth-child(n+3) { border-top: 1px solid var(--line); }
   .month-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
   .month-figures { grid-template-columns: minmax(0, 1fr); }
-  .month-figure { border-left: 0; border-top: 1px solid var(--market-line); }
+  .month-figure { border-left: 0; border-top: 1px solid var(--line); }
   .month-figure:first-child { border-top: 0; }
   .app-shell .month-alert { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kind" "name" "figure"; }
   .month-lead { font-size: 1.1rem; }
@@ -83,10 +83,10 @@
 .products-list { min-width: 0; }
 .products-table { width: 100%; font-variant-numeric: tabular-nums; }
 .products-table tbody tr { cursor: pointer; }
-.products-table tbody tr:focus-visible { outline: 2px solid var(--market-focus); outline-offset: -2px; }
+.products-table tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .products-table th.number, .products-table td.number { text-align: right; }
 .products-sort { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; font-weight: 650; }
-.products-sort:focus-visible { outline: 2px solid var(--market-focus); outline-offset: 2px; }
+.products-sort:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .products-table th[aria-sort="ascending"] .products-sort::after { content: "▲" / ""; font-size: 10px; }
 .products-table th[aria-sort="descending"] .products-sort::after { content: "▼" / ""; font-size: 10px; }
 .product-card[hidden] { display: none; }
@@ -94,27 +94,27 @@
 .product-name { font-weight: 650; }
 .product-open { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .product-open:hover { text-decoration: underline; }
-.product-category { font-size: 12px; color: var(--market-muted); }
-.products-table .is-down { color: var(--market-negative); }
-.products-table .is-up { color: var(--market-positive); }
-.product-card { display: grid; gap: 14px; min-width: 0; padding: 20px 22px; background: var(--market-surface); border-radius: 14px; box-shadow: var(--market-raised); position: sticky; top: 16px; }
+.product-category { font-size: 12px; color: var(--ink-2); }
+.products-table .is-down { color: var(--loss); }
+.products-table .is-up { color: var(--gain); }
+.product-card { display: grid; gap: 14px; min-width: 0; padding: 20px 22px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); position: sticky; top: 16px; }
 .product-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .product-card-head h2, .product-card p { margin: 0; }
-.product-card-category { font-size: 12.5px; color: var(--market-muted); }
+.product-card-category { font-size: 12.5px; color: var(--ink-2); }
 .product-card-margin { font-size: 2.2rem; font-weight: 750; letter-spacing: -.03em; line-height: 1.1; }
-.product-card-margin.is-loss { color: var(--market-negative); }
-.product-card-note, .product-card-missing { padding: 10px 12px; border-radius: 8px; background: var(--market-warn-wash); color: var(--market-warn-ink); font-size: 13px; }
+.product-card-margin.is-loss { color: var(--loss); }
+.product-card-note, .product-card-missing { padding: 10px 12px; border-radius: 8px; background: var(--warn-bg); color: var(--warn); font-size: 13px; }
 .product-card-facts { display: grid; gap: 0; margin: 0; }
-.product-card-facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--market-line); }
-.product-card-facts dt { color: var(--market-muted); font-size: 13px; }
+.product-card-facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); }
+.product-card-facts dt { color: var(--ink-2); font-size: 13px; }
 .product-card-facts dd { margin: 0; font-weight: 650; text-align: right; }
-.product-margin-path { fill: none; stroke: var(--viz-contribution); stroke-width: 2; }
-.product-margin-point { fill: var(--viz-contribution); }
-.product-margin-point.is-current { stroke: var(--market-surface); stroke-width: 2; }
+.product-margin-path { fill: none; stroke: var(--bar); stroke-width: 2; }
+.product-margin-point { fill: var(--bar); }
+.product-margin-point.is-current { stroke: var(--card); stroke-width: 2; }
 .product-source { display: grid; gap: 14px; }
 .product-source-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 .product-source-head h2, .product-source-note { margin: 0; }
-.product-source-note { color: var(--market-muted); font-size: 13px; }
+.product-source-note { color: var(--ink-2); font-size: 13px; }
 @media (max-width: 1180px) {
   .products-layout { grid-template-columns: minmax(0, 1fr); }
   .product-card { position: static; }
