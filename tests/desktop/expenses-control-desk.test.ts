@@ -110,6 +110,7 @@ test("a confirmed earlier month is shown as a hint under each group, an unconfir
     await page.evaluate(revision => window.esmer.confirmExpenseCompleteness({ period: "2025-09", reviewedRevision: revision, complete: true, reason: "Sentetik onay" }), september.expenseRevision);
     await setMonth(page, "2025-09"); await setMonth(page, "2025-10");
     await expect(page.locator("[data-group=rent]")).toContainText("Eylül: 40,00 ₺");
-    await expect(page.locator("[data-group=staff]")).toContainText("Eylül: kayıt yok");
+    // A group without a line in the confirmed month gives no hint.
+    await expect(page.locator("[data-group=staff]")).not.toContainText("Eylül");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

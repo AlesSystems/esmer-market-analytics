@@ -22,7 +22,7 @@ test("net profit: absent before the confirmation on Bu ay, shown after it, withd
     await openSection(page, "Giderler");
     await expect(page.getByRole("heading", { name: "Ekim 2025 giderleri", level: 1 })).toBeVisible();
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
-    await expect(page.getByText("Kayıt bulunmaması, gider olmadığı anlamına gelmez.", { exact: true })).toBeVisible();
+    await expect(page.getByText("Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.", { exact: true })).toBeVisible();
     await expect(page.getByRole("complementary", { name: "Bu ayın net kârı" })).toHaveCount(0);
     await expect(page.getByText("Tahmini net kâr")).toHaveCount(0);
     const save = (requestId: string, category: string, net: string) => page.evaluate(({ requestId, category, net }) => window.esmer.createExpense({ action: "save", requestId, duplicateReview: null, fields: { date: "2025-10-05", paymentDate: null, category, classification: "operating-expense", net, tax: "0", gross: net, taxTreatment: "non-recoverable", taxEvidence: "synthetic-tax", supportingReference: null, sourceReference: null, labourPeriod: null, loss: null } } as never), { requestId, category, net });

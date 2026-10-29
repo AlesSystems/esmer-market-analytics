@@ -75,7 +75,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
     await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-01");
     await app.evaluate(() => { const db = Reflect.get(globalThis, "manualExpenseTestLock"); db.exec("COMMIT"); db.close(); Reflect.deleteProperty(globalThis, "manualExpenseTestLock"); });
     await expect(page.locator("#expense-manual")).toBeFocused();
-    await expect(page.getByText("Elle girildi · sürüm 1", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "İncele / düzelt", exact: true })).toBeVisible();
     const original = await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" })); if (original.status !== "expenses") throw Error("expenses missing");
     await page.evaluate(id => localStorage.setItem("esmer.pending-manual-expense", id), (original.rows[0].value as {origin: {requestId: string}}).origin.requestId);
     await app.evaluate(({ session }) => session.fromPartition("persist:esmer").flushStorageData());
@@ -98,7 +98,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
     await expect(page.getByRole("button", { name: "İncele / düzelt", exact: true })).toHaveCount(2);
     await page.locator(`[id="expense-record-${original.rows[0].entityId}"]`).click();
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik iptal kontrolü"); await page.getByRole("button", { name: "Gideri geri al", exact: true }).click();
-    await expect(page.getByRole("cell", { name: /^Geri alındı/ })).toBeVisible();
+    await expect(page.getByRole("cell", { name: /Geri alındı$/ })).toBeVisible();
     await page.locator(`[id="expense-record-${original.rows[0].entityId}"]`).click();
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik geri yükleme"); await page.getByRole("button", { name: "Sürüm 1 geri yükle", exact: true }).click();
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ rows: expect.arrayContaining([expect.objectContaining({ revision: 4 })]) });
