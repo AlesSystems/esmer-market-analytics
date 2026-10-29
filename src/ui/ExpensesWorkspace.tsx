@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ManualExpenseEntry, pendingExpenseKey } from "./ManualExpenseEntry";
 import { useExpenseNavigation } from "./expense-navigation";
 import { ExpenseEditor, currentValue, type Run } from "./expenses/ExpenseEditor";
@@ -9,6 +9,7 @@ import { classificationLabels, type ExpensePeriod, type ExpensePreview, type Exp
 import type { ExpenseGroupKey } from "../expenses/groups";
 import { date, money } from "./format";
 import { attentionText, blankSentence, confirmPlan, confirmReason, groupLabels, statusText } from "./expenses/copy";
+import { AppFrame } from "./frame";
 import { stepMonth } from "./month-step";
 import { monthName } from "./pages/month-summary";
 const failed = "Yerel hizmete ulaşılamadı. Yeniden deneyin.";
@@ -23,6 +24,7 @@ function Amount({ value }: { value: string }) {
 /** Giderler for one month: the four monthly totals built from the month's lines, one confirmation, and the lines themselves. */
 export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true }: { active?: boolean; period: string; onPeriod?: (period: string) => void; onNetProfit?: () => void }) {
   const navigation = useExpenseNavigation();
+  const frame = useContext(AppFrame);
   const [savedPeriod, setSavedPeriod] = useState<{ incurred: string; payment: string | null; related: string }>();
   const [task, setTask] = useState<"records" | "manual" | "import">("records");
   const opener = useRef<() => void>(() => undefined);
@@ -59,7 +61,8 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     finally { if (id === generation.current) setLoading(false); }
     return false;
   }
-  useEffect(() => { if (!active) { if (task === "manual" && !busy && !localStorage.getItem(pendingExpenseKey)) setTask("records"); return; } if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setAsking(false); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active]);
+  // An open draft is kept while Kaynak belgeler, Canlı bağlantı or Hakkında cover the page; only recovery (which already asked the owner) drops it.
+  useEffect(() => { if (!active) { if (task === "manual" && !busy && !localStorage.getItem(pendingExpenseKey) && frame?.view === "recovery") setTask("records"); return; } if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setAsking(false); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active]);
   // The month before is read once for the hints under the groups. It is shown only when the owner confirmed that month.
   const before = stepMonth(period, -1, null);
   const loaded = !!view;
@@ -113,8 +116,8 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     {task === "import" && preview && <ImportPreview preview={preview} keep={keep} setKeep={setKeep} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); returnToRecords(); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
     {loadError && <div className="g-note is-warn" role="alert"><span>{loadError}</span><button type="button" className="btn btn-secondary" disabled={loading} onClick={() => void load()}>Giderleri yeniden yükle</button></div>}
     {loading && !view && <p role="status" className="g-muted">Giderler yükleniyor…</p>}
-    {view && plan && showMonth && <>
-      <section className="card g-main" aria-labelledby="g-main-title">
+    {showMonth && (view || manual) && <>
+      {view && plan && <section className="card g-main" aria-labelledby="g-main-title">
         <div className="g-card-head"><h2 id="g-main-title">Aylık toplamlar</h2>
           <div className="g-links">
             <button type="button" className="link" id="expense-import" disabled={locked} onClick={importExcel}><UploadIcon />Excel’den içe aktar</button>
@@ -161,14 +164,14 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
             </div>
           </div>}
         </div>
-      </section>
+      </section>}
       <section className="card g-recs" aria-labelledby="g-recs-title">
         <div className="g-card-head"><h2 id="g-recs-title">Kayıtlar</h2>
           {!manual && <button type="button" className="btn btn-secondary" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}><PlusIcon />Elle ekle</button>}
         </div>
         <p className="g-muted">Excel’den ya da elle girilen her satır burada. Toplamlar bu satırlardan hesaplanır.</p>
         {manual && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { if (!current) return; setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
-        {view.rows.length === 0 ? <p className="g-none">Bu ay için kayıt yok.</p>
+        {!view ? null : view.rows.length === 0 ? <p className="g-none">Bu ay için kayıt yok.</p>
           : <div className="table-scroll g-table" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih</th><th>Kategori</th><th className="number">Tutar</th><th>Durum</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => {
             const value = currentValue(row);
             return <tr key={row.entityId}>
@@ -180,7 +183,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
             </tr>;
           })}</tbody></table></div>}
       </section>
-      <MonthDetails view={view} />
+      {view && <MonthDetails view={view} />}
     </>}
     {view && selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} />}
   </main>;
