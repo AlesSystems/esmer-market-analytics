@@ -2,12 +2,10 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import {
-  bridgeLayout, compactMoney, niceTicks, rankLayout, toNumber,
+  bridgeLayout, compactMoney, niceTicks, toNumber,
 } from "../../src/ui/charts/geometry";
 import { Bridge } from "../../src/ui/charts/Bridge";
 import { ChartFrame } from "../../src/ui/charts/ChartFrame";
-import { EstimateBadge } from "../../src/ui/charts/EstimateBadge";
-import { RankBars } from "../../src/ui/charts/RankBars";
 
 const money = (value: string) => `${value.replace(".", ",")} ₺`;
 
@@ -44,28 +42,7 @@ describe("compact money and numbers", () => {
   });
 });
 
-describe("rank and bridge layout", () => {
-  test("rank bars start at zero, extend negatives leftwards and stub unknown values", () => {
-    const layout = rankLayout([{ id: "a", value: "100" }, { id: "b", value: "-50" }, { id: "c", value: null }, { id: "d", value: "0" }]);
-    expect(layout.zero).toBeCloseTo((50 / 150) * 100, 5);
-    const [a, b, c, d] = layout.rows;
-    expect(a).toMatchObject({ kind: "value", negative: false });
-    expect(a.left).toBeCloseTo(layout.zero, 5);
-    expect(a.left + a.width).toBeCloseTo(100, 5);
-    expect(b.negative).toBe(true);
-    expect(b.left + b.width).toBeCloseTo(layout.zero, 5);
-    expect(c.kind).toBe("unknown");
-    expect(c.width).toBeGreaterThan(0);
-    expect(d.width).toBe(0);
-  });
-
-  test("rank bars honour a shared max and survive all-unknown input", () => {
-    expect(rankLayout([{ id: "a", value: "50" }], 200).rows[0].width).toBeCloseTo(25, 5);
-    const none = rankLayout([{ id: "a", value: null }]);
-    expect(none.rows[0].kind).toBe("unknown");
-    expect(Number.isFinite(none.zero)).toBe(true);
-  });
-
+describe("bridge layout", () => {
   test("bridge floats minus steps from the running total and keeps unknown separate", () => {
     const layout = bridgeLayout([
       { label: "Satış", value: "1000", kind: "total" },
@@ -124,40 +101,6 @@ describe("rendering", () => {
     expect(two).toContain("Bilinmiyor");
   });
 
-  test("RankBars passes the clicked button to onSelect and renders focusKey as data-focus-key", () => {
-    const rows = [{ id: "a", label: "Ürün A", value: "10", focusKey: "rank-a", onSelect: () => undefined }, { id: "b", label: "Ürün B", value: "5" }];
-    const markup = renderToStaticMarkup(h(RankBars, { rows, color: "red", formatValue: money }));
-    expect(markup).toMatch(/<button[^>]*data-focus-key="rank-a"/);
-    expect(markup.match(/data-focus-key/g)).toHaveLength(1);
-    const element = h(RankBars, { rows, color: "red", formatValue: money }) as { type: (props: unknown) => { props: { children: { key: string; props: { children: { props: { onClick: (event: { currentTarget: string }) => void } } } }[] } } };
-    let received: unknown;
-    const tree = element.type({ rows: [{ ...rows[0], onSelect: (button: unknown) => { received = button; } }], color: "red", formatValue: money });
-    tree.props.children[0].props.children.props.onClick({ currentTarget: "the-button" });
-    expect(received).toBe("the-button");
-  });
-
-  test("RankBars prints exact values, never draws null as a bar and names it Bilinmiyor", () => {
-    const markup = renderToStaticMarkup(h(RankBars, {
-      color: "var(--viz-sales)", formatValue: money, ariaLabel: "Ürün sıralaması",
-      rows: [
-        { id: "a", label: "Ürün A", value: "1234.50", detail: "3 satır" },
-        { id: "b", label: "Ürün B", value: null },
-        { id: "c", label: "Ürün C", value: "-5.00", onSelect: () => undefined },
-      ],
-    }));
-    expect(markup).toContain('aria-label="Ürün sıralaması"');
-    expect(markup).toContain("1234,50 ₺");
-    expect(markup).toContain("3 satır");
-    const unknownRow = markup.split("<li").find((part) => part.includes("Ürün B"))!;
-    expect(unknownRow).toContain("Bilinmiyor");
-    expect(unknownRow).toContain('data-state="unknown"');
-    expect(unknownRow).not.toContain("viz-bar--value");
-    expect(markup).toContain("<button");
-    expect(markup).toContain("viz-bar--negative");
-    expect(markup).not.toContain("NaN");
-    expect(renderToStaticMarkup(h(RankBars, { rows: [], color: "red", formatValue: money, empty: "Ürün yok." }))).toContain("Ürün yok.");
-  });
-
   test("Bridge renders every step with operator, value and a hatched unknown step", () => {
     const markup = renderToStaticMarkup(h(Bridge, {
       formatValue: money,
@@ -177,11 +120,4 @@ describe("rendering", () => {
     expect(renderToStaticMarkup(h(Bridge, { steps: [], formatValue: money, empty: "Adım yok." }))).toContain("Adım yok.");
   });
 
-  test("EstimateBadge is a details disclosure with the fixed chip text", () => {
-    const markup = renderToStaticMarkup(h(EstimateBadge, null, h("p", null, "Sözleşme anlamı")));
-    expect(markup).toContain("<details");
-    expect(markup).toMatch(/<summary[^>]*>[^]*Doğrulanmamış tahmin[^]*<\/summary>/);
-    expect(markup).toContain("Sözleşme anlamı");
-    expect(markup).not.toContain(" open");
-  });
 });

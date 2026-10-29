@@ -61,28 +61,6 @@ export function roundedBarPath(x: number, y: number, w: number, h: number, round
 export type Span = { left: number; width: number; negative: boolean; kind: "value" | "unknown" };
 const UNKNOWN_STUB = 8;
 
-export function rankLayout(rows: { id: string; value: string | null }[], max?: number): { zero: number; rows: (Span & { id: string })[] } {
-  const values = rows.map((row) => toNumber(row.value));
-  const known = values.filter((value): value is number => value !== null);
-  const posMax = Math.max(0, ...known);
-  const negMax = Math.max(0, ...known.map((value) => -value));
-  const hi = posMax > 0 ? (max ?? posMax) : 0;
-  const lo = negMax > 0 ? -(max ?? negMax) : 0;
-  const span = hi - lo || 1;
-  const zero = (-lo / span) * 100;
-  return {
-    zero,
-    rows: rows.map((row, index) => {
-      const value = values[index];
-      if (value === null) return { id: row.id, kind: "unknown", negative: false, left: Math.min(zero, 100 - UNKNOWN_STUB), width: UNKNOWN_STUB };
-      const width = Math.min(100, (Math.abs(value) / span) * 100);
-      return value < 0
-        ? { id: row.id, kind: "value", negative: true, left: zero - width, width }
-        : { id: row.id, kind: "value", negative: false, left: zero, width };
-    }),
-  };
-}
-
 export type BridgeKind = "total" | "minus" | "result" | "unknown";
 export type BridgeStep = { label: string; value: string | null; kind: BridgeKind; detail?: string };
 export type BridgeRow = Omit<Span, "kind"> & { index: number; kind: BridgeKind; value: string | null };

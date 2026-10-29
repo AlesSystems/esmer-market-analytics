@@ -34,6 +34,31 @@ export function monthSummary(month:string,t:{sales:string|null;grossProfit:strin
  return loss||t.marginPct.startsWith("-")?`${gross} — ${base} 100 ₺'lik satışta ${whole(t.marginPct)} ₺ zarar.`:`${gross} — ${base} 100 ₺'lik satıştan ${whole(t.marginPct)} ₺.`;
 }
 
+const dative=["Ocak'a","Şubat'a","Mart'a","Nisan'a","Mayıs'a","Haziran'a","Temmuz'a","Ağustos'a","Eylül'e","Ekim'e","Kasım'a","Aralık'a"];
+export const monthLocative=(month:string)=>locative[index(month)];
+export const monthDative=(month:string)=>dative[index(month)];
+const previousOf=(month:string)=>{const d=new Date(`${month}-01T00:00:00Z`);d.setUTCMonth(d.getUTCMonth()-1);return d.toISOString().slice(0,7);};
+
+/** "Ekim'de 1,97 milyon ₺ satış yaptınız. Tahmini brüt kâr": the sentence the hero amount completes. */
+export function monthLead(month:string,sales:string|null):string {
+ return sales===null?`${names[index(month)]} ayının satış tutarı bilinmiyor. Tahmini brüt kâr`:`${locative[index(month)]} ${wordMoney(sales)} satış yaptınız. Tahmini brüt kâr`;
+}
+
+/** "Her 100 ₺'lik satıştan 15 ₺ kâr kaldı."; the margin is over known-cost sales, and the line says so whenever some sales have no cost. Null when the margin is unknown. */
+export function marginLine(t:{marginPct:string|null;unknownCostSales:string}):string|null {
+ if(t.marginPct===null)return null;
+ const base=!/^-?0+(\.0+)?$/.test(t.unknownCostSales)?"Maliyeti bilinen her":"Her";
+ return t.marginPct.startsWith("-")?`${base} 100 ₺'lik satışta ${whole(t.marginPct)} ₺ zarar.`:`${base} 100 ₺'lik satıştan ${whole(t.marginPct)} ₺ kâr kaldı.`;
+}
+
+/** "Eylül'e göre %10,60 fazla"; the percentage is the service's, only its sign is read. Null without a comparison. */
+export function monthChange(month:string,pct:string|null):string|null {
+ if(pct===null)return null;
+ const against=`${dative[index(previousOf(month))]} göre`;
+ if(/^-?0+(\.0+)?$/.test(pct))return `${against} değişmedi`;
+ return `${against} ${percentText(positive(pct))} ${pct.startsWith("-")?"az":"fazla"}`;
+}
+
 type BridgeTotals={sales:string|null;knownCostSales:string;cost:string|null;grossProfit:string|null;unknownCostSales:string;unknownSaleAmounts:number;expenses:string|null;netProfit:string|null};
 type Step={label:string;value:string|null;kind:"total"|"minus"|"result"|"unknown";detail?:string};
 const zero=(value:string)=>/^-?0+(\.0+)?$/.test(value);

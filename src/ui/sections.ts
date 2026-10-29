@@ -1,10 +1,11 @@
 import type {Availability,RequestError} from "../domain/contracts";
+import type {QuickFilter} from "./products/product-rows";
 
 /** The three top tabs, in order. Each one owns exactly one page component in src/ui/pages. */
 export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","Giderler"]] as const;
 export type Section=typeof sections[number][0];
-/** Optional state carried by a navigation, e.g. the product to open on Ürünler. */
-export type NavigationState={productId?:string};
+/** Optional state carried by a navigation: the product to open on Ürünler, or the filter to start it with. */
+export type NavigationState={productId?:string;filter?:QuickFilter};
 export type Coverage={from:string;to:string;last:string|null};
 
 /** Every page receives these props and nothing else. */

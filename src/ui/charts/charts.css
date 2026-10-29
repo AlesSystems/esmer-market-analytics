@@ -96,3 +96,6 @@
 .viz-estimate>summary,.viz-estimate-body{border:1px solid CanvasText}
 }
 .viz-zero-marker{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+
+/* the bridge inside the "Nasıl hesaplandı?" popover */
+.viz-bridge .viz-row-label small { margin-top: 0; }

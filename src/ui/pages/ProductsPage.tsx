@@ -92,7 +92,7 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
   <td><button type="button" className="product-name product-open" onClick={event=>{event.stopPropagation();open(p.id);}}>{productName(p)}</button>{p.category&&<span className="product-category">{p.category}</span>}</td>
   <td className="number">{amount(p.sales)}</td><td className="number">{amount(p.cost)}</td><td className="number">{amount(p.grossProfit)}</td><td className="number">{percent(p.marginPct)}</td><td className="number"><PointsChange value={p.marginChangePoints}/></td>
  </tr>;
- return <Shell busy={loading} chip={<TrustChip/>}>
+ return <Shell busy={loading} chip={<TrustChip costKnownPct={view.totals.costKnownPct}/>}>
   <p className="products-note">{monthName(view.month)} · {view.products.length} ürün</p>
   <div className="products-tools">
    <div role="group" aria-label="Hızlı süzgeçler" className="products-filters">{quickFilters.map(([key,label])=><Button key={key} variant={filter===key?"default":"outline"} aria-pressed={filter===key} onClick={()=>setFilter(key)}>{label}</Button>)}</div>
