@@ -1,27 +1,30 @@
 import {expect,test} from "vitest";
-import {monthSummary,wordMoney,monthName,percentText} from "../../src/ui/pages/month-summary";
+import {changeArrow,marginLine,monthChange,monthDative,monthLead,monthLocative,wordMoney,monthName,percentText} from "../../src/ui/pages/month-summary";
 
-const totals={sales:"1970000",grossProfit:"296000.4",marginPct:"15.03"};
-
-test("the summary sentence reads sales, gross profit and the per-100 figure in plain Turkish",()=>{
- expect(monthSummary("2025-10",totals)).toBe("Ekim'de 1,97 milyon ₺ satış yaptınız; tahmini brüt kâr 296 bin ₺ — her 100 ₺'lik satıştan 15 ₺.");
- expect(monthSummary("2025-08",{sales:"480",grossProfit:"57.5",marginPct:"13.37"})).toBe("Ağustos'ta 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — her 100 ₺'lik satıştan 13 ₺.");
+test("the lead names the month and the word-money sales; the hero amount follows it",()=>{
+ expect(monthLead("2025-10","1970000")).toBe("Ekim'de 1,97 milyon ₺ satış yaptınız. Tahmini brüt kâr");
+ expect(monthLead("2025-08","480")).toBe("Ağustos'ta 480 ₺ satış yaptınız. Tahmini brüt kâr");
+ expect(monthLead("2025-10",null)).toBe("Ekim ayının satış tutarı bilinmiyor. Tahmini brüt kâr");
 });
 
-test("with unknown-cost sales the per-100 figure names its base: known-cost sales",()=>{
- expect(monthSummary("2025-10",{sales:"480",grossProfit:"57.5",marginPct:"13.37",unknownCostSales:"50"})).toBe("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — maliyeti bilinen her 100 ₺'lik satıştan 13 ₺.");
- expect(monthSummary("2025-10",{sales:"480",grossProfit:"57.5",marginPct:"13.37",unknownCostSales:"0.00"})).toBe("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — her 100 ₺'lik satıştan 13 ₺.");
- expect(monthSummary("2025-09",{sales:"40",grossProfit:"-4",marginPct:"-10.00",unknownCostSales:"5"})).toBe("Eylül'de 40 ₺ satış yaptınız; tahmini brüt zarar 4 ₺ — maliyeti bilinen her 100 ₺'lik satışta 10 ₺ zarar.");
+test("months take their Turkish locative and dative endings",()=>{
+ expect(["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12"].map(monthLocative))
+  .toEqual(["Ocak'ta","Şubat'ta","Mart'ta","Nisan'da","Mayıs'ta","Haziran'da","Temmuz'da","Ağustos'ta","Eylül'de","Ekim'de","Kasım'da","Aralık'ta"]);
+ expect(["2025-01","2025-04","2025-09","2025-10","2025-11","2025-12"].map(monthDative)).toEqual(["Ocak'a","Nisan'a","Eylül'e","Ekim'e","Kasım'a","Aralık'a"]);
 });
 
-test("a loss reads as a loss, never as a negative gain",()=>{
- expect(monthSummary("2025-09",{sales:"40",grossProfit:"-4",marginPct:"-10.00"})).toBe("Eylül'de 40 ₺ satış yaptınız; tahmini brüt zarar 4 ₺ — her 100 ₺'lik satışta 10 ₺ zarar.");
+test("the per-100 line reads from the margin and names its base when some sales have no cost",()=>{
+ expect(marginLine({marginPct:"15.03",unknownCostSales:"0.00"})).toBe("Her 100 ₺'lik satıştan 15 ₺ kâr kaldı.");
+ expect(marginLine({marginPct:"13.37",unknownCostSales:"50"})).toBe("Maliyeti bilinen her 100 ₺'lik satıştan 13 ₺ kâr kaldı.");
+ expect(marginLine({marginPct:"-10.00",unknownCostSales:"0"})).toBe("Her 100 ₺'lik satışta 10 ₺ zarar.");
+ expect(marginLine({marginPct:null,unknownCostSales:"0"})).toBeNull();
 });
 
-test("unknown values drop out of the sentence instead of printing null or zero",()=>{
- expect(monthSummary("2025-10",{sales:"480",grossProfit:null,marginPct:null})).toBe("Ekim'de 480 ₺ satış yaptınız; maliyetler bilinmediği için brüt kâr hesaplanamadı.");
- expect(monthSummary("2025-10",{sales:null,grossProfit:null,marginPct:null})).toBe("Ekim ayının satış tutarı bilinmiyor.");
- expect(monthSummary("2025-10",{sales:"480",grossProfit:"57.5",marginPct:null})).toBe("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺.");
+test("the change against last month reads fewer or more, with the dative month",()=>{
+ expect(monthChange("2025-10","10.60")).toBe("Eylül'e göre %10,60 fazla");
+ expect(monthChange("2025-10","-4.00")).toBe("Eylül'e göre %4,00 az");
+ expect(monthChange("2026-01","0.00")).toBe("Aralık'a göre değişmedi");
+ expect(monthChange("2025-10",null)).toBeNull();
 });
 
 test("word money and month names",()=>{
@@ -42,4 +45,13 @@ test("the money unit is chosen after rounding",()=>{
 test("a negative percentage puts the sign before the percent mark",()=>{
  expect(percentText("-10.00")).toBe("-%10,00");
  expect(percentText("13.37")).toBe("%13,37");
+});
+
+test("the change arrow points up for a rise, down for a fall and is absent for zero or no comparison", () => {
+  expect(changeArrow("10.60")).toBe("up");
+  expect(changeArrow("-3.20")).toBe("down");
+  expect(changeArrow("0")).toBeNull();
+  expect(changeArrow("0.00")).toBeNull();
+  expect(changeArrow("-0.00")).toBeNull();
+  expect(changeArrow(null)).toBeNull();
 });

@@ -6,6 +6,7 @@ import {openStore} from "../../src/store/store";
 import {writeRawEstimatePackage} from "../../src/source/raw-package";
 import {richEstimateSnapshot} from "../helpers/rich-estimate-fixture";
 import {executablePath} from "../helpers/desktop-executable";
+import {setMonth} from "../helpers/desktop-navigation";
 
 // Synthetic names and categories for the rich fixture so the capture reads like a market.
 const names=["Süt 1 L","Beyaz peynir","Ekmek","Çay 1 kg","Toz şeker","Ayçiçek yağı","Yumurta 10'lu","Makarna","Pirinç","Domates salçası","Zeytin","Tereyağı","Yoğurt","Ayran","Su 1,5 L","Kola 1 L","Bisküvi","Çikolata","Deterjan","Bulaşık sıvısı","Tuvalet kâğıdı","Kahve","Un","Mercimek","Nohut","Bulgur","Sucuk","Kaşar","Limon","Patates","Soğan","Elma","Muz","Portakal","Sabun","Şampuan","Diş macunu","Peçete","Çöp torbası","Kibrit","Tuz","Sirke","Ketçap","Mayonez","Bal","Reçel","Helva","Lokum"];
@@ -23,10 +24,10 @@ test("capture Bu ay evidence",async()=>{
   const app=await electron.launch({executablePath,args:[`--user-data-dir=${profile}`]});
   try{
    const page=await app.firstWindow();await expect(page.getByRole("navigation",{name:"Ana gezinme"})).toBeVisible();
-   for(const size of [{width:1440,height:900},{width:1024,height:768}]){
+   for(const size of [{width:1440,height:900},{width:1100,height:560}]){
     await app.evaluate(({BrowserWindow},v)=>BrowserWindow.getAllWindows()[0].setContentSize(v.width,v.height),size);
     for(const [month,name] of shots){
-     if(month)await page.getByLabel("Dönem",{exact:true}).fill(month);
+     if(month)await setMonth(page,month);
      await expect(page.getByRole("heading",{level:1}).first()).toBeVisible();await page.locator(".app-body").focus();await page.waitForTimeout(700);
      await page.screenshot({path:join(directory,`${name}-${size.width}.png`)});
     }

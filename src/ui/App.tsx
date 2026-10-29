@@ -1,26 +1,29 @@
 import { validSelectedMonth, type SelectedMonth } from "../domain/month";
 import { ExpenseNavigationProvider, useExpenseNavigation } from "./expense-navigation";
-import { followedMonth } from "./month-follow";
+import { followedMonth, localMonth } from "./month-follow";
 import { initialSourceQuery } from "./source-query";
 import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { useCallback, useEffect, useRef, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import { OperationProgress } from "./OperationProgress";
 import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
 import { AppShell } from "./AppShell";
 import { AppFrame, type FrameView, type LaunchRequest } from "./frame";
 import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
-import { LiveBadge, SettingsPage } from "./settings/SettingsPage";
-import { useLiveConnection } from "./settings/live";
+import { LivePanel } from "./settings/LivePanel";
+import { SettingsMenu } from "./shell/SettingsMenu";
+import { MonthStepper } from "./shell/MonthStepper";
+import { ExcelExport } from "./shell/ExcelExport";
+import { SourceDocuments } from "./source-documents/SourceDocuments";
+import { MonthProfitProvider } from "./pages/month-profit-data";
+import { liveTrouble, useLiveConnection } from "./settings/live";
 import { importSqlSource } from "./sql-import";
 import type { Coverage, NavigationState, PageProps, Section } from "./sections";
 import { MonthPage } from "./pages/MonthPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
-import { ReportsPage } from "./pages/ReportsPage";
 
-const pages: Record<Section, ComponentType<PageProps>> = { month: MonthPage, products: ProductsPage, expenses: ExpensesPage, reports: ReportsPage };
+const pages: Record<Section, ComponentType<PageProps>> = { month: MonthPage, products: ProductsPage, expenses: ExpensesPage };
 const unavailable = { status: "unavailable", code: "SERVICE_UNAVAILABLE", message: "Yerel hizmete ulaşılamadı. Uygulamayı yeniden açın." } satisfies Availability;
 function importMessage(result: ImportOutcome | RequestError | JobOutcome): string {
   switch (result.status) {
@@ -66,25 +69,27 @@ function App() {
   const [navigationState, setNavigationState] = useState<NavigationState>({});
   const [launchRequest, setLaunchRequest] = useState<LaunchRequest | null>(null);
   const opener = useRef<HTMLElement | null>(null);
-  const focusPending = useRef(false);
   const show = useCallback((next: FrameView, after?: () => void) => {
     if (current.current === next) {after?.();return;}
     const transition = () => {
       const previous = current.current;
       if (previous === next) return;
       if (previous === "workspace") opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      if (next === "settings") focusPending.current = true;
       if (next === "workspace") requestAnimationFrame(() => {
         if (document.activeElement && document.activeElement !== document.body) return;
         (opener.current?.isConnected ? opener.current : document.querySelector<HTMLElement>(".settings-entry"))?.focus();
       });
       current.current = next; setFrameView(next); after?.();
     };
-    if (next === "settings" || current.current === "settings" && next === "workspace" && !after) transition(); else expenseNavigation.leave(transition);
+    // Live connection and Kaynak belgeler keep the workspace (and any open expense draft) mounted underneath, so entering and leaving them needs no draft prompt.
+    const light = (view: FrameView) => view === "live" || view === "documents";
+    if (light(next) || light(current.current) && next === "workspace" && !after) transition(); else expenseNavigation.leave(transition);
   }, [expenseNavigation.leave]);
-  const claimFocus = useCallback(() => { const pending = focusPending.current; focusPending.current = false; return pending; }, []);
   const sectionRef = useRef<Section>("month");
+  // Bu ay and Ürünler share one read of the month; leaving Giderler may have changed the expenses it was computed with, so it is read again.
+  const [expensesLeft, setExpensesLeft] = useState(0);
   const navigate = useCallback((next: Section, state: NavigationState = {}) => { if (next === sectionRef.current && !Object.keys(state).length) return; expenseNavigation.leave(() => {
+    if (sectionRef.current === "expenses" && next !== "expenses") setExpensesLeft(count => count + 1);
     sectionRef.current = next;
     setSection(next); setNavigationState(state); setLaunchRequest({ destination: next, sequence: ++launchSequence.current });
   }); }, [expenseNavigation.leave]);
@@ -133,42 +138,48 @@ function App() {
       }));
       if (outcome?.status === "cancelled") setSqlNotice("SQL içe aktarma iptal edildi.");
       else if (outcome?.status === "live" && outcome.live.phase === "idle" && !outcome.configurationError) show("workspace");
-      else show("settings");
+      else show("live");
     } finally { setSqlImporting(false); }
   }
   function restored() { show("workspace", () => navigate("month")); refreshAvailability(); }
   const ready = availability?.status === "ready" ? availability : undefined;
   const notices = <>
     <OperationProgress />
-    {monthSaveError && <p role="alert">{monthSaveError} <Button variant="outline" onClick={() => {if(selectedMonth)selectMonth(selectedMonth);}}>Dönemi kaydetmeyi yeniden dene</Button></p>}
+    {monthSaveError && <p role="alert">{monthSaveError} <Button variant="secondary" onClick={() => {if(selectedMonth)selectMonth(selectedMonth);}}>Dönemi kaydetmeyi yeniden dene</Button></p>}
     {(!result || result.status === "cancelled" || result.status === "historical") && ready?.lastImportError && <p role="alert">{previousImportMessage(ready)}</p>}
-    {sqlNotice && <div className="import-outcome"><p role={sqlNotice === "SQL içe aktarma iptal edildi." ? "status" : "alert"}>{sqlNotice}</p><Button variant="ghost" onClick={() => setSqlNotice("")}>Bildirimi kapat</Button></div>}
-    {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="ghost" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
+    {sqlNotice && <div className="import-outcome"><p role={sqlNotice === "SQL içe aktarma iptal edildi." ? "status" : "alert"}>{sqlNotice}</p><Button variant="link" onClick={() => setSqlNotice("")}>Bildirimi kapat</Button></div>}
+    {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="link" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
   </>;
+  const dataset = ready?.store === "loaded" ? ready.dataset : undefined;
   const overlay = frameView === "recovery"
-    ? <RecoveryWorkspace embedded onClose={() => show("workspace")} onRestored={restored} />
-    : <SettingsPage availability={availability} source={coverage ?? undefined} sourceResolution={availability && availability.status !== "ready" ? { status: "failed", message: availability.message } : resolution}
-      live={live} importing={importing} sqlImporting={sqlImporting} onImportPackage={() => expenseNavigation.leave(() => void importPackage())} onImportSql={() => expenseNavigation.leave(() => void importSql())} onRecovery={() => show("recovery")} onClose={() => show("workspace")} claimFocus={claimFocus} />;
+    ? <RecoveryWorkspace onClose={() => show("workspace")} onRestored={restored} />
+    : frameView === "live"
+      ? <LivePanel live={live} cutoff={coverage?.last ?? live.status?.cutoff ?? dataset?.cutoff} hasData={!!coverage || !!dataset} sqlImporting={sqlImporting} onImportSql={() => expenseNavigation.leave(() => void importSql())} onClose={() => show("workspace")} />
+      : frameView === "documents" && selectedMonth ? <SourceDocuments month={selectedMonth} availability={availability} onClose={() => show("workspace")} /> : null;
   const onMonth = useCallback((month: string) => { if (validSelectedMonth(month)) expenseNavigation.leave(() => selectMonth(month)); }, [expenseNavigation.leave, selectMonth]);
   const Page = pages[section];
   // Without any data there is no latest month to pick; pages read the current month until data arrives, without remembering it.
-  const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? new Date().toISOString().slice(0, 7) : null);
-  const reportsVisited = useRef(false);
-  const reportsState = useRef<NavigationState>({});
+  const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? localMonth(new Date()) : null);
   const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
   if (ready) lastReady.current = ready;
   const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
-  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
+  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="secondary" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="secondary" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
   // A page that was open stays mounted (hidden) through a failed or pending availability refresh, so its open detail survives a retry.
   const pageAvailability = ready ?? lastReady.current;
-  if (section === "reports") reportsVisited.current = true;
-  if (section === "reports") reportsState.current = navigationState;
-  // Rapor ve Excel stays mounted (hidden, inactive) once visited, so an open report or document survives other sections.
-  const reports = preferencesReady && pageAvailability && reportsVisited.current ? <div hidden={section !== "reports"}><ReportsPage month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={section === "reports" && frameView === "workspace" && !!ready} state={reportsState.current} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /></div> : undefined;
-  const page = preferencesReady && pageAvailability && section !== "reports" ? <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={frameView === "workspace" && !!ready} state={navigationState} navigate={navigate} openSettings={() => show("settings")} openRecovery={() => show("recovery")} refresh={refreshAvailability} /> : undefined;
-  const content = <>{!(ready && (page || reports)) && (failure ?? loading)}<div className="page-host" hidden={!(ready && (page || reports))}>{page}{reports}</div></>;
-  return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices, connection: <LiveBadge state={live.state} onOpen={() => show("settings")} /> }}>
-    <AppShell section={section} navigate={navigate} controls={<label className="period-label">Dönem<Input type="month" lang="tr" value={selectedMonth ?? ""} onChange={event => onMonth(event.target.value)} /></label>}>{content}</AppShell>
+  const active = frameView === "workspace" && !!ready;
+  const revision = useMemo(() => ({ availability: pageAvailability, expensesLeft }), [pageAvailability, expensesLeft]);
+  const page = preferencesReady && pageAvailability ? <Page key={section} month={pageMonth} onMonth={onMonth} coverage={coverage} availability={pageAvailability} active={active} state={navigationState} navigate={navigate} importPackage={() => expenseNavigation.leave(() => void importPackage())} refresh={refreshAvailability} /> : undefined;
+  const content = <>{!(ready && page) && (failure ?? loading)}<div className="page-host" hidden={!(ready && page)}>{page}</div></>;
+  const controls = <>
+    <MonthStepper month={pageMonth} coverage={section === "expenses" ? null : coverage} onMonth={onMonth} />
+    <ExcelExport month={pageMonth} revision={revision} />
+  </>;
+  const menu = <SettingsMenu availability={availability} coverage={coverage} resolution={availability && availability.status !== "ready" ? { status: "failed", message: availability.message } : resolution} liveState={live.state} liveAttention={liveTrouble(live.status, live.state)} importing={importing} sqlImporting={sqlImporting}
+    documentsEnabled={!!selectedMonth && !!ready} onImportPackage={() => expenseNavigation.leave(() => void importPackage())} onRecovery={() => show("recovery")} onLive={() => show("live")} onDocuments={() => show("documents")} />;
+  return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices }}>
+    <MonthProfitProvider month={pageMonth} active={active} revision={revision}>
+      <AppShell section={section} navigate={navigate} controls={controls} menu={menu}>{content}</AppShell>
+    </MonthProfitProvider>
   </AppFrame.Provider>;
 }
 createRoot(document.getElementById("root")!).render(<ExpenseNavigationProvider><App /></ExpenseNavigationProvider>);

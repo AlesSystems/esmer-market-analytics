@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { businessPackage } from "../helpers/business-fixtures";
 import { openStore } from "../../src/store/store";
-import {openSettings, openWorkspace } from "../helpers/desktop-navigation";
+import {openSettingsItem, openWorkspace } from "../helpers/desktop-navigation";
 // The financial Özet desk was removed (#103); preserved local sales are read from Rapor ve Excel › Veri ve kaynak.
 
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin"
@@ -25,7 +25,7 @@ test("packaged SQL connection preserves local reports and encrypts configuration
   try {
     let page = await app.firstWindow();await openWorkspace(page);
     await expect(page.getByRole("heading", {name: "Bu ay", level: 1})).toBeVisible();
-    await openSettings(page);
+    await openSettingsItem(page, /^Canlı bağlantı/);
     await expect(page.getByRole("button", {name: "Bağlantıyı değiştir", exact: true})).toHaveCount(0);
     await app.evaluate(({dialog}, path) => {dialog.showOpenDialog = async () => ({canceled: false, filePaths: [path]});}, sourceFile);
     await page.getByRole("button", {name: "SQL kaynağını içe aktar", exact: true}).click();
@@ -33,11 +33,11 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     if (configured) {
       await expect(page.getByText("Kaynak kayıtlarının özeti", {exact: false})).toBeVisible({timeout: 30_000});
       expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "idle", lastRecord: "preview"}});
-      await openSettings(page);
+      await openSettingsItem(page, /^Canlı bağlantı/);
     } else {
       await expect(page.getByText("Kaynağa ulaşılamadı.", {exact: true})).toBeVisible({timeout: 30_000});
       expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "stale", lastSuccessAt: null}});
-      await expect(page.getByRole("button", {name: "Canlı kaynak doğrulanamadı", exact: true})).toBeVisible();
+      await expect(page.getByRole("status").filter({hasText: "Güncellik doğrulanamadı"})).toBeVisible();
       await page.getByRole("button", {name: "Şimdi yenile", exact: true}).click();
       await expect(page.getByText("Kaynağa ulaşılamadı.", {exact: true})).toBeVisible({timeout: 30_000});
     }
@@ -52,13 +52,13 @@ test("packaged SQL connection preserves local reports and encrypts configuration
     await expect(liveTile.getByRole("button", {name: "Bağlantıyı değiştir", exact: true})).toBeVisible();
     await liveTile.getByRole("button", {name: "Bağlantıyı kapat", exact: true}).click();
     await expect.poll(() => page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
-    await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
+    await page.getByRole("button", {name: "Ana sayfaya dön", exact: true}).click();
     await app.close();
     app = await electron.launch({executablePath, args: [`--user-data-dir=${userData}`]});
     page = await app.firstWindow();await openWorkspace(page);
-    await openSettings(page);
+    await openSettingsItem(page, /^Canlı bağlantı/);
     expect(await page.evaluate(() => window.esmer.getLiveStatus())).toMatchObject({status: "live", configured: true, live: {phase: "disabled"}});
-    await page.getByRole("button", {name: "Ayarları kapat", exact: true}).click();
+    await page.getByRole("button", {name: "Ana sayfaya dön", exact: true}).click();
     await app.close();
     const store = openStore(join(userData, "analytics.sqlite"));
     try {expect(store.readSnapshot()).toEqual(before);} finally {store.close();}

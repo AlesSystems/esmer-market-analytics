@@ -1,4 +1,4 @@
-import { openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { monthLabel, openSection, openWorkspace, setMonth } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -23,15 +23,12 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
     await expect(page.getByLabel("KDV tutarı (TRY)", { exact: true })).toHaveValue("");
     await page.getByLabel("Kategori", { exact: true }).fill("Sentetik elektrik");
     await expect(page.getByRole("alertdialog")).toHaveCount(0);
-    const period = page.locator(".sidebar").getByLabel("Dönem", { exact: true }), previous = await period.inputValue();
-    if (host === "sales") {
-      await period.fill("9999-01"); await expect(page.getByRole("alertdialog")).toHaveCount(0);
-      await expect(period).toHaveValue(previous);
-      await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
-    }
-    await period.fill("2026-01");
+    const stepper = page.getByRole("group", { name: "Dönem", exact: true }), previous = await monthLabel(page).getAttribute("data-month");
+    const earlier = stepper.getByRole("button", { name: "Önceki ay", exact: true });
+    const step = await earlier.getAttribute("aria-disabled") === "true" ? stepper.getByRole("button", { name: "Sonraki ay", exact: true }) : earlier;
+    await step.click();
     await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
-    await expect(period).toHaveValue(previous);
+    await expect(monthLabel(page)).toHaveAttribute("data-month", previous!);
     await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
     await openSection(page, "Bu ay");
@@ -39,8 +36,8 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
     await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
     await expect(nav.getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
-    await period.fill("2026-01"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
-    await expect(period).toHaveValue("2026-01");
+    await step.click(); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    await expect(monthLabel(page)).not.toHaveAttribute("data-month", previous!);
     await page.locator("#expense-manual").click();
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("");
     await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
@@ -51,8 +48,8 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-save-"));
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    let page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click();
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-01");
+    let page = await app.firstWindow();await openWorkspace(page); await openSection(page, "Giderler");
+    await setMonth(page, "2026-01");
     await page.locator("#expense-manual").click(); await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByLabel("Gider tarihi", { exact: true })).toBeFocused();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik elektrik");
@@ -73,22 +70,21 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
     });
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-02");
+    await page.getByRole("group", { name: "Dönem", exact: true }).getByRole("button", { name: "Sonraki ay", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Kaydın sonucu bekleniyor", exact: true })).toBeVisible();
-    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2026-01");
+    await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-01");
     await app.evaluate(() => { const db = Reflect.get(globalThis, "manualExpenseTestLock"); db.exec("COMMIT"); db.close(); Reflect.deleteProperty(globalThis, "manualExpenseTestLock"); });
     await expect(page.locator("#expense-manual")).toBeFocused();
-    await page.getByText(/^Tüm kayıtlar/).click();
-    await expect(page.getByText("Elle girildi · sürüm 1", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "İncele / düzelt", exact: true })).toBeVisible();
     const original = await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" })); if (original.status !== "expenses") throw Error("expenses missing");
     await page.evaluate(id => localStorage.setItem("esmer.pending-manual-expense", id), (original.rows[0].value as {origin: {requestId: string}}).origin.requestId);
     await app.evaluate(({ session }) => session.fromPartition("persist:esmer").flushStorageData());
     await app.close(); app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] }); page = await app.firstWindow();await openWorkspace(page);
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).not.toBeNull();
-    await page.getByRole("button", { name: "Giderler", exact: true }).click(); await expect(page.locator(".notice[role=status]")).toContainText("Gider kaydedildi.");
+    await openSection(page, "Giderler"); await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBeNull();
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ rows: [expect.objectContaining({ revision: 1 })] });
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await page.locator("#expense-manual").click();
+    await setMonth(page, "2026-01"); await page.locator("#expense-manual").click();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik ayrı elektrik");
     await page.getByLabel("Net tutar (TRY)", { exact: true }).fill("1250,50"); await page.getByLabel("KDV tutarı (TRY)", { exact: true }).fill("0"); await page.getByLabel("Brüt tutar (TRY)", { exact: true }).fill("1250,50");
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
@@ -99,11 +95,10 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByLabel("Benzer kayıtları inceledim; bu ayrı bir gider", { exact: true })).not.toBeChecked();
     await page.getByLabel("Benzer kayıtları inceledim; bu ayrı bir gider", { exact: true }).check(); await page.getByRole("button", { name: "Ayrı gider olarak kaydet", exact: true }).click();
-    await page.getByText(/^Tüm kayıtlar/).click();
     await expect(page.getByRole("button", { name: "İncele / düzelt", exact: true })).toHaveCount(2);
     await page.locator(`[id="expense-record-${original.rows[0].entityId}"]`).click();
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik iptal kontrolü"); await page.getByRole("button", { name: "Gideri geri al", exact: true }).click();
-    await expect(page.getByRole("cell", { name: /^Geri alındı/ })).toBeVisible();
+    await expect(page.getByRole("cell", { name: /Geri alındı$/ })).toBeVisible();
     await page.locator(`[id="expense-record-${original.rows[0].entityId}"]`).click();
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik geri yükleme"); await page.getByRole("button", { name: "Sürüm 1 geri yükle", exact: true }).click();
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ rows: expect.arrayContaining([expect.objectContaining({ revision: 4 })]) });
@@ -113,7 +108,7 @@ test("manual save validates fields, reviews duplicates, restores focus and resol
 test("an in-flight save loses its renderer reply and resolves through the retained request identity", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-lost-reply-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.locator("#expense-manual").click();
+    const page = await app.firstWindow();await openWorkspace(page); await openSection(page, "Giderler"); await page.locator("#expense-manual").click();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik kayıp yanıt");
     for (const label of ["Net tutar (TRY)", "KDV tutarı (TRY)", "Brüt tutar (TRY)"]) await page.getByLabel(label, { exact: true }).fill(label === "KDV tutarı (TRY)" ? "0" : "75");
     await app.evaluate(({ app }) => {
@@ -124,8 +119,8 @@ test("an in-flight save loses its renderer reply and resolves through the retain
     const requestId = await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense")); expect(requestId).not.toBeNull();
     await page.reload({ waitUntil: "domcontentloaded" });await openWorkspace(page);
     await app.evaluate(() => { const db = Reflect.get(globalThis, "manualExpenseTestLock"); db.exec("COMMIT"); db.close(); Reflect.deleteProperty(globalThis, "manualExpenseTestLock"); });
-    await page.getByRole("button", { name: "Giderler", exact: true }).click();
-    await expect(page.locator(".notice[role=status]")).toContainText("Gider kaydedildi.");
+    await openSection(page, "Giderler");
+    await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBeNull();
     expect(await page.evaluate(id => window.esmer.createExpense({ action: "resolve", requestId: id! }), requestId)).toMatchObject({ status: "already-saved", revision: 1 });
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ rows: [expect.objectContaining({ revision: 1 })] });
@@ -134,17 +129,17 @@ test("an in-flight save loses its renderer reply and resolves through the retain
 test("an absent pending receipt requires current-record review before another manual submission", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-absent-receipt-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();await openWorkspace(page); await expect(page.getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
+    const page = await app.firstWindow();await openWorkspace(page); await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Giderler", exact: true })).toBeVisible();
     await page.evaluate(() => localStorage.setItem("esmer.pending-manual-expense", "absent-after-older-backup"));
-    await page.getByRole("button", { name: "Giderler", exact: true }).click();
+    await openSection(page, "Giderler");
     await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
     await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBe("absent-after-older-backup");
-    await page.getByRole("button", { name: "Giderlere dön", exact: true }).click(); await page.locator("#expense-manual").click();
+    await page.getByRole("button", { name: "Vazgeç", exact: true }).click(); await page.locator("#expense-manual").click();
     await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
-    await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
+    await setMonth(page, "2026-01"); await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
     await page.screenshot({ path: testInfo.outputPath("manual-review-required.png"), fullPage: true });
     await page.getByRole("button", { name: "Kayıtları incele", exact: true }).click();
@@ -157,14 +152,14 @@ test("an absent pending receipt requires current-record review before another ma
 test("a payment outside the displayed incurred month offers the payment month without changing selection", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-payment-")), app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    const page = await app.firstWindow();await openWorkspace(page); await page.getByRole("button", { name: "Giderler", exact: true }).click(); await page.getByLabel("Dönem", { exact: true }).fill("2026-01"); await page.locator("#expense-manual").click();
+    const page = await app.firstWindow();await openWorkspace(page); await openSection(page, "Giderler"); await setMonth(page, "2026-01"); await page.locator("#expense-manual").click();
     await page.getByLabel("Gider tarihi", { exact: true }).fill("2026-01-15"); await page.getByLabel("Ödeme tarihi (isteğe bağlı)", { exact: true }).fill("2026-02-01"); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik ayrı ödeme ayı");
     for (const label of ["Net tutar (TRY)", "KDV tutarı (TRY)", "Brüt tutar (TRY)"]) await page.getByLabel(label, { exact: true }).fill(label === "KDV tutarı (TRY)" ? "0" : "75");
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByRole("button", { name: "O aya git", exact: true })).toBeVisible();
     await expect(page.getByText("Gider ayı: 2026-01", { exact: false })).toContainText("Ödeme ayı: 2026-02");
-    await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2026-01");
-    await page.getByRole("button", { name: "O aya git", exact: true }).click(); await expect(page.getByLabel("Dönem", { exact: true })).toHaveValue("2026-02");
+    await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-01");
+    await page.getByRole("button", { name: "O aya git", exact: true }).click(); await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-02");
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-02" }))).toMatchObject({ incurred: "0", payments: "75" });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -175,16 +170,16 @@ for (const host of ["source"] as const) test(`leaving Giderler keeps a manual dr
   try {
     const page = await app.firstWindow();await openWorkspace(page);
     const nav = page.getByRole("navigation", { name: "Ana gezinme" });
-    await expect(page.locator(".sidebar").getByLabel("Dönem", { exact: true })).not.toHaveValue("");
+    await expect(monthLabel(page)).not.toHaveAttribute("data-month", "");
     await openSection(page, "Giderler");
-    await page.locator(".sidebar").getByLabel("Dönem", { exact: true }).fill("2024-01");
+    await setMonth(page, "2024-01");
     await page.locator("#expense-manual").click(); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik korunacak taslak");
-    await openSection(page, "Rapor ve Excel"); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
+    await openSection(page, "Ürünler"); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
     await expect(nav.getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
-    await openSection(page, "Rapor ve Excel"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
-    await expect(nav.getByRole("button", { name: "Rapor ve Excel", exact: true })).toHaveAttribute("aria-current", "page");
-    await expect(page.locator(".sidebar").getByLabel("Dönem", { exact: true })).toHaveValue("2024-01");
+    await openSection(page, "Ürünler"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    await expect(nav.getByRole("button", { name: "Ürünler", exact: true })).toHaveAttribute("aria-current", "page");
+    await expect(monthLabel(page)).toHaveAttribute("data-month", "2024-01");
     await openSection(page, "Giderler"); await expect(page.getByRole("alertdialog")).toHaveCount(0);
     await page.locator("#expense-manual").click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }

@@ -11,11 +11,11 @@ import { estimatePackage } from "../helpers/estimate-fixture";
 import { writeRawPackage } from "../../src/source/raw-package";
 import { rawSnapshot } from "../helpers/raw-fixture";
 import { writeFile } from "node:fs/promises";
-import { importPackage, openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { importPackage, monthLabel, openSection, openSettings, openSettingsItem, openWorkspace, setMonth, settingsMenu } from "../helpers/desktop-navigation";
 
 const nav = (page: Page) => page.getByRole("navigation", { name: "Ana gezinme" });
 
-test("every packaged launch opens Bu ay with the four sections and Settings in reach", async () => {
+test("every packaged launch opens Bu ay with the three tabs and the gear in reach", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-"));
   try {
     for (let launch = 0; launch < 2; launch++) {
@@ -24,11 +24,11 @@ test("every packaged launch opens Bu ay with the four sections and Settings in r
         const page = await app.firstWindow();
         await openWorkspace(page);
         await expect(page.getByRole("heading", { name: "Marketinize bir bütün olarak bakın.", level: 1 })).toHaveCount(0);
-        await expect(nav(page).getByRole("button")).toHaveText(["Bu ay", "Ürünler", "Giderler", "Rapor ve Excel"]);
+        await expect(nav(page).getByRole("button")).toHaveText(["Bu ay", "Ürünler", "Giderler"]);
         await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
         await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
-        await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-        await expect(page.getByRole("heading", { name: "Ayarlar", level: 1, exact: true })).toBeVisible();
+        await openSettings(page);
+        await expect(settingsMenu(page).getByRole("button", { name: /^Veri paketi içe aktar/ })).toBeVisible();
       } finally {
         await app.close();
       }
@@ -39,7 +39,7 @@ test("every packaged launch opens Bu ay with the four sections and Settings in r
 });
 
 for (const source of [false, true]) {
-  test(`sections enter retained ${source ? "recorded-source" : "financial"} pages and remember month`, async () => {
+  test(`tabs enter retained ${source ? "recorded-source" : "financial"} pages and remember month`, async () => {
     const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-routes-"));
     const store = openStore(join(userData, "analytics.sqlite"));
     try {
@@ -52,7 +52,6 @@ for (const source of [false, true]) {
       await openWorkspace(page);
       const routes: [string, () => Promise<void>, () => Promise<void>][] = [
         ["Ürünler", () => openSection(page, "Ürünler"), () => expect(page.getByRole("heading", { name: "Ürünler", level: 1 })).toBeVisible()],
-        ["Rapor ve Excel", () => openSection(page, "Rapor ve Excel"), () => expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible()],
         ["Giderler", () => openSection(page, "Giderler"), () => expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toBeVisible()],
         ["Bu ay", () => openSection(page, "Bu ay"), () => expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible()],
       ];
@@ -60,14 +59,17 @@ for (const source of [false, true]) {
         await open();
         await expect(nav(page).getByRole("button", { name, exact: true })).toHaveAttribute("aria-current", "page");
         await check();
-        await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-        await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
+        await openSettingsItem(page, /^Canlı bağlantı/);
+        await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
         await expect(nav(page).getByRole("button", { name, exact: true })).toHaveAttribute("aria-current", "page");
         await check();
       }
-      await page.getByLabel("Dönem", { exact: true }).filter({ visible: true }).fill("2025-11");
       await openSection(page, "Giderler");
-      await expect(page.getByLabel("Dönem", { exact: true }).filter({ visible: true })).toHaveValue("2025-11");
+      await setMonth(page, "2025-11");
+      await openSection(page, "Ürünler");
+      await expect(monthLabel(page)).toHaveAttribute("data-month", "2025-11");
+      await openSection(page, "Giderler");
+      await expect(monthLabel(page)).toHaveAttribute("data-month", "2025-11");
       await page.locator("#expense-manual").click();
       await page.getByLabel("Kategori", { exact: true }).fill("Sentetik taslak");
       await openSection(page, "Bu ay");
@@ -79,7 +81,7 @@ for (const source of [false, true]) {
   });
 }
 
-test("Settings closes to its opener and import leaves later section requests usable", async () => {
+test("the gear menu closes to its opener and import leaves later section requests usable", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-welcome-import-"));
   const packagePath = join(userData, "synthetic.json");
   await writeFile(packagePath, estimatePackage());
@@ -87,18 +89,16 @@ test("Settings closes to its opener and import leaves later section requests usa
   try {
     const page = await app.firstWindow();
     await openWorkspace(page);
-    await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-    await page.getByRole("button", { name: "Ayarları kapat", exact: true }).click();
+    await openSettings(page);
+    await page.keyboard.press("Escape");
     await expect(page.getByRole("button", { name: "Ayarlar", exact: true })).toBeFocused();
     await expect(page.getByRole("heading", { name: "Kâr tahmini için veri paketi gerekiyor", exact: true })).toBeVisible();
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
-    await openSection(page, "Rapor ve Excel");
-    await expect(page.getByRole("heading", { name: "Rapor ve Excel", level: 1, exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Excel’e aktar", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Excel’e aktar", exact: true })).toBeEnabled();
     await openSection(page, "Giderler");
-    await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: / giderleri$/, level: 1 })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -116,8 +116,7 @@ test("launch keeps empty readiness and unavailable recovery reachable", async ()
     await expect(page.getByRole("heading", { name: "Yerel veriler açılamadı", exact: true })).toBeVisible();
     await openSection(page, "Giderler");
     await expect(page.getByRole("heading", { name: "Yerel veriler açılamadı", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
-    await page.getByRole("button", { name: "Yedekleme ve kurtarma", exact: true }).click();
+    await openSettingsItem(page, /^Yedekle \/ Geri yükle/);
     await expect(page.getByRole("heading", { name: "Yedekleme ve kurtarma", level: 1, exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Ana sayfaya dön", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Yerel veriler açılamadı", exact: true })).toBeVisible();
@@ -138,7 +137,7 @@ test("launch loads bundled assets without external requests or page errors", asy
     await openWorkspace(page);
     await expect(page.getByRole("img", { name: "Esmer Market" })).toBeVisible();
     expect(await page.getByRole("img", { name: "Esmer Market" }).evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
-    for (const section of ["Ürünler", "Giderler", "Rapor ve Excel", "Bu ay"] as const) await openSection(page, section);
+    for (const section of ["Ürünler", "Giderler", "Bu ay"] as const) await openSection(page, section);
     await expect(page.getByRole("heading", { name: "Bu ay", level: 1 })).toBeVisible();
     expect(externalRequests).toEqual([]);
     expect(failed).toEqual([]);

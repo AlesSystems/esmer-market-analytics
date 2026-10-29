@@ -3,78 +3,103 @@ import {mkdtemp,rm,writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {executablePath} from "../helpers/desktop-executable";
-import {openWorkspace,importPackage} from "../helpers/desktop-navigation";
+import {openWorkspace,monthLabel,setMonth} from "../helpers/desktop-navigation";
 import {monthProfitPackage} from "../helpers/month-profit-fixture";
 
-const figure=(page:Page,name:string)=>page.getByRole("region",{name:"Ayın rakamları"}).getByRole("article").filter({has:page.getByRole("heading",{name,exact:true})});
+const hero=(page:Page)=>page.getByRole("region",{name:"Ayın özeti"});
+const netCard=(page:Page)=>page.getByRole("region",{name:/[Nn]et kâr$/});
+const attention=(page:Page)=>page.getByRole("list",{name:"Dikkat edilecekler"}).getByRole("button");
 
-test("Bu ay opens at launch with four sections, and an imported estimate package answers the month in one screen",async()=>{
+test("Bu ay opens at launch with three tabs, and an imported estimate package answers the month in one screen",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"bu-ay-")),file=join(userData,"month.json");await writeFile(file,monthProfitPackage());
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   let page=await app.firstWindow();await openWorkspace(page);
   const nav=page.getByRole("navigation",{name:"Ana gezinme"});
-  await expect(nav.getByRole("button")).toHaveText(["Bu ay","Ürünler","Giderler","Rapor ve Excel"]);
+  await expect(nav.getByRole("button")).toHaveText(["Bu ay","Ürünler","Giderler"]);
   await expect(nav.getByRole("button",{name:"Bu ay",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("button",{name:"Ayarlar",exact:true})).toBeVisible();
-  await expect(page.getByRole("button",{name:"Karşılama",exact:true})).toHaveCount(0);
+  await expect(page.getByRole("button",{name:"Rapor ve Excel"})).toHaveCount(0);
   // No estimate package yet: one sentence and the way to import one.
   await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Ayarlar",level:1})).toBeVisible();
   await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
-  await importPackage(page);
+  await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
   // First use selects the latest month in the package.
   await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
-  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
-  await expect(page.getByText("Ekim'de 480 ₺ satış yaptınız; tahmini brüt kâr 57,5 ₺ — maliyeti bilinen her 100 ₺'lik satıştan 13 ₺.",{exact:true})).toBeVisible();
-  await expect(figure(page,"Satış").locator("strong")).toHaveText("480,00 ₺");
-  await expect(figure(page,"Satış")).toContainText("Önceki ayla karşılaştırılamıyor");
-  await expect(figure(page,"Tahmini brüt kâr").locator("strong")).toHaveText("57,50 ₺");
-  await expect(figure(page,"Tahmini brüt kâr")).toContainText("Önceki ayla karşılaştırılamıyor");
-  await expect(figure(page,"Marj").locator("strong")).toHaveText("%13,37");
-  await expect(figure(page,"Marj")).toContainText("▼ 6,63 puan önceki aya göre");
-  await expect(figure(page,"Tahmini net kâr")).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
-  await expect(page.locator(".viz-estimate")).toHaveCount(1);
-  // The trust chip leads to Rapor ve Excel.
-  await page.locator(".viz-estimate summary").click();
-  await page.getByRole("button",{name:"Ayrıntılar Rapor ve Excel’de",exact:true}).click();
-  await expect(nav.getByRole("button",{name:"Rapor ve Excel",exact:true})).toHaveAttribute("aria-current","page");
-  await expect(page.getByRole("heading",{name:"Rapor ve Excel",level:1})).toBeVisible();
-  await nav.getByRole("button",{name:"Bu ay",exact:true}).click();
+  await expect(monthLabel(page)).toHaveText("Ekim 2025");
+  await expect(monthLabel(page)).toHaveAttribute("data-month","2025-10");
+  await expect(hero(page).getByText("Ekim'de 480 ₺ satış yaptınız. Tahmini brüt kâr",{exact:true})).toBeVisible();
+  await expect(hero(page).locator(".hero-num")).toHaveText("57,50 ₺");
+  await expect(hero(page)).toContainText("Önceki ayla karşılaştırılamıyor");
+  await expect(hero(page).getByText("Maliyeti bilinen her 100 ₺'lik satıştan 13 ₺ kâr kaldı.",{exact:true})).toBeVisible();
+  // One trust chip per page, and the bridge behind "Nasıl hesaplandı?".
+  await expect(page.getByRole("button",{name:"Tahmini",exact:true})).toHaveCount(1);
+  await page.getByRole("button",{name:"Tahmini",exact:true}).click();
+  await expect(page.getByRole("dialog",{name:"Tahmini hakkında"})).toContainText("Son alış fiyatıyla tahmin");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog",{name:"Tahmini hakkında"})).toBeHidden();
+  await page.getByRole("button",{name:"Nasıl hesaplandı?",exact:true}).click();
   await expect(page.getByRole("list",{name:"Satıştan net kâra köprü"}).locator('li[data-state="unknown"]')).toHaveCount(3);
-  await expect(page.getByRole("list",{name:"En çok kazandıran ürünler"}).getByRole("button").first()).toContainText("Süt");
-  const attention=page.getByRole("list",{name:"Dikkat edilecek ürünler"}).getByRole("button");
-  await expect(attention).toHaveText([
-   "Zarar ediyorEkmekBrüt zarar 4,00 ₺",
-   "Marjı düştüSütMarj %31,50 → %30,00",
-   "Marjı düştüŞekerMarj %40,00 → %20,00",
-   "Çok satıyor ama marjı düşükÇaySatış 200,00 ₺ · marj %5,00",
-   "Çok satıyor ama marjı düşükEkmekSatış 40,00 ₺ · marj -%10,00",
-   "Maliyeti eksikPeynirSatış 50,00 ₺ · maliyet kaydı yok",
+  await page.keyboard.press("Escape");
+  // Net card: the month is not complete, so it says so and offers no expense step.
+  await expect(netCard(page)).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
+  await expect(netCard(page).getByRole("button")).toHaveCount(0);
+  // Attention: one row per product, at most four, then one aggregate missing-cost row.
+  await expect(attention(page)).toHaveText([
+   "EkmekZarar ediyorBrüt zarar 4,00 ₺",
+   "SütMarjı düştüMarj %31,50 → %30,00",
+   "ŞekerMarjı düştüMarj %40,00 → %20,00",
+   "ÇayÇok satıyor ama marjı düşükSatış 200,00 ₺ · marj %5,00",
+   "1 ürünün alış fiyatı yokSatışları kâra katılmadı; sıfır sayılmadı",
   ]);
-  await attention.first().click();
-  await expect(page.getByRole("heading",{name:"Ürünler",level:1})).toBeVisible();
-  await expect(page.locator('tr[data-product="3"]')).toHaveAttribute("aria-current","true");
-  await expect(page.locator('tr[data-product="3"]')).toBeFocused();
+  // Six-month bars from the history: three months here, the current one highlighted.
+  const bars=page.getByRole("img",{name:"Son 6 ayın brüt kârı"});
+  await expect(bars.locator("g[data-month]")).toHaveCount(3);
+  await expect(bars.locator("g[data-month='2025-10'] .bar")).toHaveClass(/is-current/);
+  await attention(page).first().click();
+  await expect(nav.getByRole("button",{name:"Ürünler",exact:true})).toHaveAttribute("aria-current","page");
+  await expect(page.getByRole("dialog",{name:"Ekmek"})).toBeVisible();
+  // The aggregate row opens Ürünler filtered to the products without a purchase price.
+  await page.getByRole("button",{name:"Bu ay",exact:true}).click();
+  await attention(page).last().click();
+  await expect(page.getByRole("button",{name:/^Alış fiyatı yok/})).toHaveAttribute("aria-pressed","true");
+  await expect(page.locator(".products-table tbody tr")).toHaveCount(1);
   // A full month without expenses: net profit names the missing step and leads to Giderler.
   await page.getByRole("button",{name:"Bu ay",exact:true}).click();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
+  await setMonth(page,"2025-09");
   await expect(page.getByRole("heading",{name:"Eylül 2025",level:1})).toBeVisible();
-  await expect(figure(page,"Tahmini net kâr")).toContainText("Bu ayın giderleri girilmedi");
-  await figure(page,"Tahmini net kâr").getByRole("button",{name:"Giderlere git",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Giderler",level:1})).toBeVisible();
-  // Months outside the package say which months it covers.
+  await expect(netCard(page)).toContainText("Bu ayın giderleri girilmedi");
+  await netCard(page).getByRole("button",{name:"Giderleri gir",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Eylül 2025 giderleri",level:1})).toBeVisible();
+  // The stepper stops at the data range: the package covers 01.08.2025 – 20.10.2025.
+  const stepper=page.getByRole("group",{name:"Dönem",exact:true});
   await page.getByRole("button",{name:"Bu ay",exact:true}).click();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-12");
-  await expect(page.getByText("Veri paketi 01.08.2025 – 20.10.2025 arasını kapsıyor. Bu aralıktan bir ay seçin.",{exact:true})).toBeVisible();
-  await page.getByRole("button",{name:"Son aya git (Ekim 2025)",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-08");
+  await setMonth(page,"2025-10");
+  await expect(stepper.getByRole("button",{name:"Sonraki ay",exact:true})).toHaveAttribute("aria-disabled","true");
+  await stepper.getByRole("button",{name:"Sonraki ay",exact:true}).click({force:true});
+  await expect(monthLabel(page)).toHaveAttribute("data-month","2025-10");
+  await setMonth(page,"2025-08");
+  await expect(stepper.getByRole("button",{name:"Önceki ay",exact:true})).toHaveAttribute("aria-disabled","true");
   await expect(page.getByRole("heading",{name:"Ağustos 2025",level:1})).toBeVisible();
-  await expect(figure(page,"Satış")).not.toContainText("önceki aya göre");
+  await expect(hero(page)).not.toContainText("göre");
   // The remembered month survives a restart and Bu ay opens directly.
   await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();
   await expect(page.getByRole("heading",{name:"Ağustos 2025",level:1})).toBeVisible();
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
+
+test("a remembered month outside the package says which months it covers and leads back",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"bu-ay-range-")),file=join(userData,"month.json");await writeFile(file,monthProfitPackage());
+ let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
+ try{
+  let page=await app.firstWindow();await openWorkspace(page);
+  await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
+  await page.getByRole("button",{name:"Veri paketi içe aktar",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
+  await page.evaluate(()=>window.esmer.setPreferences({selectedMonth:"2025-12"}));
+  await app.close();app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});page=await app.firstWindow();
+  await expect(page.getByText("Veri paketi 01.08.2025 – 20.10.2025 arasını kapsıyor. Bu aralıktan bir ay seçin.",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Son aya git (Ekim 2025)",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });

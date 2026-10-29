@@ -1,685 +1,346 @@
 ---
 name: Esmer Market
-description: A light, restrained desktop analysis system for an offline market owner.
+description: A clean light desktop answer sheet for one market owner: three top tabs, one azure accent, every figure in one place.
 colors:
-  background: "#ffffff"
-  foreground: "#202124"
-  primary: "#27272a"
-  primary-foreground: "#ffffff"
-  secondary: "#f4f4f5"
-  secondary-foreground: "#3f3f46"
-  muted-surface: "#fafafa"
-  muted: "#62626b"
-  accent: "#e6f2ef"
-  accent-foreground: "#215e54"
-  accent-border: "#bddbd2"
-  line: "#e1e1e5"
-  input: "#b7b7bf"
-  ring: "#28796b"
-  positive: "#236c59"
-  positive-chart: "#3a8a7a"
-  negative: "#b42318"
-  warning: "#fff8e9"
-  warning-foreground: "#80580b"
-  warning-border: "#e4cea4"
-  selection-background: "#cae7df"
-  overview-blue: "#2459d5"
-  overview-ink: "#182644"
-  overview-muted: "#5c6980"
-  overview-line: "#dce3ee"
-  # Settings surface (Glazed Tile Panel): scoped to the Ayarlar page and the sidebar live badge.
-  settings-glaze: "#fbfaf6"
-  settings-grout: "#e4ddce"
-  settings-grout-light: "#efeae0"
-  settings-ink: "#18233f"
-  settings-ink-hover: "#26365f"
-  settings-ink-soft: "#4a5470"
-  settings-cobalt: "#1f3f9a"
-  settings-turquoise: "#0a665e"
-  settings-coral: "#b03a25"
-  settings-saffron: "#d99a1b"
-  settings-amber-wash: "#fff3d6"
-  settings-amber-ink: "#5c3d00"
-  settings-amber-seal: "#f2b84b"
-  settings-error-wash: "#fbe9e4"
-  settings-error-ink: "#8a2614"
-  settings-choice-line: "#cfc7b6"
-  settings-selection: "#c9d6f2"
-  # Welcome B: scoped to the launch page.
-  welcome-stage: "#244fcd"
-  welcome-action: "#2459d5"
-  welcome-action-hover: "#1942a4"
-  welcome-ink: "#182644"
-  welcome-launch: "#f5f6f9"
-  welcome-muted: "#59667d"
-  welcome-line: "#d4dbe6"
-  welcome-stage-muted: "#e0e8ff"
-  welcome-seal-line: "#7594ed"
-  welcome-local: "#526059"
-  welcome-local-dot: "#34715c"
-  welcome-guide: "#e9ede4"
-  welcome-focus: "#ae651d"
-  welcome-selection: "#cbd8f8"
-  welcome-scrollbar: "#aab4c5"
+  page: "#f5f7fa"
+  card: "#ffffff"
+  ink: "#18212e"
+  ink-muted: "#5b6472"
+  line: "#e3e7ee"
+  edge: "#c5ccd6"
+  field: "#8792a2"
+  soft: "#eef1f5"
+  hover: "#f2f5f9"
+  track: "#e7ebf1"
+  mute: "#a3abb7"
+  accent: "#0b6bcb"
+  accent-hover: "#0959ab"
+  accent-wash: "#e9f2fc"
+  accent-selection: "#d4e6f8"
+  chart-bar: "#5b97d9"
+  gain: "#0f7b51"
+  loss: "#bf2f2a"
+  loss-wash: "#fdecea"
+  warn: "#965a00"
+  warn-wash: "#fff4e2"
+  warn-line: "#ecd2a0"
 typography:
-  chart-label:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "11px"
-  status:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "12px"
-  supporting:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "13px"
-  headline:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(25px, 2.3vw, 32px)"
-    fontWeight: 650
-    lineHeight: 1.2
-    letterSpacing: "-0.025em"
-  amount:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(34px, 3.3vw, 48px)"
-    fontWeight: 650
-    lineHeight: 1.15
-    letterSpacing: "-0.035em"
-  title:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "18px"
-    fontWeight: 600
-    lineHeight: 1.35
-  body:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "15px"
-    fontWeight: 400
-    lineHeight: 1.5
-  ledger-value:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "17px"
-    fontWeight: 600
-  brand:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "20px"
+  hero:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "3.5rem"
     fontWeight: 700
-  panel-title:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "22px"
-  total:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "24px"
-  operating-total:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "25px"
-    fontWeight: 600
-  metric:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "30px"
-    fontWeight: 650
-  amount-compact:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "36px"
-    fontWeight: 650
+    lineHeight: 1.05
+    letterSpacing: "-0.03em"
+  net:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "2.25rem"
+    fontWeight: 700
     lineHeight: 1.15
-  label:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "14px"
-    fontWeight: 500
-  settings-display:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(28px, 2.6vw, 36px)"
-    fontWeight: 650
+    letterSpacing: "-0.02em"
+  headline:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "1.75rem"
+    fontWeight: 700
     lineHeight: 1.2
-    letterSpacing: "-0.025em"
-  settings-intro:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "15px"
-  settings-tile-title:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "20px"
-    fontWeight: 650
-    lineHeight: 1.3
-    letterSpacing: "-0.012em"
-  settings-band-line:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "13.5px"
-    lineHeight: 1.45
-  settings-status:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "13px"
+    letterSpacing: "-0.02em"
+  lead:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 500
+    lineHeight: 1.4
+  title:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.35
+    letterSpacing: "-0.01em"
+  body:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+    fontFeature: "tnum"
+  label:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "0.875rem"
     fontWeight: 600
     lineHeight: 1.5
-  settings-subhead:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "16px"
-    fontWeight: 650
-  settings-body:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "14px"
-    lineHeight: 1.55
-  settings-fact-label:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
+  chart-label:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
     fontSize: "13px"
-  settings-fact-value:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "17px"
     fontWeight: 600
-    fontFeature: "tnum"
-  settings-coverage-lead:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "28px"
-    fontWeight: 650
-    lineHeight: 1.1
-    letterSpacing: "-0.02em"
-    fontFeature: "tnum"
-  settings-action:
-    fontFamily: "Segoe UI, system-ui, sans-serif"
-    fontSize: "14.5px"
-    fontWeight: 600
-  welcome-display:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "clamp(45px, 4.7vw, 70px)"
-    fontWeight: 500
-    lineHeight: 1.12
-    letterSpacing: "-0.035em"
-  welcome-display-italic:
-    fontFamily: "Welcome Newsreader, serif"
+  chart-tick:
+    fontFamily: "Figtree Variable, Segoe UI, system-ui, sans-serif"
+    fontSize: "12px"
     fontWeight: 400
-  welcome-title:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "35px"
-    fontWeight: 500
-    letterSpacing: "-0.025em"
-  welcome-body:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "14px"
-    lineHeight: 1.8
-  welcome-action:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "16px"
-    fontWeight: 600
-  welcome-row-title:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "14px"
-    fontWeight: 600
-  welcome-row-description:
-    fontFamily: "Manrope Variable, sans-serif"
-    fontSize: "11px"
-  welcome-seal:
-    fontFamily: "Welcome Newsreader, serif"
-    fontSize: "43px"
 rounded:
-  control: "6px"
-  notice: "8px"
-  surface: "10px"
-  settings-tile: "6px"
-  settings-track: "4px"
-  settings-pill: "999px"
-  welcome-panel: "12px"
-  welcome-action: "8px"
+  bar: "3px"
+  xs: "4px"
+  sm: "8px"
+  md: "10px"
+  lg: "12px"
+  xl: "14px"
+  full: "999px"
 spacing:
-  compact: "8px"
-  control-inline: "12px"
-  field: "16px"
-  surface: "22px"
-  section: "24px"
-  page-inline: "32px"
-  settings-grout: "6px"
-  settings-action-gap: "10px"
-  settings-tile-compact: "16px"
-  settings-tile-block: "18px"
-  settings-tile-inline: "20px"
+  xs: "4px"
+  sm: "8px"
+  md: "12px"
+  lg: "20px"
+  xl: "28px"
+  page-x: "24px"
+  topbar: "64px"
 components:
-  welcome-action:
-    backgroundColor: "{colors.welcome-action}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.welcome-action}"
-    rounded: "{rounded.welcome-action}"
-    padding: "18px 20px"
-  welcome-action-hover:
-    backgroundColor: "{colors.welcome-action-hover}"
-    textColor: "{colors.primary-foreground}"
-  button-default:
-    backgroundColor: "{colors.primary}"
-    textColor: "{colors.primary-foreground}"
-    rounded: "{rounded.control}"
-    padding: "8px 12px"
+  tab:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-muted}"
+    typography: "{typography.body}"
+    padding: "0 14px"
+    height: "64px"
+  tab-active:
+    textColor: "{colors.ink}"
+  button-primary:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.card}"
+    rounded: "{rounded.md}"
+    padding: "0 18px"
+    height: "44px"
+  button-primary-hover:
+    backgroundColor: "{colors.accent-hover}"
+  button-secondary:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "0 18px"
+    height: "44px"
+  button-secondary-hover:
+    backgroundColor: "{colors.hover}"
+  button-top:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "0 14px"
     height: "40px"
-  button-outline:
-    backgroundColor: "{colors.background}"
-    textColor: "{colors.foreground}"
-    rounded: "{rounded.control}"
-    padding: "8px 12px"
+  chip-trust:
+    backgroundColor: "{colors.soft}"
+    textColor: "{colors.ink-muted}"
+    rounded: "{rounded.full}"
+    padding: "0 12px 0 9px"
+    height: "32px"
+  chip-trust-open:
+    backgroundColor: "{colors.accent-wash}"
+    textColor: "{colors.accent-hover}"
+  card:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.xl}"
+    padding: "24px 28px"
+  card-hero:
+    backgroundColor: "{colors.card}"
+    rounded: "{rounded.xl}"
+    padding: "20px 28px 12px"
+  fact-column:
+    padding: "10px 20px"
+  fact-column-missing:
+    rounded: "{rounded.lg}"
+
+    backgroundColor: "{colors.warn-wash}"
+    textColor: "{colors.warn}"
+  input-search:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "0 42px"
+    height: "46px"
+  segmented:
+    backgroundColor: "{colors.track}"
+    textColor: "{colors.ink-muted}"
+    rounded: "{rounded.md}"
+    padding: "3px"
+  segmented-selected:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.accent}"
+    rounded: "{rounded.sm}"
+    height: "36px"
+  month-stepper:
+    backgroundColor: "{colors.soft}"
+    rounded: "{rounded.md}"
+    padding: "3px"
     height: "40px"
-  input:
-    backgroundColor: "{colors.background}"
-    textColor: "{colors.foreground}"
-    rounded: "{rounded.control}"
-    padding: "8px 12px"
-    height: "40px"
-  badge-secondary:
-    backgroundColor: "{colors.secondary}"
-    textColor: "{colors.secondary-foreground}"
-    rounded: "{rounded.control}"
-    padding: "4px 8px"
-  badge-warning:
-    backgroundColor: "{colors.warning}"
-    textColor: "{colors.warning-foreground}"
-    rounded: "{rounded.control}"
-    padding: "4px 8px"
-  settings-tile:
-    backgroundColor: "{colors.settings-glaze}"
-    textColor: "{colors.settings-ink}"
-    rounded: "{rounded.settings-tile}"
-    padding: "18px 20px 20px"
-  settings-band-ink:
-    backgroundColor: "{colors.settings-ink}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.settings-tile-title}"
-    padding: "18px 20px 16px"
-  settings-band-cobalt:
-    backgroundColor: "{colors.settings-cobalt}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.settings-tile-title}"
-    padding: "18px 20px 16px"
-  settings-band-turquoise:
-    backgroundColor: "{colors.settings-turquoise}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.settings-tile-title}"
-    padding: "18px 20px 16px"
-  settings-band-coral:
-    backgroundColor: "{colors.settings-coral}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.settings-tile-title}"
-    padding: "18px 20px 16px"
-  settings-band-saffron:
-    backgroundColor: "{colors.settings-saffron}"
-    textColor: "{colors.settings-ink}"
-    typography: "{typography.settings-tile-title}"
-    padding: "18px 20px 16px"
-  settings-status-pill-stale:
-    backgroundColor: "{colors.settings-amber-wash}"
-    textColor: "{colors.settings-amber-ink}"
-    typography: "{typography.settings-status}"
-    rounded: "{rounded.settings-pill}"
-    padding: "4px 11px"
-  settings-action-primary:
-    backgroundColor: "{colors.settings-ink}"
-    textColor: "{colors.primary-foreground}"
-    typography: "{typography.settings-action}"
-    rounded: "{rounded.settings-tile}"
-    padding: "9px 16px"
-    height: "42px"
-  settings-action-primary-hover:
-    backgroundColor: "{colors.settings-ink-hover}"
-    textColor: "{colors.primary-foreground}"
-  settings-action-outline:
-    textColor: "{colors.settings-ink}"
-    typography: "{typography.settings-action}"
-    rounded: "{rounded.settings-tile}"
-    padding: "9px 16px"
-    height: "42px"
-  settings-action-quiet:
-    textColor: "{colors.settings-ink}"
-    rounded: "{rounded.settings-tile}"
-    padding: "9px 4px"
-    height: "42px"
-  settings-view-switch:
-    backgroundColor: "{colors.settings-grout-light}"
-    rounded: "{rounded.settings-tile}"
-    padding: "4px"
-  settings-view-switch-pressed:
-    backgroundColor: "{colors.settings-ink}"
-    textColor: "{colors.primary-foreground}"
-    rounded: "{rounded.settings-track}"
-    padding: "7px 14px"
-    height: "38px"
-  settings-size-choice:
-    backgroundColor: "{colors.background}"
-    textColor: "{colors.settings-ink}"
-    rounded: "{rounded.settings-tile}"
-    padding: "10px 6px"
-    height: "84px"
-  settings-size-choice-checked:
-    backgroundColor: "{colors.settings-ink}"
-    textColor: "{colors.primary-foreground}"
-  settings-coverage-track:
-    backgroundColor: "{colors.settings-grout-light}"
-    rounded: "{rounded.settings-track}"
-    height: "16px"
-  settings-seal:
-    rounded: "{rounded.settings-pill}"
-    size: "22px"
-  settings-notice-warning:
-    backgroundColor: "{colors.settings-amber-wash}"
-    textColor: "{colors.settings-amber-ink}"
-    rounded: "{rounded.settings-tile}"
-    padding: "10px 12px"
-  settings-notice-alert:
-    backgroundColor: "{colors.settings-error-wash}"
-    textColor: "{colors.settings-error-ink}"
-    rounded: "{rounded.settings-tile}"
-    padding: "10px 12px"
-  settings-live-badge:
-    textColor: "{colors.muted}"
-    rounded: "{rounded.control}"
-    padding: "4px 10px"
-    height: "34px"
-  settings-live-badge-on:
-    textColor: "{colors.settings-turquoise}"
-  settings-live-badge-stale:
-    textColor: "{colors.warning-foreground}"
+  menu:
+    backgroundColor: "{colors.card}"
+    rounded: "{rounded.xl}"
+    padding: "8px"
+    width: "352px"
+  drawer:
+    backgroundColor: "{colors.card}"
+    width: "440px"
+  ledger-row-selected:
+    backgroundColor: "{colors.accent-wash}"
+    height: "48px"
 ---
-
-## Owner workspace revision (2026-10-19)
-
-The current redesign direction is **Market ledger**: warm paper, dark olive navigation,
-brass focus accents and shallow layered surfaces. This revision supersedes the earlier
-cobalt/glazed aesthetic descriptions below; financial truth and interaction contracts remain.
-Implementation is centralized in `src/ui/owner-workspace.css`; the sidecar records its tokens.
-
-Manrope supports Turkish operational reading, with the existing Newsreader welcome accent.
-The hierarchy is owner question → covered contribution → daily movement → source evidence.
-Source estimates remain explicitly unverified. Returns excluded from contribution stay beside
-that headline; unknowns, valid zero and losses stay distinct. Quantitative marks remain 2D.
-
-Raised panels provide restrained depth without perspective distortion. Surfaces share cream
-`#f7f5ed` / `#fffef9`, olive ink `#243b32`, action `#315c45`, muted `#59685d`,
-and rules `#d8ddd0`. Dense content reflows at 1200, 800 and 500px; tables retain their
-own horizontal scroll area. A keyboard skip action reaches the workspace. Reduced motion
-and forced-colors are supported in CSS.
-
-Status: packaged macOS visual acceptance recorded on 2026-10-22 for wide, narrow,
-200% zoom and keyboard use. See [the acceptance receipt](docs/evidence/owner-workspace/2026-10-22-acceptance.md).
-Windows runtime and owner acceptance remain separate gates.
-The hosted preview is synthetic and does not provide desktop source/import/backup access.
-
 
 # Design System: Esmer Market
 
-## Selected Özet surface · Kontrol masası
-
-The owner selected prototype C and its blue palette on 2026-10-03. This direction governs the monthly overview and its active shell. Other workspaces and the settings panel retain their existing rules below. The website logo replaces the text brand across the shared shell, using a packaged local image.
-
-On 2026-10-06 the user approved issue 72's simpler composition while retaining this visual identity. The first reading level shows net sales with its comparable-period change, available covered estimated gross profit before operating expenses, and recorded expenses with their completeness qualification. A small daily-sales chart and product highlights follow. Detailed monthly reports open in Raporlar. The permanent evidence column and the full report below Özet are superseded by this navigation contract.
-
-Use cobalt `#2459d5`, ink `#182644`, muted ink `#5c6980`, separators `#dce3ee`, and white. Manrope Variable is packaged locally for this surface, including Turkish characters, with Segoe UI and system fallbacks. Amounts use tabular numerals. Blue indicates actions and selection; financial signs and evidence text retain their meanings.
-
-The user requested removal of decorative 3D elements on 2026-10-03. Native controls expose business tasks directly. Narrow windows reflow summary figures and keep dense tables within keyboard-accessible horizontal scroll regions.
-
-The `MonthlyDisplay` report remains the authority for every amount, comparison, coverage state, chart height, and category share. Prototype fixtures and their comparison controls are excluded from the production entry. See [the implementation contract](workstreams/ozet-control-desk/CONTRACT.md).
-
 ## Overview
 
-The user selected welcome prototype B, **Çalışma masası**, on 2026-10-10. Its cobalt split stage is a scoped launch surface. Welcome tokens apply only within `.welcome-page`; the ledger, overview and settings worlds retain their existing decisions.
+**Creative North Star: "The Clean Counter"**
 
-**Creative North Star: "The Quiet Market Ledger"**
+The owner approved this world on 2026-10-29 (prototype B, "Üç sekme") and it replaces every earlier look. A cool off-white page, white cards that lift on a faint shadow, near-black ink, and one azure accent for action, selection and focus. It reads like a tidied shop counter: the answer is laid out in front of Eralp, and everything else is a step behind a click.
 
-This is a light desktop operating system for reading a market month without turning the work into a dashboard spectacle. White working space, soft zinc surfaces, charcoal actions, a restrained teal selection, and visible rules let the figures, evidence, and Turkish labels do the work.
-
-The sidebar keeps the working context close while the content area stays broad, dense, and calm. Colour carries state sparingly: teal locates the current path, green and red support signed values, and amber keeps incomplete evidence visible. The system is intentionally light-only and uses native controls where they already serve the workflow.
+Structure follows one rule: each figure has one home. Bu ay gives one sentence and one large gross-profit figure, then up to four attention rows and the net state. Ürünler is a sortable ledger with a push drawer. Giderler shows four group totals built from the stored lines. Explanations (how it was calculated, why it is an estimate, what the app cannot know) sit behind a popover, the gear menu or an overlay instead of repeating as captions. Colour never carries a figure on its own: green and red belong to gain and loss, amber to warnings, and an unknown amount is written "bilinmiyor", never drawn as zero.
 
 **Key Characteristics:**
+- Three top tabs (Bu ay, Ürünler, Giderler); no sidebar, no welcome page, no dashboard of KPI tiles.
+- One azure accent, rare by design; semantic colours only for gain, loss and warning.
+- Soft tonal cards over a cool page; no card borders at rest; shadows are ambient.
+- Figtree, packaged locally, tabular numerals everywhere; the large figure is the only loud type.
+- Native buttons, tables, disclosures and flat 2D SVG marks; unknowns stay visible and distinct from zero.
+- Settings are a gear popover; recovery, live connection and source documents are full-page overlays with "Ana sayfaya dön".
 
-- Light zinc shell with charcoal primary actions and restrained teal selection.
-- Segoe UI hierarchy, tabular figures, visible rules, and compact operational density.
-- Native tables, selects, disclosures, and SVG trend chart retained beside three shared controls.
-- Explicit warning, unavailable, synthetic, and report-evidence states.
-
-### Settings surface — Glazed Tile Panel
-
-**Scoped North Star: "The Glazed Tile Panel"**
-
-Ayarlar is an approved second visual world, deliberately not consistent with the ledger. It is a panel of glaze-white çini tiles set in warm grout. Each tile is one job: a saturated glaze band names it, a round eight-point seal carries its condition, and its body holds only the facts and the next action. Colour is louder here than in the ledger, but it stays on the bands and seals; every pressable control in the panel is deep ink.
-
-The world is scoped. Its tokens carry the `settings-` prefix and apply inside the settings page, plus the live badge in the sidebar footer. The Quiet Market Ledger remains the system for every other surface.
-
-**Key Characteristics:**
-
-- Glaze tiles separated by a 6px warm-grout gap on a grout page ground.
-- Five glaze bands (ink, cobalt, turquoise, coral, saffron), one per job, with a seal and an optional status pill.
-- Deep ink as the only colour on pressable controls; primary, outline, and quiet underlined variants.
-- A coverage strip drawn to exact date proportion up to today, with a hatched coral gap.
-- Segoe UI and tabular figures, inherited from the ledger.
+History: the market-ledger (green rail, paper, Manrope), Özet control desk, welcome stage and Glazed Tile settings worlds are gone from the code and are not rules here. The 2D-only rule for quantitative marks (no perspective or 3D, owner request 2026-10-03) carries over. The packaged macOS review of 2026-10-22 described the superseded world; Windows acceptance is still a separate gate.
 
 ## Colors
 
-Welcome uses `welcome-stage` for the cobalt editorial panel and `welcome-action` for the Özet action. `welcome-launch` is the quiet launch ground; `welcome-ink`, `welcome-muted` and `welcome-line` distinguish labels and row separators. The green local dot accompanies written local/connection status and makes no financial claim. The amber `welcome-focus` outline remains visible on keyboard controls.
-
-The palette is neutral first: charcoal directs action, teal establishes location, and financial state colours remain supporting signals.
+A cool neutral page and white cards, one azure, and three signal colours kept for meaning.
 
 ### Primary
-
-- **Charcoal action:** primary buttons and the strongest interactive commitment.
-- **Teal focus and selection:** the current destination, focus ring, caret, progress accent, and selected local state.
-
-### Secondary
-
-- **Zinc support surface:** quiet controls, neutral markers, and subdued table structure.
-- **Teal selection wash:** selected navigation and related active states, paired with darker teal text.
-- **Teal selection border:** the boundary for pressed local navigation; it keeps the selected state legible on paper.
-- **Selection wash:** the browser text-selection background, paired with dark teal selected text.
-- **Amber evidence state:** incomplete, synthetic, partial-period, and unavailable operating-result context, always with its border and written explanation.
-- **Positive green and negative red:** signed comparisons and returns; the daily chart uses its dedicated positive bar green. These are never the only carrier of financial meaning.
+- **Counter Azure** (`accent`, #0b6bcb): action, selection and focus. Primary button, active tab underline, current-month bar, margin line, selected segment text, links, focus ring, text caret, form accent.
+- **Deep Azure** (`accent-hover`, #0959ab): hover for the azure button and links; text on a washed selection.
+- **Azure Wash** (`accent-wash`, #e9f2fc): the selected ledger row, an open chip, the hovered chip.
+- **Azure Selection** (`accent-selection`, #d4e6f8): text selection only.
+- **Chart Azure** (`chart-bar`, #5b97d9): past-month bars, margin bars and the bridge totals; the current month takes the full azure.
 
 ### Neutral
+- **Cool Page** (`page`, #f5f7fa): the app background, table header ground and quiet notes.
+- **Card White** (`card`, #ffffff): top bar, cards, menus, drawer, popovers.
+- **Counter Ink** (`ink`, #18212e): headings, figures, body on cards.
+- **Soft Ink** (`ink-muted`, #5b6472): supporting text, table headers, inactive tabs and labels.
+- **Hairline** (`line`, #e3e7ee): dividers between rows, sections and the top bar.
+- **Control Edge** (`edge`, #c5ccd6): secondary button outline and scrollbar thumbs.
+- **Field Edge** (`field`, #8792a2): input borders, the zero line and dashed empty bars; dark enough for a 3:1 boundary.
+- **Soft Fill** (`soft`, #eef1f5): month stepper and chip ground.
+- **Hover Fill** (`hover`, #f2f5f9): row and menu hover.
+- **Track** (`track`, #e7ebf1): segmented control well and margin-bar track.
+- **Mute** (`mute`, #a3abb7): decorative or disabled marks only (the attention chevron, a disabled month step); never text a reader needs.
 
-- **Paper canvas:** the application background and standard control surface.
-- **Charcoal text and muted text:** primary reading order, then supporting metadata and explanation.
-- **Fine zinc line:** the recurring separator around controls, surfaces, tables, and ledger rows.
+### Signal
+- **Gain Green** (`gain`, #0f7b51) and **Loss Red** (`loss`, #bf2f2a, wash `loss-wash` #fdecea): a gain or a loss, nothing else. Loss colours a negative figure, a loss chip and a negative bar; a positive figure stays ink.
+- **Warning Amber** (`warn`, #965a00; wash `warn-wash` #fff4e2; edge `warn-line` #ecd2a0): missing data, a blank expense group, a stale confirmation, a loss-of-margin chip. The amber hatch marks an unknown amount in the bridge.
 
-**The Accent Is Location Rule.** Teal marks focus, selection, and progress. It does not certify profit or a favourable financial result.
-
-### Settings surface — Glazed Tile Panel
-
-The settings palette is glazed earthenware: warm grout and glaze-white for the material, deep ink for words and actions, and four saturated glazes that identify the tiles.
-
-- **Glaze white** (`settings-glaze`): every tile surface.
-- **Warm grout** (`settings-grout`): the page ground behind the panel, which shows through the gaps as grout lines.
-- **Light grout** (`settings-grout-light`): inset wells within a tile: the coverage track, the view switch, the empty-coverage note, and history dividers.
-- **Deep ink** (`settings-ink`, hover `settings-ink-hover`): text, the active-data and about bands, every pressable control, the focus outline, checked choices, and the source-coverage bar.
-- **Soft ink** (`settings-ink-soft`): supporting copy, fact labels, and captions.
-- **Cobalt glaze** (`settings-cobalt`): the import band and the cutoff marker on the coverage strip.
-- **Turquoise glaze** (`settings-turquoise`): the live-connection band, the active entry in import history, and the sidebar live badge when the connection is on or checking.
-- **Coral glaze** (`settings-coral`): the backup and recovery band and, at reduced alpha, the hatched coverage gap.
-- **Saffron glaze** (`settings-saffron`): the display band. It is the only band that carries ink text instead of white.
-- **Amber wash and amber ink** (`settings-amber-wash`, `settings-amber-ink`, seal disc `settings-amber-seal`): stale and failed state on the status pill, the seal, and the written warning note.
-- **Error wash and error ink** (`settings-error-wash`, `settings-error-ink`): alert notes and failed import-history lines.
-- **Choice line** (`settings-choice-line`) and **ink selection** (`settings-selection`): the resting border of text-size choices and the text-selection wash.
-
-**The One Glaze Per Job Rule.** Each tile has exactly one glaze, and the glaze identifies the job. Ink is used for the active-data and about tiles; cobalt, turquoise, coral, and saffron are used only for import, live connection, backup, and display.
-
-**The Ink-Only Controls Rule.** Pressable controls inside the panel are deep ink: filled, outlined, or underlined. Glaze colours never fill or outline a button, switch, or choice.
-
-**The Amber Is Stale Rule.** Stale and failed state replaces the band's status pill and seal with amber and always arrives with a written line. Coral identifies the backup tile and the coverage gap; it never signals failure on its own.
+### Named Rules
+**The One Azure Rule.** Azure marks what can be pressed, what is selected and where focus is. It is never decoration, and no second accent exists.
+**The Signal Rule.** Green and red mean gain and loss, amber means attention. A figure that is merely large or important stays ink.
+**The Unknown Is Not Zero Rule.** A missing amount is "bilinmiyor" in soft ink or an amber tile, never a zero and never a bar of height zero; the empty bar is a dashed outline.
 
 ## Typography
 
-Welcome uses locally bundled Manrope Variable for display and controls, paired with true locally bundled Newsreader italic under the `Welcome Newsreader` family for the headline emphasis and EM seal. Both Latin and Latin Extended italic subsets are shipped offline; `font-synthesis: none` prevents a simulated italic. At ≤900px the headline is 49px; at ≤700px the launch title is 30px. This pairing does not replace body typography elsewhere.
+**Display, headline and body font:** Figtree Variable (with Segoe UI, system-ui, sans-serif), packaged locally in latin and latin-ext, weights 300–900 available, 400–700 used.
 
-**Interface Font:** Segoe UI with system-ui and sans-serif fallbacks.
-
-**Character:** The system uses the Windows-native reading face already present in the build. Hierarchy comes from compact size and weight changes, while tabular numerals make financial comparison stable.
+**Character:** A friendly geometric sans with open numerals; hierarchy comes from size and weight, with tight tracking only on large figures. Tabular numerals are on for the whole body so columns of money line up. Text size is the owner's Electron zoom preference (Normal, Büyük, Çok büyük); the scale is `--base` (16px) multiples, so sizes stay proportional.
 
 ### Hierarchy
+- **Hero** (700, 3.5rem / 56px, 1.05, -0.03em): the single gross-profit figure on Bu ay; the kuruş part is set at .5em in soft ink. 2.75rem under 560px.
+- **Net** (700, 2.25rem / 36px, 1.15, -0.02em): Tahmini net kâr.
+- **Headline** (700, 1.75rem / 28px, 1.2, -0.02em): page and overlay `h1`, the drawer product name; expense group amounts scale between 1.125rem and 1.75rem with their column.
+- **Lead** (500, 1.25rem / 20px, 1.4): the one-sentence answer under which the hero figure sits; also the net-same line at 700.
+- **Title** (700, 1.125rem / 18px, 1.35, -0.01em): card `h2`, drawer facts values.
+- **Body** (400, 1rem / 16px, 1.5; 1.6 in paragraphs): table cells in the ledger, rows, forms. Paragraphs run at most about 64–84ch.
+- **Label** (600, 0.875rem / 14px, 1.5): table headers, buttons in tables, chips, captions (`small`), menu sub-lines. No uppercase, no wide tracking.
+- **Chart label** (600, 13px; axis labels 13px) and **chart tick** (400, 12px): inside SVG only.
 
-- **Amount:** the monthly result uses the largest, tightly tracked role; it is a figure, not a promotional headline.
-- **Headline:** page titles use the responsive headline role.
-- **Title:** section headings use the sturdy 18px role.
-- **Body:** ordinary workspace copy uses the 15px body role; explanatory paragraphs open their line-height to 1.6.
-- **Label:** 14px labels anchor controls, table headers, and metadata; supporting text is 13px, status markers are 12px, and chart ticks are 11px.
-- **Financial scale:** ledger values use 17px; brand, panel, total, operating-total, and metric roles use 20px, 22px, 24px, 25px, and 30px respectively. The monthly amount has a 36px compact-width fallback.
-
-**The Comparable Figures Rule.** Amounts, totals, and tables use tabular numerals; numeric table columns align right and retain their units and signs.
-
-### Settings surface — Glazed Tile Panel
-
-The settings world keeps Segoe UI and steps its own ramp around the tile.
-
-- **Settings display:** the "Ayarlar" page title, larger than the ledger headline, followed by one 15px intro sentence in soft ink.
-- **Tile title:** the 20px/650 name in each glaze band, with a 13.5px band line beneath it, capped at 60ch.
-- **Status pill:** 13px/600 condition text at the band's trailing edge.
-- **Subhead and body:** 16px/650 for a named group inside a tile; 14px at 1.55 line-height for tile copy.
-- **Facts:** 13px soft-ink labels over 17px/600 tabular values; secondary detail sits beneath at 13px/400.
-- **Coverage lead:** the day count since the last record at 28px/650 tabular. When there is no gap, the sentence that replaces the count drops to 18px.
-- **Actions:** 14.5px/600 on every pressable control in the panel; view-switch segments use 14px/600.
-
-**The Counted Days Rule.** The coverage lead is the only large figure on the page. It counts days, not money, and it stays tabular.
+### Named Rules
+**The One Loud Figure Rule.** Only one figure per page is set in Hero or Net size. Everything else steps down to Title or Body.
+**The Quiet Label Rule.** Labels are sentence case at 14px/600. No kickers, no eyebrows, no uppercase tracking.
 
 ## Layout
 
-Welcome has a 1300px maximum desk width, a `1.1fr 1fr` split, 610px minimum desk height, 5.5% page inset and 112px masthead. Below 900px the inset becomes 24px and panels use 32px padding. Below 700px the desk stacks, the inset becomes 20px, and content scrolls naturally; the panels keep their shared outer silhouette.
+A sticky 64px top bar (logo, three tabs, then month stepper, "Excel’e aktar" and the gear) over a single centred workspace, 1248px max, 24px side padding, 28px top and 56px bottom. Pages are two-column grids of cards with a 20px gap: Bu ay is 7fr / 5fr (hero and attention left; net and six-month bars right); Giderler stacks full-width cards with four group totals as columns divided by hairlines; Ürünler is one full-width ledger card.
 
-The desktop shell is a 208px sticky sidebar beside a flexible main area. The workspace is capped at 1660px and uses 28px top, 32px inline, and 48px lower padding. Reused spacing moves from 8px inside compact controls through 16px fields and 22–24px surface groups.
+Spacing runs on a 4/8/12/20/28 rhythm: card padding 24–28px, fact-column padding 10–20px, control gaps 8–14px. Cards never nest and nothing tile-shaped sits inside one: facts are columns separated by 1px hairlines. The drawer is a non-modal push panel (440px) that gives the workspace room instead of covering it; below 760px it starts at the top of the window.
 
-The monthly workspace uses a two-to-three-column grid: answer and daily trend first, a full-width attention row, then finance and category regions. At 1050px it becomes a single sequence. At 800px the sidebar becomes a wrapping top strip; at 650px summary and attention groups simplify to one column; at 500px the ledger values return beneath their labels. Dense tables scroll within their own region.
-
-The evidence panel is 390px wide on large screens. At 1250px it becomes a fixed overlay with viewport-safe inset behavior. Popovers open beside their sidebar triggers and become fixed within the compact sidebar layout.
-
-### Settings surface — Glazed Tile Panel
-
-The panel is a six-column grid with a 6px grout gap. The page heading sits above it with the title and intro on the left and the close action at the trailing edge, wrapping when needed. The active-data tile spans all six columns. Import and live connection share the next course at three columns each. Backup, display, and about follow at two columns each. Each tile spans two subgrid rows, so bands and bodies align across a course regardless of band-line length.
-
-Bands use 18px top, 20px inline, and 16px bottom padding; bodies use 18px top and 20px inline and bottom padding, with a 16px stack gap. Actions sit at the foot of the body with a 10px gap.
-
-At 1050px, import and live each take the full width, backup and display share a course, and the last tile spans the full width. At 800px, the sidebar footer becomes a wrapping row alongside the compact sidebar. At 650px, every tile spans the full width and both band and body padding drop to 16px. The band is a size container: at 400px or narrower, the status pill moves under the band line instead of competing with the title.
-
-**The Aligned Courses Rule.** Tiles in one course share subgrid rows. A longer band line pushes down every body in that course, never just its own.
+Responsive: under 1360px with the drawer open the ledger drops its margin-bar column and the toolbar re-flows; under 1060px the top bar buttons collapse to icons; under 920px the Bu ay columns stack (hero, net, chart) and the attention detail column hides, Giderler columns go two-up; under 760px the tabs wrap onto a second 48px row; under 560px columns stack and padding shrinks. Wide tables scroll inside their card.
 
 ## Elevation & Depth
 
-Welcome panels are flat. The cobalt/light tonal split and fine launch-row rules establish hierarchy without a drop shadow. Controls use a 150ms ease-out colour transition, removed for reduced motion.
-
-The working surface is flat: borders and tonal differences establish ordinary structure. Only a popover, operations hub, or compact evidence panel receives depth, because it temporarily overlaps the ledger.
+Tonal layering with ambient shadow. The page is the lowest tone, cards are white and lifted by one soft two-layer shadow, and transient surfaces (popovers, the gear menu, toasts, the leave-draft prompt) carry a larger one. Cards have no border; hairlines only divide inside them.
 
 ### Shadow Vocabulary
+- **Card** (`box-shadow: 0 1px 2px rgb(16 24 40 / .06), 0 8px 24px rgb(16 24 40 / .06)`): every card, state panel and note.
+- **Popover** (`box-shadow: 0 2px 6px rgb(16 24 40 / .08), 0 18px 44px rgb(16 24 40 / .14)`): trust and bridge popovers, gear menu, toast, leave prompt.
+- **Drawer** (`box-shadow: -2px 0 6px rgb(16 24 40 / .05), -18px 0 48px rgb(16 24 40 / .12)`): the product drawer's left edge.
+- **Selected segment** (`box-shadow: 0 1px 2px rgb(16 24 40 / .1), 0 2px 6px rgb(16 24 40 / .05)`): the raised white thumb in a segmented control and the hovered month step.
 
-- **Sidebar overlay:** `0 8px 28px #20212426` for data and operations popovers.
-- **Compact evidence panel:** `0 10px 32px #20212426` when the detail panel is fixed below the wide layout.
-
-**The Overlap-Only Depth Rule.** Shadows explain an overlay. Standard cards, rows, and figures stay flat.
-
-### Settings surface — Glazed Tile Panel
-
-Tiles sit flat in the grout; the grout gap, not a shadow, separates them. The only depth is the glaze itself: each band carries a top-down white sheen and a hairline inner bottom edge, so it reads as fired glaze on the tile. The cutoff marker carries a 2px glaze-white ring so it stays visible where it crosses the ink coverage bar. In forced-colours mode, tiles gain a 1px `CanvasText` border, bands become `Canvas` with a `CanvasText` rule, and checked controls take a 2px `Highlight` border.
-
-**The Glaze Is The Depth Rule.** Depth belongs to the band's glaze sheen. Tiles never take a drop shadow.
+### Named Rules
+**The Ambient Shadow Rule.** Shadows are soft, blurred and low-contrast (cool ink at 5–14%). No hard offsets, no coloured glows. In forced-colors mode every elevated surface gets a 1px outline instead.
 
 ## Shapes
 
-Welcome uses 12px outer panel/guide corners and 8px primary-action corners. The two panels share one outline: outer corners round on the desktop split and on the top/bottom of the stacked layout. Launch rows remain square with a bottom rule.
-
-Controls and compact status markers use a 6px radius. Notices and attention groups widen to 8px; reusable workspace blocks, recovery sections, and overlays use 10px. Borders are fine and visible. Tables, ledgers, and charts are defined by alignment and separators rather than decorative containers.
-
-### Settings surface — Glazed Tile Panel
-
-Tiles, controls, notices, and size choices share one small tile corner (`settings-tile`). Inset pieces (the coverage track and its source bar, and view-switch segments) use the tighter `settings-track` corner. Status pills are fully round (`settings-pill`). The seal is a 22px circle with a 1.5px rim and an eight-point star built from two overlaid 8px squares, one rotated 45°; in the sidebar badge it shrinks to 14px with 5px squares. Outline controls use a 1.5px ink border. The coverage gap is a 135° hatch of 2px coral lines every 7px.
+Gently rounded and consistent: cards 14px, popover menu 14px, notes and the amber missing column 12px, buttons, inputs, steppers and segmented wells 10px, selected segment thumbs and menu rows 8px, small chips 999px, bars, the tab underline and margin-bar fills 3px (`bar`), bridge bars 4px. Corners are always rounded, never sharp, and never a pill except chips. Quantitative marks are flat 2D: rounded-rectangle bars with a 3px radius, a 2.5px azure line with white-filled dots, a dashed outline for an empty month, and an amber hatch for an unknown amount.
 
 ## Components
 
-Welcome presents one prominent `Özeti aç` action and four quiet real-page shortcuts: Satışlar, Alışlar ve maliyet, Giderler and Raporlar. Ayarlar opens from the masthead. The inline Başlangıç rehberi expands with `aria-expanded`; closing restores focus to its trigger. The heading receives focus when entering welcome. The sidebar Karşılama action returns through the existing expense draft guard.
+### Top bar and tabs
+- A white bar, 1px hairline below, 64px high. Logo image left (30px tall), tabs, then tools right.
+- **Tab:** 16px/600 soft ink; hover or current turns ink. The current tab has a 3px azure underline pinned to the bar's bottom edge, inset 10px each side. Focus ring sits inside the tab.
+- **Month stepper:** soft-fill 40px group, chevron steps (34px) and a 112px bold label; a step beyond the data range stays visible but is aria-disabled in mute.
 
-### Button
+### Buttons
+- **Primary** (`btn btn-primary`): azure, white text, 44px, 10px radius, 16px/600, a 1px azure-tinted shadow; hover deep azure. One per view. Giderler's "Excel’den içe aktar" is the primary while the month has no lines and secondary afterwards; "Elle ekle" and "Şablonu indir" are links.
+- The shared `Button` component only renders these classes (`primary`, `secondary`, `link`); there is no second button system, and form controls take the field style below.
+- **Secondary** (`btn btn-secondary`): white with an inset 1px edge ring; hover hover-fill with field-edge ring.
+- **Top-bar button** (`btn-top`): 40px; below 1060px it collapses to an icon.
+- **Link** (`link`): azure 16px/600 text button, underline on hover; inline variant underlines at 40% azure.
+- **Icon button:** 40px, soft ink, soft-fill on hover and while its menu is open.
+- Disabled is 50% opacity, `not-allowed`.
 
-The shared native button is the system's primary action primitive. It has a 40px minimum height, a 6px corner, 8px by 12px padding, and default, outline, ghost, link, and destructive variants. Default is charcoal with white text; outline keeps the paper surface and visible line; ghost stays quiet until hover. The normal palette uses the teal focus ring and the global 2px outline with a 3px offset; forced colours replace it with a 2px `Highlight` outline. Disabled actions reduce opacity and keep the not-allowed cursor.
+### Chips and popovers
+- **Trust chip:** 32px pill on soft fill with an info icon and "Tahmini"; hover or open turns azure wash. Opens a 380px popover under it that discloses the estimate once per page. "Nasıl hesaplandı?" is a link-style trigger opening the calculation bridge.
+- **Popover:** white, 12px radius, popover shadow, 14px text; Escape closes and returns focus to the trigger.
 
-### Input
+### Cards / containers
+- **Card:** white, 14px radius, card shadow, 24px 28px padding; `h2` with a 12px margin. The Bu ay hero card is 20px 28px 12px.
+- **Fact columns:** side-by-side figures divided by 1px hairlines, no fill, 10px 20px padding, used for Giderler group totals and the drawer's three facts. A missing group becomes an amber wash column (12px radius) with an amber hairline above its hint.
+- **State panel:** card shape, 640px max, for loading, empty and unavailable messages with a primary or outline action.
+- **Note:** a soft card strip; the warning variant is amber wash with no shadow.
 
-The shared native input fills its available width with the same 40px minimum height and 6px corner. It uses paper, the input border, readable foreground text, placeholder muting, the teal focus ring, and the same global outline policy as buttons. Native selects and textareas retain the same visual family through the global stylesheet.
+### Ledger and tables
+- **Products ledger:** header row sticky and white, 44px; body rows 48px, 16px text, hairline dividers; the whole row is the target but the name is the real button. Row hover is hover-fill; the selected row is azure wash and its name turns deep azure. Money is right-aligned and tabular; an unknown cost spans the profit and margin cells in italic soft ink.
+- **Margin bar:** a 6px track with a 3px-radius fill in chart azure (loss red when negative), capped at 140px.
+- **Loss and drop chips:** 22px pills beside a product name, red wash or amber wash.
+- **Sort button:** text button in the header; the active column goes ink-bold with an azure arrow.
 
-### Badge
+### Inputs / fields
+- **Search:** 46px, 10px radius, 1px field-edge border, 16px text, a leading search icon and a trailing clear button; focus turns the border azure with a 2px azure outline.
+- **Form fields** (every input, select and textarea): 44px, field-edge border, 10px radius; hover darkens to soft ink; focus azure; invalid red border plus red message text.
+- **Segmented control:** a track-tone well of 36px buttons, selected shown as a white raised thumb with azure text and the count in azure. Used for the product filter and for text size.
 
-The shared native span badge is a compact 12px status marker with 4px by 8px padding and a 6px corner. Default, secondary, outline, destructive, and warning variants cover the build's reusable status language. Warning is reserved for the amber evidence state.
+### Navigation
+- Top tabs only. Bu ay attention rows are full-width buttons that jump to a product or to the missing-cost filter, with a chevron that turns azure on hover.
+- **Gear menu:** a 352px white popover with 10px-rounded rows: Veri paketi içe aktar, Yedekle / Geri yükle, Yazı boyutu (segmented), Canlı bağlantı, Kaynak belgeler, Hakkında ve bilinen sınırlar. Rows show a soft-ink sub-line; "Hakkında" swaps the menu content in place with a back row. Escape returns focus to the gear.
+- **Overlay page:** replaces the workspace under the same top bar with an "Ana sayfaya dön" secondary button, an `h1` and 640px panels.
 
-### Native Working Elements
+### Product drawer
+A white, 440px right push panel under the top bar. Sticky head with category, product name in Headline, and a close icon; body has a lead sentence, three fact columns (sale price, purchase cost, margin), conditional notes (red wash for a loss, page-tone for missing cost), a six-month margin line, and an outline "Kaynak satırlar" button.
 
-Tables, select controls, `details` disclosures, and the existing SVG chart remain native or purpose-built. They are not replaced with generated data, select, disclosure, or chart frameworks; their existing state ownership and interaction semantics are part of the system.
-
-### Settings surface — Glazed Tile Panel
-
-These components belong to the settings world and are styled only inside the settings page, except the sidebar live badge.
-
-#### Tile
-
-One job per tile: a glaze band on top and a glaze-white body below, clipped to the tile corner. The band places the seal at the leading edge, the name and band line in the middle, and an optional status pill at the trailing edge. The status pill is a translucent dark wash on the band (an ink wash on saffron); stale and failed states switch it to amber. The body stacks facts, notes, and an action row anchored to the foot.
-
-#### Seal
-
-A round eight-point-star seal that carries the tile's condition without a glyph icon. It is a filled disc with a star cut out in the band colour when the state is on, ready, pending, or running. It turns amber with an amber-ink star when stale or failed, has a dashed rim when unknown, and is an open rim with a solid star when off, empty, or not set up. While checking or running, it rotates once every 2.4s (linear). State changes fade the disc and star over 240ms. Under reduced motion, the rotation stops.
-
-#### Pressable Controls
-
-Deep ink only, with a 42px minimum height, 9px by 16px padding, and the tile corner.
-
-- **Primary:** ink fill with white text; the hover state deepens to the ink-hover tone. One primary action per tile.
-- **Outline:** transparent, with a 1.5px ink border and ink text; hover adds a 7% ink wash. It is also used for the "Ayarları kapat" close action in the heading.
-- **Quiet:** borderless underlined ink text with 4px inline padding, 1px underline offset 4px, thickening to 2px on hover. Used for secondary configuration.
-- **States:** colours transition over 160ms ease-out; press nudges down 1px over 120ms; disabled drops to 45% opacity with a not-allowed cursor. Focus is a 2px ink outline with a 3px offset everywhere in the panel.
-
-#### Coverage Strip
-
-A 16px light-grout track drawn to exact date proportion from the start of the data to today. The ink bar marks the source span, with a 4px minimum width. A 4px cobalt marker with a glaze-white ring marks the financial cutoff. Hatched coral fills the gap from the last record to today. The coverage lead above states the gap in days, and a tabular caption below labels the start and "Bugün". The track is an image with a full Turkish accessible description. Without data, it is replaced by a light-grout note.
-
-#### View Switch
-
-A segmented pair in a light-grout well with 4px padding and a 4px gap. Segments are transparent at rest with a 7% ink wash on hover; the pressed segment (`aria-pressed`) fills with ink and white text. Background and text transitions take 180ms ease-out.
-
-#### Text-Size Choices
-
-Three radio tiles in an auto-fit grid (96px minimum, 8px gap) under a 14px/600 legend. Each tile is white with a 1.5px choice-line border. It previews "Aa" at 17px, 21px, or 26px above its label. Hover turns the border ink; the checked choice fills with ink and white text. The native radio covers the tile invisibly, so focus shows as the ink outline on the tile. While preferences load, the group is disabled at 50% opacity with a progress cursor.
-
-#### Notes and History
-
-Warning notes use the amber wash and amber ink; alert notes use the error wash and error ink; both have 10px by 12px padding. Import history is a native disclosure with a CSS chevron that rotates over 180ms. Inside, the history list scrolls at 240px, has a 96px date column and light-grout row rules, shows the active entry in turquoise, and shows failure detail in error ink.
-
-#### Sidebar Live Badge and Ayarlar Entry
-
-The sidebar footer holds a full-width live badge above the Ayarlar entry. The badge is a 34px transparent button with 13px text and a 14px seal. Its text is muted when off, turquoise when on or checking, and incumbent warning amber when stale, with a darker amber seal. Hover adds a 6% ink wash, and focus is a 2px ink outline with a 2px offset. Its status changes are announced politely. The Ayarlar entry is the incumbent ghost navigation button with a stroked slider icon; it is marked as the current page while settings are open. At 800px, the footer wraps into a row and the badge shrinks to its content.
-
-#### Motion
-
-The panel has one entrance movement: the coverage gap reveals left to right with a clip-path inset over 900ms on `cubic-bezier(.16, 1, .3, 1)` after a 160ms delay. Everything else is state feedback: 120–240ms ease-out transitions and the checking seal's rotation. Reduced motion removes both the reveal and the rotation.
+### Charts
+Six-month gross-profit bars (past months chart azure, current month full azure, negative red, empty months a dashed outline with the zero line dashed in field-edge) and a margin line; the bridge in the "Nasıl hesaplandı?" popover is a labelled row list with a horizontal track, azure total bars, grey minus bars and the amber hatch for unknown.
 
 ## Do's and Don'ts
 
 ### Do:
-
-- **Do** keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.
-- **Do** use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.
-- **Do** use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.
-- **Do** preserve native table scrolling and disclosure behavior when extending an existing workflow.
+- **Do** give every figure one home; link to it instead of repeating it.
+- **Do** use `accent` (#0b6bcb) only for what can be pressed, what is selected and focus; keep one primary button per view.
+- **Do** write unknown amounts as "bilinmiyor" in soft ink or an amber tile, and keep blank expense groups explicit until the owner confirms them.
+- **Do** put explanations in the trust chip popover, "Nasıl hesaplandı?", the Hakkında menu or an overlay, not in always-visible captions.
+- **Do** build new surfaces from `--page`, `--card`, `--line` and the shadow vocabulary above; size type with the `--t-*` scale so the owner's text-size setting works.
+- **Do** keep tap and click targets at 40px or more, give every control a visible focus ring (2px azure, 2px offset) and keep forced-colors outlines.
+- **Do** keep charts flat 2D, signed and unknown-safe.
 
 ### Don't:
-
-- **Don't** restore the superseded navy rail or dark component variants. Cobalt actions are authorized within the selected Özet surface.
-- **Don't** use teal, green, or red alone to assert financial meaning.
-- **Don't** replace missing evidence with a zero or hide it to make a compact view cleaner.
-- **Don't** add a generated control framework where the native table, select, disclosure, or chart already owns the task.
-
-### Settings surface — Glazed Tile Panel
-
-The ledger Do's and Don'ts above govern surfaces outside settings and the selected Özet control desk. The deep ink and cobalt here are scoped to the settings panel; they do not restore the superseded navy rail or blue action system elsewhere. Inside the panel, the ink focus outline replaces the teal ring.
-
-#### Do:
-
-- **Do** give each settings job its own tile, glaze, seal, one plain band line, and only its next action.
-- **Do** keep every pressable control deep ink: primary fill, 1.5px outline, or quiet underline.
-- **Do** pair every stale, failed, or unknown seal with written state in the status pill or a note.
-- **Do** draw the coverage strip to true date proportion up to today and state the gap in days.
-- **Do** align tiles within a course on shared subgrid rows and keep the 6px grout gap at every width.
-
-#### Don't:
-
-- **Don't** fill or outline a button, switch, or choice with cobalt, turquoise, coral, or saffron.
-- **Don't** carry glaze tokens, the grout ground, or tile bands onto ledger workspaces; only the sidebar live badge leaves the settings page.
-- **Don't** give tiles a drop shadow; the grout gap and the band's glaze carry the depth.
-- **Don't** imply financial meaning for source rows on a tile or the coverage strip; source coverage stays labelled as record counts.
-
-## Sales, purchasing, expenses and reports extension
-
-The user approved the overview visual system for all four workspaces on 2026-10-03. These pages inherit its white ground, cobalt actions, Manrope Variable typography and fine separators. The selected structures and data boundaries are recorded in [the workspace contract](docs/contracts/page-control-desks.md). The later simplicity request removes production 3D objects and duplicate panels. Native controls retain task navigation, draft state and source evidence. Settings keeps the Glazed Tile Panel with shorter supporting copy.
-
-The October 8 copy refinement removes duplicate counts, action phrases and explanations already carried by headings or controls. Supporting text is shorter across source browsing, expenses, invoices, reports and Settings. Financial qualifications, provenance, missing-data warnings and recovery guidance retain their existing placement. [The compact-copy receipt](docs/evidence/2026-10-08-compact-copy.md) records the tested build and synthetic visual evidence.
-
-Issue 72 supersedes the earlier first-view compositions and inline substantial details. Every business page shows its title, shared working month and compact source status. Product, transaction and invoice details occupy the content area with their parent destination active and a labelled return. Returning restores the originating filters, page, scroll and keyboard focus. Archived reports show their saved month and provenance instead of an editable working-month control. Technical evidence starts collapsed under `Veri ve hesaplama ayrıntıları`; material financial caveats stay beside the affected result.
-
-The user confirmed [v0.5's Mac demo scope](docs/superpowers/plans/2026-10-09-v0.5-demo.md) on 2026-10-09. Imported source records drive one consistent workspace without a data-view selector. For prepared estimate packages, Özet leads with the concise qualified estimate and keeps raw counts secondary; Satışlar leads with product estimate lookup and gives recorded documents a clear secondary entry. Recorded-only packages lead with existing counts and record lookup. Raporlar holds the current estimate and Excel export when supported, otherwise explains unavailable cost candidates, with a separate historical archive destination. Estimate status, return exclusions, unknown amounts and coverage stay beside the results. Settings describes the active data and preserves its remaining controls. This refinement keeps the established white ground, cobalt actions, Manrope typography and native working elements.
+- **Don't** bring back a sidebar, a welcome page, a four-section dashboard of KPI tiles or the dark-rail market-ledger look.
+- **Don't** add a second accent or use green for anything but gain.
+- **Don't** show a missing cost, expense or tax treatment as zero, in text or in a chart.
+- **Don't** colour a figure red or green for emphasis; only gain and loss do that.
+- **Don't** use hard offset shadows, glow, gradients on surfaces, or 3D.
+- **Don't** add uppercase labels, kickers or eyebrows above headings.
+- **Don't** repeat the same number on the same page in a card, a caption and a chart label.

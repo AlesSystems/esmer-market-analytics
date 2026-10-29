@@ -1,255 +1,453 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T00:00:00.000Z",
+  "generatedAt": "2026-10-29T18:05:16.000Z",
   "title": "Design System: Esmer Market",
   "extensions": {
-    "ownerWorkspace": {"direction": "Market ledger", "status": "packaged macOS visually reviewed 2026-10-22; Windows acceptance separate", "canvas": "#f7f5ed", "surface": "#fffef9", "ink": "#243b32", "muted": "#59685d", "action": "#315c45", "rule": "#d8ddd0", "wash": "#e8eee0", "brass": "#a67b37", "depth": "0 10px 30px #243b3210, 0 2px 4px #243b3208", "chartPolicy": "2D, signed, unknown-safe; no perspective on quantitative marks", "implementation": "src/ui/owner-workspace.css"},
-    "roundedMeta": {"welcome-panel": {"scope": "welcome", "purpose": "Shared outer panel silhouette and inline guide."}, "welcome-action": {"scope": "welcome", "purpose": "Primary \u00d6zet launch action."}},
     "colorMeta": {
-      "welcome-stage": {"role": "primary", "scope": "welcome", "displayName": "Stage", "canonical": "#244fcd"},
-      "welcome-action": {"role": "primary", "scope": "welcome", "displayName": "Action", "canonical": "#2459d5"},
-      "welcome-action-hover": {"role": "primary", "scope": "welcome", "displayName": "Action Hover", "canonical": "#1942a4"},
-      "welcome-ink": {"role": "neutral", "scope": "welcome", "displayName": "Ink", "canonical": "#182644"},
-      "welcome-launch": {"role": "neutral", "scope": "welcome", "displayName": "Launch", "canonical": "#f5f6f9"},
-      "welcome-muted": {"role": "neutral", "scope": "welcome", "displayName": "Muted", "canonical": "#59667d"},
-      "welcome-line": {"role": "neutral", "scope": "welcome", "displayName": "Line", "canonical": "#d4dbe6"},
-      "welcome-stage-muted": {"role": "neutral", "scope": "welcome", "displayName": "Stage Muted", "canonical": "#e0e8ff"},
-      "welcome-seal-line": {"role": "neutral", "scope": "welcome", "displayName": "Seal Line", "canonical": "#7594ed"},
-      "welcome-local": {"role": "neutral", "scope": "welcome", "displayName": "Local", "canonical": "#526059"},
-      "welcome-local-dot": {"role": "neutral", "scope": "welcome", "displayName": "Local Dot", "canonical": "#34715c"},
-      "welcome-guide": {"role": "neutral", "scope": "welcome", "displayName": "Guide", "canonical": "#e9ede4"},
-      "welcome-focus": {"role": "neutral", "scope": "welcome", "displayName": "Focus", "canonical": "#ae651d"},
-      "welcome-selection": {"role": "neutral", "scope": "welcome", "displayName": "Selection", "canonical": "#cbd8f8"},
-      "welcome-scrollbar": {"role": "neutral", "scope": "welcome", "displayName": "Scrollbar", "canonical": "#aab4c5"},
-
-      "overview-blue": {"role": "primary", "scope": "overview", "displayName": "Cobalt Action", "canonical": "#2459d5"},
-      "overview-ink": {"role": "neutral", "scope": "overview", "displayName": "Overview Ink", "canonical": "#182644"},
-      "overview-muted": {"role": "neutral", "scope": "overview", "displayName": "Overview Muted", "canonical": "#5c6980"},
-      "overview-line": {"role": "neutral", "scope": "overview", "displayName": "Overview Rule", "canonical": "#dce3ee"},
-      "primary": { "role": "primary", "displayName": "Charcoal Action", "canonical": "#27272a", "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#fafafa"] },
-      "background": { "role": "neutral", "displayName": "Paper Canvas", "canonical": "#ffffff", "tonalRamp": ["#202124", "#3f3f46", "#62626b", "#a1a1aa", "#d4d4d8", "#e1e1e5", "#f4f4f5", "#ffffff"] },
-      "accent": { "role": "secondary", "displayName": "Teal Selection", "canonical": "#e6f2ef", "tonalRamp": ["#123a34", "#164b40", "#215e54", "#236c59", "#28796b", "#4a9d90", "#8ac8bd", "#e6f2ef"] },
-      "warning": { "role": "secondary", "displayName": "Amber Evidence", "canonical": "#fff8e9", "tonalRamp": ["#4a3306", "#80580b", "#a77414", "#c69b48", "#e4cea4", "#f3e5c6", "#fff8e9", "#fffbf2"] },
-      "positive": { "role": "secondary", "displayName": "Positive Green", "canonical": "#236c59", "tonalRamp": ["#123a34", "#164b40", "#215e54", "#236c59", "#418d78", "#75b9a6", "#b5ded2", "#edf8f4"] },
-      "negative": { "role": "secondary", "displayName": "Negative Red", "canonical": "#b42318", "tonalRamp": ["#4d100c", "#741710", "#982017", "#b42318", "#d0554c", "#e69089", "#f5c6c1", "#fff1f0"] },
-      "accent-border": { "role": "secondary", "displayName": "Teal Selection Border", "canonical": "#bddbd2" },
-      "positive-chart": { "role": "secondary", "displayName": "Positive Chart Bar", "canonical": "#3a8a7a" },
-      "selection-background": { "role": "secondary", "displayName": "Selection Wash", "canonical": "#cae7df" },
-      "settings-glaze": { "role": "neutral", "scope": "settings", "displayName": "Glaze White", "canonical": "#fbfaf6", "tonalRamp": ["#2b2820", "#4a463b", "#6e6857", "#948d79", "#bab29f", "#ddd6c6", "#efeae0", "#fbfaf6"] },
-      "settings-grout": { "role": "neutral", "scope": "settings", "displayName": "Warm Grout", "canonical": "#e4ddce", "tonalRamp": ["#3a342a", "#5a5243", "#7d7461", "#a39a85", "#c6bda9", "#e4ddce", "#efeae0", "#f8f5ee"] },
-      "settings-grout-light": { "role": "neutral", "scope": "settings", "displayName": "Light Grout", "canonical": "#efeae0" },
-      "settings-ink": { "role": "primary", "scope": "settings", "displayName": "Deep Ink", "canonical": "#18233f", "tonalRamp": ["#0c1222", "#18233f", "#26365f", "#3a4c7d", "#5f6f9a", "#8e9aba", "#c9d6f2", "#eef2fa"] },
-      "settings-ink-hover": { "role": "primary", "scope": "settings", "displayName": "Deep Ink Hover", "canonical": "#26365f" },
-      "settings-ink-soft": { "role": "neutral", "scope": "settings", "displayName": "Soft Ink", "canonical": "#4a5470" },
-      "settings-cobalt": { "role": "tertiary", "scope": "settings", "displayName": "Cobalt Glaze", "canonical": "#1f3f9a", "tonalRamp": ["#0f1f4d", "#1f3f9a", "#2c52bd", "#4a6fd3", "#7590e0", "#a3b5eb", "#d1dbf5", "#eef2fc"] },
-      "settings-turquoise": { "role": "tertiary", "scope": "settings", "displayName": "Turquoise Glaze", "canonical": "#0a665e", "tonalRamp": ["#04332f", "#0a665e", "#0f8076", "#2a9c91", "#5bb8ae", "#94d3cc", "#c9ebe7", "#eef9f8"] },
-      "settings-coral": { "role": "tertiary", "scope": "settings", "displayName": "Coral Glaze", "canonical": "#b03a25", "tonalRamp": ["#4a170e", "#7a2617", "#b03a25", "#cc5640", "#de826f", "#eaad9f", "#f5d6ce", "#fbe9e4"] },
-      "settings-saffron": { "role": "tertiary", "scope": "settings", "displayName": "Saffron Glaze", "canonical": "#d99a1b", "tonalRamp": ["#4a3306", "#5c3d00", "#9a6a0f", "#d99a1b", "#f2b84b", "#f7d083", "#fbe6bd", "#fff3d6"] },
-      "settings-amber-wash": { "role": "secondary", "scope": "settings", "displayName": "Stale Amber Wash", "canonical": "#fff3d6" },
-      "settings-amber-ink": { "role": "secondary", "scope": "settings", "displayName": "Stale Amber Ink", "canonical": "#5c3d00" },
-      "settings-amber-seal": { "role": "secondary", "scope": "settings", "displayName": "Stale Seal Amber", "canonical": "#f2b84b" },
-      "settings-error-wash": { "role": "secondary", "scope": "settings", "displayName": "Alert Wash", "canonical": "#fbe9e4" },
-      "settings-error-ink": { "role": "secondary", "scope": "settings", "displayName": "Alert Ink", "canonical": "#8a2614" },
-      "settings-choice-line": { "role": "neutral", "scope": "settings", "displayName": "Choice Line", "canonical": "#cfc7b6" },
-      "settings-selection": { "role": "neutral", "scope": "settings", "displayName": "Ink Selection", "canonical": "#c9d6f2" }
+      "accent": {
+        "role": "primary",
+        "displayName": "Counter Azure",
+        "canonical": "#0b6bcb",
+        "canonicalOklch": "oklch(53% 0.169 255)",
+        "tonalRamp": [
+          "#00005f",
+          "#002985",
+          "#004eac",
+          "#1a73d4",
+          "#4599fd",
+          "#66baff",
+          "#86dbff",
+          "#9df2ff"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Deep Azure",
+        "canonical": "#0959ab"
+      },
+      "accent-wash": {
+        "role": "primary",
+        "displayName": "Azure Wash",
+        "canonical": "#e9f2fc"
+      },
+      "accent-selection": {
+        "role": "primary",
+        "displayName": "Azure Selection",
+        "canonical": "#d4e6f8"
+      },
+      "chart-bar": {
+        "role": "primary",
+        "displayName": "Chart Azure",
+        "canonical": "#5b97d9",
+        "canonicalOklch": "oklch(66% 0.117 252)",
+        "tonalRamp": [
+          "#000f48",
+          "#00326c",
+          "#155490",
+          "#3c77b7",
+          "#609cde",
+          "#7fbcff",
+          "#9eddff",
+          "#b4f4ff"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Cool Page",
+        "canonical": "#f5f7fa",
+        "canonicalOklch": "oklch(98% 0.005 258)",
+        "tonalRamp": [
+          "#151618",
+          "#313335",
+          "#515355",
+          "#737477",
+          "#96989b",
+          "#b5b7ba",
+          "#d6d7da",
+          "#edeff1"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "#ffffff"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Counter Ink",
+        "canonical": "#18212e",
+        "canonicalOklch": "oklch(25% 0.028 258)",
+        "tonalRamp": [
+          "#0e1623",
+          "#2a3341",
+          "#495362",
+          "#6a7585",
+          "#8e99aa",
+          "#acb8ca",
+          "#ccd9ea",
+          "#e3f0ff"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Soft Ink",
+        "canonical": "#5b6472",
+        "canonicalOklch": "oklch(50% 0.025 259)",
+        "tonalRamp": [
+          "#0f1621",
+          "#2b3340",
+          "#4a5361",
+          "#6c7584",
+          "#8f99a8",
+          "#aeb8c8",
+          "#ced8e8",
+          "#e5efff"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e3e7ee"
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Control Edge",
+        "canonical": "#c5ccd6"
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field Edge",
+        "canonical": "#8792a2"
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "Soft Fill",
+        "canonical": "#eef1f5"
+      },
+      "hover": {
+        "role": "neutral",
+        "displayName": "Hover Fill",
+        "canonical": "#f2f5f9"
+      },
+      "track": {
+        "role": "neutral",
+        "displayName": "Track",
+        "canonical": "#e7ebf1"
+      },
+      "mute": {
+        "role": "neutral",
+        "displayName": "Mute",
+        "canonical": "#a3abb7"
+      },
+      "gain": {
+        "role": "secondary",
+        "displayName": "Gain Green",
+        "canonical": "#0f7b51",
+        "canonicalOklch": "oklch(52% 0.112 160)",
+        "tonalRamp": [
+          "#002302",
+          "#00431d",
+          "#00653c",
+          "#25885d",
+          "#50ad80",
+          "#71ce9f",
+          "#92efbe",
+          "#a9ffd5"
+        ]
+      },
+      "loss": {
+        "role": "secondary",
+        "displayName": "Loss Red",
+        "canonical": "#bf2f2a",
+        "canonicalOklch": "oklch(53% 0.182 27)",
+        "tonalRamp": [
+          "#4c0000",
+          "#750000",
+          "#9f0009",
+          "#c93933",
+          "#f46256",
+          "#ff8375",
+          "#ffa494",
+          "#ffbbaa"
+        ]
+      },
+      "loss-wash": {
+        "role": "secondary",
+        "displayName": "Loss Wash",
+        "canonical": "#fdecea"
+      },
+      "warn": {
+        "role": "secondary",
+        "displayName": "Warning Amber",
+        "canonical": "#965a00",
+        "canonicalOklch": "oklch(52% 0.116 66)",
+        "tonalRamp": [
+          "#350000",
+          "#582000",
+          "#7c4200",
+          "#a16516",
+          "#c88942",
+          "#eaa862",
+          "#ffc882",
+          "#ffdf99"
+        ]
+      },
+      "warn-wash": {
+        "role": "secondary",
+        "displayName": "Amber Wash",
+        "canonical": "#fff4e2"
+      },
+      "warn-line": {
+        "role": "secondary",
+        "displayName": "Amber Edge",
+        "canonical": "#ecd2a0"
+      }
     },
     "typographyMeta": {
-      "welcome-display": {"displayName": "Display", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-display-italic": {"displayName": "Display Italic", "scope": "welcome", "purpose": "Welcome launch page only; true local Newsreader italic for italic display and seal."},
-      "welcome-title": {"displayName": "Title", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-body": {"displayName": "Body", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-action": {"displayName": "Action", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-row-title": {"displayName": "Row Title", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-row-description": {"displayName": "Row Description", "scope": "welcome", "purpose": "Welcome launch page only."},
-      "welcome-seal": {"displayName": "Seal", "scope": "welcome", "purpose": "Welcome launch page only; true local Newsreader italic for italic display and seal."},
-
-      "chart-label": { "displayName": "Chart Label", "purpose": "The compact daily trend tick." },
-      "status": { "displayName": "Status Marker", "purpose": "Compact badge and figure-status text." },
-      "supporting": { "displayName": "Supporting Text", "purpose": "Captions, evidence detail, and muted operational context." },
-      "amount": { "displayName": "Monthly Amount", "purpose": "The primary monthly financial figure." },
-      "amount-compact": { "displayName": "Compact Monthly Amount", "purpose": "The narrow-width fallback for the monthly amount." },
-      "headline": { "displayName": "Workspace Headline", "purpose": "Page titles and the first reading level." },
-      "title": { "displayName": "Section Title", "purpose": "Ledger, table, and workspace section headings." },
-      "body": { "displayName": "Operational Body", "purpose": "Turkish explanatory copy and ordinary workspace reading." },
-      "label": { "displayName": "Control Label", "purpose": "Controls, metadata, and table headers." },
-      "ledger-value": { "displayName": "Ledger Value", "purpose": "Right-aligned financial line values." },
-      "brand": { "displayName": "Brand", "purpose": "The sidebar product identity." },
-      "panel-title": { "displayName": "Panel Title", "purpose": "The evidence detail-panel heading." },
-      "total": { "displayName": "Total", "purpose": "Expense-total disclosure." },
-      "operating-total": { "displayName": "Operating Total", "purpose": "Operating summary emphasis." },
-      "metric": { "displayName": "Metric", "purpose": "Supporting dashboard metric values." },
-      "settings-display": { "displayName": "Settings Display", "purpose": "The Ayarlar page title." },
-      "settings-intro": { "displayName": "Settings Intro", "purpose": "The one-sentence soft-ink intro under the Ayarlar title." },
-      "settings-tile-title": { "displayName": "Tile Title", "purpose": "The tile name in each glaze band." },
-      "settings-band-line": { "displayName": "Band Line", "purpose": "The one plain line under each tile name, capped at 60ch." },
-      "settings-status": { "displayName": "Status Pill", "purpose": "Condition text in the band's trailing pill." },
-      "settings-subhead": { "displayName": "Tile Subhead", "purpose": "A named group inside a tile body." },
-      "settings-body": { "displayName": "Tile Body", "purpose": "Soft-ink tile copy." },
-      "settings-fact-label": { "displayName": "Fact Label", "purpose": "Soft-ink labels in tile fact lists." },
-      "settings-fact-value": { "displayName": "Fact Value", "purpose": "Tabular values in tile fact lists." },
-      "settings-coverage-lead": { "displayName": "Coverage Lead", "purpose": "The day count from the last record to today; the only large figure on the page." },
-      "settings-action": { "displayName": "Tile Action", "purpose": "Label text on every pressable control in the panel." }
+      "hero": {
+        "displayName": "Hero",
+        "purpose": "The single gross-profit figure on Bu ay."
+      },
+      "net": {
+        "displayName": "Net",
+        "purpose": "Tahmini net kâr."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page and overlay h1, drawer product name, expense group amounts."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The one-sentence answer under the page title."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card h2 and drawer fact values."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Ledger cells, rows, forms; tabular numerals."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table headers, chips, captions, menu sub-lines; sentence case."
+      },
+      "chart-label": {
+        "displayName": "Chart Label",
+        "purpose": "Inside SVG charts only."
+      },
+      "chart-tick": {
+        "displayName": "Chart Tick",
+        "purpose": "Axis tick labels inside SVG charts only."
+      }
     },
     "shadows": [
-      { "name": "sidebar-overlay", "value": "0 8px 28px #20212426", "purpose": "Data and operations popovers overlapping the sidebar context." },
-      { "name": "detail-overlay", "value": "0 10px 32px #20212426", "purpose": "The fixed compact-width evidence panel." },
-      { "name": "settings-glaze-sheen", "value": "linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0) 55%); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .16)", "purpose": "Settings scope. The glaze band's top-down sheen and hairline lower edge; the only depth on a tile." },
-      { "name": "settings-cutoff-ring", "value": "0 0 0 2px #fbfaf6", "purpose": "Settings scope. Keeps the cobalt cutoff marker legible where it crosses the ink coverage bar." }
+      {
+        "name": "card",
+        "value": "0 1px 2px rgb(16 24 40 / .06), 0 8px 24px rgb(16 24 40 / .06)",
+        "purpose": "Every card, state panel and note."
+      },
+      {
+        "name": "popover",
+        "value": "0 2px 6px rgb(16 24 40 / .08), 0 18px 44px rgb(16 24 40 / .14)",
+        "purpose": "Popovers, gear menu, toast, leave prompt."
+      },
+      {
+        "name": "drawer",
+        "value": "-2px 0 6px rgb(16 24 40 / .05), -18px 0 48px rgb(16 24 40 / .12)",
+        "purpose": "Left edge of the product drawer."
+      },
+      {
+        "name": "segment-thumb",
+        "value": "0 1px 2px rgb(16 24 40 / .1), 0 2px 6px rgb(16 24 40 / .05)",
+        "purpose": "Selected segment thumb and hovered month step."
+      }
     ],
     "motion": [
-      { "name": "settings-gap-reveal", "value": "clip-path inset(0 100% 0 0) → none, 900ms cubic-bezier(.16, 1, .3, 1), 160ms delay, fill backwards", "purpose": "Settings scope. The single entrance movement: the hatched coverage gap reveals left to right. Removed under reduced motion." },
-      { "name": "settings-seal-turn", "value": "rotate 360deg, 2.4s linear infinite", "purpose": "Settings scope. The seal turns while checking or running. Removed under reduced motion." },
-      { "name": "settings-state", "value": "160–240ms ease-out (controls 160ms, switch/choices/chevron 180ms, seal fill 240ms)", "purpose": "Settings scope. Background, border, and colour feedback on state change." },
-      { "name": "settings-press", "value": "translateY(1px), 120ms ease-out", "purpose": "Settings scope. Press feedback on tile actions." }
+      {
+        "name": "drawer-in",
+        "value": ".32s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Drawer slides 28px in from the right; all motion is disabled under prefers-reduced-motion."
+      }
     ],
     "breakpoints": [
-      { "name": "detail-overlay", "value": "1250px" },
-      { "name": "monthly-stack", "value": "1050px" },
-      { "name": "compact-sidebar", "value": "800px" },
-      { "name": "compact-summary", "value": "650px" },
-      { "name": "narrow-ledger", "value": "500px" },
-      { "name": "settings-panel-stack", "value": "1050px", "purpose": "Import and live go full width; backup and display share a course; the last tile spans the full width." },
-      { "name": "settings-sidebar-footer", "value": "800px", "purpose": "The sidebar footer wraps into a row; the live badge shrinks to its content." },
-      { "name": "settings-single-column", "value": "650px", "purpose": "Every tile spans the full width; band and body padding drop to 16px." },
-      { "name": "settings-band-container", "value": "400px (container, inline-size)", "purpose": "The status pill drops under the band line." }
-    ]
+      {
+        "name": "drawer-ledger",
+        "value": "1360px"
+      },
+      {
+        "name": "topbar-icons",
+        "value": "1060px"
+      },
+      {
+        "name": "bu-ay-stack",
+        "value": "920px"
+      },
+      {
+        "name": "tabs-wrap",
+        "value": "760px"
+      },
+      {
+        "name": "compact",
+        "value": "560px"
+      }
+    ],
+    "textScale": {
+      "base": "16px",
+      "steps": {
+        "sm": ".875",
+        "md": "1",
+        "lg": "1.125",
+        "xl": "1.25",
+        "2xl": "1.75",
+        "net": "2.25",
+        "hero": "3.5"
+      },
+      "note": "Text size is the owner's Electron zoom preference; --base keeps steps proportional."
+    }
   },
   "components": [
     {
-      "name": "Default Button",
-      "kind": "button",
-      "refersTo": "button-default",
-      "description": "The charcoal action for the main step in a local workflow.",
-      "html": "<button class=\"ds-button-default\">Kaydet</button>",
-      "css": ".ds-button-default { min-height: 40px; padding: 8px 12px; border: 1px solid transparent; border-radius: 6px; background: #27272a; color: #ffffff; font: 500 14px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; } .ds-button-default:hover { background: color-mix(in srgb, #27272a 90%, transparent); } .ds-button-default:focus-visible { outline: 2px solid #28796b; outline-offset: 3px; border-color: #28796b; box-shadow: 0 0 0 3px color-mix(in srgb, #28796b 50%, transparent); } @media (forced-colors: active) { .ds-button-default:focus-visible { outline: 2px solid Highlight; outline-offset: 3px; } } .ds-button-default:disabled { cursor: not-allowed; opacity: .5; }"
-    },
-    {
-      "name": "Text Input",
-      "kind": "input",
-      "refersTo": "input",
-      "description": "A full-width paper field for period, filter, and operational entry.",
-      "html": "<input class=\"ds-input\" placeholder=\"Ara\" />",
-      "css": ".ds-input { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid #b7b7bf; border-radius: 6px; background: #ffffff; color: #202124; font: 400 14px/1.2 Segoe UI, system-ui, sans-serif; } .ds-input::placeholder { color: #62626b; } .ds-input:focus-visible { outline: 2px solid #28796b; outline-offset: 3px; border-color: #28796b; box-shadow: 0 0 0 3px color-mix(in srgb, #28796b 50%, transparent); } @media (forced-colors: active) { .ds-input:focus-visible { outline: 2px solid Highlight; outline-offset: 3px; } } .ds-input:disabled { cursor: not-allowed; opacity: .5; }"
-    },
-    {
-      "name": "Warning Badge",
-      "kind": "chip",
-      "refersTo": "badge-warning",
-      "description": "A compact written marker for incomplete or cautionary evidence.",
-      "html": "<span class=\"ds-badge-warning\">Eksik veri</span>",
-      "css": ".ds-badge-warning { display: inline-flex; width: fit-content; gap: 4px; padding: 4px 8px; border: 1px solid #e4cea4; border-radius: 6px; background: #fff8e9; color: #80580b; font: 500 12px/1.5 Segoe UI, system-ui, sans-serif; }"
-    },
-    {
-      "name": "Settings Glazed Tile",
-      "kind": "card",
-      "refersTo": "settings-tile",
-      "scope": "settings",
-      "description": "One settings job: a glaze band with seal, name, line and status pill above a glaze-white body with facts and its next action.",
-      "html": "<div class=\"ds-st-ground\"><section class=\"ds-st-tile ds-st-turquoise\"><header class=\"ds-st-band\"><span class=\"ds-st-seal ds-st-seal-on\"></span><div><h2>Canlı bağlantı</h2><p>İzole SQL kopyasını yalnızca okur. Mali veri setini etkinleştirmez.</p></div><span class=\"ds-st-pill\">Bağlantı açık</span></header><div class=\"ds-st-body\"><dl class=\"ds-st-facts\"><div><dt>Son başarılı kontrol</dt><dd>02.10.2026 14:05</dd></div><div><dt>Yerel kesim tarihi</dt><dd>30.09.2026</dd></div></dl></div></section></div>",
-      "css": ".ds-st-ground { padding: 6px; background: #e4ddce; font-family: Segoe UI, system-ui, sans-serif; } .ds-st-tile { overflow: hidden; border-radius: 6px; background: #fbfaf6; color: #18233f; } .ds-st-band { --band: #0a665e; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 12px; padding: 18px 20px 16px; color: #ffffff; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 55%), var(--band); box-shadow: inset 0 -1px 0 rgba(0,0,0,.16); } .ds-st-band > div { display: contents; } .ds-st-band h2 { grid-column: 2; grid-row: 1; margin: 0; font-size: 20px; font-weight: 650; line-height: 1.3; letter-spacing: -.012em; } .ds-st-band p { grid-column: 2 / -1; grid-row: 2; margin: 0; font-size: 13.5px; line-height: 1.45; max-width: 60ch; } .ds-st-band .ds-st-seal { grid-column: 1; grid-row: 1; margin-top: 2px; } .ds-st-pill { grid-column: 3; grid-row: 1; justify-self: end; white-space: nowrap; padding: 4px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; line-height: 1.5; background: rgba(0,0,0,.22); } .ds-st-body { display: flex; flex-direction: column; gap: 16px; padding: 18px 20px 20px; } .ds-st-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 14px 24px; margin: 0; } .ds-st-facts dt { font-size: 13px; color: #4a5470; } .ds-st-facts dd { margin: 3px 0 0; font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-st-seal { position: relative; display: inline-block; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; } .ds-st-seal::before, .ds-st-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 8px; height: 8px; border-radius: 1px; background: currentColor; } .ds-st-seal::after { transform: rotate(45deg); } .ds-st-seal-on { background: currentColor; } .ds-st-seal-on::before, .ds-st-seal-on::after { background: var(--band); }"
-    },
-    {
-      "name": "Settings Seal States",
-      "kind": "custom",
-      "refersTo": "settings-seal",
-      "scope": "settings",
-      "description": "The round eight-point-star seal: open (off/empty), filled (on/ready), rotating (checking), amber (stale/failed), dashed (unknown).",
-      "html": "<div class=\"ds-seal-row\"><span class=\"ds-seal\"></span><span class=\"ds-seal ds-seal-on\"></span><span class=\"ds-seal ds-seal-checking\"></span><span class=\"ds-seal ds-seal-stale\"></span><span class=\"ds-seal ds-seal-unknown\"></span></div>",
-      "css": ".ds-seal-row { --band: #1f3f9a; display: flex; gap: 14px; padding: 16px 20px; background: #1f3f9a; color: #ffffff; } .ds-seal { --seal-disc: transparent; --seal-star: currentColor; position: relative; display: inline-block; width: 22px; height: 22px; border: 1.5px solid currentColor; border-radius: 50%; background: var(--seal-disc); transition: background-color 240ms ease-out, border-color 240ms ease-out; } .ds-seal::before, .ds-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 8px; height: 8px; border-radius: 1px; background: var(--seal-star); } .ds-seal::after { transform: rotate(45deg); } .ds-seal-on { --seal-disc: currentColor; --seal-star: var(--band); } .ds-seal-checking { animation: ds-seal-turn 2.4s linear infinite; } .ds-seal-stale { --seal-disc: #f2b84b; --seal-star: #5c3d00; border-color: #f2b84b; } .ds-seal-unknown { border-style: dashed; } @keyframes ds-seal-turn { to { transform: rotate(360deg); } } @media (prefers-reduced-motion: reduce) { .ds-seal { animation: none; } }"
-    },
-    {
-      "name": "Settings Primary Action",
-      "kind": "button",
-      "refersTo": "settings-action-primary",
-      "scope": "settings",
-      "description": "The ink-filled next action at the foot of a tile; one per tile.",
-      "html": "<button class=\"ds-st-primary\">Veri paketi içe aktar</button>",
-      "css": ".ds-st-primary { min-height: 42px; padding: 9px 16px; border: 1.5px solid #18233f; border-radius: 6px; background: #18233f; color: #ffffff; font: 600 14.5px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease-out, color 160ms ease-out, transform 120ms ease-out; } .ds-st-primary:hover:not(:disabled) { background: #26365f; } .ds-st-primary:active:not(:disabled) { transform: translateY(1px); } .ds-st-primary:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-primary:disabled { opacity: .45; cursor: not-allowed; }"
-    },
-    {
-      "name": "Settings Outline Action",
-      "kind": "button",
-      "refersTo": "settings-action-outline",
-      "scope": "settings",
-      "description": "A secondary ink-outlined action; also the heading's close action.",
-      "html": "<button class=\"ds-st-outline\">Bağlantıyı kapat</button>",
-      "css": ".ds-st-outline { min-height: 42px; padding: 9px 16px; border: 1.5px solid #18233f; border-radius: 6px; background: transparent; color: #18233f; font: 600 14.5px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 160ms ease-out, transform 120ms ease-out; } .ds-st-outline:hover:not(:disabled) { background: rgba(24, 35, 63, .07); } .ds-st-outline:active:not(:disabled) { transform: translateY(1px); } .ds-st-outline:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-outline:disabled { opacity: .45; cursor: not-allowed; }"
-    },
-    {
-      "name": "Settings Quiet Action",
-      "kind": "button",
-      "refersTo": "settings-action-quiet",
-      "scope": "settings",
-      "description": "An underlined ink action for secondary configuration.",
-      "html": "<button class=\"ds-st-quiet\">Test bağlantısını ayarla</button>",
-      "css": ".ds-st-quiet { min-height: 42px; padding: 9px 4px; border: 1.5px solid transparent; border-radius: 6px; background: transparent; color: #18233f; font: 500 14.5px/1.2 Segoe UI, system-ui, sans-serif; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer; } .ds-st-quiet:hover:not(:disabled) { text-decoration-thickness: 2px; } .ds-st-quiet:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; } .ds-st-quiet:disabled { opacity: .45; cursor: not-allowed; }"
-    },
-    {
-      "name": "Settings Coverage Strip",
-      "kind": "custom",
-      "refersTo": "settings-coverage-track",
-      "scope": "settings",
-      "description": "Data coverage drawn to exact date proportion up to today: ink source span, cobalt cutoff marker, hatched coral gap, and a day-count lead.",
-      "html": "<figure class=\"ds-cov\"><p class=\"ds-cov-lead\"><strong>18 gün</strong> son kayıttan bugüne</p><div class=\"ds-cov-track\"><span class=\"ds-cov-source\" style=\"left:0;width:82%\"></span><span class=\"ds-cov-cutoff\" style=\"left:76%\"></span><span class=\"ds-cov-gap\" style=\"left:82%;right:0\"></span></div><figcaption><span>01.01.2026</span><span>Bugün</span></figcaption></figure>",
-      "css": ".ds-cov { display: grid; gap: 10px; margin: 0; padding: 18px 20px; background: #fbfaf6; color: #18233f; font-family: Segoe UI, system-ui, sans-serif; } .ds-cov-lead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font-size: 14px; color: #4a5470; } .ds-cov-lead strong { font-size: 28px; font-weight: 650; line-height: 1.1; letter-spacing: -.02em; color: #18233f; font-variant-numeric: tabular-nums; } .ds-cov-track { position: relative; height: 16px; border-radius: 4px; background: #efeae0; overflow: hidden; } .ds-cov-source { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: #18233f; } .ds-cov-cutoff { position: absolute; top: -2px; bottom: -2px; width: 4px; margin-left: -2px; border-radius: 2px; background: #1f3f9a; box-shadow: 0 0 0 2px #fbfaf6; } .ds-cov-gap { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, rgba(176, 58, 37, .38) 0 2px, transparent 2px 7px); animation: ds-gap-reveal 900ms cubic-bezier(.16, 1, .3, 1) 160ms backwards; } @keyframes ds-gap-reveal { from { clip-path: inset(0 100% 0 0); } } .ds-cov figcaption { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: #4a5470; font-variant-numeric: tabular-nums; } @media (prefers-reduced-motion: reduce) { .ds-cov-gap { animation: none; } }"
-    },
-    {
-      "name": "Settings View Switch",
+      "name": "Top Tabs",
       "kind": "nav",
-      "refersTo": "settings-view-switch",
-      "scope": "settings",
-      "description": "A segmented pair in a light-grout well; the pressed segment fills with ink.",
-      "html": "<div class=\"ds-vs\" role=\"group\"><button aria-pressed=\"true\">Gerçek yedek görünümü</button><button aria-pressed=\"false\">Korunan mali veri görünümü</button></div>",
-      "css": ".ds-vs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 6px; background: #efeae0; } .ds-vs button { min-height: 38px; padding: 7px 14px; border: 0; border-radius: 4px; background: transparent; color: #18233f; font: 600 14px/1.2 Segoe UI, system-ui, sans-serif; cursor: pointer; transition: background-color 180ms ease-out, color 180ms ease-out; } .ds-vs button:hover { background: rgba(24, 35, 63, .07); } .ds-vs button[aria-pressed=\"true\"] { background: #18233f; color: #ffffff; } .ds-vs button:focus-visible { outline: 2px solid #18233f; outline-offset: 3px; }"
+      "refersTo": "tab",
+      "description": "Three top tabs; the current one has a 3px azure underline on the bar's bottom edge.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab\" aria-current=\"page\">Bu ay</button><button class=\"ds-tab\">Ürünler</button><button class=\"ds-tab\">Giderler</button></nav>",
+      "css": ".ds-tabs{display:flex;gap:4px;height:64px;background:var(--card, #fff);border-bottom:1px solid var(--line, #e3e7ee);padding:0 10px;font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif}.ds-tab{position:relative;border:0;background:none;padding:0 14px;color:var(--ink-2, #5b6472);font:600 16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;cursor:pointer}.ds-tab:hover,.ds-tab[aria-current=page]{color:var(--ink, #18212e)}.ds-tab[aria-current=page]::after{content:'';position:absolute;left:10px;right:10px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent, #0b6bcb)}.ds-tab:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:-6px;border-radius:10px}"
     },
     {
-      "name": "Settings Text-Size Choice",
-      "kind": "input",
-      "refersTo": "settings-size-choice",
-      "scope": "settings",
-      "description": "Radio tiles previewing Aa at each text size; the checked tile fills with ink.",
-      "html": "<fieldset class=\"ds-size\"><legend>Yazı boyutu</legend><label><input type=\"radio\" name=\"ds-size\" checked /><span>Aa</span>Normal</label><label data-size=\"large\"><input type=\"radio\" name=\"ds-size\" /><span>Aa</span>Büyük</label><label data-size=\"larger\"><input type=\"radio\" name=\"ds-size\" /><span>Aa</span>Çok büyük</label></fieldset>",
-      "css": ".ds-size { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin: 0; padding: 18px 20px; border: 0; background: #fbfaf6; font-family: Segoe UI, system-ui, sans-serif; } .ds-size legend { margin-bottom: 10px; font-size: 14px; font-weight: 600; color: #18233f; } .ds-size label { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 84px; padding: 10px 6px; border: 1.5px solid #cfc7b6; border-radius: 6px; background: #ffffff; font-size: 13px; font-weight: 600; color: #18233f; white-space: nowrap; cursor: pointer; transition: background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out; } .ds-size label span { font-size: 17px; font-weight: 650; line-height: 1.1; } .ds-size label[data-size=\"large\"] span { font-size: 21px; } .ds-size label[data-size=\"larger\"] span { font-size: 26px; } .ds-size input { position: absolute; inset: 0; opacity: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; } .ds-size label:hover { border-color: #18233f; } .ds-size label:has(input:checked) { border-color: #18233f; background: #18233f; color: #ffffff; } .ds-size label:has(input:focus-visible) { outline: 2px solid #18233f; outline-offset: 3px; }"
-    },
-    {
-      "name": "Sidebar Live Badge",
+      "name": "Primary Button",
       "kind": "button",
-      "refersTo": "settings-live-badge",
-      "scope": "settings",
-      "description": "The sidebar-footer status button that opens Ayarlar; text colour and seal carry the live state.",
-      "html": "<div class=\"ds-lb-col\"><button class=\"ds-lb\"><span class=\"ds-lb-seal\"></span>Canlı bağlantı kapalı</button><button class=\"ds-lb ds-lb-on\"><span class=\"ds-lb-seal\"></span>Canlı bağlantı açık</button><button class=\"ds-lb ds-lb-stale\"><span class=\"ds-lb-seal\"></span>Canlı kaynak doğrulanamadı</button></div>",
-      "css": ".ds-lb-col { display: grid; gap: 6px; width: 208px; padding: 8px; background: #fafafa; } .ds-lb { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 34px; padding: 4px 10px; border: 0; border-radius: 6px; background: transparent; font: 400 13px/1.4 Segoe UI, system-ui, sans-serif; text-align: left; color: #62626b; cursor: pointer; transition: background-color 160ms ease-out; } .ds-lb:hover { background: rgba(24, 35, 63, .06); } .ds-lb:focus-visible { outline: 2px solid #18233f; outline-offset: 2px; } .ds-lb-seal { position: relative; display: inline-block; flex: none; width: 14px; height: 14px; border: 1.25px solid currentColor; border-radius: 50%; } .ds-lb-seal::before, .ds-lb-seal::after { content: \"\"; position: absolute; inset: 0; margin: auto; width: 5px; height: 5px; border-radius: 1px; background: currentColor; } .ds-lb-seal::after { transform: rotate(45deg); } .ds-lb-on { color: #0a665e; } .ds-lb-on .ds-lb-seal { background: currentColor; } .ds-lb-on .ds-lb-seal::before, .ds-lb-on .ds-lb-seal::after { background: #ffffff; } .ds-lb-stale { color: #80580b; } .ds-lb-stale .ds-lb-seal { background: #c88a12; border-color: #c88a12; } .ds-lb-stale .ds-lb-seal::before, .ds-lb-stale .ds-lb-seal::after { background: #5c3d00; }"
+      "refersTo": "button-primary",
+      "description": "Azure action, one per view.",
+      "html": "<button class=\"ds-btn-primary\">Giderleri gir</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:10px;background:var(--accent, #0b6bcb);color:#fff;font:600 16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;box-shadow:0 1px 2px rgb(11 107 203/.25);cursor:pointer}.ds-btn-primary:hover{background:var(--accent-h, #0959ab)}.ds-btn-primary:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:2px}.ds-btn-primary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White button with an inset edge ring; the top-bar variant is 40px.",
+      "html": "<button class=\"ds-btn-secondary\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4v11m0 0-4-4m4 4 4-4M5 19h14\"/></svg> Excel’e aktar</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border:0;border-radius:10px;background:var(--card, #fff);color:var(--ink, #18212e);font:600 16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;box-shadow:inset 0 0 0 1px var(--edge, #c5ccd6);cursor:pointer}.ds-btn-secondary:hover{background:var(--hover, #f2f5f9);box-shadow:inset 0 0 0 1px var(--field, #8792a2)}.ds-btn-secondary:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:2px}"
+    },
+    {
+      "name": "Trust Chip",
+      "kind": "chip",
+      "refersTo": "chip-trust",
+      "description": "Discloses the estimate once per page; opens a popover.",
+      "html": "<button class=\"ds-chip\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></svg> Tahmini</button>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 9px;border:0;border-radius:999px;background:var(--soft, #eef1f5);color:var(--ink-2, #5b6472);font:600 14px 'Figtree Variable','Segoe UI',system-ui,sans-serif;white-space:nowrap;cursor:pointer}.ds-chip:hover{background:var(--accent-50, #e9f2fc);color:var(--accent-h, #0959ab)}.ds-chip:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:2px}"
+    },
+    {
+      "name": "Hero Card",
+      "kind": "card",
+      "refersTo": "card-hero",
+      "description": "Bu ay: one sentence, one large gross-profit figure, then an attention row.",
+      "html": "<section class=\"ds-hero\"><p class=\"ds-lead\">Ekim’de 573,3 bin ₺ satış yaptınız.</p><p class=\"ds-num\">154.210<span>,40 ₺</span></p><button class=\"ds-att\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 3 2 20h20L12 3Z\"/><path d=\"M12 10v5M12 18h.01\"/></svg><b>Süt 1 L</b><span>Zarar ediyor</span></button></section>",
+      "css": ".ds-hero{background:var(--card, #fff);border-radius:14px;box-shadow:0 1px 2px rgb(16 24 40/.06),0 8px 24px rgb(16 24 40/.06);padding:28px 32px 22px;font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e);max-width:520px}.ds-lead{margin:0;font-size:20px;line-height:1.4;font-weight:500;color:var(--ink-2, #5b6472)}.ds-num{margin:4px 0 14px;font-size:56px;line-height:1.05;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}.ds-num span{font-size:.5em;letter-spacing:0;color:var(--ink-2, #5b6472);font-weight:600}.ds-att{display:flex;align-items:center;gap:10px;width:100%;border:0;border-top:1px solid var(--line, #e3e7ee);background:none;padding:12px 8px 4px;font:500 16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e);text-align:left;cursor:pointer}.ds-att svg{color:var(--loss, #bf2f2a)}.ds-att span{color:var(--ink-2, #5b6472);font-size:14px}.ds-att:hover{background:var(--hover, #f2f5f9)}"
+    },
+    {
+      "name": "Expense Group Tile",
+      "kind": "card",
+      "refersTo": "inset-tile",
+      "description": "Giderler group total; an unconfirmed blank group turns amber, never zero.",
+      "html": "<div class=\"ds-tiles\"><div class=\"ds-tile\"><span class=\"ds-lbl\">Kira</span><span class=\"ds-amt\">18.500,00 ₺</span></div><div class=\"ds-tile ds-miss\"><span class=\"ds-lbl\">Personel</span><span class=\"ds-amt\">Girilmedi</span></div></div>",
+      "css": ".ds-tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px;font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif}.ds-tile{display:grid;gap:2px;padding:16px 18px 14px;border-radius:12px;background:var(--page, #f5f7fa)}.ds-lbl{font-weight:600;color:var(--ink, #18212e)}.ds-amt{font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink, #18212e);font-variant-numeric:tabular-nums}.ds-miss{background:var(--warn-bg, #fff4e2)}.ds-miss .ds-lbl,.ds-miss .ds-amt{color:var(--warn, #965a00)}.ds-miss .ds-amt{font-weight:500;letter-spacing:0}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Ledger search, 46px with a leading icon.",
+      "html": "<label class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg><input type=\"search\" placeholder=\"Ürün ara\" aria-label=\"Ürün ara\"></label>",
+      "css": ".ds-search{position:relative;display:block;width:300px;font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e)}.ds-search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--ink-2, #5b6472)}.ds-search input{width:100%;height:46px;padding:0 42px;border:1px solid var(--field, #8792a2);border-radius:10px;background:var(--card, #fff);font:16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e);box-sizing:border-box}.ds-search input::placeholder{color:var(--ink-2, #5b6472)}.ds-search input:hover{border-color:var(--ink-2, #5b6472)}.ds-search input:focus-visible{border-color:var(--accent, #0b6bcb);outline:2px solid var(--accent, #0b6bcb);outline-offset:1px}"
+    },
+    {
+      "name": "Segmented Filter",
+      "kind": "custom",
+      "refersTo": "segmented",
+      "description": "Track-tone well; the selected option is a raised white thumb with azure text.",
+      "html": "<div class=\"ds-seg\" role=\"group\"><button aria-pressed=\"true\">Hepsi <span>48</span></button><button aria-pressed=\"false\">Zarar <span>3</span></button><button aria-pressed=\"false\">Alış fiyatı yok <span>5</span></button></div>",
+      "css": ".ds-seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--track, #e7ebf1);font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif}.ds-seg button{display:inline-flex;gap:8px;height:36px;align-items:center;padding:0 14px;border:0;border-radius:8px;background:none;color:var(--ink-2, #5b6472);font:600 14px 'Figtree Variable','Segoe UI',system-ui,sans-serif;cursor:pointer}.ds-seg button:hover{color:var(--ink, #18212e)}.ds-seg button[aria-pressed=true]{background:var(--card, #fff);color:var(--accent, #0b6bcb);box-shadow:0 1px 2px rgb(16 24 40/.1),0 2px 6px rgb(16 24 40/.05)}.ds-seg span{font-weight:500}.ds-seg button:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:2px}"
+    },
+    {
+      "name": "Ledger Row",
+      "kind": "custom",
+      "refersTo": "ledger-row-selected",
+      "description": "Products ledger rows: 48px, hairline dividers, selected row in azure wash, margin bar at the end.",
+      "html": "<table class=\"ds-ledger\"><tbody><tr><td><b>Domates</b></td><td class=\"n\">12.400,00 ₺</td><td class=\"n\">24,1%</td><td><i class=\"bar\"><i style=\"width:58%\"></i></i></td></tr><tr class=\"sel\"><td><b>Süt 1 L</b> <em>Zarar</em></td><td class=\"n\">9.800,00 ₺</td><td class=\"n neg\">-2,3%</td><td><i class=\"bar\"><i class=\"neg\" style=\"width:12%\"></i></i></td></tr></tbody></table>",
+      "css": ".ds-ledger{border-collapse:separate;border-spacing:0;width:100%;font:16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e);font-variant-numeric:tabular-nums}.ds-ledger td{height:48px;padding:0 14px;border-bottom:1px solid var(--line, #e3e7ee);white-space:nowrap}.ds-ledger tr:hover td{background:var(--hover, #f2f5f9)}.ds-ledger tr.sel td{background:var(--accent-50, #e9f2fc)}.ds-ledger tr.sel b{color:var(--accent-h, #0959ab)}.ds-ledger .n{text-align:right}.ds-ledger .neg{color:var(--loss, #bf2f2a)}.ds-ledger em{display:inline-flex;align-items:center;height:22px;margin-left:6px;padding:0 8px;border-radius:999px;background:var(--loss-bg, #fdecea);color:var(--loss, #bf2f2a);font:700 13px 'Figtree Variable','Segoe UI',system-ui,sans-serif}.ds-ledger .bar{display:block;width:140px;height:6px;border-radius:3px;background:var(--track, #e7ebf1);overflow:hidden}.ds-ledger .bar i{display:block;height:100%;border-radius:3px;background:var(--bar, #5b97d9)}.ds-ledger .bar i.neg{background:var(--loss, #bf2f2a)}"
+    },
+    {
+      "name": "Gear Menu Row",
+      "kind": "nav",
+      "refersTo": "menu",
+      "description": "A row in the Ayarlar popover: icon, label, soft-ink sub-line, chevron.",
+      "html": "<div class=\"ds-menu\"><button class=\"ds-item\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 4v11m0 0-4-4m4 4 4-4M5 19h14\"/></svg><span>Veri paketi içe aktar<small>Şu anki veri sonu: 31.10.2026</small></span></button><button class=\"ds-item\"><span>Canlı bağlantı<small>Kapalı</small></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 6 6 6-6 6\"/></svg></button></div>",
+      "css": ".ds-menu{width:352px;background:var(--card, #fff);border-radius:14px;box-shadow:0 2px 6px rgb(16 24 40/.08),0 18px 44px rgb(16 24 40/.14);padding:8px;font-family:'Figtree Variable','Segoe UI',system-ui,sans-serif}.ds-item{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border:0;border-radius:10px;background:none;text-align:left;font:600 16px 'Figtree Variable','Segoe UI',system-ui,sans-serif;color:var(--ink, #18212e);cursor:pointer}.ds-item:hover{background:var(--hover, #f2f5f9)}.ds-item span{flex:1}.ds-item small{display:block;font-size:14px;font-weight:400;color:var(--ink-2, #5b6472)}.ds-item svg{color:var(--ink-2, #5b6472)}.ds-item:focus-visible{outline:2px solid var(--accent, #0b6bcb);outline-offset:2px}"
     }
   ],
   "narrative": {
-    "northStar": "The Quiet Market Ledger",
-    "overview": "This is a light desktop operating system for reading a market month without turning the work into a dashboard spectacle. White working space, soft zinc surfaces, charcoal actions, a restrained teal selection, and visible rules let the figures, evidence, and Turkish labels do the work. The sidebar keeps the working context close while the content area stays broad, dense, and calm. Colour carries state sparingly: teal locates the current path, green and red support signed values, and amber keeps incomplete evidence visible. The system is intentionally light-only and uses native controls where they already serve the workflow.",
-    "keyCharacteristics": ["Light zinc shell with charcoal primary actions and restrained teal selection.", "Segoe UI hierarchy, tabular figures, visible rules, and compact operational density.", "Native tables, selects, disclosures, and SVG trend chart retained beside three shared controls.", "Explicit warning, unavailable, synthetic, and report-evidence states."],
-    "rules": [
-      { "name": "The Accent Is Location Rule", "body": "Teal marks focus, selection, and progress. It does not certify profit or a favourable financial result.", "section": "colors" },
-      { "name": "The Comparable Figures Rule", "body": "Amounts, totals, and tables use tabular numerals; numeric table columns align right and retain their units and signs.", "section": "typography" },
-      { "name": "The Overlap-Only Depth Rule", "body": "Shadows explain an overlay. Standard cards, rows, and figures stay flat.", "section": "elevation" },
-      { "name": "The One Glaze Per Job Rule", "scope": "settings", "body": "Each tile has exactly one glaze, and the glaze identifies the job. Ink is used for the active-data and about tiles; cobalt, turquoise, coral, and saffron are used only for import, live connection, backup, and display.", "section": "colors" },
-      { "name": "The Ink-Only Controls Rule", "scope": "settings", "body": "Pressable controls inside the panel are deep ink: filled, outlined, or underlined. Glaze colours never fill or outline a button, switch, or choice.", "section": "colors" },
-      { "name": "The Amber Is Stale Rule", "scope": "settings", "body": "Stale and failed state replaces the band's status pill and seal with amber and always arrives with a written line. Coral identifies the backup tile and the coverage gap; it never signals failure on its own.", "section": "colors" },
-      { "name": "The Counted Days Rule", "scope": "settings", "body": "The coverage lead is the only large figure on the page. It counts days, not money, and it stays tabular.", "section": "typography" },
-      { "name": "The Aligned Courses Rule", "scope": "settings", "body": "Tiles in one course share subgrid rows. A longer band line pushes down every body in that course, never just its own.", "section": "layout" },
-      { "name": "The Glaze Is The Depth Rule", "scope": "settings", "body": "Depth belongs to the band's glaze sheen. Tiles never take a drop shadow.", "section": "elevation" }
+    "northStar": "The Clean Counter",
+    "overview": "The owner approved this world on 2026-10-29 (prototype B, \"Üç sekme\") and it replaces every earlier look. A cool off-white page, white cards that lift on a faint shadow, near-black ink, and one azure accent for action, selection and focus. It reads like a tidied shop counter: the answer is laid out in front of Eralp, and everything else is a step behind a click.\n\nStructure follows one rule: each figure has one home. Bu ay gives one sentence and one large gross-profit figure, then up to four attention rows and the net state. Ürünler is a sortable ledger with a push drawer. Giderler shows four group totals built from the stored lines. Explanations (how it was calculated, why it is an estimate, what the app cannot know) sit behind a popover, the gear menu or an overlay instead of repeating as captions. Colour never carries a figure on its own: green and red belong to gain and loss, amber to warnings, and an unknown amount is written \"bilinmiyor\", never drawn as zero.",
+    "keyCharacteristics": [
+      "Three top tabs (Bu ay, Ürünler, Giderler); no sidebar, no welcome page, no dashboard of KPI tiles.",
+      "One azure accent, rare by design; semantic colours only for gain, loss and warning.",
+      "Soft tonal cards over a cool page; no card borders at rest; shadows are ambient.",
+      "Figtree, packaged locally, tabular numerals everywhere; the large figure is the only loud type.",
+      "Native buttons, tables, disclosures and flat 2D SVG marks; unknowns stay visible and distinct from zero.",
+      "Settings are a gear popover; recovery, live connection and source documents are full-page overlays with \"Ana sayfaya dön\"."
     ],
-    "scopedWorlds": [
-      {"scope": "welcome", "appliesTo": "WelcomePage and its welcome.css; no business workspace restyling.", "northStar": "Çalışma masası", "overview": "User-selected prototype B, 2026-10-10: a cobalt split stage, large Manrope display with true local Newsreader italic, actual market logo and quiet real-destination launch list. Every launch opens welcome. Returning respects expense drafts and remembered workspace state.", "keyCharacteristics": ["Flat cobalt and light split panels with shared 12px outer corners.", "One strong Özet action and four named shortcuts.", "Locally bundled fonts, Turkish copy and honest written connection status.", "Stacked natural scrolling below 700px."], "dos": ["Keep welcome vocabulary scoped to .welcome-page.", "Route launch actions to existing pages and preserve draft protection."], "donts": ["Do not imply financial readiness from welcome branding or local status.", "Do not ship prototype switching or simulated destinations."]},
-      {"scope": "overview", "appliesTo": "The non-embedded Özet monthly workspace and its active shell.", "northStar": "Kontrol masası", "overview": "The owner selected prototype C on 2026-10-03. White, cobalt, Manrope Variable, four monthly figures, daily sales, category ranking and a narrow evidence column define the monthly surface. The website logo ships locally. Existing financial details and saved report semantics remain available.", "keyCharacteristics": ["Blue #2459d5 actions and selection, ink #182644, fine separators.", "Local Manrope Latin and Latin Extended fonts, tabular amounts.", "Fixed-camera three-layer object selects evidence explanations with equivalent HTML controls.", "MonthlyDisplay remains the authority for all figures and evidence states."], "dos": ["Keep missing cost and incomplete expenses explicit.", "Keep 3D fallback usable and motion inactive by default."], "donts": ["Do not map the object proportions to financial amounts.", "Do not ship prototype fixtures or selection controls in production."]},
+    "rules": [
       {
-        "scope": "settings",
-        "appliesTo": "The Ayarlar settings page and the sidebar-footer live badge.",
-        "northStar": "The Glazed Tile Panel",
-        "overview": "Ayarlar is an approved second visual world, deliberately not consistent with the ledger. It is a panel of glaze-white çini tiles set in warm grout. Each tile is one job: a saturated glaze band names it, a round eight-point seal carries its condition, and its body holds only the facts and the next action. Colour is louder here than in the ledger, but it stays on the bands and seals; every pressable control in the panel is deep ink. The world is scoped. Its tokens carry the `settings-` prefix and apply inside the settings page, plus the live badge in the sidebar footer. The Quiet Market Ledger remains the system for other surfaces except the selected Özet control desk.",
-        "keyCharacteristics": ["Glaze tiles separated by a 6px warm-grout gap on a grout page ground.", "Five glaze bands (ink, cobalt, turquoise, coral, saffron), one per job, with a seal and an optional status pill.", "Deep ink as the only colour on pressable controls; primary, outline, and quiet underlined variants.", "A coverage strip drawn to exact date proportion up to today, with a hatched coral gap.", "Segoe UI and tabular figures, inherited from the ledger."],
-        "dos": ["Do give each settings job its own tile, glaze, seal, one plain band line, and only its next action.", "Do keep every pressable control deep ink: primary fill, 1.5px outline, or quiet underline.", "Do pair every stale, failed, or unknown seal with written state in the status pill or a note.", "Do draw the coverage strip to true date proportion up to today and state the gap in days.", "Do align tiles within a course on shared subgrid rows and keep the 6px grout gap at every width."],
-        "donts": ["Don't fill or outline a button, switch, or choice with cobalt, turquoise, coral, or saffron.", "Don't carry glaze tokens, the grout ground, or tile bands onto ledger workspaces; only the sidebar live badge leaves the settings page.", "Don't give tiles a drop shadow; the grout gap and the band's glaze carry the depth.", "Don't imply financial meaning for source rows on a tile or the coverage strip; source coverage stays labelled as record counts."]
+        "name": "The One Azure Rule",
+        "body": "Azure marks what can be pressed, what is selected and where focus is. It is never decoration, and no second accent exists.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signal Rule",
+        "body": "Green and red mean gain and loss, amber means attention. A figure that is merely large or important stays ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Unknown Is Not Zero Rule",
+        "body": "A missing amount is \"bilinmiyor\" in soft ink or an amber tile, never a zero and never a bar of height zero; the empty bar is a dashed outline.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Loud Figure Rule",
+        "body": "Only one figure per page is set in Hero or Net size. Everything else steps down to Title or Body.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Label Rule",
+        "body": "Labels are sentence case at 14px/600. No kickers, no eyebrows, no uppercase tracking.",
+        "section": "typography"
+      },
+      {
+        "name": "The Ambient Shadow Rule",
+        "body": "Shadows are soft, blurred and low-contrast (cool ink at 5–14%). No hard offsets, no coloured glows. In forced-colors mode every elevated surface gets a 1px outline instead.",
+        "section": "elevation"
       }
     ],
-    "dos": ["Do keep the period, cutoff, synthetic identity, and evidence state readable where the owner works.", "Do use the light paper-and-zinc surfaces, visible separators, and tabular figures to support scanning.", "Do use teal for the current path and keyboard focus, and pair positive, negative, and amber colour with written context.", "Do preserve native table scrolling and disclosure behavior when extending an existing workflow."],
-    "donts": ["Don't restore the superseded navy rail or dark component variants. Cobalt actions are authorized within the selected Özet surface.", "Don't use teal, green, or red alone to assert financial meaning.", "Don't replace missing evidence with a zero or hide it to make a compact view cleaner.", "Don't add a generated control framework where the native table, select, disclosure, or chart already owns the task."]
+    "dos": [
+      "Do give every figure one home; link to it instead of repeating it.",
+      "Do use `accent` (#0b6bcb) only for what can be pressed, what is selected and focus; keep one primary button per view.",
+      "Do write unknown amounts as \"bilinmiyor\" in soft ink or an amber tile, and keep blank expense groups explicit until the owner confirms them.",
+      "Do put explanations in the trust chip popover, \"Nasıl hesaplandı?\", the Hakkında menu or an overlay, not in always-visible captions.",
+      "Do build new surfaces from `--page`, `--card`, `--line` and the shadow vocabulary above; size type with the `--t-*` scale so the owner's text-size setting works.",
+      "Do keep tap and click targets at 40px or more, give every control a visible focus ring (2px azure, 2px offset) and keep forced-colors outlines.",
+      "Do keep charts flat 2D, signed and unknown-safe."
+    ],
+    "donts": [
+      "Don't bring back a sidebar, a welcome page, a four-section dashboard of KPI tiles or the dark-rail market-ledger look.",
+      "Don't add a second accent or use green for anything but gain.",
+      "Don't show a missing cost, expense or tax treatment as zero, in text or in a chart.",
+      "Don't colour a figure red or green for emphasis; only gain and loss do that.",
+      "Don't use hard offset shadows, glow, gradients on surfaces, or 3D.",
+      "Don't add uppercase labels, kickers or eyebrows above headings.",
+      "Don't repeat the same number on the same page in a card, a caption and a chart label."
+    ]
   }
 }

@@ -4,7 +4,7 @@ import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {readSheet} from "read-excel-file/node";
 import {executablePath} from "../helpers/desktop-executable";
-import {openWorkspace,importPackage,openSection} from "../helpers/desktop-navigation";
+import {openWorkspace,importPackage,openSettingsItem,setMonth,settingsMenu,openSettings} from "../helpers/desktop-navigation";
 import {monthProfitPackage,monthProfitSnapshot} from "../helpers/month-profit-fixture";
 import {writeRawEstimatePackage} from "../../src/source/raw-package";
 import type {SqlSnapshot} from "../../src/source/sql-server";
@@ -36,34 +36,34 @@ async function intercept(app:ElectronApplication,body:string){
 const importFile=async(app:ElectronApplication,page:Page,file:string)=>{
  await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
  await importPackage(page);
- await expect(page.getByRole("heading",{name:"Ayarlar",exact:true,level:1})).toBeHidden(); // a slow import closes Ayarlar and returns to Bu ay
+ await expect(settingsMenu(page)).toBeHidden();
+ await expect(page.getByText("Gerçek kaynak kayıtları içe aktarıldı.",{exact:true})).toBeVisible();
 };
+const docs=(page:Page)=>page.getByRole("main",{name:"Kaynak belgeler"});
+const exportButton=(page:Page)=>page.getByRole("button",{name:"Excel’e aktar",exact:true});
 
-test("Rapor ve Excel exports the month to Excel and opens a source document and returns focus to its row",async()=>{
- const userData=await mkdtemp(join(tmpdir(),"reports-page-")),file=join(userData,"month.json"),output=join(userData,"out.xlsx");await writeFile(file,monthProfitPackage());
+test("the header exports the month to Excel and Kaynak belgeler opens a document and returns focus to its row",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"export-docs-")),file=join(userData,"month.json"),output=join(userData,"out.xlsx");await writeFile(file,monthProfitPackage());
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   const page=await app.firstWindow();await openWorkspace(page);
-  await openSection(page,"Rapor ve Excel");
-  await expect(page.getByRole("button",{name:"Excel’e aktar",exact:true})).toBeDisabled();
-  await app.evaluate(({dialog},path)=>{dialog.showOpenDialog=async()=>({canceled:false,filePaths:[path]});},file);
-  await importPackage(page);
-  await expect(page.getByRole("heading",{name:"Ayarlar",exact:true,level:1})).toBeHidden();
-  await openSection(page,"Rapor ve Excel");
-  await expect(page.getByRole("heading",{name:"Rapor ve Excel",level:1})).toBeVisible();
-  await expect(page.getByRole("tab")).toHaveCount(0);
-  const exportButton=page.getByRole("button",{name:"Excel’e aktar",exact:true});await expect(exportButton).toBeEnabled();
+  await expect(exportButton(page)).toBeDisabled();
+  await importFile(app,page,file);
+  await expect(exportButton(page)).toBeEnabled();
   await app.evaluate(({dialog},path)=>{dialog.showSaveDialog=async()=>({canceled:false,filePath:path});},output);
-  await exportButton.click();
-  await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.",{exact:true})).toBeVisible();
+  await exportButton(page).click();
+  await expect(page.getByRole("status").filter({hasText:"Doğrulanmamış tahmin Excel dosyasına kaydedildi."})).toBeVisible();
   const rows=await readSheet(await readFile(output),"Özet");
   expect(rows.find(r=>r[0]==="Satış")?.[1]).toBe("480");
-  await page.getByRole("button",{name:"Kaynak belgeleri aç",exact:true}).click();
+  await openSettingsItem(page,/^Kaynak belgeler/);
   const row=page.getByRole("button",{name:/^Belgeyi aç /}).first();await expect(row).toBeVisible();
   await row.click();
   await expect(page.getByRole("region",{name:"Kaynak belge ayrıntıları"})).toBeVisible();
   await page.getByRole("button",{name:"Belgelere dön",exact:true}).click();
   await expect(row).toBeFocused();
+  await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
+  await expect(page.getByRole("button",{name:"Ayarlar",exact:true})).toBeFocused();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
@@ -74,52 +74,52 @@ test("Kaynak belgeler pages, returns to the opened row, reloads on SOURCE_CHANGE
  try{
   const page=await app.firstWindow();await openWorkspace(page);
   await importFile(app,page,file);
-  await openSection(page,"Rapor ve Excel");
-  await expect(page.getByLabel("Dönem",{exact:true})).toHaveValue("2025-10");
-  const docs=page.getByRole("region",{name:"Kaynak belgeler"});
-  await page.getByRole("button",{name:"Kaynak belgeleri aç",exact:true}).click();
-  await expect(docs.getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
-  await expect(docs.getByRole("button",{name:/^Belgeyi aç /})).toHaveCount(50);
-  await expect(docs.getByRole("button",{name:"Önceki belgeler",exact:true})).toBeDisabled();
-  await docs.getByRole("button",{name:"Sonraki belgeler",exact:true}).click();
-  await expect(docs.getByRole("status").filter({hasText:"51–60 / 60"})).toBeVisible();
-  await expect(docs.getByRole("button",{name:/^Belgeyi aç /})).toHaveCount(10);
-  await expect(docs.getByRole("button",{name:"Sonraki belgeler",exact:true})).toBeDisabled();
-  await expect(docs.getByRole("button",{name:"Önceki belgeler",exact:true})).toBeFocused();
-  const row=docs.getByRole("button",{name:/^Belgeyi aç /}).first();
+  await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
+  await openSettingsItem(page,/^Kaynak belgeler/);
+  await expect(docs(page).getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
+  await expect(docs(page).getByRole("button",{name:/^Belgeyi aç /})).toHaveCount(50);
+  await expect(docs(page).getByRole("button",{name:"Önceki belgeler",exact:true})).toBeDisabled();
+  await docs(page).getByRole("button",{name:"Sonraki belgeler",exact:true}).click();
+  await expect(docs(page).getByRole("status").filter({hasText:"51–60 / 60"})).toBeVisible();
+  await expect(docs(page).getByRole("button",{name:/^Belgeyi aç /})).toHaveCount(10);
+  await expect(docs(page).getByRole("button",{name:"Sonraki belgeler",exact:true})).toBeDisabled();
+  await expect(docs(page).getByRole("button",{name:"Önceki belgeler",exact:true})).toBeFocused();
+  const row=docs(page).getByRole("button",{name:/^Belgeyi aç /}).first();
   await row.click();
-  await expect(docs.getByRole("button",{name:"Belgelere dön",exact:true})).toBeVisible();
-  await docs.getByRole("button",{name:"Belgelere dön",exact:true}).click();
+  await expect(docs(page).getByRole("button",{name:"Belgelere dön",exact:true})).toBeVisible();
+  await docs(page).getByRole("button",{name:"Belgelere dön",exact:true}).click();
   await expect(row).toBeFocused();
-  await expect(docs.getByRole("status").filter({hasText:"51–60 / 60"})).toBeVisible();
+  await expect(docs(page).getByRole("status").filter({hasText:"51–60 / 60"})).toBeVisible();
   // SOURCE_CHANGED once on the paged read: the list reloads from the first page.
-  await docs.getByRole("button",{name:"Rapora dön",exact:true}).click();
+  await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();
   await intercept(app,`(calls)=>calls.n===2?{status:"source-unavailable",code:"SOURCE_CHANGED",message:"Kaynak sürümü değişti. Yeni sürümü açın."}:null`);
-  await page.getByRole("button",{name:"Kaynak belgeleri aç",exact:true}).click();
-  await expect(docs.getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
-  await expect(docs.getByRole("alert")).toHaveCount(0);
+  await openSettingsItem(page,/^Kaynak belgeler/);
+  await expect(docs(page).getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
+  await expect(docs(page).getByRole("alert")).toHaveCount(0);
   // A failing read shows an alert; Yeniden dene recovers.
-  await docs.getByRole("button",{name:"Rapora dön",exact:true}).click();
+  await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();
   await intercept(app,`(calls)=>calls.n===1?{status:"source-unavailable",code:"NOT_FOUND",message:"Sentetik okuma hatası"}:null`);
-  await page.getByRole("button",{name:"Kaynak belgeleri aç",exact:true}).click();
-  await expect(docs.getByRole("alert")).toContainText("Sentetik okuma hatası");
-  await docs.getByRole("button",{name:"Yeniden dene",exact:true}).click();
-  await expect(docs.getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
-  await expect(docs.getByRole("alert")).toHaveCount(0);
+  await openSettingsItem(page,/^Kaynak belgeler/);
+  await expect(docs(page).getByRole("alert")).toContainText("Sentetik okuma hatası");
+  await docs(page).getByRole("button",{name:"Yeniden dene",exact:true}).click();
+  await expect(docs(page).getByRole("status").filter({hasText:"1–50 / 60"})).toBeVisible();
+  await expect(docs(page).getByRole("alert")).toHaveCount(0);
   // A month without documents.
-  await docs.getByRole("button",{name:"Rapora dön",exact:true}).click();
-  await page.getByLabel("Dönem",{exact:true}).fill("2025-09");
-  await page.getByRole("button",{name:"Kaynak belgeleri aç",exact:true}).click();
-  await expect(docs.getByText("Bu ay için kaynak belge yok.",{exact:true})).toBeVisible();
+  await page.getByRole("button",{name:"Ana sayfaya dön",exact:true}).click();
+  await setMonth(page,"2025-09");
+  await openSettingsItem(page,/^Kaynak belgeler/);
+  await expect(docs(page).getByText("Bu ay için kaynak belge yok.",{exact:true})).toBeVisible();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });
 
-test("Rapor ve Excel without a package says a data package is needed",async()=>{
- const userData=await mkdtemp(join(tmpdir(),"reports-empty-"));
+test("without a package the export and Kaynak belgeler are disabled",async()=>{
+ const userData=await mkdtemp(join(tmpdir(),"export-empty-"));
  const app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
   const page=await app.firstWindow();await openWorkspace(page);
-  await openSection(page,"Rapor ve Excel");
   await expect(page.getByRole("heading",{name:"Kâr tahmini için veri paketi gerekiyor",exact:true})).toBeVisible();
+  await expect(exportButton(page)).toBeDisabled();
+  await openSettings(page);
+  await expect(settingsMenu(page).getByRole("button",{name:/^Kaynak belgeler/})).toBeDisabled();
  }finally{await app.close();await rm(userData,{recursive:true,force:true});}
 });

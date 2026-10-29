@@ -57,7 +57,7 @@ test("packaged Windows profile retains app-owned history across launch and resta
       const page = await app.firstWindow();await openWorkspace(page);
       expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(true);
       expect(await realpath(await app.evaluate(({ app }) => app.getPath("userData")))).toBe(actualProfile);
-      await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name: "Rapor ve Excel", exact: true })).toBeVisible();
+      await expect(page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button")).toHaveText(["Bu ay", "Ürünler", "Giderler"]);
       expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", liveConnection: "disabled" });
       const expenses = await page.evaluate(() => window.esmer.queryExpenses({ period: "2025-09" }));
       expect(expenses).toMatchObject({ rows: expect.any(Array) });
