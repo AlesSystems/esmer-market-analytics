@@ -1,5 +1,5 @@
 import {expect,test} from "vitest";
-import {marginLine,monthChange,monthDative,monthLead,monthLocative,wordMoney,monthName,percentText} from "../../src/ui/pages/month-summary";
+import {changeArrow,marginLine,monthChange,monthDative,monthLead,monthLocative,wordMoney,monthName,percentText} from "../../src/ui/pages/month-summary";
 
 test("the lead names the month and the word-money sales; the hero amount follows it",()=>{
  expect(monthLead("2025-10","1970000")).toBe("Ekim'de 1,97 milyon ₺ satış yaptınız. Tahmini brüt kâr");
@@ -45,4 +45,13 @@ test("the money unit is chosen after rounding",()=>{
 test("a negative percentage puts the sign before the percent mark",()=>{
  expect(percentText("-10.00")).toBe("-%10,00");
  expect(percentText("13.37")).toBe("%13,37");
+});
+
+test("the change arrow points up for a rise, down for a fall and is absent for zero or no comparison", () => {
+  expect(changeArrow("10.60")).toBe("up");
+  expect(changeArrow("-3.20")).toBe("down");
+  expect(changeArrow("0")).toBeNull();
+  expect(changeArrow("0.00")).toBeNull();
+  expect(changeArrow("-0.00")).toBeNull();
+  expect(changeArrow(null)).toBeNull();
 });

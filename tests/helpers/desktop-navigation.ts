@@ -4,7 +4,7 @@ export const settingsMenu = (page: Page) => page.getByRole("dialog", { name: "Ay
 
 /** Opens the gear menu (a popover, not a page). */
 export async function openSettings(page: Page) {
-  if (!await settingsMenu(page).isVisible()) await page.getByRole("button", { name: "Ayarlar", exact: true }).click();
+  if (!await settingsMenu(page).isVisible()) await page.getByRole("button", { name: /^Ayarlar(, dikkat gerekiyor)?$/ }).click();
   await settingsMenu(page).waitFor();
 }
 
