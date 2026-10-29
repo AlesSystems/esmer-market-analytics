@@ -8,27 +8,14 @@
 @import "./pages/pages.css";
 @source "./**/*.{ts,tsx}";
 @layer components {
-  .data-status { position: relative; margin: 0; padding: 0; border: 0; }
-  .data-status > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; margin: 0; font-weight: 400; }
-  .data-status > summary { border-color: transparent; padding-left: 0; font-size: 13px; }
-  .data-status > summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1px 1px 0; transform: rotate(45deg); margin: 0 3px 4px auto; }
-  .status { display: inline-flex; align-items: center; width: fit-content; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; line-height: 1.5; background: var(--soft); color: var(--ink); }
-  .recovery-section { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); min-width: 0; }
-  .positive { color: var(--gain); }
-  .negative { color: var(--loss); }
-  .table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border-radius: 6px; }
+  .recovery-section { margin: 20px 0; padding: 24px 28px; min-width: 0; max-width: 640px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); }
+  .table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border-radius: 12px; background: var(--card); }
   .table-scroll th:first-child, .table-scroll td:first-child { min-width: 120px; }
   .table-scroll tr:hover td { background: var(--page); }
   .number { text-align: right; white-space: nowrap; }
   .report-actions, .recovery-actions, .operation-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
-  .report-actions label { flex: 1 1 240px; }
-  .report-actions select { width: 100%; min-width: 0; }
-  .primary { background: var(--accent); color: var(--card); border-color: var(--accent); }
-  .note { font-size: 13px; }
-  .app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; border-bottom: 1px solid var(--line); }
   .recovery-workspace > nav { margin-bottom: 20px; }
   .recovery-workspace > p { margin: 10px 0 24px; }
-  .recovery-section { margin: 20px 0; }
   .recovery-section h2 { margin-bottom: 12px; }
   .recovery-backups { list-style: none; padding: 0; }
   .recovery-backups li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
@@ -38,12 +25,8 @@
     .recovery-section { padding: 18px; }
     .recovery-backups li { flex-direction: column; }
   }
-  @media (forced-colors: active) {
-    [data-slot="button"] { border: 1px solid CanvasText; }
-  }
 }
 
 .skip-workspace { position: fixed; z-index: 100; left: 16px; top: -100px; background: var(--card); color: var(--ink); }
 .skip-workspace:focus { top: 12px; }
 main, section { min-width: 0; }
-.table-scroll { background: var(--card); border-radius: 10px; }

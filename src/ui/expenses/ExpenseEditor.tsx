@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { classifications, classificationLabels, type ExpenseFields, type ExpenseRecord, type ExpenseResult, type ExpenseValue } from "../../expenses/contracts";
 import type { RequestError } from "../../domain/contracts";
-import { Input } from "../components/ui/input";
 import { date, money } from "../format";
 
 export type Run = (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean, focusId?: string) => Promise<void>;
@@ -16,7 +15,7 @@ export function ExpenseEditor({ row, history, busy, close, run }: { row: Expense
   useEffect(() => { title.current?.focus(); }, []);
   function update<K extends keyof ExpenseFields>(key: K, value: ExpenseFields[K]) { setFields(previous => previous ? { ...previous, [key]: value } : null); }
   const decimal = (key: string) => ["net", "tax", "gross"].includes(key);
-  const textField = (key: "date" | "paymentDate" | "category" | "net" | "tax" | "gross" | "taxEvidence" | "supportingReference" | "sourceReference" | "labourPeriod", label: string, type = "text") => <label>{label}<Input type={type} readOnly={key === "sourceReference"} inputMode={decimal(key) ? "decimal" : undefined} value={(decimal(key) ? fields?.[key]?.replace(".", ",") : fields?.[key]) ?? ""} onChange={event => update(key, (decimal(key) ? event.target.value.replace(",", ".") : event.target.value) || (["date", "category", "net", "tax", "gross"].includes(key) ? "" : null))} /></label>;
+  const textField = (key: "date" | "paymentDate" | "category" | "net" | "tax" | "gross" | "taxEvidence" | "supportingReference" | "sourceReference" | "labourPeriod", label: string, type = "text") => <label>{label}<input type={type} readOnly={key === "sourceReference"} inputMode={decimal(key) ? "decimal" : undefined} value={(decimal(key) ? fields?.[key]?.replace(".", ",") : fields?.[key]) ?? ""} onChange={event => update(key, (decimal(key) ? event.target.value.replace(",", ".") : event.target.value) || (["date", "category", "net", "tax", "gross"].includes(key) ? "" : null))} /></label>;
   return <section className="card g-task" aria-label="Gider düzeltmesi">
     <div className="g-card-head"><h2 ref={title} tabIndex={-1}>Gideri incele ve düzelt</h2></div>
     <p className="g-muted">{original ? ("kind" in original.origin ? "Elle girildi" : "Excel") : "Eski kayıt"} · sürüm {row.revision}</p>
@@ -26,7 +25,7 @@ export function ExpenseEditor({ row, history, busy, close, run }: { row: Expense
         {textField("date", "Gider tarihi", "date")}{textField("paymentDate", "Ödeme tarihi", "date")}{textField("category", "Kategori")}
         <label>Sınıflandırma<select value={fields.classification} onChange={event => { const classification = event.target.value as ExpenseFields["classification"]; setFields({ ...fields, classification, labourPeriod: classification === "labour" ? fields.date.slice(0, 7) : null, loss: classification === "inventory-loss" ? { evidence: "", recognition: "separate" } : null }); }}>{classifications.map(item => <option key={item} value={item}>{classificationLabels[item]}</option>)}</select></label>
         {fields.classification === "labour" && textField("labourPeriod", "İşçilik dönemi", "month")}
-        {fields.loss && <><label>Kayıp kanıtı<Input value={fields.loss.evidence} onChange={event => update("loss", { ...fields.loss!, evidence: event.target.value })} /></label><label>Kayıp işlemi<select value={fields.loss.recognition} onChange={event => update("loss", { ...fields.loss!, recognition: event.target.value as "separate" | "already-in-cost" })}><option value="separate">Ayrıca giderleştir</option><option value="already-in-cost">Maliyette zaten yer alıyor</option></select></label></>}
+        {fields.loss && <><label>Kayıp kanıtı<input value={fields.loss.evidence} onChange={event => update("loss", { ...fields.loss!, evidence: event.target.value })} /></label><label>Kayıp işlemi<select value={fields.loss.recognition} onChange={event => update("loss", { ...fields.loss!, recognition: event.target.value as "separate" | "already-in-cost" })}><option value="separate">Ayrıca giderleştir</option><option value="already-in-cost">Maliyette zaten yer alıyor</option></select></label></>}
       </fieldset>
       <fieldset disabled={busy} className="g-fields"><legend>Tutar ve KDV</legend>
         {textField("net", "Net tutar")}{textField("tax", "KDV tutarı")}{textField("gross", "Brüt tutar")}
@@ -35,7 +34,7 @@ export function ExpenseEditor({ row, history, busy, close, run }: { row: Expense
       </fieldset>
       <fieldset disabled={busy} className="g-fields"><legend>Referanslar</legend>{textField("supportingReference", "Destek referansı")}{textField("sourceReference", "Kayıt referansı")}</fieldset>
       <p className="g-cap">Tutarları virgüllü ondalık olarak girin (örnek: 1250,50). Net, KDV ve brüt ilişkisi kayıtta doğrulanır.</p>
-      <label className="g-reason">Değişiklik gerekçesi<Input required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>
+      <label className="g-reason">Değişiklik gerekçesi<input required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>
       <div className="g-actions"><button type="submit" className="btn btn-primary" disabled={busy || !reason.trim()}>Düzeltmeyi kaydet</button><button type="button" className="btn btn-secondary" disabled={busy || !reason.trim() || original?.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: null, reason }), "Gider geri alındı. Geçmişi korundu.", true)}>Gideri geri al</button><button type="button" className="btn btn-secondary" onClick={close}>Düzeltmeyi kapat</button></div>
     </form>}
     <h3>Kayıt geçmişi</h3>

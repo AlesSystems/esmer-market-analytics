@@ -71,11 +71,11 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
 
  if(!month)return <Shell><p role="status">Veriler hazırlanıyor…</p></Shell>;
  if(!read)return <Shell busy><section className="card ledger is-loading" aria-label="Ürünler"><p className="muted tools-empty" role="status">Ürünler yükleniyor…</p></section></Shell>;
- if("failed" in read)return <Shell busy={loading}><div className="state" role="alert"><p>Ürünler okunamadı. {read.failed}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
+ if("failed" in read)return <Shell busy={loading}><div className="state" role="alert"><p>Ürünler okunamadı. {read.failed}</p><Button variant="secondary" onClick={retry}>Yeniden dene</Button></div></Shell>;
  if(!view){
   const result=read.result;
   const code=result.status==="source-unavailable"?result.code as string:"";
-  if(code&&code!=="MONTH_NOT_COVERED"&&code!=="ESTIMATE_UNAVAILABLE")return <Shell busy={loading}><div className="state" role="alert"><p>Ürünler okunamadı. Veri paketi değişmiş olabilir.</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
+  if(code&&code!=="MONTH_NOT_COVERED"&&code!=="ESTIMATE_UNAVAILABLE")return <Shell busy={loading}><div className="state" role="alert"><p>Ürünler okunamadı. Veri paketi değişmiş olabilir.</p><Button variant="secondary" onClick={retry}>Yeniden dene</Button></div></Shell>;
   return <Shell busy={loading}>{result.status==="source-unavailable"&&<MonthUnavailable result={result} month={read.month} purpose="ayın ürünlerini ve kârlarını gösterir" coverage={coverage} onMonth={onMonth} importPackage={importPackage}/>}</Shell>;
  }
 
@@ -103,7 +103,7 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
      <TrustChip costKnownPct={view.totals.costKnownPct}/>
     </div>
     {view.products.length===0?<p className="chart-empty tools-empty">Bu ay satılan ürün yok.</p>:rows.length===0
-     ?<div className="state-inline"><p>Aramaya uyan ürün yok.</p><Button variant="outline" onClick={clear}>Aramayı ve süzgeci temizle</Button></div>
+     ?<div className="state-inline"><p>Aramaya uyan ürün yok.</p><Button variant="secondary" onClick={clear}>Aramayı ve süzgeci temizle</Button></div>
      :<div className="tbl-wrap" role="region" aria-label="Ürün listesi"><table className="products-table" onKeyDown={walk}>
       <caption className="sr-only">{monthName(view.month)} ürünleri. Ürün adına basınca ayrıntı açılır; aşağı ve yukarı oklarla gezinilir.</caption>
       <thead><tr><th className="rank" scope="col"><span className="sr-only">Sıra</span></th>{columns.map(([key,label,numeric])=><th key={key} scope="col" className={numeric?"num":undefined} aria-sort={sortOf(key)}><button type="button" className={`sort${sortOf(key)?" is-on":""}`} onClick={()=>setSort(nextSort(sort,key))}>{label}{sortOf(key)==="ascending"?<ArrowUpIcon className="sort-ico"/>:<ArrowDownIcon className="sort-ico"/>}</button></th>)}<th className="bar-cell" aria-hidden="true"/></tr></thead>
@@ -114,7 +114,7 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
   {!source&&selected!==null&&<>
    {chosen
     ?<ProductDrawer key={chosen.id} product={chosen} month={view.month} sourceButton={sourceButton} onClose={close} onSource={()=>setSource(true)}/>
-    :<aside className="drawer" role="dialog" aria-modal="false" aria-label="Ürün ayrıntısı"><div className="dr-body"><p className="dr-note">{names.current.get(selected)??`Ürün #${selected}`} bu ay satılmadı.</p><Button variant="outline" onClick={close}>Ayrıntıyı kapat</Button></div></aside>}
+    :<aside className="drawer" role="dialog" aria-modal="false" aria-label="Ürün ayrıntısı"><div className="dr-body"><p className="dr-note">{names.current.get(selected)??`Ürün #${selected}`} bu ay satılmadı.</p><Button variant="secondary" onClick={close}>Ayrıntıyı kapat</Button></div></aside>}
   </>}
   {source&&chosen&&<ProductSourceLines key={`${view.source.hash}|${view.month}|${chosen.id}`} hash={view.source.hash} month={view.month} productId={chosen.id} name={productName(chosen)} onBack={()=>{setSource(false);requestAnimationFrame(()=>sourceButton.current?.focus());}}/>}
  </Shell>;

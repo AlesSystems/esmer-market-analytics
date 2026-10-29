@@ -68,19 +68,19 @@ export function SourceDocuments({month,availability,onClose}:{month:string;avail
  function back(){setDetail(undefined);restoreReturn(receipt.current,heading.current);}
  function page(to:number,button:"previous"|"next"){pagerFocus.current=button;setOffset(to);}
  return <main className="overlay-page" aria-label="Kaynak belgeler">
-  <nav aria-label="Sayfa gezinmesi"><Button variant="outline" onClick={onClose}>Ana sayfaya dön</Button></nav>
+  <nav aria-label="Sayfa gezinmesi"><Button variant="secondary" onClick={onClose}>Ana sayfaya dön</Button></nav>
   {detail?<>
-   <Button variant="outline" onClick={back}>Belgelere dön</Button>
+   <Button variant="secondary" onClick={back}>Belgelere dön</Button>
    <div ref={detailBox}><SourceDocumentDetail key={detail.document?.ID} document={detail.document} lines={detail.lines}/></div>
   </>:<>
    <h1 ref={heading} tabIndex={-1}>Kaynak belgeler</h1>
    <p>{monthName(month)} için veri paketindeki kayıtlı belgeler. Tutarlar kaynak kaydındandır ve doğrulanmamıştır.</p>
-   {message&&<div role="alert"><p>{message}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
+   {message&&<div role="alert"><p>{message}</p><Button variant="secondary" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
    {!list&&!message&&<p role="status">Belgeler yükleniyor…</p>}
    {list&&(list.total===0?<p role="status">Bu ay için kaynak belge yok.</p>:<>
     <div className="table-scroll" tabIndex={0} aria-label="Kaynak belgeler tablosu"><table><thead><tr><th>Belge kayıt ID’si</th><th>Kaynak tarihi</th><th>Belge türü</th><th>Belge tutarı</th><th>Para birimi</th></tr></thead>
      <tbody>{list.documents.map(row=><tr key={row.ID}><td><Button variant="link" data-focus-key={`report-document-${list.hash}-${row.ID}`} aria-label={`Belgeyi aç ${row.ID}`} onClick={event=>open(row.ID!,event.currentTarget)}>{row.ID}</Button></td><td>{row.FIS_TARIHI?date(row.FIS_TARIHI.slice(0,10)):"—"}</td><td>{typeLabel(row.FIS_TURU)}</td><td className="number">{row.GENELTOPLAM?decimal(row.GENELTOPLAM):"—"}</td><td>{row.CURRENCY??"Bilinmiyor"}</td></tr>)}</tbody></table></div>
-    <nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" ref={previous} disabled={list.offset===0} onClick={()=>page(Math.max(0,list.offset-PAGE),"previous")}>Önceki belgeler</Button><span role="status">{`${list.offset+1}–${Math.min(list.offset+PAGE,list.total)} / ${list.total}`}</span><Button variant="outline" ref={next} disabled={list.offset+PAGE>=list.total} onClick={()=>page(list.offset+PAGE,"next")}>Sonraki belgeler</Button></nav>
+    <nav className="report-actions" aria-label="Belge sayfaları"><Button variant="secondary" ref={previous} disabled={list.offset===0} onClick={()=>page(Math.max(0,list.offset-PAGE),"previous")}>Önceki belgeler</Button><span role="status">{`${list.offset+1}–${Math.min(list.offset+PAGE,list.total)} / ${list.total}`}</span><Button variant="secondary" ref={next} disabled={list.offset+PAGE>=list.total} onClick={()=>page(list.offset+PAGE,"next")}>Sonraki belgeler</Button></nav>
    </>)}
   </>}
  </main>;

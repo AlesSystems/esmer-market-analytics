@@ -67,11 +67,15 @@
   button, input, select, textarea { font: inherit; max-width: 100%; }
   button { cursor: pointer; }
   button:disabled { cursor: not-allowed; opacity: .5; }
-  button:not([data-slot]) { min-height: 40px; padding: 8px 12px; border: 1px solid var(--edge); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-sm); font-weight: 600; }
-  button:not([data-slot]):hover { background: var(--hover); }
-  input:not([data-slot]):not([type="checkbox"]):not([type="radio"]), select, textarea { min-width: 0; min-height: 40px; padding: 8px 10px; border: 1px solid var(--field); border-radius: 10px; background: var(--card); color: var(--ink); }
+  button { min-height: 40px; padding: 8px 12px; border: 1px solid var(--edge); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-sm); font-weight: 600; }
+  button:hover { background: var(--hover); }
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { width: 100%; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-md); font-weight: 500; }
+  input:not([type="checkbox"]):not([type="radio"]):hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) { border-color: var(--ink-2); }
+  input:not([type="checkbox"]):not([type="radio"]):focus-visible, select:focus-visible, textarea:focus-visible { border-color: var(--accent); outline-offset: 1px; }
+  input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--loss); }
+  input:disabled, select:disabled, textarea:disabled { opacity: .6; }
   input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); flex-shrink: 0; }
-  textarea { min-height: 80px; resize: vertical; }
+  textarea { min-height: 80px; padding: 10px 12px; resize: vertical; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   [hidden] { display: none !important; }
   [role="alert"] { color: var(--loss); }

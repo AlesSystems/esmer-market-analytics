@@ -32,13 +32,13 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
  return <section className="product-source" aria-labelledby="product-source-title" aria-busy={busy}>
   <div className="product-source-head">
    <h2 id="product-source-title" ref={heading} tabIndex={-1}>{name} · kaynak satırlar · {monthName(month)}</h2>
-   <Button variant="outline" onClick={onBack}>Ürünlere dön</Button>
+   <Button variant="secondary" onClick={onBack}>Ürünlere dön</Button>
   </div>
   <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Belge toplamı KDV dahil, belgenin tamamının tutarıdır; kâr tahmini bu ürünün satır tutarlarından hesaplanır. Tutarlar kaynakta kaydedildiği gibidir; doğrulanmadı.</p>
-  {error&&<div role="alert" className="state"><p>{error}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
+  {error&&<div role="alert" className="state"><p>{error}</p><Button variant="secondary" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
   {busy&&!view&&<p role="status">Kaynak satırları yükleniyor…</p>}
   {detail?<>
-   <Button variant="outline" onClick={()=>{returnTo.current=documentId;setDocumentId(null);}}>Belgelere dön</Button>
+   <Button variant="secondary" onClick={()=>{returnTo.current=documentId;setDocumentId(null);}}>Belgelere dön</Button>
    <SourceDocumentDetail key={detail.document?.ID} document={detail.document} lines={detail.lines}/>
   </>:view&&documentId===null&&view.document===null&&<>
    {view.total===0?<p className="viz-empty">Bu ay bu ürünü içeren satış belgesi kaydı yok.</p>:<div className="table-scroll"><table className="product-source-table">
@@ -51,7 +51,7 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
      <td className="number">{row.GENELTOPLAM?money(row.GENELTOPLAM):"—"}</td>
     </tr>)}</tbody>
    </table></div>}
-   {view.total>PAGE&&<nav className="report-actions" aria-label="Belge sayfaları"><Button variant="outline" disabled={busy||offset===0} onClick={()=>setOffset(Math.max(0,offset-PAGE))}>Önceki belgeler</Button><span role="status">{offset+1}–{Math.min(offset+PAGE,view.total)} / {view.total}</span><Button variant="outline" disabled={busy||offset+PAGE>=view.total} onClick={()=>setOffset(offset+PAGE)}>Sonraki belgeler</Button></nav>}
+   {view.total>PAGE&&<nav className="report-actions" aria-label="Belge sayfaları"><Button variant="secondary" disabled={busy||offset===0} onClick={()=>setOffset(Math.max(0,offset-PAGE))}>Önceki belgeler</Button><span role="status">{offset+1}–{Math.min(offset+PAGE,view.total)} / {view.total}</span><Button variant="secondary" disabled={busy||offset+PAGE>=view.total} onClick={()=>setOffset(offset+PAGE)}>Sonraki belgeler</Button></nav>}
   </>}
  </section>;
 }

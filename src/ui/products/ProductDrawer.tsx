@@ -38,7 +38,7 @@ export function ProductDrawer({product,month,onSource,onClose,sourceButton,headi
    {costKnown
     ?<><h3>Son 6 ay marj</h3><div className="dr-chart"><MarginLine product={p}/></div></>
     :<p className="dr-note">Bu ürünün alış fiyatı kayıtlı değil, bu yüzden marjı bilinmiyor. Satışı kâra katılmadı; sıfır sayılmadı.</p>}
-   <Button ref={sourceButton} variant="outline" onClick={onSource}>Kaynak satırlar</Button>
+   <Button ref={sourceButton} variant="secondary" onClick={onSource}>Kaynak satırlar</Button>
   </div>
  </aside>;
 }

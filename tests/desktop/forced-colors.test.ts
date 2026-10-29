@@ -36,7 +36,7 @@ test("forced colors keeps a keyboard focus outline on tabs and the month stepper
 });
 
 async function importedApp(bytes = richEstimatePackage()) {
-  const userData = await mkdtemp(join(tmpdir(), "esmer-shadcn-ui-"));
+  const userData = await mkdtemp(join(tmpdir(), "esmer-forced-colors-"));
   const packagePath = join(userData, "representative-month.json");
   await writeFile(packagePath, bytes);
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });

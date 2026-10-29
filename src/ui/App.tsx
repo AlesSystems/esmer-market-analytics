@@ -145,14 +145,14 @@ function App() {
   const ready = availability?.status === "ready" ? availability : undefined;
   const notices = <>
     <OperationProgress />
-    {monthSaveError && <p role="alert">{monthSaveError} <Button variant="outline" onClick={() => {if(selectedMonth)selectMonth(selectedMonth);}}>Dönemi kaydetmeyi yeniden dene</Button></p>}
+    {monthSaveError && <p role="alert">{monthSaveError} <Button variant="secondary" onClick={() => {if(selectedMonth)selectMonth(selectedMonth);}}>Dönemi kaydetmeyi yeniden dene</Button></p>}
     {(!result || result.status === "cancelled" || result.status === "historical") && ready?.lastImportError && <p role="alert">{previousImportMessage(ready)}</p>}
-    {sqlNotice && <div className="import-outcome"><p role={sqlNotice === "SQL içe aktarma iptal edildi." ? "status" : "alert"}>{sqlNotice}</p><Button variant="ghost" onClick={() => setSqlNotice("")}>Bildirimi kapat</Button></div>}
-    {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="ghost" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
+    {sqlNotice && <div className="import-outcome"><p role={sqlNotice === "SQL içe aktarma iptal edildi." ? "status" : "alert"}>{sqlNotice}</p><Button variant="link" onClick={() => setSqlNotice("")}>Bildirimi kapat</Button></div>}
+    {result && <div className="import-outcome"><p role={result.status === "failed" || result.status === "rejected" ? "alert" : "status"}>{importMessage(result)}</p>{result.status !== "failed" && result.status !== "rejected" && <Button variant="link" onClick={() => setResult(undefined)}>Bildirimi kapat</Button>}</div>}
   </>;
   const dataset = ready?.store === "loaded" ? ready.dataset : undefined;
   const overlay = frameView === "recovery"
-    ? <RecoveryWorkspace embedded onClose={() => show("workspace")} onRestored={restored} />
+    ? <RecoveryWorkspace onClose={() => show("workspace")} onRestored={restored} />
     : frameView === "live"
       ? <LivePanel live={live} cutoff={coverage?.last ?? live.status?.cutoff ?? dataset?.cutoff} hasData={!!coverage || !!dataset} sqlImporting={sqlImporting} onImportSql={() => expenseNavigation.leave(() => void importSql())} onClose={() => show("workspace")} />
       : frameView === "documents" && selectedMonth ? <SourceDocuments month={selectedMonth} availability={availability} onClose={() => show("workspace")} /> : null;
@@ -163,7 +163,7 @@ function App() {
   const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
   if (ready) lastReady.current = ready;
   const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
-  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="outline" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="outline" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
+  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="secondary" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="secondary" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
   // A page that was open stays mounted (hidden) through a failed or pending availability refresh, so its open detail survives a retry.
   const pageAvailability = ready ?? lastReady.current;
   const active = frameView === "workspace" && !!ready;
