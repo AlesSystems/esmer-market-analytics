@@ -16,7 +16,7 @@ import { MonthStepper } from "./shell/MonthStepper";
 import { ExcelExport } from "./shell/ExcelExport";
 import { SourceDocuments } from "./source-documents/SourceDocuments";
 import { MonthProfitProvider } from "./pages/month-profit-data";
-import { useLiveConnection } from "./settings/live";
+import { liveTrouble, useLiveConnection } from "./settings/live";
 import { importSqlSource } from "./sql-import";
 import type { Coverage, NavigationState, PageProps, Section } from "./sections";
 import { MonthPage } from "./pages/MonthPage";
@@ -174,7 +174,7 @@ function App() {
     <MonthStepper month={pageMonth} coverage={section === "expenses" ? null : coverage} onMonth={onMonth} />
     <ExcelExport month={pageMonth} revision={revision} />
   </>;
-  const menu = <SettingsMenu availability={availability} coverage={coverage} resolution={availability && availability.status !== "ready" ? { status: "failed", message: availability.message } : resolution} liveState={live.state} importing={importing} sqlImporting={sqlImporting}
+  const menu = <SettingsMenu availability={availability} coverage={coverage} resolution={availability && availability.status !== "ready" ? { status: "failed", message: availability.message } : resolution} liveState={live.state} liveAttention={liveTrouble(live.status, live.state)} importing={importing} sqlImporting={sqlImporting}
     documentsEnabled={!!selectedMonth && !!ready} onImportPackage={() => expenseNavigation.leave(() => void importPackage())} onRecovery={() => show("recovery")} onLive={() => show("live")} onDocuments={() => show("documents")} />;
   return <AppFrame.Provider value={{ view: frameView, launchRequest, show, overlay, notices }}>
     <MonthProfitProvider month={pageMonth} active={active} revision={revision}>

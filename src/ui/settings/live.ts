@@ -31,6 +31,12 @@ export function liveState(status: LiveStatusResult | undefined, readable: boolea
   return ({ disabled: "off", refreshing: "checking", stale: "stale" } as Record<string, LiveState>)[status.live.phase] ?? "on";
 }
 
+/** Trouble the owner must see: a connection that is switched on but stale or unreadable. A switched-off connection, a healthy one and one still being checked are not trouble. */
+export function liveTrouble(status: LiveStatusResult | undefined, state: LiveState): boolean {
+  if (!status || status.live.phase === "disabled") return false;
+  return state === "stale" || state === "unknown";
+}
+
 export function useLiveConnection(onDatasetChanged: () => void): LiveConnection {
   const [status, setStatus] = useState<LiveStatusResult>();
   const [readable, setReadable] = useState(true);

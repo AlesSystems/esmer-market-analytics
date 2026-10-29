@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { RecoveryStatus } from "../../recovery/contracts";
 import { textSizes, type Availability, type RequestError, type TextSize } from "../../domain/contracts";
 import { ChevronLeftIcon, ChevronRightIcon, DatabaseIcon, GearIcon, InfoIcon, ShieldIcon, TextSizeIcon, DownloadIcon, FileIcon } from "../icons";
@@ -7,6 +7,7 @@ import { limitations } from "../settings/limitations-data";
 import type { Limitation } from "../settings/limitations";
 import { liveTitles, type LiveState } from "../settings/live";
 import type { Coverage } from "../sections";
+import { AppFrame } from "../frame";
 import { useDismiss } from "../use-dismiss";
 
 type Resolution = { status: "pending" | "resolved" } | { status: "failed"; message: string };
@@ -15,6 +16,8 @@ type Props = {
   coverage: Coverage | null;
   resolution: Resolution;
   liveState: LiveState;
+  /** The connection is switched on but stale or unreadable. */
+  liveAttention: boolean;
   importing: boolean;
   sqlImporting: boolean;
   documentsEnabled: boolean;
@@ -25,6 +28,7 @@ type Props = {
 };
 
 const moment = (value: string) => new Intl.DateTimeFormat("tr-TR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+const backupTitles: Record<RecoveryStatus["state"], string> = { "setup-required": "Yedekleme henüz kurulmadı", pending: "Yedek sırada", running: "Yedek alınıyor", ready: "Hazır", failed: "Dikkat gerekiyor" };
 const sizeLabels: Record<TextSize, string> = { normal: "Normal", large: "Büyük", larger: "Çok büyük" };
 
 function TextSizeControl() {
@@ -73,32 +77,48 @@ function About({ coverage, availability, onBack }: { coverage: Coverage | null; 
 }
 
 /** The gear: a non-modal popover with the app's few settings. Escape, a press outside or leaving it closes it; Escape returns focus to the gear. */
-export function SettingsMenu({ availability, coverage, resolution, liveState, importing, sqlImporting, documentsEnabled, onImportPackage, onRecovery, onLive, onDocuments }: Props) {
+export function SettingsMenu({ availability, coverage, resolution, liveState, liveAttention, importing, sqlImporting, documentsEnabled, onImportPackage, onRecovery, onLive, onDocuments }: Props) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"main" | "about">("main");
   const [backup, setBackup] = useState<RecoveryStatus>();
-  const box = useRef<HTMLDivElement>(null), gear = useRef<HTMLButtonElement>(null), panel = useRef<HTMLDivElement>(null);
+  const frameView = useContext(AppFrame)?.view;
+  const box = useRef<HTMLDivElement>(null), gear = useRef<HTMLButtonElement>(null), panel = useRef<HTMLDivElement>(null), aboutItem = useRef<HTMLButtonElement>(null), fromAbout = useRef(false);
   const close = useCallback((viaKeyboard: boolean) => { setOpen(false); setView("main"); if (viaKeyboard) gear.current?.focus(); }, []);
   useDismiss(box, open, close);
-  useEffect(() => { if (!open) return; let active = true; window.esmer.getRecoveryStatus().then(value => { if (active && value.status === "recovery") setBackup(value); }).catch(() => undefined); return () => { active = false; }; }, [open]);
-  useEffect(() => { if (open) panel.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus(); }, [open, view]);
+  // The backup state also marks the gear, so it is read at start, whenever the menu opens or a full-page view closes, and once a minute.
+  useEffect(() => {
+    let active = true;
+    const read = () => window.esmer.getRecoveryStatus().then(value => { if (active && value.status === "recovery") setBackup(value); }).catch(() => undefined);
+    void read();
+    const timer = setInterval(() => { void read(); }, 60_000);
+    return () => { active = false; clearInterval(timer); };
+  }, [open, frameView]);
+  useEffect(() => {
+    if (!open) return;
+    if (view === "main" && fromAbout.current) { fromAbout.current = false; aboutItem.current?.focus(); return; }
+    panel.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, [open, view]);
   const run = (action: () => void) => () => { close(false); action(); };
   const ready = availability?.status === "ready" ? availability : undefined;
   const dataset = ready?.store === "loaded" ? ready.dataset : undefined;
   const cutoff = coverage?.last ?? dataset?.cutoff;
   const packageLine = resolution.status === "pending" ? "Kaynak durumu kontrol ediliyor…" : resolution.status === "failed" ? resolution.message : cutoff ? `Şu anki veri sonu: ${date(cutoff)}` : "Henüz veri paketi yok";
   const latest = backup?.backups[0];
-  const backupLine = !backup ? "Durum okunuyor…" : backup.state === "setup-required" ? "Yedekleme henüz kurulmadı" : latest ? `Son yedek: ${moment(latest.createdAt)}` : "Henüz yedek yok";
+  const lastBackup = latest ? `Son yedek: ${moment(latest.createdAt)}` : "Henüz yedek yok";
+  const backupLine = !backup ? "Durum okunuyor…" : backup.state === "ready" ? lastBackup : backup.state === "setup-required" ? backupTitles["setup-required"] : latest ? `${backupTitles[backup.state]} · ${lastBackup}` : backupTitles[backup.state];
+  const backupAttention = backup?.state === "failed";
+  const attention = backupAttention || liveAttention;
+  const gearName = attention ? "Ayarlar, dikkat gerekiyor" : "Ayarlar";
   return <div className="gear-wrap" ref={box}>
-    <button ref={gear} type="button" className="icon-btn settings-entry" aria-label="Ayarlar" title="Ayarlar" aria-haspopup="dialog" aria-expanded={open} aria-controls="settings-menu" onClick={() => open ? close(false) : setOpen(true)}><GearIcon /></button>
+    <button ref={gear} type="button" className="icon-btn settings-entry" aria-label={gearName} title={gearName} aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? "settings-menu" : undefined} onClick={() => open ? close(false) : setOpen(true)}><GearIcon />{attention && <span className="gear-dot" aria-hidden="true" />}</button>
     {open && <div className="menu" id="settings-menu" role="dialog" aria-label="Ayarlar" ref={panel}>
-      {view === "about" ? <About coverage={coverage} availability={availability} onBack={() => setView("main")} /> : <ul className="menu-list">
+      {view === "about" ? <About coverage={coverage} availability={availability} onBack={() => { fromAbout.current = true; setView("main"); }} /> : <ul className="menu-list">
         <li><button type="button" className="menu-item" data-autofocus disabled={importing || sqlImporting} onClick={run(onImportPackage)}><DownloadIcon /><span>{importing ? "Veriler içe aktarılıyor…" : "Veri paketi içe aktar"}<small role={resolution.status === "failed" ? "alert" : undefined}>{packageLine}</small></span></button></li>
-        <li><button type="button" className="menu-item" onClick={run(onRecovery)}><ShieldIcon /><span>Yedekle / Geri yükle<small>{backupLine}</small></span><ChevronRightIcon className="menu-go" /></button></li>
+        <li><button type="button" className="menu-item" onClick={run(onRecovery)}><ShieldIcon /><span>Yedekle / Geri yükle<small className={backupAttention ? "menu-warn" : undefined}>{backupLine}</small></span><ChevronRightIcon className="menu-go" /></button></li>
         <TextSizeControl />
-        <li><button type="button" className="menu-item" onClick={run(onLive)}><DatabaseIcon /><span>Canlı bağlantı<small>{liveTitles[liveState]}</small></span><ChevronRightIcon className="menu-go" /></button></li>
+        <li><button type="button" className="menu-item" onClick={run(onLive)}><DatabaseIcon /><span>Canlı bağlantı<small className={liveAttention ? "menu-warn" : undefined}>{liveTitles[liveState]}</small></span><ChevronRightIcon className="menu-go" /></button></li>
         <li><button type="button" className="menu-item" disabled={!documentsEnabled} onClick={run(onDocuments)}><FileIcon /><span>Kaynak belgeler<small>Veri paketindeki kayıtlı belgeler</small></span><ChevronRightIcon className="menu-go" /></button></li>
-        <li><button type="button" className="menu-item" onClick={() => setView("about")}><InfoIcon /><span>Hakkında ve bilinen sınırlar</span><ChevronRightIcon className="menu-go" /></button></li>
+        <li><button type="button" className="menu-item" ref={aboutItem} onClick={() => setView("about")}><InfoIcon /><span>Hakkında ve bilinen sınırlar</span><ChevronRightIcon className="menu-go" /></button></li>
       </ul>}
     </div>}
   </div>;

@@ -25,6 +25,8 @@
 .icon-btn { width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; color: var(--ink-2); display: grid; place-items: center; flex: none; }
 .icon-btn:hover, .icon-btn[aria-expanded="true"] { background: var(--soft); color: var(--ink); }
 .icon-btn .ico { width: 22px; height: 22px; }
+.settings-entry { position: relative; }
+.gear-dot { position: absolute; top: 7px; right: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--warn); box-shadow: 0 0 0 2px var(--card); }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 10px; font-size: var(--t-md); font-weight: 600; white-space: nowrap; }
 .btn-primary { background: var(--accent); color: var(--card); box-shadow: 0 1px 2px rgb(11 107 203 / .25); }
@@ -49,6 +51,7 @@
 .menu-item small { font-size: var(--t-sm); font-weight: 400; color: var(--ink-2); }
 .menu-item > span { flex: 1; min-width: 0; }
 .menu-go { color: var(--ink-2); }
+.menu-item small.menu-warn { color: var(--warn); font-weight: 600; }
 .menu-size { padding: 10px 12px; margin: 2px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .menu-back { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none; padding: 8px 10px; border-radius: 10px; font-size: var(--t-md); font-weight: 700; color: var(--ink); text-align: left; }
 .menu-back:hover { background: var(--hover); }
