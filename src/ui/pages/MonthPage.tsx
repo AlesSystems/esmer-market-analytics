@@ -12,7 +12,7 @@ import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
 import {attentionRows,netCardState,netReasonText} from "./month-answer";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
-import {marginLine,monthBridgeSteps,monthChange,monthLead,monthName,percentText} from "./month-summary";
+import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthLead,monthName,percentText} from "./month-summary";
 
 /** "57,50 ₺" with the kuruş set smaller. The text is the service amount as formatted, nothing is rounded. */
 function Amount({value,className}:{value:string;className:string}){
@@ -35,7 +35,7 @@ function Shell({title,children,busy=false}:{title:string;children:ReactNode;busy
 export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PageProps) {
  const {read,loading,retry}=useMonthProfitContext();
  if(!month)return <Shell title="Bu ay"><p role="status">Veriler hazırlanıyor…</p></Shell>;
- if(!read)return <Shell title={monthName(month)} busy><p role="status">Bu ayın rakamları yükleniyor…</p></Shell>;
+ if(!read)return <Shell title={monthName(month)} busy><div className="ay is-loading"><div className="col"><section className="card hero" aria-label="Ayın özeti"><p className="muted" role="status">Bu ayın rakamları yükleniyor…</p></section></div><div className="col"><section className="card netcard" aria-hidden="true"/><section className="card chart" aria-hidden="true"/></div></div></Shell>;
  if("failed" in read)return <Shell title={monthName(read.month)} busy={loading}><div className="state" role="alert"><p>Bu ayın rakamları okunamadı. {read.failed}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
  const result=read.result;
  if(result.status==="source-unavailable"){
@@ -46,7 +46,7 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const byId=new Map(v.products.map(p=>[p.id,p]));
  const attention=attentionRows(v.attention),net=netCardState(t);
  const change=c===null?null:monthChange(v.month,c.grossProfitPct);
- const up=c?.grossProfitPct!=null&&!c.grossProfitPct.startsWith("-");
+ const arrow=changeArrow(c?.grossProfitPct??null);
  const line=marginLine(t);
  return <Shell title={monthName(v.month)} busy={loading}>
   <div className="ay">
@@ -55,7 +55,7 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
      <p className="lead">{monthLead(v.month,t.sales)}</p>
      <div className="hero-row">
       {t.grossProfit===null?<p className="hero-num is-unknown"><Unknown/></p>:<Amount value={t.grossProfit} className="hero-num"/>}
-      {c!==null&&(change!==null?<p className="delta">{up?<ArrowUpIcon/>:<ArrowDownIcon/>}{change}</p>:<p className="delta">Önceki ayla karşılaştırılamıyor</p>)}
+      {c!==null&&(change!==null?<p className="delta">{arrow==="up"?<ArrowUpIcon/>:arrow==="down"?<ArrowDownIcon/>:null}{change}</p>:<p className="delta">Önceki ayla karşılaştırılamıyor</p>)}
      </div>
      {t.grossProfit===null?<p className="hero-sub">Maliyetler bilinmediği için brüt kâr hesaplanamadı.</p>:line!==null&&<p className="hero-sub">{line}</p>}
      <div className="disclose">

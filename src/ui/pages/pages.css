@@ -9,6 +9,11 @@
 .ay { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
 .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .hero { padding: 28px 32px 22px; }
+/* While another month loads the layout stays, the figures do not. */
+.is-loading .hero { min-height: 300px; }
+.is-loading .netcard { min-height: 132px; }
+.is-loading .chart { min-height: 250px; }
+.ledger.is-loading { min-height: 320px; }
 .lead { font-size: var(--t-xl); line-height: 1.4; color: var(--ink-2); font-weight: 500; text-wrap: balance; }
 .hero-row { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; margin: 4px 0 10px; }
 .hero-num { font-size: var(--t-hero); line-height: 1.05; font-weight: 700; letter-spacing: -.03em; color: var(--ink); }

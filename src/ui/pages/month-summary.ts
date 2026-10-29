@@ -59,9 +59,15 @@ export function monthChange(month:string,pct:string|null):string|null {
  return `${against} ${percentText(positive(pct))} ${pct.startsWith("-")?"az":"fazla"}`;
 }
 
+const zero=(value:string)=>/^-?0+(\.0+)?$/.test(value);
+/** Which way the month-on-month arrow points. A zero change or no comparison has no arrow. The percentage is the service's, only its sign is read. */
+export function changeArrow(pct:string|null):"up"|"down"|null {
+ if(pct===null||zero(pct))return null;
+ return pct.startsWith("-")?"down":"up";
+}
+
 type BridgeTotals={sales:string|null;knownCostSales:string;cost:string|null;grossProfit:string|null;unknownCostSales:string;unknownSaleAmounts:number;expenses:string|null;netProfit:string|null};
 type Step={label:string;value:string|null;kind:"total"|"minus"|"result"|"unknown";detail?:string};
-const zero=(value:string)=>/^-?0+(\.0+)?$/.test(value);
 /** Satış → (maliyeti bilinmeyen satış kenara) → mal maliyeti → brüt kâr → giderler → net kâr. Service strings pass through untouched. */
 export function monthBridgeSteps(t:BridgeTotals):Step[] {
  const aside=!zero(t.unknownCostSales)||t.unknownSaleAmounts>0;

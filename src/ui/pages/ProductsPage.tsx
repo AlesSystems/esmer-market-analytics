@@ -70,7 +70,7 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
  };
 
  if(!month)return <Shell><p role="status">Veriler hazırlanıyor…</p></Shell>;
- if(!read)return <Shell busy><p role="status">Ürünler yükleniyor…</p></Shell>;
+ if(!read)return <Shell busy><section className="card ledger is-loading" aria-label="Ürünler"><p className="muted tools-empty" role="status">Ürünler yükleniyor…</p></section></Shell>;
  if("failed" in read)return <Shell busy={loading}><div className="state" role="alert"><p>Ürünler okunamadı. {read.failed}</p><Button variant="outline" onClick={retry}>Yeniden dene</Button></div></Shell>;
  if(!view){
   const result=read.result;
