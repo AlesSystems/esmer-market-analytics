@@ -56,8 +56,11 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
   await page.getByRole("button",{name:"Gideri kaydet",exact:true}).click();
   await expect(page.locator("#expense-manual")).toBeFocused();
   await shoot("giderler");
+  // One group has a line, so the empty groups are named before the explicit confirmation.
   await page.getByRole("button",{name:"Bu ayın giderleri tamam",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Onaylandı",exact:true})).toBeVisible();
+  await expect(page.getByRole("alert").filter({hasText:"Personel toplamı, Elektrik/su ve Diğer için kayıt yok."})).toBeVisible();
+  await page.getByRole("button",{name:"Bu kalemlerde gider yok, onayla",exact:true}).click();
+  await expect(page.getByText("Onaylandı",{exact:true})).toBeVisible();
   // Bu ay now carries the net profit (Ekim 2025 is a full month in the fixture).
   await openSection(page,"Bu ay");
   await expect(page.getByRole("heading",{name:"Tahmini net kâr",level:2})).toBeVisible();

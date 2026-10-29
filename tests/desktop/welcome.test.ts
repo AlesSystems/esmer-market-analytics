@@ -98,7 +98,7 @@ test("the gear menu closes to its opener and import leaves later section request
     await expect(nav(page).getByRole("button", { name: "Bu ay", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("button", { name: "Excel’e aktar", exact: true })).toBeEnabled();
     await openSection(page, "Giderler");
-    await expect(page.getByRole("heading", { name: "Giderler", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: / giderleri$/, level: 1 })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 

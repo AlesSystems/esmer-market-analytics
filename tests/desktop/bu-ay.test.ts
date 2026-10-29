@@ -70,7 +70,7 @@ test("Bu ay opens at launch with three tabs, and an imported estimate package an
   await expect(page.getByRole("heading",{name:"Eylül 2025",level:1})).toBeVisible();
   await expect(netCard(page)).toContainText("Bu ayın giderleri girilmedi");
   await netCard(page).getByRole("button",{name:"Giderleri gir",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Giderler",level:1})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Eylül 2025 giderleri",level:1})).toBeVisible();
   // The stepper stops at the data range: the package covers 01.08.2025 – 20.10.2025.
   const stepper=page.getByRole("group",{name:"Dönem",exact:true});
   await page.getByRole("button",{name:"Bu ay",exact:true}).click();
