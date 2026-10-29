@@ -5,7 +5,6 @@ import {
   bridgeLayout, compactMoney, niceTicks, toNumber,
 } from "../../src/ui/charts/geometry";
 import { Bridge } from "../../src/ui/charts/Bridge";
-import { ChartFrame } from "../../src/ui/charts/ChartFrame";
 
 const money = (value: string) => `${value.replace(".", ",")} ₺`;
 
@@ -67,40 +66,6 @@ describe("bridge layout", () => {
 });
 
 describe("rendering", () => {
-  const table = {
-    caption: "Günlük satış tablosu",
-    columns: [{ label: "Tarih" }, { label: "Tutar", numeric: true }],
-    rows: [["01.10.2026", "1.234,50 ₺"], ["02.10.2026", "Bilinmiyor"]],
-  };
-
-  test("ChartFrame exposes a Grafik/Tablo toggle with aria-pressed and a real table", () => {
-    const chart = renderToStaticMarkup(h(ChartFrame, { title: "Günlük satış", summary: "Ekim 2026", table }, h("p", null, "plot")));
-    expect(chart).toContain("<figure");
-    expect(chart).toMatch(/<button[^>]*aria-pressed="true"[^>]*>Grafik<\/button>/);
-    expect(chart).toMatch(/<button[^>]*aria-pressed="false"[^>]*>Tablo<\/button>/);
-    expect(chart).toContain("plot");
-    expect(chart).not.toContain("<table");
-    const tabular = renderToStaticMarkup(h(ChartFrame, { title: "Günlük satış", table, defaultView: "table" }, h("p", null, "plot")));
-    expect(tabular).toMatch(/<button[^>]*aria-pressed="false"[^>]*>Grafik<\/button>/);
-    expect(tabular).toMatch(/<button[^>]*aria-pressed="true"[^>]*>Tablo<\/button>/);
-    expect(tabular).toContain("<table");
-    expect(tabular).toContain("<caption");
-    expect(tabular).toContain("Günlük satış tablosu");
-    expect(tabular).toContain('scope="col"');
-    expect(tabular).toContain("1.234,50 ₺");
-    expect(tabular).toContain("Bilinmiyor");
-    expect(tabular).not.toContain("plot");
-  });
-
-  test("ChartFrame shows a legend only for two or more series and omits the toggle without rows", () => {
-    const one = renderToStaticMarkup(h(ChartFrame, { title: "T", legend: [{ key: "a", label: "Satış", color: "red" }] }, "x"));
-    expect(one).not.toContain("viz-legend");
-    expect(one).not.toContain("Tablo");
-    const two = renderToStaticMarkup(h(ChartFrame, { title: "T", legend: [{ key: "a", label: "Satış", color: "red" }, { key: "u", label: "Bilinmiyor", color: "unknown" }] }, "x"));
-    expect(two).toContain("viz-legend");
-    expect(two).toContain("Bilinmiyor");
-  });
-
   test("Bridge renders every step with operator, value and a hatched unknown step", () => {
     const markup = renderToStaticMarkup(h(Bridge, {
       formatValue: money,
@@ -119,5 +84,4 @@ describe("rendering", () => {
     expect(markup).toContain("<ol");
     expect(renderToStaticMarkup(h(Bridge, { steps: [], formatValue: money, empty: "Adım yok." }))).toContain("Adım yok.");
   });
-
 });

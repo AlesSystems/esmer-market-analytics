@@ -35,7 +35,7 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
    <Button variant="outline" onClick={onBack}>Ürünlere dön</Button>
   </div>
   <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Belge toplamı KDV dahil, belgenin tamamının tutarıdır; kâr tahmini bu ürünün satır tutarlarından hesaplanır. Tutarlar kaynakta kaydedildiği gibidir; doğrulanmadı.</p>
-  {error&&<div role="alert" className="month-state"><p>{error}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
+  {error&&<div role="alert" className="state"><p>{error}</p><Button variant="outline" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
   {busy&&!view&&<p role="status">Kaynak satırları yükleniyor…</p>}
   {detail?<>
    <Button variant="outline" onClick={()=>{returnTo.current=documentId;setDocumentId(null);}}>Belgelere dön</Button>

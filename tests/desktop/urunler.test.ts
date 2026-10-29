@@ -54,7 +54,7 @@ test("the ledger sorts its four columns with unknown last, filters from the serv
    expect(await order(page),`${name} second click`).toEqual(second);
    await expect(page.locator(".products-table thead th[aria-sort]")).toHaveCount(1);
   }
-  await header(page,"Kâr").getByRole("button").click();await header(page,"Kâr").getByRole("button").click();
+  await header(page,"Kâr").getByRole("button").click();
   await expect(header(page,"Kâr")).toHaveAttribute("aria-sort","descending");
   for(const [name,ids] of [["Zarar · marj düştü",["1","5","3"]],["Alış fiyatı yok",["2"]],["Tümü",["1","4","5","7","3","2"]]] as const){
    await filters(page).getByRole("button",{name:new RegExp(`^${name}`)}).click();

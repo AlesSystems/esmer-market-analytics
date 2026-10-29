@@ -35,7 +35,7 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
   await sales.getByRole("button").click();
   await expect(sales).toHaveAttribute("aria-sort",/ascending|descending/);
   await page.locator(".products-table tbody tr").first().click();
-  const card=page.getByRole("region",{name:"Ürün kartı"});
+  const card=page.getByRole("dialog");
   await expect(card).toBeVisible();
   await shoot("urunler");
   await card.getByRole("button",{name:"Kaynak satırlar",exact:true}).click();

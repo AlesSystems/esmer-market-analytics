@@ -7,14 +7,12 @@ import {MonthBars} from "../charts/MonthBars";
 import {AlertIcon,ArrowDownIcon,ArrowRightIcon,ArrowUpIcon,ChevronDownIcon,ChevronRightIcon,InfoIcon} from "../icons";
 import {Popover} from "../shell/Popover";
 import {money} from "../format";
+import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
 import {attentionRows,netCardState,netReasonText} from "./month-answer";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
 import {marginLine,monthBridgeSteps,monthChange,monthLead,monthName,percentText} from "./month-summary";
-
-/** Strings from the service pass through; null is an explicit unknown, never zero. */
-function Unknown({text="Bilinmiyor"}:{text?:string}){return <><span aria-hidden="true">—</span><span className="sr-only">{text}</span></>;}
 
 /** "57,50 ₺" with the kuruş set smaller. The text is the service amount as formatted, nothing is rounded. */
 function Amount({value,className}:{value:string;className:string}){

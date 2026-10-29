@@ -1,11 +1,14 @@
 import type {MonthProfitProduct} from "../../source/month-profit";
 
 /** Table order, filtering and search for Ürünler. Membership comes from service flags; values are only compared, never combined. */
-export type SortKey="name"|"sales"|"cost"|"grossProfit"|"marginPct"|"marginChangePoints";
+export type SortKey="name"|"sales"|"grossProfit"|"marginPct";
 export type Sort={key:SortKey;direction:"ascending"|"descending"};
-export type QuickFilter="all"|"loss"|"lowMargin10"|"marginDrop"|"missingCost";
+export type QuickFilter="all"|"attention"|"missingCost";
 export const defaultSort:Sort={key:"grossProfit",direction:"descending"};
-export const quickFilters:[QuickFilter,string][]=[["all","Tümü"],["loss","Zarar edenler"],["lowMargin10","Marjı %10’un altında"],["marginDrop","Marjı düşenler"],["missingCost","Maliyeti eksik"]];
+export const quickFilters:[QuickFilter,string][]=[["all","Tümü"],["attention","Zarar · marj düştü"],["missingCost","Alış fiyatı yok"]];
+const inFilter=(p:MonthProfitProduct,filter:QuickFilter)=>filter==="all"||(filter==="attention"?p.flags.loss||p.flags.marginDrop:p.flags.missingCost);
+/** How many products each filter holds, ignoring the search. */
+export const filterCounts=(rows:MonthProfitProduct[]):Record<QuickFilter,number>=>({all:rows.length,attention:rows.filter(p=>inFilter(p,"attention")).length,missingCost:rows.filter(p=>inFilter(p,"missingCost")).length});
 
 export const productName=(p:Pick<MonthProfitProduct,"id"|"name">)=>p.name??`Ürün #${p.id}`;
 const byId=(a:string,b:string)=>a.length-b.length||(a<b?-1:a>b?1:0);
@@ -39,5 +42,5 @@ export function matchesSearch(p:MonthProfitProduct,query:string,index?:Map<strin
 }
 
 export function visibleProducts(rows:MonthProfitProduct[],{query,filter,sort}:{query:string;filter:QuickFilter;sort:Sort},index?:Map<string,string>):MonthProfitProduct[] {
- return sortProducts(rows.filter(p=>(filter==="all"||p.flags[filter])&&matchesSearch(p,query,index)),sort);
+ return sortProducts(rows.filter(p=>inFilter(p,filter)&&matchesSearch(p,query,index)),sort);
 }
