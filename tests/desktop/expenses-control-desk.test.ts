@@ -82,7 +82,7 @@ test("expense groups show unknown totals as Eksik, never zero, block the confirm
     await expect(groups.getByText("Önce işaretli satırları düzeltin.", { exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Kayıtlar" }).locator("tbody tr")).toHaveCount(8);
     await expect(page.locator("canvas")).toHaveCount(0);
-    for (const width of [1440, 1100, 680, 390]) { await page.setViewportSize({ width, height: width === 1100 ? 560 : 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
+    for (const width of [1440, 1100, 680, 390]) { await page.setViewportSize({ width, height: width === 1100 ? 560 : 900 }); await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
     await setMonth(page, "2025-08");
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true })).toBeVisible();

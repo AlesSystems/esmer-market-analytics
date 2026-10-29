@@ -16,6 +16,7 @@ export const SearchIcon = ({ className }: P) => <Icon className={className}><cir
 export const CloseIcon = ({ className }: P) => <Icon className={className}><path d="M6 6l12 12M18 6 6 18"/></Icon>;
 export const InfoIcon = ({ className }: P) => <Icon className={className}><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".4" fill="currentColor"/></Icon>;
 export const AlertIcon = ({ className }: P) => <Icon className={className}><path d="M12 4 3 19.5h18z"/><path d="M12 10v4.5"/><circle cx="12" cy="17" r=".4" fill="currentColor"/></Icon>;
+export const PlusIcon = ({ className }: P) => <Icon className={className}><path d="M12 5v14M5 12h14"/></Icon>;
 export const CheckIcon = ({ className }: P) => <Icon className={className}><path d="m5 12.5 4.5 4.5L19 7.5"/></Icon>;
 export const DownloadIcon = ({ className }: P) => <Icon className={className}><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></Icon>;
 export const UploadIcon = ({ className }: P) => <Icon className={className}><path d="M12 15.5v-11M7 9l5-5 5 5M5 19.5h14"/></Icon>;

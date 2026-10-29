@@ -2,48 +2,27 @@
 @import "./theme.css";
 @import "./branding.css";
 @import "./shell.css";
-@import "./expenses-control-desk.css";
+@import "./expenses.css";
 @import "./source-document-detail.css";
 @import "./charts/charts.css";
 @import "./pages/pages.css";
 @source "./**/*.{ts,tsx}";
 @layer components {
-  .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-  .section-heading { margin-bottom: 18px; }
-  .section-heading > span, .section-heading label { color: var(--ink-2); font-size: 13px; }
-  .section-heading label { display: flex; align-items: center; gap: 8px; }
   .data-status { position: relative; margin: 0; padding: 0; border: 0; }
   .data-status > summary { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; margin: 0; font-weight: 400; }
   .data-status > summary { border-color: transparent; padding-left: 0; font-size: 13px; }
   .data-status > summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1px 1px 0; transform: rotate(45deg); margin: 0 3px 4px auto; }
   .status { display: inline-flex; align-items: center; width: fit-content; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; line-height: 1.5; background: var(--soft); color: var(--ink); }
-  .notice { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 14px 0; background: var(--page); color: var(--ink); font-size: 14px; }
-  .notice > span { flex: 1 1 250px; }
-  .notice.warning { color: var(--warn); background: var(--warn-bg); border-color: var(--warn-line); }
-  .block, .recovery-section { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); min-width: 0; }
+  .recovery-section { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); min-width: 0; }
   .positive { color: var(--gain); }
   .negative { color: var(--loss); }
-  .caption { font-size: 13px; margin-top: 12px; }
   .table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border-radius: 6px; }
   .table-scroll th:first-child, .table-scroll td:first-child { min-width: 120px; }
   .table-scroll tr:hover td { background: var(--page); }
   .number { text-align: right; white-space: nowrap; }
-  .expense-section { margin-top: 22px; }
-  .evidence { display: grid; gap: 5px; }
-  .evidence dd { margin-bottom: 12px; overflow-wrap: anywhere; }
-  .report-actions, .expense-actions, .recovery-actions, .operation-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
-  .expense-reason, .report-actions label { display: grid; gap: 6px; max-width: 100%; min-width: 0; }
+  .report-actions, .recovery-actions, .operation-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
   .report-actions label { flex: 1 1 240px; }
   .report-actions select { width: 100%; min-width: 0; }
-  .expense-check { display: flex; gap: 10px; align-items: center; margin: 14px 0; }
-  .expense-reason { max-width: 600px; margin: 16px 0; }
-  .expense-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px,100%),1fr)); gap: 16px; border: 0; padding: 0; margin: 20px 0; }
-  .expense-fields legend { margin-bottom: 12px; font-weight: 600; }
-  .expense-fields label { display: grid; align-content: start; gap: 6px; }
-  .expense-totals { display: flex; flex-wrap: wrap; gap: 28px; margin: 24px 0 8px; }
-  .expense-totals dd { font-size: 24px; margin-top: 8px; }
-  .workspace-task > .block, .workspace-task + .block, .workspace > div > div > .block + .block { margin-top: 20px; }
-  .expenses-workspace details small { overflow-wrap: anywhere; }
   .primary { background: var(--accent); color: var(--card); border-color: var(--accent); }
   .note { font-size: 13px; }
   .app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; border-bottom: 1px solid var(--line); }
@@ -56,23 +35,12 @@
   .recovery-preview { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
   progress { accent-color: var(--accent); max-width: 100%; }
   @media (max-width: 650px) {
-    .section-heading { flex-wrap: wrap; }
-    .block, .recovery-section { padding: 18px; }
+    .recovery-section { padding: 18px; }
     .recovery-backups li { flex-direction: column; }
   }
   @media (forced-colors: active) {
-    .notice, [data-slot="button"] { border: 1px solid CanvasText; }
+    [data-slot="button"] { border: 1px solid CanvasText; }
   }
-}
-
-@layer components {
-  .manual-expense { max-width: 960px; }
-  .manual-expense-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .manual-guidance { grid-column: 1 / -1; }
-  .field-error { color: var(--loss); font-size: .875rem; }
-  .expense-leave { position: sticky; top: 0; z-index: 20; margin: 0; }
-  .manual-expense [aria-invalid="true"] { border-color: var(--loss); }
-  @media (max-width: 640px) { .manual-expense-fields { grid-template-columns: minmax(0, 1fr); } }
 }
 
 .skip-workspace { position: fixed; z-index: 100; left: 16px; top: -100px; background: var(--card); color: var(--ink); }

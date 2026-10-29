@@ -135,6 +135,7 @@ test("operating report reopens on the reviewed expense revision after expense ed
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, packagePath);
     await importPackage(page);
     await openSection(page, "Giderler");
+    await setMonth(page, "2025-09");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true }).click();
     await page.getByRole("button", { name: "İçe aktar", exact: true }).click();
