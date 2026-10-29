@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from "react";
 
-/** Closes a popover on Escape, a press outside it, or focus moving outside it. Escape reports `true` so the caller can return focus to the trigger. */
+/** Closes a popover on Escape, a press outside it, or focus moving outside it. Escape reports `true` so the caller can return focus to the trigger. Escape is taken in the capture phase and stopped there, so a page handler under the popover (the product drawer) never sees the same key. */
 export function useDismiss(box: RefObject<HTMLElement | null>, open: boolean, close: (viaKeyboard: boolean) => void) {
   useEffect(() => {
     if (!open) return;
@@ -8,9 +8,9 @@ export function useDismiss(box: RefObject<HTMLElement | null>, open: boolean, cl
     const key = (event: KeyboardEvent) => { if (event.key === "Escape") { event.stopPropagation(); close(true); } };
     const focus = (event: FocusEvent) => { if (box.current && event.relatedTarget instanceof Node && !box.current.contains(event.relatedTarget)) close(false); };
     document.addEventListener("mousedown", outside);
-    document.addEventListener("keydown", key);
+    document.addEventListener("keydown", key, true);
     const node = box.current;
     node?.addEventListener("focusout", focus);
-    return () => { document.removeEventListener("mousedown", outside); document.removeEventListener("keydown", key); node?.removeEventListener("focusout", focus); };
+    return () => { document.removeEventListener("mousedown", outside); document.removeEventListener("keydown", key, true); node?.removeEventListener("focusout", focus); };
   }, [box, open, close]);
 }
