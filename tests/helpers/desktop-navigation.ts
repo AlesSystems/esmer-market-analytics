@@ -25,7 +25,10 @@ export async function openWorkspace(page: Page) {
 }
 
 export async function openSection(page: Page, name: "Bu ay" | "Ürünler" | "Giderler") {
-  await page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true }).click();
+  const tab = page.getByRole("navigation", { name: "Ana gezinme" }).getByRole("button", { name, exact: true });
+  await tab.click();
+  // Settle before returning: either the tab is current or the expense draft guard asks first.
+  await expect(tab.and(page.locator('[aria-current="page"]')).or(page.getByRole("alertdialog")).first()).toBeVisible();
 }
 
 export const monthLabel = (page: Page) => page.getByRole("group", { name: "Dönem", exact: true }).locator(".month-label");

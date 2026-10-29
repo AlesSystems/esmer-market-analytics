@@ -13,8 +13,8 @@ async function launch(to?: string): Promise<{ app: ElectronApplication; page: Pa
   const store = openStore(join(userData, "analytics.sqlite"));
   try { store.importSourcePreview(monthProfitPackage(to ? { ...monthProfitSnapshot(), to } : monthProfitSnapshot())); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
-  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1100, 560));
   const page = await app.firstWindow(); await openWorkspace(page);
+  await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1100, 560));
   return { app, page, userData };
 }
 const finish = async (app: ElectronApplication, userData: string) => { await app.close().catch(() => undefined); await rm(userData, { recursive: true, force: true }); };
