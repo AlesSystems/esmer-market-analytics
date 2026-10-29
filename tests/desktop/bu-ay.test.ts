@@ -58,7 +58,12 @@ test("Bu ay opens at launch with three tabs, and an imported estimate package an
   await expect(bars.locator("g[data-month='2025-10'] .bar")).toHaveClass(/is-current/);
   await attention(page).first().click();
   await expect(nav.getByRole("button",{name:"Ürünler",exact:true})).toHaveAttribute("aria-current","page");
-  await expect(page.locator('tr[data-product="3"]')).toHaveAttribute("aria-current","true");
+  await expect(page.getByRole("dialog",{name:"Ekmek"})).toBeVisible();
+  // The aggregate row opens Ürünler filtered to the products without a purchase price.
+  await page.getByRole("button",{name:"Bu ay",exact:true}).click();
+  await attention(page).last().click();
+  await expect(page.getByRole("button",{name:/^Alış fiyatı yok/})).toHaveAttribute("aria-pressed","true");
+  await expect(page.locator(".products-table tbody tr")).toHaveCount(1);
   // A full month without expenses: net profit names the missing step and leads to Giderler.
   await page.getByRole("button",{name:"Bu ay",exact:true}).click();
   await setMonth(page,"2025-09");
