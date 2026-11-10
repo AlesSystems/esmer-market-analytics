@@ -37,13 +37,15 @@ const monthIndex = (month: string) => Number(month.slice(0, 4)) * 12 + Number(mo
 /** Steps the month stepper to `month` (YYYY-MM). Fails when the data range ends before it. */
 export async function setMonth(page: Page, month: string) {
   const group = page.getByRole("group", { name: "Dönem", exact: true });
+  const label = monthLabel(page);
+  await expect(label).toHaveAttribute("data-month", /^\d{4}-\d{2}$/);
   for (let guard = 0; guard < 80; guard++) {
-    const current = await monthLabel(page).getAttribute("data-month");
+    const current = await label.getAttribute("data-month");
     if (current === month) return;
     const step = group.getByRole("button", { name: monthIndex(month) > monthIndex(current!) ? "Sonraki ay" : "Önceki ay", exact: true });
     expect(await step.getAttribute("aria-disabled"), `the data range ends before ${month}`).not.toBe("true");
     await step.click();
-    await expect(monthLabel(page)).not.toHaveAttribute("data-month", current!);
+    await expect(label).not.toHaveAttribute("data-month", current!);
   }
   throw new Error(`could not reach ${month}`);
 }

@@ -1,9 +1,41 @@
-import { importPackage, openSection, openWorkspace, setMonth } from "../helpers/desktop-navigation";
+import { importPackage, monthLabel, openSection, openWorkspace, setMonth } from "../helpers/desktop-navigation";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 const executablePath = process.env.ESMER_EXECUTABLE ?? (process.platform === "darwin" ? resolve(`release/mac${process.arch === "arm64" ? "-arm64" : ""}/Esmer Market Analytics.app/Contents/MacOS/Esmer Market Analytics`) : process.platform === "win32" ? resolve("release/win-unpacked/Esmer Market Analytics.exe") : resolve("release/linux-unpacked/esmer-market-analytics"));
+
+test("expense month navigation waits for the initial period", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-expense-period-"));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    await page.clock.setFixedTime(new Date("2026-01-15T12:00:00Z"));
+    await app.evaluate(({ ipcMain }) => {
+      const registry = ipcMain as unknown as { _invokeHandlers: Map<string, (...args: unknown[]) => unknown> };
+      const original = registry._invokeHandlers.get("esmer:request")!;
+      ipcMain.removeHandler("esmer:request");
+      ipcMain.handle("esmer:request", async (...args) => {
+        const result = await original(...args);
+        if (args[1] === "querySourceWorkspace") {
+          await new Promise<void>(resolve => { Reflect.set(globalThis, "releaseInitialPeriod", resolve); });
+        }
+        return result;
+      });
+    });
+    await page.reload();
+    await openSection(page, "Giderler");
+    await expect(monthLabel(page)).toHaveAttribute("data-month", "");
+    await expect.poll(() => app.evaluate(() => typeof Reflect.get(globalThis, "releaseInitialPeriod"))).toBe("function");
+    await Promise.all([
+      setMonth(page, "2026-02"),
+      app.evaluate(() => { setTimeout(() => Reflect.get(globalThis, "releaseInitialPeriod")(), 1000); }),
+    ]);
+    await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-02");
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
 test("expenses are reachable without a source and cancelled selection leaves an empty period", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-expenses-"));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
