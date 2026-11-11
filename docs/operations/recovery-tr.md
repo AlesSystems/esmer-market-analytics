@@ -4,7 +4,7 @@ Bu işlemler yalnızca Esmer Market analiz uygulamasındaki verileri kapsar. Mar
 
 ## Kurtarma için hazırlanın
 
-1. **Yedekleme ve kurtarma** bölümünü açın.
+1. Dişli simgesinden **Ayarlar** menüsünü açın. **Yedekle / Geri yükle** öğesini seçin.
 2. Yedekleme kurulumunu başlatın ve yedeklerin saklanacağı klasörü seçin. Bilgisayar kaybolsa veya diski bozulsa da erişebileceğiniz harici bir ortam kullanın.
 3. Kurtarma anahtarı dosyasını ayrı bir güvenli ortama kaydedin. Anahtarı yedek dosyalarıyla aynı klasörde saklamayın.
 4. Sakladığınız anahtar dosyasını yeniden seçerek doğrulayın. Uygulamadaki saklama açıklamasını okuyup onaylayın.
@@ -23,7 +23,7 @@ Uygulama son beş doğrulanmış normal yedeği tutar. Sabitlenen yedekler ve y�
 ## Başka bir bilgisayara geri yükleyin
 
 1. Bağımsız olarak sakladığınız yedeği ve kurtarma anahtarı dosyasını hazırlayın.
-2. Yeni bilgisayarda uygulamayı açın ve **Yedekleme ve kurtarma** bölümüne girin. Önceki bilgisayarın kullanıcı hesabına veya yerel anahtar deposuna gerek yoktur.
+2. Yeni bilgisayarda uygulamayı açın. **Ayarlar > Yedekle / Geri yükle** öğesini seçin. Önceki bilgisayarın kullanıcı hesabına veya yerel anahtar deposuna gerek yoktur.
 3. **Yedekten geri yükle** işlemini başlatın. Şifreli yedek dosyasını ve ardından kurtarma anahtarı dosyasını seçin.
 4. Doğrulama tamamlandığında veri kesim tarihini, kayıt ve rapor sayılarını inceleyin.
 5. Seçili yedekle mevcut analiz verilerinin değiştirilmesini açıkça onaylayın. Onaydan önce mevcut veriler değişmez. Onaydan sonra açık raporları yeniden açın.
@@ -40,4 +40,4 @@ Geri yükleme sırasında uygulama kapanırsa uygulamayı yeniden açın. Yerel 
 
 ## Kabul sınırı
 
-Bu kılavuz uygulamadaki yedekleme ve kurtarma adımlarını anlatır. Temiz Windows kurulumunda, gerçek işletim sistemi anahtar korumasıyla ve bilgisayardan bağımsız saklanan dosyalarla kurtarma kabulü henüz tamamlanmamıştır. [Windows devam planı](windows-phase-9-handoff.md) bu kontrolleri listeler.
+Bu kılavuz uygulamadaki yedekleme ve kurtarma adımlarını anlatır. [11 Kasım 2026 Windows 11 kaydı](../evidence/2026-11-11-windows-v1-smoke.md), yerel dosya pencereleriyle alınan şifreli yedeğin aynı bilgisayarda boş bir profile geri yüklenmesini doğrular. Giderler, tamamlık onayı ve Excel değerleri korundu. Dosyalar aynı diskteydi. Ayrı temiz Windows bilgisayarında, önceki işletim sistemi anahtar deposu olmadan ve bağımsız ortamda saklanan dosyalarla kurtarma kabulü [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138) içinde açık kalır.

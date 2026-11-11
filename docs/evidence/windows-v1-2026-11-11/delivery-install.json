@@ -1,0 +1,14 @@
+{
+  "codeChanged": false,
+  "versionIncreased": false,
+  "profileBefore": null,
+  "stage": "install",
+  "syntheticOnly": true,
+  "productVersionBefore": null,
+  "archiveAfter": "A25DF1F39745E330FAFED96DA26D815F815BF8E73245F352C835F26B8E61927A",
+  "archiveBefore": null,
+  "profileAfter": null,
+  "exitCode": 0,
+  "installerHash": "5BCB2C5E5B733B3B734287B728DA340DA8F3B68E614FC024888C4E5062B0B9D9",
+  "productVersionAfter": "1.0.1.0"
+}
