@@ -1,0 +1,135 @@
+{
+  "allSheetValuesAndTypesEqual": true,
+  "sheets": [
+    {
+      "name": "Özet",
+      "rows": 23
+    },
+    {
+      "name": "Ürünler",
+      "rows": 56
+    },
+    {
+      "name": "Giderler",
+      "rows": 12
+    }
+  ],
+  "summary": [
+    [
+      "Doğrulanmamış tahmin — kesin kâr değildir",
+      null,
+      null
+    ],
+    [
+      "Dönem",
+      "2025-10",
+      null
+    ],
+    [
+      "Veri aralığı",
+      "2025-10-01 / 2025-10-31",
+      null
+    ],
+    [
+      "Kaynak sürümü",
+      "cd5930e3153b1ab6c5794d254f872fc6210281000cb81ea487bb8bbd9b7a2b8e",
+      null
+    ],
+    [
+      "Hesaplama sürümü",
+      "month-profit-v1",
+      null
+    ],
+    [
+      "Son alış fiyatıyla yapılmış tahmindir; iadeler kâra dahil değildir. Tutarlar kesin ondalık metindir; boş hücre bilinmeyendir, sıfır değildir.",
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null
+    ],
+    [
+      "Gösterge",
+      "Değer",
+      "Not"
+    ],
+    [
+      "Satış",
+      "573259",
+      null
+    ],
+    [
+      "Maliyeti bilinen satış",
+      "529051",
+      null
+    ],
+    [
+      "Tahmini maliyet",
+      "384951",
+      null
+    ],
+    [
+      "Tahmini brüt kâr",
+      "144100",
+      null
+    ],
+    [
+      "Marj (%)",
+      "27.24",
+      null
+    ],
+    [
+      "Maliyeti bilinen satış (%)",
+      "87.71",
+      null
+    ],
+    [
+      "Maliyeti bilinmeyen satış",
+      "44208",
+      null
+    ],
+    [
+      "Maliyeti bilinmeyen ürün",
+      "47",
+      null
+    ],
+    [
+      "İadeler",
+      "29938",
+      null
+    ],
+    [
+      "Tutarı bilinmeyen satış satırı",
+      "0",
+      null
+    ],
+    [
+      "Tutarı bilinmeyen iade satırı",
+      "0",
+      null
+    ],
+    [
+      "Fiş sayısı",
+      "916",
+      null
+    ],
+    [
+      "Ortalama sepet",
+      "625.83",
+      null
+    ],
+    [
+      "Giderler",
+      "1000",
+      null
+    ],
+    [
+      "Tahmini net kâr",
+      "143100",
+      null
+    ]
+  ],
+  "restoredAllSheetValuesAndTypesEqual": true
+}
