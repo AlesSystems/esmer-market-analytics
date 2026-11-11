@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "vitest";
 import { mkdtemp, mkdir, writeFile, rm, rename, symlink, copyFile, appendFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { createPackage } from "@electron/asar";
 import { inspectRelease, inspectMacRelease } from "../../tools/release-inventory";
@@ -28,7 +28,7 @@ async function macFixture() {
   const framework = join(release, "Contents", "Frameworks", "Electron Framework.framework", "Versions", "A");
   await mkdir(framework, {recursive:true});
   await writeFile(join(framework, "Electron Framework"), "synthetic framework");
-  await symlink("A", join(framework, "..", "Current"));
+  await symlink(process.platform === "win32" ? framework : "A", join(framework, "..", "Current"), process.platform === "win32" ? "junction" : "dir");
   return release;
 }
 
@@ -45,7 +45,7 @@ test("Mac inventory rejects nested data, unknown runtime files and escaping link
   await writeFile(join(release, framework, "private.sqlite"), "synthetic");
   await writeFile(join(release, framework, "private.dat"), "synthetic");
   await writeFile(join(release, "Contents", "Info.plist"), "-----BEGIN PRIVATE KEY-----");
-  await symlink("../../../../../../outside", join(release, framework, "escape"));
+  await symlink(process.platform === "win32" ? resolve(release, framework, "../../../../../../outside") : "../../../../../../outside", join(release, framework, "escape"), process.platform === "win32" ? "junction" : "dir");
   const result = await inspectMacRelease(release);
   expect(result.violations).toContain(`distribution:${framework}/private.sqlite`);
   expect(result.violations).toContain(`distribution:${framework}/private.dat`);
@@ -56,7 +56,7 @@ test("Mac inventory rejects nested data, unknown runtime files and escaping link
 test("Mac inventory rejects an approved framework link that resolves outside the app", async () => {
   const release = await macFixture();
   const path = "Contents/Frameworks/Electron Framework.framework/Resources";
-  await symlink(tmpdir(), join(release, path));
+  await symlink(tmpdir(), join(release, path), process.platform === "win32" ? "junction" : "dir");
   expect((await inspectMacRelease(release)).violations).toContain(`link:${path}`);
 });
 
