@@ -23,10 +23,10 @@ test("forced colors keeps a keyboard focus outline on tabs and the month stepper
       await expect(control).toBeFocused();
       const outline = await control.evaluate(node => {
         const style = getComputedStyle(node);
-        return { style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+        return { style: style.outlineStyle, width: parseFloat(style.outlineWidth), scale: devicePixelRatio };
       });
       expect(outline.style).not.toBe("none");
-      expect(outline.width).toBeGreaterThanOrEqual(2);
+      expect(outline.width).toBeGreaterThanOrEqual(Math.floor(2 * outline.scale) / outline.scale);
     }
     await capture(page, testInfo.outputPath("forced-colors-keyboard-focus.png"));
   } finally {

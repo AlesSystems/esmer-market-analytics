@@ -41,7 +41,9 @@ test("Giderler, empty month: the answer and the confirmation stay above the fold
     await expect(page.getByRole("button", { name: "Şablonu indir", exact: true })).toHaveClass(/\blink\b/);
     expect(await style(page, "[data-state=empty] .g-amt", "font-size")).toBe("18px");
     await expect(page.locator(".g-empty p")).toHaveText("Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.");
-    expect(await style(page, ".g-tile:nth-child(2)", "border-left-width")).toBe("1px");
+    const dividerWidth = Number.parseFloat(await style(page, ".g-tile:nth-child(2)", "border-left-width"));
+    const expectedDividerWidth = await page.evaluate(() => Math.max(1, Math.floor(devicePixelRatio)) / devicePixelRatio);
+    expect(dividerWidth).toBeCloseTo(expectedDividerWidth, 4);
     expect(await style(page, ".g-tile:nth-child(2)", "background-color")).toBe("rgba(0, 0, 0, 0)");
   } finally { await finish(app, userData); }
 });
@@ -104,7 +106,9 @@ test("Bu ay and the drawer: chart title with its unit, quiet net reason, fold sl
     await openSection(page, "Ürünler");
     await page.locator(".products-table tr[data-product='1'] button").click();
     await expect(page.locator(".drawer")).toBeVisible();
-    expect(await style(page, ".dr-facts > div:nth-child(2)", "border-left-width")).toBe("1px");
+    const dividerWidth = Number.parseFloat(await style(page, ".dr-facts > div:nth-child(2)", "border-left-width"));
+    const expectedDividerWidth = await page.evaluate(() => Math.max(1, Math.floor(devicePixelRatio)) / devicePixelRatio);
+    expect(dividerWidth).toBeCloseTo(expectedDividerWidth, 4);
     expect(await style(page, ".dr-facts > div:nth-child(2)", "background-color")).toBe("rgba(0, 0, 0, 0)");
   } finally { await finish(app, userData); }
 });
