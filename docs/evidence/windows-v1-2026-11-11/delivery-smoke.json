@@ -1,0 +1,19 @@
+{
+  "runtime": {
+    "packaged": true,
+    "version": "1.0.1",
+    "scale": 1.5
+  },
+  "gross": "144.100,00 ₺",
+  "net": "143.100,00 ₺",
+  "productSourceRowsReachable": true,
+  "expenseComplete": true,
+  "limitation": "düzeltildi\nWindows 11 kullanım kontrolü geçti",
+  "fixtureSetup": "copied the preserved synthetic analytics.sqlite after installation",
+  "portable": {
+    "normalLaunch": true,
+    "developerNodeOnPath": false,
+    "net": "143.100,00 ₺",
+    "devicePixelRatio": 1.5
+  }
+}

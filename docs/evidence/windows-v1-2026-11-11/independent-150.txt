@@ -1,0 +1,23 @@
+
+> esmer-market-analytics@1.0.1 typecheck
+> tsc --noEmit
+
+
+> esmer-market-analytics@1.0.1 lint
+> eslint .
+
+
+Running 6 tests using 1 worker
+
+(node:25840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 tests\desktop\design-finish.test.ts:26:1 › Giderler, empty month: the answer and the confirmation stay above the fold, Excel import leads (1.7s)
+  ok 2 tests\desktop\design-finish.test.ts:51:1 › Giderler with lines: one line per row, the blank-group question above the fold, no hint for a group without lines (1.9s)
+  ok 3 tests\desktop\design-finish.test.ts:82:1 › Giderler: a line that needs a fix gets a chip, a reversed line says so, normal lines get none (1.6s)
+  ok 4 tests\desktop\design-finish.test.ts:95:1 › Bu ay and the drawer: chart title with its unit, quiet net reason, fold slack, columns instead of nested tiles (1.8s)
+  ok 5 tests\desktop\forced-colors.test.ts:11:1 › forced colors keeps a keyboard focus outline on tabs and the month stepper (2.5s)
+  ok 6 tests\desktop\v1-walk.test.ts:12:1 › v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar (4.7s)
+
+  6 passed (15.1s)
+{"packaged":true,"version":"1.0.1","displays":[{"scaleFactor":1.5,"bounds":{"x":0,"y":0,"width":1280,"height":800}}]}
+

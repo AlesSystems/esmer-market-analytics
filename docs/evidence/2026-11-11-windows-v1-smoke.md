@@ -85,6 +85,24 @@ These files are retained locally in `work/windows-current/delivery`. A rebuild h
 | `release-inventory.json` | `545d7184c0ae5a73435ee61be4e394007427ee6f3cc90fcedcf1dd8c5fda514a` |
 | `distribution-inspection.json` | `a8197ca156b215aa581cc549851f9e229373c731ebee1cb4b9a7e0272ab47745` |
 
+## Delivery rebuild
+
+The delivery rebuild uses source commit `a4c325234dc2c4526287e5e5fe22b3b15368491a`. It includes the Windows test repairs and the updated bundled limitations. Comparing both archive inventories found only `dist/ui/app.js` changed. The desktop main process, preload, service worker, styles and dependencies retained their hashes. The renderer difference is the imported limitations text; no calculation or workflow source changed.
+
+`npm run package:win` passed again with `DISTRIBUTIONS_MATCH_INSPECTED_PAYLOAD`. The unsigned files are retained separately in `work/windows-current/final-delivery`.
+
+The full packaged desktop suite then passed again on this rebuilt payload at native 150%, with 68 passes and six optional capture skips. A separate reviewer independently passed typecheck, lint and all six focused design, forced-colors and v1-journey tests, and measured native scale factor 1.5 in a separate packaged launch. The [125% run](windows-v1-2026-11-11/desktop-125.txt), [final 150% run](windows-v1-2026-11-11/desktop-150.txt) and [independent check](windows-v1-2026-11-11/independent-150.txt) retain sanitized output.
+
+The exact delivery installer was then [installed successfully](windows-v1-2026-11-11/delivery-install.json) in another guarded test directory. Its archive matched the delivery hash below. After copying the preserved synthetic analytics database into that test profile, the installed app showed the same product/source rows, completed expense and 143,100.00 TRY net estimate. Hakkında showed the updated Windows status. The exact portable file launched normally without developer Node on `PATH` and showed the same result at native 150%. The [delivery smoke receipt](windows-v1-2026-11-11/delivery-smoke.json) records those observations. [Uninstall](windows-v1-2026-11-11/delivery-uninstall.json) removed the executable and registration and preserved the synthetic database hash. Windows display scaling was restored to its original 125%.
+
+| Delivery artifact | SHA-256 |
+| --- | --- |
+| `Esmer Market Analytics Setup 1.0.1.exe` | `5bcb2c5e5b733b3b734287b728da340da8f3b68e614fc024888c4e5062b0b9d9` |
+| `Esmer Market Analytics 1.0.1.exe` | `dbb124d9f5f8c342aa7cdf8bd0393223af7dcbd43ef5fbce06c04e274e74b26f` |
+| `resources/app.asar` | `a25df1f39745e330fafed96da26d815f815bf8e73245f352c835f26b8e61927a` |
+| `release-inventory.json` | `d841ce40ad923c84c4ac95691b2a27b3c9ea35662dc6624717516f466a135f61` |
+| `distribution-inspection.json` | `736a4c5afc6ec45c8149a9a8c44d8d1a469734478e108728cb18a32673b12476` |
+
 The workflow now retains both verified executables and both manifests in `windows-distributions-<commit>` for 14 days after a successful run. This is an Actions artifact, not a published release or a moved version tag.
 
 ## Screenshots
@@ -103,6 +121,8 @@ Windows 10, a separate clean machine, independent media, original OS credential-
 
 No production SQL, live refresh, owner contact or owner installation occurred. [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) remains open for owner acceptance, installation direction and production permissions/validation. Verified profit and the display-rounding decision remain open. The conditional above-100,000-row benchmark does not apply to this fixture or the current package cap.
 
-`npm audit --omit=dev --json` reported two high-severity transitive Azure authentication dependencies in the locked graph. This task did not change dependencies or assess their reachability. The distributions are unsigned. No downloaded-installer SmartScreen result or stronger security acceptance is inferred from the smoke test.
+`npm audit --omit=dev --json` reported two high-severity transitive Azure authentication dependencies in the locked graph. [#139](https://github.com/AlesSystems/esmer-market-analytics/issues/139) tracks assessment. This task did not change dependencies or assess their reachability. The distributions are unsigned. No downloaded-installer SmartScreen result or stronger security acceptance is inferred from the smoke test.
 
 Prove It Works required inspection of the installed and portable artifacts and native Excel output. Fix Root Causes kept the test repairs at fixture creation and DPI quantization. Sequence Work into Verifiable Units kept failed observations separate from subsequent passing runs.
+
+The [decision trail](windows-v1-2026-11-11/decisions.tsv) records the principal choices and verification checkpoints. Independent Standards and Spec review covered the patch and evidence. The Spec reviewer separately ran the rebuilt packaged journey, checked live limitations and confirmed artifact hashes. Its PASS+NOTES verdict preserves the initial/final artifact distinction and requires current-head CI before merge. A reviewer locator error was corrected from a nonexistent table row to the observed list item; it was not an application failure.

@@ -1,10 +1,10 @@
 # Windows v1 build and smoke test (operator handoff)
 
-For Altan, on his own Windows machine. This records the remaining A07 Windows smoke acceptance associated with [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). That issue is closed, but no current manual acceptance receipt is recorded. This handoff supersedes the per-phase handoffs ([Phase 1](windows-phase-1-handoff.md) to [Phase 9](windows-phase-9-handoff.md)), which stay as history.
+For Altan, on his own Windows machine. The [11 November Windows 11 receipt](../evidence/2026-11-11-windows-v1-smoke.md) records the A07 v1 smoke journey for [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). This procedure repeats those checks for another build or Windows configuration. It supersedes the per-phase handoffs ([Phase 1](windows-phase-1-handoff.md) to [Phase 9](windows-phase-9-handoff.md)), which stay as history.
 
-On 2026-10-27, [Windows CI passed](../evidence/2026-10-27-windows-ci.md) on main `6c11ed44510aa8b687f1279e01b220711a738185`, app version **1.0.1**. It built and inspected NSIS and portable distributions and passed 48 packaged desktop tests on Windows Server 2025. The billing block is no longer current. CI did not perform the manual installer, native display-scaling or uninstall walkthrough on Windows 10 or 11.
+PR #137 merged. [Current main Windows CI](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/42807839845) passed on 2026-11-10 at `7f5020c`, app version **1.0.1**. Local Windows 11 checks on 2026-11-11 passed 185 unit, 302 integration and 68 packaged desktop tests, plus native dialogs, Excel, 125% and 150% scaling, persistence, same-machine recovery and uninstall. Optional skips and the exact artifacts are in the receipt.
 
-Use that exact commit below. The older `v1.0.1` tag points to `f23b11e` and predates the Windows fixes. Version 1.0.1 alone does not identify the tested build. CI retained test evidence and the unpacked inventory for 14 days, but did not retain the executables or publish a new release.
+The repeat-build source below includes the test portability fixes and the updated bundled limitations. The older `v1.0.1` tag points to `f23b11e` and predates the Windows fixes. Version 1.0.1 alone does not identify a tested build. Use the receipt's hashes for the delivered files. The workflow now retains verified executables and both inspection manifests for 14 days in `windows-distributions-<commit>`. It does not publish a release or move the tag.
 
 Read `AGENTS.md` first. Use synthetic data only. This handoff does not authorize production source access or installing on the owner's PC; both need Eralp's separate permission ([issue #110](https://github.com/AlesSystems/esmer-market-analytics/issues/110)). Never put credentials, real customer data or backup details in Git or screenshots.
 
@@ -23,19 +23,20 @@ git --version
 
 ## Build
 
-Run separately in PowerShell. The commands rebuild the CI-tested commit for the manual walkthrough. Stop at the first failure and record it. For a later build, record its exact commit and repeat the automated checks before claiming acceptance.
+Run separately in PowerShell. The commands rebuild the locally tested delivery source for the native walkthrough. Stop at the first failure and record it. For a later build, record its exact commit and repeat the automated checks before claiming acceptance.
 
 ```powershell
 git clone https://github.com/AlesSystems/esmer-market-analytics.git
 Set-Location esmer-market-analytics
 git fetch --tags
-git checkout --detach 6c11ed44510aa8b687f1279e01b220711a738185
+git checkout --detach a4c325234dc2c4526287e5e5fe22b3b15368491a
 git rev-parse HEAD
 npm ci
 npm run typecheck
 npm run lint
 npm run test:unit
 npm run test:integration
+$env:npm_config_script_shell = "$env:SystemRoot\System32\cmd.exe"
 npm run package:win
 ```
 
@@ -76,7 +77,7 @@ npm exec -- playwright test
 
 Tick each item and note anything odd. Use the synthetic data below only.
 
-1. Install: run the NSIS installer. Expect an unsigned-publisher warning (SmartScreen, "Unknown publisher"); this is accepted for v1 ([known limitations](known-limitations-tr.md)). Finish the install and launch the app.
+1. Install: run the NSIS installer in a disposable test account or with the guarded isolation described in the receipt. The build is unsigned, so Windows may show a publisher warning. A locally built installer may show none. Record the actual observation. Finish the install and launch the app.
 2. Make a synthetic estimate package. The monthly tool needs a SQL source, so use the test fixture instead. From the repo root:
 
    ```powershell
@@ -85,17 +86,17 @@ Tick each item and note anything odd. Use the synthetic data below only.
    ```
 
    `work/` is git-ignored. Do not commit the package.
-3. Ayarlar > Veri paketi: "Veri paketi içe aktar", choose `synthetic-estimate.json`. Expect "Gerçek kaynak kayıtları içe aktarıldı."
+3. Open the gear menu, select "Veri paketi içe aktar" and choose `synthetic-estimate.json` through the native picker. Expect "Gerçek kaynak kayıtları içe aktarıldı." The generated fixture is synthetic despite this generic success text.
 4. Bu ay: the month figures and the trust chip load, no error text. Net profit is not shown until the month's expenses are marked complete (step 7).
 5. Ürünler: the product list loads. Open a product card, then Kaynak satırlar; rows appear (Satış documents only).
 6. Giderler: "Şablonu indir", fill the template with synthetic expenses, "Excel’den içe aktar". Expect the rows listed.
 7. Giderler: "Bu ayın giderleri tamam" and confirm.
 8. Bu ay again: net profit now appears.
-9. Rapor ve Excel: "Excel’e aktar", save the file, open it in Excel; figures match Bu ay.
-10. Ayarlar: five tiles (Veri paketi, Yedekleme ve kurtarma, Görünüm, Canlı bağlantı, Hakkında). Open Hakkında and check the "Bilinen sınırlar" list matches [known-limitations-tr.md](known-limitations-tr.md). Leave Canlı bağlantı off; it needs a SQL source and is out of scope for this test.
+9. Use "Excel’e aktar" in the header, save through the native dialog and open the file in Excel. Compare the figures, period, method and exclusions with Bu ay. Save a copy in Excel and compare worksheet values and cell types.
+10. Open the gear menu. Check package import, "Yedekle / Geri yükle", text-size controls, "Canlı bağlantı", "Kaynak belgeler" and "Hakkında ve bilinen sınırlar". Check the limitations against [known-limitations-tr.md](known-limitations-tr.md). The app has three tabs, Bu ay, Ürünler and Giderler. Export is in the header. Leave the live connection disabled.
 11. Display scaling: repeat a pass of steps 4 to 10 at Windows scaling 125 % and 150 % (Settings > System > Display). Look for clipped text, overlapping controls, unreachable buttons.
-12. Backup and restore ([recovery-tr.md](recovery-tr.md)): set up backup to a folder on a separate disk or USB stick, save the key file elsewhere, confirm "Son doğrulanan yedek". Then restore into a fresh state (uninstall and reinstall, or a second Windows user) and check expenses and the complete mark returned. CI already passed a same-runner fresh-profile restore. Record this manual result separately. A06's v1 scope is an encrypted backup plus documented restore under [#98](../decisions/issue-98-profit-first-estimate-edition.md); a separate clean-machine loss exercise remains post-v1.
-13. Close and reopen: data persists. Optionally launch the portable exe and confirm it shows the same data (same `%APPDATA%\esmer-market-analytics`).
+12. Backup and restore ([recovery-tr.md](recovery-tr.md)): choose distinct backup and key locations outside the app profile and confirm "Son doğrulanan yedek". Restore into a fresh test profile through the native dialogs. Check expenses, completeness, monthly figures and Excel values. Uninstall normally preserves the existing profile, so uninstall/reinstall alone does not create a fresh state. Record whether files are on independent media. A06's v1 scope is encrypted backup plus documented restore under [#98](../decisions/issue-98-profit-first-estimate-edition.md). Separate-machine and independent-media proof remain post-v1 in [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138).
+13. Close and reopen. Launch the portable exe sequentially with the same explicit synthetic `--user-data-dir` and confirm that it shows the same data. For normal owner use, both variants share `%APPDATA%\esmer-market-analytics`; do not use that personal folder for this test.
 14. Uninstall from Settings > Apps. Confirm the app is gone. The data folder normally stays; delete it only on your own test account.
 
 The two-second benchmark is conditional on prepared packages exceeding 100,000 rows under #98. Packages currently cap at 100,000 rows and 32 MiB. This walkthrough records no full-dataset performance pass. If the cap changes beyond that threshold, measure the four pages on documented Windows hardware with dataset size and cold and warm timings.
@@ -106,7 +107,7 @@ Owner installation, Eralp's acceptance and permission for the specific productio
 
 Write a new file `docs/evidence/<date>-windows-v1-smoke.md` (do not overwrite older evidence) with:
 
-- Commit SHA (`git rev-parse HEAD`), app version and tag if applicable. Do not label `6c11ed4` as the `v1.0.1` tag.
+- Commit SHA (`git rev-parse HEAD`), app version and tag if applicable. Do not label a later 1.0.1 build as the older `v1.0.1` tag.
 - Windows edition and build, CPU, RAM, display scaling tested, Node and npm versions.
 - Every command above with pass or fail, and the final `DISTRIBUTIONS_MATCH_INSPECTED_PAYLOAD` line.
 - SHA-256 of the installer and the portable exe, and the `release-inventory.json` and `distribution-inspection.json` hashes.
@@ -114,4 +115,4 @@ Write a new file `docs/evidence/<date>-windows-v1-smoke.md` (do not overwrite ol
 - Screenshots (synthetic data only; no key files, no paths revealing personal data).
 - What was not tested (live SQL, production source, owner install).
 
-Commit the file as `docs: record Windows v1 smoke acceptance` and open a PR. Mark A07 smoke acceptance passed only when the required manual checks have a passing receipt. Update the row "Windows elle kullanım kabulü bekliyor" in [known-limitations-tr.md](known-limitations-tr.md) only after that acceptance. If a check fails or is skipped, record it and keep the applicable acceptance open. GitHub issue closure alone supplies no proof. Keep separate-machine recovery, production access and owner acceptance open until their own evidence exists.
+Commit the file as `docs: record Windows v1 smoke acceptance` and open a PR. Mark A07 passed only for the tested build and Windows configuration. If a check fails or is skipped, record it and keep that acceptance open. GitHub issue closure alone supplies no proof. Keep separate-machine recovery, production access and owner acceptance open until their own evidence exists.
