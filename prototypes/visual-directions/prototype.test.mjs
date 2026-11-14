@@ -68,6 +68,7 @@ test('expense actions are honest previews and never imply a saved record or net 
 test('every direction remains operable with narrow windows, larger text and keyboard dialogs', async ({ page }) => {
   await page.setViewportSize({ width: 680, height: 800 });
   await page.goto('/');
+  await expect(page.getByText('Sentetik veriler', { exact: true })).toBeVisible();
   for (const direction of ['A · Çalışma alanı', 'B · Ayın hesabı', 'C · Odaklı görünüm']) {
     await page.getByRole('button', { name: direction, exact: true }).click();
     await page.getByRole('button', { name: 'Görünüm ve araçlar' }).click();
