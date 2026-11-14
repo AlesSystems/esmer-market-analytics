@@ -18,7 +18,7 @@ test("approved A exposes the observed period and supporting amounts before produ
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
     await expect(page.getByRole("heading", { name: "Ekim 2025", level: 1 })).toBeVisible();
     await expect(page.getByText("01.10.2025 – 20.10.2025 · Kısmi ay", { exact: true })).toBeVisible();
-    await expect(page.getByText("Veri sonu: 20.10.2025", { exact: true })).toBeVisible();
+    await expect(page.getByText("Paketin kapsadığı son gün: 20.10.2025", { exact: true })).toBeVisible();
     const facts = page.getByRole("group", { name: "Aylık destekleyici tutarlar" });
     await expect(facts).toContainText("Satış480,00 ₺");
     await expect(facts).toContainText("Tahmini ürün maliyeti372,50 ₺");

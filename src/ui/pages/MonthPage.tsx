@@ -51,7 +51,7 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const line=marginLine(t);
  const lastDay=new Date(Date.UTC(Number(v.month.slice(0,4)),Number(v.month.slice(5,7)),0)).toISOString().slice(0,10);
  const partial=v.dataFrom>`${v.month}-01`||v.dataUntil<lastDay;
- return <Shell title={monthName(v.month)} busy={loading} period={<><p className="period">{date(v.dataFrom)} – {date(v.dataUntil)} · {partial?"Kısmi ay":"Tam ay"}</p><p className="data-cutoff">Veri sonu: {date(v.source.to)}</p></>}>
+ return <Shell title={monthName(v.month)} busy={loading} period={<><p className="period">{date(v.dataFrom)} – {date(v.dataUntil)} · {partial?"Kısmi ay":"Tam ay"}</p><p className="data-cutoff">Paketin kapsadığı son gün: {date(v.source.to)}</p></>}>
   <div className="month-layout">
     <section className="card hero section-wide" aria-label="Ayın özeti">
      <div className="result-heading"><h2>Tahmini brüt kâr</h2><Popover buttonClass="link" dialogLabel="Nasıl hesaplandı" panelClass="pop-bridge" label={<>Nasıl hesaplandı?<ChevronDownIcon/></>}><Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/></Popover></div>
