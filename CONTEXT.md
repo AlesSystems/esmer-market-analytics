@@ -4,6 +4,12 @@ Terms used when discussing the owner's local reports and their evidence. These d
 
 ## Language
 
+**Offline review (çevrimdışı inceleme):** Eralp's review of the app using a prepared data package without a connection to the store's live database. Installation and review do not establish permission for production access.
+_Avoid_: Live rollout, production acceptance
+
+**Owner acceptance (işletme sahibinin kabulü):** Eralp's recorded decision after reviewing the app's workflow, estimate limitations and remaining issues. A completed installation or closed engineering issue is not owner acceptance.
+_Avoid_: Installation complete, verified financial truth
+
 **Satış:** v1's sale amount on the recorded `TOPLAM_KDV_MATRAHI` basis. It is not verified revenue or KDV-exclusive net sales.
 _Avoid_: Kapsanan satış adayı, verified revenue
 
