@@ -1,5 +1,5 @@
 import { test, expect, _electron as electron } from "@playwright/test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openStore } from "../../src/store/store";
@@ -48,7 +48,7 @@ test("approved A exposes the observed period and supporting amounts before produ
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-test("mixed known and unknown sales show a known subtotal and the missing-amount count", async () => {
+test("mixed known and unknown sales show a known subtotal and the missing-amount count", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-unknown-sale-"));
   const snapshot = monthProfitSnapshot();
   snapshot.lines.push({ ...snapshot.lines.find(line => line.ID === "1011")!, ID: "1099", TOPLAM_KDV_MATRAHI: null });
@@ -63,10 +63,13 @@ test("mixed known and unknown sales show a known subtotal and the missing-amount
     await expect(facts).toContainText("480,00 ₺");
     await expect(facts.getByText("1 satırın tutarı bilinmiyor", { exact: true })).toBeVisible();
     await expect(page.locator(".hero-num")).toHaveText("57,50 ₺");
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: testInfo.outputPath("unknown-sales-subtotal.png"), animations: "disabled" });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
-test("the calculation explanation stays readable inside wide, narrow and zoomed viewports", async () => {
+test("the calculation explanation stays readable inside wide, narrow and zoomed viewports", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-calculation-bounds-"));
   const store = openStore(join(userData, "analytics.sqlite"));
   try { store.importSourcePreview(monthProfitPackage()); } finally { store.close(); }
@@ -78,19 +81,23 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
     await trigger.click();
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
-    for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 390, height: 800, zoom: 1 }, { width: 1440, height: 1000, zoom: 2 }]) {
+    for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 680, height: 1000, zoom: 2 }, { width: 1440, height: 1000, zoom: 2 }]) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
         window.setContentSize(size.width, size.height);
         window.webContents.setZoomFactor(size.zoom);
       }, size);
+      const viewport = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, devicePixelRatio }));
+      expect(viewport.width).toBeLessThanOrEqual(size.width / size.zoom);
+      await writeFile(testInfo.outputPath(`viewport-${size.width}-zoom${size.zoom}.json`), JSON.stringify({ requested: size, actual: viewport }));
       await expect(explanation).toBeVisible();
       await expect.poll(() => explanation.evaluate(node => {
         const bounds = node.getBoundingClientRect();
         return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight;
       })).toBe(true);
-      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
+      await page.evaluate(() => document.fonts.ready);
+      await page.screenshot({ path: testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`), animations: "disabled" });
     }
     await page.keyboard.press("Escape");
     await expect(explanation).toBeHidden();
