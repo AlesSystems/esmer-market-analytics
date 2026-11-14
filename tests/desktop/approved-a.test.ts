@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { openStore } from "../../src/store/store";
 import { monthProfitPackage } from "../helpers/month-profit-fixture";
 import { executablePath } from "../helpers/desktop-executable";
-import { openSection, openWorkspace } from "../helpers/desktop-navigation";
+import { openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
 
 test("approved A exposes the observed period and supporting amounts before product investigation", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-approved-a-"));
@@ -35,5 +35,15 @@ test("approved A exposes the observed period and supporting amounts before produ
     await expect(page.getByRole("dialog", { name: "Ekmek" })).toBeVisible();
     await openSection(page, "Giderler");
     await expect(page.getByRole("heading", { name: "Ekim 2025 giderleri", level: 1 })).toBeVisible();
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1100, 560));
+    await openSettings(page);
+    const menu = settingsMenu(page);
+    const menuBounds = await menu.boundingBox();
+    expect(menuBounds!.y + menuBounds!.height).toBeLessThanOrEqual(560);
+    const about = menu.getByRole("button", { name: /^Hakkında ve bilinen sınırlar/ });
+    await about.scrollIntoViewIfNeeded();
+    await expect(about).toBeInViewport();
+    await about.click();
+    await expect(page.getByRole("region", { name: "Bilinen sınırlar" })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
