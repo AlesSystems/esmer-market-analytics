@@ -17,7 +17,7 @@ function points(value:string,month:string){
  return `${monthDative(previousOf(month))} göre ${flat?"değişmedi":`${value.startsWith("-")?"−":"+"}${decimal(value.replace(/^-/,""),2)} puan`}`;
 }
 
-/** The right-hand push panel for one product. Non-modal: the ledger beside it keeps working. */
+/** A non-modal product detail: beside the ledger when space permits, stacked below it in constrained windows. */
 export function ProductDrawer({product,month,onSource,onClose,sourceButton,heading}:{heading?:Ref<HTMLHeadingElement>;product:MonthProfitProduct;month:string;onSource:()=>void;onClose:()=>void;sourceButton?:Ref<HTMLButtonElement>}) {
  const p=product,costKnown=p.grossProfit!==null,loss=p.flags.loss;
  const unit=p.unit;
