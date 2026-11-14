@@ -41,7 +41,7 @@ jobs:
         shell: pwsh
         run: |
           $env:ESMER_EXECUTABLE = Join-Path $env:GITHUB_WORKSPACE 'release/win-unpacked/Esmer Market Analytics.exe'
-          npm exec -- playwright test
+          npm exec -- playwright test tests/desktop/clean-install-restore.test.ts --repeat-each=10
       - name: Upload synthetic verification evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

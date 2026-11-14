@@ -17,6 +17,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
   const store = openStore(join(original, "analytics.sqlite"));
   const populated = await populateRecoveryStore(store);
   store.close();
+  console.info("RECOVERY_STAGE launch original", Date.now());
   let app = await electron.launch({executablePath, args: [`--user-data-dir=${original}`]});
   try {
     await app.evaluate(({safeStorage, dialog}, paths) => {
@@ -48,16 +49,23 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(page.locator(".topbar .logo")).toBeVisible();
     await page.screenshot({path: "test-results/phase-9-recovery-680.png", fullPage: true});
     expect((await readFile(keyPath)).length).toBeGreaterThan(50);
+    console.info("RECOVERY_STAGE close original", Date.now());
     await app.close();
+    console.info("RECOVERY_STAGE remove original", Date.now());
     await rm(original, {recursive: true, force: true});
+    console.info("RECOVERY_STAGE launch fresh", Date.now());
     app = await electron.launch({executablePath, args: [`--user-data-dir=${fresh}`]});
+    console.info("RECOVERY_STAGE fresh launched", Date.now());
     const backupPath = join(destination, (await readdir(destination)).find(name => name.endsWith(".esmerbackup"))!);
     await app.evaluate(({dialog}, paths) => {
       dialog.showOpenDialog = (async (...args: unknown[]) => { const options = args.at(-1) as {filters?: {extensions?: string[]}[]}; return {canceled: false, filePaths: options.filters?.some(filter => filter.extensions?.includes("txt")) ? [paths.keyPath] : [paths.backupPath]}; }) as typeof dialog.showOpenDialog;
       dialog.showMessageBox = async () => ({response: 0, checkboxChecked: false});
     }, {backupPath, keyPath});
+    console.info("RECOVERY_STAGE fresh window", Date.now());
     const restored = await app.firstWindow();await openWorkspace(restored);
+    console.info("RECOVERY_STAGE fresh workspace", Date.now());
     await openSettingsItem(restored, /^Yedekle \/ Geri yükle/);
+    console.info("RECOVERY_STAGE select backup", Date.now());
     await restored.getByRole("button", {name: "Yedek ve anahtar seç"}).click();
     await expect(restored.getByRole("heading", {name: "Geri yükleme önizlemesi"})).toBeVisible();
     await expect(restored.getByText(/Veri kesim tarihi: 30\.09\.2025/)).toBeVisible();
@@ -65,6 +73,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await restored.setViewportSize({width: 680, height: 720});
     await expect(restored.locator(".topbar .logo")).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
+    console.info("RECOVERY_STAGE confirm restore", Date.now());
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
     await expect(restored.getByRole("navigation", {name: "Ana gezinme"}).getByRole("button", {name: "Bu ay", exact: true})).toHaveAttribute("aria-current", "page");
     await setMonth(restored, "2025-09");
@@ -75,5 +84,5 @@ test("packaged recovery restores a real encrypted backup after original user dat
     finally { restoredStore.close(); }
     // The restored expenses are readable through the kept operation and equal the pre-loss records.
     expect(await restored.evaluate(() => window.esmer.queryExpenses({period: "2025-09"}))).toEqual(JSON.parse(JSON.stringify(populated.expenses)));
-  } finally { await app.close(); await rm(root, {recursive: true, force: true}); }
+  } finally { console.info("RECOVERY_STAGE final close", Date.now()); await app.close(); console.info("RECOVERY_STAGE final remove", Date.now()); await rm(root, {recursive: true, force: true}); }
 });
