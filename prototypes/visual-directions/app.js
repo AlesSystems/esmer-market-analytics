@@ -10,10 +10,10 @@ const months = {
   '2025-04': { name: 'Nisan 2025', period: null, sales: null, cost: null, knownSales: null, gross: null, margin: null, coverage: null, comparison: 'Bu ay örnek veri paketinin dışında.', status: 'absent', expenses: 'Bu ay için gider örneği yok' },
 };
 const septemberProducts = [
-  { id: '1042', name: 'Tam yağlı süt 1 L', group: 'Süt ve kahvaltılık', quantity: '1.240 adet', sales: '62.000,00 ₺', cost: '45.880,00 ₺', gross: '16.120,00 ₺', margin: '%26,00', note: 'Düzenli katkı', kind: 'normal' },
+  { id: '1042', name: 'Tam yağlı süt 1 L', group: 'Süt ve kahvaltılık', quantity: '1.240 adet', sales: '62.000,00 ₺', cost: '45.880,00 ₺', gross: '16.120,00 ₺', margin: '%26,00', note: 'Pozitif brüt kâr', kind: 'normal' },
   { id: '2081', name: 'Ayçiçek yağı 5 L', group: 'Temel gıda', quantity: '180 adet', sales: '81.000,00 ₺', cost: '70.200,00 ₺', gross: '10.800,00 ₺', margin: '%13,33', note: 'Marj düştü', kind: 'warning' },
   { id: '3096', name: 'Domates', group: 'Meyve ve sebze', quantity: '320,500 kg', sales: '19.230,00 ₺', cost: '20.512,00 ₺', gross: '−1.282,00 ₺', margin: '−%6,67', note: 'Zarar', kind: 'loss' },
-  { id: '4158', name: 'Bulaşık deterjanı 750 ml', group: 'Temizlik', quantity: 'Bilinemiyor', sales: '3.800,00 ₺', cost: null, gross: null, margin: null, note: 'Maliyet eksik', kind: 'missing' },
+  { id: '4158', name: 'Bulaşık deterjanı 750 ml', group: 'Temizlik', quantity: 'Bilinmiyor', sales: '3.800,00 ₺', cost: null, gross: null, margin: null, note: 'Maliyet eksik', kind: 'missing' },
   { id: '5073', name: 'İçme suyu 1,5 L', group: 'İçecekler', quantity: '800 adet', sales: '12.000,00 ₺', cost: '12.000,00 ₺', gross: '0,00 ₺', margin: '%0,00', note: 'Sıfır brüt kâr', kind: 'zero' },
 ];
 const state = { direction: 'a', month: '2025-09', page: 'month', largeText: false };
@@ -46,7 +46,7 @@ function products() {
   if (state.month === '2025-09') return septemberProducts;
   const current = months[state.month];
   if (current.status === 'absent') return [];
-  return [{ id: '9001', name: 'Örnek temel gıda ürünü', group: 'Sentetik ay örneği', quantity: current.status === 'unknown' ? 'Bilinemiyor' : '1.000 adet', sales: current.sales, cost: current.cost, gross: current.gross, margin: current.margin, note: current.status === 'loss' ? 'Zarar' : current.status === 'zero' ? 'Sıfır brüt kâr' : current.status === 'unknown' ? 'Maliyet eksik' : 'Örnek ürün', kind: current.status === 'unknown' ? 'missing' : current.status }];
+  return [{ id: '9001', name: 'Örnek temel gıda ürünü', group: 'Sentetik ay örneği', quantity: current.status === 'unknown' ? 'Bilinmiyor' : '1.000 adet', sales: current.sales, cost: current.cost, gross: current.gross, margin: current.margin, note: current.status === 'loss' ? 'Zarar' : current.status === 'zero' ? 'Sıfır brüt kâr' : current.status === 'unknown' ? 'Maliyet eksik' : 'Örnek ürün', kind: current.status === 'unknown' ? 'missing' : current.status }];
 }
 function trust() {
   const data = months[state.month];
@@ -87,6 +87,7 @@ function expensePanel() {
 function render() {
   const data = months[state.month];
   app.className = `direction-${state.direction}${state.largeText ? ' large-text' : ''}`;
+  dialog.classList.toggle('large-text-dialog', state.largeText);
   app.innerHTML = `<div class="app-shell"><header class="app-chrome">${brand()}${navigation()}<div class="chrome-tools"><button class="icon-button" aria-label="Görünüm ve araçlar" data-dialog="settings">${icon('settings')}</button></div><div class="rail-foot"><span class="offline-indicator"></span>Çevrimdışı çalışma<small>Veri sonu: 18 Ekim 2025</small></div></header>
     <main id="workspace" tabindex="-1"><div class="workspace-head"><div><p class="page-context">${state.page === 'month' ? 'Ayın özeti' : state.page === 'products' ? 'Ürün incelemesi' : 'Gider incelemesi'}</p><h1>${data.name}</h1><p class="period">${data.period ? `${data.period}${data.partial ? ' · Kısmi ay' : ' · Tam ay'}` : 'Veri paketi dışında'}</p></div><div class="workspace-tools">${monthPicker()}<button class="secondary" data-dialog="export">Excel’e aktar</button></div></div>
     <div class="provenance">${trust()}<span>Veri sonu: 18 Ekim 2025 <span class="provenance-secondary">· Örnek paket</span></span></div>
@@ -113,7 +114,7 @@ function showDialog(name, trigger) {
   const content = {
     estimate: ['Bu sonuçlar neden tahmini?', `<p>Ürün maliyeti, belge tarihindeki son alış fiyatı üzerinden tahmin edilir. Kaynak alanlarının ekonomik anlamı doğrulanmış değildir.</p><dl class="detail-facts"><div><dt>Maliyeti bilinen satış</dt><dd>${data.coverage ?? 'Bilinmiyor'}</dd></div><div><dt>Gerçekte gözlenen dönem</dt><dd>${data.period ?? 'Bu ay veri yok'}</dd></div><div><dt>Veri sonu</dt><dd>18 Ekim 2025</dd></div></dl><p>Eksik, sıfır veya negatif maliyetli satırlar brüt kâra dahil edilmez. İadelerin kâra etkisi, özgün satış maliyetiyle eşleştirilemediği için dışarıdadır. Sonuç, işletmenin doğrulanmış toplam kârı değildir.</p><p class="dialog-note">Tüm rakamlar sentetik örneklerdir. Bu inceleme bir kaynağı doğrulamaz.</p>`],
     calculation: ['Tahmini brüt kârın hesabı', `<p>${data.name} için gösterilen tutarlar:</p><dl class="calculation-rows"><div><dt>Satış</dt><dd>${money(data.sales)}</dd></div><div><dt>Maliyeti bilinen satış</dt><dd>${money(data.knownSales)}</dd></div><div><dt>Tahmini ürün maliyeti</dt><dd>${money(data.cost)}</dd></div><div class="calculation-total"><dt>Tahmini brüt kâr</dt><dd>${money(data.gross)}</dd></div><div><dt>Marj</dt><dd>${data.margin ?? 'Bilinmiyor'}</dd></div></dl><p>Brüt kâr yalnızca maliyeti bilinen satışlardan hesaplanır. Marj aynı satış grubuna dayanır. Satış tutarı doğrulanmış gelir veya KDV hariç net satış iddiası değildir.</p>${data.status === 'unknown' ? '<p class="dialog-note">Bu ay maliyet eksik. Bilinmeyen maliyet sıfır sayılmadığı için sonuç gösterilmiyor.</p>' : ''}<p class="dialog-note">Prototip hazır, bağımsız olarak belirtilmiş örnek tutarları gösterir; finansal hesaplama çalıştırmaz.</p>`],
-    'expense-import': ['Excel’den gider ekle', '<p class="dialog-note">Görsel akış örneği. Gerçek dosya seçilmez veya kaydedilmez.</p><div class="upload-preview"><span class="file-icon">XLSX</span><strong>eylul-giderleri-ornek.xlsx</strong><span>3 sentetik kayıt · inceleme önizlemesi</span></div><ol class="preview-steps"><li>Dosya ve sütunları incele</li><li>Eksik KDV bilgisi ve olası tekrarları kontrol et</li><li>Geçerli kayıtları açıkça onayla</li></ol><p>Kaydetme, hata düzeltme ve tekrar kararları, seçilecek tasarımın bağlantılı prototipinde tamamlanacak. Bu ilk örnek, işlemin yerini ve görünümünü değerlendirmek içindir.</p>'],
+    'expense-import': ['Excel’den gider ekle', '<p class="dialog-note">Görsel akış örneği. Gerçek dosya seçilmez veya kaydedilmez.</p><div class="upload-preview"><span class="file-icon">XLSX</span><strong>giderler-ornek.xlsx</strong><span>3 sentetik kayıt · inceleme önizlemesi</span></div><ol class="preview-steps"><li>Dosya ve sütunları incele</li><li>Eksik KDV bilgisi ve olası tekrarları kontrol et</li><li>Geçerli kayıtları açıkça onayla</li></ol><p>Kaydetme, hata düzeltme ve tekrar kararları, seçilecek tasarımın bağlantılı prototipinde tamamlanacak. Bu ilk örnek, işlemin yerini ve görünümünü değerlendirmek içindir.</p>'],
     template: ['Gider şablonu', '<p>Asıl uygulamada Excel şablonu kullanılır. Bu prototipte indirme yapılmaz.</p><div class="table-scroll"><table><thead><tr><th>Alan</th><th>Örnek</th></tr></thead><tbody><tr><td>Dönem / gider türü</td><td>Eylül 2025 / Kira</td></tr><tr><td>Tutar ve KDV bilgisi</td><td>Kayıt ve kanıta göre</td></tr><tr><td>Kaynak / açıklama</td><td>Sentetik gider belgesi</td></tr></tbody></table></div><p>Gider sınıfı ve KDV uygulaması tahmin edilmez. Bilinmeyen bilgi net kârı engelleyebilir.</p>'],
     manual: ['Tek bir gider ekleme', '<p>Elle ekleme, Excel’in yanında ikincil giriş yoludur.</p><div class="form-preview"><div><span>Gider türü</span><strong>Seçilmesi gerekir</strong></div><div><span>Tutar ve dönem</span><strong>Girilen kayda göre</strong></div><div><span>KDV uygulaması ve kanıt</span><strong>Bilinmiyorsa net kâr gösterilmez</strong></div></div><p class="dialog-note">Bu ilk görsel prototipte form ve kayıt işlemi uygulanmadı. Hiçbir gider eklenmedi.</p>'],
     'expense-review': ['Gider incelemesi henüz tamamlanmadı', `<p>${data.name} için giderlerin eksiksiz olduğu henüz onaylanmadı. Boş bir gider grubu kendiliğinden sıfır sayılmaz.</p><p>Gerçek akışta gider türleri, KDV bilgisi ve eksik gruplar incelenir. Ayda hiç gider yoksa bunun ayrıca açıkça bildirilmesi gerekir.</p><p class="dialog-note">Onaylama ve sonradan yapılan değişikliklerin net sonucu geri çekmesi, sonraki bağlantılı prototipte gösterilecek. Bu örnek herhangi bir onay kaydetmez.</p>`],
@@ -143,6 +144,7 @@ document.addEventListener('click', event => {
   else if ('textSize' in button.dataset) {
     state.largeText = !state.largeText;
     app.classList.toggle('large-text', state.largeText);
+    dialog.classList.toggle('large-text-dialog', state.largeText);
     button.textContent = state.largeText ? 'Normal yazıya dön' : 'Büyük yazı kullan';
   }
 });
