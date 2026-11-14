@@ -4,23 +4,24 @@ import { createRoot } from "react-dom/client";
 import { expect, test } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { AppShell } from "../../src/ui/AppShell";
+import { AppShell, WorkspaceHeader } from "../../src/ui/AppShell";
 
-test("the top bar holds the logo, three tabs, the controls and the gear; the skip action moves focus into the workspace", async () => {
+test("the rail holds the store identity, navigation and settings; page controls and the skip action remain usable", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   const host = document.createElement("div"); document.body.append(host);
   const root = createRoot(host);
-  await act(async () => root.render(h(AppShell, { section: "products", navigate: () => undefined, controls: h("span", { id: "controls" }, "kontroller"), menu: h("span", { id: "menu" }, "menü"), children: h("h1", null, "Sentetik çalışma alanı") })));
+  await act(async () => root.render(h(AppShell, { section: "products", navigate: () => undefined, controls: h("span", { id: "controls" }, "kontroller"), menu: h("span", { id: "menu" }, "menü"), children: h(WorkspaceHeader, { title: "Sentetik çalışma alanı" }) })));
   const skip = host.querySelector<HTMLButtonElement>(".skip-workspace")!;
   expect(skip.textContent).toBe("İçeriğe geç");
   await act(async () => skip.click());
   expect(document.activeElement).toBe(host.querySelector(".app-body"));
   const bar = host.querySelector("header.topbar")!;
-  expect(bar.querySelector("img")?.getAttribute("alt")).toBe("Esmer Market");
+  expect(bar.querySelector("strong")?.textContent).toBe("Esmer Market");
   const nav = bar.querySelector('nav[aria-label="Ana gezinme"]')!;
   expect([...nav.querySelectorAll("button")].map(button => button.textContent)).toEqual(["Bu ay", "Ürünler", "Giderler"]);
   expect([...nav.querySelectorAll("[aria-current]")].map(button => button.textContent)).toEqual(["Ürünler"]);
-  expect(bar.querySelector("#controls")?.textContent).toBe("kontroller");
+  expect(host.querySelector(".workspace-head h1")?.textContent).toBe("Sentetik çalışma alanı");
+  expect(host.querySelector(".workspace-head #controls")?.textContent).toBe("kontroller");
   expect(bar.querySelector("#menu")?.textContent).toBe("menü");
   await act(async () => root.unmount()); host.remove();
 });
@@ -33,9 +34,9 @@ const contrast = (a: string, b: string) => { const values = [luminance(a), lumin
 const css = readFileSync("src/ui/theme.css", "utf8");
 const token = (name: string) => css.match(new RegExp(`--${name}: (#[0-9a-fA-F]{6});`))![1];
 
-test("theme tokens carry the three-tab palette", () => {
+test("theme tokens carry the approved A palette", () => {
   expect(Object.fromEntries(["page", "card", "line", "field", "ink", "ink-2", "soft", "hover", "accent", "accent-h", "accent-50", "accent-100", "bar", "gain", "loss", "warn", "warn-bg"].map(name => [name, token(name)])))
-    .toEqual({ page: "#f5f7fa", card: "#ffffff", line: "#e3e7ee", field: "#8792a2", ink: "#18212e", "ink-2": "#5b6472", soft: "#eef1f5", hover: "#f2f5f9", accent: "#0b6bcb", "accent-h": "#0959ab", "accent-50": "#e9f2fc", "accent-100": "#d4e6f8", bar: "#5b97d9", gain: "#0f7b51", loss: "#bf2f2a", warn: "#965a00", "warn-bg": "#fff4e2" });
+    .toEqual({ page: "#f4f5f8", card: "#ffffff", line: "#e0e2e9", field: "#8792a2", ink: "#252b39", "ink-2": "#626b7b", soft: "#f0f1f5", hover: "#f4f2f6", accent: "#6c3d78", "accent-h": "#563060", "accent-50": "#f1eaf4", "accent-100": "#e5d6eb", bar: "#ab89b5", gain: "#0f7b51", loss: "#bf2f2a", warn: "#965a00", "warn-bg": "#fff4e2" });
 });
 
 test("every text and control pairing of the theme keeps contrast at least 4.5:1", () => {
