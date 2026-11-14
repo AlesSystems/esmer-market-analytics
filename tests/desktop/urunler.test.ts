@@ -199,6 +199,12 @@ test("constrained product details stay separate from the ledger and source retur
    expect(await page.locator(".tbl-wrap").evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
    for(const [name,value] of [["Satış fiyatı","10,00 ₺"],["Alış maliyeti","7,00 ₺"],["Marj","%30,00"]] as const)await expect(fact(page,name)).toHaveText(value);
+   await page.keyboard.press("ArrowDown");
+   await expect(rowButton(page,"4")).toBeFocused();
+   await expect(drawer(page,"Çay").getByRole("heading",{name:"Çay",exact:true})).toBeInViewport();
+   await page.keyboard.press("ArrowUp");
+   await expect(rowButton(page,"1")).toBeFocused();
+   await expect(drawer(page,"Süt").getByRole("heading",{name:"Süt",exact:true})).toBeInViewport();
    if(size.zoom===1)await page.screenshot({path:testInfo.outputPath(`product-detail-${size.width}.png`),animations:"disabled"});
    else{const png=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));await writeFile(testInfo.outputPath("product-detail-zoom200.png"),Buffer.from(png,"base64"));}
    await drawer(page).getByRole("button",{name:"Kaynak satırlar",exact:true}).click();
