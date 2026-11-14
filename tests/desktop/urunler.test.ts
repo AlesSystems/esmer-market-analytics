@@ -215,5 +215,14 @@ test("constrained product details stay separate from the ledger and source retur
    await expect(rowButton(page,"1")).toBeFocused();
    await expect(rowButton(page,"1")).toBeInViewport();
   }
+  await app.evaluate(({BrowserWindow})=>{const window=BrowserWindow.getAllWindows()[0];window.setContentSize(1000,560);window.webContents.setZoomFactor(1);});
+  await expect.poll(()=>page.evaluate(()=>innerWidth)).toBe(1000);
+  await setMonth(page,"2025-09");
+  await rowButton(page,"6").click();
+  await expect(drawer(page,"Yağ").getByRole("heading",{name:"Yağ",exact:true})).toBeInViewport();
+  await setMonth(page,"2025-10");
+  await expect(page.getByText("Yağ bu ay satılmadı.",{exact:true})).toBeInViewport({ratio:1});
+  await drawer(page).getByRole("button",{name:"Ayrıntıyı kapat",exact:true}).click();
+  await expect(page.getByRole("searchbox",{name:"Ürün ara"})).toBeFocused();
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
