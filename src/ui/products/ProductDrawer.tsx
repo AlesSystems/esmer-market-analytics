@@ -18,10 +18,10 @@ function points(value:string,month:string){
 }
 
 /** A non-modal product detail: beside the ledger when space permits, stacked below it in constrained windows. */
-export function ProductDrawer({product,month,onSource,onClose,sourceButton,heading}:{heading?:Ref<HTMLHeadingElement>;product:MonthProfitProduct;month:string;onSource:()=>void;onClose:()=>void;sourceButton?:Ref<HTMLButtonElement>}) {
+export function ProductDrawer({product,month,onSource,onClose,sourceButton,heading,panel}:{heading?:Ref<HTMLHeadingElement>;panel?:Ref<HTMLElement>;product:MonthProfitProduct;month:string;onSource:()=>void;onClose:()=>void;sourceButton?:Ref<HTMLButtonElement>}) {
  const p=product,costKnown=p.grossProfit!==null,loss=p.flags.loss;
  const unit=p.unit;
- return <aside className="drawer" role="dialog" aria-modal="false" aria-labelledby="drawer-title">
+ return <aside className="drawer" ref={panel} role="dialog" aria-modal="false" aria-labelledby="drawer-title">
   <header className="dr-head">
    <div>{p.category&&<p>{p.category}</p>}<h2 id="drawer-title" ref={heading} tabIndex={-1}>{productName(p)}</h2></div>
    <button type="button" className="icon-btn" aria-label="Ayrıntıyı kapat" title="Ayrıntıyı kapat" onClick={onClose}><CloseIcon/></button>
