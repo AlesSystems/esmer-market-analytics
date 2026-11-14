@@ -67,7 +67,7 @@
   button, input, select, textarea { font: inherit; max-width: 100%; }
   button { cursor: pointer; }
   button:disabled { cursor: not-allowed; opacity: .5; }
-  button { min-height: 40px; padding: 8px 12px; border: 1px solid var(--edge); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-sm); font-weight: 600; }
+  button { min-width: 40px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--edge); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-sm); font-weight: 600; }
   button:hover { background: var(--hover); }
   input:not([type="checkbox"]):not([type="radio"]), select, textarea { width: 100%; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--card); color: var(--ink); font-size: var(--t-md); font-weight: 500; }
   input:not([type="checkbox"]):not([type="radio"]):hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) { border-color: var(--ink-2); }
