@@ -1,7 +1,7 @@
 import type {Availability,RequestError} from "../domain/contracts";
 import type {QuickFilter} from "./products/product-rows";
 
-/** The three top tabs, in order. Each one owns exactly one page component in src/ui/pages. */
+/** The three workspace destinations, in order. Each owns one page component in src/ui/pages. */
 export const sections=[["month","Bu ay"],["products","Ürünler"],["expenses","Giderler"]] as const;
 export type Section=typeof sections[number][0];
 /** Optional state carried by a navigation: the product to open on Ürünler, or the filter to start it with. */

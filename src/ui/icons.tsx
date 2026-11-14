@@ -25,3 +25,7 @@ export const TextSizeIcon = ({ className }: P) => <Icon className={className}><p
 export const DatabaseIcon = ({ className }: P) => <Icon className={className}><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></Icon>;
 export const ArrowRightIcon = ({ className }: P) => <Icon className={className}><path d="M5 12h14M13 6l6 6-6 6"/></Icon>;
 export const FileIcon = ({ className }: P) => <Icon className={className}><path d="M14 3.5H7a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7.5z"/><path d="M14 3.5v4h4M9.5 13h5M9.5 16.5h5"/></Icon>;
+
+export const CalendarIcon = ({ className }: P) => <Icon className={className}><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16M8 15h2M14 15h2"/></Icon>;
+export const ProductsIcon = ({ className }: P) => <Icon className={className}><path d="m12 3 9 5-9 5-9-5 9-5ZM3 8v9l9 5 9-5V8M12 13v9M7.5 5.5l9 5"/></Icon>;
+export const ReceiptIcon = ({ className }: P) => <Icon className={className}><path d="M5 3v18l3-2 4 2 4-2 3 2V3l-3 2-4-2-4 2-3-2ZM9 9h6M9 13h6M9 17h3"/></Icon>;

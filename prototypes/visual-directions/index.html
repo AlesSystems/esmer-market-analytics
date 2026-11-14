@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Esmer Market — Tasarım prototipi</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a href="#workspace" class="skip-link">İçeriğe geç</a>
+  <header class="review-bar" aria-label="Prototip inceleme araçları">
+    <div class="review-label"><span class="review-dot"></span><strong>Tasarım prototipi</strong><span>Sentetik veriler</span></div>
+    <div class="direction-switch" role="group" aria-label="Görsel yön">
+      <button data-direction="a" aria-pressed="true">A · Çalışma alanı</button>
+      <button data-direction="b" aria-pressed="false">B · Ayın hesabı</button>
+      <button data-direction="c" aria-pressed="false">C · Odaklı görünüm</button>
+    </div>
+    <button class="review-help" id="review-guide">İnceleme rehberi</button>
+  </header>
+  <div id="app" class="direction-a"></div>
+  <dialog id="detail-dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+</body>
+</html>

@@ -2,7 +2,7 @@
 .gider { min-width: 0; display: grid; gap: 20px; align-content: start; }
 .gider > * { min-width: 0; margin-top: 0; margin-bottom: 0; }
 
-.g-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
+.g-head { display: block; align-items: flex-start; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; }
 .g-say { margin-top: 4px; max-width: 64ch; color: var(--ink-2); font-size: var(--t-lg); text-wrap: pretty; }
 .g-say:empty { display: none; }
 .g-muted { color: var(--ink-2); font-size: var(--t-sm); }
@@ -124,3 +124,4 @@
   .g-note, .g-leave, .g-ask, .g-attn, .g-tile[data-state="missing"] { border: 1px solid CanvasText; }
   .g-done .ico { color: Highlight; }
 }
+.g-head .g-say { margin-top: 8px; }

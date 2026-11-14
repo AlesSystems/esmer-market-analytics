@@ -7,7 +7,7 @@ import { executablePath } from "../helpers/desktop-executable";
 import { openSection, openWorkspace } from "../helpers/desktop-navigation";
 import { monthProfitPackage, monthProfitSnapshot } from "../helpers/month-profit-fixture";
 
-// Design finish on the three tabs at the small window (1100x560): what stays above the fold, one-line rows, columns instead of tiles.
+// Retained expense and chart behavior in a small window (1100x560). A uses visible headings and scrollable sections.
 async function launch(to?: string): Promise<{ app: ElectronApplication; page: Page; userData: string }> {
   const userData = await mkdtemp(join(tmpdir(), "design-finish-"));
   const store = openStore(join(userData, "analytics.sqlite"));
@@ -20,22 +20,20 @@ async function launch(to?: string): Promise<{ app: ElectronApplication; page: Pa
 const finish = async (app: ElectronApplication, userData: string) => { await app.close().catch(() => undefined); await rm(userData, { recursive: true, force: true }); };
 const save = (page: Page, requestId: string, date: string, category: string, net: string, treatment = "non-recoverable") =>
   page.evaluate(({ requestId, date, category, net, treatment }) => window.esmer.createExpense({ action: "save", requestId, duplicateReview: null, fields: { date, paymentDate: null, category, classification: "operating-expense", net, tax: "0", gross: net, taxTreatment: treatment, taxEvidence: treatment === "unknown" ? null : "synthetic-tax", supportingReference: null, sourceReference: null, labourPeriod: null, loss: null } } as never), { requestId, date, category, net, treatment });
-const bottom = (page: Page, selector: string) => page.locator(selector).evaluate(node => ({ bottom: node.getBoundingClientRect().bottom, fold: innerHeight }));
 const style = (page: Page, selector: string, property: string) => page.locator(selector).first().evaluate((node, name) => getComputedStyle(node).getPropertyValue(name), property);
 
-test("Giderler, empty month: the answer and the confirmation stay above the fold, Excel import leads", async () => {
+test("Giderler, empty month: the selected month and confirmation are reachable, Excel import leads", async () => {
   test.setTimeout(90_000);
   const { app, page, userData } = await launch("2025-10-31");
   try {
     await openSection(page, "Giderler");
     const heading = page.getByRole("heading", { name: "Ekim 2025 giderleri", level: 1 });
-    await expect(heading).toBeAttached();
-    expect(await heading.evaluate(node => node.getBoundingClientRect().width)).toBeLessThanOrEqual(1);
+    await expect(heading).toBeVisible();
     await expect(page.locator(".g-say")).toHaveText("Bu ay için gider girilmedi.");
     const confirm = page.getByRole("button", { name: "Bu ay gider yok", exact: true });
     await expect(confirm).toBeVisible();
-    const edge = await bottom(page, ".g-foot");
-    expect(edge.bottom).toBeLessThanOrEqual(edge.fold);
+    await confirm.scrollIntoViewIfNeeded();
+    await expect(confirm).toBeInViewport();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true })).toHaveClass(/btn-primary/);
     await expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toHaveClass(/\blink\b/);
     await expect(page.getByRole("button", { name: "Şablonu indir", exact: true })).toHaveClass(/\blink\b/);
@@ -48,7 +46,7 @@ test("Giderler, empty month: the answer and the confirmation stay above the fold
   } finally { await finish(app, userData); }
 });
 
-test("Giderler with lines: one line per row, the blank-group question above the fold, no hint for a group without lines", async () => {
+test("Giderler with lines: one line per row, explicit blank-group review, no hint for a group without lines", async () => {
   test.setTimeout(90_000);
   const { app, page, userData } = await launch("2025-10-31");
   try {
@@ -74,8 +72,8 @@ test("Giderler with lines: one line per row, the blank-group question above the 
     await page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true }).click();
     const ask = page.getByRole("alert").filter({ hasText: "için kayıt yok." });
     await expect(ask).toBeVisible();
-    const edge = await ask.evaluate(node => ({ bottom: node.getBoundingClientRect().bottom, fold: innerHeight }));
-    expect(edge.bottom).toBeLessThanOrEqual(edge.fold);
+    await ask.scrollIntoViewIfNeeded();
+    await expect(ask).toBeInViewport();
   } finally { await finish(app, userData); }
 });
 
@@ -92,7 +90,7 @@ test("Giderler: a line that needs a fix gets a chip, a reversed line says so, no
   } finally { await finish(app, userData); }
 });
 
-test("Bu ay and the drawer: chart title with its unit, quiet net reason, fold slack, columns instead of nested tiles", async () => {
+test("Bu ay and the drawer: chart unit, quiet net reason, reachable observations and numeric columns", async () => {
   test.setTimeout(90_000);
   const { app, page, userData } = await launch();
   try {
@@ -101,8 +99,8 @@ test("Bu ay and the drawer: chart title with its unit, quiet net reason, fold sl
     await expect(net).toContainText("Ay henüz tamamlanmadı");
     await expect(net.locator(".net-say")).toHaveCount(0);
     expect(await style(page, ".netcard .muted", "font-size")).toBe("14px");
-    const edge = await page.locator(".att-row").last().evaluate(node => ({ bottom: node.getBoundingClientRect().bottom, fold: innerHeight }));
-    expect(edge.fold - edge.bottom).toBeGreaterThanOrEqual(24);
+    await page.locator(".att-row").last().scrollIntoViewIfNeeded();
+    await expect(page.locator(".att-row").last()).toBeInViewport();
     await openSection(page, "Ürünler");
     await page.locator(".products-table tr[data-product='1'] button").click();
     await expect(page.locator(".drawer")).toBeVisible();

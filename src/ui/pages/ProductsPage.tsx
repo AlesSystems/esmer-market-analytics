@@ -1,3 +1,4 @@
+import {WorkspaceHeader} from "../AppShell";
 import {useDeferredValue,useEffect,useMemo,useRef,useState} from "react";
 import type {KeyboardEvent,ReactNode} from "react";
 import type {MonthProfitProduct} from "../../source/month-profit";
@@ -16,14 +17,14 @@ const columns:[SortKey,string,boolean][]=[["name","Ürün",false],["sales","Sat�
 const MARGIN_BAR_AT=40;
 
 function Shell({busy=false,onKeyDown,children}:{busy?:boolean;onKeyDown?:(event:KeyboardEvent<HTMLElement>)=>void;children:ReactNode}) {
- return <main className="products-page" aria-busy={busy} onKeyDown={onKeyDown}><h1 className="sr-only">Ürünler</h1>{children}</main>;
+ return <main className="products-page" aria-busy={busy} onKeyDown={onKeyDown}><WorkspaceHeader title="Ürünler" label="Ürün incelemesi"/>{children}</main>;
 }
 
 export function ProductsPage({month,onMonth,coverage,state,importPackage}:PageProps) {
  const {read,loading,retry}=useMonthProfitContext();
  const [sort,setSort]=useState<Sort>(defaultSort),[filter,setFilter]=useState<QuickFilter>(state.filter??"all"),[query,setQuery]=useState("");
  const [selected,setSelected]=useState<string|null>(state.productId??null),[tabId,setTabId]=useState<string|null>(null),[source,setSource]=useState(false);
- const focusRow=useRef<string|null>(state.productId??null),searchBox=useRef<HTMLInputElement>(null),sourceButton=useRef<HTMLButtonElement>(null);
+ const focusRow=useRef<string|null>(state.productId??null),searchBox=useRef<HTMLInputElement>(null),sourceButton=useRef<HTMLButtonElement>(null),detailPanel=useRef<HTMLElement>(null);
  const view=read&&"result" in read&&read.result.status==="month-profit"?read.result.view:null;
  const deferredQuery=useDeferredValue(query);
  const index=useMemo(()=>view?searchIndex(view.products):new Map<string,string>(),[view]);
@@ -46,6 +47,11 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
   const button=document.querySelector<HTMLElement>(`.products-table tr[data-product="${CSS.escape(id)}"] button`);
   button?.scrollIntoView({block:"center"});button?.focus({preventScroll:true});
  });
+ // A stacked detail follows the ledger in normal flow. Bring it into view without
+ // taking keyboard focus away from the row used by ArrowUp/ArrowDown and close.
+ useEffect(()=>{
+  if(selected!==null&&viewMonth&&!source&&window.matchMedia("(max-width: 1200px)").matches)detailPanel.current?.scrollIntoView({block:"start"});
+ },[selected,chosen?.id,source,viewMonth]);
  const names=useRef(new Map<string,string>());
  if(chosen)names.current.set(chosen.id,productName(chosen));
  const tabStop=rows.some(p=>p.id===tabId)?tabId:rows[0]?.id;
@@ -113,8 +119,8 @@ export function ProductsPage({month,onMonth,coverage,state,importPackage}:PagePr
   </div>
   {!source&&selected!==null&&<>
    {chosen
-    ?<ProductDrawer key={chosen.id} product={chosen} month={view.month} sourceButton={sourceButton} onClose={close} onSource={()=>setSource(true)}/>
-    :<aside className="drawer" role="dialog" aria-modal="false" aria-label="Ürün ayrıntısı"><div className="dr-body"><p className="dr-note">{names.current.get(selected)??`Ürün #${selected}`} bu ay satılmadı.</p><Button variant="secondary" onClick={close}>Ayrıntıyı kapat</Button></div></aside>}
+    ?<ProductDrawer key={chosen.id} panel={detailPanel} product={chosen} month={view.month} sourceButton={sourceButton} onClose={close} onSource={()=>setSource(true)}/>
+    :<aside className="drawer" ref={detailPanel} role="dialog" aria-modal="false" aria-label="Ürün ayrıntısı"><div className="dr-body"><p className="dr-note">{names.current.get(selected)??`Ürün #${selected}`} bu ay satılmadı.</p><Button variant="secondary" onClick={close}>Ayrıntıyı kapat</Button></div></aside>}
   </>}
   {source&&chosen&&<ProductSourceLines key={`${view.source.hash}|${view.month}|${chosen.id}`} hash={view.source.hash} month={view.month} productId={chosen.id} name={productName(chosen)} onBack={()=>{setSource(false);requestAnimationFrame(()=>sourceButton.current?.focus());}}/>}
  </Shell>;

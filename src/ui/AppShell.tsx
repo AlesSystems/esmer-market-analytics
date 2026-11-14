@@ -1,8 +1,17 @@
-import { useContext, useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
 import { AppFrame } from "./frame";
 import { sections, type Section } from "./sections";
+import { CalendarIcon, ProductsIcon, ReceiptIcon } from "./icons";
 
-/** Top bar with the three tabs, then whatever the app passes as month and export controls and the gear menu. Knows nothing about page content. */
+const WorkspaceControls = createContext<ReactNode>(null);
+
+/** Normal-flow heading shared by pages; adding a content section never repositions the tools. */
+export function WorkspaceHeader({title, label, children}: {title: string; label?: string; children?: ReactNode}) {
+  const controls = useContext(WorkspaceControls);
+  return <header className="workspace-head"><div className="page-heading">{label && <p>{label}</p>}<h1>{title}</h1>{children}</div><div className="workspace-tools">{controls}</div></header>;
+}
+
+/** A's navigation rail and a flexible content workspace. Page sections own their content and service results. */
 export function AppShell({ section, navigate, controls, menu, children }: {
   section?: Section; navigate?: (section: Section) => void;
   controls?: ReactNode; menu?: ReactNode; children: ReactNode;
@@ -27,14 +36,15 @@ export function AppShell({ section, navigate, controls, menu, children }: {
   return <div className="sales-app app-shell">
     <button className="skip-workspace" onClick={() => body.current?.focus()}>İçeriğe geç</button>
     <header className="topbar"><div className="topbar-in">
-      <img className="logo" src="/assets/esmer-market-logo.png" alt="Esmer Market" width="125" height="30" />
-      {navigate && <nav className="tabs" aria-label="Ana gezinme">{sections.map(([id, label]) => <button type="button" className="tab" key={id} aria-current={!away && section === id ? "page" : undefined} onClick={() => { if (away) frame?.show("workspace", () => navigate(id)); else navigate(id); }}>{label}</button>)}</nav>}
-      <div className="topbar-tools">{controls}{menu}</div>
+      <div className="workspace-brand"><span className="brand-mark" aria-hidden="true">e<span>.</span></span><div><strong>Esmer Market</strong><small>Aylık işletme görünümü</small></div></div>
+      {navigate && <nav className="tabs" aria-label="Ana gezinme">{sections.map(([id, label]) => <button type="button" className="tab" key={id} aria-current={!away && section === id ? "page" : undefined} onClick={() => { if (away) frame?.show("workspace", () => navigate(id)); else navigate(id); }}>{id === "month" ? <CalendarIcon/> : id === "products" ? <ProductsIcon/> : <ReceiptIcon/>}<span>{label}</span></button>)}</nav>}
+      <div className="rail-tools">{menu}</div>
+      <p className="rail-offline"><span aria-hidden="true"/>Çevrimdışı çalışma<small>Yerel verilerle çalışır</small></p>
     </div></header>
     <div className="app-body" ref={body} tabIndex={-1}>
       <div className="workspace">
         {frame?.notices}
-        <div className="workspace-content" hidden={away}>{children}</div>
+        <div className="workspace-content" hidden={away}><WorkspaceControls.Provider value={controls}>{children}</WorkspaceControls.Provider></div>
         {away && frame.overlay}
       </div>
     </div>

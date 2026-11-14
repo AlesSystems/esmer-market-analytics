@@ -1,3 +1,4 @@
+import {WorkspaceHeader} from "../AppShell";
 import type {ReactNode} from "react";
 import type {AttentionKind,MonthProfitProduct,Pct} from "../../source/month-profit";
 import type {PageProps} from "../sections";
@@ -6,13 +7,13 @@ import {Bridge} from "../charts";
 import {MonthBars} from "../charts/MonthBars";
 import {AlertIcon,ArrowDownIcon,ArrowRightIcon,ArrowUpIcon,ChevronDownIcon,ChevronRightIcon,InfoIcon} from "../icons";
 import {Popover} from "../shell/Popover";
-import {money} from "../format";
+import {date,money} from "../format";
 import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
 import {attentionRows,netCardState,netReasonText} from "./month-answer";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
-import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthLead,monthName,percentText} from "./month-summary";
+import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthName,percentText} from "./month-summary";
 
 /** "57,50 ₺" with the kuruş set smaller. The text is the service amount as formatted, nothing is rounded. */
 function Amount({value,className}:{value:string;className:string}){
@@ -28,8 +29,8 @@ function attentionFigure(kind:keyof typeof titles,p:MonthProfitProduct):string {
  return `Satış ${p.sales===null?"bilinmiyor":money(p.sales)} · marj ${margin(p.marginPct)}`;
 }
 
-function Shell({title,children,busy=false}:{title:string;children:ReactNode;busy?:boolean}) {
- return <main className="month-page" aria-busy={busy}><h1 className="sr-only">{title}</h1>{children}</main>;
+function Shell({title,children,busy=false,period}:{title:string;children:ReactNode;busy?:boolean;period?:ReactNode}) {
+ return <main className="month-page" aria-busy={busy}><WorkspaceHeader title={title} label="Ayın özeti">{period}</WorkspaceHeader>{children}</main>;
 }
 
 export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PageProps) {
@@ -48,24 +49,26 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const change=c===null?null:monthChange(v.month,c.grossProfitPct);
  const arrow=changeArrow(c?.grossProfitPct??null);
  const line=marginLine(t);
- return <Shell title={monthName(v.month)} busy={loading}>
-  <div className="ay">
-   <div className="col">
-    <section className="card hero" aria-label="Ayın özeti">
-     <p className="lead">{monthLead(v.month,t.sales)}</p>
+ const lastDay=new Date(Date.UTC(Number(v.month.slice(0,4)),Number(v.month.slice(5,7)),0)).toISOString().slice(0,10);
+ const partial=v.dataFrom>`${v.month}-01`||v.dataUntil<lastDay;
+ return <Shell title={monthName(v.month)} busy={loading} period={<><p className="period">{date(v.dataFrom)} – {date(v.dataUntil)} · {partial?"Kısmi ay":"Tam ay"}</p><p className="data-cutoff">Paketin kapsadığı son gün: {date(v.source.to)}</p></>}>
+  <div className="month-layout">
+    <section className="card hero section-wide" aria-label="Ayın özeti">
+     <div className="result-heading"><h2>Tahmini brüt kâr</h2><Popover buttonClass="link" dialogLabel="Nasıl hesaplandı" panelClass="pop-bridge" label={<>Nasıl hesaplandı?<ChevronDownIcon/></>}><Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/></Popover></div>
+     <div className="result-copy">
      <div className="hero-row">
       {t.grossProfit===null?<p className="hero-num is-unknown"><Unknown/></p>:<Amount value={t.grossProfit} className="hero-num"/>}
       {c!==null&&(change!==null?<p className="delta">{arrow==="up"?<ArrowUpIcon/>:arrow==="down"?<ArrowDownIcon/>:null}{change}</p>:<p className="delta">Önceki ayla karşılaştırılamıyor</p>)}
      </div>
      {t.grossProfit===null?<p className="hero-sub">Maliyetler bilinmediği için brüt kâr hesaplanamadı.</p>:line!==null&&<p className="hero-sub">{line}</p>}
-     <div className="disclose">
-      <Popover buttonClass="link" dialogLabel="Nasıl hesaplandı" panelClass="pop-bridge" label={<>Nasıl hesaplandı?<ChevronDownIcon/></>}>
-       <Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/>
-      </Popover>
-      <TrustChip costKnownPct={t.costKnownPct}/>
+     <div className="disclose"><TrustChip costKnownPct={t.costKnownPct}/></div>
      </div>
+     <dl className="month-facts" role="group" aria-label="Aylık destekleyici tutarlar"><div><dt>{t.sales!==null&&t.unknownSaleAmounts>0?"Bilinen satış tutarı":"Satış"}</dt><dd>{t.sales===null?<Unknown/>:money(t.sales)}</dd>{t.unknownSaleAmounts>0&&<dd className="amount-uncertainty">{t.unknownSaleAmounts} satırın tutarı bilinmiyor</dd>}</div><div><dt>Tahmini ürün maliyeti</dt><dd>{t.cost===null?<Unknown/>:money(t.cost)}</dd></div><div><dt>Marj</dt><dd>{t.marginPct===null?<Unknown/>:percentText(t.marginPct)}</dd></div></dl>
+    </section>
+    <section className="card observations" aria-labelledby="observations-title">
+     <div className="section-heading"><div><h2 id="observations-title">Ürünlerde dikkat çekenler</h2><p>Bu ay inceleyebileceğiniz ürünler</p></div><button type="button" className="link" onClick={()=>navigate("products")}>Tüm ürünler<ArrowRightIcon/></button></div>
      <div className="att">
-      <h2 className="h3">Dikkat edilecekler</h2>
+      <h3 className="sr-only">Dikkat edilecekler</h3>
       {attention.products.length===0&&attention.missingCost===0?<p className="muted">Bu ay dikkat isteyen bir şey yok.</p>
        :<ul aria-label="Dikkat edilecekler">
         {attention.products.map(row=>{const p=byId.get(row.productId);if(!p)return null;const kind=row.kind as keyof typeof titles;
@@ -74,19 +77,16 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
        </ul>}
      </div>
     </section>
-   </div>
-   <div className="col">
     {net.kind==="missing"
-     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v.dataUntil)}</p>}</section>
-     :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2>
+     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2><p className="net-context">Giderlerden sonra ne kalıyor?</p>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v.dataUntil)}</p>}</section>
+     :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2><p className="net-context">Giderlerden sonra ne kalıyor?</p>
        {net.kind==="same"?<p className="net-same">Brüt kârla aynı</p>:<Amount value={t.netProfit!} className={`net${t.netProfit!.startsWith("-")?" is-neg":""}`}/>}
        <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
-    <section className="card chart" aria-labelledby="chart-title">
+    <section className="card chart section-wide" aria-labelledby="chart-title">
      <h2 id="chart-title">Son 6 ay brüt kâr (₺)</h2>
      {v.history.length<6&&<p className="muted">Paket yalnız {v.history.length} ayı kapsıyor.</p>}
      <MonthBars history={v.history} month={v.month}/>
     </section>
-   </div>
   </div>
  </Shell>;
 }

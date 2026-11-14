@@ -4,7 +4,7 @@
 
 Updated on 2026-11-11 against `main` at `7f5020cd231fa8f7a2f1427595591ede963828ec`, after [PR #137](https://github.com/AlesSystems/esmer-market-analytics/pull/137), and the [Windows 11 continuation](2026-11-11-windows-v1-smoke.md). The app version is **1.0.1**. This index distinguishes build-specific evidence from the remaining acceptance checks.
 
-The app opens Bu ay, with Ürünler and Giderler as the other tabs, Excel export in the header and Ayarlar in the gear menu. It includes recorded-source profit estimates, source-document browsing, Excel and manual expense entry, Excel export and encrypted recovery. Existing synthetic financial datasets remain supported. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
+The recorded main build opens Bu ay, with Ürünler and Giderler as the other tabs, Excel export in the header and Ayarlar in the gear menu. The later [approved Prototype A implementation](2026-11-14-approved-a-ui.md), on PR #153, moves these areas into a side navigation and records its own build-specific verification. It includes recorded-source profit estimates, source-document browsing, Excel and manual expense entry, Excel export and encrypted recovery. Existing synthetic financial datasets remain supported. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
 
 [Recorded-source estimates](../contracts/recorded-estimates.md) have real arithmetic reconciliation over retained authorized September 2025 operands. The source meanings remain assumptions. Return contribution, unsupported costs and unknown amounts stay explicit. Estimates are transient and cannot become accepted financial-report versions.
 
@@ -29,6 +29,8 @@ On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issue
 The Windows continuation is tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) was reopened for owner acceptance, installation direction and production permissions/validation. [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138) tracks independent Windows recovery and power-loss durability. Issue closure alone supplies no acceptance evidence or source permission.
 
 ## Later implementation evidence
+
+The November 14 [approved A UI receipt](2026-11-14-approved-a-ui.md) records the owner's selected visual direction, implementation in the actual application, responsive sections for future charts, packaged synthetic workflow checks and screenshots. Its verification is specific to that branch/build and does not replace the earlier Windows or owner acceptance receipts.
 
 The November 11 [Windows smoke receipt](2026-11-11-windows-v1-smoke.md) records the current native walkthrough, test-portability repairs, synthetic oracles and exact local artifact hashes. CI now retains verified executables and both inspection manifests for 14 days. No new public release or version tag is implied.
 

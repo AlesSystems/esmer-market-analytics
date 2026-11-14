@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType }
 import { createRoot } from "react-dom/client";
 import { OperationProgress } from "./OperationProgress";
 import type { Availability, ImportOutcome, RequestError, JobOutcome } from "../domain/contracts";
-import { AppShell } from "./AppShell";
+import { AppShell, WorkspaceHeader } from "./AppShell";
 import { AppFrame, type FrameView, type LaunchRequest } from "./frame";
 import { RecoveryWorkspace } from "./recovery/RecoveryWorkspace";
 import { LivePanel } from "./settings/LivePanel";
@@ -162,8 +162,8 @@ function App() {
   const pageMonth = selectedMonth ?? (resolution.status !== "pending" && !coverage ? localMonth(new Date()) : null);
   const lastReady = useRef<Extract<Availability, { status: "ready" }>>(undefined);
   if (ready) lastReady.current = ready;
-  const loading = <main><h1>Yerel veriler açılıyor</h1><p role="status">Verileriniz hazırlanıyor…</p></main>;
-  const failure = availability && availability.status !== "ready" ? <main><h1>Yerel veriler açılamadı</h1><p role="alert">{availability.message}</p><Button variant="secondary" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="secondary" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
+  const loading = <main><WorkspaceHeader title="Yerel veriler açılıyor"/><p role="status">Verileriniz hazırlanıyor…</p></main>;
+  const failure = availability && availability.status !== "ready" ? <main><WorkspaceHeader title="Yerel veriler açılamadı"/><p role="alert">{availability.message}</p><Button variant="secondary" onClick={() => { setAvailability(undefined); refreshAvailability(); }}>Yeniden dene</Button><Button variant="secondary" onClick={() => show("recovery")}>Yedekten geri yükle</Button></main> : undefined;
   // A page that was open stays mounted (hidden) through a failed or pending availability refresh, so its open detail survives a retry.
   const pageAvailability = ready ?? lastReady.current;
   const active = frameView === "workspace" && !!ready;
