@@ -81,6 +81,8 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
     await trigger.click();
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
+    const history = page.getByRole("table", { name: "Aylara göre satış, brüt kâr ve marj", exact: true });
+    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("57,50 ₺");
     for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 680, height: 1000, zoom: 2 }, { width: 1440, height: 1000, zoom: 2 }]) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
@@ -95,6 +97,7 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
         const bounds = node.getBoundingClientRect();
         return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight;
       })).toBe(true);
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
       await page.screenshot({ path: testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`), animations: "disabled" });
