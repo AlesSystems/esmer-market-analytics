@@ -33,7 +33,7 @@ Each node runs only after its predecessors succeed. One worker owns production U
 | ID | Type | Objective / allowed area | Dependencies | Acceptance | State |
 | --- | --- | --- | --- | --- | --- |
 | A01 | analysis/design | Record approved A and chart extensibility, issue #154 and scoped contract | — | Explicit human choice and updated scope; remote/base verified | completed |
-| A02 | implementation/test | Adopt A using `src/ui/` and related existing UI tests in worker worktree | A01 | Faithful real UI; preserved flows; focused red/green checks and no data/finance changes | ready |
+| A02 | implementation/test | Adopt A using `src/ui/` and related existing UI tests in worker worktree | A01 | Faithful real UI; preserved flows; focused red/green checks and no data/finance changes | running: `codex/ui-a-154`, based on `03962fc` |
 | A03 | integration | Worker merges integration tip; merger integrates result | A02 | Coherent commits and clean merge; unrelated work preserved | pending |
 | A04 | test | Integrated suites, build/package, actual screenshots and visual inspection | A03 | Checks and environment recorded; defects diagnosed and repaired | pending |
 | A05 | review | Independent Standards and Spec reviews of `23aab64...HEAD` | A04 | Relevant findings fixed by one worker and rechecked | pending |
