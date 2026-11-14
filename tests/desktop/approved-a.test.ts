@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openStore } from "../../src/store/store";
-import { monthProfitPackage } from "../helpers/month-profit-fixture";
+import { monthProfitPackage, monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { executablePath } from "../helpers/desktop-executable";
 import { openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
 
@@ -45,5 +45,23 @@ test("approved A exposes the observed period and supporting amounts before produ
     await expect(about).toBeInViewport();
     await about.click();
     await expect(page.getByRole("region", { name: "Bilinen sınırlar" })).toBeVisible();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("mixed known and unknown sales show a known subtotal and the missing-amount count", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-unknown-sale-"));
+  const snapshot = monthProfitSnapshot();
+  snapshot.lines.push({ ...snapshot.lines.find(line => line.ID === "1011")!, ID: "1099", TOPLAM_KDV_MATRAHI: null });
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importSourcePreview(monthProfitPackage(snapshot)); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    const facts = page.getByRole("group", { name: "Aylık destekleyici tutarlar" });
+    await expect(facts.getByText("Bilinen satış tutarı", { exact: true })).toBeVisible();
+    await expect(facts).toContainText("480,00 ₺");
+    await expect(facts.getByText("1 satırın tutarı bilinmiyor", { exact: true })).toBeVisible();
+    await expect(page.locator(".hero-num")).toHaveText("57,50 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
