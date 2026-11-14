@@ -10,6 +10,8 @@ The app opens **Bu ay**, with **Ürünler** and **Giderler** as the other tabs. 
 
 The optional isolated SQL connection starts disabled. Imported records remain usable offline. The Windows smoke receipt covers the tested Windows 11 configuration. Windows 10, independent clean-machine recovery, power-loss durability, production source permission and owner installation remain separate checks. Follow the [Windows handoff](docs/operations/windows-v1-handoff.md) and [current acceptance status](docs/evidence/index.md). The restored-backup demo is not production validation.
 
+The [14 November offline delivery](docs/operations/eralp-offline-delivery.md) identifies the tested installer and the Turkish installation/review checklist for Altan to use alongside Eralp. Check Eralp's Windows version before installing. [Readiness evidence](docs/evidence/2026-11-14-eralp-offline-readiness.md) records the #139 authentication assessment; #138 remains deferred. Owner acceptance and production permission are not implied.
+
 ## Develop and verify
 
 Use Node 24.15 or a compatible newer Node 24 patch and npm 11.
