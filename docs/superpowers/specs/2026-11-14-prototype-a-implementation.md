@@ -33,10 +33,10 @@ Each node runs only after its predecessors succeed. One worker owns production U
 | ID | Type | Objective / allowed area | Dependencies | Acceptance | State |
 | --- | --- | --- | --- | --- | --- |
 | A01 | analysis/design | Record approved A and chart extensibility, issue #154 and scoped contract | — | Explicit human choice and updated scope; remote/base verified | completed |
-| A02 | implementation/test | Adopt A using `src/ui/` and related existing UI tests in worker worktree | A01 | Faithful real UI; preserved flows; focused red/green checks and no data/finance changes | completed: worker `accdab2`, including integration `229cd1d` |
-| A03 | integration | Worker merges integration tip; merger integrates result | A02 | Coherent commits and clean merge; unrelated work preserved | completed: merger fast-forwarded to `accdab2` |
-| A04 | test | Integrated suites, build/package, actual screenshots and visual inspection | A03 | Checks and environment recorded; defects diagnosed and repaired | completed: `9421f5a`, 71 packaged checks; host NSIS limitation recorded |
-| A05 | review | Independent Standards and Spec reviews of `23aab64...HEAD` | A04 | Relevant findings fixed by one worker and rechecked | running |
-| A06 | documentation | Reconcile current design/product docs and chart extension guidance; evidence/PR handoff | A05 | Concrete runnable app/build, screenshots, hashes, checks and unresolved gates | pending |
+| A02 | implementation/test | Adopt A using `src/ui/` and related existing UI tests in worker worktree | A01 | Faithful real UI; preserved flows; focused red/green checks and no data/finance changes | completed: worker `4b92b4d`, including integration `a81068e` |
+| A03 | integration | Worker merges integration tip; merger integrates result | A02 | Coherent commits and clean merge; unrelated work preserved | completed: merger fast-forwarded to `4b92b4d`; parent documentation preserved |
+| A04 | test | Integrated suites, build/package, actual screenshots and visual inspection | A03 | Checks and environment recorded; defects diagnosed and repaired | completed: final `4b92b4d`, 185 unit / 314 integration / 73 packaged checks; skips and host NSIS limitation recorded |
+| A05 | review | Independent Standards and Spec reviews of `23aab64...HEAD` | A04 | Relevant findings fixed by one worker and rechecked | completed: one P2 per axis resolved; independent rechecks recorded |
+| A06 | documentation | Reconcile current design/product docs and chart extension guidance; evidence/PR handoff | A05 | Concrete runnable app/build, screenshots, hashes, checks and unresolved gates | completed: [receipt](../../evidence/2026-11-14-approved-a-ui.md), [reviews](../../evidence/2026-11-14-approved-a-review.md) and PR #153 handoff; native Windows CI receipt tracked on PR |
 
 Risks: existing layout-specific desktop assertions may need deliberate updates; financial-only screens must remain reachable; fixed widths can clip at larger text; a browser prototype is not packaged Windows evidence. Production access, owner contact, install, release publication and merge remain outside this implementation.

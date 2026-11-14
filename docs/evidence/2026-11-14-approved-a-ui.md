@@ -4,7 +4,7 @@ Workstream [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/1
 
 ## Build and scope
 
-Integration branch: `codex/ui-prototype-review`. Previous prototype milestone: `23aab64`. Production base: `3520ce0`. Implemented UI: `c75588d`, followed by bounded settings, coverage-label and loading-state corrections; final tested production commit: `9421f5a9c7ef9482f5a819add550a705e321bc67`. App version remains 1.0.1; these are review builds, not a new release tag.
+Integration branch: `codex/ui-prototype-review`. Previous prototype milestone: `23aab64`. Production base: `3520ce0`. Implemented UI: `c75588d`, followed by bounded settings, coverage-label and loading-state corrections; final implementation commit: `4b92b4dd2c7ffe3666d3f16721530cb4f177ad8e`. App version remains 1.0.1; these are review builds, not a new release tag.
 
 The real React UI now uses A's plum/white palette, local Figtree, side navigation, month/period heading, broad gross-result section, aligned supporting figures, product observations and expense next step. Existing flows and service results remain in use. No schema, dependency, financial formula, privileged IPC, source permission or packaging configuration changed. The original checkout and unrelated worktrees were preserved.
 
@@ -18,10 +18,10 @@ Date: 2026-11-14. Environment: macOS/Darwin arm64, Node 24.15.0, npm 11.12.1, lo
 
 | Procedure | Expected / actual result |
 | --- | --- |
-| `npm run test:unit` | 185 passed after replacing superseded top-bar/logo/azure assertions with the approved A contract; behavioral navigation/focus assertions retained |
-| `npm run test:integration` | 314 passed, 17 environment-dependent isolated SQL checks skipped |
+| `npm run test:unit` | 185 passed at `4b92b4d`; superseded top-bar/logo/azure assertions now follow approved A, with behavioral navigation/focus assertions retained |
+| `npm run test:integration` | 314 passed at `4b92b4d`, 17 environment-dependent isolated SQL checks skipped |
 | `npm run typecheck`, `npm run lint`, `git diff --check` | Passed |
-| `npm run test:desktop` with capture variables below | Rebuilt and launched the actual packaged Mac app: 71 passed, 4 skipped in 1.4 minutes at `9421f5a` |
+| `npm run test:desktop` with capture variables below | Rebuilt and launched the actual packaged Mac app: 73 passed, 4 skipped in 1.4 minutes at `4b92b4d` |
 | `npm run build`, `npm run package:local` | Passed as part of the packaged desktop command |
 | `npm run package:win` on this Mac | Windows app staging completed, but NSIS could not spawn its bundled Mac `makensis` executable (`Unknown system error -86`); no successful Windows distribution verification is claimed from this attempt |
 
@@ -30,14 +30,14 @@ The four desktop skips were the Windows lifecycle test and three optional altern
 Reproduce the integrated capture run:
 
 ```sh
-ESMER_CAPTURE_VISUAL=/tmp/esmer-ui-a-integrated-visual ESMER_CAPTURE_OWNER=/tmp/esmer-ui-a-integrated-owner npm run test:desktop
+ESMER_CAPTURE_VISUAL=/tmp/esmer-ui-a-final-visual ESMER_CAPTURE_OWNER=/tmp/esmer-ui-a-final-owner npm run test:desktop
 ```
 
-During implementation, focused tests exposed missing period/supporting figures (`41dab1a`), the legacy narrow-screen order placing observations before the result (`98bc8a4`), and a settings popup extending to 768px in a 560px viewport (`b8a4637`, fixed `54d8ab0`). The first full run then caught missing month controls while the expense period resolved; `9421f5a` fixed the loading branch and the existing assertion passed unchanged. Two old unit visual assertions were updated in `36e5cd5`. The final complete desktop run passed.
+During implementation, focused tests exposed missing period/supporting figures (`41dab1a`), the legacy narrow-screen order placing observations before the result (`98bc8a4`), and a settings popup extending to 768px in a 560px viewport (`b8a4637`, fixed `54d8ab0`). The first full run then caught missing month controls while the expense period resolved; `9421f5a` fixed the loading branch and the existing assertion passed unchanged. Two old unit visual assertions were updated in `36e5cd5`. The first complete desktop run passed. Review regressions then exposed incomplete-sales wording (`acf50df`, fixed `9237900`), popup overflow (`03dfa2a`, fixed `fbb43b1`), the chart table’s narrow-zoom overflow (`16169ab`, fixed `d72b045`) and popup content behind the narrow header (`36f0525`, fixed `4b92b4d`). The viewport test waits for Electron zoom to settle. The numeric table and financial values remain unchanged. The final integrated run after all review fixes passed 73 packaged checks, with the same four platform/optional skips.
 
 ## Visual evidence
 
-These are screenshots of the packaged application using synthetic data at `9421f5a`, not pictures of the disposable prototype. The parent inspected wide monthly/product/expense screens, narrower reading order and the settings popup; keyboard/zoom capture includes visible focus.
+These are screenshots of the packaged application using synthetic data at `4b92b4d`, not pictures of the disposable prototype. The parent inspected wide monthly/product/expense screens, narrower reading order and the settings popup; keyboard/zoom capture includes visible focus.
 
 - [Monthly workspace](images/2026-11-14-ui-a/month-wide.png)
 - [Product ledger](images/2026-11-14-ui-a/products-wide.png)
@@ -48,10 +48,18 @@ These are screenshots of the packaged application using synthetic data at `9421f
 
 Capture sizes include 1440×900 and 1120×760 native windows, 680×800 content size, and 1440×1000 at Electron zoom 2. macOS window chrome can reduce the content area of native-size captures; 200% is an Electron host test, not evidence of actual Windows display scaling.
 
+Additional review captures at `4b92b4d`, inspected by the parent and reviewers:
+
+- [Incomplete sales shown as a known subtotal](images/2026-11-14-ui-a/unknown-sales-subtotal.png)
+- [Calculation explanation at desktop width](images/2026-11-14-ui-a/calculation-wide.png)
+- [Calculation explanation at narrow width and 200% zoom](images/2026-11-14-ui-a/calculation-narrow-zoom200.png)
+
+The popup checks use actual CSS widths 1440, 680, 340 (680 content width at zoom 2), and 720 (1440 content width at zoom 2). Electron can clamp native height; assertions use actual dimensions. Native `capturePage` supplies zoom screenshots. The tall explanation scrolls internally while every edge stays within the viewport. No unsupported 390px native viewport is claimed.
+
 ## Review and remaining verification
 
-Independent Standards and Spec review is pending on this implementation. The final review and Windows CI receipts belong on [PR #153](https://github.com/AlesSystems/esmer-market-analytics/pull/153) and [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/154); later receipts identify the exact reviewed/tested commit.
+Independent [Standards and Spec reviews](2026-11-14-approved-a-review.md) each found one P2, both resolved and independently rechecked. Standards verified the known-sales subtotal and unknown-row count; Spec verified viewport bounds, unobscured content, resize/scroll, Escape/focus and the retained accessible chart table. Windows CI receipts belong on [PR #153](https://github.com/AlesSystems/esmer-market-analytics/pull/153) and [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/154); later receipts identify the exact reviewed/tested commit.
 
-The existing Windows workflow must run `npm run package:win` and the packaged desktop suite against this branch. Actual Windows 100%/125%/150% display scaling, native picker/export/recovery interactions and owner hardware/readability remain manual checks for the new UI. Earlier Windows receipts describe earlier builds. No production access, Eralp contact, installation, publication or merge was performed.
+The existing Windows workflow runs `npm run package:win` and the packaged desktop suite against this branch. Actual Windows 100%/125%/150% display scaling, native picker/export/recovery interactions and owner hardware/readability remain manual checks for the new UI. Earlier Windows receipts describe earlier builds. No production access, Eralp contact, installation, publication or merge was performed.
 
 The standalone simulated-prototype tickets #149–152 were deferred after the explicit request to implement A. They are not falsely marked complete; #144–145, the design map and source specification remain open for their unperformed human acceptance criteria.
