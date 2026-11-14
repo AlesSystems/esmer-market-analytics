@@ -100,7 +100,12 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
       await page.evaluate(() => document.fonts.ready);
-      await page.screenshot({ path: testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`), animations: "disabled" });
+      const screenshot = testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`);
+      if (size.zoom === 1) await page.screenshot({ path: screenshot, animations: "disabled" });
+      else {
+        const png = await app.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));
+        await writeFile(screenshot, Buffer.from(png, "base64"));
+      }
     }
     await page.keyboard.press("Escape");
     await expect(explanation).toBeHidden();
