@@ -105,7 +105,7 @@ A quiet white navigation rail anchors the store identity. The content opens with
 
 Keep the answer, evidence and next action distinct through alignment, spacing and type. Avoid grids of equally prominent KPI tiles. A large gross-result amount is the primary focus; supporting amounts are smaller. Product rows keep money right aligned. Preserve written explanations of loss, unknown cost, incomplete expenses and partial periods.
 
-Bu ay, Ürünler and Giderler remain the three business destinations. The selected month follows navigation and restarts. Product investigation retains search, filter, sorting, scroll position and focus when returning from evidence. Supporting operations remain under Ayarlar and use the established full-page overlays and return behavior. Navigation and period changes retain expense draft protection.
+Bu ay, Ürünler and Giderler remain the three business destinations. The selected month follows navigation and restarts. Product investigation retains search, filter, sorting, scroll position and focus when returning from evidence. Detail stays beside the ledger when space permits; in constrained windows it follows the ledger in normal flow. Selecting a product or changing to a month where it has no sales brings its detail or notice into view, while closing returns focus to the appropriate row or search. Supporting operations remain under Ayarlar and use the established full-page overlays and return behavior. Navigation and period changes retain expense draft protection.
 
 ## Color
 

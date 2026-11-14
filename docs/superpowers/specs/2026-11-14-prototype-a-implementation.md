@@ -39,4 +39,11 @@ Each node runs only after its predecessors succeed. One worker owns production U
 | A05 | review | Independent Standards and Spec reviews of `23aab64...HEAD` | A04 | Relevant findings fixed by one worker and rechecked | completed: one P2 per axis resolved; independent rechecks recorded |
 | A06 | documentation | Reconcile current design/product docs and chart extension guidance; evidence/PR handoff | A05 | Concrete runnable app/build, screenshots, hashes, checks and unresolved gates | completed: [receipt](../../evidence/2026-11-14-approved-a-ui.md), [reviews](../../evidence/2026-11-14-approved-a-review.md) and PR #153 handoff; native Windows CI receipt tracked on PR |
 
+Native Windows continuation: [run 43595408858](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43595408858), PR head `5e51446`, passed distribution inspection but exposed product-table overlap beneath the detail panel at the runner's constrained window size. Its 70 passing desktop checks do not make that run successful. The same implementer owns the bounded repair; the original overlap requirement remains.
+
+| ID | Type | Objective / allowed area | Dependencies | Acceptance | State |
+| --- | --- | --- | --- | --- | --- |
+| A07 | implementation/test/review | Diagnose and correct product detail/table layout in `src/ui/` and focused packaged tests; merge and recheck | A06 | Deterministic regression; readable amounts and keyboard/context behavior; no overlap; independent focused review | completed: `5982fdf`, four product checks and both review axes clear |
+| A08 | test/documentation | Repeat native Windows CI and record final build/PR handoff | A07 | Successful Windows distributions and complete desktop suite; exact run/build, remaining manual checks and cleanup recorded | running: final native CI; the exact run and final A08 state are recorded on PR #153 |
+
 Risks: existing layout-specific desktop assertions may need deliberate updates; financial-only screens must remain reachable; fixed widths can clip at larger text; a browser prototype is not packaged Windows evidence. Production access, owner contact, install, release publication and merge remain outside this implementation.

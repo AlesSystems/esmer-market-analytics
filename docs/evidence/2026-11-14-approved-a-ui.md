@@ -4,7 +4,7 @@ Workstream [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/1
 
 ## Build and scope
 
-Integration branch: `codex/ui-prototype-review`. Previous prototype milestone: `23aab64`. Production base: `3520ce0`. Implemented UI: `c75588d`, followed by bounded settings, coverage-label and loading-state corrections; final implementation commit: `4b92b4dd2c7ffe3666d3f16721530cb4f177ad8e`. App version remains 1.0.1; these are review builds, not a new release tag.
+Integration branch: `codex/ui-prototype-review`. Previous prototype milestone: `23aab64`. Production base: `3520ce0`. Implemented UI: `c75588d`, followed by bounded settings, coverage-label and loading-state corrections; final implementation commit: `5982fdf700612f3be428b46fca76e899666c8b9b`. App version remains 1.0.1; these are review builds, not a new release tag.
 
 The real React UI now uses A's plum/white palette, local Figtree, side navigation, month/period heading, broad gross-result section, aligned supporting figures, product observations and expense next step. Existing flows and service results remain in use. No schema, dependency, financial formula, privileged IPC, source permission or packaging configuration changed. The original checkout and unrelated worktrees were preserved.
 
@@ -56,9 +56,20 @@ Additional review captures at `4b92b4d`, inspected by the parent and reviewers:
 
 The popup checks use actual CSS widths 1440, 680, 340 (680 content width at zoom 2), and 720 (1440 content width at zoom 2). Electron can clamp native height; assertions use actual dimensions. Native `capturePage` supplies zoom screenshots. The tall explanation scrolls internally while every edge stays within the viewport. No unsupported 390px native viewport is claimed.
 
+## Native Windows continuation
+
+The first native [Windows run 43595408858](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43595408858), PR head `5e51446` / checkout merge `68cfc7de81d8aba362cf97824920009037758d86`, passed typecheck, lint, 185 unit and 302 integration checks (29 environment skips), and built/inspected both Windows distributions. The desktop stage had **70 passed, one failed, six optional capture skips**: at the runner's effective 1000px window, the ledger extended beneath the product detail. This run is a failure, not Windows acceptance.
+
+Regression `96ae21d` exposed the constrained layout. Fix `8722d16` stacks the full-width detail after the ledger at constrained widths and brings it into view without changing keyboard focus. The existing side-by-side overlap assertion remains intact at an explicit 1440px width. New checks cover 1000px, 680px and 200% zoom, numeric columns, arrow navigation, source return and close focus. Spec review then reproduced a no-sales notice falling below the fold after a month change (`285eb82`); `5982fdf` gives populated and absent detail the same scroll anchor after the month settles. Four final packaged product checks, typecheck, lint and diff checks passed on Mac.
+
+- [Stacked product detail](images/2026-11-14-ui-a/product-detail-stacked.png)
+- [Stacked product detail at 200% zoom](images/2026-11-14-ui-a/product-detail-stacked-zoom200.png)
+
+These product captures are from `5982fdf`. The final repeated Mac/Windows suite receipts and exact CI artifact identities are recorded on PR #153, linked below, so later verification does not claim an older build.
+
 ## Review and remaining verification
 
-Independent [Standards and Spec reviews](2026-11-14-approved-a-review.md) each found one P2, both resolved and independently rechecked. Standards verified the known-sales subtotal and unknown-row count; Spec verified viewport bounds, unobscured content, resize/scroll, Escape/focus and the retained accessible chart table. Windows CI receipts belong on [PR #153](https://github.com/AlesSystems/esmer-market-analytics/pull/153) and [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/154); later receipts identify the exact reviewed/tested commit.
+Independent [Standards and Spec reviews](2026-11-14-approved-a-review.md) first found one P2 each, both resolved and independently rechecked. The Windows continuation received separate focused reviews; its additional Spec finding on the no-sales notice was fixed in `5982fdf`. Standards verified the known-sales subtotal and unknown-row count; Spec verified viewport bounds, unobscured content, resize/scroll, Escape/focus and the retained accessible chart table. Windows CI receipts belong on [PR #153](https://github.com/AlesSystems/esmer-market-analytics/pull/153) and [#154](https://github.com/AlesSystems/esmer-market-analytics/issues/154); later receipts identify the exact reviewed/tested commit.
 
 The existing Windows workflow runs `npm run package:win` and the packaged desktop suite against this branch. Actual Windows 100%/125%/150% display scaling, native picker/export/recovery interactions and owner hardware/readability remain manual checks for the new UI. Earlier Windows receipts describe earlier builds. No production access, Eralp contact, installation, publication or merge was performed.
 
