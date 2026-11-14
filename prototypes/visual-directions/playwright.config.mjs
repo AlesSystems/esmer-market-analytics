@@ -8,7 +8,7 @@ export default defineConfig({
   outputDir: '../../test-results/visual-directions',
   use: { baseURL: 'http://127.0.0.1:4178', headless: true },
   webServer: {
-    command: 'node prototypes/visual-directions/serve.mjs --port 4178',
+    command: 'node serve.mjs --port 4178',
     url: 'http://127.0.0.1:4178',
     reuseExistingServer: false,
   },
