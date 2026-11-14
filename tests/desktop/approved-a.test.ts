@@ -89,13 +89,14 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
         window.setContentSize(size.width, size.height);
         window.webContents.setZoomFactor(size.zoom);
       }, size);
+      await expect.poll(() => page.evaluate(() => innerWidth)).toBe(size.width / size.zoom);
       const viewport = await page.evaluate(() => ({ width: innerWidth, height: innerHeight, devicePixelRatio }));
-      expect(viewport.width).toBeLessThanOrEqual(size.width / size.zoom);
       await writeFile(testInfo.outputPath(`viewport-${size.width}-zoom${size.zoom}.json`), JSON.stringify({ requested: size, actual: viewport }));
       await expect(explanation).toBeVisible();
       await expect.poll(() => explanation.evaluate(node => {
         const bounds = node.getBoundingClientRect();
-        return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight;
+        const topPoint = document.elementFromPoint(bounds.left + 16, bounds.top + 16);
+        return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight && topPoint !== null && node.contains(topPoint);
       })).toBe(true);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
