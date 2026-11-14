@@ -1,3 +1,4 @@
+import {WorkspaceHeader} from "../AppShell";
 import {useDeferredValue,useEffect,useMemo,useRef,useState} from "react";
 import type {KeyboardEvent,ReactNode} from "react";
 import type {MonthProfitProduct} from "../../source/month-profit";
@@ -16,7 +17,7 @@ const columns:[SortKey,string,boolean][]=[["name","Ürün",false],["sales","Sat�
 const MARGIN_BAR_AT=40;
 
 function Shell({busy=false,onKeyDown,children}:{busy?:boolean;onKeyDown?:(event:KeyboardEvent<HTMLElement>)=>void;children:ReactNode}) {
- return <main className="products-page" aria-busy={busy} onKeyDown={onKeyDown}><h1 className="sr-only">Ürünler</h1>{children}</main>;
+ return <main className="products-page" aria-busy={busy} onKeyDown={onKeyDown}><WorkspaceHeader title="Ürünler" label="Ürün incelemesi"/>{children}</main>;
 }
 
 export function ProductsPage({month,onMonth,coverage,state,importPackage}:PageProps) {

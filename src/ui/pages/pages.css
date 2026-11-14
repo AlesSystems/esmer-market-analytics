@@ -1,6 +1,6 @@
 /* Bu ay: answer page. Tokens live in theme.css; buttons and links in shell.css. */
 .month-page, .products-page { min-width: 0; }
-.card { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); padding: 24px 28px; min-width: 0; }
+.card { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 26px 28px; min-width: 0; border: 1px solid var(--line); }
 .card h2 { margin-bottom: 12px; }
 .muted { color: var(--ink-2); font-size: var(--t-sm); }
 .state { display: grid; gap: 10px; justify-items: start; padding: 24px 28px; background: var(--card); border-radius: 14px; box-shadow: var(--shadow); max-width: 640px; }
@@ -8,20 +8,20 @@
 
 .ay { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; align-items: start; }
 .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-.hero { padding: 20px 28px 12px; }
+.hero { padding: 24px 28px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(240px, .8fr); column-gap: 34px; }
 /* While another month loads the layout stays, the figures do not. */
 .is-loading .hero { min-height: 300px; }
 .is-loading .netcard { min-height: 132px; }
 .is-loading .chart { min-height: 250px; }
 .ledger.is-loading { min-height: 320px; }
 .lead { font-size: var(--t-xl); line-height: 1.4; color: var(--ink-2); font-weight: 500; text-wrap: balance; }
-.hero-row { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; margin: 2px 0 6px; }
-.hero-num { font-size: var(--t-hero); line-height: 1.05; font-weight: 700; letter-spacing: -.03em; color: var(--ink); }
+.hero-row { display: block; align-items: baseline; flex-wrap: wrap; column-gap: 18px; row-gap: 2px; margin: 2px 0 6px; margin-top: 0; }
+.hero-num { font-size: 51px; line-height: 1.05; font-weight: 700; letter-spacing: -.03em; color: var(--ink); margin: 10px 0 12px; }
 .hero-num.is-unknown { color: var(--ink-2); }
 .cents { font-size: .5em; letter-spacing: 0; color: var(--ink-2); font-weight: 600; }
-.delta { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-2); font-size: var(--t-md); font-weight: 500; }
+.delta { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-2); font-size: var(--t-sm); font-weight: 500; margin-top: 12px; }
 .delta .ico { width: 16px; height: 16px; }
-.hero-sub { font-size: var(--t-lg); color: var(--ink); line-height: 1.4; }
+.hero-sub { font-size: var(--t-md); color: var(--ink-2); line-height: 1.4; max-width: 52ch; }
 .disclose { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border: 0; border-radius: 999px; background: var(--soft); color: var(--ink-2); font-size: var(--t-sm); font-weight: 600; white-space: nowrap; }
 .chip:hover, .chip[aria-expanded="true"] { background: var(--accent-50); color: var(--accent-h); }
@@ -46,7 +46,7 @@
 .att-go { color: var(--mute); width: 18px; height: 18px; }
 .att-row:hover .att-go { color: var(--accent); }
 
-.netcard { padding: 24px 26px; }
+.netcard { padding: 24px 26px; align-self: stretch; }
 .netcard h2 { margin-bottom: 6px; }
 .net-say { color: var(--ink-2); margin-bottom: 18px; text-wrap: pretty; }
 .net { font-size: var(--t-net); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 6px; color: var(--ink); }
@@ -75,9 +75,6 @@
 @media (max-width: 920px) {
   .ay { display: flex; flex-direction: column; }
   .col { display: contents; }
-  .hero { order: 1; }
-  .netcard { order: 2; }
-  .chart { order: 3; }
   .att-row { grid-template-columns: auto minmax(0, 1fr) auto; }
   .att-x { display: none; }
 }
@@ -104,7 +101,7 @@
 .sclear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; }
 .sclear .ico { width: 16px; height: 16px; }
 .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--track); }
-.seg button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: var(--t-sm); font-weight: 600; white-space: nowrap; min-height: 0; }
+.seg button { min-height: 40px; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); font-size: var(--t-sm); font-weight: 600; white-space: nowrap; min-height: 40px; }
 .seg button:hover { color: var(--ink); background: none; }
 .seg button[aria-pressed="true"] { background: var(--card); color: var(--accent); box-shadow: 0 1px 2px rgb(16 24 40 / .1), 0 2px 6px rgb(16 24 40 / .05); }
 .count { font-weight: 500; color: var(--ink-2); }
@@ -124,14 +121,14 @@
 .products-table td.unk { text-align: center; }
 .unk { color: var(--ink-2); font-style: italic; font-weight: 500; }
 .is-neg { color: var(--loss); }
-.sort { display: inline-flex; align-items: center; gap: 4px; padding: 4px 2px; margin: 0 -2px; border: 0; border-radius: 4px; background: none; font: inherit; color: inherit; min-height: 0; }
+.sort { display: inline-flex; align-items: center; gap: 4px; padding: 4px 2px; margin: 0 -2px; border: 0; border-radius: 4px; background: none; font: inherit; color: inherit; min-height: 40px; }
 th.num .sort { flex-direction: row-reverse; }
 .sort:hover { color: var(--ink); background: none; }
 .sort.is-on { color: var(--ink); font-weight: 700; }
 .sort-ico { width: 14px; height: 14px; visibility: hidden; }
 .sort.is-on .sort-ico { visibility: visible; color: var(--accent); }
 .products-table .name { font-weight: 600; }
-.row-btn { padding: 2px 0; border: 0; border-radius: 4px; background: none; color: var(--ink); font-size: var(--t-md); font-weight: 600; text-align: left; min-height: 0; }
+.row-btn { padding: 2px 0; border: 0; border-radius: 4px; background: none; color: var(--ink); font-size: var(--t-md); font-weight: 600; text-align: left; min-height: 40px; }
 .products-table tbody tr { cursor: pointer; }
 .products-table tbody tr:hover td { background: var(--hover); }
 .products-table tbody tr:hover .row-btn, .products-table tbody tr.is-selected .row-btn { color: var(--accent-h); }
@@ -146,8 +143,8 @@ th.num .sort { flex-direction: row-reverse; }
 .mbar i.is-neg { background: var(--loss); }
 
 /* The drawer is non-modal: the workspace makes room for it, so the ledger stays usable beside it. */
-.app-shell:has(.drawer) .workspace { max-width: none; margin-left: 0; margin-right: min(440px, calc(100vw - 24px)); }
-.drawer { position: fixed; z-index: 35; top: 64px; right: 0; bottom: 0; width: min(440px, calc(100vw - 24px)); background: var(--card); box-shadow: -2px 0 6px rgb(16 24 40 / .05), -18px 0 48px rgb(16 24 40 / .12); overflow-y: auto; animation: drawer-in .32s cubic-bezier(.16, 1, .3, 1); }
+.app-shell:has(.drawer) .workspace { max-width: none; margin-left: 0; margin-right: min(400px, calc(100vw - 24px)); }
+.drawer { position: fixed; z-index: 35; top: 0; right: 0; bottom: 0; width: min(400px, calc(100vw - 24px)); background: var(--card); box-shadow: -2px 0 6px rgb(16 24 40 / .05), -18px 0 48px rgb(16 24 40 / .12); overflow-y: auto; animation: drawer-in .32s cubic-bezier(.16, 1, .3, 1); }
 @keyframes drawer-in { from { transform: translateX(28px); opacity: .4; } to { transform: none; opacity: 1; } }
 .dr-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 20px 14px 28px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--card); }
 .dr-head h2 { font-size: var(--t-2xl); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
@@ -189,4 +186,43 @@ th.num .sort { flex-direction: row-reverse; }
   .products-table tbody tr.is-selected td { outline: 2px solid Highlight; outline-offset: -2px; }
   .seg button[aria-pressed="true"] { border: 2px solid Highlight; }
   .mbar i { background: CanvasText; }
+}
+
+/* Sections participate in normal flow, so later charts can span either column. */
+.month-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.section-wide { grid-column: 1 / -1; }
+.result-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 10px; }
+.result-heading h2 { margin-bottom: 0; }
+.result-copy { min-width: 0; }
+.hero-num .cents { font-size: 1em; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+.month-facts { display: flex; flex-direction: column; gap: 14px; margin: 12px 0 0; padding: 0 0 0 30px; border-left: 1px solid var(--line); }
+.month-facts dt { font-size: var(--t-sm); }
+.month-facts dd { font-size: var(--t-lg); font-weight: 650; margin-top: 2px; }
+.section-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
+.section-heading h2 { margin-bottom: 5px; }
+.section-heading p { font-size: var(--t-sm); }
+.observations .att { border: 0; padding-top: 8px; margin-top: 10px; }
+.observations .att-row { padding-block: 12px; grid-template-columns: auto minmax(0, 1fr) auto; }
+.observations .att-t { white-space: normal; display: grid; gap: 3px; }
+.observations .att-x { grid-column: 2; grid-row: auto; white-space: normal; }
+.observations .att-go { grid-column: 3; grid-row: 1 / 3; }
+.observations .att-i { grid-column: 1; grid-row: 1 / 3; }
+.net-context { margin: 0 0 18px; font-size: var(--t-sm); }
+.netcard .btn { margin-top: 4px; }
+.month-layout > .chart { max-width: none; }
+.month-layout .month-bars { max-width: 680px; margin-inline: auto; }
+.products-page > .page-heading { margin-bottom: 0; }
+@media (max-width: 1160px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .month-facts { flex-direction: row; flex-wrap: wrap; gap: 20px 34px; padding: 20px 0 0; margin-top: 20px; border-left: 0; border-top: 1px solid var(--line); }
+  .month-layout { grid-template-columns: minmax(0, 1fr); }
+  .month-layout > .section-wide { grid-column: auto; }
+}
+@media (max-width: 680px) {
+  .card { padding: 22px; }
+  .hero-num { font-size: clamp(34px, 7.5vw, 48px); overflow-wrap: anywhere; }
+  .result-heading { align-items: start; flex-wrap: wrap; }
+  .month-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; }
+  .section-heading { flex-wrap: wrap; }
+  .observations .att-x { display: block; }
 }

@@ -1,3 +1,4 @@
+import { WorkspaceHeader } from "./AppShell";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ManualExpenseEntry, pendingExpenseKey } from "./ManualExpenseEntry";
 import { useExpenseNavigation } from "./expense-navigation";
@@ -105,10 +106,10 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   };
   const why = !plan ? null : manual ? "Önce elle ekleme formunu kapatın." : plan.blocked ? "Önce işaretli satırları düzeltin." : null;
   return <main className="gider" aria-busy={busy}>
-    <header className="g-head">
-      <div><h1 className="sr-only">{monthName(period)} giderleri</h1><p className="g-say" aria-live="polite">{view && showMonth ? statusText(view) : ""}</p></div>
+    <div className="g-head">
+      <WorkspaceHeader title={`${monthName(period)} giderleri`} label="Gider incelemesi"><p className="g-say" aria-live="polite">{view && showMonth ? statusText(view) : ""}</p></WorkspaceHeader>
       {!showMonth && <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Giderlere dön</button>}
-    </header>
+    </div>
     {savedPeriod && showMonth && <p className="g-note">Gider ayı: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme ayı: {savedPeriod.payment}</>}.{onPeriod && <button type="button" className="link link-inline" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>O aya git</button>}</p>}
     {busy && <p role="status" className="g-note">İşlem sürüyor…</p>}
     {message && <p className="g-note" role="status">{message}</p>}

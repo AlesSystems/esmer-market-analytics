@@ -1,4 +1,4 @@
-/* The one token set. Accent blue is for action, selection and focus; green and red only for gain and loss; amber only for warnings. */
+/* The one token set. Plum is for action, selection and focus; green and red only for gain and loss; amber only for warnings. */
 @theme inline {
   --color-background: var(--card);
   --color-foreground: var(--ink);
@@ -28,29 +28,29 @@
   --t-2xl: calc(var(--base) * 1.75);
   --t-net: calc(var(--base) * 2.25);
   --t-hero: calc(var(--base) * 3.5);
-  --page: #f5f7fa;
+  --page: #f4f5f8;
   --card: #ffffff;
-  --line: #e3e7ee;
+  --line: #e0e2e9;
   --field: #8792a2;
   --edge: #c5ccd6;
-  --ink: #18212e;
-  --ink-2: #5b6472;
-  --soft: #eef1f5;
-  --hover: #f2f5f9;
+  --ink: #252b39;
+  --ink-2: #626b7b;
+  --soft: #f0f1f5;
+  --hover: #f4f2f6;
   --track: #e7ebf1;
   --mute: #a3abb7;
-  --accent: #0b6bcb;
-  --accent-h: #0959ab;
-  --accent-50: #e9f2fc;
-  --accent-100: #d4e6f8;
-  --bar: #5b97d9;
+  --accent: #6c3d78;
+  --accent-h: #563060;
+  --accent-50: #f1eaf4;
+  --accent-100: #e5d6eb;
+  --bar: #ab89b5;
   --gain: #0f7b51;
   --loss: #bf2f2a;
   --loss-bg: #fdecea;
   --warn: #965a00;
   --warn-bg: #fff4e2;
   --warn-line: #ecd2a0;
-  --shadow: 0 1px 2px rgb(16 24 40 / .06), 0 8px 24px rgb(16 24 40 / .06);
+  --shadow: 0 2px 6px rgb(37 43 57 / .025);
   --shadow-pop: 0 2px 6px rgb(16 24 40 / .08), 0 18px 44px rgb(16 24 40 / .14);
 }
 @layer base {
