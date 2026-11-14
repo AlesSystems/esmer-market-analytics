@@ -65,3 +65,35 @@ test("mixed known and unknown sales show a known subtotal and the missing-amount
     await expect(page.locator(".hero-num")).toHaveText("57,50 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+test("the calculation explanation stays readable inside wide, narrow and zoomed viewports", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-calculation-bounds-"));
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importSourcePreview(monthProfitPackage()); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
+    const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
+    await trigger.click();
+    const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
+    for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 390, height: 800, zoom: 1 }, { width: 1440, height: 1000, zoom: 2 }]) {
+      await app.evaluate(({ BrowserWindow }, size) => {
+        const window = BrowserWindow.getAllWindows()[0];
+        window.setContentSize(size.width, size.height);
+        window.webContents.setZoomFactor(size.zoom);
+      }, size);
+      await expect(explanation).toBeVisible();
+      await expect.poll(() => explanation.evaluate(node => {
+        const bounds = node.getBoundingClientRect();
+        return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight;
+      })).toBe(true);
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
+    }
+    await page.keyboard.press("Escape");
+    await expect(explanation).toBeHidden();
+    await expect(trigger).toBeFocused();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
