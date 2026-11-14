@@ -63,7 +63,7 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
      {t.grossProfit===null?<p className="hero-sub">Maliyetler bilinmediği için brüt kâr hesaplanamadı.</p>:line!==null&&<p className="hero-sub">{line}</p>}
      <div className="disclose"><TrustChip costKnownPct={t.costKnownPct}/></div>
      </div>
-     <dl className="month-facts" role="group" aria-label="Aylık destekleyici tutarlar"><div><dt>Satış</dt><dd>{t.sales===null?<Unknown/>:money(t.sales)}</dd></div><div><dt>Tahmini ürün maliyeti</dt><dd>{t.cost===null?<Unknown/>:money(t.cost)}</dd></div><div><dt>Marj</dt><dd>{t.marginPct===null?<Unknown/>:percentText(t.marginPct)}</dd></div></dl>
+     <dl className="month-facts" role="group" aria-label="Aylık destekleyici tutarlar"><div><dt>{t.sales!==null&&t.unknownSaleAmounts>0?"Bilinen satış tutarı":"Satış"}</dt><dd>{t.sales===null?<Unknown/>:money(t.sales)}</dd>{t.unknownSaleAmounts>0&&<dd className="amount-uncertainty">{t.unknownSaleAmounts} satırın tutarı bilinmiyor</dd>}</div><div><dt>Tahmini ürün maliyeti</dt><dd>{t.cost===null?<Unknown/>:money(t.cost)}</dd></div><div><dt>Marj</dt><dd>{t.marginPct===null?<Unknown/>:percentText(t.marginPct)}</dd></div></dl>
     </section>
     <section className="card observations" aria-labelledby="observations-title">
      <div className="section-heading"><div><h2 id="observations-title">Ürünlerde dikkat çekenler</h2><p>Bu ay inceleyebileceğiniz ürünler</p></div><button type="button" className="link" onClick={()=>navigate("products")}>Tüm ürünler<ArrowRightIcon/></button></div>

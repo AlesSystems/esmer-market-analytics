@@ -198,6 +198,7 @@ th.num .sort { flex-direction: row-reverse; }
 .month-facts { display: flex; flex-direction: column; gap: 14px; margin: 12px 0 0; padding: 0 0 0 30px; border-left: 1px solid var(--line); }
 .month-facts dt { font-size: var(--t-sm); }
 .month-facts dd { font-size: var(--t-lg); font-weight: 650; margin-top: 2px; }
+.month-facts .amount-uncertainty { font-size: var(--t-sm); font-weight: 400; color: var(--ink-2); }
 .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
 .section-heading h2 { margin-bottom: 5px; }
 .section-heading p { font-size: var(--t-sm); }
