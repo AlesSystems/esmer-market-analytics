@@ -23,9 +23,10 @@ September expense examples are 48,000 rent, 18,400 utilities and 20,000 operatin
 ## Observed checks
 
 - The first browser test failed against the placeholder interface because the visual-direction control did not exist; it passed after implementation. An earlier startup attempt exposed an incorrect test-host relative path, which was corrected before the behavioral red/green check.
-- Five public-interface browser tests pass: month/result atomic transition in all directions; valid zero versus unknown/absent/partial states; product search/detail/focus return; honest expense previews; all directions at 680 × 800 with larger text and keyboard dialogs.
+- Six public-interface browser tests pass: month/result atomic transition in all directions; valid zero versus unknown/absent/partial states; product search/detail/focus return; honest expense previews; all directions at 680 × 800 with larger text and keyboard dialogs; existing 40 × 40 px minimum hit areas for visible buttons at both 1440 and 680 px.
 - Larger text visibly increases the dialog heading as well as the workspace. Escape returns focus to the original control. The page has no horizontal overflow at the tested narrow size; product tables have labelled internal horizontal scrolling.
 - The coordinating agent separately checked gross/margin pairs and September’s percentage change using Python Decimal; the literal values agree. This is fixture arithmetic sanity checking, not source-semantic proof.
+- Standards review identified application action targets below the existing 40 px minimum. The accessibility revision raises product-name, trust, calculation, text-link, review and navigation buttons to at least 40 px, preserving the three compositions. Review-strip buttons also use 40 px. A public browser hit-area regression failed against the prior stylesheet (34 px review control), then passed after the revision. The six-test browser suite was rerun and screenshots recaptured after this revision.
 - JavaScript syntax checks, focused ESLint and `git diff --check` pass.
 - Reproducible screenshots cover all directions at 1440 × 900, plus A at 680 × 800 with larger text and an enlarged explanation. The captured image can extend below the viewport to show the actual scrollable page.
 

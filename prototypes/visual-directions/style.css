@@ -28,7 +28,8 @@ button,input,select {
   font:inherit
 }
 button {
-  cursor:pointer
+  cursor:pointer;
+  min-height:40px;
 }
 button,select,input {
   touch-action:manipulation
@@ -170,7 +171,7 @@ a {
   padding:7px 12px;
   border-radius:5px;
   font-size:13px;
-  min-height:34px;
+  min-height:40px;
   white-space:nowrap;
   color:#657080
 }
@@ -181,7 +182,7 @@ a {
 }
 .review-help {
   font-size:13px;
-  min-height:34px;
+  min-height:40px;
   color:#5a6375;
   white-space:nowrap
 }
@@ -371,7 +372,7 @@ main {
   display:inline-flex;
   align-items:center;
   gap:6px;
-  min-height:32px
+  min-height:40px
 }
 .text-button:hover {
   text-decoration:underline
@@ -395,7 +396,7 @@ main {
   gap:7px;
   color:var(--muted);
   font-size:inherit;
-  min-height:32px;
+  min-height:40px;
   padding:3px 0
 }
 .trust svg {
@@ -521,7 +522,7 @@ main {
   text-align:left;
   gap:8px;
   padding:0;
-  min-height:28px
+  min-height:40px
 }
 .product-name svg {
   width:13px;
@@ -962,7 +963,7 @@ main {
 .direction-c .app-nav button {
   border-radius:20px;
   padding:7px 17px;
-  min-height:37px;
+  min-height:40px;
   font-size:.83em
 }
 .direction-c .app-nav svg {
@@ -1775,7 +1776,7 @@ dialog::backdrop {
   .result-heading .text-button {
     font-size:.75em;
     text-align:right;
-    min-height:26px
+    min-height:40px
   }
   .result-heading h2 {
     padding-top:3px

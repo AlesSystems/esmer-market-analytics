@@ -90,3 +90,20 @@ test('every direction remains operable with narrow windows, larger text and keyb
     expect(overflow, 'the page itself must not overflow; financial tables may scroll within their region').toBe(false);
   }
 });
+
+test('visible actions retain the existing forty-pixel minimum hit area', async ({ page }) => {
+  await page.goto('/');
+  for (const width of [1440, 680]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const direction of ['A · Çalışma alanı', 'B · Ayın hesabı', 'C · Odaklı görünüm']) {
+      await page.getByRole('button', { name: direction, exact: true }).click();
+      const buttons = await page.getByRole('button').all();
+      for (const button of buttons) {
+        const box = await button.boundingBox();
+        const label = `${direction}, ${width}px: ${await button.innerText() || await button.getAttribute('aria-label')}`;
+        expect(box.height, label).toBeGreaterThanOrEqual(40);
+        expect(box.width, label).toBeGreaterThanOrEqual(40);
+      }
+    }
+  }
+});
