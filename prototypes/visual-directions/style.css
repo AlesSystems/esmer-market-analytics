@@ -1339,7 +1339,7 @@ dialog::backdrop {
     padding-inline:16px
   }
   .review-label>span:last-child {
-    display:none
+    display:inline;
   }
   .direction-switch button {
     padding-inline:9px
