@@ -36,6 +36,8 @@ Environment: macOS arm64, Node 24.15.0, npm 11.12.1. Commands: `npm run test:int
 
 Initial integration attempt: 323 passed, 17 skipped, one failed because `npm ci --ignore-scripts` had not installed Electron's macOS binary. The failure was `ENOENT` copying that binary in the release-inventory test, not an app failure. `npm exec -- install-electron` followed by the full integration rerun passed. These local checks do not supply new Windows acceptance.
 
+Fresh independent candidate review of `3520ce0..528b069` found no actionable security or regression issue. The reviewer independently reran the 10 new checks, the focused group (15 passed / one optional skip), typecheck, lint and diff check, and confirmed unchanged runtime/package inputs. This is one candidate review cycle, separate from the initial boundary investigation.
+
 ## Delivery and acceptance boundary
 
 The [delivery list](../operations/eralp-offline-delivery.md) identifies unchanged main `3520ce0` installer and portable files from [CI 43055324223](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43055324223), which passed Windows packaging and 68 desktop tests. The [November 11 receipt](2026-11-11-windows-v1-smoke.md) covers native Windows 11 usage. No changed runtime is being substituted for that evidence.
