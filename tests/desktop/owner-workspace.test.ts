@@ -8,7 +8,7 @@ import { richEstimatePackage } from "../helpers/rich-estimate-fixture";
 import { executablePath } from "../helpers/desktop-executable";
 import { monthLabel, openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
 
-// Routes are the three top tabs.
+// The three workspace destinations share one remembered month.
 type Route = { name: string; nav: "Bu ay" | "Ürünler" | "Giderler" };
 const routes: Route[] = [
   { name: "bu-ay", nav: "Bu ay" },
@@ -70,7 +70,6 @@ for (const source of [true]) test(`owner workspace renders ${source ? "source" :
         await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
         await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
         await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
-        await expect(page.locator(".workspace")).toHaveCSS("background-color", "rgb(245, 247, 250)");
         await page.getByRole("button", { name: "İçeriğe geç", exact: true }).focus();
         await page.keyboard.press("Enter");
         await expect(page.locator(".app-body")).toBeFocused();

@@ -10,7 +10,7 @@ const hero=(page:Page)=>page.getByRole("region",{name:"Ayın özeti"});
 const netCard=(page:Page)=>page.getByRole("region",{name:/[Nn]et kâr$/});
 const attention=(page:Page)=>page.getByRole("list",{name:"Dikkat edilecekler"}).getByRole("button");
 
-test("Bu ay opens at launch with three tabs, and an imported estimate package answers the month in one screen",async()=>{
+test("Bu ay opens at launch with three destinations, and an imported estimate package answers the selected month",async()=>{
  const userData=await mkdtemp(join(tmpdir(),"bu-ay-")),file=join(userData,"month.json");await writeFile(file,monthProfitPackage());
  let app=await electron.launch({executablePath,args:[`--user-data-dir=${userData}`]});
  try{
@@ -28,7 +28,8 @@ test("Bu ay opens at launch with three tabs, and an imported estimate package an
   await expect(page.getByRole("heading",{name:"Ekim 2025",level:1})).toBeVisible();
   await expect(monthLabel(page)).toHaveText("Ekim 2025");
   await expect(monthLabel(page)).toHaveAttribute("data-month","2025-10");
-  await expect(hero(page).getByText("Ekim'de 480 ₺ satış yaptınız. Tahmini brüt kâr",{exact:true})).toBeVisible();
+  await expect(hero(page).getByRole("heading",{name:"Tahmini brüt kâr",exact:true})).toBeVisible();
+  await expect(page.getByRole("group",{name:"Aylık destekleyici tutarlar"})).toContainText("Satış480,00 ₺");
   await expect(hero(page).locator(".hero-num")).toHaveText("57,50 ₺");
   await expect(hero(page)).toContainText("Önceki ayla karşılaştırılamıyor");
   await expect(hero(page).getByText("Maliyeti bilinen her 100 ₺'lik satıştan 13 ₺ kâr kaldı.",{exact:true})).toBeVisible();
