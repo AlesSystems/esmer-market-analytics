@@ -28,10 +28,10 @@ export function MonthBars({ history, month }: { history: MonthProfitView["histor
         </g>;
       })}
     </svg>
-    <table className="sr-only">
+    <div className="sr-only"><table>
       <caption>Aylara göre satış, brüt kâr ve marj</caption>
       <thead><tr><th scope="col">Ay</th><th scope="col">Satış</th><th scope="col">Brüt kâr</th><th scope="col">Marj</th></tr></thead>
       <tbody>{history.map(row => <tr key={row.month}><th scope="row">{monthName(row.month)}</th><td>{row.sales === null ? "Bilinmiyor" : money(row.sales)}</td><td>{row.grossProfit === null ? "Bilinmiyor" : money(row.grossProfit)}</td><td>{row.marginPct === null ? "Bilinmiyor" : percentText(row.marginPct)}</td></tr>)}</tbody>
-    </table>
+    </table></div>
   </>;
 }
