@@ -1,5 +1,5 @@
 import {test,expect,_electron as electron,type ElectronApplication,type Page} from "@playwright/test";
-import {mkdtemp,rm} from "node:fs/promises";
+import {mkdtemp,rm,writeFile} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {openStore} from "../../src/store/store";
@@ -81,6 +81,7 @@ test("the ledger sorts its four columns with unknown last, filters from the serv
 test("the drawer shows literal figures and a gap-aware margin line, pushes the table aside, and keyboard walks, opens and closes it",async()=>{
  const {app,page,userData}=await launch();
  try{
+  await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows()[0].setContentSize(1440,900));
   await openSection(page,"Ürünler");
   await expect(drawer(page)).toHaveCount(0);
   // Only the focus stop of the ledger is in the tab order.
@@ -180,5 +181,33 @@ test("Bu ay attention opens the drawer; a product without sales in the month say
   await expect(header(page,"Satış")).toHaveAttribute("aria-sort","descending");
   await expect(drawer(page,"Süt").getByRole("button",{name:"Kaynak satırlar",exact:true})).toBeFocused();
   await expect(monthLabel(page)).toHaveAttribute("data-month","2025-10");
+ }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
+});
+
+
+test("constrained product details stay separate from the ledger and source return keeps context",async({},testInfo)=>{
+ const {app,page,userData}=await launch();
+ try{
+  await openSection(page,"Ürünler");
+  for(const size of [{width:1000,height:900,zoom:1},{width:680,height:800,zoom:1},{width:1440,height:1000,zoom:2}]){
+   await app.evaluate(({BrowserWindow},size)=>{const window=BrowserWindow.getAllWindows()[0];window.setContentSize(size.width,size.height);window.webContents.setZoomFactor(size.zoom);},size);
+   await expect.poll(()=>page.evaluate(()=>innerWidth)).toBe(size.width/size.zoom);
+   await rowButton(page,"1").click();
+   await expect(drawer(page,"Süt").getByRole("heading",{name:"Süt",exact:true})).toBeInViewport();
+   const [ledger,detail]=await Promise.all([page.getByRole("region",{name:"Ürünler",exact:true}).boundingBox(),drawer(page,"Süt").boundingBox()]);
+   expect(ledger!.y+ledger!.height).toBeLessThanOrEqual(detail!.y);
+   expect(await page.locator(".tbl-wrap").evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
+   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+   for(const [name,value] of [["Satış fiyatı","10,00 ₺"],["Alış maliyeti","7,00 ₺"],["Marj","%30,00"]] as const)await expect(fact(page,name)).toHaveText(value);
+   if(size.zoom===1)await page.screenshot({path:testInfo.outputPath(`product-detail-${size.width}.png`),animations:"disabled"});
+   else{const png=await app.evaluate(async({BrowserWindow})=>(await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));await writeFile(testInfo.outputPath("product-detail-zoom200.png"),Buffer.from(png,"base64"));}
+   await drawer(page).getByRole("button",{name:"Kaynak satırlar",exact:true}).click();
+   await expect(page.getByRole("table",{name:"Bu ürünün geçtiği satış belgeleri"})).toBeVisible();
+   await page.getByRole("button",{name:"Ürünlere dön",exact:true}).click();
+   await expect(drawer(page).getByRole("button",{name:"Kaynak satırlar",exact:true})).toBeFocused();
+   await drawer(page).getByRole("button",{name:"Ayrıntıyı kapat",exact:true}).click();
+   await expect(rowButton(page,"1")).toBeFocused();
+   await expect(rowButton(page,"1")).toBeInViewport();
+  }
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true});}
 });
