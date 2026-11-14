@@ -1,6 +1,6 @@
 # Prototype implementation work graph
 
-Scope: [#148](https://github.com/AlesSystems/esmer-market-analytics/issues/148), the first prototype frontier of [#147](https://github.com/AlesSystems/esmer-market-analytics/issues/147). The user explicitly requests review before continuation. No production implementation is included.
+Historical scope: [#148](https://github.com/AlesSystems/esmer-market-analytics/issues/148), the first prototype frontier of [#147](https://github.com/AlesSystems/esmer-market-analytics/issues/147). The review pause was honored. The owner subsequently selected A and explicitly requested implementation; see the [new implementation contract and work graph](../superpowers/specs/2026-11-14-prototype-a-implementation.md). This first-milestone record contains no production implementation evidence.
 
 Integration branch: `codex/ui-prototype-review`, based on `3520ce0821f6b90a1f0ed903beb2e08fa837584f` (origin/main). Original checkout and unrelated worktrees stay unchanged. One implementer owns the isolated prototype directory in its own worktree; the merger alone integrates its commits.
 
@@ -13,8 +13,8 @@ Integration branch: `codex/ui-prototype-review`, based on `3520ce0821f6b90a1f0ed
 | P05 | test | Browser behavior, keyboard, narrow/large-text and screenshot verification | P04 | Named scenarios pass and limitations recorded | completed |
 | P06 | review | Standards and specification review; fix findings, rerun affected checks | P05 | No unresolved blocking findings | completed |
 | P07 | documentation | Review assets, evidence and tracker handoff | P06 | Runnable local preview, screenshots, launch instructions, exact commits and checks | completed |
-| H01 | review | Project owner selects/refines visual direction (#143) | P07 | Explicit feedback/approval of a concrete direction | blocked: awaiting project-owner review of delivered prototype |
-| P08 | implementation | Connected product, expense and operations tickets #149–151 | H01 | Respective ticket acceptance criteria, integrated prototype | blocked: H01 |
+| H01 | review | Project owner selects/refines visual direction (#143) | P07 | Explicit feedback/approval of a concrete direction | completed: owner chose A and requested implementation |
+| P08 | implementation | Connected product, expense and operations tickets #149–151 | H01 | Respective ticket acceptance criteria, integrated prototype | pending: prototype-only sequence superseded for the latest implementation request; not claimed complete |
 | H02 | review | Connected-flow decision #144 | P08 | Human walkthrough and agreed flows | blocked: P08 |
 | P09 | documentation | Handoff #152 | H02 | Final specification/coverage/evidence artifact | blocked: H02 |
 | H03 | review | Final acceptance #145 | P09 | Explicit project-owner acceptance | blocked: P09 |
