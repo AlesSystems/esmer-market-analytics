@@ -133,7 +133,7 @@ Use a consistent 4/8/12/20/28 spacing rhythm, generous section padding, and smal
 ## Components and behavior
 
 - **Navigation:** labelled business destinations with a persistent active state, visible focus and a readable store identity. On narrow windows the rail reflows so essential navigation and actions remain reachable.
-- **Month controls:** selected month stays visible; previous/next buttons preserve the existing availability and draft guards. The period and actual data cutoff must not imply that historical imports are current activity.
+- **Month controls:** selected month stays visible; previous/next buttons preserve the existing availability and draft guards. The period and package coverage must not imply that historical imports are current activity. The monthly label “Paketin kapsadığı son gün” uses the pinned report’s coverage end; source details separately retain the last recorded document date.
 - **Monthly answer:** one explicit Tahmini brüt kâr label, gross amount or meaningful unavailable state, aligned Satış / Tahmini ürün maliyeti / Marj, and access to calculation detail. Use the same service-provided population and formatted values.
 - **Trust disclosure:** one accessible estimated-results disclosure per page, opening the existing basis, exclusions and cost coverage. Do not repeat long caveats beside every number.
 - **Product list/detail:** full-result search, existing filters and sort, keyboard-operable rows, preserved units, and available cost/margin/source detail. A name is a real button; the row may also be clickable. Missing cost and unknown margin remain explicit.
@@ -144,7 +144,7 @@ Use a consistent 4/8/12/20/28 spacing rhythm, generous section padding, and smal
 
 ## Charts and future growth
 
-The owner explicitly requested room for later charts. The monthly page must be composed from independent semantic sections in a responsive grid. Full-width and split-width sections should work in the same normal document flow, with intrinsic height and `minmax(0, ...)` columns. Later charts can be added as sections without changing the shell, month ownership or financial operations.
+The owner explicitly requested room for later charts. The monthly page must be composed from independent semantic sections in a responsive grid. Full-width and split-width sections should work in the same normal document flow, with intrinsic height and `minmax(0, ...)` columns. Later charts can be added as sections without changing the shell, month ownership or financial operations. In [MonthPage.tsx](src/ui/pages/MonthPage.tsx), a `card` section participates in `month-layout`; `section-wide` spans both columns. Omit that modifier for a split-width section. [The shared heading](src/ui/AppShell.tsx) keeps month/export controls in normal flow, independent of those sections.
 
 Use the existing chart components and service-provided data. Every chart must carry its period, units, meaningful title and a numeric/table alternative. Unknown values remain gaps or distinct unknown marks; zero and negative values remain valid signed values. Kilograms and pieces cannot become one physical total. Do not infer an unsupported comparison or forecast.
 
