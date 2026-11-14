@@ -7,7 +7,7 @@ Uygulama internet olmadan çalışır. Verileriniz yalnızca bu bilgisayarda dur
 ## Kurulumdan önce
 
 1. **Windows + R** tuşlarına basıp `winver` yazın. Windows sürümünü ve derlemesini inceleme kaydına yazın. **Ayarlar > Sistem > Hakkında > Sistem türü** altında x64 bilgisayar olduğunu kontrol edin.
-2. Yerel kullanım kanıtı **Windows 11 x64** içindir. Windows 10 veya başka bir yapılandırmada Altan [Windows kontrol listesini](windows-v1-handoff.md) tamamlamadan uyumluluğu geçti olarak kaydetmeyin. ARM/32 bit için bu x64 teslimi doğrulanmış değildir.
+2. Yerel kullanım kanıtı **Windows 11 x64** içindir. Windows 10 veya başka bir yapılandırmada Altan, teslim EXE’leri ve hazır sentetik paketle [elle kullanım kontrollerini](windows-v1-handoff.md#smoke-test-manual) tamamlamadan uyumluluğu geçti olarak kaydetmeyin. Eralp’in bilgisayarında derleme veya Node kurulumu gerekmez. ARM/32 bit için bu x64 teslimi doğrulanmış değildir.
 3. Dosyanın SHA-256 değerini teslim listesiyle karşılaştırın. Yalnızca “1.0.1” adına güvenmeyin; aynı sürüm adıyla eski dosyalar vardır.
 4. Önceden kullanılan bir analiz kurulumu varsa verisini koruyun ve önce yedek alın. Gösterim verilerini onun içine yüklemeyin.
 

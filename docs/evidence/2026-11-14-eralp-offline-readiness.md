@@ -38,6 +38,12 @@ Initial integration attempt: 323 passed, 17 skipped, one failed because `npm ci 
 
 Fresh independent candidate review of `3520ce0..528b069` found no actionable security or regression issue. The reviewer independently reran the 10 new checks, the focused group (15 passed / one optional skip), typecheck, lint and diff check, and confirmed unchanged runtime/package inputs. This is one candidate review cycle, separate from the initial boundary investigation.
 
+[PR #146](https://github.com/AlesSystems/esmer-market-analytics/pull/146) publishes commits `ad4bb38` (boundary tests), `528b069` (handoff/assessment), and `30af78c` (independent review). [Windows CI attempt 2](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43588431314/attempts/2) passed on `30af78c`: typecheck, lint, 185 unit, 312 integration (29 skips), `npm run package:win` with `DISTRIBUTIONS_MATCH_INSPECTED_PAYLOAD`, and 68 packaged desktop tests (six optional capture skips).
+
+[Attempt 1](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43588431314/attempts/1) passed security/integration/package checks but recorded native test-worker exit `3221226505` before the first desktop test (0 ms); the other 67 passed. The existing November 11 receipt records the same exit code. No application assertion failure was reported. The underlying native crash was not diagnosed; rerunning the unchanged commit passed all 68. No test was skipped, weakened or given automatic retries. This new CI run is automated evidence, not another native owner walkthrough.
+
+#139 was closed on November 14 with this non-applicability assessment. Audit warnings remain visible; there is no dependency or runtime upgrade.
+
 ## Delivery and acceptance boundary
 
 The [delivery list](../operations/eralp-offline-delivery.md) identifies unchanged main `3520ce0` installer and portable files from [CI 43055324223](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/43055324223), which passed Windows packaging and 68 desktop tests. The [November 11 receipt](2026-11-11-windows-v1-smoke.md) covers native Windows 11 usage. No changed runtime is being substituted for that evidence.
@@ -45,6 +51,8 @@ The [delivery list](../operations/eralp-offline-delivery.md) identifies unchange
 The local handoff includes the CI inspection manifests, checksum list, synthetic August–October 2025 package and Turkish install/review/recovery documents. The synthetic package comes from the existing rich-estimate fixture, not a real backup. Its generic import success message does not make it real data. A separate demo profile keeps synthetic expenses and completeness statements out of the owner's normal workspace.
 
 Downloaded EXE bytes were SHA-256 verified against the immutable CI inspection record. Synthetic file SHA-256: `cd5930e3153b1ab6c5794d254f872fc6210281000cb81ea487bb8bbd9b7a2b8e`; 2,994 headers and 7,415 lines. An independent Python Decimal sum of the generated October operands gives covered sale 529,051 TRY less cost 384,951 TRY = gross estimate 144,100 TRY; less the walkthrough's 1,000 TRY expense = 143,100 TRY. This matches the existing Windows oracle; it does not establish real financial semantics.
+
+Local delivery archive: `work/Esmer-Market-Eralp-Offline-Review-2026-11-14.zip` in the original checkout's ignored work area; 233,201,285 bytes, SHA-256 `52615f4432d5ef8bc404f1b11cc62665b68ac9e8f7708e002f7478c3017fb8a8`. It contains both original EXEs, CI manifests, synthetic package, `BASLA.html` (offline Turkish guide), `BENI-OKU.txt` and `SHA256SUMS.txt`. ZIP integrity and every contained checksum were verified. Remote GitHub evidence links need internet; the guide itself does not. Binaries and generated samples are not committed to Git.
 
 The [review checklist](../operations/reveal-tr.md) records actual Windows configuration, install result, workflows, Excel, backup, unresolved display preferences and Eralp's own decision. It also asks who will provide future offline packages and hold recovery material; no recurring service commitment is invented.
 
