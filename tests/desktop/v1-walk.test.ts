@@ -45,14 +45,8 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
   // Giderler: one manual expense, then the month's expenses complete.
   await openSection(page,"Giderler");
   await page.locator("#expense-manual").click();
-  await page.getByLabel("Gider tarihi",{exact:true}).fill("2025-10-15");
   await page.getByLabel("Kategori",{exact:true}).fill("Sentetik kira");
-  await page.getByLabel("Sınıflandırma",{exact:true}).selectOption("operating-expense");
-  await page.getByLabel("Net tutar (TRY)",{exact:true}).fill("1.000,00");
-  await page.getByLabel("KDV tutarı (TRY)",{exact:true}).fill("0");
-  await page.getByLabel("Brüt tutar (TRY)",{exact:true}).fill("1.000,00");
-  await page.getByLabel("KDV işlemi",{exact:true}).selectOption("non-recoverable");
-  await page.getByLabel("KDV kanıtı",{exact:true}).fill("synthetic-tax");
+  await page.getByLabel("Tutar (TRY)",{exact:true}).fill("1.000,00");
   await page.getByRole("button",{name:"Gideri kaydet",exact:true}).click();
   await expect(page.locator("#expense-manual")).toBeFocused();
   await shoot("giderler");
