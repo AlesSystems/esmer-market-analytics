@@ -7,7 +7,7 @@ import { requireValid } from "../store/revisions";
 import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ManualCandidate, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
 import { readExpenseWorkbook, decimalCell, dateCell, type Cell } from "./workbook";
 import { isExpense, isManualBill, expensePeriod, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
-import { relevantExpenseRevision } from "./adjustments";
+import { manualBillNumbers, relevantExpenseRevision } from "./adjustments";
 import { groupExpenses } from "./groups";
 const hash = (s: string | Uint8Array) => createHash("sha256").update(s).digest("hex");
 const nullable = (cells: Cell[], index: number) => cells[index]?.value || null;
@@ -76,9 +76,8 @@ export class Expenses {
     }
     try {
       const cells = readExpenseWorkbook(bytes), known = new Map(snapshot.app.filter(row => row.kind === "expense").map(row => [row.entityId, row]));
-      const aliases = new Map<string, string>(), billsByAmount = new Map<string, ManualCandidate[]>(), billNumbers = new Map<string, number>();
+      const aliases = new Map<string, string>(), billsByAmount = new Map<string, ManualCandidate[]>(), billNumbers = manualBillNumbers(snapshot.expenseHistory);
       for (const record of snapshot.expenseHistory) if (record.kind === "expense") {
-        if (isManualBill(record.value) && !billNumbers.has(record.entityId)) billNumbers.set(record.entityId, record.revision);
         if (isExpense(record.value) && record.value.attachment && record.value.sourceReference) aliases.set(record.value.sourceReference, record.entityId);
       }
       for (const record of known.values()) if (record.kind === "expense" && isManualBill(record.value) && !record.value.voided) {

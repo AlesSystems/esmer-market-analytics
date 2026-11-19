@@ -7,6 +7,7 @@ import { ImportPreview } from "./expenses/ImportPreview";
 import { ImportLanding } from "./expenses/ImportLanding";
 import { AlertIcon, ArrowRightIcon, CheckIcon, DownloadIcon, PlusIcon, UploadIcon } from "./icons";
 import { type ExpensePeriod, type ExpensePreview, type ExpenseRecord } from "../expenses/contracts";
+import { manualBillNumbers } from "../expenses/adjustments";
 import { isManualBill } from "../expenses/validation";
 import type { ExpenseGroupKey } from "../expenses/groups";
 import { date, money } from "./format";
@@ -91,8 +92,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     } catch { setError(failed); }
     finally { unlock(); setBusy(false); }
   };
-  const billNumbers = new Map<string, number>();
-  for (const row of view?.history ?? []) if (isManualBill(row.value) && !billNumbers.has(row.entityId)) billNumbers.set(row.entityId, row.revision);
+  const billNumbers = manualBillNumbers(view?.history ?? []);
   const plan = view ? confirmPlan(view) : undefined;
   const confirm = (complete: boolean, explicit = false) => { if (!view || !plan) return; setAsking(false); void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete, reason: complete ? confirmReason(plan, explicit) : "Onay kaldırıldı" }), "", true, "expense-confirm-action"); };
   // Lines present but a group blank: the first press asks, because a blank is not the same as "no expense".
