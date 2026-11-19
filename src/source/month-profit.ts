@@ -10,7 +10,7 @@ import type {AppRecord} from "../store/revisions";
 // rounding (ROUND_HALF_UP) of divisions: percentages, averageBasket, unitPrice and unitCost.
 // Thresholds compare unrounded values; rounded values never feed amounts.
 const D=Decimal.clone({precision:200,rounding:Decimal.ROUND_HALF_UP});
-export const MONTH_PROFIT_VERSION="month-profit-v1";
+export const MONTH_PROFIT_VERSION="month-profit-v2";
 export type Money=string;
 export type Pct=string|null;
 export type NetProfitReason="costUnknown"|"monthPartial"|"expensesMissing"|"expensesIncomplete"|"expensesBlocked"|"unknownTax"|"confirmationStale";
