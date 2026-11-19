@@ -53,6 +53,7 @@ export interface DesktopApi {
   createExpense(request: ExpenseRequests["createExpense"]): Promise<import("../expenses/contracts").CreateExpenseResult | RequestError>;
   saveExpenseTemplate(): Promise<ExpenseResult | RequestError>;
   previewExpenses(): Promise<ExpenseResult | RequestError>;
+  cancelExpensePreview(request: ExpenseRequests["cancelExpensePreview"]): Promise<ExpenseResult | RequestError>;
   confirmExpenses(request: ExpenseRequests["confirmExpenses"]): Promise<ExpenseResult | RequestError>;
   queryExpenses(request: ExpenseRequests["queryExpenses"]): Promise<ExpenseResult | RequestError>;
   correctExpense(request: ExpenseRequests["correctExpense"]): Promise<ExpenseResult | RequestError>;

@@ -126,6 +126,10 @@ export class Expenses {
     this.pending = preview;
     return structuredClone(preview);
   }
+  cancelPreview({ previewId }: { previewId: string }) {
+    if (this.pending?.previewId === previewId) this.pending = null;
+    return { status: "cancelled" as const };
+  }
   confirm(request: ConfirmExpensesRequest) {
     const p = this.pending;
     requireValid(p && p.previewId === request.previewId);

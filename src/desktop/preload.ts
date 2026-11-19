@@ -19,6 +19,7 @@ const api: DesktopApi = {
   createExpense: request => ipcRenderer.invoke("esmer:request", "createExpense", request),
   saveExpenseTemplate: () => ipcRenderer.invoke("esmer:request", "saveExpenseTemplate", null),
   previewExpenses: () => ipcRenderer.invoke("esmer:request", "previewExpenses", null),
+  cancelExpensePreview: request => ipcRenderer.invoke("esmer:request", "cancelExpensePreview", request),
   confirmExpenses: request => ipcRenderer.invoke("esmer:request", "confirmExpenses", request),
   queryExpenses: request => ipcRenderer.invoke("esmer:request", "queryExpenses", request),
   correctExpense: request => ipcRenderer.invoke("esmer:request", "correctExpense", request),

@@ -24,13 +24,14 @@ function validRecoveryRequest(operation: string, payload: unknown): boolean {
   if (operation === "pinBackup") return exact(payload, ["backupId", "pinned"]) && validId(payload.backupId) && typeof payload.pinned === "boolean";
   return exact(payload, ["token"]) && validId(payload.token);
 }
-const expenseOperations = ["createExpense", "saveExpenseTemplate", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"];
+const expenseOperations = ["createExpense", "saveExpenseTemplate", "previewExpenses", "cancelExpensePreview", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"];
 export function validExpenseRequest(operation: string, payload: unknown): boolean {
   if (operation === "createExpense") return validCreateExpenseRequest(payload);
   const revision = (v: unknown) => Number.isSafeInteger(v) && Number(v) >= 0;
   const reason = (v: unknown) => typeof v === "string" && !!v.trim() && v.length <= 1000 && !/[\u0000-\u001f\u007f]/.test(v);
   if (operation === "saveExpenseTemplate" || operation === "previewExpenses") return payload === null;
   if (operation === "queryExpenses") return exact(payload, ["period"]) && validPeriod(payload.period);
+  if (operation === "cancelExpensePreview") return exact(payload, ["previewId"]) && validId(payload.previewId);
   if (operation === "confirmExpenses") {
     const row = (v: unknown): v is number => Number.isSafeInteger(v) && Number(v) >= 2 && Number(v) <= 5001;
     if (!(exact(payload, ["previewId", "keepCandidateRows"]) || exact(payload, ["previewId", "keepCandidateRows", "matches"])) ||

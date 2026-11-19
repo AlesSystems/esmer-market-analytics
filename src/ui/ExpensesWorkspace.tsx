@@ -49,6 +49,10 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   function open(row: ExpenseRecord, focusBack: string) { opener.current = () => document.getElementById(focusBack)?.focus(); setSelected(row); }
   useEffect(() => { if (active && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading, active]);
   const hasPreview = !!preview;
+  const previewId = preview?.previewId;
+  useEffect(() => () => {
+    if (previewId) void window.esmer.cancelExpensePreview({ previewId }).catch(() => undefined);
+  }, [previewId]);
   useEffect(() => { if (active && task === "import") taskTitle.current?.focus(); }, [task, active, hasPreview]);
   useEffect(() => { if (asking) cancelAsk.current?.focus(); }, [asking]);
   async function load(): Promise<boolean> {
@@ -100,6 +104,14 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   }
   const chooseWorkbook = () => void run(() => window.esmer.previewExpenses(), "");
   const saveTemplate = () => void run(() => window.esmer.saveExpenseTemplate(), "Excel şablonu kaydedildi.");
+  const closePreview = (after?: () => void) => {
+    if (!preview) { after?.(); return; }
+    void run(async () => {
+      const result = await window.esmer.cancelExpensePreview({ previewId: preview.previewId });
+      if (result.status === "cancelled") { setPreview(undefined); after?.(); }
+      return result;
+    }, "");
+  };
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
   const manual = task === "manual", showMonth = !selected && task !== "import";
   const locked = busy || manual;
@@ -115,14 +127,14 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   return <main className="gider" aria-busy={busy}>
     <div className="g-head">
       <WorkspaceHeader title={`${monthName(period)} giderleri`} label="Gider incelemesi"><p className="g-say" aria-live="polite">{view && showMonth ? statusText(view) : ""}</p></WorkspaceHeader>
-      {!showMonth && <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => navigation.leave(returnToRecords)}>Giderlere dön</button>}
+      {!showMonth && <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => navigation.leave(() => closePreview(returnToRecords))}>Giderlere dön</button>}
     </div>
     {savedPeriod && showMonth && <p className="g-note">Gider ayı: {savedPeriod.incurred}{savedPeriod.payment && <> · Ödeme ayı: {savedPeriod.payment}</>}.{onPeriod && <button type="button" className="link link-inline" onClick={() => navigation.leave(() => onPeriod(savedPeriod.related))}>O aya git</button>}</p>}
     {busy && <p role="status" className="g-note">İşlem sürüyor…</p>}
     {message && <p className="g-note" role="status">{message}</p>}
     {error && <p className="g-note is-warn" role="alert">{error}</p>}
     {task === "import" && !preview && view && <ImportLanding view={view} title={taskTitle} busy={busy} chooseWorkbook={chooseWorkbook} saveTemplate={saveTemplate} />}
-    {task === "import" && preview && <ImportPreview key={preview.previewId} preview={preview} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); setError(""); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={request => void run(() => window.esmer.confirmExpenses(request), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
+    {task === "import" && preview && <ImportPreview key={preview.previewId} preview={preview} busy={busy} invalid={!!invalid} title={taskTitle} close={() => closePreview()} confirm={request => void run(() => window.esmer.confirmExpenses(request), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
     {loadError && <div className="g-note is-warn" role="alert"><span>{loadError}</span><button type="button" className="btn btn-secondary" disabled={loading} onClick={() => void load()}>Giderleri yeniden yükle</button></div>}
     {loading && !view && <p role="status" className="g-muted">Giderler yükleniyor…</p>}
     {showMonth && (view || manual) && <>
