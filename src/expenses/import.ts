@@ -31,7 +31,12 @@ function value(c: Cell[], batchId: string, row: number): ExpenseValue {
   const v = { format: "expense-v1", date, paymentDate, category: c[3]?.value, classification, net, tax, gross, taxTreatment, taxEvidence: nullable(c, 9), supportingReference: nullable(c, 10), sourceReference: nullable(c, 0), labourPeriod: nullable(c, 11), loss: nullable(c, 12) || recognition ? { evidence: nullable(c, 12), recognition } : null, origin: { batchId, row }, reason: "Excel içe aktarımı", evidence: batchId, replacesRevision: null, voided: false };
   if (!validExpense(v)) throw new Error("Kanıt / referans alanları: kısa, kişisel veri içermeyen kimlik kullanın; kategori en çok 80 karakter olmalı ve kayıp işlemi sınıfla eşleşmeli."); return v;
 }
-const same = (a: ExpenseValue, b: ExpenseValue) => canonical(Object.fromEntries(fieldKeys.map(k => [k, a[k as keyof ExpenseValue]]))) === canonical(Object.fromEntries(fieldKeys.map(k => [k, b[k as keyof ExpenseValue]])));
+const amountKeys = ["net", "tax", "gross"] as const;
+const detailKeys = fieldKeys.filter(key => !amountKeys.some(amount => key === amount));
+const comparableDetails = (value: ExpenseValue) => canonical(Object.fromEntries(detailKeys.map(key => [key, value[key as keyof ExpenseValue]])));
+const same = (a: ExpenseValue, b: ExpenseValue) =>
+  amountKeys.every(key => new Exact(a[key]).eq(b[key])) && comparableDetails(a) === comparableDetails(b);
+
 export class Expenses {
   private pending: ExpensePreview | null = null;
   constructor(private readonly store: ReturnType<typeof openStore>) {}
@@ -65,6 +70,10 @@ export class Expenses {
     this.pending = null;
     const snapshot = this.store.readSnapshot(), batchId = hash(bytes);
     const preview: ExpensePreview = { status: "preview", previewId: randomUUID(), batchId, baseRevision: snapshot.pin.appRevision, rows: [], manualCandidates: {}, errors: [], alreadyImported: this.store.expenseBatches().some(b => b.batchId === batchId) };
+    if (preview.alreadyImported) {
+      this.pending = preview;
+      return structuredClone(preview);
+    }
     try {
       const cells = readExpenseWorkbook(bytes), known = new Map(snapshot.app.filter(row => row.kind === "expense").map(row => [row.entityId, row]));
       const aliases = new Map<string, string>(), billsByAmount = new Map<string, ManualCandidate[]>(), billNumbers = new Map<string, number>();

@@ -101,7 +101,9 @@ test("Excel and manual references share identity in both directions, with confli
       if (first === "excel") { const preview = service.preview(await workbook([row])); service.confirm({ previewId: preview.previewId, keepCandidateRows: [] }); }
       else service.create({ action: "save", requestId: "manual-first", fields: canonical, duplicateReview: null });
       expect(service.create({ action: "save", requestId: "manual-second", fields: canonical, duplicateReview: null }).status).toBe("already-present");
-      const preview = service.preview(await workbook([row])); expect(preview.rows[0].alreadyPresent).toBe(true);
+      if (first === "excel") expect(service.preview(await workbook([row]))).toMatchObject({ alreadyImported: true, errors: [], rows: [] });
+      const preview = service.preview(await workbook([Array(row.length).fill(null), row]));
+      expect(preview.rows[0].alreadyPresent).toBe(true);
       expect(service.create({ action: "save", requestId: "different", fields: { ...canonical, category: "Changed" }, duplicateReview: null }).status).toBe("reference-conflict");
       expect(store.readPin().appRevision).toBe(1);
     } finally { store.close(); }

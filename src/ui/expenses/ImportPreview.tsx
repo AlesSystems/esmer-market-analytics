@@ -27,9 +27,9 @@ export function ImportPreview({ preview, busy, invalid, title, close, confirm }:
     `Elle kayıt no. ${bill.billNumber} · ${bill.category} · ${monthName(bill.period)} · ${money(bill.amount)}`;
   return <section className="card g-task" aria-label="Excel önizlemesi">
     <div className="g-card-head"><h2 ref={title} tabIndex={-1}>Excel önizlemesi</h2><button type="button" className="btn btn-secondary" disabled={busy} onClick={close}>Önizlemeyi kapat</button></div>
+    {preview.alreadyImported ? <p className="g-note">Bu Excel dosyası zaten içe aktarılmış.</p> : <>
     <p>{preview.rows.length.toLocaleString("tr-TR")} satır · Aylar: {[...new Set(preview.rows.flatMap(row => row.value ? [row.value.date.slice(0, 7)] : []))].join(", ") || "Belirlenemiyor"}</p>
     <p className="g-cap">Henüz hiçbir şey kaydedilmedi. Hatalı satır varsa Excel dosyasını düzeltip yeniden seçin.</p>
-    {preview.alreadyImported && <p className="g-note">Bu Excel dosyası zaten içe aktarılmış.</p>}
     {preview.errors.map((item, i) => <p role="alert" key={i}>{item}</p>)}
     <div className="table-scroll" tabIndex={0} aria-label="Önizleme satırları"><table><thead><tr><th>Satır / tarih</th><th>Kategori / tür</th><th className="number">Brüt tutar</th><th>Durum</th></tr></thead><tbody>{preview.rows.map(row => {
       const bills = row.matchKey ? preview.manualCandidates[row.matchKey] : undefined;
@@ -51,6 +51,7 @@ export function ImportPreview({ preview, busy, invalid, title, close, confirm }:
         {match && row.duplicates.length > 0 && <label className="g-check"><input type="checkbox" disabled={busy} checked={acknowledgedRows.has(row.row)} onChange={event => setAcknowledged(event.target.checked ? [...acknowledged, row.row] : acknowledged.filter(id => id !== row.row))} />Satır {row.row}: benzer ayrıntılı kayıt ayrı kalacak</label>}
       </> : row.duplicates.length > 0 ? <label className="g-check"><input type="checkbox" disabled={busy} checked={keepRows.has(row.row)} onChange={event => setKeep(event.target.checked ? [...keep, row.row] : keep.filter(id => id !== row.row))} />Satır {row.row}: benzer kayıt var, yine de ayrı gider olarak ekle</label> : row.errors.length === 0 ? "Hazır" : null}</td>
     </tr>; })}</tbody></table></div>
+    </>}
     <div className="g-actions"><button type="button" className="btn btn-primary" disabled={blocked} onClick={() => confirm({ previewId: preview.previewId, keepCandidateRows: keep, acknowledgedDetailedRows: acknowledged, matches: Object.entries(matches).map(([row, entityId]) => ({ row: Number(row), entityId })) })}>İçe aktar</button></div>
   </section>;
 }
