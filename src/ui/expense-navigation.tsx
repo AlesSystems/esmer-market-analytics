@@ -2,35 +2,43 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { ExpenseDraftDialog } from "./expenses/ExpenseDraftDialog";
 
 type Protection = { dirty: boolean; locked: boolean };
-type Navigation = { leave: (action: () => void) => void; protect: (value: Protection) => void; busy: () => boolean };
+type Navigation = { leave: (action: () => void) => void; protect: (value: Protection) => void; lock: () => () => void; busy: () => boolean };
 type PendingLeave =
   | { kind: "dirty"; action: () => void; opener: HTMLElement | null }
   | { kind: "locked"; opener: HTMLElement | null };
 
-const Context = createContext<Navigation>({ leave: action => action(), protect: () => undefined, busy: () => false });
+const Context = createContext<Navigation>({ leave: action => action(), protect: () => undefined, lock: () => () => undefined, busy: () => false });
 export const useExpenseNavigation = () => useContext(Context);
 
 export function ExpenseNavigationProvider({ children }: { children: ReactNode }) {
   const acceptedAction = useRef(false);
+  const operations = useRef(0);
   const protection = useRef<Protection>({ dirty: false, locked: false });
   const lockedTitle = useRef<HTMLHeadingElement>(null);
   const [notice, setNotice] = useState<PendingLeave | null>(null);
   const noticeKind = notice?.kind;
 
+  const locked = useCallback(() => protection.current.locked || operations.current > 0, []);
+  const clearLockNotice = useCallback(() => {
+    if (!locked()) setNotice(previous => previous?.kind === "locked" ? null : previous);
+  }, [locked]);
   const protect = useCallback((value: Protection) => {
     protection.current = value;
-    if (!value.locked) setNotice(previous => previous?.kind === "locked" ? null : previous);
-  }, []);
-  const busy = useCallback(() => protection.current.dirty || protection.current.locked, []);
+    clearLockNotice();
+  }, [clearLockNotice]);
+  const lock = useCallback(() => {
+    operations.current++;
+    return () => { operations.current--; clearLockNotice(); };
+  }, [clearLockNotice]);
+  const busy = useCallback(() => protection.current.dirty || locked(), [locked]);
   const leave = useCallback((next: () => void) => {
-    const { dirty, locked } = protection.current;
-    if (acceptedAction.current || (!dirty && !locked)) {
+    if (acceptedAction.current || !busy()) {
       next();
       return;
     }
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setNotice(locked ? { kind: "locked", opener } : { kind: "dirty", action: next, opener });
-  }, []);
+    setNotice(locked() ? { kind: "locked", opener } : { kind: "dirty", action: next, opener });
+  }, [busy, locked]);
 
   useEffect(() => {
     if (noticeKind === "locked") lockedTitle.current?.focus();
@@ -42,7 +50,7 @@ export function ExpenseNavigationProvider({ children }: { children: ReactNode })
     (opener?.isConnected ? opener : document.querySelector<HTMLElement>(".settings-entry"))?.focus();
   }
 
-  return <Context.Provider value={{ leave, protect, busy }}>
+  return <Context.Provider value={{ leave, protect, lock, busy }}>
     {notice?.kind === "dirty" && <ExpenseDraftDialog onDecision={decision => {
       if (decision === "keep") {
         continueEditing();

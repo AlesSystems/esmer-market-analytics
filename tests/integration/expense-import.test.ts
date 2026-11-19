@@ -72,3 +72,136 @@ test("bounded duplicate lookup still rejects repeated stock-loss evidence within
     expect(expenses.preview(await workbook([another])).rows[0].errors).toContain("Kayıp kanıtı başka bir kayıtta kullanılmış.");
   } finally { store.close(); }
 });
+
+test("the owner chooses which identical monthly bill receives the Excel details", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50,00" };
+    const first = expenses.create({ action: "save-bill", requestId: "first-bill", fields });
+    const second = expenses.create({ action: "save-bill", requestId: "second-bill", fields });
+    if (first.status !== "saved" || second.status !== "saved") throw Error("Fixture bills not saved");
+    store.confirmExpensesComplete({ period: fields.period, reviewedRevision: second.revision, complete: true, reason: "Synthetic review" });
+    const before = store.readSnapshot();
+    const bytes = await workbook([row]);
+    const abandoned = expenses.preview(bytes);
+    expect(store.readSnapshot()).toEqual(before);
+    expect(expenses.cancelPreview({ previewId: abandoned.previewId })).toEqual({ status: "cancelled" });
+    expect(() => expenses.confirm({ previewId: abandoned.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: second.entityId }] })).toThrow();
+    const preview = expenses.preview(bytes);
+    expect(preview.manualCandidates[preview.rows[0].matchKey!]).toMatchObject([
+      { entityId: first.entityId, revision: first.revision, category: "Kira", period: "2026-01", amount: "50" },
+      { entityId: second.entityId, revision: second.revision, category: "Kira", period: "2026-01", amount: "50" },
+    ]);
+    const matches = [{ row: 2, entityId: second.entityId }];
+    expect(() => expenses.confirm({ previewId: abandoned.previewId, keepCandidateRows: [], matches })).toThrow();
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] })).toThrow();
+    expect(store.readSnapshot()).toEqual(before);
+    expect(expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches })).toMatchObject({ status: "imported", count: 1 });
+    const current = expenses.query({ period: fields.period });
+    expect(current).toMatchObject({ confirmation: "stale", incurred: "100", rows: [
+      { entityId: first.entityId, value: { format: "manual-bill-v1" } },
+      { entityId: second.entityId, value: { date: "2026-01-15", origin: { kind: "manual", requestId: "second-bill" }, attachment: { batchId: preview.batchId, row: 2 }, replacesRevision: second.revision } },
+    ] });
+    expect(store.readPinned(before.pin)).toEqual(before);
+    const repeat = expenses.preview(bytes);
+    expect(expenses.confirm({ previewId: repeat.previewId, keepCandidateRows: [] }).status).toBe("already-imported");
+    const equivalent = expenses.preview(await workbook([Array(row.length).fill(null), row]));
+    expect(equivalent.rows[0]).toMatchObject({ row: 3, alreadyPresent: true });
+    expect(expenses.confirm({ previewId: equivalent.previewId, keepCandidateRows: [] })).toMatchObject({ status: "imported", count: 0 });
+    expect(expenses.create({ action: "resolve", requestId: "second-bill" })).toMatchObject({ status: "already-saved", revision: second.revision });
+  } finally { store.close(); }
+});
+
+test("same-bill selection is exclusive, stale or failed imports change nothing, and genuine peers stay separate", async () => {
+  let fault = false, rowsWritten = 0;
+  const store = openStore(":memory:", { fault: stage => { if (stage === "expense-row" && fault && ++rowsWritten === 2) throw Error("fixture write fault"); } });
+  const expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50" };
+    const bill = expenses.create({ action: "save-bill", requestId: "rent-bill", fields });
+    const otherMonth = expenses.create({ action: "save-bill", requestId: "feb-rent-bill", fields: { ...fields, period: "2026-02" } });
+    if (bill.status !== "saved" || otherMonth.status !== "saved") throw Error("Fixture bills not saved");
+    const bytes = await workbook([row, ["another-bill", ...row.slice(1)]]);
+    const preview = expenses.preview(bytes);
+    expect(preview.manualCandidates[preview.rows[0].matchKey!].map(item => item.entityId)).toEqual([bill.entityId]);
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: [2, 3].map(row => ({ row, entityId: bill.entityId })) })).toThrow();
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [3], matches: [{ row: 2, entityId: otherMonth.entityId }] })).toThrow();
+    store.appendRevision({ kind: "setting", entityId: "currency", value: { currency: "TRY", reason: "Synthetic update", evidence: "fixture" } });
+    const before = store.readSnapshot(), generation = store.recoveryGeneration();
+    const selection = { keepCandidateRows: [3], matches: [{ row: 2, entityId: bill.entityId }] };
+    expect(() => expenses.confirm({ previewId: preview.previewId, ...selection })).toThrow();
+    const retry = expenses.preview(bytes);
+    fault = true;
+    expect(() => expenses.confirm({ previewId: retry.previewId, ...selection })).toThrow("fixture write fault");
+    expect(store.readSnapshot()).toEqual(before);
+    expect(store.expenseBatches()).toEqual([]);
+    expect(store.recoveryGeneration()).toEqual(generation);
+    fault = false;
+    expect(expenses.confirm({ previewId: retry.previewId, ...selection })).toMatchObject({ status: "imported", count: 2 });
+    expect(expenses.query({ period: fields.period })).toMatchObject({ incurred: "100", rows: [
+      { entityId: bill.entityId, value: { attachment: { batchId: retry.batchId, row: 2 } } },
+      { value: { origin: { batchId: retry.batchId, row: 3 } } },
+    ] });
+  } finally { store.close(); }
+});
+
+test("many workbook rows can share one selectable candidate set without repeating its payload", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50" };
+    for (let i = 0; i < 20; i++) expect(expenses.create({ action: "save-bill", requestId: `bill-${i}`, fields }).status).toBe("saved");
+    const preview = expenses.preview(await workbook(Array.from({ length: 100 }, (_, index) => [`ref-${index}`, ...row.slice(1)])));
+    expect(preview.rows).toHaveLength(100);
+    const matchKeys = [...new Set(preview.rows.map(row => row.matchKey))];
+    expect(matchKeys).toHaveLength(1);
+    expect(preview.manualCandidates[matchKeys[0]!]).toHaveLength(20);
+    expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThan(120_000);
+  } finally { store.close(); }
+});
+
+test("linking a manual bill requires explicit acknowledgement of a remaining detailed duplicate", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const existing = expenses.preview(await workbook([row]));
+    expenses.confirm({ previewId: existing.previewId, keepCandidateRows: [] });
+    const bill = expenses.create({ action: "save-bill", requestId: "mixed-candidate", fields: { period: "2026-01", category: "Kira", amount: "50" } });
+    if (bill.status !== "saved") throw Error("Fixture bill not saved");
+    const preview = expenses.preview(await workbook([["ref-mixed", ...row.slice(1)]]));
+    expect(preview.rows[0].duplicates).toHaveLength(1);
+    expect(preview.rows[0].matchKey).toBeTruthy();
+    const before = expenses.query({ period: "2026-01" });
+    const link = { previewId: preview.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: bill.entityId }] };
+    expect(() => expenses.confirm(link)).toThrow();
+    expect(expenses.query({ period: "2026-01" })).toEqual(before);
+    expect(expenses.confirm({ ...link, acknowledgedDetailedRows: [2] })).toMatchObject({ status: "imported", count: 1 });
+    expect(expenses.query({ period: "2026-01" })).toMatchObject({ incurred: "100", rows: [
+      { entityId: before.rows[0].entityId, revision: before.rows[0].revision },
+      { entityId: bill.entityId, value: { attachment: { batchId: preview.batchId, row: 2 } } },
+    ] });
+  } finally { store.close(); }
+});
+
+test.each(["detailed", "enriched"] as const)("workbook replay and equivalent decimal corrections preserve %s references", async format => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const bytes = await workbook([row]);
+    const bill = format === "enriched" ? expenses.create({ action: "save-bill", requestId: "equivalent-decimals", fields: { period: "2026-01", category: "Kira", amount: "50" } }) : undefined;
+    if (bill && bill.status !== "saved") throw Error("Fixture bill not saved");
+    const preview = expenses.preview(bytes);
+    expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: bill ? [{ row: 2, entityId: bill.entityId }] : [] });
+    const [expense] = expenses.query({ period: "2026-01" }).rows;
+    const replacement = { date: "2026-01-15", paymentDate: "2026-02-01", category: "Kira", classification: "operating-expense" as const, net: "50.00", tax: "0.00", gross: "50.00", taxTreatment: "non-recoverable" as const, taxEvidence: "tax-1", supportingReference: "bill-1", sourceReference: "ref-1", labourPeriod: null, loss: null };
+    const corrected = store.changeExpense({ entityId: expense.entityId, expectedRevision: expense.revision, reason: "Synthetic format correction", replacement });
+    const equivalent = expenses.preview(await workbook([Array(row.length).fill(null), row]));
+    expect(equivalent.rows[0]).toMatchObject({ errors: [], alreadyPresent: true });
+    expect(expenses.confirm({ previewId: equivalent.previewId, keepCandidateRows: [] })).toMatchObject({ status: "imported", count: 0 });
+    store.changeExpense({ entityId: expense.entityId, expectedRevision: corrected, reason: "Synthetic amount correction", replacement: { ...replacement, net: "55", gross: "55" } });
+    const before = expenses.query({ period: "2026-01" });
+    const replay = expenses.preview(bytes);
+    expect(replay).toMatchObject({ alreadyImported: true, errors: [], rows: [] });
+    expect(expenses.confirm({ previewId: replay.previewId, keepCandidateRows: [] })).toMatchObject({ status: "already-imported", count: 0 });
+    expect(expenses.query({ period: "2026-01" })).toEqual(before);
+    const changed = expenses.preview(await workbook([Array(row.length).fill(null), Array(row.length).fill(null), row]));
+    expect(changed.rows[0].errors).toContain("Kayıt referansı mevcut kayıttan farklı. Gerekçeli düzeltme kullanın.");
+  } finally { store.close(); }
+});

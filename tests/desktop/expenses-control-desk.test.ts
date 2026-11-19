@@ -21,8 +21,10 @@ test("plain month offers import first, opens and closes manual entry with focus 
     await expect(page.getByRole("button", { name: "Bu ay gider yok", exact: true })).toBeVisible();
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "İşlem iptal edildi" })).toBeVisible();
-    await page.getByRole("button", { name: "Elle ekle", exact: true }).press("Enter");
+    await page.getByRole("button", { name: "Giderlere dön", exact: true }).click();
+    await page.getByRole("button", { name: "Elle gider ekle", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "Elle gider ekle", exact: true })).toBeFocused();
     // The form opens inside Kayıtlar; the month's totals stay in view but cannot be confirmed or re-imported beside an open draft.
     await expect(page.getByRole("region", { name: "Kayıtlar" }).getByRole("heading", { name: "Elle gider ekle", exact: true })).toBeVisible();
@@ -30,7 +32,7 @@ test("plain month offers import first, opens and closes manual entry with focus 
     await expect(page.getByRole("button", { name: "Bu ay gider yok", exact: true })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true })).toBeDisabled();
     await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Elle gider ekle", exact: true })).toBeFocused();
     const capture = async (name: string) => {
       const path = process.env.ESMER_CAPTURE_EVIDENCE === "1" ? `workstreams/page-control-desks/expenses/${name}.png` : testInfo.outputPath(`${name}.png`);
       if (process.env.ESMER_CAPTURE_EVIDENCE === "1") await mkdir("workstreams/page-control-desks/expenses", { recursive: true });
@@ -58,7 +60,7 @@ test("recorded-source expenses embed one main and keep manual entry reachable", 
     const page = await app.firstWindow();await openWorkspace(page);
     await openSection(page, "Giderler");
     await expect(page.getByRole("main").filter({ visible: true })).toHaveCount(1);
-    await expect(page.getByRole("button", { name: "Elle ekle", exact: true }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Elle gider ekle", exact: true }).filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -86,7 +88,7 @@ test("expense groups show unknown totals as Eksik, never zero, block the confirm
     await setMonth(page, "2025-08");
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Elle ekle", exact: true }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Elle gider ekle", exact: true }).filter({ visible: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 

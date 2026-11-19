@@ -5,8 +5,8 @@ import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, t
 import { rawFingerprint } from "../source/live";
 import type { OperationControl } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
-import { isExpense, validFields, fieldKeys } from "../expenses/validation";
-import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
+import { isExpense, validFields, fieldKeys, isManualBill, expensePeriod, validAttachment } from "../expenses/validation";
+import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue, ManualBill, ManualBillCommand } from "../expenses/contracts";
 import { createHash, randomUUID } from "node:crypto";
 import { backup, DatabaseSync } from "node:sqlite";
 import { Exact } from "../domain/money";
@@ -247,17 +247,29 @@ class AnalyticsStore {
   expenseBatches(): ExpenseBatch[] {
     return this.db.prepare("SELECT batch_id,created_at,count,first_revision,last_revision FROM expense_batches ORDER BY rowid").all().map(row => ({ batchId: String(row.batch_id), createdAt: String(row.created_at), count: Number(row.count), firstRevision: Number(row.first_revision), lastRevision: Number(row.last_revision) }));
   }
-  importExpenses(batchId: string, expectedRevision: number, changes: AppChange[]): boolean {
+  importExpenses(batchId: string, expectedRevision: number, changes: { entityId: string; value: ExpenseValue; match?: { entityId: string; revision: number } }[]): boolean {
     return this.transaction(() => {
-      requireValid(validId(batchId) && changes.every(change => change.kind === "expense" && isExpense(change.value)));
+      requireValid(validId(batchId));
       if (this.db.prepare("SELECT batch_id FROM expense_batches WHERE batch_id=?").get(batchId)) return false;
       requireValid(this.currentPin().appRevision === expectedRevision);
       const first = expectedRevision + 1;
+      const latest = this.db.prepare("SELECT revision,value_json FROM app_revisions WHERE kind='expense' AND entity_id=? ORDER BY revision DESC LIMIT 1");
       for (const change of changes) {
-        requireValid(!this.db.prepare("SELECT revision FROM app_revisions WHERE kind='expense' AND entity_id=?").get(change.entityId));
-        this.insertRevision(change); this.options.fault?.("expense-row");
+        const attachment = change.value.origin;
+        requireValid(validAttachment(attachment) && attachment.batchId === batchId && !latest.get(change.entityId));
+        if (change.match) {
+          const record = latest.get(change.match.entityId);
+          requireValid(record?.revision === change.match.revision);
+          const bill = decode<ManualBill | ExpenseValue>(record.value_json);
+          requireValid(isManualBill(bill) && !bill.voided && bill.period === expensePeriod(change.value) && new Exact(bill.amount).eq(change.value.gross));
+          this.insertRevision({ kind: "expense", entityId: change.match.entityId, value: { ...change.value, origin: bill.origin, attachment, replacesRevision: change.match.revision, reason: "Excel ayrıntıları elle girilen gidere eklendi" } });
+        } else {
+          this.insertRevision({ kind: "expense", entityId: change.entityId, value: change.value });
+        }
+        this.options.fault?.("expense-row");
       }
       this.db.prepare("INSERT INTO expense_batches VALUES(?,?,?,?,?)").run(batchId, new Date().toISOString(), changes.length, changes.length ? first : expectedRevision, this.currentPin().appRevision);
+      if (!changes.length) this.db.prepare("UPDATE recovery_state SET changed=changed+1 WHERE singleton=1").run();
       return true;
     });
   }
@@ -265,15 +277,18 @@ class AnalyticsStore {
     const receipt = this.db.prepare("SELECT entity_id,revision FROM expense_commands WHERE request_id=?").get(requestId);
     if (!receipt) return { status: "not-saved" };
     const original = this.db.prepare("SELECT value_json FROM app_revisions WHERE revision=?").get(receipt.revision)!;
-    const value = decode<ExpenseValue>(original.value_json);
-    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: value.date.slice(0, 7), paymentPeriod: value.paymentDate?.slice(0, 7) ?? null };
+    const value = decode<ExpenseValue | ManualBill>(original.value_json);
+    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: expensePeriod(value), paymentPeriod: isExpense(value) ? value.paymentDate?.slice(0, 7) ?? null : null };
   }
   createExpenseCommand(requestId: string, fields: ExpenseFields, duplicateReview: {fingerprint: string; keepSeparate: true} | null): CreateExpenseResult {
     return this.transaction(() => {
       const digest = hash(fields), receipt = this.db.prepare("SELECT digest FROM expense_commands WHERE request_id=?").get(requestId);
       if (receipt) { requireValid(receipt.digest === digest); return this.resolveExpenseCommand(requestId); }
-      const current = this.snapshot(this.currentPin()).app.filter(row => row.kind === "expense" && isExpense(row.value));
-      const entityId = fields.sourceReference ? `expense-ref:${createHash("sha256").update(fields.sourceReference).digest("hex")}` : `expense-manual:${createHash("sha256").update(requestId).digest("hex")}`;
+      const snapshot = this.snapshot(this.currentPin());
+      const current = snapshot.app.filter(row => row.kind === "expense" && isExpense(row.value));
+      const alias = fields.sourceReference && snapshot.expenseHistory.find(row => row.kind === "expense" && isExpense(row.value) && row.value.attachment && row.value.sourceReference === fields.sourceReference)?.entityId;
+      const defaultId = fields.sourceReference ? `expense-ref:${createHash("sha256").update(fields.sourceReference).digest("hex")}` : `expense-manual:${createHash("sha256").update(requestId).digest("hex")}`;
+      const entityId = alias || defaultId;
       const existing = current.find(row => row.entityId === entityId);
       const equalFields = (value: ExpenseValue) => hash(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]]))) === digest;
       if (existing && existing.kind === "expense" && isExpense(existing.value)) {
@@ -281,6 +296,7 @@ class AnalyticsStore {
         this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(requestId, digest, entityId, existing.revision, "identified");
         return { status: "already-present", entityId, revision: existing.revision, incurredPeriod: fields.date.slice(0, 7), paymentPeriod: fields.paymentDate?.slice(0, 7) ?? null };
       }
+      if (alias) return { status: "reference-conflict", entityId };
       const active = current.filter(row => row.kind === "expense" && isExpense(row.value) && !row.value.voided);
       if (fields.loss && active.some(row => row.kind === "expense" && isExpense(row.value) && row.value.loss?.evidence === fields.loss!.evidence)) return { status: "invalid", fieldErrors: { loss: "Kayıp kanıtı başka bir kayıtta kullanılmış." } };
       const matches = active.filter(row => row.kind === "expense" && isExpense(row.value) && row.value.date === fields.date && new Exact(row.value.gross).eq(fields.gross)).toSorted((a, b) => a.entityId.localeCompare(b.entityId));
@@ -293,23 +309,53 @@ class AnalyticsStore {
       return { status: "saved", entityId, revision, incurredPeriod: fields.date.slice(0, 7), paymentPeriod: fields.paymentDate?.slice(0, 7) ?? null };
     });
   }
+  saveManualBill(request: ManualBillCommand): CreateExpenseResult {
+    return this.transaction(() => {
+      const digest = hash(request);
+      const receipt = this.db.prepare("SELECT digest FROM expense_commands WHERE request_id=?").get(request.requestId);
+      if (receipt) {
+        requireValid(receipt.digest === digest);
+        return this.resolveExpenseCommand(request.requestId);
+      }
+      const correction = request.action === "correct-bill";
+      const entityId = correction ? request.entityId : `expense-manual:${createHash("sha256").update(request.requestId).digest("hex")}`;
+      const previous = correction ? this.revisionHistory().findLast(row => row.entityId === entityId) : null;
+      if (correction && !(previous?.kind === "expense" && isManualBill(previous.value) && previous.revision === request.expectedRevision)) {
+        return { status: "failed", code: "STALE_EXPENSE", message: "Gider değişti. Kayıtları yeniden açıp güncel sürümü inceleyin." };
+      }
+      const value: ManualBill = {
+        ...request.fields, format: "manual-bill-v1",
+        origin: previous?.kind === "expense" && isManualBill(previous.value) ? previous.value.origin : { kind: "manual", requestId: request.requestId },
+        reason: correction ? request.reason : "Elle kayıt oluşturuldu",
+        evidence: request.requestId, replacesRevision: previous?.revision ?? null, voided: false,
+      };
+      const revision = this.insertRevision({ kind: "expense", entityId, value });
+      this.options.fault?.("expense-row");
+      this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(request.requestId, digest, entityId, revision, correction ? "corrected" : "created");
+      return { status: "saved", entityId, revision, incurredPeriod: value.period, paymentPeriod: null };
+    });
+  }
   changeExpense(request: CorrectExpenseRequest | RestoreExpenseRequest): number {
     return this.transaction(() => {
       const history = this.revisionHistory().filter(row => row.entityId === request.entityId);
       const latest = history.at(-1);
-      requireValid(latest?.kind === "expense" && isExpense(latest.value) && latest.revision === request.expectedRevision);
+      requireValid(latest?.kind === "expense" && latest.revision === request.expectedRevision);
+      const previous = "restoreRevision" in request && request.restoreRevision !== null ? history.find(row => row.revision === request.restoreRevision) : undefined;
+      if ("restoreRevision" in request && request.restoreRevision !== null) requireValid(previous?.kind === "expense");
+      const restored = previous?.kind === "expense" ? previous.value : undefined;
+      const target = restored ?? latest.value;
+      if (isManualBill(target)) {
+        requireValid("restoreRevision" in request);
+        return this.insertRevision({ kind: "expense", entityId: request.entityId, value: { ...target, voided: !restored || target.voided, evidence: "owner-review", reason: request.reason, replacesRevision: latest.revision } });
+      }
+      requireValid(isExpense(target));
       let replacement: ExpenseValue;
       if ("replacement" in request) {
         requireValid(validFields(request.replacement));
-        requireValid(request.replacement.sourceReference === latest.value.sourceReference);
-        replacement = { ...latest.value, ...request.replacement, voided: false };
-      } else if (request.restoreRevision === null) replacement = { ...latest.value, voided: true };
-      else {
-        const previous = history.find(row => row.revision === request.restoreRevision);
-        requireValid(previous?.kind === "expense" && isExpense(previous.value));
-        const previousValue = previous.value;
-        replacement = { ...latest.value, ...Object.fromEntries(fieldKeys.map(key => [key, previousValue[key as keyof ExpenseValue]])), voided: previousValue.voided };
-      }
+        requireValid(request.replacement.sourceReference === target.sourceReference);
+        replacement = { ...target, ...request.replacement, voided: false };
+      } else if (request.restoreRevision === null) replacement = { ...target, voided: true };
+      else replacement = target;
       if (!replacement.voided && replacement.loss) {
         const current = this.snapshot(this.currentPin()).app;
         requireValid(!current.some(row => row.kind === "expense" && row.entityId !== request.entityId && isExpense(row.value) && !row.value.voided && row.value.loss?.evidence === replacement.loss!.evidence));

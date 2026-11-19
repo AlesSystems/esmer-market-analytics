@@ -24,14 +24,34 @@ function validRecoveryRequest(operation: string, payload: unknown): boolean {
   if (operation === "pinBackup") return exact(payload, ["backupId", "pinned"]) && validId(payload.backupId) && typeof payload.pinned === "boolean";
   return exact(payload, ["token"]) && validId(payload.token);
 }
-const expenseOperations = ["createExpense", "saveExpenseTemplate", "previewExpenses", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"];
+const expenseOperations = ["createExpense", "saveExpenseTemplate", "previewExpenses", "cancelExpensePreview", "confirmExpenses", "queryExpenses", "correctExpense", "restoreExpense", "confirmExpenseCompleteness"];
 export function validExpenseRequest(operation: string, payload: unknown): boolean {
   if (operation === "createExpense") return validCreateExpenseRequest(payload);
   const revision = (v: unknown) => Number.isSafeInteger(v) && Number(v) >= 0;
   const reason = (v: unknown) => typeof v === "string" && !!v.trim() && v.length <= 1000 && !/[\u0000-\u001f\u007f]/.test(v);
   if (operation === "saveExpenseTemplate" || operation === "previewExpenses") return payload === null;
   if (operation === "queryExpenses") return exact(payload, ["period"]) && validPeriod(payload.period);
-  if (operation === "confirmExpenses") return exact(payload, ["previewId", "keepCandidateRows"]) && validId(payload.previewId) && Array.isArray(payload.keepCandidateRows) && payload.keepCandidateRows.length <= 5000 && payload.keepCandidateRows.every(v => Number.isSafeInteger(v) && v >= 2 && v <= 5001) && new Set(payload.keepCandidateRows).size === payload.keepCandidateRows.length;
+  if (operation === "cancelExpensePreview") return exact(payload, ["previewId"]) && validId(payload.previewId);
+  if (operation === "confirmExpenses") {
+    const row = (v: unknown): v is number => Number.isSafeInteger(v) && Number(v) >= 2 && Number(v) <= 5001;
+    if (!(exact(payload, ["previewId", "keepCandidateRows"]) || exact(payload, ["previewId", "keepCandidateRows", "matches"]) || exact(payload, ["previewId", "keepCandidateRows", "matches", "acknowledgedDetailedRows"])) ||
+      !validId(payload.previewId) || !Array.isArray(payload.keepCandidateRows) || payload.keepCandidateRows.length > 5000 ||
+      !payload.keepCandidateRows.every(row)) return false;
+    const reviewed = new Set(payload.keepCandidateRows);
+    if (reviewed.size !== payload.keepCandidateRows.length) return false;
+    if (!("matches" in payload)) return true;
+    if (!Array.isArray(payload.matches) || reviewed.size + payload.matches.length > 5000) return false;
+    const linked = new Set<string>();
+    for (const match of payload.matches) {
+      if (!exact(match, ["row", "entityId"]) || !row(match.row) || !validId(match.entityId) || reviewed.has(match.row) || linked.has(match.entityId)) return false;
+      reviewed.add(match.row);
+      linked.add(match.entityId);
+    }
+    if (!("acknowledgedDetailedRows" in payload)) return true;
+    const acknowledged = payload.acknowledgedDetailedRows;
+    return Array.isArray(acknowledged) && acknowledged.length <= payload.matches.length &&
+      acknowledged.every(row) && new Set(acknowledged).size === acknowledged.length;
+  }
   if (operation === "confirmExpenseCompleteness") return exact(payload, ["period", "reviewedRevision", "complete", "reason"]) && validPeriod(payload.period) && revision(payload.reviewedRevision) && typeof payload.complete === "boolean" && reason(payload.reason);
   if (operation === "correctExpense" || operation === "restoreExpense") return exact(payload, ["entityId", "expectedRevision", "reason", operation === "correctExpense" ? "replacement" : "restoreRevision"]) && validId(payload.entityId) && revision(payload.expectedRevision) && Number(payload.expectedRevision) > 0 && reason(payload.reason) && (operation === "correctExpense" ? validFields(payload.replacement) : payload.restoreRevision === null || revision(payload.restoreRevision) && Number(payload.restoreRevision) > 0);
   return false;

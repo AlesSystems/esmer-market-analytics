@@ -34,6 +34,8 @@ _Avoid_: Exact cost, inventory value
 **Replacement cost (ikame maliyeti):** An estimate using the latest validated purchase cost available by the dataset cutoff. It does not revise historical cost.
 _Avoid_: Historical cost, inflation-adjusted cost
 
+**Manual expense (elle girilen gider)** means one ordinary running cost, such as rent or electricity, that the owner assigns to a category and a chosen month. Its amount is the full bill in TRY, including any KDV, with the KDV breakdown unknown.
+
 **Expense completeness (gider tamlığı):** An owner-reviewed statement about whether expense evidence for a period has been supplied. Import success or an empty record list does not establish completeness.
 _Avoid_: Import complete
 

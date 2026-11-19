@@ -35,7 +35,7 @@ test("Giderler, empty month: the selected month and confirmation are reachable, 
     await confirm.scrollIntoViewIfNeeded();
     await expect(confirm).toBeInViewport();
     await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true })).toHaveClass(/btn-primary/);
-    await expect(page.getByRole("button", { name: "Elle ekle", exact: true })).toHaveClass(/\blink\b/);
+    await expect(page.getByRole("button", { name: "Elle gider ekle", exact: true })).toHaveClass(/\blink\b/);
     await expect(page.getByRole("button", { name: "Şablonu indir", exact: true })).toHaveClass(/\blink\b/);
     expect(await style(page, "[data-state=empty] .g-amt", "font-size")).toBe("18px");
     await expect(page.locator(".g-empty p")).toHaveText("Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.");

@@ -1,7 +1,7 @@
 import { Exact } from "../domain/money";
 import type { AppRecord } from "../store/revisions";
 import type { Classification } from "./contracts";
-import { isExpense } from "./validation";
+import { isExpense, isManualBill } from "./validation";
 
 export const expenseGroupKeys = ["staff", "rent", "utilities", "other"] as const;
 export type ExpenseGroupKey = typeof expenseGroupKeys[number];
@@ -27,12 +27,21 @@ export function displayGroup(classification: Classification, category: string): 
   return "other";
 }
 
-/** Mirrors calculateExpenseComponents: same lines, same net/gross rule, same blockers. */
+/** Mirrors calculateEstimateExpenseComponents: same lines, same net/gross rule, same blockers. */
 export function groupExpenses(period: string, app: AppRecord[]): { groups: ExpenseGroup[]; attention: ExpenseAttention[] } {
   const totals = new Map<ExpenseGroupKey, { amount: InstanceType<typeof Exact> | null; count: number }>(expenseGroupKeys.map(key => [key, { amount: new Exact(0), count: 0 }]));
   const attention: ExpenseAttention[] = [], losses = new Set<string>();
   for (const record of app) {
     if (record.kind !== "expense") continue;
+    if (isManualBill(record.value)) {
+      const bill = record.value;
+      if (!bill.voided && bill.period === period) {
+        const group = totals.get(displayGroup("operating-expense", bill.category) ?? "other")!;
+        group.count++;
+        group.amount = group.amount?.plus(bill.amount) ?? null;
+      }
+      continue;
+    }
     if (!isExpense(record.value)) {
       const legacy = record.value as { date: string; category?: string; voided?: boolean };
       if (legacy.date.startsWith(period) && !legacy.voided) attention.push({ entityId: record.entityId, category: legacy.category ?? "Eski kayıt", date: legacy.date, reason: "legacy" });

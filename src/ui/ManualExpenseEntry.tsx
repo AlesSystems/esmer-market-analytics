@@ -1,115 +1,142 @@
-import { useEffect, useRef, useState } from "react";
-import { classifications, classificationLabels, type CreateExpenseResult, type ExpenseFields, type ManualExpenseInput } from "../expenses/contracts";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { CreateExpenseResult, ExpenseRecord, ManualBill, ManualBillFields } from "../expenses/contracts";
 import type { RequestError } from "../domain/contracts";
-import { money, date } from "./format";
 import { useExpenseNavigation } from "./expense-navigation";
+import { monthName } from "./pages/month-summary";
+
 export const pendingExpenseKey = "esmer.pending-manual-expense";
-const blank: ManualExpenseInput = { date: "", paymentDate: null, category: "", classification: "unclassified", net: "", tax: "", gross: "", taxTreatment: "unknown", taxEvidence: null, supportingReference: null, sourceReference: null, labourPeriod: null, loss: null };
-type State = { tag: "review-required" | "reviewing-records"; message: string } | { tag: "editing"; errors: Partial<Record<keyof ExpenseFields, string>>; message: string } | { tag: "review"; review: Extract<CreateExpenseResult, {status: "duplicate-review"}>; acknowledged: boolean } | { tag: "submitting" | "checking" | "uncertain"; requestId: string };
-export function ManualExpenseEntry({ period, close, saved, reviewRecords }: { period: string; close: () => void; reviewRecords: () => Promise<boolean>; saved: (result: Extract<CreateExpenseResult, {status: "saved" | "already-saved" | "already-present"}>, current: boolean) => void }) {
-  const [fields, setFields] = useState<ManualExpenseInput>({ ...blank }), [lossRecognition, setLossRecognition] = useState("");
-  const [state, setState] = useState<State>({ tag: "editing", errors: {}, message: "" });
-  const recordsReview = useRef<HTMLButtonElement>(null);
-  const reviewTitle = useRef<HTMLHeadingElement>(null);
-  const title = useRef<HTMLHeadingElement>(null), form = useRef<HTMLFormElement>(null), requestId = useRef<string | null>(null), generation = useRef(0);
+type Saved = Extract<CreateExpenseResult, { status: "saved" | "already-saved" | "already-present" }>;
+type State =
+  | { tag: "editing"; errors: Partial<Record<keyof ManualBillFields, string>>; message: string }
+  | { tag: "review-required" | "reviewing-records"; message: string }
+  | { tag: "submitting" | "checking" | "uncertain"; requestId: string };
+const editing = { tag: "editing", errors: {}, message: "" } as const;
+type Correction = { row: ExpenseRecord; bill: ManualBill; busy: boolean; history: (reason: string, blocked: boolean) => ReactNode };
+
+export function ManualExpenseEntry({ period, close, saved, reviewRecords, correction }: {
+  period: string;
+  close: () => void;
+  saved: (result: Saved) => void;
+  reviewRecords: () => Promise<boolean>;
+  correction?: Correction;
+}) {
+  const initial = {
+    period: correction?.bill.period ?? period,
+    category: correction?.bill.category ?? "",
+    amount: correction?.bill.amount.replace(".", ",") ?? "",
+  };
+  const [fields, setFields] = useState(initial);
+  const [reason, setReason] = useState("");
+  const [state, setState] = useState<State>(editing);
+  const recordsReview = useRef<HTMLButtonElement>(null), title = useRef<HTMLHeadingElement>(null), form = useRef<HTMLFormElement>(null);
+  const requestId = useRef<string | null>(null), generation = useRef(0);
   const navigation = useExpenseNavigation();
-  const currentPeriod = useRef(period); currentPeriod.current = period;
-  const locked = state.tag === "submitting" || state.tag === "checking" || state.tag === "uncertain" || state.tag === "reviewing-records";
+  const locked = state.tag === "submitting" || state.tag === "checking" || state.tag === "uncertain" || state.tag === "reviewing-records" || !!correction?.busy;
   const reviewRequired = state.tag === "review-required";
-  const dirty = JSON.stringify(fields) !== JSON.stringify(blank);
+  const dirty = fields.period !== initial.period || fields.category !== initial.category || fields.amount !== initial.amount || reason !== "";
+
   useEffect(() => { title.current?.focus(); }, []);
-  useEffect(() => { if (state.tag === "review") reviewTitle.current?.focus(); if (state.tag === "review-required") recordsReview.current?.focus(); }, [state.tag]);
+  useEffect(() => { if (reviewRequired) recordsReview.current?.focus(); }, [reviewRequired]);
   useEffect(() => { if (state.tag === "editing" && Object.keys(state.errors).length) form.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus(); }, [state]);
-  useEffect(() => { navigation.protect({ dirty, locked }); return () => navigation.protect({ dirty: false, locked: false }); }, [dirty, locked, state.tag, navigation.protect]);
+  useEffect(() => {
+    navigation.protect({ dirty, locked });
+    return () => navigation.protect({ dirty: false, locked: false });
+  }, [dirty, locked, state.tag, navigation.protect]);
   useEffect(() => {
     const pending = localStorage.getItem(pendingExpenseKey);
     if (pending && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(pending)) { requestId.current = pending; void resolve(pending); }
     else localStorage.removeItem(pendingExpenseKey);
     return () => { ++generation.current; };
   }, []);
-  function update<K extends keyof ManualExpenseInput>(key: K, value: ManualExpenseInput[K]) {
-    if (reviewRequired) return;
-    ++generation.current; requestId.current = null;
-    setFields(previous => ({ ...previous, [key]: value, ...(key === "date" && previous.classification === "labour" ? { labourPeriod: String(value).slice(0, 7) || null } : {}) }));
-    setState({ tag: "editing", errors: {}, message: "" });
-  }
-  function accept(result: CreateExpenseResult | RequestError, id: number, token: string, capturedPeriod: string) {
-    if (result.status === "saved" || result.status === "already-saved" || result.status === "already-present") {
-      if (localStorage.getItem(pendingExpenseKey) === token) localStorage.removeItem(pendingExpenseKey);
-      const current = id === generation.current && currentPeriod.current === capturedPeriod;
-      if (current) navigation.protect({ dirty: false, locked: false });
-      saved(result, current); return;
-    }
-    if (id !== generation.current || currentPeriod.current !== capturedPeriod) return;
-    if (result.status === "failed" || result.status === "unavailable") { setState({ tag: "uncertain", requestId: token }); return; }
-    if (result.status === "not-saved") { requestId.current = token; setState({ tag: "review-required", message: "Bu veritabanında kayıt bulunamadı. Yeniden eklemeden önce mevcut kayıtları inceleyin. Yeniden açılışta kaydedilmemiş form bilgileri korunmaz; eski bir yedekten dönüldüyse bu sonuç yalnızca o yedeği tanımlar." }); return; }
-    localStorage.removeItem(pendingExpenseKey);
-    if (result.status === "duplicate-review") setState({ tag: "review", review: result, acknowledged: false });
-    else if (result.status === "invalid") {
-      setState({ tag: "editing", errors: result.fieldErrors, message: "İşaretlenen alanları inceleyin." });
-      requestAnimationFrame(() => form.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus());
-    } else if (result.status === "reference-conflict") setState({ tag: "editing", errors: { sourceReference: "Bu referans mevcut veya geri alınmış bir kayda ait. Kayıtlarda gerekçeli düzeltme / geri yükleme kullanın." }, message: "Kayıt değiştirilmedi." });
 
-    else setState({ tag: "editing", errors: {}, message: "message" in result ? result.message : "İstek tamamlanamadı." });
+  function update(key: keyof ManualBillFields, value: string) {
+    requestId.current = null;
+    setFields(previous => ({ ...previous, [key]: value }));
+    setState(editing);
+  }
+  function clearPending(token: string | null) {
+    if (localStorage.getItem(pendingExpenseKey) === token) localStorage.removeItem(pendingExpenseKey);
+  }
+  function accept(result: CreateExpenseResult | RequestError, id: number, token: string) {
+    if (id !== generation.current) return;
+    if (result.status === "saved" || result.status === "already-saved" || result.status === "already-present") {
+      clearPending(token);
+      navigation.protect({ dirty: false, locked: false });
+      saved(result);
+    } else if (result.status === "failed" && result.code === "STALE_EXPENSE") {
+      clearPending(token);
+      setState({ tag: "review-required", message: result.message });
+    } else if (result.status === "failed" || result.status === "unavailable") {
+      setState({ tag: "uncertain", requestId: token });
+    } else if (result.status === "not-saved") {
+      setState({ tag: "review-required", message: "Bu veritabanında kayıt bulunamadı. Yeniden kaydetmeden önce mevcut kayıtları inceleyin. Eski bir yedekten dönüldüyse bu sonuç yalnızca o yedeği tanımlar." });
+    } else {
+      clearPending(token);
+      setState(result.status === "invalid"
+        ? { tag: "editing", errors: result.fieldErrors, message: "İşaretlenen alanları inceleyin." }
+        : { ...editing, message: "message" in result ? result.message : "İstek tamamlanamadı." });
+    }
   }
   async function resolve(token: string) {
     const id = ++generation.current;
-    navigation.protect({ dirty, locked: true }); setState({ tag: "checking", requestId: token });
-    try { accept(await window.esmer.createExpense({ action: "resolve", requestId: token }), id, token, period); }
+    navigation.protect({ dirty, locked: true });
+    setState({ tag: "checking", requestId: token });
+    try { accept(await window.esmer.createExpense({ action: "resolve", requestId: token }), id, token); }
     catch { if (id === generation.current) setState({ tag: "uncertain", requestId: token }); }
   }
   async function inspectRecords() {
     if (state.tag !== "review-required") return;
-    const message = state.message, id = ++generation.current, token = requestId.current;
-    navigation.protect({ dirty, locked: true }); setState({ tag: "reviewing-records", message });
+    const id = ++generation.current;
+    navigation.protect({ dirty, locked: true });
+    setState({ tag: "reviewing-records", message: state.message });
     const reviewed = await reviewRecords();
     if (id !== generation.current) return;
     if (reviewed) {
-      if (localStorage.getItem(pendingExpenseKey) === token) localStorage.removeItem(pendingExpenseKey);
-      navigation.protect({ dirty: false, locked: false }); close();
-    } else setState({ tag: "review-required", message: "Kayıtlar açılamadı. Yeniden eklemeden önce kayıtları tekrar inceleyin." });
+      clearPending(requestId.current);
+      navigation.protect({ dirty: false, locked: false });
+      close();
+    } else setState({ tag: "review-required", message: "Kayıtlar açılamadı. Yeniden kaydetmeden önce kayıtları tekrar inceleyin." });
   }
   async function submit() {
     if (locked || reviewRequired) return;
-    if (fields.classification === "inventory-loss" && !lossRecognition) { setState({ tag: "editing", errors: { loss: "Kayıp işlemini seçin." }, message: "İşaretlenen alanları inceleyin." }); requestAnimationFrame(() => document.getElementById("manual-loss-recognition")?.focus()); return; }
-    const referenceErrors: Partial<Record<keyof ExpenseFields, string>> = {};
-    for (const key of ["taxEvidence", "supportingReference", "sourceReference"] as const) if (fields[key] !== null && !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(fields[key]!)) referenceErrors[key] = "1–128 karakterlik kod kullanın: harf, rakam, nokta, alt çizgi, iki nokta veya kısa çizgi.";
-    if (fields.loss && !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(fields.loss.evidence)) referenceErrors.loss = "Geçerli bir kayıp kanıtı kodu girin.";
-    if (Object.keys(referenceErrors).length) { setState({ tag: "editing", errors: referenceErrors, message: "İşaretlenen alanları inceleyin." }); requestAnimationFrame(() => form.current?.querySelector<HTMLElement>("[aria-invalid=true]")?.focus()); return; }
-    const token = requestId.current ?? crypto.randomUUID(); requestId.current = token;
-    const review = state.tag === "review" && state.acknowledged ? { fingerprint: state.review.fingerprint, keepSeparate: true as const } : null;
+    const token = requestId.current ?? crypto.randomUUID();
+    requestId.current = token;
+    try { localStorage.setItem(pendingExpenseKey, token); }
+    catch { setState({ ...editing, message: "Tekrar kontrol kimliği bu bilgisayarda saklanamadı. Kayıt gönderilmedi." }); return; }
     const id = ++generation.current;
-    try { localStorage.setItem(pendingExpenseKey, token); } catch { setState({ tag: "editing", errors: {}, message: "Tekrar kontrol kimliği bu bilgisayarda saklanamadı. Kayıt gönderilmedi." }); return; }
-    navigation.protect({ dirty, locked: true }); setState({ tag: "submitting", requestId: token });
-    try { accept(await window.esmer.createExpense({ action: "save", requestId: token, fields, duplicateReview: review }), id, token, period); }
+    navigation.protect({ dirty, locked: true });
+    setState({ tag: "submitting", requestId: token });
+    const request = correction
+      ? { action: "correct-bill" as const, requestId: token, entityId: correction.row.entityId, expectedRevision: correction.row.revision, reason, fields }
+      : { action: "save-bill" as const, requestId: token, fields };
+    try { accept(await window.esmer.createExpense(request), id, token); }
     catch { if (id === generation.current) setState({ tag: "uncertain", requestId: token }); }
   }
   const errors = state.tag === "editing" ? state.errors : {};
-  const input = (key: "date" | "paymentDate" | "category" | "net" | "tax" | "gross" | "taxEvidence" | "sourceReference" | "supportingReference", label: string, type = "text") => <label htmlFor={`manual-${key}`}>{label}<input aria-label={label} id={`manual-${key}`} type={type} maxLength={key === "category" ? 80 : ["net", "tax", "gross"].includes(key) ? 100 : 128} inputMode={["net", "tax", "gross"].includes(key) ? "decimal" : undefined} value={fields[key] ?? ""} aria-invalid={!!errors[key]} aria-describedby={errors[key] ? `manual-${key}-error` : undefined} onChange={event => update(key, event.target.value || (["date", "category", "net", "tax", "gross"].includes(key) ? "" : null))}/>{errors[key] && <span className="g-err" id={`manual-${key}-error`}>{errors[key]}</span>}</label>;
+  const input = (key: "category" | "amount", label: string) => <label>{label}<input aria-label={label} id={`manual-${key}`} maxLength={key === "category" ? 80 : 100} inputMode={key === "amount" ? "decimal" : undefined} value={fields[key]} required aria-invalid={!!errors[key]} aria-describedby={errors[key] ? `manual-${key}-error` : undefined} onChange={event => update(key, event.target.value)}/>{errors[key] && <span className="g-err" id={`manual-${key}-error`}>{errors[key]}</span>}</label>;
   const disabled = locked || reviewRequired;
-  return <section className="g-form" aria-label="Elle gider girişi"><div className="g-form-head"><div><h3 ref={title} tabIndex={-1}>Elle gider ekle</h3><p>Dönem: {period}</p></div><button type="button" className="btn btn-secondary" disabled={locked} onClick={() => navigation.leave(close)}>Vazgeç</button></div>
+  const cancel = <button type="button" className="btn btn-secondary" disabled={locked} onClick={() => navigation.leave(close)}>{correction ? "Düzeltmeyi kapat" : "Vazgeç"}</button>;
+  return <section className={correction ? "card g-task" : "g-form"} aria-label={correction ? "Gider düzeltmesi" : "Elle gider girişi"}>
+    <div className="g-form-head"><div>{correction
+      ? <h2 ref={title} tabIndex={-1}>Gideri incele ve düzelt</h2>
+      : <h3 ref={title} tabIndex={-1}>Elle gider ekle</h3>}
+      <p>{monthName(initial.period)}</p></div>{cancel}</div>
     <form ref={form} noValidate onSubmit={event => { event.preventDefault(); void submit(); }}>
       <fieldset disabled={disabled} className="g-fields"><legend>Gider bilgileri</legend>
-        {input("date", "Gider tarihi", "date")}{input("paymentDate", "Ödeme tarihi (isteğe bağlı)", "date")}{input("category", "Kategori")}
-        <label>Sınıflandırma<select aria-label="Sınıflandırma" value={fields.classification} aria-invalid={!!errors.classification} aria-describedby={errors.classification ? "manual-classification-error" : undefined} onChange={event => { const classification = event.target.value as ExpenseFields["classification"]; setLossRecognition(""); update("classification", classification); setFields(previous => ({ ...previous, classification, labourPeriod: classification === "labour" ? previous.date.slice(0, 7) || null : null, loss: classification === "inventory-loss" ? { evidence: "", recognition: "separate" } : null })); }}>{classifications.map(value => <option key={value} value={value}>{classificationLabels[value]}</option>)}</select>{errors.classification && <span className="g-err" id="manual-classification-error">{errors.classification}</span>}</label>
-        {fields.classification === "labour" && <p className="g-guide">İşçilik dönemi: <strong>{fields.labourPeriod || "Gider tarihini girin"}</strong>. Yalnızca aylık toplam girin; kişi veya bordro bilgisi eklemeyin.</p>}
-        {fields.classification === "inventory-loss" && <><label>Kayıp kanıtı<input aria-label="Kayıp kanıtı" value={fields.loss?.evidence ?? ""} maxLength={128} aria-invalid={!!errors.loss} aria-describedby={errors.loss ? "manual-loss-error" : undefined} onChange={event => update("loss", { evidence: event.target.value, recognition: fields.loss?.recognition ?? "separate" })}/></label><label>Kayıp işlemi<select aria-label="Kayıp işlemi" id="manual-loss-recognition" value={lossRecognition} aria-invalid={!!errors.loss} aria-describedby={errors.loss ? "manual-loss-error" : undefined} onChange={event => { setLossRecognition(event.target.value); update("loss", { evidence: fields.loss?.evidence ?? "", recognition: event.target.value as "separate" | "already-in-cost" }); }}><option value="">Seçin</option><option value="separate">Ayrı gider</option><option value="already-in-cost">Maliyete dahil</option></select>{errors.loss && <span className="g-err" id="manual-loss-error">{errors.loss}</span>}</label></>}
+        {correction && <label>Gider ayı<input type="month" required aria-invalid={!!errors.period} value={fields.period} onChange={event => update("period", event.target.value)}/>{errors.period && <span className="g-err">{errors.period}</span>}</label>}
+        {input("category", "Kategori")}
+        {input("amount", "Tutar (TRY)")}
+        {correction && <label>Değişiklik gerekçesi<input required maxLength={500} value={reason} onChange={event => { requestId.current = null; setReason(event.target.value); setState(editing); }}/></label>}
       </fieldset>
-      <fieldset disabled={disabled} className="g-fields"><legend>Tutar ve KDV</legend>
-        {input("net", "Net tutar (TRY)")}{input("tax", "KDV tutarı (TRY)")}{input("gross", "Brüt tutar (TRY)")}
-        <label>KDV işlemi<select aria-label="KDV işlemi" value={fields.taxTreatment} onChange={event => update("taxTreatment", event.target.value as ExpenseFields["taxTreatment"])}><option value="unknown">Bilinmiyor</option><option value="recoverable">İndirilebilir</option><option value="non-recoverable">İndirilemez</option></select><small>KDV işlemi bilinmiyorsa faaliyet kârı hesaplanamaz.</small></label>
-        {fields.taxTreatment !== "unknown" && input("taxEvidence", "KDV kanıtı")}
-      </fieldset>
-      <p className="g-cap">TRY tutarlarını 1250,50 veya 1.250,50 biçiminde girin. Net ile KDV toplamı brüte eşit olmalı. Boş KDV, sıfır sayılmaz. Ödeme tarihi ödeme hareketlerini ayrıca belirler.</p>
-      <details open={!!errors.sourceReference || !!errors.supportingReference || !!errors.taxEvidence && fields.taxTreatment === "unknown"}><summary>Referanslar (isteğe bağlı)</summary><p>Kişisel bilgi yerine kısa kod kullanın. Aynı kayıt referansı, Excel ve elle girişte aynı gideri tanımlar.</p><fieldset disabled={disabled} className="g-fields">{input("sourceReference", "Kayıt referansı")}{input("supportingReference", "Destek referansı")}{fields.taxTreatment === "unknown" && input("taxEvidence", "KDV kanıtı (isteğe bağlı)")}</fieldset></details>
-      {(state.tag === "editing" || state.tag === "review-required" || state.tag === "reviewing-records") && state.message && <p className="g-note is-warn" role="alert">{state.message}</p>}
-      {state.tag === "review" && <section className="g-note is-warn g-review" aria-label="Benzer giderleri incele"><h4 ref={reviewTitle} tabIndex={-1}>Benzer tarih ve tutarda {state.review.totalCount} kayıt var</h4><ul>{state.review.candidates.map(row => <li key={row.entityId}>{date(row.date)} · {row.category} · {money(row.gross)} · sürüm {row.revision}</li>)}</ul>{state.review.totalCount > 5 && <p>İlk beş kayıt gösteriliyor. Kayıtlar bölümünde tüm giderleri inceleyebilirsiniz.</p>}<label className="g-check"><input type="checkbox" checked={state.acknowledged} onChange={event => setState({ ...state, acknowledged: event.target.checked })}/>Benzer kayıtları inceledim; bu ayrı bir gider</label></section>}
+      {"message" in state && state.message && <p className="g-note is-warn" role="alert">{state.message}</p>}
       <p className="g-cap">Kaydetmek, dönemin giderlerinin eksiksiz olduğunu onaylamaz.</p>
       <div className="g-actions">
-        {reviewRequired && <button type="button" className="btn btn-secondary" ref={recordsReview} onClick={() => navigation.leave(() => void inspectRecords())}>Kayıtları incele</button>}
+        {reviewRequired && <button type="button" className="btn btn-secondary" ref={recordsReview} onClick={() => void inspectRecords()}>Kayıtları incele</button>}
         {state.tag === "uncertain"
-          ? <><p role="alert">Kaydın sonucu bilinmiyor. Yeniden eklemeden önce kontrol edin.</p><button type="button" className="btn btn-primary" onClick={() => void resolve(state.requestId)}>Kaydı kontrol et</button></>
-          : <button type="submit" className="btn btn-primary" disabled={locked || reviewRequired || state.tag === "review" && !state.acknowledged}>{state.tag === "submitting" ? "Gider kaydediliyor…" : state.tag === "checking" || state.tag === "reviewing-records" ? "Kayıt kontrol ediliyor…" : state.tag === "review" ? "Ayrı gider olarak kaydet" : "Gideri kaydet"}</button>}
+          ? <><p role="alert">Kaydın sonucu bilinmiyor. Yeniden kaydetmeden önce kontrol edin.</p><button type="button" className="btn btn-primary" onClick={() => void resolve(state.requestId)}>Kaydı kontrol et</button></>
+          : <button type="submit" className="btn btn-primary" disabled={disabled || !!correction && (!reason.trim() || !fields.period)}>{state.tag === "submitting" ? "Gider kaydediliyor…" : state.tag === "checking" || state.tag === "reviewing-records" ? "Kayıt kontrol ediliyor…" : correction ? "Düzeltmeyi kaydet" : "Gideri kaydet"}</button>}
       </div>
-    </form></section>;
+    </form>
+    {correction?.history(reason, disabled)}
+  </section>;
 }

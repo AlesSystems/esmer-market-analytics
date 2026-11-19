@@ -46,14 +46,21 @@ test("expenses are reachable without a source and cancelled selection leaves an 
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
     await expect(page.getByText("Kayıt yok demek gider yok demek değildir: şablonu doldurup içe aktarın. Personel için yalnızca aylık toplamı girin.", { exact: true })).toBeVisible();
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
+    await expect(page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Excel şablonu nasıl doldurulur?", { exact: true })).toHaveCount(0);
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Excel’den gider içe aktar" })).toBeFocused();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" })).toContainText("Henüz içe aktarma yok.");
+    await expect(page.getByRole("button", { name: "Şablonu indir", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "İşlem iptal edildi" })).toBeVisible();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" })).toBeVisible();
+    await page.getByRole("button", { name: "Giderlere dön", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Excel’den içe aktar", exact: true })).toBeFocused();
     // No lines: the only confirmation is the explicit "Bu ay gider yok".
     await expect(page.getByRole("button", { name: "Bu ay gider yok", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true })).toHaveCount(0);
     await page.setViewportSize({ width: 680, height: 720 });
-    await page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true }).click();
-    await page.getByText("Excel şablonu nasıl doldurulur?", { exact: true }).click();
     await page.screenshot({ path: "test-results/phase-7-expenses-empty-small.png", fullPage: true });
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
@@ -71,12 +78,13 @@ test("expense workbook review, correction, reversal, history restoration and own
     const page = await app.firstWindow();await openWorkspace(page);
     await openSection(page, "Giderler");
     await setMonth(page, "2026-01");
+    await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
     await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, templatePath);
     await page.getByRole("button", { name: "Şablonu indir", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "Excel şablonu kaydedildi." })).toBeVisible();
     expect((await stat(templatePath)).size).toBeGreaterThan(0);
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
-    await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Excel önizlemesi" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Aylık toplamlar", exact: true })).toHaveCount(0);
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-01" }))).toMatchObject({ status: "expenses", rows: [] });
@@ -114,7 +122,11 @@ test("expense workbook review, correction, reversal, history restoration and own
     await page.setViewportSize({ width: 680, height: 720 });
     await page.screenshot({ path: "test-results/phase-7-expenses-small.png", fullPage: true });
     await setMonth(page, "2026-02");
-    await page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true }).click();
+    await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    const history = page.getByRole("region", { name: "İçe aktarma geçmişi" });
+    await expect(history.getByRole("listitem")).toHaveCount(1);
+    await expect(history.getByRole("listitem")).toContainText("1 kayıt · sürümler 1–1");
+    await page.getByText("Hesap ayrıntıları", { exact: true }).click();
     await expect(page.locator(".g-totals > div").first()).toContainText("0,00 ₺");
     await expect(page.locator(".g-totals > div").nth(1)).toContainText("50,00 ₺");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
@@ -135,12 +147,14 @@ test("invalid rows block a whole workbook and duplicate candidates require expli
     await setMonth(page, "2026-01");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("button", { name: "İçe aktar", exact: true })).toBeDisabled();
     await expect(page.getByRole("alert").first()).toContainText("geçersiz");
     await page.screenshot({ path: "test-results/phase-7-expenses-rejected.png", fullPage: true });
     await write([good, ["ref-b", ...good.slice(1)]]);
     await page.getByRole("button", { name: "Önizlemeyi kapat", exact: true }).click();
-    await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Excel’den gider içe aktar" })).toBeFocused();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("button", { name: "İçe aktar", exact: true })).toBeDisabled();
     await page.getByLabel("Satır 3: benzer kayıt var, yine de ayrı gider olarak ekle").check();
     await expect(page.getByRole("button", { name: "İçe aktar", exact: true })).toBeEnabled();
@@ -170,6 +184,7 @@ test("operating report reopens on the reviewed expense revision after expense ed
     await setMonth(page, "2025-09");
     await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).filter({ visible: true }).click();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await page.getByRole("button", { name: "İçe aktar", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "Giderler içe aktarıldı." })).toBeVisible();
     await page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true }).filter({ visible: true }).click();
@@ -202,5 +217,88 @@ test("initial expense query failure ends loading and can be retried", async () =
     await page.getByRole("button", { name: "Giderleri yeniden yükle", exact: true }).click();
     await expect(page.getByText("Bu ay için gider girilmedi.", { exact: true })).toBeVisible();
     await expect(page.getByRole("alert")).toHaveCount(0);
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("Excel review identifies identical manual bills, cancels safely, and supports a separate bill", async ({}, testInfo) => {
+  const { writeFile } = await import("node:fs/promises");
+  const { workbook } = await import("../helpers/expense-fixtures");
+  const userData = await mkdtemp(join(tmpdir(), "esmer-bill-reconcile-")), workbookPath = join(userData, "bills.xlsx");
+  const electricity = ["electricity-1", "15.11.2026", null, "Elektrik", "operating-expense", "1000", "250", "1250", "recoverable", "tax-1", null, null, null, null];
+  const firstWorkbook = await workbook([electricity]);
+  await writeFile(workbookPath, firstWorkbook);
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
+    await openWorkspace(page);
+    await openSection(page, "Giderler");
+    await setMonth(page, "2026-11");
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Elle gider ekle" }).click();
+      await page.getByRole("textbox", { name: "Kategori", exact: true }).fill("Elektrik");
+      await page.getByRole("textbox", { name: "Tutar (TRY)", exact: true }).fill("1.250,00");
+      await page.getByRole("button", { name: "Gideri kaydet" }).click();
+      await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
+    }
+    const records = page.getByRole("region", { name: "Kayıtlar" });
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" })).toContainText("Kasım 2026");
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
+    const openImport = () => page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    const chooseWorkbook = () => page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
+    const openDecision = () => page.getByRole("button", { name: "Satır 2: 2 olası elle kayıt" }).click();
+    const confirmImport = page.getByRole("button", { name: "İçe aktar", exact: true });
+    const choice = page.getByRole("combobox", { name: "Satır 2 eşleştirme kararı" });
+    await openImport(); await chooseWorkbook(); await openDecision();
+    await expect(confirmImport).toBeDisabled();
+    await expect(choice.getByRole("option")).toHaveCount(4);
+    await choice.selectOption({ label: "Elle kayıt no. 2 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await page.getByRole("button", { name: "Önizlemeyi kapat" }).click();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" })).toContainText("Henüz içe aktarma yok.");
+    await chooseWorkbook(); await openDecision();
+    await expect(confirmImport).toBeDisabled();
+    await page.screenshot({ path: testInfo.outputPath("bill-matches.png"), fullPage: true });
+    await choice.selectOption({ label: "Elle kayıt no. 2 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await confirmImport.click();
+    await expect(records.locator("tbody tr")).toHaveCount(2);
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" })).toContainText(/15[.\/]11[.\/]2026/);
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 1" })).toContainText("Kasım 2026");
+    await records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" }).getByRole("button", { name: "İncele / düzelt" }).click();
+    await expect(page.getByText(/Elle girildi · Excel ayrıntıları eklendi/)).toBeVisible();
+    await page.getByText("Sürüm ayrıntıları", { exact: true }).click();
+    await expect(page.getByText("İçe aktarma / satır", { exact: true })).toBeVisible();
+    await page.getByRole("textbox", { name: "Kategori", exact: true }).fill("Sentetik taslak");
+    const stay = page.getByRole("button", { name: "Düzenlemeye dön" });
+    for (const leave of [
+      () => page.getByRole("button", { name: "Düzeltmeyi kapat" }).click(),
+      () => page.getByRole("button", { name: "Giderlere dön" }).click(),
+      () => page.getByRole("button", { name: "Önceki ay" }).click(),
+      () => openSection(page, "Bu ay"),
+    ]) {
+      await leave();
+      await expect(page.getByRole("alertdialog")).toBeVisible();
+      await stay.click();
+      await expect(page.getByRole("textbox", { name: "Kategori", exact: true })).toHaveValue("Sentetik taslak");
+    }
+    await page.getByRole("button", { name: "Düzeltmeyi kapat" }).click();
+    await page.getByRole("button", { name: "Taslağı sil" }).click();
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" }).getByRole("button", { name: "İncele / düzelt" })).toBeFocused();
+    await openImport();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" }).getByRole("listitem")).toHaveCount(1);
+    await chooseWorkbook();
+    await expect(page.getByText("Bu Excel dosyası zaten içe aktarılmış.", { exact: true })).toBeVisible();
+    await expect(confirmImport).toBeDisabled();
+    await page.getByRole("button", { name: "Önizlemeyi kapat" }).click();
+    await writeFile(workbookPath, await workbook([["electricity-2", ...electricity.slice(1)]]));
+    await chooseWorkbook();
+    await page.getByRole("button", { name: "Satır 2: 1 olası elle kayıt" }).click();
+    await choice.selectOption({ label: "Elle kayıt no. 1 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await expect(page.getByRole("checkbox", { name: /benzer ayrıntılı kayıt ayrı kalacak/ })).toBeVisible();
+    await expect(confirmImport).toBeDisabled();
+    await page.getByRole("checkbox", { name: /benzer ayrıntılı kayıt ayrı kalacak/ }).check();
+    await expect(confirmImport).toBeEnabled();
+    await choice.selectOption("separate");
+    await confirmImport.click();
+    await expect(records.locator("tbody tr")).toHaveCount(3);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

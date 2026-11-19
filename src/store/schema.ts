@@ -1,5 +1,5 @@
 export const APPLICATION_ID = 1163087186;
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 export const schema = `
 CREATE TABLE datasets (
   id TEXT PRIMARY KEY, lineage TEXT NOT NULL, manifest_json TEXT NOT NULL CHECK(json_valid(manifest_json)),
@@ -81,4 +81,14 @@ export const manualExpenseMigration = `CREATE TABLE expense_commands (
 ) STRICT;
 CREATE TRIGGER immutable_expense_command_update BEFORE UPDATE ON expense_commands BEGIN SELECT RAISE(ABORT,'IMMUTABLE_COMMAND'); END;
 CREATE TRIGGER immutable_expense_command_delete BEFORE DELETE ON expense_commands BEGIN SELECT RAISE(ABORT,'IMMUTABLE_COMMAND'); END;
+CREATE TRIGGER backup_expense_command AFTER INSERT ON expense_commands BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;
+
+export const manualBillMigration = `DROP TRIGGER immutable_expense_command_update;
+DROP TRIGGER immutable_expense_command_delete;
+DROP TRIGGER backup_expense_command;
+ALTER TABLE expense_commands RENAME TO expense_commands_v8;
+${manualExpenseMigration.replace("('created','identified')", "('created','identified','corrected')")}
+DROP TRIGGER backup_expense_command;
+INSERT INTO expense_commands SELECT * FROM expense_commands_v8;
+DROP TABLE expense_commands_v8;
 CREATE TRIGGER backup_expense_command AFTER INSERT ON expense_commands BEGIN UPDATE recovery_state SET changed=changed+1 WHERE singleton=1; END;`;

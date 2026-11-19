@@ -67,6 +67,7 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 | Business navigation simplification | [Approved plan](../superpowers/plans/2026-10-06-issue-72-simplification.md), [implementation and platform handoff](2026-10-06-issue-72-simplification.md) |
 | Prepared-package recovery | [PR #68 receipt](2026-10-04-estimate-package-recovery.md) |
 | Manual expense entry | [Plan](../superpowers/plans/2026-10-04-manual-expense-entry.md), [local packaged evidence and open Windows checks](2026-10-04-manual-expense-entry.md) |
+| Monthly bills and Excel reconciliation | [Packaged Windows results and screenshots](issue-155-giderler-windows.md) |
 | Giderler draft confirmation | [Packaged dialog checks and screenshots](2026-11-19-expense-draft-dialog.md) |
 | Synthetic SQL update tracking | [Packaged verification](live-mock-tracking.md), [disposable SQL procedure](../operations/synthetic-sql-environment.md) |
 | Recorded-source estimates | [Contract](../contracts/recorded-estimates.md), [real arithmetic and packaged evidence](../../workstreams/estimated-v1/evidence.md), [Windows continuation](../../workstreams/estimated-v1/windows-handoff.md) |

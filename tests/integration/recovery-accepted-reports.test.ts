@@ -3,11 +3,13 @@ import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { Expenses } from "../../src/expenses/import";
 import { Recovery } from "../../src/recovery/backup";
 import { generateRecoveryKey, encodeRecoveryKey, decodeRecoveryKey } from "../../src/recovery/keys";
 import { validateSnapshot } from "../../src/recovery/validate";
 import { openStore } from "../../src/store/store";
 import type { AcceptedReport } from "../../src/store/revisions";
+import { row, workbook } from "../helpers/expense-fixtures";
 import { businessPackage } from "../helpers/business-fixtures";
 
 // Frozen synthetic outputs of the removed report service: one monthly-report-v1 and one monthly-report-v2.
@@ -38,6 +40,15 @@ test("backup and restore keep frozen v1 and v2 accepted reports byte-equal and v
     store.acceptReport(structuredClone(v1)); store.acceptReport(structuredClone(v2));
     const before = rows(join(original, "analytics.sqlite"));
     expect(before.reports).toHaveLength(2);
+    const expenses = new Expenses(store);
+    const period = "2025-09";
+    const saved = expenses.create({ action: "save-bill", requestId: "bill", fields: { period, category: "Elektrik", amount: "1.250,00" } });
+    if (saved.status !== "saved") throw Error("Manual bill was not saved");
+    const corrected = expenses.create({ action: "correct-bill", requestId: "correction", entityId: saved.entityId, expectedRevision: saved.revision,
+      reason: "Tutar düzeltildi", fields: { period, category: "Elektrik", amount: "1.200,00" } });
+    expect(corrected.status).toBe("saved");
+    expect(store.readReport(v1.id)).toEqual(v1);
+    expect(store.readReport(v2.id)).toEqual(v2);
     const status = await recovery.backupNow();
     const latest = [...status.backups].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
     const artifact = join(destination, `${latest.id}.esmerbackup`);
@@ -73,4 +84,51 @@ test("deep validation accepts the frozen v1 and v2 reports and rejects a v2 repo
     seed(bad, [tampered]);
     expect(() => validateSnapshot(bad)).toThrow();
   } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test("a linked bill can cross historical versions and survive encrypted restore with its original receipt", async () => {
+  const { v1 } = await frozen();
+  const root = await mkdtemp(join(tmpdir(), "esmer-linked-restore-"));
+  const original = join(root, "original.sqlite"), restored = join(root, "restored.sqlite"), destination = join(root, "backups");
+  await mkdir(destination);
+  const key = generateRecoveryKey();
+  let recovery: Recovery | undefined;
+  try {
+    recovery = await Recovery.open(original, { destination, key });
+    const store = recovery.store!, expenses = new Expenses(store);
+    expect(store.importPackage(businessPackage()).status).toBe("active");
+    store.acceptReport(v1);
+    const fields = { period: "2026-01", category: "Kira", amount: "50" };
+    const bill = expenses.create({ action: "save-bill", requestId: "backup-bill", fields });
+    if (bill.status !== "saved") throw Error("Fixture bill not saved");
+    const preview = expenses.preview(await workbook([row]));
+    expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: bill.entityId }] });
+    const linked = expenses.query({ period: fields.period }).rows[0];
+    const detailed = linked.value;
+    if (!("format" in detailed) || detailed.format !== "expense-v1") throw Error("Fixture link not saved");
+    const version = store.changeExpense({ entityId: bill.entityId, expectedRevision: linked.revision, restoreRevision: bill.revision, reason: "Review original bill" });
+    expect(expenses.query({ period: fields.period }).rows[0].value).toMatchObject({ format: "manual-bill-v1" });
+    const reused = expenses.preview(await workbook([Array(row.length).fill(null), row]));
+    expect(reused.rows[0].errors).not.toEqual([]);
+    store.changeExpense({ entityId: bill.entityId, expectedRevision: version, restoreRevision: linked.revision, reason: "Restore the detailed bill" });
+    const equivalent = expenses.create({ action: "save", requestId: "legacy-equivalent", duplicateReview: null, fields: {
+      date: detailed.date, paymentDate: detailed.paymentDate, category: detailed.category, classification: detailed.classification,
+      net: "50", tax: "0", gross: "50", taxTreatment: detailed.taxTreatment, taxEvidence: detailed.taxEvidence,
+      supportingReference: detailed.supportingReference, sourceReference: detailed.sourceReference, labourPeriod: detailed.labourPeriod, loss: detailed.loss,
+    } });
+    expect(equivalent).toMatchObject({ status: "already-present", entityId: bill.entityId });
+    const before = expenses.query({ period: fields.period });
+    const status = await recovery.backupNow(), artifact = join(destination, `${status.backups[0].id}.esmerbackup`);
+    await recovery.close(); recovery = undefined;
+    recovery = await Recovery.open(restored);
+    const restore = await recovery.prepareRestore(artifact, key);
+    await recovery.confirmRestore(restore.token);
+    const recovered = new Expenses(recovery.store!);
+    expect(recovered.query({ period: fields.period })).toEqual(before);
+    expect(recovered.create({ action: "resolve", requestId: "backup-bill" })).toMatchObject({ status: "already-saved", revision: bill.revision });
+    expect(recovery.store!.readReport(v1.id)).toEqual(v1);
+  } finally {
+    await recovery?.close();
+    await rm(root, { recursive: true, force: true });
+  }
 });
