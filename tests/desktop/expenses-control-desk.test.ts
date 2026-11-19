@@ -21,7 +21,9 @@ test("plain month offers import first, opens and closes manual entry with focus 
     await expect(page.getByRole("button", { name: "Bu ay gider yok", exact: true })).toBeVisible();
     await app.evaluate(({ dialog }) => { dialog.showOpenDialog = async () => ({ canceled: true, filePaths: [] }); });
     await page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    await page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
     await expect(page.getByRole("status").filter({ hasText: "İşlem iptal edildi" })).toBeVisible();
+    await page.getByRole("button", { name: "Giderlere dön", exact: true }).click();
     await page.getByRole("button", { name: "Elle ekle", exact: true }).press("Enter");
     await expect(page.getByRole("heading", { name: "Elle gider ekle", exact: true })).toBeFocused();
     // The form opens inside Kayıtlar; the month's totals stay in view but cannot be confirmed or re-imported beside an open draft.
