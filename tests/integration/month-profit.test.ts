@@ -1,3 +1,8 @@
+import { readSheet } from "read-excel-file/node";
+import { Expenses } from "../../src/expenses/import";
+import { excelMonthProfit } from "../../src/source/month-profit-export";
+import { november, novemberProfitPackage, novemberProfitSnapshot, novemberElectricityExcelRow } from "../helpers/november-bill-fixture";
+import { workbook } from "../helpers/expense-fixtures";
 import {expect,test} from "vitest";
 import {openStore} from "../../src/store/store";
 import {handleRequest} from "../../src/desktop/requests";
@@ -47,4 +52,51 @@ test("cached month estimates are reused for one package hash and dropped when th
   store.importSourcePreview(writeRawEstimatePackage(s,"fixture:month-profit","replacement"));
   expect(store.readMonthProfit({month:"2025-10"})).toMatchObject({status:"month-profit",view:{totals:{grossProfit:"67.5"}}});
  }finally{store.close();}
+});
+
+test("the November estimate and workbook deduct a manual bill in full after review", async () => {
+ const store = openStore(":memory:");
+ try {
+  const expenses = new Expenses(store);
+  store.importSourcePreview(novemberProfitPackage());
+  const read = () => store.readMonthProfit({ month: november });
+  expect(read()).toMatchObject({ status: "month-profit", view: { totals: { grossProfit: "10000", netProfit: null } } });
+  const saved = expenses.create({ action: "save-bill", requestId: "electricity", fields: { period: november, category: "Elektrik", amount: "1.250,00" } });
+  if (saved.status !== "saved") throw Error("Manual bill was not saved");
+  expect(expenses.query({ period: november })).toMatchObject({ summary: { expenses: "1250" }, incurred: "1250", payments: "0" });
+  expect(read()).toMatchObject({ view: { totals: { expenses: "1250", expensesComplete: false, netProfit: null, netProfitReason: "expensesIncomplete" } } });
+  store.confirmExpensesComplete({ period: november, reviewedRevision: saved.revision, complete: true, reason: "İncelendi" });
+  const result = read();
+  if (result.status !== "month-profit") throw Error("November view unavailable");
+  expect(result.view.totals).toMatchObject({ grossProfit: "10000", expenses: "1250", expensesComplete: true, netProfit: "8750" });
+  const pinned = store.readMonthProfitPinned({ month: november, hash: result.view.source.hash });
+  if (pinned.status !== "month-profit") throw Error("November export unavailable");
+  const summary = await readSheet(await excelMonthProfit(pinned.view), "Özet");
+  const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
+  expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", "1250", "8750"]);
+
+  const corrected = expenses.create({ action: "correct-bill", requestId: "electricity-correction", entityId: saved.entityId, expectedRevision: saved.revision,
+   reason: "Tutar düzeltildi", fields: { period: november, category: "Elektrik", amount: "1.250,25" } });
+  if (corrected.status !== "saved") throw Error("Manual bill was not corrected");
+  expect(read()).toMatchObject({ view: { totals: { expenses: "1250.25", expensesComplete: false, netProfit: null, netProfitReason: "confirmationStale" } } });
+  store.confirmExpensesComplete({ period: november, reviewedRevision: corrected.revision, complete: true, reason: "Yeniden incelendi" });
+  expect(read()).toMatchObject({ view: { totals: { netProfit: "8749.75" } } });
+
+  const partial = { ...novemberProfitSnapshot(), to: "2026-11-29" };
+  store.importSourcePreview(novemberProfitPackage(partial));
+  expect(read()).toMatchObject({ view: { totals: { grossProfit: "10000", netProfit: null, netProfitReason: "monthPartial" } } });
+
+  const noCost = novemberProfitSnapshot();
+  noCost.lines[0].BELGE_TARIHINDEKI_SON_ALIS_FIYATI = null;
+  store.importSourcePreview(novemberProfitPackage(noCost));
+  expect(read()).toMatchObject({ view: { totals: { grossProfit: null, netProfit: null, netProfitReason: "costUnknown" } } });
+
+  store.importSourcePreview(novemberProfitPackage());
+  const blocking = [...novemberElectricityExcelRow];
+  blocking[8] = "unknown";
+  blocking[9] = null;
+  const preview = expenses.preview(await workbook([blocking]));
+  expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] });
+  expect(read()).toMatchObject({ view: { totals: { expenses: null, netProfit: null, netProfitReason: "unknownTax" } } });
+ } finally { store.close(); }
 });
