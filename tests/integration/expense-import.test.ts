@@ -85,6 +85,8 @@ test("the owner chooses which identical monthly bill receives the Excel details"
     const bytes = await workbook([row]);
     const abandoned = expenses.preview(bytes);
     expect(store.readSnapshot()).toEqual(before);
+    expect(expenses.cancelPreview({ previewId: abandoned.previewId })).toEqual({ status: "cancelled" });
+    expect(() => expenses.confirm({ previewId: abandoned.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: second.entityId }] })).toThrow();
     const preview = expenses.preview(bytes);
     expect(preview.manualCandidates[preview.rows[0].matchKey!]).toMatchObject([
       { entityId: first.entityId, revision: first.revision, category: "Kira", period: "2026-01", amount: "50" },
@@ -120,6 +122,8 @@ test("same-bill selection is exclusive, stale or failed imports change nothing, 
     const otherMonth = expenses.create({ action: "save-bill", requestId: "feb-rent-bill", fields: { ...fields, period: "2026-02" } });
     if (bill.status !== "saved" || otherMonth.status !== "saved") throw Error("Fixture bills not saved");
     const bytes = await workbook([row, ["another-bill", ...row.slice(1)]]);
+    expect(expenses.cancelPreview({ previewId: abandoned.previewId })).toEqual({ status: "cancelled" });
+    expect(() => expenses.confirm({ previewId: abandoned.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: second.entityId }] })).toThrow();
     const preview = expenses.preview(bytes);
     expect(preview.manualCandidates[preview.rows[0].matchKey!].map(item => item.entityId)).toEqual([bill.entityId]);
     expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: [2, 3].map(row => ({ row, entityId: bill.entityId })) })).toThrow();
