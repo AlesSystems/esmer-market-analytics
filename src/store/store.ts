@@ -5,8 +5,8 @@ import { readRawPackage, validSourcePreviewRequest, type SourcePreviewRequest, t
 import { rawFingerprint } from "../source/live";
 import type { OperationControl } from "../reports/contracts";
 import { relevantExpenseRevision } from "../expenses/adjustments";
-import { isExpense, validFields, fieldKeys } from "../expenses/validation";
-import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue } from "../expenses/contracts";
+import { isExpense, validFields, fieldKeys, isManualBill, expensePeriod } from "../expenses/validation";
+import type { CreateExpenseResult, ExpenseFields, ExpenseBatch, CorrectExpenseRequest, RestoreExpenseRequest, ConfirmExpenseCompletenessRequest, ExpenseValue, ManualBill, ManualBillCommand } from "../expenses/contracts";
 import { createHash, randomUUID } from "node:crypto";
 import { backup, DatabaseSync } from "node:sqlite";
 import { Exact } from "../domain/money";
@@ -265,8 +265,8 @@ class AnalyticsStore {
     const receipt = this.db.prepare("SELECT entity_id,revision FROM expense_commands WHERE request_id=?").get(requestId);
     if (!receipt) return { status: "not-saved" };
     const original = this.db.prepare("SELECT value_json FROM app_revisions WHERE revision=?").get(receipt.revision)!;
-    const value = decode<ExpenseValue>(original.value_json);
-    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: value.date.slice(0, 7), paymentPeriod: value.paymentDate?.slice(0, 7) ?? null };
+    const value = decode<ExpenseValue | ManualBill>(original.value_json);
+    return { status: "already-saved", entityId: String(receipt.entity_id), revision: Number(receipt.revision), incurredPeriod: expensePeriod(value), paymentPeriod: isExpense(value) ? value.paymentDate?.slice(0, 7) ?? null : null };
   }
   createExpenseCommand(requestId: string, fields: ExpenseFields, duplicateReview: {fingerprint: string; keepSeparate: true} | null): CreateExpenseResult {
     return this.transaction(() => {
@@ -293,11 +293,45 @@ class AnalyticsStore {
       return { status: "saved", entityId, revision, incurredPeriod: fields.date.slice(0, 7), paymentPeriod: fields.paymentDate?.slice(0, 7) ?? null };
     });
   }
+  saveManualBill(request: ManualBillCommand): CreateExpenseResult {
+    return this.transaction(() => {
+      const digest = hash(request);
+      const receipt = this.db.prepare("SELECT digest FROM expense_commands WHERE request_id=?").get(request.requestId);
+      if (receipt) {
+        requireValid(receipt.digest === digest);
+        return this.resolveExpenseCommand(request.requestId);
+      }
+      const correction = request.action === "correct-bill";
+      const entityId = correction ? request.entityId : `expense-manual:${createHash("sha256").update(request.requestId).digest("hex")}`;
+      const previous = correction ? this.revisionHistory().findLast(row => row.entityId === entityId) : null;
+      if (correction && !(previous?.kind === "expense" && isManualBill(previous.value) && previous.revision === request.expectedRevision)) {
+        return { status: "failed", code: "STALE_EXPENSE", message: "Gider değişti. Kayıtları yeniden açıp güncel sürümü inceleyin." };
+      }
+      const value: ManualBill = {
+        ...request.fields, format: "manual-bill-v1",
+        origin: previous?.kind === "expense" && isManualBill(previous.value) ? previous.value.origin : { kind: "manual", requestId: request.requestId },
+        reason: correction ? request.reason : "Elle kayıt oluşturuldu",
+        evidence: request.requestId, replacesRevision: previous?.revision ?? null, voided: false,
+      };
+      const revision = this.insertRevision({ kind: "expense", entityId, value });
+      this.options.fault?.("expense-row");
+      this.db.prepare("INSERT INTO expense_commands VALUES(?,?,?,?,?)").run(request.requestId, digest, entityId, revision, correction ? "corrected" : "created");
+      return { status: "saved", entityId, revision, incurredPeriod: value.period, paymentPeriod: null };
+    });
+  }
   changeExpense(request: CorrectExpenseRequest | RestoreExpenseRequest): number {
     return this.transaction(() => {
       const history = this.revisionHistory().filter(row => row.entityId === request.entityId);
       const latest = history.at(-1);
-      requireValid(latest?.kind === "expense" && isExpense(latest.value) && latest.revision === request.expectedRevision);
+      requireValid(latest?.kind === "expense" && latest.revision === request.expectedRevision);
+      if (isManualBill(latest.value)) {
+        requireValid("restoreRevision" in request);
+        const previous = request.restoreRevision === null ? null : history.find(row => row.revision === request.restoreRevision);
+        requireValid(request.restoreRevision === null || previous?.kind === "expense" && isManualBill(previous.value));
+        const value = previous?.kind === "expense" && isManualBill(previous.value) ? previous.value : latest.value;
+        return this.insertRevision({ kind: "expense", entityId: request.entityId, value: { ...value, voided: previous ? value.voided : true, evidence: "owner-review", reason: request.reason, replacesRevision: latest.revision } });
+      }
+      requireValid(isExpense(latest.value));
       let replacement: ExpenseValue;
       if ("replacement" in request) {
         requireValid(validFields(request.replacement));

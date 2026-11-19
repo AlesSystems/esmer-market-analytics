@@ -6,7 +6,7 @@ import { Exact, sum } from "../domain/money";
 import { requireValid } from "../store/revisions";
 import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
 import { readExpenseWorkbook, decimalCell, dateCell, type Cell } from "./workbook";
-import { isExpense, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
+import { isExpense, isManualBill, expensePeriod, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
 import { relevantExpenseRevision } from "./adjustments";
 import { groupExpenses } from "./groups";
 const hash = (s: string | Uint8Array) => createHash("sha256").update(s).digest("hex");
@@ -38,6 +38,15 @@ export class Expenses {
   create(request: CreateExpenseRequest): CreateExpenseResult {
     requireValid(validCreateExpenseRequest(request));
     if (request.action === "resolve") return this.store.resolveExpenseCommand(request.requestId);
+    if (request.action === "save-bill" || request.action === "correct-bill") {
+      const fields = { ...request.fields, category: request.fields.category.trim() };
+      const fieldErrors: Partial<Record<keyof typeof fields, string>> = {};
+      try { fields.amount = decimalCell({ value: fields.amount, numeric: false }); }
+      catch { fieldErrors.amount = "Geçerli bir TRY tutarı girin (ör. 1.250,50)."; }
+      if (!fields.category) fieldErrors.category = "Kategori zorunlu.";
+      if (Object.keys(fieldErrors).length) return { status: "invalid", fieldErrors };
+      return this.store.saveManualBill({ ...request, fields });
+    }
     const fields = { ...request.fields }, fieldErrors: Partial<Record<keyof ExpenseFields, string>> = {};
     for (const key of ["net", "tax", "gross"] as const) {
       try { fields[key] = decimalCell({ value: fields[key], numeric: false }); }
@@ -112,13 +121,13 @@ export class Expenses {
   query({ period }: QueryExpensesRequest): ExpensePeriod {
     requireValid(validPeriod(period));
     const snapshot = this.store.readSnapshot(), history = snapshot.expenseHistory.filter(row => row.kind === "expense"), expenseRevision = relevantExpenseRevision(history, period);
-    const rows = snapshot.app.filter(row => row.kind === "expense").filter(row => (row.value.date.startsWith(period) || isExpense(row.value) && row.value.paymentDate?.startsWith(period)));
+    const rows = snapshot.app.filter(row => row.kind === "expense").filter(row => (expensePeriod(row.value) === period || isExpense(row.value) && row.value.paymentDate?.startsWith(period)));
     const confirmation = snapshot.app.find(row => row.kind === "confirmation" && row.entityId === `expense-complete:${period}`);
-    const current = rows.filter(row => isExpense(row.value) && !row.value.voided);
+    const current = rows.filter(row => (isExpense(row.value) || isManualBill(row.value)) && !row.value.voided);
     const complete = confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.reviewedRevision === expenseRevision;
     const components = calculateExpenseComponents({ period, expenses: snapshot.app });
     const coverage = components.reasons.length ? "incomplete" : complete || Object.values(components.breakdownCoverage).includes("available") ? "available" : "missing";
     const summary: ExpensePeriod["summary"] = { expenses: coverage === "available" ? components.expenses : null, coverage, labour: components.breakdownCoverage.labour === "available" ? components.breakdown.labour : null, labourCoverage: components.breakdownCoverage.labour, reasons: components.reasons, excluded: components.excluded };
-    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, confirmation: confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.period === period ? complete ? "current" : "stale" : "none", ...groupExpenses(period, snapshot.app), incurred: sum(current.filter(row => row.value.date.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
+    return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, confirmation: confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.period === period ? complete ? "current" : "stale" : "none", ...groupExpenses(period, snapshot.app), incurred: sum(current.filter(row => expensePeriod(row.value) === period).map(row => isManualBill(row.value) ? row.value.amount : isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
   }
 }

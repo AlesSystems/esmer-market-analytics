@@ -2,7 +2,7 @@ import { Exact, sum } from "../domain/money";
 import type { GrossResult } from "./costs";
 import type { AppRecord } from "../store/revisions";
 import type { OperatingResult } from "../expenses/contracts";
-import { isExpense } from "../expenses/validation";
+import { isExpense, isManualBill } from "../expenses/validation";
 export const OPERATING_CALCULATION_VERSION = "synthetic-operating-calc-v1";
 export function calculateExpenseComponents(input: { period: string; expenses: AppRecord[] }): Pick<OperatingResult, "expenses" | "payments" | "breakdown" | "breakdownCoverage" | "excluded" | "reasons"> {
   const reasons: string[] = [], amounts: string[] = [], payments: string[] = [], excluded: OperatingResult["excluded"] = [];
@@ -12,6 +12,13 @@ export function calculateExpenseComponents(input: { period: string; expenses: Ap
   for (const record of input.expenses) {
     if (record.kind !== "expense") continue;
     const v = record.value;
+    if (isManualBill(v)) {
+      if (!v.voided && v.period === input.period) {
+        reasons.push("UNKNOWN_TAX");
+        breakdownCoverage.operatingExpense = "incomplete";
+      }
+      continue;
+    }
     if (!isExpense(v)) { if (v.date.startsWith(input.period)) reasons.push("LEGACY_EXPENSE"); continue; }
     if (v.voided) continue;
     if (v.paymentDate?.startsWith(input.period)) payments.push(v.gross);

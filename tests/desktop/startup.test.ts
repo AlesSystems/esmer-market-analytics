@@ -340,7 +340,7 @@ test("packaged owning worker migrates and reopens durable revisions and report p
         expect(await page.evaluate(() => window.esmer.getAvailability())).toMatchObject({ status: "ready", store: "loaded", dataset: { datasetId: before.pin.datasetId, counts: { documents: 2, lines: 2, suppliers: 0 } } });
       } finally { await app.close(); }
       const check = new DatabaseSync(databasePath, { readOnly: true });
-      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 8 }); }
+      try { expect(check.prepare("PRAGMA user_version").get()).toEqual({ user_version: 9 }); }
       finally { check.close(); }
       const reopened = openStore(databasePath);
       try {

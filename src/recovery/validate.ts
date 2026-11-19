@@ -1,5 +1,5 @@
-import { isExpense, fieldKeys } from "../expenses/validation";
-import type { ExpenseValue } from "../expenses/contracts";
+import { isExpense, isManualBill, manualBillFields, fieldKeys } from "../expenses/validation";
+import type { ExpenseValue, ManualBill } from "../expenses/contracts";
 import { readRawPackage } from "../source/raw-package";
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
@@ -117,22 +117,47 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
   for (const row of revisions) validateChange({kind:row.kind,entityId:row.entity_id,value:decode(row.value_json)} as AppChange);
   if (version >= 8) {
     const receipts = db.prepare("SELECT * FROM expense_commands").all();
-    const digest = (value: ExpenseValue) => createHash("sha256").update(canonical(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]])))).digest("hex");
+    const digest = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
+    const revisionsById = new Map(revisions.map(row => [row.revision, row]));
+    const receiptsById = new Map(receipts.map(row => [row.request_id, row]));
     for (const receipt of receipts) {
-      const original = revisions.find(row => row.revision === receipt.revision);
+      const original = revisionsById.get(receipt.revision);
       requireValid(validId(receipt.request_id) && /^[a-f0-9]{64}$/.test(String(receipt.digest)) && original?.kind === "expense" && original.entity_id === receipt.entity_id);
-      const value = decode<ExpenseValue>(original!.value_json);
-      requireValid(isExpense(value) && !value.voided && digest(value) === receipt.digest);
-      if (receipt.outcome === "created") requireValid("kind" in value.origin && value.origin.requestId === receipt.request_id && value.replacesRevision === null && !revisions.some(row => row.kind === "expense" && row.entity_id === receipt.entity_id && Number(row.revision) < Number(receipt.revision)));
+      const value = decode<ExpenseValue | ManualBill>(original!.value_json);
+      if (isManualBill(value)) {
+        requireValid(version >= 9 && !value.voided && value.evidence === receipt.request_id);
+        const fields = manualBillFields(value);
+        if (receipt.outcome === "created") {
+          requireValid(value.origin.requestId === receipt.request_id && value.replacesRevision === null &&
+            receipt.digest === digest({ action: "save-bill", requestId: receipt.request_id, fields }));
+        } else {
+          requireValid(receipt.outcome === "corrected" && value.replacesRevision !== null &&
+            receipt.digest === digest({ action: "correct-bill", requestId: receipt.request_id, entityId: receipt.entity_id, expectedRevision: value.replacesRevision, reason: value.reason, fields }));
+        }
+      } else {
+        requireValid(receipt.outcome !== "corrected" && isExpense(value) && !value.voided &&
+          digest(Object.fromEntries(fieldKeys.map(key => [key, value[key as keyof ExpenseValue]]))) === receipt.digest);
+        if (receipt.outcome === "created") requireValid("kind" in value.origin && value.origin.requestId === receipt.request_id && value.replacesRevision === null &&
+          !revisions.some(row => row.kind === "expense" && row.entity_id === receipt.entity_id && Number(row.revision) < Number(receipt.revision)));
+      }
     }
+    const latestByEntity = new Map<unknown, unknown>();
     for (const original of revisions) {
       if (original.kind !== "expense") continue;
-      const value = decode<ExpenseValue>(original.value_json);
-      if (isExpense(value) && "kind" in value.origin) {
-        const requestId = value.origin.requestId;
-        const receipt = receipts.find(row => row.request_id === requestId && row.outcome === "created");
-        requireValid(receipt && receipt.entity_id === original.entity_id && Number(receipt.revision) <= Number(original.revision));
-        if (value.replacesRevision === null) requireValid(receipt!.revision === original.revision);
+      const previous = latestByEntity.get(original.entity_id);
+      latestByEntity.set(original.entity_id, original.revision);
+      const value = decode<ExpenseValue | ManualBill>(original.value_json);
+      if (isManualBill(value)) {
+        requireValid(version >= 9 && value.replacesRevision === (previous ?? null));
+        if (value.replacesRevision !== null && value.evidence !== "owner-review") {
+          const correction = receiptsById.get(value.evidence);
+          requireValid(correction?.outcome === "corrected" && correction.revision === original.revision);
+        }
+      }
+      if ((isExpense(value) || isManualBill(value)) && "kind" in value.origin) {
+        const receipt = receiptsById.get(value.origin.requestId);
+        requireValid(receipt?.outcome === "created" && receipt.entity_id === original.entity_id && Number(receipt.revision) <= Number(original.revision));
+        if (value.replacesRevision === null) requireValid(receipt.revision === original.revision);
       }
     }
   }

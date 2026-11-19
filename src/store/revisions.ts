@@ -1,10 +1,10 @@
-import { isExpense, validExpense } from "../expenses/validation";
-import type { ExpenseValue } from "../expenses/contracts";
+import { isExpense, validExpense, isManualBill, validManualBill } from "../expenses/validation";
+import type { ExpenseValue, ManualBill } from "../expenses/contracts";
 export type Pin = { datasetId: string | null; appRevision: number };
 export type Target = { datasetId: string; kind: "document" | "line"; sourceId: string };
 type Provenance = { reason: string; evidence: string };
 export type AppChange = { entityId: string } & (
-  | { kind: "expense"; value: (Provenance & { net: string; date: string }) | ExpenseValue }
+  | { kind: "expense"; value: (Provenance & { net: string; date: string }) | ExpenseValue | ManualBill }
   | { kind: "adjustment"; value: Provenance & { net: string; target: Target; reversed: boolean } }
   | { kind: "confirmation"; value: Provenance & { period: string; reviewedRevision: number; complete: boolean } }
   | { kind: "setting"; value: Provenance & { currency: "TRY" } }
@@ -19,14 +19,16 @@ export function validateChange(change: AppChange) {
   requireValid(validId(change.entityId) && change.value && typeof change.value === "object");
   const v = change.value;
   requireValid(typeof v.reason === "string" && v.reason.trim().length > 0 && v.reason.length <= 1000 && validId(v.evidence));
-  if (change.kind === "expense" || change.kind === "adjustment") requireValid(typeof change.value.net === "string" && /^-?(?:0|[1-9][0-9]{0,39})(?:\.[0-9]{1,30})?$/.test(change.value.net));
+  const validNet = (value: unknown) => typeof value === "string" && /^-?(?:0|[1-9][0-9]{0,39})(?:\.[0-9]{1,30})?$/.test(value);
   switch (change.kind) {
     case "expense":
+      if (isManualBill(change.value)) { requireValid(validManualBill(change.value)); break; }
       if (isExpense(change.value)) { requireValid(validExpense(change.value)); break; }
       exactKeys(v, ["net", "date", "reason", "evidence"]);
-      requireValid(/^\d{4}-\d{2}-\d{2}$/.test(change.value.date) && new Date(change.value.date).toISOString().slice(0, 10) === change.value.date); break;
+      requireValid(validNet(change.value.net) && /^\d{4}-\d{2}-\d{2}$/.test(change.value.date) && new Date(change.value.date).toISOString().slice(0, 10) === change.value.date); break;
     case "adjustment": {
       exactKeys(v, ["net", "target", "reversed", "reason", "evidence"]);
+      requireValid(validNet(change.value.net));
       const target = change.value.target;
       requireValid(target && typeof target === "object"); exactKeys(target, ["datasetId", "kind", "sourceId"]);
       requireValid(validId(target.datasetId) && validId(target.sourceId) && ["document", "line"].includes(target.kind) && typeof change.value.reversed === "boolean"); break;
