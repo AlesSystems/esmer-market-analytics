@@ -22,7 +22,7 @@ export function ImportLanding({ view, title, busy, chooseWorkbook, saveTemplate 
     </section>
     <div className="g-more">
       <details><summary>Hesap ayrıntıları</summary>
-        <p>Toplama bu aya ait giderler girer. Ayrıntılı kayıtlarda indirilebilir KDV varsa net, diğer durumlarda brüt tutar sayılır. Varlık alımı, vergi, kredi, işletme sahibinin katkı ve çekişleri ile transferler gider toplamına girmez.</p>
+        <p>Toplama bu aya ait giderler girer. Elle eklenen aylık giderlerde tutarın tamamı sayılır. Ayrıntılı kayıtlarda indirilebilir KDV varsa net, diğer durumlarda brüt tutar sayılır. Varlık alımı, vergi, kredi, işletme sahibinin katkı ve çekişleri ile transferler gider toplamına girmez.</p>
         {view.summary.excluded.length > 0 && <><h3>Gider toplamı dışında</h3><ul>{view.summary.excluded.map(item => <li key={item.entityId}>{item.classification === "already-in-cost" ? "Maliyette yer alan stok kaybı" : classificationLabels[item.classification as keyof typeof classificationLabels]} · {money(item.amount)}</li>)}</ul></>}
         <dl className="g-totals"><div><dt>Gider tarihine göre kayıtlı brüt</dt><dd>{money(view.incurred)}</dd></div><div><dt>Ödeme tarihine göre kayıtlı brüt</dt><dd>{money(view.payments)}</dd></div></dl>
       </details>

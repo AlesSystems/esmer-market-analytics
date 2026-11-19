@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { Expenses } from "../../src/expenses/import";
 import { Recovery } from "../../src/recovery/backup";
 import { generateRecoveryKey, encodeRecoveryKey, decodeRecoveryKey } from "../../src/recovery/keys";
 import { validateSnapshot } from "../../src/recovery/validate";
@@ -40,6 +41,15 @@ test("backup and restore keep frozen v1 and v2 accepted reports byte-equal and v
     store.acceptReport(structuredClone(v1)); store.acceptReport(structuredClone(v2));
     const before = rows(join(original, "analytics.sqlite"));
     expect(before.reports).toHaveLength(2);
+    const expenses = new Expenses(store);
+    const period = "2025-09";
+    const saved = expenses.create({ action: "save-bill", requestId: "bill", fields: { period, category: "Elektrik", amount: "1.250,00" } });
+    if (saved.status !== "saved") throw Error("Manual bill was not saved");
+    const corrected = expenses.create({ action: "correct-bill", requestId: "correction", entityId: saved.entityId, expectedRevision: saved.revision,
+      reason: "Tutar düzeltildi", fields: { period, category: "Elektrik", amount: "1.200,00" } });
+    expect(corrected.status).toBe("saved");
+    expect(store.readReport(v1.id)).toEqual(v1);
+    expect(store.readReport(v2.id)).toEqual(v2);
     const status = await recovery.backupNow();
     const latest = [...status.backups].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
     const artifact = join(destination, `${latest.id}.esmerbackup`);

@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { openStore } from "../store/store";
 import { canonical } from "../source/package";
-import { calculateExpenseComponents } from "../analytics/operating";
+import { calculateEstimateExpenseComponents } from "../analytics/operating";
 import { Exact, sum } from "../domain/money";
 import { requireValid } from "../store/revisions";
 import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ManualCandidate, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
@@ -153,7 +153,7 @@ export class Expenses {
     const confirmation = snapshot.app.find(row => row.kind === "confirmation" && row.entityId === `expense-complete:${period}`);
     const current = rows.filter(row => (isExpense(row.value) || isManualBill(row.value)) && !row.value.voided);
     const complete = confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.reviewedRevision === expenseRevision;
-    const components = calculateExpenseComponents({ period, expenses: snapshot.app });
+    const components = calculateEstimateExpenseComponents({ period, expenses: snapshot.app });
     const coverage = components.reasons.length ? "incomplete" : complete || Object.values(components.breakdownCoverage).includes("available") ? "available" : "missing";
     const summary: ExpensePeriod["summary"] = { expenses: coverage === "available" ? components.expenses : null, coverage, labour: components.breakdownCoverage.labour === "available" ? components.breakdown.labour : null, labourCoverage: components.breakdownCoverage.labour, reasons: components.reasons, excluded: components.excluded };
     return { status: "expenses", period, appRevision: snapshot.pin.appRevision, expenseRevision, rows, history, batches: this.store.expenseBatches(), summary, complete, confirmation: confirmation?.kind === "confirmation" && confirmation.value.complete && confirmation.value.period === period ? complete ? "current" : "stale" : "none", ...groupExpenses(period, snapshot.app), incurred: sum(current.filter(row => expensePeriod(row.value) === period).map(row => isManualBill(row.value) ? row.value.amount : isExpense(row.value) ? row.value.gross : "0")), payments: sum(current.filter(row => isExpense(row.value) && row.value.paymentDate?.startsWith(period)).map(row => isExpense(row.value) ? row.value.gross : "0")) };
