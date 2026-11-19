@@ -134,6 +134,8 @@ test("November bill survives restart, reconciles with Excel and keeps a separate
   await openWorkspace(page);
   await chooseOpenPath(source);
   await importPackage(page);
+  await expect(page.getByText("Gerçek kaynak kayıtları içe aktarıldı.", { exact: true })).toBeVisible();
+  await expect(page.locator(".hero-num")).toContainText("10.000,00");
   await openSection(page, "Giderler");
   await setMonth(page, november);
   await expect(page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true })).toHaveCount(0);
