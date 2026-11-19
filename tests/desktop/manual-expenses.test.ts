@@ -85,13 +85,15 @@ test("a November bill survives reopening and each bill can be corrected with its
     await openSection(page, "Giderler"); await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("esmer.pending-manual-expense"))).toBeNull();
     expect(await page.evaluate(() => window.esmer.queryExpenses({ period: "2026-11" }))).toMatchObject({ rows: [expect.objectContaining({ revision: 1 })] });
-    await expect(page.getByRole("row", { name: /Kasım 2026 Sentetik elektrik 1\.250,00/ })).toBeVisible();
+    const firstBill = page.getByRole("row", { name: /Kasım 2026 Sentetik elektrik/ });
+    const secondBill = page.getByRole("row", { name: /Kasım 2026 Sentetik ikinci elektrik/ });
+    await expect(firstBill.getByRole("cell", { name: "1.250,00 ₺", exact: true })).toBeVisible();
     await page.locator("#expense-manual").click();
     await page.getByLabel("Kategori", { exact: true }).fill("Sentetik ikinci elektrik");
     await page.getByLabel("Tutar (TRY)", { exact: true }).fill("1.250,00");
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByRole("button", { name: "İncele / düzelt", exact: true })).toHaveCount(2);
-    await page.getByRole("row", { name: /Kasım 2026 Sentetik elektrik/ }).getByRole("button", { name: "İncele / düzelt" }).click();
+    await firstBill.getByRole("button", { name: "İncele / düzelt" }).click();
     await page.getByLabel("Tutar (TRY)", { exact: true }).fill("900,25");
     await page.getByRole("button", { name: "Düzeltmeyi kapat", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
@@ -99,9 +101,9 @@ test("a November bill survives reopening and each bill can be corrected with its
     await expect(page.getByLabel("Tutar (TRY)", { exact: true })).toHaveValue("900,25");
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik tutar düzeltmesi");
     await page.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
-    await expect(page.getByRole("row", { name: /Sentetik elektrik 900,25/ })).toBeVisible();
-    await expect(page.getByRole("row", { name: /Sentetik ikinci elektrik 1\.250,00/ })).toBeVisible();
-    await page.getByRole("row", { name: /Sentetik elektrik 900,25/ }).getByRole("button", { name: "İncele / düzelt" }).click();
+    await expect(firstBill.getByRole("cell", { name: "900,25 ₺", exact: true })).toBeVisible();
+    await expect(secondBill.getByRole("cell", { name: "1.250,00 ₺", exact: true })).toBeVisible();
+    await firstBill.getByRole("button", { name: "İncele / düzelt" }).click();
     const history = page.getByRole("table", { name: "" }).filter({ has: page.getByText("Sentetik tutar düzeltmesi", { exact: false }) });
     await expect(history.getByRole("row", { name: /1 .*Önceki sürüm.*1\.250,00/ })).toBeVisible();
     await expect(history.getByRole("row", { name: /3 .*Güncel sürüm.*900,25/ })).toBeVisible();
@@ -111,7 +113,7 @@ test("a November bill survives reopening and each bill can be corrected with its
     await page.locator(`[id="expense-record-${original.rows[0].entityId}"]`).click();
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik geri yükleme");
     await page.getByRole("button", { name: "Sürüm 1 geri yükle", exact: true }).click();
-    await expect(page.getByRole("row", { name: /Sentetik elektrik 1\.250,00/ })).toBeVisible();
+    await expect(firstBill.getByRole("cell", { name: "1.250,00 ₺", exact: true })).toBeVisible();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 test("an in-flight save loses its renderer reply and resolves through the retained request identity", async () => {
