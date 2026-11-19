@@ -158,3 +158,25 @@ test("many workbook rows can share one selectable candidate set without repeatin
     expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThan(120_000);
   } finally { store.close(); }
 });
+
+test("linking a manual bill requires explicit acknowledgement of a remaining detailed duplicate", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const existing = expenses.preview(await workbook([row]));
+    expenses.confirm({ previewId: existing.previewId, keepCandidateRows: [] });
+    const bill = expenses.create({ action: "save-bill", requestId: "mixed-candidate", fields: { period: "2026-01", category: "Kira", amount: "50" } });
+    if (bill.status !== "saved") throw Error("Fixture bill not saved");
+    const preview = expenses.preview(await workbook([["ref-mixed", ...row.slice(1)]]));
+    expect(preview.rows[0].duplicates).toHaveLength(1);
+    expect(preview.rows[0].matchKey).toBeTruthy();
+    const before = expenses.query({ period: "2026-01" });
+    const link = { previewId: preview.previewId, keepCandidateRows: [], matches: [{ row: 2, entityId: bill.entityId }] };
+    expect(() => expenses.confirm(link)).toThrow();
+    expect(expenses.query({ period: "2026-01" })).toEqual(before);
+    expect(expenses.confirm({ ...link, acknowledgedDetailedRows: [2] })).toMatchObject({ status: "imported", count: 1 });
+    expect(expenses.query({ period: "2026-01" })).toMatchObject({ incurred: "100", rows: [
+      { entityId: before.rows[0].entityId, revision: before.rows[0].revision },
+      { entityId: bill.entityId, value: { attachment: { batchId: preview.batchId, row: 2 } } },
+    ] });
+  } finally { store.close(); }
+});

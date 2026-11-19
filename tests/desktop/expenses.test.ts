@@ -267,7 +267,22 @@ test("Excel review identifies identical manual bills, cancels safely, and suppor
     await expect(page.getByText(/Elle girildi · Excel ayrıntıları eklendi/)).toBeVisible();
     await page.getByText("Sürüm ayrıntıları", { exact: true }).click();
     await expect(page.getByText("İçe aktarma / satır", { exact: true })).toBeVisible();
+    await page.getByRole("textbox", { name: "Kategori", exact: true }).fill("Sentetik taslak");
+    const stay = page.getByRole("button", { name: "Düzenlemeye devam et" });
+    for (const leave of [
+      () => page.getByRole("button", { name: "Düzeltmeyi kapat" }).click(),
+      () => page.getByRole("button", { name: "Giderlere dön" }).click(),
+      () => page.getByRole("button", { name: "Önceki ay" }).click(),
+      () => openSection(page, "Bu ay"),
+    ]) {
+      await leave();
+      await expect(page.getByRole("alertdialog")).toBeVisible();
+      await stay.click();
+      await expect(page.getByRole("textbox", { name: "Kategori", exact: true })).toHaveValue("Sentetik taslak");
+    }
     await page.getByRole("button", { name: "Düzeltmeyi kapat" }).click();
+    await page.getByRole("button", { name: "Bilgileri bırak" }).click();
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" }).getByRole("button", { name: "İncele / düzelt" })).toBeFocused();
     await openImport();
     await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" }).getByRole("listitem")).toHaveCount(1);
     await chooseWorkbook();
@@ -277,6 +292,11 @@ test("Excel review identifies identical manual bills, cancels safely, and suppor
     await writeFile(workbookPath, await workbook([["electricity-2", ...electricity.slice(1)]]));
     await chooseWorkbook();
     await page.getByRole("button", { name: "Satır 2: 1 olası elle kayıt" }).click();
+    await choice.selectOption({ label: "Elle kayıt no. 1 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await expect(page.getByRole("checkbox", { name: /benzer ayrıntılı kayıt ayrı kalacak/ })).toBeVisible();
+    await expect(confirmImport).toBeDisabled();
+    await page.getByRole("checkbox", { name: /benzer ayrıntılı kayıt ayrı kalacak/ }).check();
+    await expect(confirmImport).toBeEnabled();
     await choice.selectOption("separate");
     await confirmImport.click();
     await expect(records.locator("tbody tr")).toHaveCount(3);
