@@ -39,14 +39,13 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   const view = storedView?.period === period ? storedView : undefined;
   const [previous, setPrevious] = useState<ExpensePeriod>();
   const [preview, setPreview] = useState<ExpensePreview>();
-  const [keep, setKeep] = useState<number[]>([]);
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<ExpenseRecord>();
   const generation = useRef(0);
-  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); setKeep([]); restoreFocus.current = true; }
+  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); restoreFocus.current = true; }
   function open(row: ExpenseRecord, focusBack: string) { opener.current = () => document.getElementById(focusBack)?.focus(); setSelected(row); }
   useEffect(() => { if (active && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading, active]);
   const hasPreview = !!preview;
@@ -81,13 +80,15 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     try {
       const result = await action();
       if (result.status === "failed" || result.status === "unavailable" || result.status === "rejected") { setError(result.message); return; }
-      if (result.status === "preview") { setPreview(result); setKeep([]); return; }
+      if (result.status === "preview") { setPreview(result); return; }
       if (result.status === "cancelled") { setMessage("İşlem iptal edildi. Kayıtlar değiştirilmedi."); return; }
       setMessage(result.status === "already-imported" ? "Bu Excel dosyası zaten içe aktarılmış. Kayıtlar değiştirilmedi." : success);
       if (mutation) { if (!focusId) returnToRecords(); await load(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
     } catch { setError(failed); }
     finally { navigation.protect({ dirty: false, locked: false }); setBusy(false); }
   };
+  const billNumbers = new Map<string, number>();
+  for (const row of view?.history ?? []) if (isManualBill(row.value) && !billNumbers.has(row.entityId)) billNumbers.set(row.entityId, row.revision);
   const plan = view ? confirmPlan(view) : undefined;
   const confirm = (complete: boolean, explicit = false) => { if (!view || !plan) return; setAsking(false); void run(() => window.esmer.confirmExpenseCompleteness({ period, reviewedRevision: view.expenseRevision, complete, reason: complete ? confirmReason(plan, explicit) : "Onay kaldırıldı" }), "", true, "expense-confirm-action"); };
   // Lines present but a group blank: the first press asks, because a blank is not the same as "no expense".
@@ -121,7 +122,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     {message && <p className="g-note" role="status">{message}</p>}
     {error && <p className="g-note is-warn" role="alert">{error}</p>}
     {task === "import" && !preview && view && <ImportLanding view={view} title={taskTitle} busy={busy} chooseWorkbook={chooseWorkbook} saveTemplate={saveTemplate} />}
-    {task === "import" && preview && <ImportPreview preview={preview} keep={keep} setKeep={setKeep} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); setKeep([]); setError(""); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
+    {task === "import" && preview && <ImportPreview key={preview.previewId} preview={preview} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); setError(""); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={request => void run(() => window.esmer.confirmExpenses(request), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
     {loadError && <div className="g-note is-warn" role="alert"><span>{loadError}</span><button type="button" className="btn btn-secondary" disabled={loading} onClick={() => void load()}>Giderleri yeniden yükle</button></div>}
     {loading && !view && <p role="status" className="g-muted">Giderler yükleniyor…</p>}
     {showMonth && (view || manual) && <>
@@ -184,7 +185,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
             const record = row.value, bill = isManualBill(record), detailed = currentValue(row), value = bill ? record : detailed, fix = view.attention.find(item => item.entityId === row.entityId);
             return <tr key={row.entityId}>
               <td>{bill ? monthName(record.period) : date(record.date)}</td>
-              <td>{value?.category ?? "Eski kayıt"}{" "}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
+              <td>{value?.category ?? "Eski kayıt"}{billNumbers.has(row.entityId) && <small>Elle kayıt no. {billNumbers.get(row.entityId)}</small>}{" "}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
               <td className="number">{money(bill ? record.amount : detailed?.gross ?? record.net)}</td>
               <td className="number"><button type="button" className="link" id={recordId(row.entityId)} disabled={locked} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</button></td>
             </tr>;

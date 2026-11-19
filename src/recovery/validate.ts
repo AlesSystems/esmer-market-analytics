@@ -1,4 +1,4 @@
-import { isExpense, isManualBill, manualBillFields, fieldKeys } from "../expenses/validation";
+import { isExpense, isManualBill, manualBillFields, fieldKeys, expensePeriod } from "../expenses/validation";
 import type { ExpenseValue, ManualBill } from "../expenses/contracts";
 import { readRawPackage } from "../source/raw-package";
 import { createHash } from "node:crypto";
@@ -146,6 +146,9 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
       }
     }
     const latestByEntity = new Map<unknown, unknown>();
+    const batchRanges = version >= 9 ? new Map(db.prepare("SELECT batch_id,count,first_revision,last_revision FROM expense_batches").all().map(row => [row.batch_id, row])) : new Map();
+    const attachments = new Map<string, { entityId: unknown; sourceReference: string | null; origin: ExpenseValue["origin"] }>();
+    const aliases = new Map<string, unknown>();
     for (const original of revisions) {
       if (original.kind !== "expense") continue;
       const previous = latestByEntity.get(original.entity_id);
@@ -156,6 +159,27 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
         if (value.replacesRevision !== null && value.evidence !== "owner-review") {
           const correction = receiptsById.get(value.evidence);
           requireValid(correction?.outcome === "corrected" && correction.revision === original.revision);
+        }
+      }
+      if (isExpense(value) && value.attachment) {
+        requireValid(version >= 9 && value.replacesRevision === previous);
+        const { batchId, row } = value.attachment;
+        const key = `${batchId}:${row}`, recorded = attachments.get(key);
+        if (recorded) {
+          requireValid(recorded.entityId === original.entity_id && recorded.sourceReference === value.sourceReference && canonical(recorded.origin) === canonical(value.origin));
+        } else {
+          const batch = batchRanges.get(batchId);
+          const predecessor = revisionsById.get(previous as number);
+          const bill = predecessor ? decode<ExpenseValue | ManualBill>(predecessor.value_json) : undefined;
+          requireValid(batch && Number(batch.count) > 0 && Number(batch.first_revision) <= Number(original.revision) &&
+            Number(batch.last_revision) >= Number(original.revision) && bill && isManualBill(bill) && !bill.voided && !value.voided &&
+            bill.period === expensePeriod(value) && new Exact(bill.amount).eq(value.gross) &&
+            canonical(bill.origin) === canonical(value.origin) && value.evidence === batchId);
+          attachments.set(key, { entityId: original.entity_id, sourceReference: value.sourceReference, origin: value.origin });
+          if (value.sourceReference) {
+            requireValid(!aliases.has(value.sourceReference));
+            aliases.set(value.sourceReference, original.entity_id);
+          }
         }
       }
       if ((isExpense(value) || isManualBill(value)) && "kind" in value.origin) {

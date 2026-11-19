@@ -1,5 +1,5 @@
 import { Exact } from "../domain/money";
-import { classifications, type ExpenseFields, type ManualBill, type ManualBillFields, type CreateExpenseRequest, type ExpenseValue } from "./contracts";
+import { classifications, type ExpenseFields, type ManualBill, type ManualBillFields, type CreateExpenseRequest, type WorkbookRow, type ExpenseValue } from "./contracts";
 export const validPeriod = (v: unknown): v is string => typeof v === "string" && /^(?:19\d{2}|[2-9]\d{3})-(?:0[1-9]|1[0-2])$/.test(v) && v < "9999";
 export const validDate = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) && validPeriod(v.slice(0, 7)) && Number.isFinite(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v;
 const id = (v: unknown) => v === null || typeof v === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(v);
@@ -35,12 +35,16 @@ export function validFields(value: unknown): value is ExpenseFields {
 }
 export function isExpense(value: object): value is ExpenseValue { return "format" in value && value.format === "expense-v1"; }
 export function validExpense(value: unknown): value is ExpenseValue {
-  if (!exactKeys(value, [...fieldKeys, "format", "origin", "reason", "evidence", "replacesRevision", "voided"])) return false;
+  if (!exactKeys(value, [...fieldKeys, "format", "origin", "reason", "evidence", "replacesRevision", "voided", ...(value && typeof value === "object" && "attachment" in value ? ["attachment"] : [])])) return false;
   const fields = Object.fromEntries(fieldKeys.map(k => [k, value[k]]));
-  return validFields(fields) && value.format === "expense-v1" && validOrigin(value.origin) && typeof value.reason === "string" && !!value.reason.trim() && value.reason.length <= 1000 && value.evidence !== null && id(value.evidence) && (value.replacesRevision === null || Number.isSafeInteger(value.replacesRevision) && Number(value.replacesRevision) > 0) && typeof value.voided === "boolean";
+  return validFields(fields) && value.format === "expense-v1" && validOrigin(value.origin) && (!("attachment" in value) || ("kind" in value.origin && validAttachment(value.attachment) && value.replacesRevision !== null)) && typeof value.reason === "string" && !!value.reason.trim() && value.reason.length <= 1000 && value.evidence !== null && id(value.evidence) && (value.replacesRevision === null || Number.isSafeInteger(value.replacesRevision) && Number(value.replacesRevision) > 0) && typeof value.voided === "boolean";
 }
 
-export function validOrigin(origin: unknown): boolean {
+export function validAttachment(value: unknown): value is WorkbookRow {
+  return exactKeys(value, ["batchId", "row"]) && typeof value.batchId === "string" && /^[a-f0-9]{64}$/.test(value.batchId) && Number.isSafeInteger(value.row) && Number(value.row) >= 2 && Number(value.row) <= 5001;
+}
+
+export function validOrigin(origin: unknown): origin is ExpenseValue["origin"] {
   return exactKeys(origin, ["batchId", "row"]) && origin.batchId !== null && id(origin.batchId) && Number.isSafeInteger(origin.row) && Number(origin.row) >= 2
     || exactKeys(origin, ["kind", "requestId"]) && origin.kind === "manual" && origin.requestId !== null && id(origin.requestId);
 }

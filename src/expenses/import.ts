@@ -4,7 +4,7 @@ import { canonical } from "../source/package";
 import { calculateExpenseComponents } from "../analytics/operating";
 import { Exact, sum } from "../domain/money";
 import { requireValid } from "../store/revisions";
-import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
+import { classificationLabels, classifications, type CreateExpenseRequest, type CreateExpenseResult, type ExpenseFields, type ManualCandidate, type ExpensePreview, type ExpensePreviewRow, type ExpenseValue, type ConfirmExpensesRequest, type ExpensePeriod, type QueryExpensesRequest } from "./contracts";
 import { readExpenseWorkbook, decimalCell, dateCell, type Cell } from "./workbook";
 import { isExpense, isManualBill, expensePeriod, validExpense, fieldKeys, validFields, validDate, validCreateExpenseRequest, validPeriod } from "./validation";
 import { relevantExpenseRevision } from "./adjustments";
@@ -64,9 +64,22 @@ export class Expenses {
   preview(bytes: Uint8Array): ExpensePreview {
     this.pending = null;
     const snapshot = this.store.readSnapshot(), batchId = hash(bytes);
-    const preview: ExpensePreview = { status: "preview", previewId: randomUUID(), batchId, baseRevision: snapshot.pin.appRevision, rows: [], errors: [], alreadyImported: this.store.expenseBatches().some(b => b.batchId === batchId) };
+    const preview: ExpensePreview = { status: "preview", previewId: randomUUID(), batchId, baseRevision: snapshot.pin.appRevision, rows: [], manualCandidates: {}, errors: [], alreadyImported: this.store.expenseBatches().some(b => b.batchId === batchId) };
     try {
       const cells = readExpenseWorkbook(bytes), known = new Map(snapshot.app.filter(row => row.kind === "expense").map(row => [row.entityId, row]));
+      const aliases = new Map<string, string>(), billsByAmount = new Map<string, ManualCandidate[]>(), billNumbers = new Map<string, number>();
+      for (const record of snapshot.expenseHistory) if (record.kind === "expense") {
+        if (isManualBill(record.value) && !billNumbers.has(record.entityId)) billNumbers.set(record.entityId, record.revision);
+        if (isExpense(record.value) && record.value.attachment && record.value.sourceReference) aliases.set(record.value.sourceReference, record.entityId);
+      }
+      for (const record of known.values()) if (record.kind === "expense" && isManualBill(record.value) && !record.value.voided) {
+        const { period, category, amount } = record.value;
+        const key = `${period}:${new Exact(amount).toFixed()}`;
+        const bills = billsByAmount.get(key) ?? [];
+        if (!bills.length) billsByAmount.set(key, bills);
+        bills.push({ entityId: record.entityId, revision: record.revision, period, category, amount, billNumber: billNumbers.get(record.entityId)! });
+      }
+      for (const bills of billsByAmount.values()) bills.sort((a, b) => a.billNumber - b.billNumber);
       const seen = new Set<string>(), candidates = new Map<string, string>(), losses = new Set<string>();
       const duplicateKey = (v: ExpenseValue) => `${v.date}:${new Exact(v.gross).toFixed()}`;
       for (const record of known.values()) if (isExpense(record.value) && !record.value.voided) {
@@ -80,7 +93,8 @@ export class Expenses {
         try {
           row.value = value(c, batchId, row.row);
           row.entityId = row.value.sourceReference ? `expense-ref:${hash(row.value.sourceReference)}` : `expense:${batchId}:${row.row}`;
-          const existing = known.get(row.entityId);
+          const alias = row.value.sourceReference ? aliases.get(row.value.sourceReference) : undefined;
+          const existing = known.get(alias ?? row.entityId);
           if (seen.has(row.entityId)) row.errors.push("Kayıt referansı çalışma kitabında tekrar ediyor.");
           seen.add(row.entityId);
           if (existing) {
@@ -88,12 +102,18 @@ export class Expenses {
             else row.errors.push("Kayıt referansı mevcut kayıttan farklı. Gerekçeli düzeltme kullanın.");
           }
           if (!row.alreadyPresent) {
+            const matchKey = `${row.value.date.slice(0, 7)}:${new Exact(row.value.gross).toFixed()}`;
+            const bills = billsByAmount.get(matchKey);
+            if (bills?.length) {
+              row.matchKey = matchKey;
+              preview.manualCandidates[matchKey] = bills;
+            }
             const candidate = candidates.get(duplicateKey(row.value));
             if (candidate && candidate !== row.entityId) row.duplicates.push(candidate);
             if (row.value.loss && losses.has(row.value.loss.evidence)) row.errors.push("Kayıp kanıtı başka bir kayıtta kullanılmış.");
           }
         } catch (error) { row.errors.push(error instanceof Error ? error.message : "Satır doğrulanamadı."); row.value = null; }
-        if (row.errors.length) row.value = null;
+        if (row.errors.length) { row.value = null; delete row.matchKey; }
         if (row.value) {
           const key = duplicateKey(row.value);
           if (!candidates.has(key)) candidates.set(key, row.entityId);
@@ -109,11 +129,19 @@ export class Expenses {
   confirm(request: ConfirmExpensesRequest) {
     const p = this.pending;
     requireValid(p && p.previewId === request.previewId);
-    if (p.alreadyImported) return { status: "already-imported" as const, count: 0 };
+    if (p.alreadyImported) { this.pending = null; return { status: "already-imported" as const, count: 0 }; }
     requireValid(!p.errors.length && p.rows.length && p.rows.every(row => row.value && !row.errors.length));
-    const candidates = new Set(p.rows.filter(row => row.duplicates.length).map(row => row.row)), keep = new Set(request.keepCandidateRows);
-    requireValid(keep.size === request.keepCandidateRows.length && keep.size === candidates.size && request.keepCandidateRows.every(row => candidates.has(row)));
-    const changes = p.rows.filter(row => !row.alreadyPresent).map(row => ({ kind: "expense" as const, entityId: row.entityId, value: row.value! }));
+    const candidates = new Set(p.rows.filter(row => !row.alreadyPresent && (row.matchKey || row.duplicates.length)).map(row => row.row));
+    const keep = new Set(request.keepCandidateRows), matches = new Map((request.matches ?? []).map(match => [match.row, match.entityId]));
+    requireValid(keep.size === request.keepCandidateRows.length && matches.size === (request.matches?.length ?? 0) &&
+      new Set(matches.values()).size === matches.size && keep.size + matches.size === candidates.size &&
+      [...keep].every(row => candidates.has(row) && !matches.has(row)) && [...matches.keys()].every(row => candidates.has(row)));
+    const changes = p.rows.filter(row => !row.alreadyPresent).map(row => {
+      const entityId = matches.get(row.row);
+      const match = entityId && row.matchKey ? p.manualCandidates[row.matchKey].find(candidate => candidate.entityId === entityId) : undefined;
+      requireValid(!entityId || match);
+      return { entityId: row.entityId, value: row.value!, match };
+    });
     const imported = this.store.importExpenses(p.batchId, p.baseRevision, changes);
     this.pending = null;
     return { status: imported ? "imported" as const : "already-imported" as const, count: imported ? changes.length : 0 };
