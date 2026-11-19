@@ -145,6 +145,7 @@ test("a November bill survives reopening and each bill can be corrected with its
     await page.getByRole("button", { name: "Düzeltmeyi kapat", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Taslak silinsin mi?" })).toBeVisible();
     await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click();
+    await expect(page.getByRole("alertdialog")).toHaveCount(0);
     await expect(page.getByLabel("Tutar (TRY)", { exact: true })).toHaveValue("900,25");
     await page.getByLabel("Değişiklik gerekçesi", { exact: true }).fill("Sentetik tutar düzeltmesi");
     await page.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
