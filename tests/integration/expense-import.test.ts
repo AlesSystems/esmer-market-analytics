@@ -72,3 +72,40 @@ test("bounded duplicate lookup still rejects repeated stock-loss evidence within
     expect(expenses.preview(await workbook([another])).rows[0].errors).toContain("Kayıp kanıtı başka bir kayıtta kullanılmış.");
   } finally { store.close(); }
 });
+
+test("the owner chooses which identical monthly bill receives the Excel details", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50,00" };
+    const first = expenses.create({ action: "save-bill", requestId: "first-bill", fields });
+    const second = expenses.create({ action: "save-bill", requestId: "second-bill", fields });
+    if (first.status !== "saved" || second.status !== "saved") throw Error("Fixture bills not saved");
+    store.confirmExpensesComplete({ period: fields.period, reviewedRevision: second.revision, complete: true, reason: "Synthetic review" });
+    const before = store.readSnapshot();
+    const bytes = await workbook([row]);
+    const abandoned = expenses.preview(bytes);
+    expect(store.readSnapshot()).toEqual(before);
+    const preview = expenses.preview(bytes);
+    expect(preview.manualCandidates[preview.rows[0].matchKey!]).toMatchObject([
+      { entityId: first.entityId, revision: first.revision, category: "Kira", period: "2026-01", amount: "50" },
+      { entityId: second.entityId, revision: second.revision, category: "Kira", period: "2026-01", amount: "50" },
+    ]);
+    const matches = [{ row: 2, entityId: second.entityId }];
+    expect(() => expenses.confirm({ previewId: abandoned.previewId, keepCandidateRows: [], matches })).toThrow();
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [] })).toThrow();
+    expect(store.readSnapshot()).toEqual(before);
+    expect(expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches })).toMatchObject({ status: "imported", count: 1 });
+    const current = expenses.query({ period: fields.period });
+    expect(current).toMatchObject({ confirmation: "stale", incurred: "100", rows: [
+      { entityId: first.entityId, value: { format: "manual-bill-v1" } },
+      { entityId: second.entityId, value: { date: "2026-01-15", origin: { kind: "manual", requestId: "second-bill" }, attachment: { batchId: preview.batchId, row: 2 }, replacesRevision: second.revision } },
+    ] });
+    expect(store.readPinned(before.pin)).toEqual(before);
+    const repeat = expenses.preview(bytes);
+    expect(expenses.confirm({ previewId: repeat.previewId, keepCandidateRows: [] }).status).toBe("already-imported");
+    const equivalent = expenses.preview(await workbook([Array(row.length).fill(null), row]));
+    expect(equivalent.rows[0]).toMatchObject({ row: 3, alreadyPresent: true });
+    expect(expenses.confirm({ previewId: equivalent.previewId, keepCandidateRows: [] })).toMatchObject({ status: "imported", count: 0 });
+    expect(expenses.create({ action: "resolve", requestId: "second-bill" })).toMatchObject({ status: "already-saved", revision: second.revision });
+  } finally { store.close(); }
+});
