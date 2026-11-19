@@ -93,11 +93,11 @@
 .g-evidence dd { margin-bottom: 12px; overflow-wrap: anywhere; }
 .g-form details { margin-top: 0; }
 
-/* Collapsed notes at the foot */
+/* Import history and supporting notes */
 .g-more details { margin-top: 0; }
 .g-more details + details { margin-top: 12px; }
 .g-more p, .g-more ul { max-width: 75ch; }
-.g-more small { overflow-wrap: anywhere; }
+.g-import-history small { display: block; overflow-wrap: anywhere; }
 .g-more h3 { margin: 16px 0 6px; font-size: var(--t-md); }
 .g-totals { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 16px 0 8px; }
 .g-totals dd { margin-top: 4px; font-size: var(--t-xl); font-weight: 600; }

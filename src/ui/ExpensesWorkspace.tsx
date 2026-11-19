@@ -4,7 +4,7 @@ import { ManualExpenseEntry, pendingExpenseKey } from "./ManualExpenseEntry";
 import { useExpenseNavigation } from "./expense-navigation";
 import { ExpenseEditor, currentValue, type Run } from "./expenses/ExpenseEditor";
 import { ImportPreview } from "./expenses/ImportPreview";
-import { MonthDetails } from "./expenses/MonthDetails";
+import { ImportLanding } from "./expenses/ImportLanding";
 import { AlertIcon, ArrowRightIcon, CheckIcon, DownloadIcon, PlusIcon, UploadIcon } from "./icons";
 import { type ExpensePeriod, type ExpensePreview, type ExpenseRecord } from "../expenses/contracts";
 import { isManualBill } from "../expenses/validation";
@@ -46,10 +46,11 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<ExpenseRecord>();
   const generation = useRef(0);
-  function returnToRecords() { setTask("records"); setSelected(undefined); restoreFocus.current = true; }
+  function returnToRecords() { setTask("records"); setSelected(undefined); setPreview(undefined); setKeep([]); restoreFocus.current = true; }
   function open(row: ExpenseRecord, focusBack: string) { opener.current = () => document.getElementById(focusBack)?.focus(); setSelected(row); }
   useEffect(() => { if (active && restoreFocus.current && task === "records" && !selected && !busy && !loading) { restoreFocus.current = false; opener.current(); } }, [task, selected, busy, loading, active]);
-  useEffect(() => { if (active && task === "import") taskTitle.current?.focus(); }, [task, active]);
+  const hasPreview = !!preview;
+  useEffect(() => { if (active && task === "import") taskTitle.current?.focus(); }, [task, active, hasPreview]);
   useEffect(() => { if (asking) cancelAsk.current?.focus(); }, [asking]);
   async function load(): Promise<boolean> {
     const id = ++generation.current;
@@ -80,10 +81,10 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     try {
       const result = await action();
       if (result.status === "failed" || result.status === "unavailable" || result.status === "rejected") { setError(result.message); return; }
-      if (result.status === "preview") { setPreview(result); setKeep([]); opener.current = () => document.getElementById("expense-import")?.focus(); setTask("import"); return; }
+      if (result.status === "preview") { setPreview(result); setKeep([]); return; }
       if (result.status === "cancelled") { setMessage("İşlem iptal edildi. Kayıtlar değiştirilmedi."); return; }
       setMessage(result.status === "already-imported" ? "Bu Excel dosyası zaten içe aktarılmış. Kayıtlar değiştirilmedi." : success);
-      if (mutation) { setPreview(undefined); setKeep([]); if (!focusId) returnToRecords(); await load(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
+      if (mutation) { if (!focusId) returnToRecords(); await load(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
     } catch { setError(failed); }
     finally { navigation.protect({ dirty: false, locked: false }); setBusy(false); }
   };
@@ -92,7 +93,11 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
   // Lines present but a group blank: the first press asks, because a blank is not the same as "no expense".
   const press = () => { if (plan?.lines && plan.empty.length) setAsking(true); else confirm(true); };
   function closeAsk() { setAsking(false); requestAnimationFrame(() => document.getElementById("expense-confirm-action")?.focus()); }
-  const importExcel = () => void run(() => window.esmer.previewExpenses(), "");
+  function openExcel() {
+    opener.current = () => document.getElementById("expense-import")?.focus();
+    setTask("import"); setError(""); setMessage("");
+  }
+  const chooseWorkbook = () => void run(() => window.esmer.previewExpenses(), "");
   const saveTemplate = () => void run(() => window.esmer.saveExpenseTemplate(), "Excel şablonu kaydedildi.");
   const invalid = preview && (preview.errors.length > 0 || preview.rows.some(row => row.errors.length > 0));
   const manual = task === "manual", showMonth = !selected && task !== "import";
@@ -115,14 +120,15 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     {busy && <p role="status" className="g-note">İşlem sürüyor…</p>}
     {message && <p className="g-note" role="status">{message}</p>}
     {error && <p className="g-note is-warn" role="alert">{error}</p>}
-    {task === "import" && preview && <ImportPreview preview={preview} keep={keep} setKeep={setKeep} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); returnToRecords(); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
+    {task === "import" && !preview && view && <ImportLanding view={view} title={taskTitle} busy={busy} chooseWorkbook={chooseWorkbook} saveTemplate={saveTemplate} />}
+    {task === "import" && preview && <ImportPreview preview={preview} keep={keep} setKeep={setKeep} busy={busy} invalid={!!invalid} title={taskTitle} close={() => { setPreview(undefined); setKeep([]); setError(""); setMessage("Önizleme kapatıldı. Kayıtlar değiştirilmedi."); }} confirm={() => void run(() => window.esmer.confirmExpenses({ previewId: preview.previewId, keepCandidateRows: keep }), "Giderler içe aktarıldı. Kontrol edip “Bu ayın giderleri tamam” deyin.", true)} />}
     {loadError && <div className="g-note is-warn" role="alert"><span>{loadError}</span><button type="button" className="btn btn-secondary" disabled={loading} onClick={() => void load()}>Giderleri yeniden yükle</button></div>}
     {loading && !view && <p role="status" className="g-muted">Giderler yükleniyor…</p>}
     {showMonth && (view || manual) && <>
       {view && plan && <section className="card g-main" aria-labelledby="g-main-title">
         <div className="g-card-head"><h2 id="g-main-title">Aylık toplamlar</h2>
           <div className="g-links">
-            <button type="button" className={`btn ${plan.lines || plan.state === "current" ? "btn-secondary" : "btn-primary"}`} id="expense-import" disabled={locked} onClick={importExcel}><UploadIcon />Excel’den içe aktar</button>
+            <button type="button" className={`btn ${plan.lines || plan.state === "current" ? "btn-secondary" : "btn-primary"}`} id="expense-import" disabled={locked} onClick={openExcel}><UploadIcon />Excel’den içe aktar</button>
             <button type="button" className="link" disabled={locked} onClick={saveTemplate}><DownloadIcon />Şablonu indir</button>
           </div>
         </div>
@@ -184,7 +190,6 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
             </tr>;
           })}</tbody></table></div>}
       </section>
-      {view && <MonthDetails view={view} />}
     </>}
     {view && selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} reload={load} saved={incurred => {
       setMessage("Düzeltme kaydedildi. Dönemi yeniden inceleyin.");
