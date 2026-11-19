@@ -180,3 +180,28 @@ test("linking a manual bill requires explicit acknowledgement of a remaining det
     ] });
   } finally { store.close(); }
 });
+
+test.each(["detailed", "enriched"] as const)("workbook replay and equivalent decimal corrections preserve %s references", async format => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const bytes = await workbook([row]);
+    const bill = format === "enriched" ? expenses.create({ action: "save-bill", requestId: "equivalent-decimals", fields: { period: "2026-01", category: "Kira", amount: "50" } }) : undefined;
+    if (bill && bill.status !== "saved") throw Error("Fixture bill not saved");
+    const preview = expenses.preview(bytes);
+    expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: bill ? [{ row: 2, entityId: bill.entityId }] : [] });
+    const [expense] = expenses.query({ period: "2026-01" }).rows;
+    const replacement = { date: "2026-01-15", paymentDate: "2026-02-01", category: "Kira", classification: "operating-expense" as const, net: "50.00", tax: "0.00", gross: "50.00", taxTreatment: "non-recoverable" as const, taxEvidence: "tax-1", supportingReference: "bill-1", sourceReference: "ref-1", labourPeriod: null, loss: null };
+    const corrected = store.changeExpense({ entityId: expense.entityId, expectedRevision: expense.revision, reason: "Synthetic format correction", replacement });
+    const equivalent = expenses.preview(await workbook([Array(row.length).fill(null), row]));
+    expect(equivalent.rows[0]).toMatchObject({ errors: [], alreadyPresent: true });
+    expect(expenses.confirm({ previewId: equivalent.previewId, keepCandidateRows: [] })).toMatchObject({ status: "imported", count: 0 });
+    store.changeExpense({ entityId: expense.entityId, expectedRevision: corrected, reason: "Synthetic amount correction", replacement: { ...replacement, net: "55", gross: "55" } });
+    const before = expenses.query({ period: "2026-01" });
+    const replay = expenses.preview(bytes);
+    expect(replay).toMatchObject({ alreadyImported: true, errors: [], rows: [] });
+    expect(expenses.confirm({ previewId: replay.previewId, keepCandidateRows: [] })).toMatchObject({ status: "already-imported", count: 0 });
+    expect(expenses.query({ period: "2026-01" })).toEqual(before);
+    const changed = expenses.preview(await workbook([Array(row.length).fill(null), Array(row.length).fill(null), row]));
+    expect(changed.rows[0].errors).toContain("Kayıt referansı mevcut kayıttan farklı. Gerekçeli düzeltme kullanın.");
+  } finally { store.close(); }
+});
