@@ -4,16 +4,33 @@ import type { AppRecord } from "../store/revisions";
 import type { OperatingResult } from "../expenses/contracts";
 import { isExpense, isManualBill } from "../expenses/validation";
 export const OPERATING_CALCULATION_VERSION = "synthetic-operating-calc-v1";
-export function calculateExpenseComponents(input: { period: string; expenses: AppRecord[] }): Pick<OperatingResult, "expenses" | "payments" | "breakdown" | "breakdownCoverage" | "excluded" | "reasons"> {
+type ExpenseInput = { period: string; expenses: AppRecord[] };
+
+export function calculateExpenseComponents(input: ExpenseInput) {
+  return expenseComponents(input, "operating");
+}
+
+export function calculateEstimateExpenseComponents(input: ExpenseInput) {
+  return expenseComponents(input, "estimate");
+}
+
+function expenseComponents(input: ExpenseInput, calculation: "operating" | "estimate"): Pick<OperatingResult, "expenses" | "payments" | "breakdown" | "breakdownCoverage" | "excluded" | "reasons"> {
   const reasons: string[] = [], amounts: string[] = [], payments: string[] = [], excluded: OperatingResult["excluded"] = [];
   const losses = new Set<string>();
   const breakdown = { operatingExpense: "0", labour: "0", separateLoss: "0" };
   const breakdownCoverage: OperatingResult["breakdownCoverage"] = { operatingExpense: "missing", labour: "missing", separateLoss: "missing" };
+  function count(key: keyof typeof breakdown, amount: string) {
+    amounts.push(amount);
+    if (breakdownCoverage[key] !== "incomplete") breakdownCoverage[key] = "available";
+    breakdown[key] = new Exact(breakdown[key]).plus(amount).toFixed();
+  }
   for (const record of input.expenses) {
     if (record.kind !== "expense") continue;
     const v = record.value;
     if (isManualBill(v)) {
-      if (!v.voided && v.period === input.period) {
+      if (v.voided || v.period !== input.period) continue;
+      if (calculation === "estimate") count("operatingExpense", v.amount);
+      else {
         reasons.push("UNKNOWN_TAX");
         breakdownCoverage.operatingExpense = "incomplete";
       }
@@ -32,10 +49,7 @@ export function calculateExpenseComponents(input: { period: string; expenses: Ap
       losses.add(v.loss.evidence);
       if (v.loss.recognition === "already-in-cost") { excluded.push({ entityId: record.entityId, classification: "already-in-cost", amount: v.gross }); continue; }
     }
-    const amount = v.taxTreatment === "recoverable" ? v.net : v.gross;
-    amounts.push(amount);
-    if (breakdownCoverage[key] !== "incomplete") breakdownCoverage[key] = "available";
-    breakdown[key] = new Exact(breakdown[key]).plus(amount).toFixed();
+    count(key, v.taxTreatment === "recoverable" ? v.net : v.gross);
   }
   return { expenses: sum(amounts), payments: sum(payments), breakdown, breakdownCoverage, excluded, reasons: [...new Set(reasons)] };
 }

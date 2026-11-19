@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import type {RawPackage} from "./raw-package";
 import {calculateSourceEstimate,type EstimateLine,type EstimateTotals,type ProductLabel,type SourceEstimate} from "./estimate";
 import {validSelectedMonth} from "../domain/month";
-import {calculateExpenseComponents} from "../analytics/operating";
+import {calculateEstimateExpenseComponents} from "../analytics/operating";
 import {relevantExpenseRevision} from "../expenses/adjustments";
 import type {AppRecord} from "../store/revisions";
 
@@ -75,7 +75,7 @@ export function monthChanges(now:MonthProfitTotals,before:MonthProfitTotals|null
  return {salesPct:amount(now.sales,before.sales),grossProfitPct:amount(now.grossProfit,before.grossProfit),marginPoints:a===null||b===null?null:pct(a.minus(b)),netProfitPct:amount(now.netProfit,before.netProfit)};
 }
 function netProfit(month:string,grossProfit:string|null,partial:boolean,expenses:MonthProfitExpenses):Pick<MonthProfitTotals,"expenses"|"expensesComplete"|"netProfit"|"netProfitReason"> {
- const components=calculateExpenseComponents({period:month,expenses:expenses.app});
+ const components=calculateEstimateExpenseComponents({period:month,expenses:expenses.app});
  const confirmation=expenses.app.find(row=>row.kind==="confirmation"&&row.entityId===`expense-complete:${month}`);
  const confirmed=confirmation?.kind==="confirmation"&&confirmation.value.complete&&confirmation.value.period===month;
  const complete=confirmed&&confirmation.value.reviewedRevision===relevantExpenseRevision(expenses.history,month);

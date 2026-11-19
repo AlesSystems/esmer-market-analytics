@@ -27,7 +27,7 @@ export function displayGroup(classification: Classification, category: string): 
   return "other";
 }
 
-/** Mirrors calculateExpenseComponents: same lines, same net/gross rule, same blockers. */
+/** Mirrors calculateEstimateExpenseComponents: same lines, same net/gross rule, same blockers. */
 export function groupExpenses(period: string, app: AppRecord[]): { groups: ExpenseGroup[]; attention: ExpenseAttention[] } {
   const totals = new Map<ExpenseGroupKey, { amount: InstanceType<typeof Exact> | null; count: number }>(expenseGroupKeys.map(key => [key, { amount: new Exact(0), count: 0 }]));
   const attention: ExpenseAttention[] = [], losses = new Set<string>();
