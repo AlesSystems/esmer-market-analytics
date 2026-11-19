@@ -68,8 +68,9 @@ test("an open Elle ekle draft survives opening and closing the gear overlays, an
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik taslak");
     // Recovery replaces the workspace, so it still goes through the draft prompt.
     await openSettingsItem(page, /^Yedekle \/ Geri yükle/);
-    await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
-    await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Taslak silinsin mi?" })).toBeVisible();
+    await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click();
+    await expect(page.getByRole("button", { name: /^Ayarlar(, dikkat gerekiyor)?$/ })).toBeFocused();
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik taslak");
   } finally { await finish(app, userData); }
 });

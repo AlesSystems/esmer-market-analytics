@@ -268,7 +268,7 @@ test("Excel review identifies identical manual bills, cancels safely, and suppor
     await page.getByText("Sürüm ayrıntıları", { exact: true }).click();
     await expect(page.getByText("İçe aktarma / satır", { exact: true })).toBeVisible();
     await page.getByRole("textbox", { name: "Kategori", exact: true }).fill("Sentetik taslak");
-    const stay = page.getByRole("button", { name: "Düzenlemeye devam et" });
+    const stay = page.getByRole("button", { name: "Düzenlemeye dön" });
     for (const leave of [
       () => page.getByRole("button", { name: "Düzeltmeyi kapat" }).click(),
       () => page.getByRole("button", { name: "Giderlere dön" }).click(),
@@ -281,7 +281,7 @@ test("Excel review identifies identical manual bills, cancels safely, and suppor
       await expect(page.getByRole("textbox", { name: "Kategori", exact: true })).toHaveValue("Sentetik taslak");
     }
     await page.getByRole("button", { name: "Düzeltmeyi kapat" }).click();
-    await page.getByRole("button", { name: "Bilgileri bırak" }).click();
+    await page.getByRole("button", { name: "Taslağı sil" }).click();
     await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" }).getByRole("button", { name: "İncele / düzelt" })).toBeFocused();
     await openImport();
     await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" }).getByRole("listitem")).toHaveCount(1);

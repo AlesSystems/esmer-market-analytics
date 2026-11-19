@@ -73,8 +73,8 @@ for (const source of [false, true]) {
       await page.locator("#expense-manual").click();
       await page.getByLabel("Kategori", { exact: true }).fill("Sentetik taslak");
       await openSection(page, "Bu ay");
-      await expect(page.getByRole("alertdialog")).toContainText("Kaydedilmemiş bilgileri bırak?");
-      await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
+      await expect(page.getByRole("alertdialog")).toContainText("Taslak silinsin mi?");
+      await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click();
       await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik taslak");
       await expect(nav(page).getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
     } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
