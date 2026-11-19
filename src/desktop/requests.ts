@@ -34,7 +34,7 @@ export function validExpenseRequest(operation: string, payload: unknown): boolea
   if (operation === "cancelExpensePreview") return exact(payload, ["previewId"]) && validId(payload.previewId);
   if (operation === "confirmExpenses") {
     const row = (v: unknown): v is number => Number.isSafeInteger(v) && Number(v) >= 2 && Number(v) <= 5001;
-    if (!(exact(payload, ["previewId", "keepCandidateRows"]) || exact(payload, ["previewId", "keepCandidateRows", "matches"])) ||
+    if (!(exact(payload, ["previewId", "keepCandidateRows"]) || exact(payload, ["previewId", "keepCandidateRows", "matches"]) || exact(payload, ["previewId", "keepCandidateRows", "matches", "acknowledgedDetailedRows"])) ||
       !validId(payload.previewId) || !Array.isArray(payload.keepCandidateRows) || payload.keepCandidateRows.length > 5000 ||
       !payload.keepCandidateRows.every(row)) return false;
     const reviewed = new Set(payload.keepCandidateRows);
@@ -47,7 +47,10 @@ export function validExpenseRequest(operation: string, payload: unknown): boolea
       reviewed.add(match.row);
       linked.add(match.entityId);
     }
-    return true;
+    if (!("acknowledgedDetailedRows" in payload)) return true;
+    const acknowledged = payload.acknowledgedDetailedRows;
+    return Array.isArray(acknowledged) && acknowledged.length <= payload.matches.length &&
+      acknowledged.every(row) && new Set(acknowledged).size === acknowledged.length;
   }
   if (operation === "confirmExpenseCompleteness") return exact(payload, ["period", "reviewedRevision", "complete", "reason"]) && validPeriod(payload.period) && revision(payload.reviewedRevision) && typeof payload.complete === "boolean" && reason(payload.reason);
   if (operation === "correctExpense" || operation === "restoreExpense") return exact(payload, ["entityId", "expectedRevision", "reason", operation === "correctExpense" ? "replacement" : "restoreRevision"]) && validId(payload.entityId) && revision(payload.expectedRevision) && Number(payload.expectedRevision) > 0 && reason(payload.reason) && (operation === "correctExpense" ? validFields(payload.replacement) : payload.restoreRevision === null || revision(payload.restoreRevision) && Number(payload.restoreRevision) > 0);

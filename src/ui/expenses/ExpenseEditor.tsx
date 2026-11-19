@@ -5,6 +5,7 @@ import { date, money } from "../format";
 import { isExpense, isManualBill } from "../../expenses/validation";
 import { monthName } from "../pages/month-summary";
 import { ManualExpenseEntry } from "../ManualExpenseEntry";
+import { useExpenseNavigation } from "../expense-navigation";
 
 export type Run = (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean, focusId?: string) => Promise<void>;
 export const currentValue = (row: ExpenseRecord): ExpenseValue | null => isExpense(row.value) ? row.value : null;
@@ -26,9 +27,16 @@ export function ExpenseEditor({ row, history, busy, close, run, reload, saved }:
 /** Correction, reversal and restore of one record. Every change appends a version with a reason; the original and earlier versions stay. */
 function DetailedEditor({ row, history, busy, close, run }: EditorProps) {
   const original = currentValue(row);
-  const [fields, setFields] = useState<ExpenseFields | null>(original ? { date: original.date, paymentDate: original.paymentDate, category: original.category, classification: original.classification, net: original.net, tax: original.tax, gross: original.gross, taxTreatment: original.taxTreatment, taxEvidence: original.taxEvidence, supportingReference: original.supportingReference, sourceReference: original.sourceReference, labourPeriod: original.labourPeriod, loss: original.loss } : null);
+  const [initial] = useState<ExpenseFields | null>(() => original ? { date: original.date, paymentDate: original.paymentDate, category: original.category, classification: original.classification, net: original.net, tax: original.tax, gross: original.gross, taxTreatment: original.taxTreatment, taxEvidence: original.taxEvidence, supportingReference: original.supportingReference, sourceReference: original.sourceReference, labourPeriod: original.labourPeriod, loss: original.loss } : null);
+  const [fields, setFields] = useState(initial);
   const [reason, setReason] = useState("");
   const title = useRef<HTMLHeadingElement>(null);
+  const navigation = useExpenseNavigation();
+  const dirty = reason !== "" || JSON.stringify(fields) !== JSON.stringify(initial);
+  useEffect(() => {
+    navigation.protect({ dirty, locked: false });
+    return () => navigation.protect({ dirty: false, locked: false });
+  }, [dirty, navigation.protect]);
   useEffect(() => { title.current?.focus(); }, []);
   function update<K extends keyof ExpenseFields>(key: K, value: ExpenseFields[K]) { setFields(previous => previous ? { ...previous, [key]: value } : null); }
   const decimal = (key: string) => ["net", "tax", "gross"].includes(key);
@@ -51,8 +59,8 @@ function DetailedEditor({ row, history, busy, close, run }: EditorProps) {
       </fieldset>
       <fieldset disabled={busy} className="g-fields"><legend>Referanslar</legend>{textField("supportingReference", "Destek referansı")}{textField("sourceReference", "Kayıt referansı")}</fieldset>
       <p className="g-cap">Tutarları virgüllü ondalık olarak girin (örnek: 1250,50). Net, KDV ve brüt ilişkisi kayıtta doğrulanır.</p>
-      <label className="g-reason">Değişiklik gerekçesi<input required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>
-      <div className="g-actions"><button type="submit" className="btn btn-primary" disabled={busy || !reason.trim()}>Düzeltmeyi kaydet</button><button type="button" className="btn btn-secondary" disabled={busy || !reason.trim() || original?.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: null, reason }), "Gider geri alındı. Geçmişi korundu.", true)}>Gideri geri al</button><button type="button" className="btn btn-secondary" onClick={close}>Düzeltmeyi kapat</button></div>
+      <label className="g-reason">Değişiklik gerekçesi<input disabled={busy} required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>
+      <div className="g-actions"><button type="submit" className="btn btn-primary" disabled={busy || !reason.trim()}>Düzeltmeyi kaydet</button><button type="button" className="btn btn-secondary" disabled={busy || !reason.trim() || original?.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: null, reason }), "Gider geri alındı. Geçmişi korundu.", true)}>Gideri geri al</button><button type="button" className="btn btn-secondary" disabled={busy} onClick={() => navigation.leave(close)}>Düzeltmeyi kapat</button></div>
     </form>}
     <ExpenseHistory {...{ row, history, busy, reason, run }} />
   </section>;

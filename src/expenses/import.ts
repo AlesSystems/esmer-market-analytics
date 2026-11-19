@@ -140,12 +140,19 @@ export class Expenses {
     requireValid(keep.size === request.keepCandidateRows.length && matches.size === (request.matches?.length ?? 0) &&
       new Set(matches.values()).size === matches.size && keep.size + matches.size === candidates.size &&
       [...keep].every(row => candidates.has(row) && !matches.has(row)) && [...matches.keys()].every(row => candidates.has(row)));
+    const acknowledgements = new Set(request.acknowledgedDetailedRows);
+    requireValid(acknowledgements.size === (request.acknowledgedDetailedRows?.length ?? 0));
+    const billsById = new Map(Object.entries(p.manualCandidates).flatMap(([key, bills]) =>
+      bills.map(bill => [bill.entityId, { key, bill }] as const)));
     const changes = p.rows.filter(row => !row.alreadyPresent).map(row => {
       const entityId = matches.get(row.row);
-      const match = entityId && row.matchKey ? p.manualCandidates[row.matchKey].find(candidate => candidate.entityId === entityId) : undefined;
-      requireValid(!entityId || match);
-      return { entityId: row.entityId, value: row.value!, match };
+      const candidate = entityId ? billsById.get(entityId) : undefined;
+      requireValid(!entityId || candidate && candidate.key === row.matchKey);
+      const needsAcknowledgement = !!candidate && row.duplicates.length > 0;
+      requireValid(acknowledgements.delete(row.row) === needsAcknowledgement);
+      return { entityId: row.entityId, value: row.value!, match: candidate?.bill };
     });
+    requireValid(!acknowledgements.size);
     const imported = this.store.importExpenses(p.batchId, p.baseRevision, changes);
     this.pending = null;
     return { status: imported ? "imported" as const : "already-imported" as const, count: imported ? changes.length : 0 };

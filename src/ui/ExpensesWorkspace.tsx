@@ -79,7 +79,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     return () => { live = false; };
   }, [before, loaded, active]);
   const run: Run = async (action, success, mutation = false, focusId) => {
-    navigation.protect({ dirty: false, locked: true });
+    const unlock = navigation.lock();
     setBusy(true); setError(""); setMessage("");
     try {
       const result = await action();
@@ -89,7 +89,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
       setMessage(result.status === "already-imported" ? "Bu Excel dosyası zaten içe aktarılmış. Kayıtlar değiştirilmedi." : success);
       if (mutation) { if (!focusId) returnToRecords(); await load(); if (focusId) setTimeout(() => document.getElementById(focusId)?.focus(), 0); }
     } catch { setError(failed); }
-    finally { navigation.protect({ dirty: false, locked: false }); setBusy(false); }
+    finally { unlock(); setBusy(false); }
   };
   const billNumbers = new Map<string, number>();
   for (const row of view?.history ?? []) if (isManualBill(row.value) && !billNumbers.has(row.entityId)) billNumbers.set(row.entityId, row.revision);
