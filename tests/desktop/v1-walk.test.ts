@@ -5,7 +5,8 @@ import {join,resolve} from "node:path";
 import {readSheet} from "read-excel-file/node";
 import {executablePath} from "../helpers/desktop-executable";
 import {openWorkspace,openSection,importPackage,openSettings,settingsMenu,setMonth} from "../helpers/desktop-navigation";
-import {november,novemberProfitPackage} from "../helpers/november-bill-fixture";
+import {workbook} from "../helpers/expense-fixtures";
+import {november,novemberElectricityExcelRow,novemberProfitPackage} from "../helpers/november-bill-fixture";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
 
 // #108: the v1 owner walk on the packaged app, synthetic data only. Screenshots go to the test output dir; ESMER_CAPTURE_WALK=1 writes them to docs/evidence/one-ui/.
@@ -80,44 +81,148 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true,maxRetries:5});}
 });
 
-test("November bill yields the same 8.750 TRY net estimate on screen and in Excel", async () => {
+test("November bill survives restart, reconciles with Excel and keeps a separate bill", async ({}, testInfo) => {
+ test.setTimeout(90_000);
  const userData = await mkdtemp(join(tmpdir(), "november-bill-"));
- const source = join(userData, "source.json"), output = join(userData, "november.xlsx");
+ const source = join(userData, "source.json"), matchingWorkbook = join(userData, "matching.xlsx");
+ const template = join(userData, "template.xlsx"), separateWorkbook = join(userData, "separate.xlsx");
  await writeFile(source, novemberProfitPackage());
- const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+ await writeFile(matchingWorkbook, await workbook([novemberElectricityExcelRow]));
+ const separateRow = [...novemberElectricityExcelRow];
+ separateRow[0] = "november-electricity-2";
+ separateRow[8] = "non-recoverable";
+ separateRow[9] = "tax-2";
+ separateRow[10] = "bill-2";
+ await writeFile(separateWorkbook, await workbook([separateRow]));
+
+ const launch = () => electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+ let app = await launch();
  try {
-  const page = await app.firstWindow();
-  await openWorkspace(page);
+  let page = await app.firstWindow();
+  const button = (name: string) => page.getByRole("button", { name, exact: true });
+  const history = () => page.getByRole("region", { name: "İçe aktarma geçmişi" });
+  const records = () => page.getByRole("region", { name: "Kayıtlar" }).locator("tbody tr");
+  const chooseOpenPath = (path: string) => app.evaluate(({ dialog }, path) => {
+   dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] });
+  }, path);
+  const chooseSavePath = (path: string) => app.evaluate(({ dialog }, path) => {
+   dialog.showSaveDialog = async () => ({ canceled: false, filePath: path });
+  }, path);
+  const shot = async (name: string) => {
+   await page.evaluate(() => document.fonts.ready);
+   await page.screenshot({ path: testInfo.outputPath(`${name}.png`), fullPage: true });
+  };
+  const review = async () => {
+   await button("Bu ayın giderleri tamam").click();
+   await button("Bu kalemlerde gider yok, onayla").click();
+   await button("Net kârı gör").click();
+  };
+  const exportEstimate = async (name: string, shownNet: string, expenses: string, net: string) => {
+   await expect(page.locator(".hero-num")).toContainText("10.000,00");
+   await expect(page.locator(".netcard .net")).toContainText(shownNet);
+   const output = join(userData, `${name}.xlsx`);
+   await chooseSavePath(output);
+   await button("Excel’e aktar").click();
+   await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
+   const summary = await readSheet(await readFile(output), "Özet");
+   const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
+   expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", expenses, net]);
+   expect(amount("Hesaplama sürümü")).toBe("month-profit-v2");
+  };
+
   await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
-  await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, source);
+  await openWorkspace(page);
+  await chooseOpenPath(source);
   await importPackage(page);
   await openSection(page, "Giderler");
   await setMonth(page, november);
-  await page.getByRole("button", { name: "Elle gider ekle", exact: true }).click();
+  await expect(page.getByText("Hesap ayrıntıları ve içe aktarma geçmişi", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Excel şablonu nasıl doldurulur?", { exact: true })).toHaveCount(0);
+  await button("Excel’den içe aktar").click();
+  await expect(history()).toContainText("Henüz içe aktarma yok.");
+  await chooseSavePath(template);
+  await button("Şablonu indir").click();
+  await expect(page.getByText("Excel şablonu kaydedildi.", { exact: true })).toBeVisible();
+  const templateRows = await readSheet(await readFile(template), "Giderler");
+  expect(templateRows[0]).toContain("Gider tarihi");
+  await button("Giderlere dön").click();
+
+  await button("Elle gider ekle").click();
   await page.getByLabel("Kategori", { exact: true }).fill("Elektrik");
   await page.getByLabel("Tutar (TRY)", { exact: true }).fill("1.250,00");
-  await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
+  await shot("manual");
+  await button("Gideri kaydet").click();
   await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
+  await app.close();
+
+  app = await launch();
+  page = await app.firstWindow();
+  await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
+  await openWorkspace(page);
+  await openSection(page, "Giderler");
+  await setMonth(page, november);
+  await expect(records()).toHaveCount(1);
+  await expect(records().first()).toContainText("Kasım 2026");
+  await expect(records().first()).toContainText("Elle kayıt no. 1");
+  await records().first().getByRole("button", { name: "İncele / düzelt" }).click();
+  await expect(page.getByLabel("Tutar (TRY)", { exact: true })).toHaveValue("1250");
+  await button("Düzeltmeyi kapat").click();
 
   await openSection(page, "Bu ay");
   await expect(page.getByRole("heading", { name: "Kasım 2026", level: 1 })).toBeVisible();
   await expect(page.locator(".hero-num")).toContainText("10.000,00");
+  await expect(page.locator(".netcard")).toContainText("Bu ayın giderleri tamamlanmadı");
   await expect(page.locator(".netcard .net")).toHaveCount(0);
+  await openSection(page, "Giderler");
+  await review();
+  await exportEstimate("manual-estimate", "8.750,00", "1250", "8750");
+  await shot("net-manual");
 
   await openSection(page, "Giderler");
-  await page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true }).click();
-  await page.getByRole("button", { name: "Bu kalemlerde gider yok, onayla", exact: true }).click();
-  await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
-  await expect(page.locator(".netcard .net")).toContainText("8.750,00");
-  await expect(page.getByRole("region", { name: /[Nn]et kâr$/ })).toContainText("Giderler: 1.250,00 ₺");
+  await chooseOpenPath(matchingWorkbook);
+  await button("Excel’den içe aktar").click();
+  await button("Excel dosyası seç").click();
+  await button("Satır 2: 1 olası elle kayıt").click();
+  await expect(button("İçe aktar")).toBeDisabled();
+  await page.getByRole("combobox", { name: "Satır 2 eşleştirme kararı" })
+   .selectOption({ label: "Elle kayıt no. 1 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+  await shot("match");
+  await button("İçe aktar").click();
+  await expect(records()).toHaveCount(1);
+  await expect(records().first()).toContainText("Elle kayıt no. 1");
+  await expect(records().first()).toContainText(/15[.\/]11[.\/]2026/);
+  await expect(page.getByText("Onay eskidi", { exact: true })).toBeVisible();
+  await openSection(page, "Bu ay");
+  await expect(page.locator(".netcard")).toContainText("Giderler onaydan sonra değişti");
+  await expect(page.locator(".netcard .net")).toHaveCount(0);
+  await openSection(page, "Giderler");
+  await review();
+  await exportEstimate("linked-estimate", "9.000,00", "1000", "9000");
+  await shot("net-linked");
 
-  await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, output);
-  await page.getByRole("button", { name: "Excel’e aktar", exact: true }).click();
-  await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
-  const summary = await readSheet(await readFile(output), "Özet");
-  const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
-  expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", "1250", "8750"]);
-  expect(amount("Hesaplama sürümü")).toBe("month-profit-v2");
+  await openSection(page, "Giderler");
+  await button("Excel’den içe aktar").click();
+  await expect(history().getByRole("listitem")).toHaveCount(1);
+  await shot("import-history");
+  await button("Excel dosyası seç").click();
+  await expect(page.getByText("Bu Excel dosyası zaten içe aktarılmış.", { exact: true })).toBeVisible();
+  await expect(button("İçe aktar")).toBeDisabled();
+  await button("Önizlemeyi kapat").click();
+  await expect(history().getByRole("listitem")).toHaveCount(1);
+  await button("Giderlere dön").click();
+  await expect(records()).toHaveCount(1);
+
+  await button("Excel’den içe aktar").click();
+  await chooseOpenPath(separateWorkbook);
+  await button("Excel dosyası seç").click();
+  await expect(button("İçe aktar")).toBeDisabled();
+  await page.getByLabel("Satır 2: benzer kayıt var, yine de ayrı gider olarak ekle").check();
+  await button("İçe aktar").click();
+  await expect(records()).toHaveCount(2);
+  await expect(page.getByText("Onay eskidi", { exact: true })).toBeVisible();
+  await review();
+  // The linked bill contributes its 1,000 TRY net and the separate bill its 1,250 TRY gross.
+  await exportEstimate("separate-estimate", "7.750,00", "2250", "7750");
  } finally {
   await app.close().catch(() => {});
   await rm(userData, { recursive: true, force: true, maxRetries: 5 });
