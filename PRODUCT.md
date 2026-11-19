@@ -32,7 +32,7 @@ The monthly composition leads with a broad gross-result section, aligned support
 - The first release uses prepared analytics packages from authorized backup preparation. It must not require the owner to restore or administer the POS database.
 - Source access is permanently read-only. The first release does not require a live connection. An isolated test connection can be configured, stays off until enabled, and cannot activate a real financial dataset. Completing live integration still requires separate acceptance and authorization.
 - Historical data must show its actual cutoff rather than appear to describe current activity.
-- Spreadsheet import remains the primary expense-entry workflow. Manual entry uses the same validation, provenance and history rules. A reveal without expense data must still offer useful sales analysis.
+- Spreadsheet import remains the primary expense-entry workflow. For ordinary running costs the owner enters a category and the full bill amount for the selected month. Detailed entries use Excel. Both routes preserve correction history. A reveal without expense data must still offer useful sales analysis.
 - Do not contact the owner, connect to production or install on his computer as a development side effect.
 
 ## Capabilities and Constraints
