@@ -91,7 +91,7 @@ test("runtime validation rejects malformed revisions and preserves all original 
   store.appendRevision(expense("first", "0.00000000000001")); store.appendRevision(expense("second", "2"));
   const pin = store.readSnapshot().pin;
   store.appendRevision(expense("first", "3"));
-  expect(store.readPinned(pin).app.map(row => row.kind === "expense" && row.value.net)).toEqual(["0.00000000000001", "2"]);
+  expect(store.readPinned(pin).app.map(row => row.kind === "expense" && "net" in row.value && row.value.net)).toEqual(["0.00000000000001", "2"]);
   expect(store.readSnapshot().app.map(row => row.entityId)).toEqual(["second", "first"]);
   for (const change of [{ ...expense("invalid"), extra: "private" }, { ...expense("invalid"), value: { net: 1, date: "2025-01-15", reason: "reason", evidence: "fixture:1" } }, { ...expense("invalid"), value: { net: "1", date: "2025-02-30", reason: "reason", evidence: "fixture:1" } }]) expect(() => store.appendRevision(change as AppChange)).toThrow();
   store.close(); const db = new DatabaseSync(path);

@@ -2,12 +2,29 @@ import { useEffect, useRef, useState } from "react";
 import { classifications, classificationLabels, type ExpenseFields, type ExpenseRecord, type ExpenseResult, type ExpenseValue } from "../../expenses/contracts";
 import type { RequestError } from "../../domain/contracts";
 import { date, money } from "../format";
+import { isExpense, isManualBill } from "../../expenses/validation";
+import { monthName } from "../pages/month-summary";
+import { ManualExpenseEntry } from "../ManualExpenseEntry";
 
 export type Run = (action: () => Promise<ExpenseResult | RequestError>, success: string, mutation?: boolean, focusId?: string) => Promise<void>;
-export const currentValue = (row: ExpenseRecord): ExpenseValue | null => "format" in row.value ? row.value : null;
+export const currentValue = (row: ExpenseRecord): ExpenseValue | null => isExpense(row.value) ? row.value : null;
+
+type EditorProps = { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: Run };
+export function ExpenseEditor({ row, history, busy, close, run, reload, saved }: EditorProps & {
+  reload: () => Promise<boolean>;
+  saved: (period: string) => void;
+}) {
+  if (!isManualBill(row.value)) return <DetailedEditor {...{ row, history, busy, close, run }} />;
+  const bill = row.value;
+  return <ManualExpenseEntry period={bill.period} close={close} reviewRecords={reload} saved={result => saved(result.incurredPeriod)}
+    correction={{ row, bill, busy, history: (reason, blocked) => <>
+      <button type="button" className="btn btn-secondary" disabled={blocked || !reason.trim() || bill.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: null, reason }), "Gider geri alındı. Geçmişi korundu.", true)}>Gideri geri al</button>
+      <ExpenseHistory {...{ row, history, run, reason }} busy={blocked} />
+    </> }} />;
+}
 
 /** Correction, reversal and restore of one record. Every change appends a version with a reason; the original and earlier versions stay. */
-export function ExpenseEditor({ row, history, busy, close, run }: { row: ExpenseRecord; history: ExpenseRecord[]; busy: boolean; close: () => void; run: Run }) {
+function DetailedEditor({ row, history, busy, close, run }: EditorProps) {
   const original = currentValue(row);
   const [fields, setFields] = useState<ExpenseFields | null>(original ? { date: original.date, paymentDate: original.paymentDate, category: original.category, classification: original.classification, net: original.net, tax: original.tax, gross: original.gross, taxTreatment: original.taxTreatment, taxEvidence: original.taxEvidence, supportingReference: original.supportingReference, sourceReference: original.sourceReference, labourPeriod: original.labourPeriod, loss: original.loss } : null);
   const [reason, setReason] = useState("");
@@ -37,12 +54,18 @@ export function ExpenseEditor({ row, history, busy, close, run }: { row: Expense
       <label className="g-reason">Değişiklik gerekçesi<input required maxLength={500} value={reason} onChange={event => setReason(event.target.value)} /></label>
       <div className="g-actions"><button type="submit" className="btn btn-primary" disabled={busy || !reason.trim()}>Düzeltmeyi kaydet</button><button type="button" className="btn btn-secondary" disabled={busy || !reason.trim() || original?.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: null, reason }), "Gider geri alındı. Geçmişi korundu.", true)}>Gideri geri al</button><button type="button" className="btn btn-secondary" onClick={close}>Düzeltmeyi kapat</button></div>
     </form>}
-    <h3>Kayıt geçmişi</h3>
-    <div className="table-scroll" tabIndex={0} aria-label="Gider sürümleri"><table><thead><tr><th>Sürüm / gerekçe</th><th>Tarih / kategori</th><th className="number">Net / KDV / brüt</th><th>İşlem</th></tr></thead><tbody>{history.map(item => { const value = currentValue(item); return <tr key={item.revision}>
-      <td>{item.revision} · {item.value.reason}<small>{item.revision === row.revision ? (value?.voided ? "Güncel sürüm · geri alınmış" : "Güncel sürüm") : value?.voided ? "Önceki sürüm · geri alınmış" : "Önceki sürüm"}</small></td>
-      <td>{date(item.value.date)}<small>{value?.category}</small>{value && <details><summary>Sürüm ayrıntıları</summary><dl className="g-evidence"><dt>Ödeme tarihi</dt><dd>{value.paymentDate ? date(value.paymentDate) : "Yok"}</dd><dt>Sınıflandırma</dt><dd>{classificationLabels[value.classification]}</dd><dt>KDV işlemi / kanıtı</dt><dd>{value.taxTreatment === "recoverable" ? "İndirilebilir" : value.taxTreatment === "non-recoverable" ? "İndirilemez" : "Bilinmiyor"} · {value.taxEvidence ?? "Yok"}</dd><dt>Kayıt / destek referansı</dt><dd>{value.sourceReference ?? "Yok"} / {value.supportingReference ?? "Yok"}</dd><dt>İşçilik dönemi</dt><dd>{value.labourPeriod ?? "Uygulanmaz"}</dd><dt>Kayıp kanıtı / işlemi</dt><dd>{value.loss ? `${value.loss.evidence} · ${value.loss.recognition === "separate" ? "Ayrıca giderleştirilmiş" : "Maliyette yer alıyor"}` : "Uygulanmaz"}</dd><dt>İçe aktarma / satır</dt><dd>{"kind" in value.origin ? "Elle girildi" : `${value.origin.batchId} / ${value.origin.row}`}</dd></dl></details>}</td>
-      <td className="number">{money(item.value.net)}<small>{value ? `${money(value.tax)} / ${money(value.gross)}` : "Kanıt yok"}</small></td>
-      <td><button type="button" className="link" disabled={busy || !reason.trim() || item.revision === row.revision || !value || value.voided} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: item.revision, reason }), "Önceki sürüm yeni kayıt olarak geri yüklendi.", true)}>Sürüm {item.revision} geri yükle</button></td>
-    </tr>; })}</tbody></table></div>
+    <ExpenseHistory {...{ row, history, busy, reason, run }} />
   </section>;
+}
+
+function ExpenseHistory({ row, history, busy, reason, run }: Omit<EditorProps, "close"> & { reason: string }) {
+  return <>
+    <h3>Kayıt geçmişi</h3>
+    <div className="table-scroll" tabIndex={0} aria-label="Gider sürümleri"><table><thead><tr><th>Sürüm / gerekçe</th><th>Dönem / kategori</th><th className="number">Tutar</th><th>İşlem</th></tr></thead><tbody>{history.map(item => { const value = currentValue(item), bill = isManualBill(item.value) ? item.value : null, entry = bill ?? value; return <tr key={item.revision}>
+      <td>{item.revision} · {item.value.reason}<small>{item.revision === row.revision ? (entry?.voided ? "Güncel sürüm · geri alınmış" : "Güncel sürüm") : entry?.voided ? "Önceki sürüm · geri alınmış" : "Önceki sürüm"}</small></td>
+      <td>{isManualBill(item.value) ? monthName(item.value.period) : date(item.value.date)}<small>{entry?.category}</small>{bill && <small>Elle girildi</small>}{value && <details><summary>Sürüm ayrıntıları</summary><dl className="g-evidence"><dt>Ödeme tarihi</dt><dd>{value.paymentDate ? date(value.paymentDate) : "Yok"}</dd><dt>Sınıflandırma</dt><dd>{classificationLabels[value.classification]}</dd><dt>KDV işlemi / kanıtı</dt><dd>{value.taxTreatment === "recoverable" ? "İndirilebilir" : value.taxTreatment === "non-recoverable" ? "İndirilemez" : "Bilinmiyor"} · {value.taxEvidence ?? "Yok"}</dd><dt>Kayıt / destek referansı</dt><dd>{value.sourceReference ?? "Yok"} / {value.supportingReference ?? "Yok"}</dd><dt>İşçilik dönemi</dt><dd>{value.labourPeriod ?? "Uygulanmaz"}</dd><dt>Kayıp kanıtı / işlemi</dt><dd>{value.loss ? `${value.loss.evidence} · ${value.loss.recognition === "separate" ? "Ayrıca giderleştirilmiş" : "Maliyette yer alıyor"}` : "Uygulanmaz"}</dd><dt>İçe aktarma / satır</dt><dd>{"kind" in value.origin ? "Elle girildi" : `${value.origin.batchId} / ${value.origin.row}`}</dd></dl></details>}</td>
+      <td className="number">{money(isManualBill(item.value) ? item.value.amount : item.value.net)}{!bill && <small>{value ? `KDV ${money(value.tax)} · Brüt ${money(value.gross)}` : "Kanıt yok"}</small>}</td>
+      <td><button type="button" className="link" disabled={busy || !reason.trim() || item.revision === row.revision || !entry || entry.voided || isManualBill(row.value) !== !!bill} onClick={() => void run(() => window.esmer.restoreExpense({ entityId: row.entityId, expectedRevision: row.revision, restoreRevision: item.revision, reason }), "Önceki sürüm yeni kayıt olarak geri yüklendi.", true)}>Sürüm {item.revision} geri yükle</button></td>
+    </tr>; })}</tbody></table></div>
+  </>;
 }

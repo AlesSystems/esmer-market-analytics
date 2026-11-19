@@ -326,7 +326,7 @@ test("packaged owning worker migrates and reopens durable revisions and report p
   store.appendRevision({ kind: "adjustment", entityId: "adjustment", value: { net: "5", reason: "Synthetic adjustment", evidence: "fixture:adjustment", target: { datasetId: accepted.pin.datasetId!, kind: "line", sourceId: "line-delete" }, reversed: false } });
   expect(store.activate(staged.id).status).toBe("active");
   const before = store.readSnapshot();
-  expect(before.app.map(row => row.kind === "adjustment" ? row.applicability : row.kind === "expense" ? row.value.net : null)).toEqual(["60.000000000000001", "review-required"]);
+  expect(before.app.map(row => row.kind === "adjustment" ? row.applicability : row.kind === "expense" && "net" in row.value ? row.value.net : null)).toEqual(["60.000000000000001", "review-required"]);
   store.close();
   try {
     for (let launch = 0; launch < 2; launch++) {

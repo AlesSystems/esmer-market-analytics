@@ -48,7 +48,9 @@ test("a November bill survives reopening and each bill can be corrected with its
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-save-"));
   let app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
-    let page = await app.firstWindow(); await openWorkspace(page); await openSection(page, "Giderler");
+    let page = await app.firstWindow();
+    await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
+    await openWorkspace(page); await openSection(page, "Giderler");
     await setMonth(page, "2026-11");
     await page.locator("#expense-manual").click();
     const form = page.getByRole("region", { name: "Elle gider girişi" });
@@ -69,7 +71,7 @@ test("a November bill survives reopening and each bill can be corrected with its
     });
     await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
     await expect(page.getByLabel("Kategori", { exact: true })).toBeDisabled();
-    await page.getByRole("group", { name: "Dönem", exact: true }).getByRole("button", { name: "Sonraki ay", exact: true }).click();
+    await page.getByRole("group", { name: "Dönem", exact: true }).getByRole("button", { name: "Önceki ay", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Kaydın sonucu bekleniyor", exact: true })).toBeVisible();
     await expect(monthLabel(page)).toHaveAttribute("data-month", "2026-11");
     await app.evaluate(() => { const db = Reflect.get(globalThis, "manualExpenseTestLock"); db.exec("COMMIT"); db.close(); Reflect.deleteProperty(globalThis, "manualExpenseTestLock"); });
@@ -148,7 +150,10 @@ test("an absent pending receipt requires current-record review before another ma
     await page.getByRole("button", { name: "Vazgeç", exact: true }).click(); await page.locator("#expense-manual").click();
     await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
-    await setMonth(page, "2026-01"); await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
+    const prior = await monthLabel(page).getAttribute("data-month");
+    await page.getByRole("button", { name: "Önceki ay", exact: true }).click();
+    await expect(monthLabel(page)).not.toHaveAttribute("data-month", prior!);
+    await expect(page.getByRole("button", { name: "Kayıtları incele", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Gideri kaydet", exact: true })).toBeDisabled();
     await page.screenshot({ path: testInfo.outputPath("manual-review-required.png"), fullPage: true });
     await page.getByRole("button", { name: "Kayıtları incele", exact: true }).click();

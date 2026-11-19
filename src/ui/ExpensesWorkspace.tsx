@@ -7,6 +7,7 @@ import { ImportPreview } from "./expenses/ImportPreview";
 import { MonthDetails } from "./expenses/MonthDetails";
 import { AlertIcon, ArrowRightIcon, CheckIcon, DownloadIcon, PlusIcon, UploadIcon } from "./icons";
 import { type ExpensePeriod, type ExpensePreview, type ExpenseRecord } from "../expenses/contracts";
+import { isManualBill } from "../expenses/validation";
 import type { ExpenseGroupKey } from "../expenses/groups";
 import { date, money } from "./format";
 import { attentionChip, attentionText, blankSentence, confirmPlan, confirmReason, groupLabels, statusText } from "./expenses/copy";
@@ -63,7 +64,7 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
     return false;
   }
   // An open draft is kept while Kaynak belgeler, Canlı bağlantı or Hakkında cover the page; only recovery (which already asked the owner) drops it.
-  useEffect(() => { if (!active) { if (task === "manual" && !busy && !localStorage.getItem(pendingExpenseKey) && frame?.view === "recovery") setTask("records"); return; } if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setAsking(false); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active]);
+  useEffect(() => { if (!active) { if (!busy && !localStorage.getItem(pendingExpenseKey) && frame?.view === "recovery") { if (task === "manual") setTask("records"); setSelected(undefined); } return; } if (view?.period === period) return; restoreFocus.current = false; setTask(localStorage.getItem(pendingExpenseKey) ? "manual" : "records"); setView(undefined); setSelected(undefined); setPreview(undefined); setAsking(false); setError(""); setMessage(""); void load(); return () => { ++generation.current; }; }, [period, active]);
   // The month before is read once for the hints under the groups. It is shown only when the owner confirmed that month.
   const before = stepMonth(period, -1, null);
   const loaded = !!view;
@@ -168,23 +169,27 @@ export function ExpensesWorkspace({ period, onPeriod, onNetProfit, active = true
       </section>}
       <section className="card g-recs" aria-labelledby="g-recs-title">
         <div className="g-card-head"><h2 id="g-recs-title">Kayıtlar</h2>
-          {!manual && <button type="button" className="link" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}><PlusIcon />Elle ekle</button>}
+          {!manual && <button type="button" className="link" id="expense-manual" disabled={busy} onClick={() => { opener.current = () => document.getElementById("expense-manual")?.focus(); setTask("manual"); setMessage(""); }}><PlusIcon />Elle gider ekle</button>}
         </div>
         <p className="g-muted">Excel’den ya da elle girilen her satır burada. Toplamlar bu satırlardan hesaplanır.</p>
-        {manual && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={(result, current) => { if (!current) return; setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
+        {manual && <ManualExpenseEntry key={period} period={period} close={returnToRecords} reviewRecords={load} saved={result => { setMessage(result.status === "already-present" ? "Bu gider zaten kayıtlı." : "Gider kaydedildi."); setSavedPeriod(result.incurredPeriod !== period || result.paymentPeriod && result.paymentPeriod !== period ? { incurred: result.incurredPeriod, payment: result.paymentPeriod, related: result.incurredPeriod !== period ? result.incurredPeriod : result.paymentPeriod! } : undefined); returnToRecords(); void load(); }} />}
         {!view ? null : view.rows.length === 0 ? <p className="g-none">Bu ay için kayıt yok.</p>
-          : <div className="table-scroll g-table" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Tarih</th><th>Kategori</th><th className="number">Tutar</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => {
-            const value = currentValue(row), fix = view.attention.find(item => item.entityId === row.entityId);
+          : <div className="table-scroll g-table" tabIndex={0} aria-label="Gider kayıtları"><table><thead><tr><th>Dönem / tarih</th><th>Kategori</th><th className="number">Tutar</th><th><span className="sr-only">İşlem</span></th></tr></thead><tbody>{view.rows.map(row => {
+            const record = row.value, bill = isManualBill(record), detailed = currentValue(row), value = bill ? record : detailed, fix = view.attention.find(item => item.entityId === row.entityId);
             return <tr key={row.entityId}>
-              <td>{date(row.value.date)}</td>
+              <td>{bill ? monthName(record.period) : date(record.date)}</td>
               <td>{value?.category ?? "Eski kayıt"}{" "}{value?.voided ? <span className="rchip is-void">Geri alındı</span> : fix && <span className="rchip is-drop">{attentionChip[fix.reason]}</span>}</td>
-              <td className="number">{money(value ? value.gross : row.value.net)}</td>
+              <td className="number">{money(bill ? record.amount : detailed?.gross ?? record.net)}</td>
               <td className="number"><button type="button" className="link" id={recordId(row.entityId)} disabled={locked} onClick={() => open(row, recordId(row.entityId))}>İncele / düzelt</button></td>
             </tr>;
           })}</tbody></table></div>}
       </section>
       {view && <MonthDetails view={view} />}
     </>}
-    {view && selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} />}
+    {view && selected && <ExpenseEditor key={selected.revision} row={selected} history={view.history.filter(row => row.entityId === selected.entityId)} busy={busy} close={returnToRecords} run={run} reload={load} saved={incurred => {
+      setMessage("Düzeltme kaydedildi. Dönemi yeniden inceleyin.");
+      setSavedPeriod(incurred !== period ? { incurred, payment: null, related: incurred } : undefined);
+      returnToRecords(); void load();
+    }} />}
   </main>;
 }

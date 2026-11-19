@@ -114,7 +114,11 @@ function validateDatabase(db: DatabaseSync): SnapshotSummary {
     requireValid(readRawPackage(bytes) && createHash("sha256").update(bytes).digest("hex") === row.hash);
   }
   const revisions=db.prepare("SELECT revision,kind,entity_id,value_json FROM app_revisions ORDER BY revision").all();
-  for (const row of revisions) validateChange({kind:row.kind,entityId:row.entity_id,value:decode(row.value_json)} as AppChange);
+  for (const row of revisions) {
+    const change = { kind: row.kind, entityId: row.entity_id, value: decode(row.value_json) } as AppChange;
+    validateChange(change);
+    if (change.kind === "expense" && isManualBill(change.value)) requireValid(version >= 9);
+  }
   if (version >= 8) {
     const receipts = db.prepare("SELECT * FROM expense_commands").all();
     const digest = (value: unknown) => createHash("sha256").update(canonical(value)).digest("hex");
