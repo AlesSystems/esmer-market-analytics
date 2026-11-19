@@ -27,22 +27,69 @@ for (const host of ["empty", "source", "sales"] as const) test(`manual entry pro
     const earlier = stepper.getByRole("button", { name: "Önceki ay", exact: true });
     const step = await earlier.getAttribute("aria-disabled") === "true" ? stepper.getByRole("button", { name: "Sonraki ay", exact: true }) : earlier;
     await step.click();
-    await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Taslak silinsin mi?" })).toBeVisible();
     await expect(monthLabel(page)).toHaveAttribute("data-month", previous!);
-    await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
+    await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click();
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
     await openSection(page, "Bu ay");
-    await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?" })).toBeVisible();
-    await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Taslak silinsin mi?" })).toBeVisible();
+    await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click();
     await expect(nav.getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik elektrik");
-    await step.click(); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    await step.click(); await page.getByRole("button", { name: "Taslağı sil", exact: true }).click();
     await expect(monthLabel(page)).not.toHaveAttribute("data-month", previous!);
     await page.locator("#expense-manual").click();
     await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("");
     await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
     await expect(page.locator("#expense-manual")).toBeFocused();
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+test("draft confirmation isolates the page and returns focus without losing the draft", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-draft-dialog-"));
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    await openSection(page, "Giderler");
+    const add = page.getByRole("button", { name: "Elle ekle", exact: true });
+    const category = page.getByLabel("Kategori", { exact: true });
+    const cancel = page.getByRole("button", { name: "Vazgeç", exact: true });
+    const notice = page.getByRole("alertdialog");
+    const keep = notice.getByRole("button", { name: "Düzenlemeye dön", exact: true });
+    const discard = notice.getByRole("button", { name: "Taslağı sil", exact: true });
+
+    await page.setViewportSize({ width: 390, height: 640 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await add.click();
+    await category.fill("Sentetik su gideri");
+    await cancel.click();
+    await expect(notice).toBeVisible();
+    const movedFocusOutside = await page.locator("#manual-category").evaluate(field => {
+      field.focus();
+      return document.activeElement === field;
+    });
+    expect(movedFocusOutside).toBe(false);
+    await expect(keep).toBeFocused();
+    await expect(keep).toBeInViewport({ ratio: 1 });
+    await expect(discard).toBeInViewport({ ratio: 1 });
+    await page.keyboard.press("Tab");
+    await expect(discard).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(keep).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(notice).toHaveCount(0);
+    await expect(cancel).toBeFocused();
+    await expect(category).toHaveValue("Sentetik su gideri");
+
+    await cancel.click();
+    await discard.click();
+    await expect(add).toBeFocused();
+    await add.click();
+    await expect(category).toHaveValue("");
+  } finally {
+    await app.close();
+    await rm(userData, { recursive: true, force: true });
+  }
 });
 test("manual save validates fields, reviews duplicates, restores focus and resolves receipt after restart", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-manual-save-"));
@@ -174,10 +221,10 @@ for (const host of ["source"] as const) test(`leaving Giderler keeps a manual dr
     await openSection(page, "Giderler");
     await setMonth(page, "2024-01");
     await page.locator("#expense-manual").click(); await page.getByLabel("Kategori", { exact: true }).fill("Sentetik korunacak taslak");
-    await openSection(page, "Ürünler"); await expect(page.getByRole("heading", { name: "Kaydedilmemiş bilgileri bırak?", exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Düzenlemeye devam et", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
+    await openSection(page, "Ürünler"); await expect(page.getByRole("heading", { name: "Taslak silinsin mi?", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Düzenlemeye dön", exact: true }).click(); await expect(page.getByLabel("Kategori", { exact: true })).toHaveValue("Sentetik korunacak taslak");
     await expect(nav.getByRole("button", { name: "Giderler", exact: true })).toHaveAttribute("aria-current", "page");
-    await openSection(page, "Ürünler"); await page.getByRole("button", { name: "Bilgileri bırak", exact: true }).click();
+    await openSection(page, "Ürünler"); await page.getByRole("button", { name: "Taslağı sil", exact: true }).click();
     await expect(nav.getByRole("button", { name: "Ürünler", exact: true })).toHaveAttribute("aria-current", "page");
     await expect(monthLabel(page)).toHaveAttribute("data-month", "2024-01");
     await openSection(page, "Giderler"); await expect(page.getByRole("alertdialog")).toHaveCount(0);

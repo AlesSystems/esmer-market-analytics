@@ -102,10 +102,81 @@
 .g-totals { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 16px 0 8px; }
 .g-totals dd { margin-top: 4px; font-size: var(--t-xl); font-weight: 600; }
 
-/* Leaving with an open draft: above the page, below the top bar. */
 .g-leave { position: fixed; z-index: 60; top: 76px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; width: min(520px, calc(100vw - 32px)); padding: 18px 22px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow-pop); }
 .g-leave h2 { font-size: var(--t-lg); }
 .g-leave .g-actions { margin-top: 6px; }
+
+.g-draft-dialog {
+  position: fixed;
+  inset: 0;
+  place-items: safe center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 20px;
+  overflow: auto;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.g-draft-dialog[open] { display: grid; }
+body:has(.g-draft-dialog[open]) { overflow: hidden; }
+.g-draft-dialog::backdrop {
+  background: rgb(30 25 40 / .32);
+  opacity: 1;
+  transition: opacity 185ms ease-out;
+}
+.g-draft-dialog[data-closing]::backdrop {
+  opacity: 0;
+  transition-duration: 140ms;
+  transition-timing-function: ease-in;
+}
+.g-draft-panel {
+  width: min(100%, 460px);
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 20px 65px rgb(31 21 40 / .24);
+  opacity: 1;
+  transform: none;
+  transition: opacity 205ms cubic-bezier(.2, .75, .25, 1), transform 205ms cubic-bezier(.2, .75, .25, 1);
+}
+.g-draft-dialog[data-closing] .g-draft-panel {
+  opacity: 0;
+  transform: translateY(5px) scale(.99);
+  transition-duration: 140ms;
+  transition-timing-function: ease-in;
+}
+@starting-style {
+  .g-draft-dialog[open]::backdrop { opacity: 0; }
+  .g-draft-dialog[open] .g-draft-panel { opacity: 0; transform: translateY(8px) scale(.985); }
+}
+.g-draft-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: var(--accent-50);
+  color: var(--accent);
+}
+.g-draft-icon svg { width: 22px; height: 22px; }
+.g-draft-panel h2 { font-size: var(--t-xl); }
+.g-draft-panel p { margin-top: 6px; }
+.g-draft-actions { display: flex; flex-flow: row-reverse wrap; gap: 8px; margin-top: 24px; }
+.g-draft-discard.btn { color: var(--loss); }
+.g-draft-discard.btn:hover { border-color: var(--loss); background: var(--loss-bg); }
+
+@media (max-width: 500px) {
+  .g-draft-actions { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .g-draft-dialog::backdrop { transition: none; }
+}
 
 @media (max-width: 920px) {
   .g-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -121,7 +192,7 @@
   .g-form { padding: 16px 14px; }
 }
 @media (forced-colors: active) {
-  .g-note, .g-leave, .g-ask, .g-attn, .g-tile[data-state="missing"] { border: 1px solid CanvasText; }
+  .g-note, .g-leave, .g-draft-panel, .g-ask, .g-attn, .g-tile[data-state="missing"] { border: 1px solid CanvasText; }
   .g-done .ico { color: Highlight; }
 }
 .g-head .g-say { margin-top: 8px; }
