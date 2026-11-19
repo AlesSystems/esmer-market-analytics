@@ -207,3 +207,39 @@ test("malformed enum arrays are rejected at IPC and canonical persistence bounda
     expect(service.query({ period: "2026-01" }).summary).toMatchObject({ expenses: null, coverage: "incomplete", reasons: ["UNKNOWN_TAX"] });
   } finally { store.close(); }
 });
+
+test("a month-only bill and its correction survive restart with their original receipts and affected reviews", async () => {
+  const { mkdtemp, rm } = await import("node:fs/promises"), { tmpdir } = await import("node:os"), { join } = await import("node:path");
+  const { validateSnapshot } = await import("../../src/recovery/validate");
+  const root = await mkdtemp(join(tmpdir(), "month-bill-")), path = join(root, "analytics.sqlite");
+  let store = openStore(path, { schemaVersion: 8 });
+  try {
+    store.close(); store = openStore(path);
+    let service = new Expenses(store);
+    store.confirmExpensesComplete({ period: "2026-11", reviewedRevision: 0, complete: true, reason: "Synthetic November review" });
+    store.confirmExpensesComplete({ period: "2026-12", reviewedRevision: 0, complete: true, reason: "Synthetic December review" });
+    const bill = { action: "save-bill" as const, requestId: "november-electricity", fields: { period: "2026-11", category: "Elektrik", amount: "1.250,00" } };
+    const saved = service.create(bill);
+    if (saved.status !== "saved") throw Error("November bill missing");
+    const november = service.query({ period: "2026-11" });
+    expect(november).toMatchObject({ confirmation: "stale", incurred: "1250", payments: "0" });
+    expect(november.rows[0].value).toEqual({ format: "manual-bill-v1", ...bill.fields, amount: "1250", origin: { kind: "manual", requestId: bill.requestId }, reason: expect.any(String), evidence: bill.requestId, replacesRevision: null, voided: false });
+    expect(service.query({ period: "2026-12" })).toMatchObject({ confirmation: "current", rows: [] });
+    store.confirmExpensesComplete({ period: "2026-11", reviewedRevision: saved.revision, complete: true, reason: "Synthetic review of first version" });
+    const separate = service.create({ ...bill, requestId: "second-bill" });
+    expect(separate.status).toBe("saved");
+    const reviewed = service.query({ period: "2026-11" });
+    store.confirmExpensesComplete({ period: "2026-11", reviewedRevision: reviewed.expenseRevision, complete: true, reason: "Synthetic review of both bills" });
+    const correction = { action: "correct-bill" as const, requestId: "correct-electricity", entityId: saved.entityId, expectedRevision: saved.revision, reason: "Sent with the December bills", fields: { period: "2026-12", category: "Elektrik", amount: "900,25" } };
+    const corrected = service.create(correction);
+    if (corrected.status !== "saved") throw Error("Correction missing");
+    store.close(); store = openStore(path); service = new Expenses(store);
+    expect(service.create(bill)).toMatchObject({ status: "already-saved", revision: saved.revision, incurredPeriod: "2026-11" });
+    expect(service.create(correction)).toMatchObject({ status: "already-saved", revision: corrected.revision, incurredPeriod: "2026-12" });
+    expect(service.create({ action: "resolve", requestId: correction.requestId })).toMatchObject({ status: "already-saved", revision: corrected.revision });
+    expect(service.query({ period: "2026-11" })).toMatchObject({ confirmation: "stale", incurred: "1250", rows: [{ value: { origin: { requestId: "second-bill" } } }] });
+    expect(service.query({ period: "2026-12" })).toMatchObject({ confirmation: "stale", incurred: "900.25", payments: "0", rows: [{ entityId: saved.entityId, value: { amount: "900.25", replacesRevision: saved.revision } }] });
+    expect(service.query({ period: "2026-12" }).history.filter(row => row.entityId === saved.entityId).map(row => row.revision)).toEqual([saved.revision, corrected.revision]);
+    expect(validateSnapshot(path).revisions).toBe(store.readPin().appRevision);
+  } finally { store.close(); await rm(root, { recursive: true, force: true }); }
+});
