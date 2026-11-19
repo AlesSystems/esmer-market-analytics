@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { calculateOperatingResult } from "../../src/analytics/operating";
-import type { ExpenseValue } from "../../src/expenses/contracts";
+import type { ExpenseValue, ManualBill } from "../../src/expenses/contracts";
 import type { GrossResult } from "../../src/analytics/costs";
 const expense: ExpenseValue = { format: "expense-v1", date: "2026-01-15", paymentDate: "2026-02-01", category: "Kira", classification: "operating-expense", net: "50", tax: "0", gross: "50", taxTreatment: "non-recoverable", taxEvidence: "tax-1", supportingReference: "bill-1", sourceReference: null, labourPeriod: null, loss: null, origin: { batchId: "batch-1", row: 2 }, reason: "İçe aktarıldı", evidence: "batch-1", replacesRevision: null, voided: false };
 const gross: GrossResult = { status: "ready", confidence: "estimated", method: "historical-last-purchase-estimate", coveredSales: "300", coveredCost: "100", coveredGrossProfit: "200", coveredMarginPercent: null, costCoveragePercent: "100", covered: [], excluded: [], exposures: { coveredSales: "300", coveredReturns: "0", excludedSales: "0", excludedReturns: "0" }, warnings: [] };
@@ -34,4 +34,16 @@ test("classifications, KDV basis, loss recognition and legacy evidence remain ex
   }
   expect(calculateOperatingResult({ ...i, expenses: [{ ...i.expenses[0], value: { date: expense.date, net: "50", reason: "Legacy", evidence: "legacy" } }] }).reasons).toContain("LEGACY_EXPENSE");
   expect(calculateOperatingResult({ ...i, confirmation: { ...i.confirmation, value: { ...i.confirmation.value, complete: false } } }).value).toBeNull();
+});
+
+test("a reviewed month-only bill still needs tax evidence for the stricter operating result", () => {
+  const monthOnlyBill: ManualBill = {
+    format: "manual-bill-v1", period: "2026-01", category: "Elektrik", amount: "1250",
+    origin: { kind: "manual", requestId: "electricity" }, reason: "Elle kayıt oluşturuldu",
+    evidence: "electricity", replacesRevision: null, voided: false,
+  };
+  const reviewed = input();
+  expect(calculateOperatingResult({
+    ...reviewed, expenses: [{ ...reviewed.expenses[0], value: monthOnlyBill }],
+  })).toMatchObject({ status: "unavailable", value: null, reasons: ["UNKNOWN_TAX"] });
 });

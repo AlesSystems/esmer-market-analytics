@@ -4,7 +4,8 @@ import {tmpdir} from "node:os";
 import {join,resolve} from "node:path";
 import {readSheet} from "read-excel-file/node";
 import {executablePath} from "../helpers/desktop-executable";
-import {openWorkspace,openSection,importPackage,openSettings,settingsMenu} from "../helpers/desktop-navigation";
+import {openWorkspace,openSection,importPackage,openSettings,settingsMenu,setMonth} from "../helpers/desktop-navigation";
+import {november,novemberProfitPackage} from "../helpers/november-bill-fixture";
 import {richEstimatePackage} from "../helpers/rich-estimate-fixture";
 
 // #108: the v1 owner walk on the packaged app, synthetic data only. Screenshots go to the test output dir; ESMER_CAPTURE_WALK=1 writes them to docs/evidence/one-ui/.
@@ -77,4 +78,47 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
   await expect(page.getByRole("region",{name:"Bilinen sınırlar"})).toBeVisible();
   await shoot("ayarlar");
  }finally{await app.close().catch(()=>{});await rm(userData,{recursive:true,force:true,maxRetries:5});}
+});
+
+test("November bill yields the same 8.750 TRY net estimate on screen and in Excel", async () => {
+ const userData = await mkdtemp(join(tmpdir(), "november-bill-"));
+ const source = join(userData, "source.json"), output = join(userData, "november.xlsx");
+ await writeFile(source, novemberProfitPackage());
+ const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+ try {
+  const page = await app.firstWindow();
+  await openWorkspace(page);
+  await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
+  await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, source);
+  await importPackage(page);
+  await openSection(page, "Giderler");
+  await setMonth(page, november);
+  await page.getByRole("button", { name: "Elle gider ekle", exact: true }).click();
+  await page.getByLabel("Kategori", { exact: true }).fill("Elektrik");
+  await page.getByLabel("Tutar (TRY)", { exact: true }).fill("1.250,00");
+  await page.getByRole("button", { name: "Gideri kaydet", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
+
+  await openSection(page, "Bu ay");
+  await expect(page.getByRole("heading", { name: "Kasım 2026", level: 1 })).toBeVisible();
+  await expect(page.locator(".hero-num")).toContainText("10.000,00");
+  await expect(page.locator(".netcard .net")).toHaveCount(0);
+
+  await openSection(page, "Giderler");
+  await page.getByRole("button", { name: "Bu ayın giderleri tamam", exact: true }).click();
+  await page.getByRole("button", { name: "Bu kalemlerde gider yok, onayla", exact: true }).click();
+  await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
+  await expect(page.locator(".netcard .net")).toContainText("8.750,00");
+  await expect(page.getByRole("region", { name: /[Nn]et kâr$/ })).toContainText("Giderler: 1.250,00 ₺");
+
+  await app.evaluate(({ dialog }, path) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: path }); }, output);
+  await page.getByRole("button", { name: "Excel’e aktar", exact: true }).click();
+  await expect(page.getByText("Doğrulanmamış tahmin Excel dosyasına kaydedildi.", { exact: true })).toBeVisible();
+  const summary = await readSheet(await readFile(output), "Özet");
+  const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
+  expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", "1250", "8750"]);
+ } finally {
+  await app.close().catch(() => {});
+  await rm(userData, { recursive: true, force: true, maxRetries: 5 });
+ }
 });
