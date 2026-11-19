@@ -109,3 +109,50 @@ test("the owner chooses which identical monthly bill receives the Excel details"
     expect(expenses.create({ action: "resolve", requestId: "second-bill" })).toMatchObject({ status: "already-saved", revision: second.revision });
   } finally { store.close(); }
 });
+
+test("same-bill selection is exclusive, stale or failed imports change nothing, and genuine peers stay separate", async () => {
+  let fault = false, rowsWritten = 0;
+  const store = openStore(":memory:", { fault: stage => { if (stage === "expense-row" && fault && ++rowsWritten === 2) throw Error("fixture write fault"); } });
+  const expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50" };
+    const bill = expenses.create({ action: "save-bill", requestId: "rent-bill", fields });
+    const otherMonth = expenses.create({ action: "save-bill", requestId: "feb-rent-bill", fields: { ...fields, period: "2026-02" } });
+    if (bill.status !== "saved" || otherMonth.status !== "saved") throw Error("Fixture bills not saved");
+    const bytes = await workbook([row, ["another-bill", ...row.slice(1)]]);
+    const preview = expenses.preview(bytes);
+    expect(preview.manualCandidates[preview.rows[0].matchKey!].map(item => item.entityId)).toEqual([bill.entityId]);
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [], matches: [2, 3].map(row => ({ row, entityId: bill.entityId })) })).toThrow();
+    expect(() => expenses.confirm({ previewId: preview.previewId, keepCandidateRows: [3], matches: [{ row: 2, entityId: otherMonth.entityId }] })).toThrow();
+    store.appendRevision({ kind: "setting", entityId: "currency", value: { currency: "TRY", reason: "Synthetic update", evidence: "fixture" } });
+    const before = store.readSnapshot(), generation = store.recoveryGeneration();
+    const selection = { keepCandidateRows: [3], matches: [{ row: 2, entityId: bill.entityId }] };
+    expect(() => expenses.confirm({ previewId: preview.previewId, ...selection })).toThrow();
+    const retry = expenses.preview(bytes);
+    fault = true;
+    expect(() => expenses.confirm({ previewId: retry.previewId, ...selection })).toThrow("fixture write fault");
+    expect(store.readSnapshot()).toEqual(before);
+    expect(store.expenseBatches()).toEqual([]);
+    expect(store.recoveryGeneration()).toEqual(generation);
+    fault = false;
+    expect(expenses.confirm({ previewId: retry.previewId, ...selection })).toMatchObject({ status: "imported", count: 2 });
+    expect(expenses.query({ period: fields.period })).toMatchObject({ incurred: "100", rows: [
+      { entityId: bill.entityId, value: { attachment: { batchId: retry.batchId, row: 2 } } },
+      { value: { origin: { batchId: retry.batchId, row: 3 } } },
+    ] });
+  } finally { store.close(); }
+});
+
+test("many workbook rows can share one selectable candidate set without repeating its payload", async () => {
+  const store = openStore(":memory:"), expenses = new Expenses(store);
+  try {
+    const fields = { period: "2026-01", category: "Kira", amount: "50" };
+    for (let i = 0; i < 20; i++) expect(expenses.create({ action: "save-bill", requestId: `bill-${i}`, fields }).status).toBe("saved");
+    const preview = expenses.preview(await workbook(Array.from({ length: 100 }, (_, index) => [`ref-${index}`, ...row.slice(1)])));
+    expect(preview.rows).toHaveLength(100);
+    const matchKeys = [...new Set(preview.rows.map(row => row.matchKey))];
+    expect(matchKeys).toHaveLength(1);
+    expect(preview.manualCandidates[matchKeys[0]!]).toHaveLength(20);
+    expect(Buffer.byteLength(JSON.stringify(preview))).toBeLessThan(120_000);
+  } finally { store.close(); }
+});

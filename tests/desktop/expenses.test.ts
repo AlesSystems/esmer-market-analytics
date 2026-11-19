@@ -219,3 +219,66 @@ test("initial expense query failure ends loading and can be retried", async () =
     await expect(page.getByRole("alert")).toHaveCount(0);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
+
+test("Excel review identifies identical manual bills, cancels safely, and supports a separate bill", async ({}, testInfo) => {
+  const { writeFile } = await import("node:fs/promises");
+  const { workbook } = await import("../helpers/expense-fixtures");
+  const userData = await mkdtemp(join(tmpdir(), "esmer-bill-reconcile-")), workbookPath = join(userData, "bills.xlsx");
+  const electricity = ["electricity-1", "15.11.2026", null, "Elektrik", "operating-expense", "1000", "250", "1250", "recoverable", "tax-1", null, null, null, null];
+  const firstWorkbook = await workbook([electricity]);
+  await writeFile(workbookPath, firstWorkbook);
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await page.clock.setFixedTime(new Date("2026-12-10T12:00:00Z"));
+    await openWorkspace(page);
+    await openSection(page, "Giderler");
+    await setMonth(page, "2026-11");
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Elle gider ekle" }).click();
+      await page.getByRole("textbox", { name: "Kategori", exact: true }).fill("Elektrik");
+      await page.getByRole("textbox", { name: "Tutar (TRY)", exact: true }).fill("1.250,00");
+      await page.getByRole("button", { name: "Gideri kaydet" }).click();
+      await expect(page.getByRole("status").filter({ hasText: "Gider kaydedildi." })).toBeVisible();
+    }
+    const records = page.getByRole("region", { name: "Kayıtlar" });
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" })).toContainText("Kasım 2026");
+    await app.evaluate(({ dialog }, path) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [path] }); }, workbookPath);
+    const openImport = () => page.getByRole("button", { name: "Excel’den içe aktar", exact: true }).click();
+    const chooseWorkbook = () => page.getByRole("button", { name: "Excel dosyası seç", exact: true }).click();
+    const openDecision = () => page.getByRole("button", { name: "Satır 2: 2 olası elle kayıt" }).click();
+    const confirmImport = page.getByRole("button", { name: "İçe aktar", exact: true });
+    const choice = page.getByRole("combobox", { name: "Satır 2 eşleştirme kararı" });
+    await openImport(); await chooseWorkbook(); await openDecision();
+    await expect(confirmImport).toBeDisabled();
+    await expect(choice.getByRole("option")).toHaveCount(4);
+    await choice.selectOption({ label: "Elle kayıt no. 2 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await page.getByRole("button", { name: "Önizlemeyi kapat" }).click();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" })).toContainText("Henüz içe aktarma yok.");
+    await chooseWorkbook(); await openDecision();
+    await expect(confirmImport).toBeDisabled();
+    await page.screenshot({ path: testInfo.outputPath("bill-matches.png"), fullPage: true });
+    await choice.selectOption({ label: "Elle kayıt no. 2 · Elektrik · Kasım 2026 · 1.250,00 ₺" });
+    await confirmImport.click();
+    await expect(records.locator("tbody tr")).toHaveCount(2);
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" })).toContainText(/15[.\/]11[.\/]2026/);
+    await expect(records.getByRole("row").filter({ hasText: "Elle kayıt no. 1" })).toContainText("Kasım 2026");
+    await records.getByRole("row").filter({ hasText: "Elle kayıt no. 2" }).getByRole("button", { name: "İncele / düzelt" }).click();
+    await expect(page.getByText(/Elle girildi · Excel ayrıntıları eklendi/)).toBeVisible();
+    await page.getByText("Sürüm ayrıntıları", { exact: true }).click();
+    await expect(page.getByText("İçe aktarma / satır", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Düzeltmeyi kapat" }).click();
+    await openImport();
+    await expect(page.getByRole("region", { name: "İçe aktarma geçmişi" }).getByRole("listitem")).toHaveCount(1);
+    await chooseWorkbook();
+    await expect(page.getByText("Bu Excel dosyası zaten içe aktarılmış.", { exact: true })).toBeVisible();
+    await expect(confirmImport).toBeDisabled();
+    await page.getByRole("button", { name: "Önizlemeyi kapat" }).click();
+    await writeFile(workbookPath, await workbook([["electricity-2", ...electricity.slice(1)]]));
+    await chooseWorkbook();
+    await page.getByRole("button", { name: "Satır 2: 1 olası elle kayıt" }).click();
+    await choice.selectOption("separate");
+    await confirmImport.click();
+    await expect(records.locator("tbody tr")).toHaveCount(3);
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
