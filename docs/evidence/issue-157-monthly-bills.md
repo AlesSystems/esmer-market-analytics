@@ -11,4 +11,4 @@ The integration fixture migrated a schema 8 store containing a detailed manual e
 - `npm run test:desktop -- tests/desktop/manual-expenses.test.ts tests/desktop/expenses-control-desk.test.ts tests/desktop/design-finish.test.ts tests/desktop/welcome.test.ts` built the app and passed 22 desktop checks. The runner wrote the synthetic manual-entry and absent-receipt screenshots under the checkout's `test-results/manual-expenses-*`.
 - `npm run typecheck`, `npm run lint` and `git diff --check` passed.
 
-Windows desktop acceptance remains open. Run the same desktop scenarios with the integrated build's packaged Windows executable. Profit and Excel reconciliation are covered by separate workstreams #158 and #159.
+The [integrated Windows verification](issue-155-giderler-windows.md) records the packaged checks for this change.

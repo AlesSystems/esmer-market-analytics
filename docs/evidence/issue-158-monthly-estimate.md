@@ -10,4 +10,4 @@ The service tests verified missing gross profit, partial source coverage, a stal
 - `npm run test:unit` passed 186 tests. `npm run test:integration` passed 316 tests with 17 skipped.
 - `npm run typecheck`, `npm run lint` and `git diff --check` passed.
 
-Windows desktop acceptance remains open. Run the v1 walk on the integrated packaged Windows executable and check the November screen and resulting workbook.
+The [integrated Windows verification](issue-155-giderler-windows.md) records the packaged checks for this change.
