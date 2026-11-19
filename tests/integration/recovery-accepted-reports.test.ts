@@ -9,7 +9,6 @@ import { generateRecoveryKey, encodeRecoveryKey, decodeRecoveryKey } from "../..
 import { validateSnapshot } from "../../src/recovery/validate";
 import { openStore } from "../../src/store/store";
 import type { AcceptedReport } from "../../src/store/revisions";
-import { Expenses } from "../../src/expenses/import";
 import { row, workbook } from "../helpers/expense-fixtures";
 import { businessPackage } from "../helpers/business-fixtures";
 
