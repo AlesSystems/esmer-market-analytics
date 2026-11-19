@@ -117,6 +117,7 @@ test("November bill yields the same 8.750 TRY net estimate on screen and in Exce
   const summary = await readSheet(await readFile(output), "Özet");
   const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
   expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", "1250", "8750"]);
+  expect(amount("Hesaplama sürümü")).toBe("month-profit-v2");
  } finally {
   await app.close().catch(() => {});
   await rm(userData, { recursive: true, force: true, maxRetries: 5 });

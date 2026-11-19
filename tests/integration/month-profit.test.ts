@@ -74,6 +74,7 @@ test("the November estimate and workbook deduct a manual bill in full after revi
   const summary = await readSheet(await excelMonthProfit(pinned.view), "Özet");
   const amount = (label: string) => summary.find(row => row[0] === label)?.[1];
   expect([amount("Tahmini brüt kâr"), amount("Giderler"), amount("Tahmini net kâr")]).toEqual(["10000", "1250", "8750"]);
+  expect(amount("Hesaplama sürümü")).toBe("month-profit-v2");
 
   const corrected = expenses.create({ action: "correct-bill", requestId: "electricity-correction", entityId: saved.entityId, expectedRevision: saved.revision,
    reason: "Tutar düzeltildi", fields: { period: november, category: "Elektrik", amount: "1.250,25" } });
