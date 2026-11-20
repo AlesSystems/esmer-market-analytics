@@ -22,7 +22,7 @@
 
 /* Monthly estimated figures and the exact-value tables in Bu ay. */
 .monthly-trend { container-type: inline-size; }
-.monthly-trend h2 { margin-bottom: 4px; }
+.card.monthly-trend h2 { margin-bottom: 4px; }
 .monthly-trend-period, .monthly-trend-legend { font-size: var(--t-sm); }
 .monthly-trend-period { margin-bottom: 12px; }
 .monthly-trend-legend { display: flex; align-items: center; gap: 8px; justify-content: end; }
@@ -53,13 +53,14 @@
 }
 .monthly-trend-point { min-width: 8px; transform: translate(-50%, -50%); }
 .monthly-trend-list > li[aria-current="date"] :is(.monthly-trend-bar, .monthly-trend-point) { background: var(--accent); }
-.monthly-trend-list .monthly-trend-bar[data-negative="true"] { background: var(--loss); }
+.monthly-trend-list > li .monthly-trend-bar[data-negative="true"] { background: var(--loss); }
 .monthly-trend-value, .monthly-trend-missing { grid-area: value; text-align: right; overflow-wrap: anywhere; }
 .monthly-trend-value { font-weight: 700; }
 .monthly-trend-missing { color: var(--ink-2); }
 .monthly-trend-table { table-layout: fixed; }
 .monthly-trend-table th, .monthly-trend-table td { overflow-wrap: anywhere; }
 .monthly-trend-table tbody th { background: transparent; color: var(--ink); }
+.monthly-trend-table tbody tr:last-child th { border-bottom: 0; }
 .monthly-trend-table :is(th, td):last-child { text-align: right; }
 @container (max-width: 500px) {
   .monthly-trend-list > li {
@@ -71,5 +72,5 @@
 @media (forced-colors: active) {
   .monthly-trend-bar, .monthly-trend-point { forced-color-adjust: none; background: CanvasText; }
   .monthly-trend-list > li[aria-current="date"] :is(.monthly-trend-bar, .monthly-trend-point) { background: Highlight; }
-  .monthly-trend-list .monthly-trend-bar[data-negative="true"] { background: CanvasText; }
+  .monthly-trend-list > li .monthly-trend-bar[data-negative="true"] { background: CanvasText; }
 }
