@@ -96,7 +96,7 @@ test("Bu ay and the drawer: chart unit, quiet net reason, reachable observations
   try {
     await expect(page.getByRole("heading", { name: "Aylık tahmini brüt kâr (₺)", level: 2 })).toBeVisible();
     const net = page.locator(".netcard");
-    await expect(net).toContainText("Ay henüz tamamlanmadı");
+    await expect(net).toContainText("Ayın tamamı için veri yok");
     await expect(net.locator(".net-say")).toHaveCount(0);
     expect(await style(page, ".netcard .muted", "font-size")).toBe("14px");
     await page.locator(".att-row").last().scrollIntoViewIfNeeded();

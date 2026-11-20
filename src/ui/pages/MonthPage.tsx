@@ -3,17 +3,16 @@ import type {ReactNode} from "react";
 import type {AttentionKind,MonthProfitProduct,Pct} from "../../source/month-profit";
 import type {PageProps} from "../sections";
 import {Button} from "../components/ui/button";
-import {Bridge} from "../charts";
 import {MonthlyTrend} from "../charts/MonthlyTrend";
-import {AlertIcon,ArrowDownIcon,ArrowRightIcon,ArrowUpIcon,ChevronDownIcon,ChevronRightIcon,InfoIcon} from "../icons";
-import {Popover} from "../shell/Popover";
+import {AlertIcon,ArrowDownIcon,ArrowRightIcon,ArrowUpIcon,ChevronRightIcon,InfoIcon} from "../icons";
 import {date,money} from "../format";
 import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
 import {attentionRows,grossTrendReasonText,netCardState,netReasonText,netTrendReasonText} from "./month-answer";
+import {GrossProfitExplanation} from "./GrossProfitExplanation";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
-import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthName,percentText} from "./month-summary";
+import {changeArrow,marginLine,monthChange,monthName,percentText} from "./month-summary";
 
 /** "57,50 ₺" with the kuruş set smaller. The text is the service amount as formatted, nothing is rounded. */
 function Amount({value,className}:{value:string;className:string}){
@@ -49,12 +48,12 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const change=c===null?null:monthChange(v.month,c.grossProfitPct);
  const arrow=changeArrow(c?.grossProfitPct??null);
  const line=marginLine(t);
- // A successful monthly read always ends its chronological history with the selected month.
- const partial=v.history.at(-1)!.partial;
+ const lastDay=new Date(Date.UTC(Number(v.month.slice(0,4)),Number(v.month.slice(5,7)),0)).toISOString().slice(0,10);
+ const partial=v.dataFrom>`${v.month}-01`||v.dataUntil<lastDay;
  return <Shell title={monthName(v.month)} busy={loading} period={<><p className="period">{date(v.dataFrom)} – {date(v.dataUntil)} · {partial?"Kısmi ay":"Tam ay"}</p><p className="data-cutoff">Paketin kapsadığı son gün: {date(v.source.to)}</p></>}>
   <div className="month-layout">
     <section className="card hero section-wide" aria-label="Ayın özeti">
-     <div className="result-heading"><h2>Tahmini brüt kâr</h2><Popover buttonClass="link" dialogLabel="Nasıl hesaplandı" panelClass="pop-bridge" label={<>Nasıl hesaplandı?<ChevronDownIcon/></>}><Bridge steps={monthBridgeSteps(t)} formatValue={money} ariaLabel="Satıştan net kâra köprü"/></Popover></div>
+     <div className="result-heading"><h2>Tahmini brüt kâr</h2><GrossProfitExplanation totals={t}/></div>
      <div className="result-copy">
      <div className="hero-row">
       {t.grossProfit===null?<p className="hero-num is-unknown"><Unknown/></p>:<Amount value={t.grossProfit} className="hero-num"/>}
@@ -78,10 +77,12 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
      </div>
     </section>
     {net.kind==="missing"
-     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2><p className="net-context">Giderlerden sonra ne kalıyor?</p>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v.dataUntil)}</p>}</section>
-     :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2><p className="net-context">Giderlerden sonra ne kalıyor?</p>
-       {net.kind==="same"?<p className="net-same">Brüt kârla aynı</p>:<Amount value={t.netProfit!} className={`net${t.netProfit!.startsWith("-")?" is-neg":""}`}/>}
-       <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
+     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v)}</p>}</section>
+     :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2>
+       <Amount value={net.netProfit} className={`net${net.netProfit.startsWith("-")?" is-neg":""}`}/>
+       <p className="net-line">{money(net.grossProfit)} brüt kâr − {money(net.expenses)} gider = {money(net.netProfit)} tahmini net kâr</p>
+       <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button>
+      </section>}
     <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.grossProfit} formatValue={money}
       missingReason={grossTrendReasonText}/>

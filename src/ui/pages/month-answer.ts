@@ -1,5 +1,5 @@
 import type {AttentionKind,MonthProfitTotals,MonthProfitView,NetProfitReason} from "../../source/month-profit";
-import {date,isZeroDecimal} from "../format";
+import {date} from "../format";
 
 const shown=new Set<AttentionKind>(["loss","marginDrop","lowMarginHighVolume"]);
 const MOST=4;
@@ -14,27 +14,33 @@ export function attentionRows(attention:MonthProfitView["attention"]):{products:
  return {products,missingCost:new Set(attention.filter(row=>row.kind==="missingCost").map(row=>row.productId)).size};
 }
 
-export type NetCard={kind:"amount"}|{kind:"same"}|{kind:"missing";reason:NonNullable<MonthProfitTotals["netProfitReason"]>;toExpenses:boolean};
+type NetCard =
+ | {kind:"amount";grossProfit:string;expenses:string;netProfit:string}
+ | {kind:"missing";reason:NetProfitReason;toExpenses:boolean};
 const expenseReasons=new Set(["expensesMissing","expensesIncomplete","expensesBlocked","unknownTax","confirmationStale"]);
 
-/** Which of the three net-profit cards to draw. Only the entered expenses can fix the reasons that lead to Giderler. */
-export function netCardState(t:Pick<MonthProfitTotals,"netProfit"|"expenses"|"netProfitReason">):NetCard {
- if(t.netProfit!==null)return t.expenses!==null&&isZeroDecimal(t.expenses)?{kind:"same"}:{kind:"amount"};
+/** The equation uses the service's operands and result. Giderler can address expense reasons. */
+export function netCardState(t:Pick<MonthProfitTotals,"grossProfit"|"netProfit"|"expenses"|"netProfitReason">):NetCard {
+ if(t.grossProfit!==null&&t.expenses!==null&&t.netProfit!==null){
+  return {kind:"amount",grossProfit:t.grossProfit,expenses:t.expenses,netProfit:t.netProfit};
+ }
  const reason=t.netProfitReason??"costUnknown";
  return {kind:"missing",reason,toExpenses:expenseReasons.has(reason)};
 }
 
 const reasonText:Record<NetProfitReason,string>={
- costUnknown:"Maliyetler bilinmediği için hesaplanamadı",
- monthPartial:"Ay henüz tamamlanmadı",
+ costUnknown:"Bu ayın brüt kârı hesaplanamadığı için net kâr gösterilemiyor",
+ monthPartial:"Ayın tamamı için veri yok",
  expensesMissing:"Bu ayın giderleri girilmedi",
  expensesIncomplete:"Bu ayın giderleri tamamlanmadı",
  expensesBlocked:"Bazı gider satırları net kârı engelliyor",
  unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",
  confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
 };
-/** The one sentence under "Net kâr" when no net figure exists. A part-way month also says how far the data goes. */
-export const netReasonText=(reason:NetProfitReason,dataUntil:string)=>reason==="monthPartial"?`${reasonText[reason]} (${date(dataUntil)} tarihine kadar veri)`:reasonText[reason];
+/** Partial months show the actual dates covered by the source. */
+export function netReasonText(reason:NetProfitReason,{dataFrom,dataUntil}:Pick<MonthProfitView,"dataFrom"|"dataUntil">):string {
+ return reason==="monthPartial"?`${reasonText[reason]} (${date(dataFrom)} – ${date(dataUntil)})`:reasonText[reason];
+}
 
 /** When gross profit is unavailable, a known sale amount means no sale qualified for cost coverage. */
 export function grossTrendReasonText({sales}:Pick<MonthProfitTotals,"sales">):string {

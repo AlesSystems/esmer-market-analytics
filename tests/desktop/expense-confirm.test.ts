@@ -58,7 +58,7 @@ test("lines in one group: the first press names the empty groups and does not co
     // The net figure lives on Bu ay: gross minus the 10 ₺ rent.
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Tahmini net kâr", exact: true, level: 2 })).toBeVisible();
-    await expect(netCard(page)).toContainText("Giderler: 10,00 ₺");
+    await expect(netCard(page)).toContainText("57,50 ₺ brüt kâr − 10,00 ₺ gider = 47,50 ₺ tahmini net kâr");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
 
@@ -88,8 +88,7 @@ test("zero lines: 'Bu ay gider yok' is the explicit confirmation and Bu ay then 
     await expect(page.getByText("Onaylandı", { exact: true })).toBeVisible();
     expect(await confirmation(page)).toBe("current");
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
-    await expect(netCard(page)).toContainText("Brüt kârla aynı");
-    await expect(netCard(page)).toContainText("Bu ay gider yok");
+    await expect(netCard(page)).toContainText("57,50 ₺ brüt kâr − 0,00 ₺ gider = 57,50 ₺ tahmini net kâr");
     // Taking the confirmation back returns Giderler to the question.
     await openSection(page, "Giderler");
     await page.getByRole("button", { name: "Onayı kaldır", exact: true }).click();
