@@ -49,10 +49,9 @@
 .netcard { padding: 24px 26px; align-self: stretch; }
 .netcard h2 { margin-bottom: 6px; }
 .net-say { color: var(--ink-2); margin-bottom: 18px; text-wrap: pretty; }
-.net { font-size: var(--t-net); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 6px; color: var(--ink); }
+.net { font-size: var(--t-net); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 6px; color: var(--ink); overflow-wrap: anywhere; }
 .net.is-neg { color: var(--loss); }
-.net-same { font-size: var(--t-xl); font-weight: 700; margin-bottom: 6px; color: var(--ink); }
-.net-line { color: var(--ink-2); }
+.net-line { color: var(--ink-2); overflow-wrap: anywhere; text-wrap: pretty; }
 .link.link-inline { padding: 0 2px; font-size: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); }
 .link.link-inline:hover { text-decoration-color: currentColor; }
 .chart .muted { margin: -8px 0 8px; }
@@ -214,7 +213,6 @@ th.num .sort { flex-direction: row-reverse; }
 .observations .att-x { grid-column: 2; grid-row: auto; white-space: normal; }
 .observations .att-go { grid-column: 3; grid-row: 1 / 3; }
 .observations .att-i { grid-column: 1; grid-row: 1 / 3; }
-.net-context { margin: 0 0 18px; font-size: var(--t-sm); }
 .netcard .btn { margin-top: 4px; }
 .month-layout > .chart { max-width: none; }
 .month-layout .month-bars { max-width: 680px; margin-inline: auto; }
