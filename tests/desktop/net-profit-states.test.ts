@@ -135,10 +135,10 @@ test("Bu ay explains why each selected month has no net profit", async () => {
     const snapshot = monthProfitSnapshot();
     const augustDocument = snapshot.headers.find(header => header.ID === "301")!;
     const augustSale = snapshot.lines.find(line => line.ID === "3011")!;
-    const headers = [...snapshot.headers, { ...augustDocument, ID: "401", FIS_TARIHI: "2025-07-15T12:00:00.000" }];
+    const headers = [...snapshot.headers, { ...augustDocument, ID: "401", FIS_TARIHI: "2025-07-15T12:00:00.000" }, { ...augustDocument, ID: "501", FIS_TARIHI: "2025-06-15T12:00:00.000" }];
     const lines = snapshot.lines.map(line => line.ID === augustSale.ID ? { ...line, BELGE_TARIHINDEKI_SON_ALIS_FIYATI: null } : line);
-    lines.push({ ...augustSale, ID: "4011", FIS: "401" });
-    const source = writeRawEstimatePackage({ ...snapshot, from: "2025-07-01", headers, lines }, "fixture:net-reasons", "net-reasons");
+    lines.push({ ...augustSale, ID: "4011", FIS: "401" }, { ...augustSale, ID: "5011", FIS: "501" });
+    const source = writeRawEstimatePackage({ ...snapshot, from: "2025-06-10", headers, lines }, "fixture:net-reasons", "net-reasons");
     const store = openStore(join(userData, "analytics.sqlite"));
     try {
       store.importSourcePreview(source);
@@ -157,6 +157,10 @@ test("Bu ay explains why each selected month has no net profit", async () => {
       const netCard = page.getByRole("region", { name: "Net kâr", exact: true });
       const expenseLink = netCard.getByRole("button", { name: "Giderleri gir", exact: true });
       await expect(netCard).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
+      await expect(expenseLink).toHaveCount(0);
+
+      await setMonth(page, "2025-06");
+      await expect(netCard).toContainText("Ayın tamamı için veri yok (10.06.2025 – 30.06.2025)");
       await expect(expenseLink).toHaveCount(0);
 
       await setMonth(page, "2025-09");
