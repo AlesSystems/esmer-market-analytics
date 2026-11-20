@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { openStore } from "../../src/store/store";
 import { monthProfitPackage, monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { executablePath } from "../helpers/desktop-executable";
-import { openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
+import { openSection, openSettings, openWorkspace, setMonth, settingsMenu } from "../helpers/desktop-navigation";
 
 test("approved A exposes the observed period and supporting amounts before product investigation", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-approved-a-"));
@@ -130,5 +130,44 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     await page.keyboard.press("Escape");
     await expect(explanation).toBeHidden();
     await expect(trigger).toBeFocused();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("the gross profit explanation distinguishes unavailable, zero and loss when changing months", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-gross-states-"));
+  const snapshot = monthProfitSnapshot();
+  const august = snapshot.lines.find(line => line.ID === "3011")!;
+  const september = snapshot.lines.find(line => line.ID === "2011")!;
+  const october = snapshot.lines.find(line => line.ID === "1012")!;
+  snapshot.lines = [
+    { ...august, TOPLAM_KDV_MATRAHI: "80" }, // 80 ₺ sale and 10 × 8 ₺ cost
+    { ...september, TOPLAM_KDV_MATRAHI: "100" }, // 100 ₺ sale and 10 × 13.7 ₺ cost
+    { ...october, TOPLAM_KDV_MATRAHI: "200" }, // 200 ₺ excluded as the cost is missing
+    { ...october, ID: "1099", TOPLAM_KDV_MATRAHI: null },
+  ];
+  snapshot.products = snapshot.products!.filter(product => product.ID === "1" || product.ID === "2");
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importSourcePreview(monthProfitPackage(snapshot)); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
+    const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
+    await trigger.click();
+    await expect(explanation).toContainText("Bu ay maliyetini hesaplayabildiğimiz satış olmadığı için brüt kâr hesaplanamadı.");
+    await expect(explanation).toContainText("200,00 ₺’lik satışın maliyetini hesaplayamadığımız için bu satışları kâr hesabının dışında bıraktık.");
+    await expect(explanation).toContainText("1 satış kaydının tutarı bilinmiyor.");
+    await expect(explanation.getByRole("definition")).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await setMonth(page, "2025-09");
+    await expect(page.getByRole("heading", { name: "Eylül 2025", level: 1 })).toBeVisible();
+    await trigger.click();
+    await expect(explanation.getByRole("definition")).toHaveText(["100,00 ₺", "− 137,00 ₺", "= -37,00 ₺"]);
+    await page.keyboard.press("Escape");
+    await setMonth(page, "2025-08");
+    await expect(page.getByRole("heading", { name: "Ağustos 2025", level: 1 })).toBeVisible();
+    await trigger.click();
+    await expect(explanation.getByRole("definition")).toHaveText(["80,00 ₺", "− 80,00 ₺", "= 0,00 ₺"]);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
