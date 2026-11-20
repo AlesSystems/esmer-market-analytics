@@ -10,7 +10,13 @@ test("monthly net chart and table follow approval, correction and withdrawal", a
   test.setTimeout(90_000);
   const userData = await mkdtemp(join(tmpdir(), "monthly-net-chart-"));
   const file = join(userData, "net.json");
-  await writeFile(file, novemberProfitPackage({ ...novemberProfitSnapshot(), to: "2026-12-20", capturedAt: "2026-12-21T00:00:00.000Z" }));
+  const snapshot = novemberProfitSnapshot();
+  // October has known gross profit but the package starts after the first day. December has no sales.
+  await writeFile(file, novemberProfitPackage({
+    ...snapshot, from: "2026-10-12", to: "2026-12-20", capturedAt: "2026-12-21T00:00:00.000Z",
+    headers: [...snapshot.headers, { ...snapshot.headers[0], ID: "991", FIS_TARIHI: "2026-10-15T12:00:00.000" }],
+    lines: [...snapshot.lines, { ...snapshot.lines[0], ID: "992", FIS: "991" }],
+  }));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
@@ -37,6 +43,7 @@ test("monthly net chart and table follow approval, correction and withdrawal", a
       await button("Bu kalemlerde gider yok, onayla").click();
       await expect(button("Onayı kaldır")).toBeVisible();
     };
+    await expect(chart.getByRole("listitem").first()).toContainText(/Ekim 2026.*Kısmi ay.*Paket ayın tamamını kapsamıyor/);
     await expect(point).toContainText(/Kasım 2026.*Seçili ay.*Bu ayın giderleri girilmedi/);
     await showTable();
     await expect(row).toContainText(/0?1\.11\.2026 – 30\.11\.2026.*Tam ay.*Bu ayın giderleri girilmedi/);
@@ -54,7 +61,9 @@ test("monthly net chart and table follow approval, correction and withdrawal", a
     await setMonth(page, "2026-12");
     await expect(point).toContainText("8.750,00 ₺");
     await expect(point).not.toContainText("Seçili ay");
-    await expect(chart.getByRole("listitem").last()).toContainText(/Kısmi ay · 0?1\.12\.2026 – 20\.12\.2026/);
+    await expect(chart.getByRole("listitem").last()).toContainText(/Kısmi ay · 0?1\.12\.2026 – 20\.12\.2026.*Brüt kâr hesaplanamadı/);
+    const gross = page.getByRole("region", { name: "Aylık tahmini brüt kâr (₺)", exact: true });
+    await expect(gross.getByRole("listitem").last()).toContainText("Brüt kâr için yeterli veri yok");
     await showTable();
     await expect(row).toContainText("8.750,00 ₺");
 

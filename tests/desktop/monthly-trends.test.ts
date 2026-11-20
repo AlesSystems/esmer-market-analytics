@@ -40,9 +40,10 @@ test("monthly gross profit follows covered months across years, selection and pa
     await expect(gross).toContainText("Kasım 2025 – Ocak 2026");
     await expect(months).toHaveCount(3);
     await expect(months.nth(0)).toContainText(/Kasım 2025.*Kısmi ay · 10\.11\.2025 – 30\.11\.2025.*0,00 ₺/);
-    await expect(months.nth(1)).toContainText(/Aralık 2025.*Maliyetler bilinmediği için brüt kâr hesaplanamadı/);
+    await expect(months.nth(1)).toContainText(/Aralık 2025.*Brüt kâr için yeterli veri yok/);
     await expect(months.nth(2)).toContainText(/Ocak 2026.*Seçili ay.*Kısmi ay · 01\.01\.2026 – 20\.01\.2026.*-42,50 ₺/);
     await expect(page.getByRole("region", { name: "Ayın özeti" })).toContainText("-42,50 ₺");
+    await expect.poll(() => disclose.evaluate(node => node.getBoundingClientRect().height)).toBeGreaterThanOrEqual(40);
     await disclose.focus();
     await page.keyboard.press("Enter");
     await expect(exact.getByRole("row", { name: /Aralık 2025/ })).toContainText("Tam ay");
