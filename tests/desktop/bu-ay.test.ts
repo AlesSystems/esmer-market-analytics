@@ -44,7 +44,7 @@ test("Bu ay opens at launch with three destinations, and an imported estimate pa
   await expect(page.getByRole("dialog",{name:"Nasıl hesaplandı"}).getByRole("definition")).toHaveText(["430,00 ₺","− 372,50 ₺","= 57,50 ₺"]);
   await page.keyboard.press("Escape");
   // Net card: the month is not complete, so it says so and offers no expense step.
-  await expect(netCard(page)).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
+  await expect(netCard(page)).toContainText("Ayın tamamı için veri yok (01.10.2025 – 20.10.2025)");
   await expect(netCard(page).getByRole("button")).toHaveCount(0);
   // Attention: one row per product, at most four, then one aggregate missing-cost row.
   await expect(attention(page)).toHaveText([

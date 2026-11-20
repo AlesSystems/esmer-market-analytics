@@ -77,7 +77,7 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
      </div>
     </section>
     {net.kind==="missing"
-     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v.dataUntil)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v.dataUntil)}</p>}</section>
+     ?<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Net kâr</h2>{net.toExpenses?<><p className="net-say">{netReasonText(net.reason,v)}</p><button type="button" className="btn btn-primary" onClick={()=>navigate("expenses")}>Giderleri gir<ArrowRightIcon/></button></>:<p className="muted">{netReasonText(net.reason,v)}</p>}</section>
      :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2>
        <Amount value={net.netProfit} className={`net${net.netProfit.startsWith("-")?" is-neg":""}`}/>
        <p className="net-line">{money(net.grossProfit)} brüt kâr − {money(net.expenses)} gider = {money(net.netProfit)} tahmini net kâr</p>

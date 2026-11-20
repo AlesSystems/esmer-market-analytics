@@ -156,7 +156,7 @@ test("Bu ay explains why each selected month has no net profit", async () => {
       await openWorkspace(page);
       const netCard = page.getByRole("region", { name: "Net kâr", exact: true });
       const expenseLink = netCard.getByRole("button", { name: "Giderleri gir", exact: true });
-      await expect(netCard).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");
+      await expect(netCard).toContainText("Ayın tamamı için veri yok (01.10.2025 – 20.10.2025)");
       await expect(expenseLink).toHaveCount(0);
 
       await setMonth(page, "2025-06");

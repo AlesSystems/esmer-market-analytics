@@ -30,12 +30,14 @@ export function netCardState(t:Pick<MonthProfitTotals,"grossProfit"|"netProfit"|
 
 const reasonText:Record<NetProfitReason,string>={
  costUnknown:"Bu ayın brüt kârı hesaplanamadığı için net kâr gösterilemiyor",
- monthPartial:"Ay henüz tamamlanmadı",
+ monthPartial:"Ayın tamamı için veri yok",
  expensesMissing:"Bu ayın giderleri girilmedi",
  expensesIncomplete:"Bu ayın giderleri tamamlanmadı",
  expensesBlocked:"Bazı gider satırları net kârı engelliyor",
  unknownTax:"Bazı giderlerin KDV durumu bilinmiyor",
  confirmationStale:"Giderler onaydan sonra değişti; yeniden onaylayın",
 };
-/** The one sentence under "Net kâr" when no net figure exists. A part-way month also says how far the data goes. */
-export const netReasonText=(reason:NetProfitReason,dataUntil:string)=>reason==="monthPartial"?`${reasonText[reason]} (${date(dataUntil)} tarihine kadar veri)`:reasonText[reason];
+/** Partial months show the actual dates covered by the source. */
+export function netReasonText(reason:NetProfitReason,{dataFrom,dataUntil}:Pick<MonthProfitView,"dataFrom"|"dataUntil">):string {
+ return reason==="monthPartial"?`${reasonText[reason]} (${date(dataFrom)} – ${date(dataUntil)})`:reasonText[reason];
+}
