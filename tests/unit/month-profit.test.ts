@@ -20,9 +20,9 @@ test("October totals, previous month and history use literal hand-computed decim
  expect(v.totals).toEqual({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",marginPct:"13.37",costKnownPct:"86.87",unknownCostSales:"50",unknownCostProducts:1,returns:"15",unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:3,averageBasket:"160",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"monthPartial"});
  expect(v.previous).toEqual({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",marginPct:"20.00",costKnownPct:"100.00",unknownCostSales:"0",unknownCostProducts:0,returns:null,unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:2,averageBasket:"255",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
  expect(v.history).toEqual([
-  {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"},
-  {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00"},
-  {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37"},
+  {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"},
+  {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"},
+  {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37",netProfit:null,netProfitReason:"monthPartial"},
  ]);
 });
 
@@ -68,7 +68,7 @@ test("attention: literal thresholds and deterministic order (kind, then sales ra
 test("a month with no covered previous month has previous null and a one-month history",()=>{
  const v=view("2025-08");
  expect(v.previous).toBeNull();expect(v.dataFrom).toBe("2025-08-01");expect(v.dataUntil).toBe("2025-08-31");
- expect(v.history).toEqual([{month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"}]);
+ expect(v.history).toEqual([{month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"}]);
  expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}],marginChangePoints:null,unitProfit:"2",profitSharePct:"100.00",profitRank:1,flags:{loss:false,lowMargin10:false,marginDrop:false,missingCost:false}}]);
  expect(v.attention).toEqual([]);
 });
