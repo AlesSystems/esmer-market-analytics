@@ -82,12 +82,12 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
      :<section className="card netcard" aria-labelledby="net-title"><h2 id="net-title">Tahmini net kâr</h2><p className="net-context">Giderlerden sonra ne kalıyor?</p>
        {net.kind==="same"?<p className="net-same">Brüt kârla aynı</p>:<Amount value={t.netProfit!} className={`net${t.netProfit!.startsWith("-")?" is-neg":""}`}/>}
        <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
-    <MonthlyTrend title="Aylık tahmini net kâr (₺)" history={v.history} month={v.month}
-      getValue={row=>row.netProfit} formatValue={money}
-      missingReason={row=>netReasonText(row.netProfitReason??"costUnknown",row.dataUntil)}/>
     <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.grossProfit} formatValue={money}
       missingReason={()=>"Maliyetler bilinmediği için brüt kâr hesaplanamadı."}/>
+    <MonthlyTrend title="Aylık tahmini net kâr (₺)" history={v.history} month={v.month}
+      getValue={row=>row.netProfit} formatValue={money}
+      missingReason={row=>netReasonText(row.netProfitReason??"costUnknown",row.dataUntil)}/>
     <MonthlyTrend title="Aylık marj (%)" history={v.history} month={v.month}
       getValue={row=>row.marginPct} formatValue={percentText}
       missingReason={row=>row.grossProfit===null
