@@ -85,6 +85,11 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
     <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.grossProfit} formatValue={money}
       missingReason={()=>"Maliyetler bilinmediği için brüt kâr hesaplanamadı."}/>
+    <MonthlyTrend title="Aylık marj (%)" history={v.history} month={v.month}
+      getValue={row=>row.marginPct} formatValue={percentText}
+      missingReason={row=>row.grossProfit===null
+        ?"Brüt kâr hesaplanamadığı için marj hesaplanamadı."
+        :"Maliyeti bilinen satış tutarı pozitif olmadığı için marj hesaplanamadı."}/>
   </div>
  </Shell>;
 }
