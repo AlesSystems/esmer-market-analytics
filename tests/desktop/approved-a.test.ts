@@ -79,10 +79,11 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     await openWorkspace(page);
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
+    const trend = page.getByRole("region", { name: "Aylık tahmini brüt kâr (₺)", exact: true });
+    await trend.getByText("Aylık değerleri göster", { exact: true }).click();
+    await expect(trend.getByRole("row", { name: /Ekim 2025/ })).toContainText("57,50 ₺");
     await trigger.click();
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
-    const history = page.getByRole("table", { name: "Aylara göre satış, brüt kâr ve marj", exact: true });
-    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("57,50 ₺");
     for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 680, height: 1000, zoom: 2 }, { width: 1440, height: 1000, zoom: 2 }]) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
