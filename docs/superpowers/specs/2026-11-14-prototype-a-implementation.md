@@ -20,6 +20,8 @@ The established financial contracts and service results remain authoritative. No
 
 Build the page from ordinary React sections in a responsive grid with `minmax(0, ...)`, intrinsic heights and full-width/split-width placement. A chart is another section with a title, context and numeric alternative; it must not require changing navigation or the core summary. Existing charts remain supported with existing service data. Keep their available labels, null/zero/loss distinctions and table alternatives. No empty chart placeholders, new chart library, widget registry, user-configurable dashboard or new metrics are needed now. Document extension points where a later chart would be added.
 
+[Issue #163](https://github.com/AlesSystems/esmer-market-analytics/issues/163) updates the monthly calculation explanation. **Nasıl hesaplandı?** shows the selected month’s covered sales, estimated cost and gross profit in three rows. The dialog explains exclusions and unavailable gross profit, and the separate net card explains the expense deduction.
+
 ## Verification
 
 The pre-agreed seam is the actual packaged desktop UI, with existing unit/integration contracts retained. Use named synthetic fixtures and independently established amounts. First expose a missing changed behavior in a focused test; retain regression coverage and replace only superseded layout/color expectations. Check month → product/source → return and expense → confirmation/net → later change, plus first use and utilities.
