@@ -65,18 +65,3 @@ export function changeArrow(pct:string|null):"up"|"down"|null {
  if(pct===null||zero(pct))return null;
  return pct.startsWith("-")?"down":"up";
 }
-
-type BridgeTotals={sales:string|null;knownCostSales:string;cost:string|null;grossProfit:string|null;unknownCostSales:string;unknownSaleAmounts:number;expenses:string|null;netProfit:string|null};
-type Step={label:string;value:string|null;kind:"total"|"minus"|"result"|"unknown";detail?:string};
-/** Satış → (maliyeti bilinmeyen satış kenara) → mal maliyeti → brüt kâr → giderler → net kâr. Service strings pass through untouched. */
-export function monthBridgeSteps(t:BridgeTotals):Step[] {
- const aside=!zero(t.unknownCostSales)||t.unknownSaleAmounts>0;
- return [
-  {label:"Satış",value:aside?t.sales:t.knownCostSales,kind:"total"},
-  ...(aside?[{label:"Maliyeti bilinmeyen satış",value:t.unknownCostSales,kind:"unknown" as const,detail:`kenara ayrıldı · kâra dahil değil${t.unknownSaleAmounts>0?" · bilinen alt toplam":""}`},{label:"Maliyeti bilinen satış",value:t.knownCostSales,kind:"total" as const}]:[]),
-  {label:"Mal maliyeti",value:t.cost,kind:"minus"},
-  {label:"Brüt kâr",value:t.grossProfit,kind:"total"},
-  t.expenses===null?{label:"Giderler",value:null,kind:"minus",detail:"eksik"}:{label:"Giderler",value:t.expenses,kind:"minus"},
-  t.netProfit===null?{label:"Net kâr",value:null,kind:"result",detail:"hesaplanamadı"}:{label:"Net kâr",value:t.netProfit,kind:"result"},
- ];
-}
