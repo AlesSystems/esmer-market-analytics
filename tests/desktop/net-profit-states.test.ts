@@ -10,7 +10,14 @@ import { writeRawEstimatePackage } from "../../src/source/raw-package";
 // Tahmini net kâr has one home, Bu ay's net card. Giderler owns the confirmation that unlocks it.
 test("net profit: absent before the confirmation on Bu ay, shown after it, withdrawn when an edit makes the confirmation stale", async () => {
   const userData = await mkdtemp(join(tmpdir(), "net-states-")), file = join(userData, "month.json");
-  await writeFile(file, writeRawEstimatePackage({ ...monthProfitSnapshot(), to: "2025-10-31" }, "fixture:net-states", "net-states"));
+  const snapshot = monthProfitSnapshot();
+  const octoberSale = snapshot.lines.find(line => line.ID === "1011")!;
+  // October has one 800 TRY sale with 10 units at 50 TRY cost, leaving 300 TRY gross profit.
+  const lines = snapshot.lines.filter(line => !String(line.FIS).startsWith("10"));
+  lines.push({ ...octoberSale, MIKTAR_FIS: "10", TOPLAM_KDV_MATRAHI: "800", BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "50" });
+  const headers = snapshot.headers.filter(header => !String(header.ID).startsWith("10") || header.ID === "101");
+  const products = snapshot.products?.filter(product => lines.some(line => line.STOK === product.ID));
+  await writeFile(file, writeRawEstimatePackage({ ...snapshot, headers, lines, products, to: "2025-10-31" }, "fixture:net-states", "net-states"));
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow(); await openWorkspace(page);
@@ -26,12 +33,12 @@ test("net profit: absent before the confirmation on Bu ay, shown after it, withd
     await expect(page.getByRole("complementary", { name: "Bu ayın net kârı" })).toHaveCount(0);
     await expect(page.getByText("Tahmini net kâr")).toHaveCount(0);
     const save = (requestId: string, category: string, net: string) => page.evaluate(({ requestId, category, net }) => window.esmer.createExpense({ action: "save", requestId, duplicateReview: null, fields: { date: "2025-10-05", paymentDate: null, category, classification: "operating-expense", net, tax: "0", gross: net, taxTreatment: "non-recoverable", taxEvidence: "synthetic-tax", supportingReference: null, sourceReference: null, labourPeriod: null, loss: null } } as never), { requestId, category, net });
-    await save("net-state-1", "Kira", "10");
+    await save("net-state-1", "Kira", "100");
     await setMonth(page, "2025-09"); await setMonth(page, "2025-10");
     // Unconfirmed: expenses are entered but Bu ay shows no net figure and leads back.
     await openSection(page, "Bu ay");
     await expect(netCard).toContainText("Bu ayın giderleri tamamlanmadı");
-    await expect(page.getByText("47,50 ₺", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("200,00 ₺", { exact: true })).toHaveCount(0);
     await netCard.getByRole("button", { name: "Giderleri gir", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Ekim 2025 giderleri", level: 1 })).toBeVisible();
     await expect(page.locator(".g-say")).toContainText("1 / 4 grupta kayıt var");
@@ -42,8 +49,8 @@ test("net profit: absent before the confirmation on Bu ay, shown after it, withd
     await expect(page.getByRole("button", { name: "Onayı kaldır", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Tahmini net kâr", level: 2 })).toBeVisible();
-    await expect(netCard.locator(".net")).toHaveText("47,50 ₺");
-    await expect(netCard).toContainText("Giderler: 10,00 ₺");
+    await expect(netCard.locator(".net")).toHaveText("200,00 ₺");
+    await expect(netCard.getByText("300,00 ₺ brüt kâr − 100,00 ₺ gider = 200,00 ₺ tahmini net kâr", { exact: true })).toBeVisible();
     // An edit after the confirmation: Giderler says the confirmation is stale, and the old net figure is gone from Bu ay.
     await openSection(page, "Giderler");
     await save("net-state-2", "Elektrik", "5");
@@ -52,7 +59,7 @@ test("net profit: absent before the confirmation on Bu ay, shown after it, withd
     await expect(page.locator(".g-say")).toContainText("Onaydan sonra giderler değişti.");
     await expect(page.getByRole("button", { name: "Onayı kaldır", exact: true })).toHaveCount(0);
     await openSection(page, "Bu ay");
-    await expect(page.getByText("47,50 ₺", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("200,00 ₺", { exact: true })).toHaveCount(0);
     await expect(netCard).toContainText("Giderler onaydan sonra değişti; yeniden onaylayın");
     // Re-confirming (two groups now have lines) and then taking the confirmation back withdraws the figure again.
     await netCard.getByRole("button", { name: "Giderleri gir", exact: true }).click();
