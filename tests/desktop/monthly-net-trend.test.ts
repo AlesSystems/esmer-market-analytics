@@ -50,7 +50,7 @@ test("monthly net chart and table follow approval, correction and withdrawal", a
   await setMonth(page, "2026-12");
   await expect(point).toContainText("8.750,00 ₺");
   await expect(point).not.toContainText("Seçili ay");
-  await expect(chart.getByRole("listitem").last()).toContainText(/Kısmi ay · 0?1\.12\.2026 – 20\.12\.2026.*Brüt kâr hesaplanamadı/);
+  await expect(chart.getByRole("listitem").last()).toContainText(/Kısmi ay · 0?1\.12\.2026 – 20\.12\.2026.*Brüt kâr için yeterli veri yok/);
   const gross = page.getByRole("region", { name: "Aylık tahmini brüt kâr (₺)", exact: true });
   await expect(gross.getByRole("listitem").last()).toContainText("Brüt kâr için yeterli veri yok");
   await showTable();
