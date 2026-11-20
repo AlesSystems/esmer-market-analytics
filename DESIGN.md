@@ -150,7 +150,7 @@ Use the existing chart components and service-provided data. Every chart must ca
 
 Chart geometry can map supplied values to pixels; it must not calculate business metrics. Keep legends and labels readable at the owner's zoom level. Wide numeric tables scroll within their section rather than widening the application. Avoid fixed chart heights imposed on surrounding text, CSS placement based on child order, and absolute positioning of content sections.
 
-No widget registry, configurable dashboard, new chart library, new source fields or speculative metric API is required. Add a chart only when its question and existing/newly approved data contract are clear. Existing six-month bars, product margin history and calculation bridge remain supported.
+No widget registry, configurable dashboard, new chart library, new source fields or speculative metric API is required. Add a chart only when its question and existing/newly approved data contract are clear. Bu ay charts estimated gross profit, estimated net profit and margin over the same one to six covered calendar months. Each chart identifies the selected month, labels partial periods with both dates and exposes its values and unavailable states in a keyboard-accessible table. Product margin history and the calculation bridge retain their own layouts.
 
 ## Accessibility and retained boundaries
 
