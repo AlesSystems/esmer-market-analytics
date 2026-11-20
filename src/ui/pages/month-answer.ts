@@ -29,7 +29,7 @@ export function netCardState(t:Pick<MonthProfitTotals,"grossProfit"|"netProfit"|
 }
 
 const reasonText:Record<NetProfitReason,string>={
- costUnknown:"Maliyetler bilinmediği için hesaplanamadı",
+ costUnknown:"Bu ayın brüt kârı hesaplanamadığı için net kâr gösterilemiyor",
  monthPartial:"Ay henüz tamamlanmadı",
  expensesMissing:"Bu ayın giderleri girilmedi",
  expensesIncomplete:"Bu ayın giderleri tamamlanmadı",

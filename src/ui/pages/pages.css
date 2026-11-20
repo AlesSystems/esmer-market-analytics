@@ -51,7 +51,7 @@
 .net-say { color: var(--ink-2); margin-bottom: 18px; text-wrap: pretty; }
 .net { font-size: var(--t-net); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 6px; color: var(--ink); overflow-wrap: anywhere; }
 .net.is-neg { color: var(--loss); }
-.net-line { color: var(--ink-2); overflow-wrap: anywhere; text-wrap: pretty; }
+.net-line { color: var(--ink-2); font-size: var(--t-sm); overflow-wrap: anywhere; text-wrap: pretty; }
 .link.link-inline { padding: 0 2px; font-size: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); }
 .link.link-inline:hover { text-decoration-color: currentColor; }
 .chart .muted { margin: -8px 0 8px; }
