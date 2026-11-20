@@ -11,7 +11,7 @@ import {date,money} from "../format";
 import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
-import {attentionRows,netCardState,netReasonText,netTrendReasonText} from "./month-answer";
+import {attentionRows,grossTrendReasonText,netCardState,netReasonText,netTrendReasonText} from "./month-answer";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
 import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthName,percentText} from "./month-summary";
 
@@ -84,10 +84,10 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
        <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
     <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.grossProfit} formatValue={money}
-      missingReason={()=>"Brüt kâr için yeterli veri yok."}/>
+      missingReason={grossTrendReasonText}/>
     <MonthlyTrend title="Aylık tahmini net kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.netProfit} formatValue={money}
-      missingReason={row=>netTrendReasonText(row.netProfitReason)}/>
+      missingReason={netTrendReasonText}/>
     <MonthlyTrend title="Aylık marj (%)" history={v.history} month={v.month}
       getValue={row=>row.marginPct} formatValue={percentText}
       missingReason={row=>row.grossProfit===null

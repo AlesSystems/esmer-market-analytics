@@ -36,9 +36,15 @@ const reasonText:Record<NetProfitReason,string>={
 /** The one sentence under "Net kâr" when no net figure exists. A part-way month also says how far the data goes. */
 export const netReasonText=(reason:NetProfitReason,dataUntil:string)=>reason==="monthPartial"?`${reasonText[reason]} (${date(dataUntil)} tarihine kadar veri)`:reasonText[reason];
 
+/** When gross profit is unavailable, a known sale amount means no sale qualified for cost coverage. */
+export function grossTrendReasonText({sales}:Pick<MonthProfitTotals,"sales">):string {
+ return sales===null?"Brüt kâr için yeterli veri yok.":"Satış maliyeti hesaplanamadı.";
+}
+
 /** Historical coverage may start partway through a month that has already ended. */
-export function netTrendReasonText(reason:NetProfitReason|null):string {
+export function netTrendReasonText(row:Pick<MonthProfitTotals,"sales"|"netProfitReason">):string {
+ const reason=row.netProfitReason;
  if(reason==="monthPartial")return "Paket ayın tamamını kapsamıyor.";
- if(reason==="costUnknown")return "Brüt kâr hesaplanamadı.";
+ if(reason==="costUnknown")return grossTrendReasonText(row);
  return reason===null?"Net kâr hesaplanamadı.":reasonText[reason];
 }
