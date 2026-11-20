@@ -68,12 +68,20 @@ test("monthly net chart and table follow approval, correction and withdrawal", a
       await expect.poll(() => chart.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
       await expect.poll(() => table.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
       await page.evaluate(() => document.fonts.ready);
-      for (const [name, target] of [["chart", chart], ["table", table]] as const) {
-        await target.scrollIntoViewIfNeeded();
+      const capture = async (name: string) => {
         const png = await app.evaluate(async ({ BrowserWindow }) =>
           (await BrowserWindow.getAllWindows()[0].webContents.capturePage()).toPNG().toString("base64"));
         await writeFile(testInfo.outputPath(`net-${name}-680-zoom${zoom}.png`), Buffer.from(png, "base64"));
-      }
+      };
+      await toggle.press("Enter");
+      await expect(table).toBeHidden();
+      await chart.evaluate(node => node.scrollIntoView({ block: "start", behavior: "instant" }));
+      await expect(chart.getByRole("heading")).toBeInViewport();
+      await capture("chart");
+      await showTable();
+      await table.evaluate(node => node.scrollIntoView({ block: "end", behavior: "instant" }));
+      await expect(table.getByRole("row").last()).toBeInViewport();
+      await capture("table");
     }
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].webContents.setZoomFactor(1));
 
