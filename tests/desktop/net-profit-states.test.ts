@@ -7,7 +7,7 @@ import { openWorkspace, openSection, importPackage, setMonth } from "../helpers/
 import { monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { writeRawEstimatePackage } from "../../src/source/raw-package";
 
-// Tahmini net kâr has one home, Bu ay's net card. Giderler owns the confirmation that unlocks it.
+// Giderler owns the confirmation that unlocks the result shown in Bu ay.
 test("net profit: absent before the confirmation on Bu ay, shown after it, withdrawn when an edit makes the confirmation stale", async () => {
   const userData = await mkdtemp(join(tmpdir(), "net-states-")), file = join(userData, "month.json");
   await writeFile(file, writeRawEstimatePackage({ ...monthProfitSnapshot(), to: "2025-10-31" }, "fixture:net-states", "net-states"));
@@ -41,7 +41,7 @@ test("net profit: absent before the confirmation on Bu ay, shown after it, withd
     await expect(page.getByText("Onaylandı", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Onayı kaldır", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Tahmini net kâr", level: 2 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tahmini net kâr", exact: true, level: 2 })).toBeVisible();
     await expect(netCard.locator(".net")).toHaveText("47,50 ₺");
     await expect(netCard).toContainText("Giderler: 10,00 ₺");
     // An edit after the confirmation: Giderler says the confirmation is stale, and the old net figure is gone from Bu ay.

@@ -20,9 +20,9 @@ test("October totals, previous month and history use literal hand-computed decim
  expect(v.totals).toEqual({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",marginPct:"13.37",costKnownPct:"86.87",unknownCostSales:"50",unknownCostProducts:1,returns:"15",unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:3,averageBasket:"160",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"monthPartial"});
  expect(v.previous).toEqual({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",marginPct:"20.00",costKnownPct:"100.00",unknownCostSales:"0",unknownCostProducts:0,returns:null,unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:2,averageBasket:"255",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
  expect(v.history).toEqual([
-  {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"},
-  {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00"},
-  {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37"},
+  {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"},
+  {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"},
+  {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37",netProfit:null,netProfitReason:"monthPartial"},
  ]);
 });
 
@@ -68,7 +68,7 @@ test("attention: literal thresholds and deterministic order (kind, then sales ra
 test("a month with no covered previous month has previous null and a one-month history",()=>{
  const v=view("2025-08");
  expect(v.previous).toBeNull();expect(v.dataFrom).toBe("2025-08-01");expect(v.dataUntil).toBe("2025-08-31");
- expect(v.history).toEqual([{month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"}]);
+ expect(v.history).toEqual([{month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00",netProfit:null,netProfitReason:"expensesMissing"}]);
  expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}],marginChangePoints:null,unitProfit:"2",profitSharePct:"100.00",profitRank:1,flags:{loss:false,lowMargin10:false,marginDrop:false,missingCost:false}}]);
  expect(v.attention).toEqual([]);
 });
@@ -81,8 +81,40 @@ test("uncovered months and non-estimate packages are explicit unavailable result
 
 const fields={paymentDate:null,category:"Kira",classification:"operating-expense",net:"20",tax:"3.6",gross:"23.6",taxTreatment:"recoverable",taxEvidence:"fatura-1",supportingReference:null,sourceReference:null,labourPeriod:null,loss:null} as const;
 const expense=(revision:number,entityId:string,value:Partial<ExpenseValue>):AppRecord=>({revision,kind:"expense",entityId,value:{...fields,date:"2025-10-05",format:"expense-v1",origin:{kind:"manual",requestId:entityId},reason:"Elle kayıt oluşturuldu",evidence:entityId,replacesRevision:null,voided:false,...value} as ExpenseValue});
-const confirm=(revision:number,reviewedRevision:number):AppRecord=>({revision,kind:"confirmation",entityId:"expense-complete:2025-10",value:{period:"2025-10",reviewedRevision,complete:true,reason:"Ay tamam",evidence:"owner-review"}});
+const confirm=(revision:number,reviewedRevision:number,period="2025-10"):AppRecord=>({revision,kind:"confirmation",entityId:`expense-complete:${period}`,value:{period,reviewedRevision,complete:true,reason:"Ay tamam",evidence:"owner-review"}});
 const rent=expense(1,"rent",{}),labour=expense(2,"labour",{category:"Personel toplamı",classification:"labour",net:"10",tax:"0",gross:"10",taxTreatment:"non-recoverable",taxEvidence:"bordro-ozet"});
+
+test("history preserves reviewed zero expenses, break-even and a loss for independent months",()=>{
+ const august=confirm(1,0,"2025-08");
+ const september=expense(2,"rent-sep",{date:"2025-09-05",net:"102",tax:"0",gross:"102"});
+ const october=expense(4,"rent-oct",{net:"60",tax:"0",gross:"60"});
+ const app=[august,september,confirm(3,2,"2025-09"),october,confirm(5,4)];
+ const history=[september,october];
+ expect(view("2025-10",{app,history},fullOctober()).history).toMatchObject([
+  {month:"2025-08",netProfit:"20",netProfitReason:null},
+  {month:"2025-09",netProfit:"0",netProfitReason:null},
+  {month:"2025-10",netProfit:"-2.5",netProfitReason:null},
+ ]);
+
+ const amended=expense(6,"rent-sep",{date:"2025-09-05",net:"110",tax:"0",gross:"110",replacesRevision:2});
+ const revised={app:[august,amended,confirm(3,2,"2025-09"),october,confirm(5,4)],history:[...history,amended]};
+ expect(view("2025-10",revised,fullOctober()).history).toMatchObject([
+  {month:"2025-08",netProfit:"20",netProfitReason:null},
+  {month:"2025-09",netProfit:null,netProfitReason:"confirmationStale"},
+  {month:"2025-10",netProfit:"-2.5",netProfitReason:null},
+ ]);
+});
+
+test("historical results preserve month-specific expense and coverage blockers",()=>{
+ const august=expense(1,"unknown-aug",{date:"2025-08-05",taxTreatment:"unknown",taxEvidence:null});
+ const september=expense(3,"blocked-sep",{date:"2025-09-05",classification:"unclassified"});
+ const expenses={app:[august,confirm(2,1,"2025-08"),september,confirm(4,3,"2025-09")],history:[august,september]};
+ expect(view("2025-10",expenses).history).toMatchObject([
+  {month:"2025-08",netProfit:null,netProfitReason:"unknownTax"},
+  {month:"2025-09",netProfit:null,netProfitReason:"expensesBlocked"},
+  {month:"2025-10",netProfit:null,netProfitReason:"monthPartial"},
+ ]);
+});
 
 test("net profit: confirmed complete month subtracts counted expenses (recoverable net, non-recoverable gross)",()=>{
  const t=view("2025-10",{app:[rent,labour,confirm(3,2)],history:[rent,labour]},fullOctober()).totals;
@@ -115,7 +147,7 @@ test("a month without any known cost has null cost, gross profit and net (costUn
  const august=expense(1,"rent-aug",{date:"2025-08-05"}),ok={app:[august,{...confirm(2,1),entityId:"expense-complete:2025-08",value:{period:"2025-08",reviewedRevision:1,complete:true,reason:"Ay tamam",evidence:"owner-review"}} as AppRecord],history:[august]};
  const v=view("2025-08",ok,parse(s));
  expect(v.totals).toMatchObject({sales:"100",knownCostSales:"0",cost:null,grossProfit:null,marginPct:null,unknownCostSales:"100",unknownCostProducts:1,expenses:"20",expensesComplete:true,netProfit:null,netProfitReason:"costUnknown"});
- expect(v.history).toMatchObject([{month:"2025-08",sales:"100",grossProfit:null,marginPct:null}]);
+ expect(v.history).toMatchObject([{month:"2025-08",sales:"100",grossProfit:null,marginPct:null,netProfit:null,netProfitReason:"costUnknown"}]);
  expect(v.categories).toEqual([{name:"Süt ürünleri",sales:"100",grossProfit:null,marginPct:null}]);
  expect(view("2025-09",none,parse(s)).history[0]).toEqual(v.history[0]);
 });

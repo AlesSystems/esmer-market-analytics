@@ -35,7 +35,7 @@ export type MonthProfitHistoryEntry={
  dataFrom:string;
  dataUntil:string;
  partial:boolean;
-}&Pick<MonthProfitTotals,"sales"|"grossProfit"|"marginPct">;
+}&Pick<MonthProfitTotals,"sales"|"grossProfit"|"marginPct"|"netProfit"|"netProfitReason">;
 export type MonthProfitView={
  version:typeof MONTH_PROFIT_VERSION;month:string;dataFrom:string;dataUntil:string;confidence:"estimate";
  source:{hash:string;extractedAt:string;from:string;to:string};
@@ -147,8 +147,8 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
  const {dataFrom,dataUntil,partial}=monthCoverage(pkg,month);
  return {status:"month-profit",view:{version:MONTH_PROFIT_VERSION,month,dataFrom,dataUntil,confidence:"estimate",source:{hash,extractedAt:pkg.snapshot.capturedAt,from:pkg.snapshot.from,to:pkg.snapshot.to},totals,previous:totalsByMonth.get(prevMonth)??null,changes:monthChanges(totals,totalsByMonth.get(prevMonth)??null,partial||monthCoverage(pkg,prevMonth).partial),
   history:window.map(m=>{
-   const {sales,grossProfit,marginPct}=totalsByMonth.get(m)!;
-   return {month:m,...monthCoverage(pkg,m),sales,grossProfit,marginPct};
+   const {sales,grossProfit,marginPct,netProfit,netProfitReason}=totalsByMonth.get(m)!;
+   return {month:m,...monthCoverage(pkg,m),sales,grossProfit,marginPct,netProfit,netProfitReason};
   }),
   products,categories:[...categories].map(([name,c])=>({name,sales:c.sales.toFixed(),grossProfit:c.gross?.toFixed()??null,marginPct:c.gross===null?null:pct(ratio(c.gross,c.known))})).sort((a,b)=>new D(b.sales).comparedTo(a.sales)||a.name.localeCompare(b.name,"tr")),attention}};
 }
