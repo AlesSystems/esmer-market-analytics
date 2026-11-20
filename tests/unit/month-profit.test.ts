@@ -50,7 +50,7 @@ test("attention: literal thresholds and deterministic order (kind, then sales ra
 test("a month with no covered previous month has previous null and a one-month history",()=>{
  const v=view("2025-08");
  expect(v.previous).toBeNull();expect(v.dataFrom).toBe("2025-08-01");expect(v.dataUntil).toBe("2025-08-31");
- expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:"20",marginPct:"20.00"}]);
+ expect(v.history).toEqual([{month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"}]);
  expect(v.products).toEqual([{id:"1",name:"Süt",category:"Süt ürünleri",unit:"adet",sales:"100",cost:"80",grossProfit:"20",marginPct:"20.00",previousMarginPct:null,unitPrice:"10",unitCost:"8",quantity:"10",history:[{month:"2025-08",marginPct:"20.00"}],marginChangePoints:null,unitProfit:"2",profitSharePct:"100.00",profitRank:1,flags:{loss:false,lowMargin10:false,marginDrop:false,missingCost:false}}]);
  expect(v.attention).toEqual([]);
 });
@@ -97,9 +97,9 @@ test("a month without any known cost has null cost, gross profit and net (costUn
  const august=expense(1,"rent-aug",{date:"2025-08-05"}),ok={app:[august,{...confirm(2,1),entityId:"expense-complete:2025-08",value:{period:"2025-08",reviewedRevision:1,complete:true,reason:"Ay tamam",evidence:"owner-review"}} as AppRecord],history:[august]};
  const v=view("2025-08",ok,parse(s));
  expect(v.totals).toMatchObject({sales:"100",knownCostSales:"0",cost:null,grossProfit:null,marginPct:null,unknownCostSales:"100",unknownCostProducts:1,expenses:"20",expensesComplete:true,netProfit:null,netProfitReason:"costUnknown"});
- expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:null,marginPct:null}]);
+ expect(v.history).toMatchObject([{month:"2025-08",sales:"100",grossProfit:null,marginPct:null}]);
  expect(v.categories).toEqual([{name:"Süt ürünleri",sales:"100",grossProfit:null,marginPct:null}]);
- expect(view("2025-09",none,parse(s)).history[0]).toEqual({month:"2025-08",sales:"100",grossProfit:null,marginPct:null});
+ expect(view("2025-09",none,parse(s)).history[0]).toEqual(v.history[0]);
 });
 
 test("unknown sale and return amounts are counted, and an all-unknown amount is null, not zero",()=>{

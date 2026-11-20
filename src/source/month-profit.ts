@@ -30,13 +30,19 @@ export type MonthProfitProduct={id:string;name:string|null;category:string|null;
 /** Percent change (2 places) or margin points (2 places, from unrounded margins). */
 export type MonthProfitChanges={salesPct:Pct;grossProfitPct:Pct;marginPoints:Pct;netProfitPct:Pct};
 export type AttentionKind="loss"|"marginDrop"|"lowMarginHighVolume"|"missingCost";
+export type MonthProfitHistoryEntry={
+ month:string;
+ dataFrom:string;
+ dataUntil:string;
+ partial:boolean;
+}&Pick<MonthProfitTotals,"sales"|"grossProfit"|"marginPct">;
 export type MonthProfitView={
  version:typeof MONTH_PROFIT_VERSION;month:string;dataFrom:string;dataUntil:string;confidence:"estimate";
  source:{hash:string;extractedAt:string;from:string;to:string};
  totals:MonthProfitTotals;previous:MonthProfitTotals|null;
  /** Against the previous month; null without a covered previous month. Each entry is null when either side is unknown or the base is not positive; the amount changes are also null when either month is only partly loaded. */
  changes:MonthProfitChanges|null;
- history:{month:string;sales:Money|null;grossProfit:Money|null;marginPct:Pct}[];
+ history:MonthProfitHistoryEntry[];
  products:MonthProfitProduct[];
  categories:{name:string;sales:Money;grossProfit:Money|null;marginPct:Pct}[];
  attention:{kind:AttentionKind;productId:string}[];
@@ -60,7 +66,11 @@ export function validMonthProfitExportRequest(value:unknown):value is MonthProfi
 const shift=(month:string,by:number)=>{const d=new Date(`${month}-01T00:00:00Z`);d.setUTCMonth(d.getUTCMonth()+by);return d.toISOString().slice(0,7);};
 const lastDay=(month:string)=>{const d=new Date(`${shift(month,1)}-01T00:00:00Z`);d.setUTCDate(0);return d.toISOString().slice(0,10);};
 const covered=(pkg:RawPackage,month:string)=>`${month}-01`<=pkg.snapshot.to&&lastDay(month)>=pkg.snapshot.from;
-const isPartial=(pkg:RawPackage,month:string)=>pkg.snapshot.from>`${month}-01`||pkg.snapshot.to<lastDay(month);
+function monthCoverage(pkg:RawPackage,month:string){
+ const first=`${month}-01`,last=lastDay(month),{from,to}=pkg.snapshot;
+ const dataFrom=from>first?from:first,dataUntil=to<last?to:last;
+ return {dataFrom,dataUntil,partial:dataFrom!==first||dataUntil!==last};
+}
 const ratio=(num:Decimal,den:Decimal)=>den.gt(0)?num.div(den).times(100):null;
 const pct=(value:Decimal|null):Pct=>value===null?null:value.toDecimalPlaces(2).toFixed(2);
 const div2=(num:Decimal,den:Decimal)=>num.div(den).toDecimalPlaces(2).toFixed();
@@ -87,7 +97,7 @@ function netProfit(month:string,grossProfit:string|null,partial:boolean,expenses
 type Product={label:ProductLabel;lines:EstimateLine[];totals:EstimateTotals};
 function monthTotals(pkg:RawPackage,estimate:SourceEstimate,products:Map<string,Product>,expenses:MonthProfitExpenses):MonthProfitTotals {
  const s=estimate.summary,sales=s.candidateSaleAmount===null?null:new D(s.candidateSaleAmount),known=new D(s.coveredSaleAmount??0),gross=s.contribution===null?null:new D(s.contribution);
- const partial=isPartial(pkg,estimate.period);
+ const {partial}=monthCoverage(pkg,estimate.period);
  const receipts=new Set(estimate.lines.filter(l=>l.saleCandidate&&l.reason!=="AMOUNT").map(l=>l.documentId)).size;
  return {sales:sales?.toFixed()??null,knownCostSales:known.toFixed(),cost:s.candidateCost,grossProfit:gross?.toFixed()??null,marginPct:gross===null?null:pct(ratio(gross,known)),costKnownPct:s.costCoveragePercent,unknownCostSales:s.uncoveredSaleAmount===null?"0":new D(s.uncoveredSaleAmount).toFixed(),unknownCostProducts:[...products.values()].filter(p=>p.lines.some(l=>l.saleCandidate&&l.reason!==null&&COST_REASONS.has(l.reason))).length,returns:s.candidateReturnAmount===null?null:new D(s.candidateReturnAmount).negated().toFixed(),unknownSaleAmounts:s.unknownSaleAmounts,unknownReturnAmounts:s.unknownReturnAmounts,receipts,averageBasket:receipts&&sales?div2(sales,new D(receipts)):null,...netProfit(estimate.period,gross?.toFixed()??null,partial,expenses)};
 }
@@ -134,7 +144,11 @@ export function buildMonthProfit(pkg:RawPackage,hash:string,month:string,expense
  ];
  const totalsByMonth=new Map(window.map(m=>[m,monthTotals(pkg,months.get(m)!.estimate,months.get(m)!.products,expenses)]));
  const totals=totalsByMonth.get(month)!;
- return {status:"month-profit",view:{version:MONTH_PROFIT_VERSION,month,dataFrom:pkg.snapshot.from>`${month}-01`?pkg.snapshot.from:`${month}-01`,dataUntil:pkg.snapshot.to<lastDay(month)?pkg.snapshot.to:lastDay(month),confidence:"estimate",source:{hash,extractedAt:pkg.snapshot.capturedAt,from:pkg.snapshot.from,to:pkg.snapshot.to},totals,previous:totalsByMonth.get(prevMonth)??null,changes:monthChanges(totals,totalsByMonth.get(prevMonth)??null,isPartial(pkg,month)||isPartial(pkg,prevMonth)),
-  history:window.map(m=>{const t=totalsByMonth.get(m)!;return {month:m,sales:t.sales,grossProfit:t.grossProfit,marginPct:t.marginPct};}),
+ const {dataFrom,dataUntil,partial}=monthCoverage(pkg,month);
+ return {status:"month-profit",view:{version:MONTH_PROFIT_VERSION,month,dataFrom,dataUntil,confidence:"estimate",source:{hash,extractedAt:pkg.snapshot.capturedAt,from:pkg.snapshot.from,to:pkg.snapshot.to},totals,previous:totalsByMonth.get(prevMonth)??null,changes:monthChanges(totals,totalsByMonth.get(prevMonth)??null,partial||monthCoverage(pkg,prevMonth).partial),
+  history:window.map(m=>{
+   const {sales,grossProfit,marginPct}=totalsByMonth.get(m)!;
+   return {month:m,...monthCoverage(pkg,m),sales,grossProfit,marginPct};
+  }),
   products,categories:[...categories].map(([name,c])=>({name,sales:c.sales.toFixed(),grossProfit:c.gross?.toFixed()??null,marginPct:c.gross===null?null:pct(ratio(c.gross,c.known))})).sort((a,b)=>new D(b.sales).comparedTo(a.sales)||a.name.localeCompare(b.name,"tr")),attention}};
 }
