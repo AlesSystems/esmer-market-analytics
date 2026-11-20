@@ -3,7 +3,7 @@ import {readRawPackage,type RawPackage} from "../../src/source/raw-package";
 import type {AppRecord} from "../../src/store/revisions";
 import type {ExpenseValue} from "../../src/expenses/contracts";
 import {buildMonthProfit,monthChanges,type MonthProfitTotals,type MonthProfitView} from "../../src/source/month-profit";
-import {monthProfitPackage,monthProfitSnapshot} from "../helpers/month-profit-fixture";
+import {monthProfitPackage,monthProfitSnapshot,monthlyTrendSnapshot} from "../helpers/month-profit-fixture";
 import {writeRawEstimatePackage} from "../../src/source/raw-package";
 import type {SqlSnapshot} from "../../src/source/sql-server";
 
@@ -23,6 +23,24 @@ test("October totals, previous month and history use literal hand-computed decim
   {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"},
   {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00"},
   {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37"},
+ ]);
+});
+
+test("history clips partial months to the package and shows at most six calendar months through the selection",()=>{
+ const snapshot=monthlyTrendSnapshot();
+ const history=view("2026-01",none,parse(snapshot)).history;
+ expect(history).toMatchObject([
+  {month:"2025-11",dataFrom:"2025-11-10",dataUntil:"2025-11-30",partial:true,sales:"100",grossProfit:"0"},
+  {month:"2025-12",dataFrom:"2025-12-01",dataUntil:"2025-12-31",partial:false,sales:"510",grossProfit:null},
+  {month:"2026-01",dataFrom:"2026-01-01",dataUntil:"2026-01-20",partial:true,sales:"480",grossProfit:"-42.5"},
+ ]);
+ const extended=parse({...snapshot,from:"2025-06-18"});
+ expect(view("2026-01",none,extended).history.map(row=>row.month)).toEqual([
+  "2025-08","2025-09","2025-10","2025-11","2025-12","2026-01",
+ ]);
+ expect(view("2025-07",none,extended).history).toMatchObject([
+  {month:"2025-06",dataFrom:"2025-06-18",dataUntil:"2025-06-30",partial:true,grossProfit:null},
+  {month:"2025-07",dataFrom:"2025-07-01",dataUntil:"2025-07-31",partial:false,grossProfit:null},
  ]);
 });
 
