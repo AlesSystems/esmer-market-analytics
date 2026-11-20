@@ -1,12 +1,7 @@
-import { createElement as h } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import {
-  bridgeLayout, compactMoney, niceTicks, toNumber,
+  compactMoney, niceTicks, toNumber,
 } from "../../src/ui/charts/geometry";
-import { Bridge } from "../../src/ui/charts/Bridge";
-
-const money = (value: string) => `${value.replace(".", ",")} ₺`;
 
 describe("compact money and numbers", () => {
   test("uses Turkish compact units and tr-TR separators", () => {
@@ -38,50 +33,5 @@ describe("compact money and numbers", () => {
     expect(wide.max).toBeGreaterThanOrEqual(7300000);
     expect(wide.ticks[0]).toBe(0);
     expect(Object.is(niceTicks(-10, 10).ticks.find((tick) => tick === 0), 0)).toBe(true);
-  });
-});
-
-describe("bridge layout", () => {
-  test("bridge floats minus steps from the running total and keeps unknown separate", () => {
-    const layout = bridgeLayout([
-      { label: "Satış", value: "1000", kind: "total" },
-      { label: "Maliyet", value: "600", kind: "minus" },
-      { label: "Katkı", value: "400", kind: "result" },
-      { label: "Bilinmeyen", value: "250", kind: "unknown" },
-      { label: "Eksik", value: null, kind: "total" },
-    ]);
-    const [total, minus, result, unknown, missing] = layout.rows;
-    expect(total).toMatchObject({ kind: "total", left: 0 });
-    expect(total.width).toBeCloseTo(100, 5);
-    expect(minus.left).toBeCloseTo(40, 5);
-    expect(minus.width).toBeCloseTo(60, 5);
-    expect(result.left).toBe(0);
-    expect(result.width).toBeCloseTo(40, 5);
-    expect(unknown.kind).toBe("unknown");
-    expect(unknown.width).toBeCloseTo(25, 5);
-    expect(missing.kind).toBe("unknown");
-    expect(missing.value).toBeNull();
-    expect(missing.width).toBeGreaterThan(0);
-  });
-});
-
-describe("rendering", () => {
-  test("Bridge renders every step with operator, value and a hatched unknown step", () => {
-    const markup = renderToStaticMarkup(h(Bridge, {
-      formatValue: money,
-      steps: [
-        { label: "Kapsanan satış", value: "1000.00", kind: "total" },
-        { label: "Maliyet adayı", value: "600.00", kind: "minus" },
-        { label: "Katkı", value: "400.00", kind: "result" },
-        { label: "Maliyeti bilinmeyen satış", value: null, kind: "unknown" },
-      ],
-    }));
-    expect(markup).toContain("Kapsanan satış");
-    expect(markup).toContain("1000,00 ₺");
-    expect(markup).toContain("600,00 ₺");
-    expect(markup).toContain("Bilinmiyor");
-    expect(markup).toContain('data-state="unknown"');
-    expect(markup).toContain("<ol");
-    expect(renderToStaticMarkup(h(Bridge, { steps: [], formatValue: money, empty: "Adım yok." }))).toContain("Adım yok.");
   });
 });

@@ -33,14 +33,15 @@ test("Bu ay opens at launch with three destinations, and an imported estimate pa
   await expect(hero(page).locator(".hero-num")).toHaveText("57,50 ₺");
   await expect(hero(page)).toContainText("Önceki ayla karşılaştırılamıyor");
   await expect(hero(page).getByText("Maliyeti bilinen her 100 ₺'lik satıştan 13 ₺ kâr kaldı.",{exact:true})).toBeVisible();
-  // One trust chip per page, and the bridge behind "Nasıl hesaplandı?".
+  // One trust chip and the selected month’s calculation.
   await expect(page.getByRole("button",{name:"Tahmini",exact:true})).toHaveCount(1);
   await page.getByRole("button",{name:"Tahmini",exact:true}).click();
   await expect(page.getByRole("dialog",{name:"Tahmini hakkında"})).toContainText("Son alış fiyatıyla tahmin");
+  await expect(page.getByRole("dialog",{name:"Tahmini hakkında"})).toContainText("İadeler kâra dahil değil");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog",{name:"Tahmini hakkında"})).toBeHidden();
   await page.getByRole("button",{name:"Nasıl hesaplandı?",exact:true}).click();
-  await expect(page.getByRole("list",{name:"Satıştan net kâra köprü"}).locator('li[data-state="unknown"]')).toHaveCount(3);
+  await expect(page.getByRole("dialog",{name:"Nasıl hesaplandı"}).getByRole("definition")).toHaveText(["430,00 ₺","− 372,50 ₺","= 57,50 ₺"]);
   await page.keyboard.press("Escape");
   // Net card: the month is not complete, so it says so and offers no expense step.
   await expect(netCard(page)).toContainText("Ay henüz tamamlanmadı (20.10.2025 tarihine kadar veri)");

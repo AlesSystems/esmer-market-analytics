@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { openStore } from "../../src/store/store";
 import { monthProfitPackage, monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { executablePath } from "../helpers/desktop-executable";
-import { openSection, openSettings, openWorkspace, settingsMenu } from "../helpers/desktop-navigation";
+import { openSection, openSettings, openWorkspace, setMonth, settingsMenu } from "../helpers/desktop-navigation";
 
 test("approved A exposes the observed period and supporting amounts before product investigation", async () => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-approved-a-"));
@@ -71,18 +71,36 @@ test("mixed known and unknown sales show a known subtotal and the missing-amount
 
 test("the calculation explanation stays readable inside wide, narrow and zoomed viewports", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-calculation-bounds-"));
+  const snapshot = monthProfitSnapshot();
+  const covered = snapshot.lines.find(line => line.ID === "1011")!;
+  const excluded = snapshot.lines.find(line => line.ID === "1012")!;
+  // 10 units at 50 ₺ cost 500 ₺. Only their 800 ₺ sale counts toward the 300 ₺ result.
+  snapshot.lines = [
+    { ...covered, TOPLAM_KDV_MATRAHI: "800", BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "50" },
+    { ...excluded, TOPLAM_KDV_MATRAHI: "200" },
+  ];
+  snapshot.products = snapshot.products!.filter(product => product.ID === covered.STOK || product.ID === excluded.STOK);
   const store = openStore(join(userData, "analytics.sqlite"));
-  try { store.importSourcePreview(monthProfitPackage()); } finally { store.close(); }
+  try { store.importSourcePreview(monthProfitPackage(snapshot)); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
     await openWorkspace(page);
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
-    await trigger.click();
+    await trigger.focus();
+    await page.keyboard.press("Enter");
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
     const history = page.getByRole("table", { name: "Aylara göre satış, brüt kâr ve marj", exact: true });
-    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("57,50 ₺");
+    await expect(page.getByRole("group", { name: "Aylık destekleyici tutarlar" })).toContainText("Satış1.000,00 ₺");
+    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("300,00 ₺");
+    await expect(explanation.getByRole("term")).toHaveText([
+      "Maliyetini hesaplayabildiğimiz satışlar",
+      "Bu satışların tahmini ürün maliyeti",
+      "Tahmini brüt kâr",
+    ]);
+    await expect(explanation.getByRole("definition")).toHaveText(["800,00 ₺", "− 500,00 ₺", "= 300,00 ₺"]);
+    await expect(explanation).toContainText("200,00 ₺’lik satışın maliyetini hesaplayamadığımız için bu satışları kâr hesabının dışında bıraktık.");
     for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 680, height: 1000, zoom: 2 }, { width: 1440, height: 1000, zoom: 2 }]) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
@@ -99,7 +117,8 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
         return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight && topPoint !== null && node.contains(topPoint);
       })).toBe(true);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
+      for (const term of await explanation.getByRole("term").all()) await expect(term).toBeInViewport({ ratio: 1 });
+      for (const value of await explanation.getByRole("definition").all()) await expect(value).toBeInViewport({ ratio: 1 });
       await page.evaluate(() => document.fonts.ready);
       const screenshot = testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`);
       if (size.zoom === 1) await page.screenshot({ path: screenshot, animations: "disabled" });
@@ -111,5 +130,44 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     await page.keyboard.press("Escape");
     await expect(explanation).toBeHidden();
     await expect(trigger).toBeFocused();
+  } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
+});
+
+test("the gross profit explanation distinguishes unavailable, zero and loss when changing months", async () => {
+  const userData = await mkdtemp(join(tmpdir(), "esmer-gross-states-"));
+  const snapshot = monthProfitSnapshot();
+  const august = snapshot.lines.find(line => line.ID === "3011")!;
+  const september = snapshot.lines.find(line => line.ID === "2011")!;
+  const october = snapshot.lines.find(line => line.ID === "1012")!;
+  snapshot.lines = [
+    { ...august, TOPLAM_KDV_MATRAHI: "80" }, // 80 ₺ sale and 10 × 8 ₺ cost
+    { ...september, TOPLAM_KDV_MATRAHI: "100" }, // 100 ₺ sale and 10 × 13.7 ₺ cost
+    { ...october, TOPLAM_KDV_MATRAHI: "200" }, // 200 ₺ excluded as the cost is missing
+    { ...october, ID: "1099", TOPLAM_KDV_MATRAHI: null },
+  ];
+  snapshot.products = snapshot.products!.filter(product => product.ID === "1" || product.ID === "2");
+  const store = openStore(join(userData, "analytics.sqlite"));
+  try { store.importSourcePreview(monthProfitPackage(snapshot)); } finally { store.close(); }
+  const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
+  try {
+    const page = await app.firstWindow();
+    await openWorkspace(page);
+    const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
+    const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
+    await trigger.click();
+    await expect(explanation).toContainText("Bu ay maliyetini hesaplayabildiğimiz satış olmadığı için brüt kâr hesaplanamadı.");
+    await expect(explanation).toContainText("200,00 ₺’lik satışın maliyetini hesaplayamadığımız için bu satışları kâr hesabının dışında bıraktık.");
+    await expect(explanation).toContainText("1 satış kaydının tutarı bilinmiyor.");
+    await expect(explanation.getByRole("definition")).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await setMonth(page, "2025-09");
+    await expect(page.getByRole("heading", { name: "Eylül 2025", level: 1 })).toBeVisible();
+    await trigger.click();
+    await expect(explanation.getByRole("definition")).toHaveText(["100,00 ₺", "− 137,00 ₺", "= -37,00 ₺"]);
+    await page.keyboard.press("Escape");
+    await setMonth(page, "2025-08");
+    await expect(page.getByRole("heading", { name: "Ağustos 2025", level: 1 })).toBeVisible();
+    await trigger.click();
+    await expect(explanation.getByRole("definition")).toHaveText(["80,00 ₺", "− 80,00 ₺", "= 0,00 ₺"]);
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });
