@@ -71,18 +71,36 @@ test("mixed known and unknown sales show a known subtotal and the missing-amount
 
 test("the calculation explanation stays readable inside wide, narrow and zoomed viewports", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "esmer-calculation-bounds-"));
+  const snapshot = monthProfitSnapshot();
+  const covered = snapshot.lines.find(line => line.ID === "1011")!;
+  const excluded = snapshot.lines.find(line => line.ID === "1012")!;
+  // 10 units at 50 ₺ cost 500 ₺. Only their 800 ₺ sale counts toward the 300 ₺ result.
+  snapshot.lines = [
+    { ...covered, TOPLAM_KDV_MATRAHI: "800", BELGE_TARIHINDEKI_SON_ALIS_FIYATI: "50" },
+    { ...excluded, TOPLAM_KDV_MATRAHI: "200" },
+  ];
+  snapshot.products = snapshot.products!.filter(product => product.ID === covered.STOK || product.ID === excluded.STOK);
   const store = openStore(join(userData, "analytics.sqlite"));
-  try { store.importSourcePreview(monthProfitPackage()); } finally { store.close(); }
+  try { store.importSourcePreview(monthProfitPackage(snapshot)); } finally { store.close(); }
   const app = await electron.launch({ executablePath, args: [`--user-data-dir=${userData}`] });
   try {
     const page = await app.firstWindow();
     await openWorkspace(page);
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
-    await trigger.click();
+    await trigger.focus();
+    await page.keyboard.press("Enter");
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
     const history = page.getByRole("table", { name: "Aylara göre satış, brüt kâr ve marj", exact: true });
-    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("57,50 ₺");
+    await expect(page.getByRole("group", { name: "Aylık destekleyici tutarlar" })).toContainText("Satış1.000,00 ₺");
+    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("300,00 ₺");
+    await expect(explanation.getByRole("term")).toHaveText([
+      "Maliyetini hesaplayabildiğimiz satışlar",
+      "Bu satışların tahmini ürün maliyeti",
+      "Tahmini brüt kâr",
+    ]);
+    await expect(explanation.getByRole("definition")).toHaveText(["800,00 ₺", "− 500,00 ₺", "= 300,00 ₺"]);
+    await expect(explanation).toContainText("200,00 ₺’lik satışın maliyetini hesaplayamadığımız için bu satışları kâr hesabının dışında bıraktık.");
     for (const size of [{ width: 1440, height: 900, zoom: 1 }, { width: 680, height: 800, zoom: 1 }, { width: 680, height: 1000, zoom: 2 }, { width: 1440, height: 1000, zoom: 2 }]) {
       await app.evaluate(({ BrowserWindow }, size) => {
         const window = BrowserWindow.getAllWindows()[0];
@@ -99,7 +117,8 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
         return bounds.left >= 0 && bounds.right <= innerWidth && bounds.top >= 0 && bounds.bottom <= innerHeight && topPoint !== null && node.contains(topPoint);
       })).toBe(true);
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await expect(explanation.getByText("57,50 ₺", { exact: true })).toBeVisible();
+      for (const term of await explanation.getByRole("term").all()) await expect(term).toBeInViewport({ ratio: 1 });
+      for (const value of await explanation.getByRole("definition").all()) await expect(value).toBeInViewport({ ratio: 1 });
       await page.evaluate(() => document.fonts.ready);
       const screenshot = testInfo.outputPath(`calculation-${size.width}-zoom${size.zoom}.png`);
       if (size.zoom === 1) await page.screenshot({ path: screenshot, animations: "disabled" });
