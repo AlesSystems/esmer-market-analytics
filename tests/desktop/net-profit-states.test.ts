@@ -8,7 +8,7 @@ import { monthProfitSnapshot } from "../helpers/month-profit-fixture";
 import { writeRawEstimatePackage } from "../../src/source/raw-package";
 import { openStore } from "../../src/store/store";
 
-// Tahmini net kâr has one home, Bu ay's net card. Giderler owns the confirmation that unlocks it.
+// Giderler owns the confirmation that unlocks the result shown in Bu ay.
 test("net profit on Bu ay follows expense confirmation and a corrected rent amount", async ({}, testInfo) => {
   const userData = await mkdtemp(join(tmpdir(), "net-states-")), file = join(userData, "month.json");
   const snapshot = monthProfitSnapshot();
@@ -50,7 +50,7 @@ test("net profit on Bu ay follows expense confirmation and a corrected rent amou
     await expect(page.getByText("Onaylandı", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Onayı kaldır", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Tahmini net kâr", level: 2 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tahmini net kâr", exact: true, level: 2 })).toBeVisible();
     await expect(netCard.getByText("200,00 ₺", { exact: true })).toBeVisible();
     const equation = netCard.getByText("300,00 ₺ brüt kâr − 100,00 ₺ gider = 200,00 ₺ tahmini net kâr", { exact: true });
     await expect(equation).toBeVisible();

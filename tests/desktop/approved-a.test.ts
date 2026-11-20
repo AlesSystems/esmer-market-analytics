@@ -88,12 +88,13 @@ test("the calculation explanation stays readable inside wide, narrow and zoomed 
     await openWorkspace(page);
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 900));
     const trigger = page.getByRole("button", { name: "Nasıl hesaplandı?", exact: true });
+    const trend = page.getByRole("region", { name: "Aylık tahmini brüt kâr (₺)", exact: true });
+    await trend.getByText("Aylık değerleri göster", { exact: true }).click();
+    await expect(trend.getByRole("row", { name: /Ekim 2025/ })).toContainText("300,00 ₺");
     await trigger.focus();
     await page.keyboard.press("Enter");
     const explanation = page.getByRole("dialog", { name: "Nasıl hesaplandı", exact: true });
-    const history = page.getByRole("table", { name: "Aylara göre satış, brüt kâr ve marj", exact: true });
     await expect(page.getByRole("group", { name: "Aylık destekleyici tutarlar" })).toContainText("Satış1.000,00 ₺");
-    await expect(history.getByRole("row").filter({ hasText: "Ekim 2025" })).toContainText("300,00 ₺");
     await expect(explanation.getByRole("term")).toHaveText([
       "Maliyetini hesaplayabildiğimiz satışlar",
       "Bu satışların tahmini ürün maliyeti",

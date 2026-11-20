@@ -57,7 +57,7 @@ test("lines in one group: the first press names the empty groups and does not co
     expect(await confirmation(page)).toBe("current");
     // The net figure lives on Bu ay: gross minus the 10 ₺ rent.
     await page.getByRole("button", { name: "Net kârı gör", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Tahmini net kâr", level: 2 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tahmini net kâr", exact: true, level: 2 })).toBeVisible();
     await expect(netCard(page)).toContainText("57,50 ₺ brüt kâr − 10,00 ₺ gider = 47,50 ₺ tahmini net kâr");
   } finally { await app.close(); await rm(userData, { recursive: true, force: true }); }
 });

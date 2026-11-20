@@ -69,6 +69,7 @@ The October 6 [business navigation simplification](2026-10-06-issue-72-simplific
 | Manual expense entry | [Plan](../superpowers/plans/2026-10-04-manual-expense-entry.md), [local packaged evidence and open Windows checks](2026-10-04-manual-expense-entry.md) |
 | Bu ay gross and net profit explanations | [Packaged scenarios and screenshots](issue-163-bu-ay.md) |
 | Monthly bills and Excel reconciliation | [Packaged Windows results and screenshots](issue-155-giderler-windows.md) |
+| Monthly gross profit, net profit and margin | [Service and packaged chart evidence](2026-11-20-monthly-charts.md) |
 | Giderler draft confirmation | [Packaged dialog checks and screenshots](2026-11-19-expense-draft-dialog.md) |
 | Synthetic SQL update tracking | [Packaged verification](live-mock-tracking.md), [disposable SQL procedure](../operations/synthetic-sql-environment.md) |
 | Recorded-source estimates | [Contract](../contracts/recorded-estimates.md), [real arithmetic and packaged evidence](../../workstreams/estimated-v1/evidence.md), [Windows continuation](../../workstreams/estimated-v1/windows-handoff.md) |

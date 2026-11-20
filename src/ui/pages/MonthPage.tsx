@@ -3,13 +3,13 @@ import type {ReactNode} from "react";
 import type {AttentionKind,MonthProfitProduct,Pct} from "../../source/month-profit";
 import type {PageProps} from "../sections";
 import {Button} from "../components/ui/button";
-import {MonthBars} from "../charts/MonthBars";
+import {MonthlyTrend} from "../charts/MonthlyTrend";
 import {AlertIcon,ArrowDownIcon,ArrowRightIcon,ArrowUpIcon,ChevronRightIcon,InfoIcon} from "../icons";
 import {date,money} from "../format";
 import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
-import {attentionRows,netCardState,netReasonText} from "./month-answer";
+import {attentionRows,grossTrendReasonText,netCardState,netReasonText,netTrendReasonText} from "./month-answer";
 import {GrossProfitExplanation} from "./GrossProfitExplanation";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
 import {changeArrow,marginLine,monthChange,monthName,percentText} from "./month-summary";
@@ -83,11 +83,17 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
        <p className="net-line">{money(net.grossProfit)} brüt kâr − {money(net.expenses)} gider = {money(net.netProfit)} tahmini net kâr</p>
        <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button>
       </section>}
-    <section className="card chart section-wide" aria-labelledby="chart-title">
-     <h2 id="chart-title">Son 6 ay brüt kâr (₺)</h2>
-     {v.history.length<6&&<p className="muted">Paket yalnız {v.history.length} ayı kapsıyor.</p>}
-     <MonthBars history={v.history} month={v.month}/>
-    </section>
+    <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
+      getValue={row=>row.grossProfit} formatValue={money}
+      missingReason={grossTrendReasonText}/>
+    <MonthlyTrend title="Aylık tahmini net kâr (₺)" history={v.history} month={v.month}
+      getValue={row=>row.netProfit} formatValue={money}
+      missingReason={netTrendReasonText}/>
+    <MonthlyTrend title="Aylık marj (%)" history={v.history} month={v.month}
+      getValue={row=>row.marginPct} formatValue={percentText}
+      missingReason={row=>row.grossProfit===null
+        ?"Brüt kâr hesaplanamadığı için marj hesaplanamadı."
+        :"Maliyeti bilinen satış tutarı pozitif olmadığı için marj hesaplanamadı."}/>
   </div>
  </Shell>;
 }

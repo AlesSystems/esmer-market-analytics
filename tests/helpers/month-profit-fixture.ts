@@ -19,3 +19,24 @@ export function monthProfitSnapshot():SqlSnapshot{
  return {...base,from:"2025-08-01",to:"2025-10-20",headers,lines,products} as SqlSnapshot;
 }
 export const monthProfitPackage=(s=monthProfitSnapshot())=>writeRawEstimatePackage(s,"fixture:month-profit","month-profit-1");
+
+/** Cross-year chart package: partial November breaks even, December has no known cost, partial January loses ₺42.50. */
+export function monthlyTrendSnapshot():SqlSnapshot {
+ const snapshot=monthProfitSnapshot();
+ const shiftedMonth:Record<string,string>={"2025-08":"2025-11","2025-09":"2025-12","2025-10":"2026-01"};
+ const december=new Set(snapshot.headers.filter(header=>header.FIS_TARIHI?.startsWith("2025-09")).map(header=>header.ID));
+ return {
+  ...snapshot,
+  from:"2025-11-10",
+  to:"2026-01-20",
+  headers:snapshot.headers.map(header=>({
+   ...header,
+   FIS_TARIHI:shiftedMonth[header.FIS_TARIHI!.slice(0,7)]+header.FIS_TARIHI!.slice(7),
+  })),
+  lines:snapshot.lines.map(line=>({
+   ...line,
+   BELGE_TARIHINDEKI_SON_ALIS_FIYATI:line.ID==="3011"?"10":line.ID==="1031"?"290":
+    december.has(line.FIS)?null:line.BELGE_TARIHINDEKI_SON_ALIS_FIYATI,
+  })),
+ };
+}

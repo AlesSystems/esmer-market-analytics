@@ -1,0 +1,58 @@
+/* Monthly estimated figures and the exact-value tables in Bu ay. */
+.monthly-trend { container-type: inline-size; }
+.card.monthly-trend h2 { margin-bottom: 4px; }
+.monthly-trend-period, .monthly-trend-legend { font-size: var(--t-sm); }
+.monthly-trend-period { margin-bottom: 12px; }
+.monthly-trend-legend { display: flex; align-items: center; gap: 8px; justify-content: end; }
+.monthly-trend-legend::before { content: ""; height: 13px; border-left: 1px dashed var(--field); }
+.monthly-trend-list { list-style: none; margin: 0; padding: 0; }
+.monthly-trend-list > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+  grid-template-areas: "month track value";
+  gap: 4px 20px;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: var(--t-sm);
+  border-top: 1px solid var(--line);
+}
+.monthly-trend-list > li[aria-current="date"] { background: var(--accent-50); }
+.monthly-trend-month { grid-area: month; overflow-wrap: anywhere; }
+.monthly-trend-current { color: var(--accent); font-weight: 700; }
+.monthly-trend-track { grid-area: track; position: relative; min-height: 18px; }
+.monthly-trend-zero { position: absolute; top: 0; bottom: 0; left: var(--trend-zero); border-left: 1px dashed var(--field); }
+.monthly-trend-bar, .monthly-trend-point {
+  position: absolute;
+  top: 50%;
+  height: 8px;
+  transform: translateY(-50%);
+  background: var(--bar);
+  border-radius: 4px;
+}
+.monthly-trend-point { min-width: 8px; transform: translate(-50%, -50%); }
+.monthly-trend-list > li[aria-current="date"] :is(.monthly-trend-bar, .monthly-trend-point) { background: var(--accent); }
+.monthly-trend-list > li .monthly-trend-bar[data-negative="true"] { background: var(--loss); }
+.monthly-trend-value, .monthly-trend-missing { grid-area: value; text-align: right; overflow-wrap: anywhere; }
+.monthly-trend-value { font-weight: 700; }
+.monthly-trend-missing { color: var(--ink-2); }
+.monthly-trend summary { display: list-item; min-height: 40px; padding-block: 9px; }
+.monthly-trend-table { table-layout: fixed; }
+.monthly-trend-table th, .monthly-trend-table td { overflow-wrap: anywhere; }
+.monthly-trend-table tbody th { background: transparent; color: var(--ink); }
+.monthly-trend-coverage { font-weight: 400; }
+.monthly-trend-table tbody tr:last-child th { border-bottom: 0; }
+.monthly-trend-table :is(th, td):last-child { text-align: right; }
+@container (max-width: 500px) {
+  .monthly-trend-list > li {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "month value" "track track";
+  }
+  .monthly-trend-list > li:has(.monthly-trend-missing) { grid-template-areas: "month month" "value value" "track track"; }
+  .monthly-trend-missing { text-align: left; }
+  .monthly-trend-table th, .monthly-trend-table td { padding-inline: 6px; }
+}
+@media (forced-colors: active) {
+  .monthly-trend-bar, .monthly-trend-point { forced-color-adjust: none; background: CanvasText; }
+  .monthly-trend-list > li[aria-current="date"] :is(.monthly-trend-bar, .monthly-trend-point) { background: Highlight; }
+  .monthly-trend-list > li .monthly-trend-bar[data-negative="true"] { background: CanvasText; }
+}

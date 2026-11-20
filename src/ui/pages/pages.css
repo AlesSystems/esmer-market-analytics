@@ -61,17 +61,10 @@
 .net-line { color: var(--ink-2); font-size: var(--t-sm); overflow-wrap: anywhere; text-wrap: pretty; }
 .link.link-inline { padding: 0 2px; font-size: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); }
 .link.link-inline:hover { text-decoration-color: currentColor; }
-.chart .muted { margin: -8px 0 8px; }
-.month-bars, .margin-line { display: block; margin-top: 4px; max-width: 100%; }
+.margin-line { display: block; margin-top: 4px; max-width: 100%; }
 .c-grid { stroke: var(--line); stroke-width: 1; }
 .c-zero { stroke: var(--field); stroke-width: 1; stroke-dasharray: 4 4; }
-.bar { fill: var(--bar); }
-.bar.is-current { fill: var(--accent); }
-.bar.is-neg { fill: var(--loss); }
-.bar.is-empty { fill: none; stroke: var(--field); stroke-dasharray: 3 3; }
-.c-val { fill: var(--ink-2); font-size: 13px; font-weight: 600; }
 .c-axis { fill: var(--ink-2); font-size: 13px; }
-.c-axis.is-cur { fill: var(--ink); font-weight: 700; }
 .c-tick { font-size: 12px; }
 .c-line { stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
 .c-dot { fill: var(--card); stroke: var(--accent); stroke-width: 2.5; }
@@ -90,8 +83,6 @@
 }
 @media (forced-colors: active) {
   .card, .state, .pop { border: 1px solid CanvasText; }
-  .bar { fill: CanvasText; }
-  .bar.is-current { fill: Highlight; }
 }
 
 /* Ürünler: ledger and drawer */
@@ -221,8 +212,6 @@ th.num .sort { flex-direction: row-reverse; }
 .observations .att-go { grid-column: 3; grid-row: 1 / 3; }
 .observations .att-i { grid-column: 1; grid-row: 1 / 3; }
 .netcard .btn { margin-top: 4px; }
-.month-layout > .chart { max-width: none; }
-.month-layout .month-bars { max-width: 680px; margin-inline: auto; }
 .products-page > .page-heading { margin-bottom: 0; }
 @media (max-width: 1160px) {
   .hero { grid-template-columns: minmax(0, 1fr); }

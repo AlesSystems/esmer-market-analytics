@@ -4,6 +4,7 @@
 @import "./shell.css";
 @import "./expenses.css";
 @import "./source-document-detail.css";
+@import "./charts/charts.css";
 @import "./pages/pages.css";
 @source "./**/*.{ts,tsx}";
 @layer components {

@@ -54,10 +54,18 @@ test("Bu ay opens at launch with three destinations, and an imported estimate pa
    "ÇayÇok satıyor ama marjı düşükSatış 200,00 ₺ · marj %5,00",
    "1 ürünün alış fiyatı yokSatışları kâra katılmadı; sıfır sayılmadı",
   ]);
-  // Six-month bars from the history: three months here, the current one highlighted.
-  const bars=page.getByRole("img",{name:"Son 6 ayın brüt kârı"});
-  await expect(bars.locator("g[data-month]")).toHaveCount(3);
-  await expect(bars.locator("g[data-month='2025-10'] .bar")).toHaveClass(/is-current/);
+  const gross=page.getByRole("region",{name:"Aylık tahmini brüt kâr (₺)"});
+  await expect(gross).toContainText("Ağustos 2025 – Ekim 2025");
+  await expect(gross.getByRole("listitem")).toHaveCount(3);
+  const october=gross.getByRole("listitem").last();
+  await expect(october).toContainText("Seçili ay");
+  await expect(october).toContainText("Kısmi ay");
+  await expect(october).toContainText("1.10.2025 – 20.10.2025");
+  await expect(october).toContainText("57,50 ₺");
+  const showValues=gross.getByText("Aylık değerleri göster",{exact:true});
+  await showValues.focus();
+  await page.keyboard.press("Enter");
+  await expect(gross.getByRole("row",{name:/Ekim 2025/})).toContainText("57,50 ₺");
   await attention(page).first().click();
   await expect(nav.getByRole("button",{name:"Ürünler",exact:true})).toHaveAttribute("aria-current","page");
   await expect(page.getByRole("dialog",{name:"Ekmek"})).toBeVisible();

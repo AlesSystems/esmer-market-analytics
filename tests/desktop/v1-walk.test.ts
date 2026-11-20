@@ -59,7 +59,7 @@ test("v1 walk: Bu ay, Ürünler, Giderler, net profit, Excel, Ayarlar",async({},
   await expect(page.getByText("Onaylandı",{exact:true})).toBeVisible();
   // Bu ay now carries the net profit (Ekim 2025 is a full month in the fixture).
   await openSection(page,"Bu ay");
-  await expect(page.getByRole("heading",{name:"Tahmini net kâr",level:2})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Tahmini net kâr",exact:true,level:2})).toBeVisible();
   const gross=lira(await page.locator(".hero-num").innerText()),net=lira(await page.locator(".netcard .net").innerText());
   expect(Number.isFinite(gross)).toBe(true);
   expect(net).toBeCloseTo(gross-1000,2);
