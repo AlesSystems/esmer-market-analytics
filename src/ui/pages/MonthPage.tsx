@@ -11,7 +11,7 @@ import {date,money} from "../format";
 import {Unknown} from "../products/figures";
 import {productName} from "../products/product-rows";
 import {useMonthProfitContext} from "./month-profit-data";
-import {attentionRows,netCardState,netReasonText} from "./month-answer";
+import {attentionRows,netCardState,netReasonText,netTrendReasonText} from "./month-answer";
 import {TrustChip,MonthUnavailable} from "./MonthStates";
 import {changeArrow,marginLine,monthBridgeSteps,monthChange,monthName,percentText} from "./month-summary";
 
@@ -49,8 +49,8 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
  const change=c===null?null:monthChange(v.month,c.grossProfitPct);
  const arrow=changeArrow(c?.grossProfitPct??null);
  const line=marginLine(t);
- const lastDay=new Date(Date.UTC(Number(v.month.slice(0,4)),Number(v.month.slice(5,7)),0)).toISOString().slice(0,10);
- const partial=v.dataFrom>`${v.month}-01`||v.dataUntil<lastDay;
+ // A successful monthly read always ends its chronological history with the selected month.
+ const partial=v.history.at(-1)!.partial;
  return <Shell title={monthName(v.month)} busy={loading} period={<><p className="period">{date(v.dataFrom)} – {date(v.dataUntil)} · {partial?"Kısmi ay":"Tam ay"}</p><p className="data-cutoff">Paketin kapsadığı son gün: {date(v.source.to)}</p></>}>
   <div className="month-layout">
     <section className="card hero section-wide" aria-label="Ayın özeti">
@@ -84,10 +84,10 @@ export function MonthPage({month,onMonth,coverage,navigate,importPackage}:PagePr
        <p className="net-line">{net.kind==="same"?"Bu ay gider yok":`Giderler: ${money(t.expenses!)}`} · <button type="button" className="link link-inline" onClick={()=>navigate("expenses")}>Düzelt</button></p></section>}
     <MonthlyTrend title="Aylık tahmini brüt kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.grossProfit} formatValue={money}
-      missingReason={()=>"Maliyetler bilinmediği için brüt kâr hesaplanamadı."}/>
+      missingReason={()=>"Brüt kâr için yeterli veri yok."}/>
     <MonthlyTrend title="Aylık tahmini net kâr (₺)" history={v.history} month={v.month}
       getValue={row=>row.netProfit} formatValue={money}
-      missingReason={row=>netReasonText(row.netProfitReason??"costUnknown",row.dataUntil)}/>
+      missingReason={row=>netTrendReasonText(row.netProfitReason)}/>
     <MonthlyTrend title="Aylık marj (%)" history={v.history} month={v.month}
       getValue={row=>row.marginPct} formatValue={percentText}
       missingReason={row=>row.grossProfit===null

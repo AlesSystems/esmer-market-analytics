@@ -35,3 +35,10 @@ const reasonText:Record<NetProfitReason,string>={
 };
 /** The one sentence under "Net kâr" when no net figure exists. A part-way month also says how far the data goes. */
 export const netReasonText=(reason:NetProfitReason,dataUntil:string)=>reason==="monthPartial"?`${reasonText[reason]} (${date(dataUntil)} tarihine kadar veri)`:reasonText[reason];
+
+/** Historical coverage may start partway through a month that has already ended. */
+export function netTrendReasonText(reason:NetProfitReason|null):string {
+ if(reason==="monthPartial")return "Paket ayın tamamını kapsamıyor.";
+ if(reason==="costUnknown")return "Brüt kâr hesaplanamadı.";
+ return reason===null?"Net kâr hesaplanamadı.":reasonText[reason];
+}

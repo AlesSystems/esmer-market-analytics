@@ -63,10 +63,14 @@ export function MonthlyTrend({ title, history, month, getValue, missingReason, f
     <details>
       <summary>Aylık değerleri göster</summary>
       <table className="monthly-trend-table" aria-labelledby={id}>
-        <thead><tr><th scope="col">Ay</th><th scope="col">Dönem kapsamı</th><th scope="col">Sonuç</th></tr></thead>
+        <thead><tr><th scope="col">Ay ve kapsam</th><th scope="col">Sonuç</th></tr></thead>
         <tbody>{rows.map(row => <tr key={row.month} aria-current={row.current ? "date" : undefined}>
-          <th scope="row">{row.name}{row.current && <small className="monthly-trend-current">Seçili ay</small>}</th>
-          <td>{row.period}<small>{row.partial ? "Kısmi ay" : "Tam ay"}</small></td>
+          <th scope="row">
+            {row.name}
+            {row.current && <small className="monthly-trend-current">Seçili ay</small>}
+            <small className="monthly-trend-coverage">{row.period}</small>
+            <small className="monthly-trend-coverage">{row.partial ? "Kısmi ay" : "Tam ay"}</small>
+          </th>
           <td>{row.text}</td>
         </tr>)}</tbody>
       </table>

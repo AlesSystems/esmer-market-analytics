@@ -57,9 +57,11 @@
 .monthly-trend-value, .monthly-trend-missing { grid-area: value; text-align: right; overflow-wrap: anywhere; }
 .monthly-trend-value { font-weight: 700; }
 .monthly-trend-missing { color: var(--ink-2); }
+.monthly-trend summary { display: list-item; min-height: 40px; padding-block: 9px; }
 .monthly-trend-table { table-layout: fixed; }
 .monthly-trend-table th, .monthly-trend-table td { overflow-wrap: anywhere; }
 .monthly-trend-table tbody th { background: transparent; color: var(--ink); }
+.monthly-trend-coverage { font-weight: 400; }
 .monthly-trend-table tbody tr:last-child th { border-bottom: 0; }
 .monthly-trend-table :is(th, td):last-child { text-align: right; }
 @container (max-width: 500px) {
@@ -67,7 +69,9 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas: "month value" "track track";
   }
-  .monthly-trend-table th, .monthly-trend-table td { padding-inline: 4px; }
+  .monthly-trend-list > li:has(.monthly-trend-missing) { grid-template-areas: "month month" "value value" "track track"; }
+  .monthly-trend-missing { text-align: left; }
+  .monthly-trend-table th, .monthly-trend-table td { padding-inline: 6px; }
 }
 @media (forced-colors: active) {
   .monthly-trend-bar, .monthly-trend-point { forced-color-adjust: none; background: CanvasText; }
