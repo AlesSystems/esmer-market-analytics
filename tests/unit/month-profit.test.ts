@@ -19,7 +19,11 @@ test("October totals, previous month and history use literal hand-computed decim
  expect(v).toMatchObject({month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",confidence:"estimate",source:{hash,extractedAt:"2026-09-26T00:00:00.000Z",from:"2025-08-01",to:"2025-10-20"}});
  expect(v.totals).toEqual({sales:"480",knownCostSales:"430",cost:"372.5",grossProfit:"57.5",marginPct:"13.37",costKnownPct:"86.87",unknownCostSales:"50",unknownCostProducts:1,returns:"15",unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:3,averageBasket:"160",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"monthPartial"});
  expect(v.previous).toEqual({sales:"510",knownCostSales:"510",cost:"408",grossProfit:"102",marginPct:"20.00",costKnownPct:"100.00",unknownCostSales:"0",unknownCostProducts:0,returns:null,unknownSaleAmounts:0,unknownReturnAmounts:0,receipts:2,averageBasket:"255",expenses:null,expensesComplete:false,netProfit:null,netProfitReason:"expensesMissing"});
- expect(v.history).toEqual([{month:"2025-08",sales:"100",grossProfit:"20",marginPct:"20.00"},{month:"2025-09",sales:"510",grossProfit:"102",marginPct:"20.00"},{month:"2025-10",sales:"480",grossProfit:"57.5",marginPct:"13.37"}]);
+ expect(v.history).toEqual([
+  {month:"2025-08",dataFrom:"2025-08-01",dataUntil:"2025-08-31",partial:false,sales:"100",grossProfit:"20",marginPct:"20.00"},
+  {month:"2025-09",dataFrom:"2025-09-01",dataUntil:"2025-09-30",partial:false,sales:"510",grossProfit:"102",marginPct:"20.00"},
+  {month:"2025-10",dataFrom:"2025-10-01",dataUntil:"2025-10-20",partial:true,sales:"480",grossProfit:"57.5",marginPct:"13.37"},
+ ]);
 });
 
 test("products: missing cost stays null, loss stays negative, unit values only over cost-known lines",()=>{
