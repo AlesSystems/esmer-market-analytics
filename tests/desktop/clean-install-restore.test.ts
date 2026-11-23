@@ -45,7 +45,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect.poll(async () => (await readdir(destination)).filter(name => name.endsWith(".esmerbackup")).length).toBeGreaterThan(0);
     await page.screenshot({path: "test-results/phase-9-recovery-1120.png", fullPage: true});
     await page.setViewportSize({width: 680, height: 720});
-    await expect(page.getByText("Esmer Market", { exact: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Esmer Market", exact: true })).toBeVisible();
     await page.screenshot({path: "test-results/phase-9-recovery-680.png", fullPage: true});
     expect((await readFile(keyPath)).length).toBeGreaterThan(50);
     await app.close();
@@ -63,7 +63,7 @@ test("packaged recovery restores a real encrypted backup after original user dat
     await expect(restored.getByText(/Veri kesim tarihi: 30\.09\.2025/)).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-1120.png", fullPage: true});
     await restored.setViewportSize({width: 680, height: 720});
-    await expect(restored.getByText("Esmer Market", { exact: true })).toBeVisible();
+    await expect(restored.getByRole("img", { name: "Esmer Market", exact: true })).toBeVisible();
     await restored.screenshot({path: "test-results/phase-9-restore-preview-680.png", fullPage: true});
     await restored.getByRole("button", {name: "Geri yüklemeyi onayla"}).click();
     await expect(restored.getByRole("navigation", {name: "Ana gezinme"}).getByRole("button", {name: "Bu ay", exact: true})).toHaveAttribute("aria-current", "page");

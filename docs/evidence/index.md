@@ -30,6 +30,8 @@ The Windows continuation is tracked in [#109](https://github.com/AlesSystems/esm
 
 ## Later implementation evidence
 
+The November 23 [branding receipt](2026-11-23-leaf-green-branding.md) records the owner-approved leaf-green palette, the bundled Esmer Market wordmark, and packaged macOS screenshots and checks.
+
 The November 14 [approved A UI receipt](2026-11-14-approved-a-ui.md) records the owner's selected visual direction, implementation in the actual application, responsive sections for future charts, packaged synthetic workflow checks and screenshots. Its verification is specific to that branch/build and does not replace the earlier Windows or owner acceptance receipts.
 
 The November 11 [Windows smoke receipt](2026-11-11-windows-v1-smoke.md) records the current native walkthrough, test-portability repairs, synthetic oracles and exact local artifact hashes. CI now retains verified executables and both inspection manifests for 14 days. No new public release or version tag is implied.

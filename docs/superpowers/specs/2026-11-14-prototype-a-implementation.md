@@ -8,6 +8,8 @@ After reviewing the first prototype, the project owner said: “Prototype A is n
 
 ## Visual and interaction contract
 
+The 2026-11-23 branding revision in [DESIGN.md](../../../DESIGN.md) supersedes the original plum palette described below and adds the official Esmer Market wordmark.
+
 Use the concrete A prototype at `23aab64`: left navigation, plum `#6c3d78`, plum wash `#f1eaf4`, slate ink `#252b39`, cool page `#f4f5f8`, white surfaces and grey rules `#e0e2e9`. Keep locally bundled Figtree, tabular amounts, generous readable spacing and quiet flat surfaces. Gain/loss/unknown states have written meaning in addition to color.
 
 The month and actual period lead the content area. A broad monthly-result section pairs Tahmini brüt kâr and its explanation with aligned Satış, Tahmini ürün maliyeti and Marj. Product observations and the expense next step follow as distinct sections. Product, expense and supporting operations retain their real existing behavior; this is not a replacement with simulated forms or fixture values. Labels may follow A while service/API contracts stay fixed.

@@ -57,7 +57,7 @@ The monthly composition leads with a broad gross-result section, aligned support
 
 ## Brand Commitments
 
-Esmer Market is the established product/store identity. Product language is Turkish. Current screen visuals are recorded in [DESIGN.md](DESIGN.md). The owner selected Prototype A on 2026-11-14: plum actions, quiet side navigation, local Figtree and flexible monthly analysis sections. This replaces the October three-top-tab visual prescription; DESIGN.md records the current direction. This product file does not replace that record or the foundation specification.
+Esmer Market is the established product/store identity. Product language is Turkish. Current screen visuals are recorded in [DESIGN.md](DESIGN.md). The workspace follows the owner-selected Prototype A layout with quiet side navigation, local Figtree and flexible monthly analysis sections. On 2026-11-23, the owner approved fresh leaf green for the app and requested the official Esmer Market wordmark in the top-left sidebar.
 
 ## Evidence on Hand
 

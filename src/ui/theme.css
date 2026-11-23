@@ -1,4 +1,4 @@
-/* The one token set. Plum is for action, selection and focus; green and red only for gain and loss; amber only for warnings. */
+/* Leaf green marks actions, selection, and focus. Gain, loss, and warnings have separate tokens. */
 @theme inline {
   --color-background: var(--card);
   --color-foreground: var(--ink);
@@ -36,14 +36,14 @@
   --ink: #252b39;
   --ink-2: #626b7b;
   --soft: #f0f1f5;
-  --hover: #f4f2f6;
+  --hover: #f2f7e9;
   --track: #e7ebf1;
   --mute: #a3abb7;
-  --accent: #6c3d78;
-  --accent-h: #563060;
-  --accent-50: #f1eaf4;
-  --accent-100: #e5d6eb;
-  --bar: #ab89b5;
+  --accent: #4b7111;
+  --accent-h: #3b5b0c;
+  --accent-50: #eaf4d7;
+  --accent-100: #dcebbd;
+  --bar: #749a28;
   --gain: #0f7b51;
   --loss: #bf2f2a;
   --loss-bg: #fdecea;
