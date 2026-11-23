@@ -61,7 +61,7 @@ Net sales include applicable line and header discounts exactly once and exclude 
 
 Decimal strings remain exact through normalization, calculation and aggregation. Retain the existing synthetic precision-100 arithmetic and half-away-from-zero final percentage rounding. No raw-source rounding convention is approved here. Bounds and arithmetic precision for a future real mapping must be proven in P02/P03. Real header reconciliation uses its evidenced rule, never a universal 0.01 tolerance.
 
-For this version, reuse the current formatter: money retains every supplied decimal digit and pads to at least two places. This keeps additive amounts exactly reconcilable without distributing an invented cent adjustment. Ratios display two places and never determine amounts. Tiny nonzero profit must not appear as zero. Quantity text retains source precision. Excel follows the same selected values, using exact text when Excel's numeric precision is insufficient. A later two-decimal money-only view would need its own explicit rounding reconciliation policy.
+Stored outputs retain every supplied decimal digit. Excel uses the same selected values, with exact text when Excel's numeric precision is insufficient. Interactive displays follow the [display precision rule](calculations.md): round each shown figure independently, so adding displayed amounts can differ from the displayed total. Reconciliation uses exact values. Displayed ratios never determine amounts.
 
 ## State matrix and exact Turkish text
 
@@ -170,7 +170,7 @@ All quantities are pieces unless stated otherwise; all prices/costs use the same
 | E06 | Sale 100, cost 100; separate case sale 100, cost 120 | First profit 0 and margin 0%; second profit -20 and margin -20%. Both coverage 100%. |
 | E07 | X sells 1.250 kg × 80 less 10% line discount, cost 50/kg; Y sells 2 pieces × 20, cost 12/piece | X net 90, cost 62.5, profit 27.5; Y 40/24/16. Month 130/86.5/43.5, margin 33.46%. Quantities 1.250 kg and 2 pieces, never 3.250 units. |
 | E08 | Two A sales at 100 each, first cost 60 and second cost 80 | A/month sales 200, cost 140, profit 60. Replacing both costs with either monthly price is wrong. |
-| E09 | Two covered product lines each net 0.015, documented zero cost | Each profit displays 0,015 ₺, total 0,030 ₺ numerically; exact sum 0.030. Do not round each to 0.02 and claim total 0.03. Trailing source digits need not be invented after aggregation. |
+| E09 | Two covered product lines each net 0.015, documented zero cost | Exact line profit 0.015 and exact sum 0.030. The UI displays 0,02 ₺ per line and 0,03 ₺ for the total calculated from exact values. |
 | E10 | One free line, net 0, documented cost 0; separate case one zero-net line cost 5 | Profits 0 and -5 respectively; margin and monetary coverage null; covered count 1 in each, no missing-cost claim. |
 | E11 | A sale +100 and evidenced return -100, costs +60/-60 | Net sales/cost/profit = 0/0/0; absolute exposure 200, coverage 100%, margin null. |
 | E12 | E01 plus a zero-net line whose cost is missing | Monetary cost coverage still 100%; excluded count 1; covered profit 100; overall scope remains covered, not whole market. |
