@@ -1,6 +1,6 @@
 ---
 name: Esmer Market
-description: The approved A workspace: quiet side navigation, a broad monthly answer, plum actions and flexible analysis sections.
+description: The approved A workspace: quiet side navigation, a broad monthly answer, leaf-green actions and flexible analysis sections.
 colors:
   page: "#f4f5f8"
   card: "#ffffff"
@@ -10,14 +10,14 @@ colors:
   edge: "#c5ccd6"
   field: "#8792a2"
   soft: "#f0f1f5"
-  hover: "#f4f2f6"
+  hover: "#f2f7e9"
   track: "#e7ebf1"
   mute: "#a3abb7"
-  accent: "#6c3d78"
-  accent-hover: "#563060"
-  accent-wash: "#f1eaf4"
-  accent-selection: "#e5d6eb"
-  chart-bar: "#ab89b5"
+  accent: "#4b7111"
+  accent-hover: "#3b5b0c"
+  accent-wash: "#eaf4d7"
+  accent-selection: "#dcebbd"
+  chart-bar: "#749a28"
   gain: "#0f7b51"
   loss: "#bf2f2a"
   loss-wash: "#fdecea"
@@ -101,7 +101,7 @@ This replaces the 2026-10-29 azure, three-top-tab visual prescription. It does n
 
 ## Composition
 
-A quiet white navigation rail anchors the store identity. The content opens with the selected month and actual period, then a broad monthly result: Tahmini brüt kâr and its explanation on the left, aligned supporting amounts on the right. Product observations and the next expense action follow. Related analysis, including existing charts, uses normal document flow below the core answer.
+The official Esmer Market wordmark sits at the top left of the white navigation rail, above the workspace subtitle. It uses the [bundled PNG](src/ui/assets/esmer-market-logo.png) and scales proportionally in the compact header. The content opens with the selected month and actual period, then a broad monthly result: Tahmini brüt kâr and its explanation on the left, aligned supporting amounts on the right. Product observations and the next expense action follow. Related analysis, including existing charts, uses normal document flow below the core answer.
 
 Keep the answer, evidence and next action distinct through alignment, spacing and type. Avoid grids of equally prominent KPI tiles. A large gross-result amount is the primary focus; supporting amounts are smaller. Product rows keep money right aligned. Preserve written explanations of loss, unknown cost, incomplete expenses and partial periods.
 
@@ -115,10 +115,11 @@ Bu ay, Ürünler and Giderler remain the three business destinations. The select
 | Surface | `#ffffff` | Rail, content sections, menus and forms |
 | Ink | `#252b39` | Headings, figures and body text |
 | Rule | `#e0e2e9` | Section, row and rail separation |
-| Plum | `#6c3d78` | Actions, selection and keyboard focus |
-| Plum wash | `#f1eaf4` | Selected navigation and rows |
+| Leaf green | `#4b7111` | Actions, selection and keyboard focus |
+| Leaf tint | `#eaf4d7` | Selected navigation and rows |
+| Chart green | `#749a28` | Standard chart bars |
 
-The exact supporting tokens live in [theme.css](src/ui/theme.css). Muted text remains readable; disabled color is never used for required information. Green/red mean gain/loss, amber means attention. A large amount is not green merely because it is important. Unknown is written as unknown and is never represented by zero.
+The exact supporting tokens live in [theme.css](src/ui/theme.css). Muted text remains readable; disabled color is never used for required information. The logo’s yellow-green hue informs the leaf palette. Standard chart bars use the brighter green. The selected period and primary buttons use the deeper accent. Gain, loss and warning states use separate tokens and written cues. Unknown is written as unknown and is never represented by zero.
 
 Use flat surfaces with quiet rules and restrained shadows. Menus and popovers may lift above the workspace. No decorative gradients, glows, perspective, 3D quantitative marks or attention-seeking animation.
 
