@@ -2,9 +2,9 @@
 
 ## Current capabilities and open gates
 
-Updated on 2026-11-11 against `main` at `7f5020cd231fa8f7a2f1427595591ede963828ec`, after [PR #137](https://github.com/AlesSystems/esmer-market-analytics/pull/137), and the [Windows 11 continuation](2026-11-11-windows-v1-smoke.md). The app version is **1.0.1**. This index distinguishes build-specific evidence from the remaining acceptance checks.
+Updated on 2026-11-23 with the [Windows 11 offline build receipt](2026-11-23-windows-11-offline-build.md). The app version is **1.0.1**. Each receipt identifies its tested build and remaining checks.
 
-The recorded main build opens Bu ay, with Ürünler and Giderler as the other tabs, Excel export in the header and Ayarlar in the gear menu. The later [approved Prototype A implementation](2026-11-14-approved-a-ui.md), on PR #153, moves these areas into a side navigation and records its own build-specific verification. It includes recorded-source profit estimates, source-document browsing, Excel and manual expense entry, Excel export and encrypted recovery. Existing synthetic financial datasets remain supported. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
+The [approved Prototype A implementation](2026-11-14-approved-a-ui.md) opens Bu ay and places it alongside Ürünler and Giderler in the side navigation. Excel export stays in the header. Ayarlar opens from the gear. The app includes recorded-source profit estimates, source-document browsing, Excel and manual expense entry, Excel export and encrypted recovery. Existing synthetic financial datasets remain supported. The optional isolated SQL connection starts disabled. Successful raw reads and unverified estimates do not activate a validated real financial dataset.
 
 [Recorded-source estimates](../contracts/recorded-estimates.md) have real arithmetic reconciliation over retained authorized September 2025 operands. The source meanings remain assumptions. Return contribution, unsupported costs and unknown amounts stay explicit. Estimates are transient and cannot become accepted financial-report versions.
 
@@ -16,17 +16,17 @@ On 2026-10-22, [#98](https://github.com/AlesSystems/esmer-market-analytics/issue
 
 ### Windows CI and remaining acceptance
 
-[Windows validation run 42807839845](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/42807839845) passed on 2026-11-10 for main `7f5020c`, app version 1.0.1. PR #137 fixed the expense helper's initial-period race after the three-tab redesign. Typecheck, lint, 185 unit tests, 302 integration tests, Windows distribution inspection and 68 packaged desktop tests passed. There were 29 integration and six desktop skips. The [11 November receipt](2026-11-11-windows-v1-smoke.md) adds local Windows 11 checks and an agent-operated native walkthrough. The former billing block and failed main run are historical.
+[Windows CI run 45170289016](https://github.com/AlesSystems/esmer-market-analytics/actions/runs/45170289016) passed for main `d2f5a30`. The [23 November receipt](2026-11-23-windows-11-offline-build.md) adds the local Windows 11 build and native portable walkthrough at 100%, 125% and 150%. The [11 November receipt](2026-11-11-windows-v1-smoke.md) retains the earlier installer lifecycle evidence.
 
 | Check | Current evidence | Remaining acceptance |
 | --- | --- | --- |
-| Windows build and automated workflows | NSIS and portable inspected; 68 packaged desktop tests passed locally. Native Windows 11 walkthrough covered import, Excel, 125% and 150% scaling, persistence and uninstall. | A07 v1 smoke passed for the recorded build and Windows 11 configuration. Windows 10 and another configuration need their own receipt. Repeat with the [Windows v1 handoff](../operations/windows-v1-handoff.md). Owner acceptance remains separate. |
+| Windows build and automated workflows | The inspected 23 November installer and portable files match their CI hashes. The portable app passed native import, Excel, display scaling and restart. | Native NSIS install and uninstall for the 23 November build require a disposable Windows account or machine. Windows 10 needs its own receipt. Follow the [Windows v1 handoff](../operations/windows-v1-handoff.md). |
 | Encrypted recovery | Packaged DPAPI/profile-loss test passed. Native dialogs created an encrypted backup and restored into an empty Windows 11 profile; source estimates, expenses, completeness and all exported worksheet values matched. | The native test used separate directories on the same disk. Independent media and a separate clean machine without the original OS credential store remain post-v1 in [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138). Follow the [restore procedure](../operations/recovery-tr.md). |
 | Performance | No current Windows full-dataset benchmark is recorded | Under #98, the two-second benchmark applies only if prepared packages exceed 100,000 rows. Current caps are 100,000 rows and 32 MiB, so this is a conditional post-v1 check, not a failed v1 benchmark. |
 | Production source and owner handoff | Restored-backup package and mock-live checks passed on Mac | Eralp's acceptance, permission for the specific production source and historical-cost column, production connection validation, and owner installation remain separately directed. L01 is outside v1. |
 | Financial meaning | Independent reconciliation supports the declared estimate formula | Verified real-source financial semantics remain post-v1. Arithmetic matches do not establish verified profit. |
 
-The Windows continuation is tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) was reopened for owner acceptance, installation direction and production permissions/validation. [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138) tracks independent Windows recovery and power-loss durability. Issue closure alone supplies no acceptance evidence or source permission.
+The Windows continuation is tracked in [#109](https://github.com/AlesSystems/esmer-market-analytics/issues/109). [#110](https://github.com/AlesSystems/esmer-market-analytics/issues/110) records the open items for owner acceptance, installation direction and production permissions and validation. [#138](https://github.com/AlesSystems/esmer-market-analytics/issues/138) tracks independent Windows recovery and power-loss durability. Issue closure alone supplies no acceptance evidence or source permission.
 
 ## Later implementation evidence
 
@@ -34,7 +34,7 @@ The November 23 [branding receipt](2026-11-23-leaf-green-branding.md) records th
 
 The November 14 [approved A UI receipt](2026-11-14-approved-a-ui.md) records the owner's selected visual direction, implementation in the actual application, responsive sections for future charts, packaged synthetic workflow checks and screenshots. Its verification is specific to that branch/build and does not replace the earlier Windows or owner acceptance receipts.
 
-The November 11 [Windows smoke receipt](2026-11-11-windows-v1-smoke.md) records the current native walkthrough, test-portability repairs, synthetic oracles and exact local artifact hashes. CI now retains verified executables and both inspection manifests for 14 days. No new public release or version tag is implied.
+The November 11 [Windows smoke receipt](2026-11-11-windows-v1-smoke.md) records the earlier native walkthrough, test-portability repairs, synthetic oracles and exact local artifact hashes. CI now retains verified executables and both inspection manifests for 14 days. No new public release or version tag is implied.
 
 The October 27 [Windows CI receipt](2026-10-27-windows-ci.md) remains the historical first successful main Windows validation after fixes #133 and #134. That older workflow retained evidence but discarded executables. The `v1.0.1` tag predates those fixes.
 
