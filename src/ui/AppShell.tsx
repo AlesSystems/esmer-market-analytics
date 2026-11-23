@@ -36,7 +36,10 @@ export function AppShell({ section, navigate, controls, menu, children }: {
   return <div className="sales-app app-shell">
     <button className="skip-workspace" onClick={() => body.current?.focus()}>İçeriğe geç</button>
     <header className="topbar"><div className="topbar-in">
-      <div className="workspace-brand"><span className="brand-mark" aria-hidden="true">e<span>.</span></span><div><strong>Esmer Market</strong><small>Aylık işletme görünümü</small></div></div>
+      <div className="workspace-brand">
+        <img src="/assets/esmer-market-logo.png" alt="Esmer Market" width={459} height={110} />
+        <small>Aylık işletme görünümü</small>
+      </div>
       {navigate && <nav className="tabs" aria-label="Ana gezinme">{sections.map(([id, label]) => <button type="button" className="tab" key={id} aria-current={!away && section === id ? "page" : undefined} onClick={() => { if (away) frame?.show("workspace", () => navigate(id)); else navigate(id); }}>{id === "month" ? <CalendarIcon/> : id === "products" ? <ProductsIcon/> : <ReceiptIcon/>}<span>{label}</span></button>)}</nav>}
       <div className="rail-tools">{menu}</div>
       <p className="rail-offline"><span aria-hidden="true"/>Çevrimdışı çalışma<small>Yerel verilerle çalışır</small></p>

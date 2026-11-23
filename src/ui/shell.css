@@ -87,11 +87,9 @@
   .menu, .toast, .panel, .btn, .month-stepper { border: 1px solid CanvasText; }
   .segmented label:has(input:checked) { border: 2px solid Highlight; }
 }
-.workspace-brand { display: flex; gap: 10px; align-items: center; margin: 0 6px 44px; }
-.workspace-brand strong { display: block; font-size: 17px; font-weight: 650; letter-spacing: -.025em; white-space: nowrap; }
-.workspace-brand small { font-size: 11px; white-space: nowrap; }
-.brand-mark { display: block; color: var(--accent); font-size: 44px; font-weight: 750; letter-spacing: -.09em; line-height: 1; padding-right: 5px; }
-.brand-mark span { color: var(--ink); }
+.workspace-brand { min-width: 0; margin: 0 6px 28px; }
+.workspace-brand img { display: block; width: 168px; max-width: 100%; height: auto; }
+.workspace-brand small { margin: 2px 0 0 6px; font-size: 11px; }
 .tab[aria-current="page"] { color: var(--accent); background: var(--accent-50); }
 .tab:hover { background: var(--hover); }
 .rail-tools { margin: 26px 5px 0; }
@@ -111,8 +109,6 @@
   .app-shell { --rail-width: 194px; }
   .topbar-in { padding-inline: 12px; }
   .workspace { padding-inline: 26px; }
-  .workspace-brand strong { font-size: 15px; }
-  .workspace-brand small { font-size: 10px; }
 }
 @media (max-width: 1040px) {
   .workspace-head { flex-wrap: wrap; }
@@ -124,9 +120,6 @@
   .topbar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .topbar-in { flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px 22px 10px; gap: 12px; }
   .workspace-brand { margin: 0; flex: 1; }
-  .workspace-brand strong { font-size: 17px; }
-  .workspace-brand small { font-size: 11px; }
-  .brand-mark { font-size: 36px; }
   .tabs { order: 3; width: 100%; flex-direction: row; height: auto; gap: 8px; }
   .tab { flex: 1; justify-content: center; padding: 10px 8px; }
   .rail-tools { margin: 0; }
