@@ -57,6 +57,7 @@ for (const source of [true]) test(`owner workspace renders ${source ? "source" :
       await openWorkspace(page);
       await openSection(page, "Bu ay");
       await page.evaluate(() => document.fonts.ready);
+      await expect(page.getByRole("img", { name: "Esmer Market", exact: true })).toBeInViewport({ ratio: 1 });
       await expect(page.locator(".workspace-content h1:visible").first()).toBeVisible();
       await expect(page.locator('[aria-busy="true"]:visible')).toHaveCount(0);
       await expect(page.getByText(/yükleniyor|hesaplanıyor/i).filter({ visible: true })).toHaveCount(0);
