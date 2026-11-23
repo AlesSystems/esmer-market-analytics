@@ -135,7 +135,9 @@ test("launch loads bundled assets without external requests or page errors", asy
     page.on("response", response => { if (response.status() >= 400) failed.push(response.url()); });
     await page.reload();
     await openWorkspace(page);
-    await expect(page.getByText("Esmer Market", { exact: true })).toBeVisible();
+    const logo = page.getByRole("img", { name: "Esmer Market", exact: true });
+    await expect(logo).toBeVisible();
+    await expect.poll(() => logo.evaluate(image => (image as HTMLImageElement).naturalWidth)).toBe(459);
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.fonts.check('16px "Figtree Variable"', "İşletme"))).toBe(true);
     for (const section of ["Ürünler", "Giderler", "Bu ay"] as const) await openSection(page, section);
