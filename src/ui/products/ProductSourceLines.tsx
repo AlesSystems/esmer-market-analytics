@@ -34,7 +34,7 @@ export function ProductSourceLines({hash,month,productId,name,onBack}:{hash:stri
    <h2 id="product-source-title" ref={heading} tabIndex={-1}>{name} · kaynak satırlar · {monthName(month)}</h2>
    <Button variant="secondary" onClick={onBack}>Ürünlere dön</Button>
   </div>
-  <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Belge toplamı KDV dahil, belgenin tamamının tutarıdır; kâr tahmini bu ürünün satır tutarlarından hesaplanır. Tutarlar kaynakta kaydedildiği gibidir; doğrulanmadı.</p>
+  <p className="product-source-note">Bu ürünü içeren kaydedilmiş satış belgeleri. Belge toplamı KDV dahil, belgenin tamamının tutarıdır; kâr tahmini bu ürünün satır tutarlarından hesaplanır. Kaynaktan alınan tutarlar iki ondalık basamakla gösterilir ve doğrulanmadı.</p>
   {error&&<div role="alert" className="state"><p>{error}</p><Button variant="secondary" onClick={()=>setAttempt(value=>value+1)}>Yeniden dene</Button></div>}
   {busy&&!view&&<p role="status">Kaynak satırları yükleniyor…</p>}
   {detail?<>
