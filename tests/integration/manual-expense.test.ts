@@ -94,14 +94,15 @@ test("receipts survive database restart and snapshot recovery validates their hi
 });
 test("Excel and manual references share identity in both directions, with conflicts blocked", async () => {
   const { workbook, row } = await import("../helpers/expense-fixtures");
+  const bytes = await workbook([row]);
   const canonical = { ...fields, category: "Kira", net: "50,00", tax: "0", gross: "50", taxTreatment: "non-recoverable" as const, taxEvidence: "tax-1", sourceReference: "ref-1", supportingReference: "bill-1" };
   for (const first of ["excel", "manual"]) {
     const store = openStore(":memory:"), service = new Expenses(store);
     try {
-      if (first === "excel") { const preview = service.preview(await workbook([row])); service.confirm({ previewId: preview.previewId, keepCandidateRows: [] }); }
+      if (first === "excel") { const preview = service.preview(bytes); service.confirm({ previewId: preview.previewId, keepCandidateRows: [] }); }
       else service.create({ action: "save", requestId: "manual-first", fields: canonical, duplicateReview: null });
       expect(service.create({ action: "save", requestId: "manual-second", fields: canonical, duplicateReview: null }).status).toBe("already-present");
-      if (first === "excel") expect(service.preview(await workbook([row]))).toMatchObject({ alreadyImported: true, errors: [], rows: [] });
+      if (first === "excel") expect(service.preview(bytes)).toMatchObject({ alreadyImported: true, errors: [], rows: [] });
       const preview = service.preview(await workbook([Array(row.length).fill(null), row]));
       expect(preview.rows[0].alreadyPresent).toBe(true);
       expect(service.create({ action: "save", requestId: "different", fields: { ...canonical, category: "Changed" }, duplicateReview: null }).status).toBe("reference-conflict");
