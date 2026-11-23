@@ -1,3 +1,5 @@
+import {decimal} from "../format";
+
 /** Display text only. Number() is used for rounding and scaling the words; no amount feeds another amount. */
 const names=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 const locative=["Ocak'ta","Şubat'ta","Mart'ta","Nisan'da","Mayıs'ta","Haziran'da","Temmuz'da","Ağustos'ta","Eylül'de","Ekim'de","Kasım'da","Aralık'ta"];
@@ -16,8 +18,7 @@ export function wordMoney(value:string):string {
 }
 /** "%13,37"; a negative value reads "-%10,00" (the sign goes before the percent mark). */
 export function percentText(value:string):string {
- const abs=value.replace(/^-/,""),[integer,fraction=""]=abs.split(".");
- return `${value.startsWith("-")?"-":""}%${integer.replace(/\B(?=(\d{3})+(?!\d))/g,".")}${fraction?`,${fraction}`:""}`;
+ return `${value.startsWith("-")?"-":""}%${decimal(value.replace(/^-/,""))}`;
 }
 const positive=(value:string)=>value.replace(/^-/,"");
 const whole=(value:string)=>format(Math.round(Number(positive(value))),0);

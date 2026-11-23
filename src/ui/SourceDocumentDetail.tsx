@@ -25,7 +25,7 @@ export function SourceDocumentDetail({document,lines}:{document:SqlRow|null;line
  function value(name:string,source:string|null){return <><span>{readable(name,source)}</span>{raw&&source!==null&&<small className="source-document-raw">{source}</small>}</>;}
  return <section className="source-document-detail" aria-label="Kaynak belge ayrıntıları">
   <h2>Kaynak belge {document?.ID}</h2>
-  <p className="source-document-note">Tutarlar kaynak para birimindedir ve doğrulanmadı. Boş değer “—”; sıfır sayılmaz. Ürün filtresi belge seçimine uygulanır; bu belgenin tüm satırları sayfalanır.</p>
+  <p className="source-document-note">Tutarlar kaynak para birimindedir ve doğrulanmadı. Sayılar en fazla iki ondalık basamakla gösterilir. Boş değer “—”; sıfır sayılmaz. Ürün filtresi belge seçimine uygulanır; bu belgenin tüm satırları sayfalanır.</p>
   <div className="source-document-summary">{groups.map(group=><section key={group.title}><h3>{group.title}</h3><dl>{group.keys.filter(key=>Object.hasOwn(document??{},key)).map(name=><div key={name}><dt>{sourceFieldLabel("header",name)}</dt><dd className={numeric(name)?"source-document-number":undefined}>{value(name,document?.[name]??null)}</dd></div>)}</dl></section>)}
   <details><summary>Veri ve hesaplama ayrıntıları</summary>
   <label className="source-document-toggle"><input type="checkbox" checked={raw} onChange={event=>setRaw(event.target.checked)}/> Tam kaynak değerlerini göster</label>
